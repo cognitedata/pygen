@@ -148,14 +148,18 @@ class MultiAPIGenerator:
                 DataClass.to_base_name_with_space_and_version,
             ],
         )
-        view_by_view_id = {view.as_id(): view for view in views}
+
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
         interfaces = {parent for view in views for parent in view.implements or []}
+        parents_by_view_id = {
+            view.as_id(): [data_class_by_view_id[interface] for interface in view.implements or []] for view in views
+        }
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
-                interfaces, data_class_by_view_id, view_by_view_id[api.view_id]
+                parents_by_view_id[api.view_id],
+                api.view_id in interfaces,
             )
 
         # All data classes have been updated, before we can create edge APIs.
