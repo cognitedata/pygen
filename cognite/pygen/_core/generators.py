@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
 from functools import total_ordering
+from graphlib import TopologicalSorter
 from pathlib import Path
 from typing import Any, Callable, Literal, cast
 
@@ -120,10 +121,23 @@ class SDKGenerator:
         )
 
 
-def to_parents_by_view_id(
-    views: Sequence[dm.View], data_class_by_view_id: dict[dm.ViewId, DataClass], interfaces: set[dm.ViewId]
-) -> dict[dm.ViewId, list[DataClass]]:
-    return {view.as_id(): [data_class_by_view_id[interface] for interface in view.implements or []] for view in views}
+def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
+    parents_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = {
+        view.as_id(): {parent for parent in view.implements or []} for view in views
+    }
+    ancestors_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
+    for view_id in TopologicalSorter(parents_by_view_id).static_order():
+        ancestors_by_view_id[view_id] = parents_by_view_id[view_id].union(
+            *(ancestors_by_view_id[parent] for parent in parents_by_view_id[view_id])
+        )
+
+    unique_parents_by_view_id: dict[dm.ViewId, list[dm.ViewId]] = {}
+    for view in views:
+        ancestors = {grand_parent for parent in view.implements or [] for grand_parent in ancestors_by_view_id[parent]}
+        unique_parents_by_view_id[view.as_id()] = [
+            parent for parent in view.implements or [] if parent not in ancestors
+        ]
+    return unique_parents_by_view_id
 
 
 class MultiAPIGenerator:
@@ -158,11 +172,11 @@ class MultiAPIGenerator:
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
         interfaces = {parent for view in views for parent in view.implements or []}
-        parents_by_view_id = to_parents_by_view_id(views, data_class_by_view_id, interfaces)
+        parents_by_view_id = to_unique_parents_by_view_id(views)
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
-                parents_by_view_id[api.view_id],
+                [data_class_by_view_id[parent] for parent in parents_by_view_id[api.view_id]],
                 api.view_id in interfaces,
             )
 
