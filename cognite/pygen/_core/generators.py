@@ -176,7 +176,12 @@ class MultiAPIGenerator:
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
-                [data_class_by_view_id[parent] for parent in parents_by_view_id[api.view_id]],
+                [
+                    parent_class
+                    for parent in parents_by_view_id[api.view_id]
+                    # If the interface is not in the data model, then, we cannot inherit from it.
+                    if (parent_class := data_class_by_view_id.get(parent))
+                ],
                 api.view_id in interfaces,
             )
 
