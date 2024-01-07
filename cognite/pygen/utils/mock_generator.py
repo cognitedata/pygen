@@ -28,6 +28,7 @@ from cognite.client.data_classes import (
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
+from cognite.client.exceptions import CogniteNotFoundError
 from typing_extensions import TypeAlias
 
 DataType: TypeAlias = typing.Union[int, float, bool, str, dict, None]
@@ -52,6 +53,7 @@ class MockGenerator:
 
     Args:
         views (List[View]): The views to generate mock data for.
+        instance_space (str): The space to use for the generated nodes and edges.
         view_configs (dict[ViewId, ViewMockConfig]): Configuration for how to generate mock data for the different
             views. The keys are the view ids, and the values are the configuration for the view.
         default_config (ViewMockConfig): Default configuration for how to generate mock data for the different
@@ -63,7 +65,7 @@ class MockGenerator:
     def __init__(
         self,
         views: typing.Sequence[dm.View],
-        instance_space: str = "sandbox",
+        instance_space: str,
         view_configs: dict[dm.ViewId, ViewMockConfig] | None = None,
         default_config: ViewMockConfig | None = None,
         data_set_id: int | None = None,
@@ -77,7 +79,9 @@ class MockGenerator:
         self.seed = seed
 
     @classmethod
-    def from_data_model(cls, data_model_id: DataModelIdentifier, client: CogniteClient) -> MockGenerator:
+    def from_data_model(
+        cls, data_model_id: DataModelIdentifier, instance_space: str, client: CogniteClient
+    ) -> MockGenerator:
         data_model = client.data_modeling.data_models.retrieve(  # type: ignore[call-overload]
             id=data_model_id,
             inline_views=True,
@@ -85,6 +89,7 @@ class MockGenerator:
 
         return cls(
             views=data_model.views,
+            instance_space=instance_space,
         )
 
     def generate_mock_data(self) -> MockData:
@@ -340,6 +345,30 @@ class ViewMockData:
 class MockData(UserList[ViewMockData]):
     """Mock data for a given data model."""
 
+    @property
+    def view_ids(self) -> list[dm.ViewId]:
+        return [view_mock_data.view_id for view_mock_data in self]
+
+    @property
+    def nodes(self) -> dm.NodeApplyList:
+        return dm.NodeApplyList([node for view_mock_data in self for node in view_mock_data.node if node])
+
+    @property
+    def edges(self) -> dm.EdgeApplyList:
+        return dm.EdgeApplyList([edge for view_mock_data in self for edge in view_mock_data.edge if edge])
+
+    @property
+    def timeseries(self) -> TimeSeriesList:
+        return TimeSeriesList([ts for view_mock_data in self for ts in view_mock_data.timeseries if ts])
+
+    @property
+    def sequences(self) -> SequenceList:
+        return SequenceList([seq for view_mock_data in self for seq in view_mock_data.sequence if seq])
+
+    @property
+    def files(self) -> FileMetadataList:
+        return FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
+
     def dump_yaml(self, folder: Path | str) -> None:
         """Dumps the mock data to a folder in yaml format.
 
@@ -352,32 +381,61 @@ class MockData(UserList[ViewMockData]):
     def deploy(self, client: CogniteClient) -> None:
         """Deploys the mock data to CDF.
 
+        This means calling the .apply() method for the instances (nodes and edges), and the .upsert() method for
+        timeseries and sequences. Files are created using the .create() method.
+
         Args:
             client (CogniteClient): The client to use for deployment.
         """
-        nodes = dm.NodeApplyList([node for view_mock_data in self for node in view_mock_data.node if node])
-        edges = dm.EdgeApplyList([edge for view_mock_data in self for edge in view_mock_data.edge if edge])
+        nodes = self.nodes
+        edges = self.edges
         if nodes or edges:
             created = client.data_modeling.instances.apply(nodes, edges)
             print(
                 f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
                 f"and {sum(1 for e in created.edges if e.was_modified)} edges"
             )
-        timeseries = TimeSeriesList([ts for view_mock_data in self for ts in view_mock_data.timeseries if ts])
-        if timeseries:
+        if timeseries := self.timeseries:
             client.time_series.upsert(timeseries)
             print(f"Created/Updated {len(timeseries)} timeseries")
-        sequences = SequenceList([seq for view_mock_data in self for seq in view_mock_data.sequence if seq])
-        if sequences:
+        if sequences := self.sequences:
             client.sequences.upsert(sequences)
             print(f"Created/Updated {len(sequences)} sequences")
-        files = FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
-        if files:
+        if files := self.files:
             existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
             new_files = FileMetadataList([file for file in files if file.external_id not in existing])
             for file in new_files:
                 client.files.create(file)
             print(f"Created {len(new_files)} files")
+
+    def clean(self, client: CogniteClient) -> None:
+        """Cleans the mock data from CDF.
+
+        This means calling the .delete() method for the instances (nodes and edges), timeseries, sequences, and files.
+
+        Args:
+            client: The client to use for cleaning.
+
+        """
+        nodes = self.nodes
+        edges = self.edges
+        if nodes or edges:
+            client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
+            print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
+        if timeseries := self.timeseries:
+            client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
+            print(f"Deleted {len(timeseries)} timeseries")
+        if sequences := self.sequences:
+            client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
+            print(f"Deleted {len(sequences)} sequences")
+        if files := self.files:
+            try:
+                client.files.delete(external_id=files.as_external_ids())
+            except CogniteNotFoundError as e:
+                not_existing = {file["externalId"] for file in e.not_found}
+                files = FileMetadataList([file for file in files if file.external_id not in not_existing])
+                client.files.delete(external_id=files.as_external_ids())
+            print(f"Deleted {len(files)} files")
 
 
 T_DataType = typing.TypeVar("T_DataType", bound=DataType)
