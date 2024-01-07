@@ -119,6 +119,6 @@ class ViewMockConfig:
     edge_count: int = 3
     allow_edge_reuse: bool = False
     properties: dict[str, Callable[[], PropertyValue]] = field(default_factory=lambda: {})
-    property_types: dict[dm.PropertyType, Callable[[], PropertyValue]] = field(
+    property_types: dict[type[dm.PropertyType], Callable[[], PropertyValue]] = field(
         default_factory=lambda: dict(DEFAULT_PROPERTY_TYPES)
     )
