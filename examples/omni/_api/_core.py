@@ -255,9 +255,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
                 aggregates.append(agg)
             elif isinstance(agg, str):
                 if agg == "count" and properties is None:
-                    # Special case for count, we just pick the first property
-                    first_prop = next(iter(properties_by_field.values()))
-                    aggregates.append(dm.aggregations.Count(first_prop))
+                    aggregates.append(dm.aggregations.Count("externalId"))
                 elif properties is None:
                     raise ValueError(f"Cannot aggregate on {agg} without specifying properties")
                 else:
