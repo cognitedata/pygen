@@ -33,3 +33,10 @@ class OmniView:
     cdf_external_references_listed: str = "CDFExternalReferencesListed"
     primitive_with_defaults: str = "PrimitiveWithDefaults"
     empty: str = "Empty"
+
+    main_interface: str = "MainInterface"
+    sub_interface: str = "SubInterface"
+    implementation1: str = "Implementation1"
+    implementation2: str = "Implementation2"
+    implementation1_non_writeable: str = "Implementation1NonWriteable"
+    dependent_on_non_writable: str = "DependentOnNonWritable"

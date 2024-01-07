@@ -31,18 +31,39 @@ def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses
     assert len(view_data.edge) == 0
 
 
-def test_generate_mock_data_multiple_views(omni_data_classes: dict[str, OmniClasses]) -> None:
-    views = [
-        omni_data_classes[name].view
-        for name in [OmniView.connection_item_a, OmniView.connection_item_b, OmniView.connection_item_c]
-    ]
+@pytest.mark.parametrize(
+    "view_external_ids",
+    [
+        pytest.param(
+            [OmniView.connection_item_a, OmniView.connection_item_b, OmniView.connection_item_c], id="Connections"
+        ),
+        pytest.param(
+            [
+                OmniView.main_interface,
+                OmniView.sub_interface,
+                OmniView.implementation1,
+                OmniView.implementation2,
+                OmniView.implementation1_non_writeable,
+                OmniView.dependent_on_non_writable,
+            ],
+            id="Inheritance",
+        ),
+    ],
+)
+def test_generate_mock_data_multiple_views(
+    omni_data_classes: dict[str, OmniClasses], view_external_ids: list[str]
+) -> None:
+    views = [omni_data_classes[name].view for name in view_external_ids]
 
     generator = MockGenerator(views)
 
     data = generator.generate_mock_data()
 
-    assert len(data) == 3
+    assert len(data) == len(views)
     for view, view_data in zip(views, data):
         assert len(view_data.node) == 5
         edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
-        assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+        if edge_type_count == 0:
+            assert len(view_data.edge) == 0
+        else:
+            assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
