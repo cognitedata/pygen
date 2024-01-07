@@ -21,7 +21,7 @@ from tests.omni_constants import OmniClasses, OmniView
 def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses], view_external_id: str) -> None:
     single_view = omni_data_classes[view_external_id].view
 
-    generator = MockGenerator([single_view])
+    generator = MockGenerator([single_view], seed=42)
 
     data = generator.generate_mock_data()
 
@@ -29,6 +29,10 @@ def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses
     view_data = data[0]
     assert len(view_data.node) == 5
     assert len(view_data.edge) == 0
+
+    data2 = generator.generate_mock_data()
+    view_data2 = data2[0]
+    assert view_data.node.dump() == view_data2.node.dump(), "Same seed should produce same data"
 
 
 @pytest.mark.parametrize(
