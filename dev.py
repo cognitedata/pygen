@@ -94,8 +94,8 @@ def download():
             file_path = example_sdk.read_model_path(data_model_id)
             latest = data_model.latest_version()
             # Sorting by to make the output deterministic
-            latest._views = sorted(latest._views, key=lambda v: v.external_id)
-            for view in latest._views:
+            latest.views = sorted(latest.views, key=lambda v: v.external_id)
+            for view in latest.views:
                 view.properties = dict(sorted(view.properties.items()))
             file_path.write_text(latest.dump_yaml())
             typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
@@ -105,7 +105,7 @@ def download():
 
             is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
             nodes = dm.NodeList([])
-            for view in latest._views:
+            for view in latest.views:
                 nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
             nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
             nodes = _remove_duplicate_nodes(nodes)
@@ -137,12 +137,12 @@ def deploy():
 
         # Views
         views = example_sdk.load_views(data_model_id)
-        existing_views = client.data_modeling._views.retrieve(views.as_ids())
+        existing_views = client.data_modeling.views.retrieve(views.as_ids())
         new, changed, unchanged = _difference(existing_views.as_apply(), views)
         is_views_changed = bool(changed or new)
         if changed:
-            client.data_modeling._views.delete(changed.as_ids())
-        new_views = client.data_modeling._views.apply(new + changed)
+            client.data_modeling.views.delete(changed.as_ids())
+        new_views = client.data_modeling.views.apply(new + changed)
         for view in new_views:
             typer.echo(f"Created view {view.external_id} in space {view.space}")
         if unchanged:
