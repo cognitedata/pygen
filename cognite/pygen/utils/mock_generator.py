@@ -71,12 +71,12 @@ class MockGenerator:
         data_set_id: int | None = None,
         seed: int | None = None,
     ):
-        self.views = dm.ViewList(views)
+        self._views = dm.ViewList(views)
         self._instance_space = instance_space
-        self.view_configs = view_configs or {}
-        self.default_config = default_config or ViewMockConfig()
-        self.data_set_id = data_set_id
-        self.seed = seed
+        self._view_configs = view_configs or {}
+        self._default_config = default_config or ViewMockConfig()
+        self._data_set_id = data_set_id
+        self._seed = seed
 
     @classmethod
     def from_data_model(
@@ -88,7 +88,7 @@ class MockGenerator:
         ).latest_version()
 
         return cls(
-            views=data_model.views,
+            views=data_model._views,
             instance_space=instance_space,
         )
 
@@ -98,10 +98,10 @@ class MockGenerator:
         Returns:
             MockData: The generated mock data.
         """
-        if self.seed:
-            random.seed(self.seed)
+        if self._seed:
+            random.seed(self._seed)
         mock_data = MockData()
-        for components in _connected_views(self.views):
+        for components in _connected_views(self._views):
             data = self._generate_views_mock_data(components)
             mock_data.extend(data)
         return mock_data
@@ -125,7 +125,7 @@ class MockGenerator:
                 node_type = dm.DirectRelationReference.load(view.filter.dump()["equals"]["value"])
 
             view_id = view.as_id()
-            config = self.view_configs.get(view_id, self.default_config)
+            config = self._view_configs.get(view_id, self._default_config)
             properties, external = self._generate_mock_values(mapped_properties, config, view.as_id())
             node_ids = config.node_id_generator(view_id, config.node_count)
 
@@ -165,7 +165,7 @@ class MockGenerator:
             if not connection_properties:
                 continue
             view_id = view.as_id()
-            config = self.view_configs.get(view_id, self.default_config)
+            config = self._view_configs.get(view_id, self._default_config)
             for node in outputs[view_id].node:
                 for name, connection in connection_properties.items():
                     if isinstance(connection, MultiEdgeConnection):
@@ -248,7 +248,7 @@ class MockGenerator:
                         TimeSeries(
                             external_id=ts,
                             name=ts,
-                            data_set_id=self.data_set_id,
+                            data_set_id=self._data_set_id,
                             is_step=False,
                             is_string=False,
                         )
@@ -268,7 +268,7 @@ class MockGenerator:
                             external_id=file,
                             name=file,
                             source=self._instance_space,
-                            data_set_id=self.data_set_id,
+                            data_set_id=self._data_set_id,
                             mime_type="text/plain",
                         )
                         for file_set in values
@@ -282,7 +282,7 @@ class MockGenerator:
                         Sequence(
                             external_id=seq,
                             name=seq,
-                            data_set_id=self.data_set_id,
+                            data_set_id=self._data_set_id,
                             columns=[SequenceColumn(external_id="value", value_type=cast(Literal["Double"], "DOUBLE"))],
                         )
                         for seq_set in values

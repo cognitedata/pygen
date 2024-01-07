@@ -53,4 +53,4 @@ def omni_client(cognite_client: CogniteClient) -> OmniClient:
 @pytest.fixture(scope="session")
 def omni_views_by_external_id(omni_client: OmniClient) -> dict[str, dm.View]:
     data_model = OMNI_SDK.load_data_model()
-    return {view.external_id: view for view in data_model.views}
+    return {view.external_id: view for view in data_model._views}

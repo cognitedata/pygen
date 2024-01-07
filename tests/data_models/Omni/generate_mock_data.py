@@ -32,15 +32,15 @@ def main():
     Faker.seed(42)
     faker = Faker()
     data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
-    interfaces = {parent for view in data_model.views for parent in view.implements or []}
+    interfaces = {parent for view in data_model._views for parent in view.implements or []}
     views = [
         view
-        for view in data_model.views
+        for view in data_model._views
         # The empty view is used for testing and should not have mock data, neither should interfaces
         if view.external_id != "Empty" and view.as_id() not in interfaces
     ]
     # Not writeable views need to be included as they might be used in connections (edges)
-    {view.as_id() for view in data_model.views if not view.writable}
+    {view.as_id() for view in data_model._views if not view.writable}
 
     for component in connected_views(views):
         mock_data = generate_mock_data(component, node_count=5, edge_count=3, faker=faker)

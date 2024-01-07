@@ -21,7 +21,7 @@ from tests.omni_constants import OmniClasses, OmniView
 def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses], view_external_id: str) -> None:
     single_view = omni_data_classes[view_external_id].view
 
-    generator = MockGenerator([single_view], seed=42)
+    generator = MockGenerator([single_view], "sandbox", seed=42)
 
     data = generator.generate_mock_data()
 
@@ -59,7 +59,7 @@ def test_generate_mock_data_multiple_views(
 ) -> None:
     views = [omni_data_classes[name].view for name in view_external_ids]
 
-    generator = MockGenerator(views)
+    generator = MockGenerator(views, "sandbox", seed=42)
 
     data = generator.generate_mock_data()
 
