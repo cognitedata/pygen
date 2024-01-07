@@ -21,7 +21,15 @@ class OmniClasses:
 
 
 class OmniView:
-    primitive_nullable: str = "PrimitiveNullable"
     connection_item_a: str = "ConnectionItemA"
     connection_item_b: str = "ConnectionItemB"
     connection_item_c: str = "ConnectionItemC"
+
+    primitive_nullable: str = "PrimitiveNullable"
+    primitive_nullable_listed: str = "PrimitiveNullableListed"
+    primitive_required: str = "PrimitiveRequired"
+    primitive_required_listed: str = "PrimitiveRequiredListed"
+    cdf_external_references: str = "CDFExternalReferences"
+    cdf_external_references_listed: str = "CDFExternalReferencesListed"
+    primitive_with_defaults: str = "PrimitiveWithDefaults"
+    empty: str = "Empty"

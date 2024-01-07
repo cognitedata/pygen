@@ -165,10 +165,9 @@ class MockGenerator:
                 for name, connection in connection_properties.items():
                     if isinstance(connection, MultiEdgeConnection):
                         sources = outputs[connection.source].node.as_ids()
-                        if config.allow_edge_reuse or len(sources) < config.max_edge_count:
-                            end_nodes = choices(sources, k=randint(0, config.max_edge_count))
-                        else:
-                            end_nodes = random.sample(sources, k=randint(0, config.max_edge_count))
+                        max_edge_count = min(config.max_edge_count, len(sources))
+                        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
+
                         for end_node in end_nodes:
                             start_node = node.as_id()
                             if connection.direction == "inwards":
@@ -476,7 +475,6 @@ class ViewMockConfig:
     Args:
         node_count (int): The number of nodes to generate.
         max_edge_count (int): The number of edges to generate.
-        allow_edge_reuse (bool): Whether to allow edges to be reused.
         null_values (float): The fraction of nullable properties that should be null.
         node_id_generator (IDGeneratorFunction): How to generate node ids.
         property_types (dict[type[dm.PropertyType], GeneratorFunction]): How to generate mock
@@ -490,7 +488,6 @@ class ViewMockConfig:
 
     node_count: int = 5
     max_edge_count: int = 3
-    allow_edge_reuse: bool = False
     null_values: float = 0.25
     node_id_generator: IDGeneratorFunction = _RandomGenerator.node_id
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(

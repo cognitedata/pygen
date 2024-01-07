@@ -1,13 +1,27 @@
+import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen.utils.mock_generator import MockGenerator
 from tests.omni_constants import OmniClasses, OmniView
 
 
-def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses]) -> None:
-    primitive_nullable = omni_data_classes[OmniView.primitive_nullable].view
+@pytest.mark.parametrize(
+    "view_external_id",
+    [
+        OmniView.primitive_nullable,
+        OmniView.primitive_nullable_listed,
+        OmniView.primitive_required,
+        OmniView.primitive_required_listed,
+        OmniView.cdf_external_references,
+        OmniView.cdf_external_references_listed,
+        OmniView.primitive_with_defaults,
+        OmniView.empty,
+    ],
+)
+def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses], view_external_id: str) -> None:
+    single_view = omni_data_classes[view_external_id].view
 
-    generator = MockGenerator([primitive_nullable])
+    generator = MockGenerator([single_view])
 
     data = generator.generate_mock_data()
 
