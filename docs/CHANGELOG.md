@@ -14,6 +14,10 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.35.0] - 07-01-24
+### Added
+* Module `cognite.pygen.utils.mock_generator` with `MockGenerator` class for generating mock data for a given data model.
+
 ## [0.34.1] - 03-01-24
 ### Fixed
 * Bug in `pygen` when generating SDKs from views which implements another view that is also implemented by that
