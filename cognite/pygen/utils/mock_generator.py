@@ -253,6 +253,7 @@ class MockGenerator:
                             if isinstance(timeseries_set, list)
                             else [cast(str, timeseries_set)]
                         )
+                        if ts
                     ]
                 )
             elif isinstance(prop.type, dm.FileReference):
@@ -267,6 +268,7 @@ class MockGenerator:
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
+                        if file
                     ]
                 )
             elif isinstance(prop.type, dm.SequenceReference):
@@ -280,6 +282,7 @@ class MockGenerator:
                         )
                         for seq_set in values
                         for seq in (cast(list[str], seq_set) if isinstance(seq_set, list) else [cast(str, seq_set)])
+                        if seq
                     ]
                 )
 
@@ -297,34 +300,51 @@ class ViewMockData:
     sequence: SequenceList = field(default_factory=lambda: SequenceList([]))
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
-    def dump_yaml(self, folder: Path) -> None:
+    def dump_yaml(self, folder: Path | str) -> None:
+        """
+        Dumps the mock data to the given folder in yaml format.
+
+        Args:
+            folder: The folder to dump the mock data to.
+        """
+        folder_path = Path(folder)
+        if not folder_path.exists():
+            folder_path.mkdir(parents=True, exist_ok=True)
         for resource_name in ["node", "edge", "timeseries", "sequence", "file"]:
             values = getattr(self, resource_name)
             if values:
-                (folder / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
+                (folder_path / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
 
     def deploy(self, client: CogniteClient) -> None:
+        """Deploys the mock data to CDF."""
         if self.node or self.edge:
-            client.data_modeling.instances.apply(self.node, self.edge)
+            created = client.data_modeling.instances.apply(self.node, self.edge)
+            print(
+                f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+            )
         if self.timeseries:
             client.time_series.upsert(self.timeseries)
+            print(f"Created/Updated {len(self.timeseries)} timeseries")
         if self.sequence:
             client.sequences.upsert(self.sequence)
+            print(f"Created/Updated {len(self.sequence)} sequences")
         if self.file:
             existing = client.files.retrieve_multiple(external_ids=self.file.as_external_ids(), ignore_unknown_ids=True)
             new_files = FileMetadataList([file for file in self.file if file.external_id not in existing])
             for file in new_files:
                 client.files.create(file)
+            print(f"Created {len(new_files)} files")
 
 
 class MockData(UserList[ViewMockData]):
     """Mock data for a given data model."""
 
-    def dump_yaml(self, folder: Path) -> None:
-        """Dumps the mock data to a folder.
+    def dump_yaml(self, folder: Path | str) -> None:
+        """Dumps the mock data to a folder in yaml format.
 
         Args:
-            folder (Path): The folder to dump the mock data to.
+            folder (Path | str): The folder to dump the mock data to.
         """
         for view_mock_data in self:
             view_mock_data.dump_yaml(folder)
@@ -338,19 +358,26 @@ class MockData(UserList[ViewMockData]):
         nodes = dm.NodeApplyList([node for view_mock_data in self for node in view_mock_data.node if node])
         edges = dm.EdgeApplyList([edge for view_mock_data in self for edge in view_mock_data.edge if edge])
         if nodes or edges:
-            client.data_modeling.instances.apply(nodes, edges)
+            created = client.data_modeling.instances.apply(nodes, edges)
+            print(
+                f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+            )
         timeseries = TimeSeriesList([ts for view_mock_data in self for ts in view_mock_data.timeseries if ts])
         if timeseries:
             client.time_series.upsert(timeseries)
+            print(f"Created/Updated {len(timeseries)} timeseries")
         sequences = SequenceList([seq for view_mock_data in self for seq in view_mock_data.sequence if seq])
         if sequences:
             client.sequences.upsert(sequences)
+            print(f"Created/Updated {len(sequences)} sequences")
         files = FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
         if files:
             existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
             new_files = FileMetadataList([file for file in files if file.external_id not in existing])
             for file in new_files:
                 client.files.create(file)
+            print(f"Created {len(new_files)} files")
 
 
 T_DataType = typing.TypeVar("T_DataType", bound=DataType)
@@ -389,7 +416,7 @@ class _RandomGenerator:
 
     @staticmethod
     def float32(count: int) -> list[float]:
-        return [uniform(-1000, 1000) for _ in range(count)]
+        return [round(uniform(-1000, 1000), 2) for _ in range(count)]
 
     @staticmethod
     def boolean(count: int) -> list[bool]:
