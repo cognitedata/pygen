@@ -32,7 +32,7 @@ def main():
     Faker.seed(42)
     faker = Faker()
     data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
-    interfaces = {parent for view in data_model._views for parent in view.implements or []}
+    interfaces = {parent for view in data_model.views for parent in view.implements or []}
     views = [
         view
         for view in data_model._views
