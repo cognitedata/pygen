@@ -162,7 +162,58 @@ class MockGenerator:
             }
             if not connection_properties:
                 continue
-            raise NotImplementedError()
+            view_id = view.as_id()
+            config = self.view_configs.get(view_id, self.default_config)
+            for node in outputs[view_id].node:
+                for name, connection in connection_properties.items():
+                    if isinstance(connection, MultiEdgeConnection):
+                        sources = outputs[connection.source].node.as_ids()
+                        if config.allow_edge_reuse or len(sources) < config.max_edge_count:
+                            end_nodes = choices(sources, k=randint(0, config.max_edge_count))
+                        else:
+                            end_nodes = random.sample(sources, k=randint(0, config.max_edge_count))
+                        for end_node in end_nodes:
+                            start_node = node.as_id()
+                            if connection.direction == "inwards":
+                                start_node, end_node = end_node, start_node
+
+                            edge = dm.EdgeApply(
+                                space=self._instance_space,
+                                external_id=f"{start_node.external_id}:{end_node.external_id}",
+                                type=connection.type,
+                                start_node=(start_node.space, start_node.external_id),
+                                end_node=(end_node.space, end_node.external_id),
+                            )
+                            outputs[view_id].edge.append(edge)
+                    elif (
+                        isinstance(connection, dm.MappedProperty)
+                        and isinstance(connection.type, dm.DirectRelation)
+                        and connection.source
+                    ):
+                        if random.random() < 0.25 and (sources := outputs[connection.source].node.as_ids()):
+                            other_node = choice(sources)
+                            if node.sources is None:
+                                node.sources = []
+                            for source in node.sources:
+                                if source.source == view_id:
+                                    if not isinstance(source.properties, dict):
+                                        source.properties = dict(source.properties) if source.properties else {}
+                                    source.properties[name] = {
+                                        "space": other_node.space,
+                                        "externalId": other_node.external_id,
+                                    }
+                                    break
+                            else:
+                                node.sources.append(
+                                    dm.NodeOrEdgeData(
+                                        source=view_id,
+                                        properties={
+                                            name: {"space": other_node.space, "externalId": other_node.external_id}
+                                        },
+                                    )
+                                )
+                    else:
+                        raise NotImplementedError(f"Connection {type(connection)} not implemented")
 
     def _generate_mock_values(
         self, properties: dict[str, dm.MappedProperty], config: ViewMockConfig, view_id: dm.ViewId
@@ -392,7 +443,7 @@ class ViewMockConfig:
 
     Args:
         node_count (int): The number of nodes to generate.
-        edge_count (int): The number of edges to generate.
+        max_edge_count (int): The number of edges to generate.
         allow_edge_reuse (bool): Whether to allow edges to be reused.
         node_id_generator (IDGeneratorFunction): How to generate node ids.
         property_types (dict[type[dm.PropertyType], GeneratorFunction]): How to generate mock
@@ -405,7 +456,7 @@ class ViewMockConfig:
     """
 
     node_count: int = 5
-    edge_count: int = 3
+    max_edge_count: int = 3
     allow_edge_reuse: bool = False
     node_id_generator: IDGeneratorFunction = _RandomGenerator.node_id
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(

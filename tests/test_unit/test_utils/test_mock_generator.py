@@ -28,7 +28,7 @@ def test_generate_mock_data_multiple_views(omni_data_classes: dict[str, OmniClas
     data = generator.generate_mock_data()
 
     assert len(data) == 3
-    for view, view_data in zip(views, views):
+    for view, view_data in zip(views, data):
         assert len(view_data.node) == 5
         edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
-        assert len(view_data.edge) == 3 * edge_type_count
+        assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
