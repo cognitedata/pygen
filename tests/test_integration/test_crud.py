@@ -53,16 +53,16 @@ class TestCRUDOperations:
     def test_create_retrieve_delete(
         self,
         view_id: dm.ViewId,
-        omni_data_classes: dict[dm.ViewId, OmniClasses],
+        omni_data_classes: dict[str, OmniClasses],
         omni_client: OmniClient,
         cognite_client: CogniteClient,
     ) -> None:
         # Arrange
         Faker.seed(42)
         faker = Faker()
-        api_name = omni_data_classes[view_id].api_name
-        write_class = omni_data_classes[view_id].write
-        view = omni_data_classes[view_id].view
+        api_name = omni_data_classes[view_id.external_id].api_name
+        write_class = omni_data_classes[view_id.external_id].write
+        view = omni_data_classes[view_id.external_id].view
         mock_nodes = generate_mock_data([view], 2, 0, faker)[0].node
         domain_nodes = [write_class.from_instance(node) for node in mock_nodes]
         external_ids = [node.external_id for node in domain_nodes]
@@ -88,8 +88,8 @@ class TestCRUDOperations:
             cognite_client.data_modeling.instances.delete(nodes=mock_nodes.as_ids())
 
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
-    def test_list(self, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses], omni_client: OmniClient):
-        api_name = omni_data_classes[view_id].api_name
+    def test_list(self, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses], omni_client: OmniClient):
+        api_name = omni_data_classes[view_id.external_id].api_name
         api: DomainAPI = getattr(omni_client, api_name)
 
         retrieved = api.list(limit=5)

@@ -17,7 +17,7 @@ def omni_data_model() -> dm.DataModel[dm.View]:
 
 
 @pytest.fixture(scope="session")
-def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[dm.ViewId, OmniClasses]:
+def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[str, OmniClasses]:
     output = {}
     available_data_classes = vars(omni_classes)
     for view in omni_data_model.views:
@@ -26,7 +26,7 @@ def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[dm.ViewId,
         api_name = to_snake(view.external_id)
         read_class = available_data_classes[read_name]
         write_class = available_data_classes.get(write_name)
-        output[view.as_id()] = OmniClasses(read_class, write_class, api_name, view)
+        output[view.external_id] = OmniClasses(read_class, write_class, api_name, view)
     return output
 
 

@@ -37,7 +37,9 @@ nav:
         - Demo: api/demo.md
         - Exceptions: api/exceptions.md
         - Utilities:
+            - Main: api/utils.md
             - CDF: api/utils_cdf.md
+            - Mock Generator: api/utils_mock_generator.md
             - Text: api/utils_text.md
             - ExternalID Factories: api/utils_external_id_factory.md
     - Changelog: CHANGELOG.md

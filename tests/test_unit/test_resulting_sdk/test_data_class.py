@@ -39,10 +39,8 @@ def omni_nodes_with_view():
 
 class TestToFromInstances:
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
-    def test_from_to_instances(
-        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses]
-    ):
-        read_cls = omni_data_classes[view_id].read
+    def test_from_to_instances(self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses]):
+        read_cls = omni_data_classes[view_id.external_id].read
 
         domain_node = read_cls.from_instance(node)
         domain_apply_node = domain_node.as_apply()
@@ -59,20 +57,18 @@ class TestToFromInstances:
         assert node_apply.dump() == resources.nodes[0].dump()
 
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
-    def test_writeable_to_instances(
-        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses]
-    ):
-        view = omni_data_classes[view_id].view
+    def test_writeable_to_instances(self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses]):
+        view = omni_data_classes[view_id.external_id].view
         if any(prop for prop in view.properties.values() if isinstance(prop, dm.MappedProperty) and prop.default_value):
             # Mapped properties with default values will not return the same node
             # This is intentional, as write note should give hints to the user
             return
 
-        if omni_data_classes[view_id].write is not None:
+        if omni_data_classes[view_id.external_id].write is not None:
             # If there is no write class, then there is nothing to test
             return
 
-        read_cls = omni_data_classes[view_id].write
+        read_cls = omni_data_classes[view_id.external_id].write
         node_apply = node.as_apply(None, None)
         # Bug in SDK that skips the type
         node_apply.type = node.type
