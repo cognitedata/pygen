@@ -224,8 +224,6 @@ class MockGenerator:
                 generator = config.properties[name]
             elif type(prop.type) in config.property_types:
                 generator = config.property_types[type(prop.type)]
-            elif type(prop.type) in DEFAULT_PROPERTY_TYPES:
-                generator = DEFAULT_PROPERTY_TYPES[type(prop.type)]
             else:
                 raise ValueError(f"Could not generate mock data for property {name} of type {type(prop.type)}")
 
