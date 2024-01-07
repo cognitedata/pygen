@@ -24,7 +24,7 @@ else:
 
 
 def omni_independent_view_ids() -> list[ParameterSet]:
-    for connected in connected_views(OMNI_SDK.load_data_model()._views):
+    for connected in connected_views(OMNI_SDK.load_data_model().views):
         if len(connected) != 1:
             continue
         view = connected[0]

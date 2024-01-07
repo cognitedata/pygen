@@ -18,6 +18,10 @@ Changes are grouped as follows
 ### Added
 * Module `cognite.pygen.utils.mock_generator` with `MockGenerator` class for generating mock data for a given data model.
 
+### Fixed
+* When calling `.aggregate("count")` on the generated SDK, the first property was chose, which can be nullable and thus
+  give an incorrect count. This is now fixed by instead choosing `externalId` as the property to count.
+
 ## [0.34.1] - 03-01-24
 ### Fixed
 * Bug in `pygen` when generating SDKs from views which implements another view that is also implemented by that
