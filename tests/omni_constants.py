@@ -18,3 +18,10 @@ class OmniClasses:
     write: type[DomainModelApply] | None
     api_name: str
     view: dm.View
+
+
+class OmniView:
+    primitive_nullable: str = "PrimitiveNullable"
+    connection_item_a: str = "ConnectionItemA"
+    connection_item_b: str = "ConnectionItemB"
+    connection_item_c: str = "ConnectionItemC"
