@@ -646,7 +646,7 @@ def clean_model(client: CogniteClient, model_id: DataModelIdentifier, remove_spa
 def clean_space(client: CogniteClient, space: str) -> None:
     """Deletes all data in a space.
 
-    This means all nodes, edges, views, containers, and data models.
+    This means all nodes, edges, views, containers, and data models located in the space.
 
     Args:
         client: Connected CogniteClient
