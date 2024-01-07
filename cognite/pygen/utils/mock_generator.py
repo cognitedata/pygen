@@ -30,22 +30,19 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from typing_extensions import TypeAlias
 
-DataType: TypeAlias = typing.Union[int, float, bool, str, dict, datetime, date]
+DataType: TypeAlias = typing.Union[int, float, bool, str, dict, None]
 ListAbleDataType: TypeAlias = typing.Union[
     int,
     float,
     bool,
     str,
     dict,
-    datetime,
-    date,
     list[int],
     list[float],
     list[bool],
     list[str],
     list[dict],
-    list[datetime],
-    list[date],
+    None,
 ]
 
 
@@ -190,7 +187,9 @@ class MockGenerator:
                         and isinstance(connection.type, dm.DirectRelation)
                         and connection.source
                     ):
-                        if random.random() < 0.25 and (sources := outputs[connection.source].node.as_ids()):
+                        if (not connection.nullable or random.random() < (1 - config.null_values)) and (
+                            sources := outputs[connection.source].node.as_ids()
+                        ):
                             other_node = choice(sources)
                             if node.sources is None:
                                 node.sources = []
@@ -231,10 +230,15 @@ class MockGenerator:
             else:
                 raise ValueError(f"Could not generate mock data for property {name} of type {type(prop.type)}")
 
+            null_values = int(prop.nullable and config.node_count * config.null_values)
+            node_count = config.node_count - null_values
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
-                values = [generator(random.randint(0, 5)) for _ in range(config.node_count)]
+                values = [generator(random.randint(0, 5)) for _ in range(node_count)] + [None] * null_values
             else:
-                values = generator(config.node_count)
+                values = generator(config.node_count - null_values) + [None] * null_values
+            if null_values and isinstance(values, list):
+                random.shuffle(values)
+
             output[name] = values
             if isinstance(prop.type, dm.TimeSeriesReference):
                 external.timeseries.extend(
@@ -296,23 +300,37 @@ class ViewMockData:
     sequence: SequenceList = field(default_factory=lambda: SequenceList([]))
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
-    def dump_to_folder(self) -> None:
-        ...
+    def dump_yaml(self, folder: Path) -> None:
+        for resource_name in ["node", "edge", "timeseries", "sequence", "file"]:
+            values = getattr(self, resource_name)
+            if values:
+                (folder / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
 
     def deploy(self, client: CogniteClient) -> None:
-        ...
+        if self.node or self.edge:
+            client.data_modeling.instances.apply(self.node, self.edge)
+        if self.timeseries:
+            client.time_series.upsert(self.timeseries)
+        if self.sequence:
+            client.sequences.upsert(self.sequence)
+        if self.file:
+            existing = client.files.retrieve_multiple(external_ids=self.file.as_external_ids(), ignore_unknown_ids=True)
+            new_files = FileMetadataList([file for file in self.file if file.external_id not in existing])
+            for file in new_files:
+                client.files.create(file)
 
 
 class MockData(UserList[ViewMockData]):
     """Mock data for a given data model."""
 
-    def dump_to_folder(self, folder: Path) -> None:
+    def dump_yaml(self, folder: Path) -> None:
         """Dumps the mock data to a folder.
 
         Args:
             folder (Path): The folder to dump the mock data to.
         """
-        raise NotImplementedError
+        for view_mock_data in self:
+            view_mock_data.dump_yaml(folder)
 
     def deploy(self, client: CogniteClient) -> None:
         """Deploys the mock data to CDF.
@@ -320,8 +338,22 @@ class MockData(UserList[ViewMockData]):
         Args:
             client (CogniteClient): The client to use for deployment.
         """
-        for view_mock_data in self:
-            view_mock_data.deploy(client)
+        nodes = dm.NodeApplyList([node for view_mock_data in self for node in view_mock_data.node if node])
+        edges = dm.EdgeApplyList([edge for view_mock_data in self for edge in view_mock_data.edge if edge])
+        if nodes or edges:
+            client.data_modeling.instances.apply(nodes, edges)
+        timeseries = TimeSeriesList([ts for view_mock_data in self for ts in view_mock_data.timeseries if ts])
+        if timeseries:
+            client.time_series.upsert(timeseries)
+        sequences = SequenceList([seq for view_mock_data in self for seq in view_mock_data.sequence if seq])
+        if sequences:
+            client.sequences.upsert(sequences)
+        files = FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
+        if files:
+            existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
+            new_files = FileMetadataList([file for file in files if file.external_id not in existing])
+            for file in new_files:
+                client.files.create(file)
 
 
 T_DataType = typing.TypeVar("T_DataType", bound=DataType)
@@ -367,14 +399,14 @@ class _RandomGenerator:
         return [choice([True, False]) for _ in range(count)]
 
     @staticmethod
-    def timestamp(count: int) -> list[datetime]:
+    def timestamp(count: int) -> list[str]:
         # 1970 - 2050
-        return [datetime.fromtimestamp(randint(0, 2556057600)) for _ in range(count)]
+        return [datetime.fromtimestamp(randint(0, 2556057600)).isoformat(timespec="milliseconds") for _ in range(count)]
 
     @staticmethod
-    def date(count: int) -> list[date]:
+    def date(count: int) -> list[str]:
         # 1970 - 2050
-        return [date.fromtimestamp(randint(0, 2556057600)) for _ in range(count)]
+        return [date.fromtimestamp(randint(0, 2556057600)).isoformat() for _ in range(count)]
 
     @staticmethod
     def unique_numbers(count: int) -> list[int]:
@@ -445,6 +477,7 @@ class ViewMockConfig:
         node_count (int): The number of nodes to generate.
         max_edge_count (int): The number of edges to generate.
         allow_edge_reuse (bool): Whether to allow edges to be reused.
+        null_values (float): The fraction of nullable properties that should be null.
         node_id_generator (IDGeneratorFunction): How to generate node ids.
         property_types (dict[type[dm.PropertyType], GeneratorFunction]): How to generate mock
             data for the different property types. The keys are the property types, and the values are functions
@@ -458,11 +491,16 @@ class ViewMockConfig:
     node_count: int = 5
     max_edge_count: int = 3
     allow_edge_reuse: bool = False
+    null_values: float = 0.25
     node_id_generator: IDGeneratorFunction = _RandomGenerator.node_id
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(
         default_factory=lambda: dict(DEFAULT_PROPERTY_TYPES)
     )
     properties: dict[str, GeneratorFunction] = field(default_factory=lambda: {})
+
+    def __post_init__(self):
+        if self.null_values < 0 or self.null_values > 1:
+            raise ValueError("null_values must be between 0 and 1")
 
 
 def _connected_views(views: typing.Sequence[dm.View]) -> Iterable[list[dm.View]]:
