@@ -68,3 +68,11 @@ class EquipmentUnitClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>EquipmentUnitClient</strong> generated from data model ("IntegrationTestsImmutable", "EquipmentUnit", "2")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.equipment_module<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.unit_procedure<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.work_order<br />
+"""
