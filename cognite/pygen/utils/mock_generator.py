@@ -7,7 +7,8 @@ import random
 import string
 import typing
 from collections import UserList, defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from graphlib import TopologicalSorter
@@ -15,6 +16,7 @@ from pathlib import Path
 from random import choice, choices, randint, uniform
 from typing import Generic, Literal, cast
 
+import pandas as pd
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
@@ -96,16 +98,11 @@ class MockGenerator:
             MockGenerator: The mock generator.
 
         """
-        current_client_name = client.config.client_name
-        # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = f"CognitePygen:{__version__}:MockGenerator"
-
-        data_model = client.data_modeling.data_models.retrieve(  # type: ignore[call-overload]
-            ids=data_model_id,
-            inline_views=True,
-        ).latest_version()
-
-        client.config.client_name = current_client_name
+        with _log_pygen_mock_call(client) as client:
+            data_model = client.data_modeling.data_models.retrieve(
+                ids=data_model_id,
+                inline_views=True,
+            ).latest_version()
 
         return cls(
             views=data_model.views,
@@ -369,24 +366,55 @@ class ViewMockData:
 
     def deploy(self, client: CogniteClient) -> None:
         """Deploys the mock data to CDF."""
-        if self.node or self.edge:
-            created = client.data_modeling.instances.apply(self.node, self.edge)
-            print(
-                f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
-                f"and {sum(1 for e in created.edges if e.was_modified)} edges"
-            )
-        if self.timeseries:
-            client.time_series.upsert(self.timeseries)
-            print(f"Created/Updated {len(self.timeseries)} timeseries")
-        if self.sequence:
-            client.sequences.upsert(self.sequence)
-            print(f"Created/Updated {len(self.sequence)} sequences")
-        if self.file:
-            existing = client.files.retrieve_multiple(external_ids=self.file.as_external_ids(), ignore_unknown_ids=True)
-            new_files = FileMetadataList([file for file in self.file if file.external_id not in existing])
-            for file in new_files:
-                client.files.create(file)
-            print(f"Created {len(new_files)} files")
+        with _log_pygen_mock_call(client) as client:
+            if self.node or self.edge:
+                created = client.data_modeling.instances.apply(self.node, self.edge)
+                print(
+                    f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                    f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+                )
+            if self.timeseries:
+                client.time_series.upsert(self.timeseries)
+                print(f"Created/Updated {len(self.timeseries)} timeseries")
+            if self.sequence:
+                client.sequences.upsert(self.sequence)
+                print(f"Created/Updated {len(self.sequence)} sequences")
+            if self.file:
+                existing = client.files.retrieve_multiple(
+                    external_ids=self.file.as_external_ids(), ignore_unknown_ids=True
+                )
+                new_files = FileMetadataList([file for file in self.file if file.external_id not in existing])
+                for file in new_files:
+                    client.files.create(file)
+                print(f"Created {len(new_files)} files")
+
+    def _repr_html_(self) -> str:
+        table = pd.DataFrame(
+            [
+                {
+                    "resource": "node",
+                    "count": len(self.node),
+                },
+                {
+                    "resource": "edge",
+                    "count": len(self.edge),
+                },
+                {
+                    "resource": "timeseries",
+                    "count": len(self.timeseries),
+                },
+                {
+                    "resource": "sequence",
+                    "count": len(self.sequence),
+                },
+                {
+                    "resource": "file",
+                    "count": len(self.file),
+                },
+            ]
+        )
+
+        return table._repr_html_()  # type: ignore[operator]
 
 
 class MockData(UserList[ViewMockData]):
@@ -436,24 +464,25 @@ class MockData(UserList[ViewMockData]):
         """
         nodes = self.nodes
         edges = self.edges
-        if nodes or edges:
-            created = client.data_modeling.instances.apply(nodes, edges)
-            print(
-                f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
-                f"and {sum(1 for e in created.edges if e.was_modified)} edges"
-            )
-        if timeseries := self.timeseries:
-            client.time_series.upsert(timeseries)
-            print(f"Created/Updated {len(timeseries)} timeseries")
-        if sequences := self.sequences:
-            client.sequences.upsert(sequences)
-            print(f"Created/Updated {len(sequences)} sequences")
-        if files := self.files:
-            existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
-            new_files = FileMetadataList([file for file in files if file.external_id not in existing])
-            for file in new_files:
-                client.files.create(file)
-            print(f"Created {len(new_files)} files")
+        with _log_pygen_mock_call(client) as client:
+            if nodes or edges:
+                created = client.data_modeling.instances.apply(nodes, edges)
+                print(
+                    f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                    f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+                )
+            if timeseries := self.timeseries:
+                client.time_series.upsert(timeseries)
+                print(f"Created/Updated {len(timeseries)} timeseries")
+            if sequences := self.sequences:
+                client.sequences.upsert(sequences)
+                print(f"Created/Updated {len(sequences)} sequences")
+            if files := self.files:
+                existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
+                new_files = FileMetadataList([file for file in files if file.external_id not in existing])
+                for file in new_files:
+                    client.files.create(file)
+                print(f"Created {len(new_files)} files")
 
     def clean(self, client: CogniteClient) -> None:
         """Cleans the mock data from CDF.
@@ -466,23 +495,52 @@ class MockData(UserList[ViewMockData]):
         """
         nodes = self.nodes
         edges = self.edges
-        if nodes or edges:
-            client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
-            print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
-        if timeseries := self.timeseries:
-            client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
-            print(f"Deleted {len(timeseries)} timeseries")
-        if sequences := self.sequences:
-            client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
-            print(f"Deleted {len(sequences)} sequences")
-        if files := self.files:
-            try:
-                client.files.delete(external_id=files.as_external_ids())
-            except CogniteNotFoundError as e:
-                not_existing = {file["externalId"] for file in e.not_found}
-                files = FileMetadataList([file for file in files if file.external_id not in not_existing])
-                client.files.delete(external_id=files.as_external_ids())
-            print(f"Deleted {len(files)} files")
+        with _log_pygen_mock_call(client) as client:
+            if nodes or edges:
+                client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
+                print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
+            if timeseries := self.timeseries:
+                client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
+                print(f"Deleted {len(timeseries)} timeseries")
+            if sequences := self.sequences:
+                client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
+                print(f"Deleted {len(sequences)} sequences")
+            if files := self.files:
+                try:
+                    client.files.delete(external_id=files.as_external_ids())
+                except CogniteNotFoundError as e:
+                    not_existing = {file["externalId"] for file in e.not_found}
+                    files = FileMetadataList([file for file in files if file.external_id not in not_existing])
+                    client.files.delete(external_id=files.as_external_ids())
+                print(f"Deleted {len(files)} files")
+
+    def _repr_html_(self) -> str:
+        table = pd.DataFrame(
+            [
+                {
+                    "resource": "node",
+                    "count": len(self.nodes),
+                },
+                {
+                    "resource": "edge",
+                    "count": len(self.edges),
+                },
+                {
+                    "resource": "timeseries",
+                    "count": len(self.timeseries),
+                },
+                {
+                    "resource": "sequence",
+                    "count": len(self.sequences),
+                },
+                {
+                    "resource": "file",
+                    "count": len(self.files),
+                },
+            ]
+        )
+
+        return table._repr_html_()  # type: ignore[operator]
 
 
 T_DataType = typing.TypeVar("T_DataType", bound=DataType)
@@ -670,3 +728,13 @@ def _connected_components(graph: dict[_T_Component, set[_T_Component]]) -> list[
             components.append(list(component(node)))
 
     return components
+
+
+@contextmanager
+def _log_pygen_mock_call(client: CogniteClient) -> Iterator[CogniteClient]:
+    """Context manager for logging Pygen usage."""
+    current_client_name = client.config.client_name
+    # The client name is used for aggregated logging of Pygen Usage
+    client.config.client_name = f"CognitePygen:{__version__}:MockGenerator"
+    yield client
+    client.config.client_name = current_client_name
