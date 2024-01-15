@@ -137,8 +137,16 @@ class MockGenerator:
             seed=seed,
         )
 
-    def generate_mock_data(self) -> MockData:
+    def generate_mock_data(
+        self, node_count: int = 5, max_edge_per_type: int = 5, null_values: float = 0.25
+    ) -> MockData:
         """Generates mock data for the given data model/views.
+
+
+        Args:
+            node_count: The number of nodes to generate for each view.
+            max_edge_per_type: The maximum number of edges to generate for each edge type.
+            null_values: The probability of generating a null value for a nullable properties.
 
         Returns:
             MockData: The generated mock data.
@@ -147,16 +155,18 @@ class MockGenerator:
             random.seed(self._seed)
         mock_data = MockData()
         for components in _connected_views(self._views):
-            data = self._generate_views_mock_data(components)
+            data = self._generate_views_mock_data(components, node_count, max_edge_per_type, null_values)
             mock_data.extend(data)
         return mock_data
 
-    def _generate_views_mock_data(self, views: list[dm.View]) -> MockData:
-        outputs = self._generate_mock_nodes(views)
-        self._generate_mock_relations(views, outputs)
+    def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
+        outputs = self._generate_mock_nodes(views, node_count, null_values)
+        self._generate_mock_relations(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
 
-    def _generate_mock_nodes(self, views: list[dm.View]) -> dict[dm.ViewId, ViewMockData]:
+    def _generate_mock_nodes(
+        self, views: list[dm.View], default_node_count: int, default_nullable_fraction: float
+    ) -> dict[dm.ViewId, ViewMockData]:
         output: dict[dm.ViewId, ViewMockData] = {}
         for view in views:
             mapped_properties = {
@@ -171,8 +181,14 @@ class MockGenerator:
 
             view_id = view.as_id()
             config = self._view_configs.get(view_id, self._default_config)
-            properties, external = self._generate_mock_values(mapped_properties, config, view.as_id())
-            node_ids = config.node_id_generator(view_id, config.node_count)
+            properties, external = self._generate_mock_values(
+                mapped_properties,
+                config,
+                view.as_id(),
+                default_node_count,
+                default_nullable_fraction,
+            )
+            node_ids = config.node_id_generator(view_id, config.node_count or default_node_count)
 
             nodes = [
                 dm.NodeApply(
@@ -200,7 +216,13 @@ class MockGenerator:
             )
         return output
 
-    def _generate_mock_relations(self, views: list[dm.View], outputs: dict[dm.ViewId, ViewMockData]) -> None:
+    def _generate_mock_relations(
+        self,
+        views: list[dm.View],
+        outputs: dict[dm.ViewId, ViewMockData],
+        default_max_edge_count: int,
+        default_nullable_fraction: float,
+    ) -> None:
         leaf_children_by_parent = self._to_leaf_children_by_parent(views)
         for view in views:
             connection_properties = {
@@ -223,7 +245,7 @@ class MockGenerator:
                         else:
                             sources = outputs[connection.source].node.as_ids()
 
-                        max_edge_count = min(config.max_edge_per_type, len(sources))
+                        max_edge_count = min(config.max_edge_per_type or default_max_edge_count, len(sources))
                         end_nodes = random.sample(sources, k=randint(0, max_edge_count))
 
                         for end_node in end_nodes:
@@ -244,9 +266,10 @@ class MockGenerator:
                         and isinstance(connection.type, dm.DirectRelation)
                         and connection.source
                     ):
-                        if (not connection.nullable or random.random() < (1 - config.null_values)) and (
-                            sources := outputs[connection.source].node.as_ids()
-                        ):
+                        if (
+                            not connection.nullable
+                            or random.random() < (1 - (config.null_values or default_nullable_fraction))
+                        ) and (sources := outputs[connection.source].node.as_ids()):
                             other_node = choice(sources)
                             if node.sources is None:
                                 node.sources = []
@@ -272,7 +295,12 @@ class MockGenerator:
                         raise NotImplementedError(f"Connection {type(connection)} not implemented")
 
     def _generate_mock_values(
-        self, properties: dict[str, dm.MappedProperty], config: ViewMockConfig, view_id: dm.ViewId
+        self,
+        properties: dict[str, dm.MappedProperty],
+        config: ViewMockConfig,
+        view_id: dm.ViewId,
+        default_node_count: int,
+        default_nullable_fraction: float,
     ) -> tuple[dict[str, typing.Sequence[ListAbleDataType]], ViewMockData]:
         output: dict[str, typing.Sequence[ListAbleDataType]] = {}
         external = ViewMockData(view_id, self._instance_space)
@@ -285,12 +313,16 @@ class MockGenerator:
             else:
                 raise ValueError(f"Could not generate mock data for property {name} of type {type(prop.type)}")
 
-            null_values = int(prop.nullable and config.node_count * config.null_values)
-            node_count = config.node_count - null_values
+            config_node_count = config.node_count or default_node_count
+            config_null_values = config.null_values or default_nullable_fraction
+
+            null_values = int(prop.nullable and config_node_count * config_null_values)
+            node_count = config_node_count - null_values
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 values = [generator(random.randint(0, 5)) for _ in range(node_count)] + [None] * null_values
             else:
-                values = generator(config.node_count - null_values) + [None] * null_values
+                values = generator(config_node_count - null_values) + [None] * null_values
+
             if null_values and isinstance(values, list):
                 random.shuffle(values)
 
@@ -734,20 +766,21 @@ class _RandomGenerator:
         return [f"{view_id.external_id.casefold()}_{no}" for no in cls.unique_numbers(count)]
 
 
-DEFAULT_PROPERTY_TYPES: dict[type[dm.PropertyType], GeneratorFunction] = {
-    dm.Text: cast(GeneratorFunction, _RandomGenerator.text),
-    dm.Int64: cast(GeneratorFunction, _RandomGenerator.int32),
-    dm.Int32: cast(GeneratorFunction, _RandomGenerator.int64),
-    dm.Float64: cast(GeneratorFunction, _RandomGenerator.float64),
-    dm.Float32: cast(GeneratorFunction, _RandomGenerator.float32),
-    dm.Boolean: cast(GeneratorFunction, _RandomGenerator.boolean),
-    dm.Timestamp: cast(GeneratorFunction, _RandomGenerator.timestamp),
-    dm.Date: cast(GeneratorFunction, _RandomGenerator.date),
-    dm.TimeSeriesReference: cast(GeneratorFunction, _RandomGenerator.timeseries_reference()),
-    dm.FileReference: cast(GeneratorFunction, _RandomGenerator.file_reference()),
-    dm.SequenceReference: cast(GeneratorFunction, _RandomGenerator.sequence_reference()),
-    dm.Json: cast(GeneratorFunction, _RandomGenerator.json),
-}
+def _create_default_property_types() -> dict[type[dm.PropertyType], GeneratorFunction]:
+    return {
+        dm.Text: cast(GeneratorFunction, _RandomGenerator.text),
+        dm.Int64: cast(GeneratorFunction, _RandomGenerator.int32),
+        dm.Int32: cast(GeneratorFunction, _RandomGenerator.int64),
+        dm.Float64: cast(GeneratorFunction, _RandomGenerator.float64),
+        dm.Float32: cast(GeneratorFunction, _RandomGenerator.float32),
+        dm.Boolean: cast(GeneratorFunction, _RandomGenerator.boolean),
+        dm.Timestamp: cast(GeneratorFunction, _RandomGenerator.timestamp),
+        dm.Date: cast(GeneratorFunction, _RandomGenerator.date),
+        dm.TimeSeriesReference: cast(GeneratorFunction, _RandomGenerator.timeseries_reference()),
+        dm.FileReference: cast(GeneratorFunction, _RandomGenerator.file_reference()),
+        dm.SequenceReference: cast(GeneratorFunction, _RandomGenerator.sequence_reference()),
+        dm.Json: cast(GeneratorFunction, _RandomGenerator.json),
+    }
 
 
 @dataclass
@@ -765,31 +798,49 @@ class ViewMockConfig:
     For most use cases, it is recommended to use the 'default_config' parameter of the MockGenerator class instead.
 
     Args:
-        node_count (int): The number of nodes to generate.
-        max_edge_per_type (int): The maximum number of edges to generate per edge type.
-        null_values (float): The fraction of nullable properties that should be null.
-        node_id_generator (IDGeneratorFunction): How to generate node ids.
-        property_types (dict[type[dm.PropertyType], GeneratorFunction]): How to generate mock
+        node_count: The number of nodes to generate for this view.
+        max_edge_per_type: The maximum number of edges to generate per edge type for this view.
+        null_values: The fraction of nullable properties that should be null for this view.
+        node_id_generator: How to generate node ids.
+        property_types: How to generate mock
             data for the different property types. The keys are the property types, and the values are functions
             that take the number of nodes as input and return a list of property values.
-        properties (dict[str, GeneratorFunction]): How to generate mock data for the different
+        properties: How to generate mock data for the different
             properties. The keys are the property names, and the values are functions that take the number of nodes
             as input and return a list of property values.
 
     """
 
-    node_count: int = 5
-    max_edge_per_type: int = 3
-    null_values: float = 0.25
+    node_count: int | None = None
+    max_edge_per_type: int | None = None
+    null_values: float | None = None
     node_id_generator: IDGeneratorFunction = _RandomGenerator.node_id  # type: ignore[assignment]
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(
-        default_factory=lambda: dict(DEFAULT_PROPERTY_TYPES)
+        default_factory=_create_default_property_types
     )
     properties: dict[str, GeneratorFunction] = field(default_factory=lambda: {})
 
     def __post_init__(self):
-        if self.null_values < 0 or self.null_values > 1:
+        if self.null_values is not None and (self.null_values < 0 or self.null_values > 1):
             raise ValueError("null_values must be between 0 and 1")
+        if self.node_count is not None and self.node_count <= 0:
+            raise ValueError("node_count must be greater than 0")
+        if self.max_edge_per_type is not None and self.max_edge_per_type < 0:
+            raise ValueError("max_edge_per_type must be greater than 0")
+        for k, v in _create_default_property_types().items():
+            if k not in self.property_types:
+                self.property_types[k] = v
+            elif self.property_types[k] is not v:
+                expected = self.property_types[k](3)
+                if len(expected) != 3:
+                    raise ValueError(
+                        f"Invalid Custom Random Generator property_types[{k}](3) must return a list of length 3"
+                    )
+                expected = self.property_types[k](5)
+                if len(expected) != 5:
+                    raise ValueError(
+                        f"Invalid Custom Random Generator property_types[{k}](5) must return a list of length 5"
+                    )
 
 
 def _connected_views(views: typing.Sequence[dm.View]) -> Iterable[list[dm.View]]:

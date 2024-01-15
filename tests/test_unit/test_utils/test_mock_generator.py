@@ -85,13 +85,13 @@ def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]
         primitive_required.as_id(): ViewMockConfig(
             node_count=node_count,
             properties={
-                "int64": lambda count: list(count),
+                "int64": lambda count: list(range(count)),
             },
         )
     }
     generator = MockGenerator(views, "sandbox", view_configs=view_configs, default_config=default_config, seed=42)
 
-    data = generator.generate_mock_data()
+    data = generator.generate_mock_data(node_count=10)
 
     assert len(data.nodes) == len(views) * node_count
 
