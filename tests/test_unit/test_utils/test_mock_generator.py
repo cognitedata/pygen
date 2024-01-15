@@ -1,7 +1,7 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.utils.mock_generator import MockGenerator
+from cognite.pygen.utils.mock_generator import MockGenerator, ViewMockConfig
 from tests.omni_constants import OmniClasses, OmniView
 
 
@@ -71,6 +71,29 @@ def test_generate_mock_data_multiple_views(
             assert len(view_data.edge) == 0
         else:
             assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+
+
+def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]) -> None:
+    views = [class_.view for class_ in omni_data_classes.values()]
+    primitive_required = omni_data_classes[OmniView.primitive_required].view
+    node_count = 3
+    default_config = ViewMockConfig(
+        node_count=node_count,
+        property_types={dm.Text: lambda count: [f"Text {i}" for i in range(count)]},
+    )
+    view_configs = {
+        primitive_required.as_id(): ViewMockConfig(
+            node_count=node_count,
+            properties={
+                "int64": lambda count: list(count),
+            },
+        )
+    }
+    generator = MockGenerator(views, "sandbox", view_configs=view_configs, default_config=default_config, seed=42)
+
+    data = generator.generate_mock_data()
+
+    assert len(data.nodes) == len(views) * node_count
 
 
 def test__to_leaf_children_by_parent(omni_data_classes: dict[str, OmniClasses]) -> None:
