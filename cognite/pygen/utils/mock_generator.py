@@ -32,6 +32,8 @@ from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from cognite.client.exceptions import CogniteNotFoundError
 from typing_extensions import TypeAlias
 
+from cognite.pygen._version import __version__
+
 DataType: TypeAlias = typing.Union[int, float, bool, str, dict, None]
 ListAbleDataType: TypeAlias = typing.Union[
     int,
@@ -83,13 +85,30 @@ class MockGenerator:
     def from_data_model(
         cls, data_model_id: DataModelIdentifier, instance_space: str, client: CogniteClient
     ) -> MockGenerator:
+        """Creates a MockGenerator from a data model.
+
+        Args:
+            data_model_id: Identifier of the data model to generate mock data for.
+            instance_space: The space to use for the generated nodes and edges.
+            client: An instance of the CogniteClient class.
+
+        Returns:
+            MockGenerator: The mock generator.
+
+        """
+        current_client_name = client.config.client_name
+        # The client name is used for aggregated logging of Pygen Usage
+        client.config.client_name = f"CognitePygen:{__version__}:MockGenerator"
+
         data_model = client.data_modeling.data_models.retrieve(  # type: ignore[call-overload]
-            id=data_model_id,
+            ids=data_model_id,
             inline_views=True,
         ).latest_version()
 
+        client.config.client_name = current_client_name
+
         return cls(
-            views=data_model._views,
+            views=data_model.views,
             instance_space=instance_space,
         )
 

@@ -14,6 +14,16 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.35.0] - 15-01-24
+### Fixed
+* In the `MockGenerator`, when generating edges, the `end_node` now accounts for interfaces and is set to the
+  children nodes of the interface, instead of the interface itself.
+
+
+### Added
+* HTML representation method to generated `client` class. This is useful when using the generated SDK in a Jupyter
+  notebook.
+
 ## [0.35.0] - 07-01-24
 ### Added
 * Module `cognite.pygen.utils.mock_generator` with `MockGenerator` class for generating mock data for a given data model.
