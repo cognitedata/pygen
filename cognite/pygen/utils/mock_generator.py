@@ -3,6 +3,7 @@ edges, timeseries, sequences, and files for a given data model/views.
 """
 from __future__ import annotations
 
+import itertools
 import random
 import string
 import typing
@@ -153,6 +154,12 @@ class MockGenerator:
         """
         if self._seed:
             random.seed(self._seed)
+            for config in itertools.chain(self._view_configs.values(), [self._default_config]):
+                for generator in config.property_types.values():
+                    if hasattr(generator, "reset") and isinstance(generator.reset, Callable):  # type: ignore[arg-type]
+                        # This is for generators that have a state.
+                        generator.reset()
+
         mock_data = MockData()
         for components in _connected_views(self._views):
             data = self._generate_views_mock_data(components, node_count, max_edge_per_type, null_values)
@@ -719,6 +726,12 @@ class _RandomGenerator:
                     generated_numbers.add(number)
             return numbers
 
+        def reset() -> None:
+            nonlocal generated_numbers
+            generated_numbers = set()
+
+        unique_numbers.reset = reset  # type: ignore[attr-defined]
+
         return unique_numbers
 
     @classmethod
@@ -727,6 +740,11 @@ class _RandomGenerator:
 
         def timeseries_reference_inner(count: int) -> list[str]:
             return [f"timeseries_{no}" for no in unique_numbers(count)]
+
+        def reset() -> None:
+            unique_numbers.reset()  # type: ignore[attr-defined]
+
+        timeseries_reference_inner.reset = reset  # type: ignore[attr-defined]
 
         return timeseries_reference_inner
 
@@ -737,6 +755,11 @@ class _RandomGenerator:
         def file_reference_inner(count: int) -> list[str]:
             return [f"file_{no}" for no in unique_numbers(count)]
 
+        def reset() -> None:
+            unique_numbers.reset()  # type: ignore[attr-defined]
+
+        file_reference_inner.reset = reset  # type: ignore[attr-defined]
+
         return file_reference_inner
 
     @classmethod
@@ -745,6 +768,11 @@ class _RandomGenerator:
 
         def sequence_reference_inner(count: int) -> list[str]:
             return [f"sequence_{no}" for no in unique_numbers(count)]
+
+        def reset() -> None:
+            unique_numbers.reset()  # type: ignore[attr-defined]
+
+        sequence_reference_inner.reset = reset  # type: ignore[attr-defined]
 
         return sequence_reference_inner
 
