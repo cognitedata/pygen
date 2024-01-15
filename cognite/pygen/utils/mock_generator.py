@@ -10,6 +10,7 @@ from collections import UserList, defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from graphlib import TopologicalSorter
 from pathlib import Path
 from random import choice, choices, randint, uniform
 from typing import Generic, Literal, cast
@@ -155,6 +156,7 @@ class MockGenerator:
         return output
 
     def _generate_mock_relations(self, views: list[dm.View], outputs: dict[dm.ViewId, ViewMockData]) -> None:
+        leaf_children_by_parent = self._to_leaf_children_by_parent(views)
         for view in views:
             connection_properties = {
                 name: prop
@@ -169,7 +171,13 @@ class MockGenerator:
             for node in outputs[view_id].node:
                 for name, connection in connection_properties.items():
                     if isinstance(connection, MultiEdgeConnection):
-                        sources = outputs[connection.source].node.as_ids()
+                        if connection.source in leaf_children_by_parent:
+                            sources: list[dm.NodeId] = []
+                            for child in leaf_children_by_parent[connection.source]:
+                                sources.extend(outputs[child].node.as_ids())
+                        else:
+                            sources = outputs[connection.source].node.as_ids()
+
                         max_edge_count = min(config.max_edge_count, len(sources))
                         end_nodes = random.sample(sources, k=randint(0, max_edge_count))
 
@@ -292,6 +300,26 @@ class MockGenerator:
                 )
 
         return output, external
+
+    @staticmethod
+    def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, set[dm.ViewId]]:
+        leaf_children_by_parent: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
+        for view in views:
+            for parent in view.implements or []:
+                leaf_children_by_parent[parent].add(view.as_id())
+
+        leafs: set[dm.ViewId] = set()
+        for view_id in TopologicalSorter(leaf_children_by_parent).static_order():
+            if view_id not in leaf_children_by_parent:
+                leafs.add(view_id)
+                continue
+
+            parents = leaf_children_by_parent[view_id] - leafs
+            for parent in parents:
+                leaf_children_by_parent[view_id].remove(parent)
+                leaf_children_by_parent[view_id].update(leaf_children_by_parent[parent])
+
+        return leaf_children_by_parent
 
 
 @dataclass

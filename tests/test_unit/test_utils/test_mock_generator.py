@@ -71,3 +71,24 @@ def test_generate_mock_data_multiple_views(
             assert len(view_data.edge) == 0
         else:
             assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+
+
+def test__to_leaf_children_by_parent(omni_data_classes: dict[str, OmniClasses]) -> None:
+    views = [
+        omni_data_classes[name].view
+        for name in [
+            OmniView.main_interface,
+            OmniView.sub_interface,
+            OmniView.implementation1,
+            OmniView.implementation2,
+        ]
+    ]
+    expected = {
+        OmniView.main_interface: {OmniView.implementation1, OmniView.implementation2},
+        OmniView.sub_interface: {OmniView.implementation1, OmniView.implementation2},
+    }
+
+    actual = MockGenerator._to_leaf_children_by_parent(views)
+    actual = {k.external_id: {vv.external_id for vv in v} for k, v in actual.items()}
+
+    assert actual == expected
