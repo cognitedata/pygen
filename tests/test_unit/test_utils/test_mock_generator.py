@@ -79,14 +79,15 @@ def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]
     node_count = 3
     default_config = ViewMockConfig(
         node_count=node_count,
-        property_types={dm.Text: lambda count: [f"Text {i}" for i in range(count)]},
+        property_types={dm.Float64: lambda count: [0.5] * count, dm.Text: lambda count: ["Hello"] * count},
     )
     view_configs = {
         primitive_required.as_id(): ViewMockConfig(
             node_count=node_count,
             properties={
-                "int64": lambda count: list(range(count)),
+                "int64": lambda count: [42] * count,
             },
+            property_types={dm.Float64: lambda count: [0.5] * count, dm.Text: lambda count: ["there"] * count},
         )
     }
     generator = MockGenerator(views, "sandbox", view_configs=view_configs, default_config=default_config, seed=42)
@@ -94,6 +95,22 @@ def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]
     data = generator.generate_mock_data(node_count=10)
 
     assert len(data.nodes) == len(views) * node_count
+    primitive_required_data = next(d for d in data if d.view_id == primitive_required.as_id())
+
+    other_values = [
+        source.properties["float64"]
+        for node in primitive_required_data.node
+        for source in node.sources
+        if source.properties["float64"] != 0.5
+    ]
+    assert len(other_values) == 0, f"Unexpected values: {other_values}"
+    other_values = [
+        source.properties["text"]
+        for node in primitive_required_data.node
+        for source in node.sources
+        if source.properties["text"] != "there"
+    ]
+    assert len(other_values) == 0, f"Unexpected values: {other_values}"
 
 
 def test__to_leaf_children_by_parent(omni_data_classes: dict[str, OmniClasses]) -> None:
