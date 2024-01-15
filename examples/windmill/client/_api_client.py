@@ -24,7 +24,7 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.35.0
+        pygen = 0.35.1
         cognite-sdk = 7.8.5
         pydantic = 2.5.3
 
@@ -42,7 +42,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.35.0"
+        client.config.client_name = "CognitePygen:0.35.1"
 
         view_by_read_class = {
             data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
@@ -91,3 +91,19 @@ class WindmillClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>WindmillClient</strong> generated from data model ("power-models", "Windmill", "1")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.blade<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.gearbox<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.generator<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.high_speed_shaft<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.main_shaft<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.metmast<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.nacelle<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.power_inverter<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.rotor<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.sensor_position<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.windmill<br />
+"""

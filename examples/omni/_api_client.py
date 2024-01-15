@@ -30,7 +30,7 @@ class OmniClient:
     OmniClient
 
     Generated with:
-        pygen = 0.35.0
+        pygen = 0.35.1
         cognite-sdk = 7.8.5
         pydantic = 2.5.3
 
@@ -48,7 +48,7 @@ class OmniClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.35.0"
+        client.config.client_name = "CognitePygen:0.35.1"
 
         view_by_read_class = {
             data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
@@ -109,3 +109,25 @@ class OmniClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>OmniClient</strong> generated from data model ("pygen-models", "Omni", "1")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references_listed<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.dependent_on_non_writable<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.empty<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.implementation_1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.implementation_1_non_writeable<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.implementation_2<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.main_interface<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable_listed<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.primitive_required<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.primitive_required_listed<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.primitive_with_defaults<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.sub_interface<br />
+"""

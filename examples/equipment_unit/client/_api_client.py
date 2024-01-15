@@ -16,7 +16,7 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.35.0
+        pygen = 0.35.1
         cognite-sdk = 7.8.5
         pydantic = 2.5.3
 
@@ -34,7 +34,7 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.35.0"
+        client.config.client_name = "CognitePygen:0.35.1"
 
         view_by_read_class = {
             data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
@@ -68,3 +68,11 @@ class EquipmentUnitClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>EquipmentUnitClient</strong> generated from data model ("IntegrationTestsImmutable", "EquipmentUnit", "2")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.equipment_module<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.unit_procedure<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.work_order<br />
+"""

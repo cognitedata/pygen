@@ -61,3 +61,9 @@ class {{ client_name }}:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>{{ client_name }}</strong> generated from data model ("{{ data_model.space }}", "{{ data_model.external_id }}", "{{ data_model.version }}")<br />
+with the following APIs available<br />{% for api in api_by_view_id.values() %}{% if not api.data_class.is_edge_class %}
+&nbsp;&nbsp;&nbsp;&nbsp;.{{ api.api_class.parent_attribute }}<br />{% endif %}{% endfor %}
+"""
