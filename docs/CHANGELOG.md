@@ -14,11 +14,15 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.35.0] - 15-01-24
+## [0.35.2] - 18-01-24
+### Fixed
+* If a view has a dependency on another `view` named `Field` importing the generated client would raise
+  a `NameError: name 'JsonValue' is not defined`. This has now been fixed.
+
+## [0.35.1] - 15-01-24
 ### Fixed
 * In the `MockGenerator`, when generating edges, the `end_node` now accounts for interfaces and is set to the
   children nodes of the interface, instead of the interface itself.
-
 
 ### Added
 * HTML representation method to generated `client` class. This is useful when using the generated SDK in a Jupyter
