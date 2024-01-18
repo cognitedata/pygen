@@ -142,6 +142,7 @@ class DataClass:
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
+        # Todo update pydantic field if any of the dependencies are named Field.
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
         self.is_interface = is_interface
