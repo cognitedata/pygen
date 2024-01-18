@@ -22,7 +22,7 @@ class TestDataClasses:
 
         assert country_data_class.pydantic_field == "pydantic.Field"
         wrong_field = [field.name for field in country_data_class if field.pydantic_field != "pydantic.Field"]
-        assert not wrong_field, f"Wrong field(s): {wrong_field}"
+        assert not wrong_field, f"Wrong pydantic field for the following field(s): {wrong_field}"
 
 
 _DEPENDENCY_NAMED_FIELD = """
