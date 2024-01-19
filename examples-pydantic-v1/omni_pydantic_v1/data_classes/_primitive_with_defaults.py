@@ -73,6 +73,7 @@ class PrimitiveWithDefaults(DomainModel):
         return PrimitiveWithDefaultsApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             auto_increment_int_32=self.auto_increment_int_32,
             default_boolean=self.default_boolean,
             default_float_32=self.default_float_32,

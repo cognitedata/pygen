@@ -69,6 +69,7 @@ class UnitProcedure(DomainModel):
         return UnitProcedureApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             name=self.name,
             type_=self.type_,
             work_orders=[work_order.as_apply() for work_order in self.work_orders or []],

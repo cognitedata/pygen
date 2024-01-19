@@ -68,6 +68,7 @@ class DependentOnNonWritable(DomainModel):
         return DependentOnNonWritableApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             a_value=self.a_value,
             to_non_writable=[
                 to_non_writable.as_apply() if isinstance(to_non_writable, DomainModel) else to_non_writable

@@ -56,6 +56,7 @@ class Rotor(DomainModel):
         return RotorApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             rotor_speed_controller=self.rotor_speed_controller,
             rpm_low_speed_shaft=self.rpm_low_speed_shaft,
         )

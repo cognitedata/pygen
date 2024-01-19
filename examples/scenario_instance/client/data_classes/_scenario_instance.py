@@ -85,6 +85,7 @@ class ScenarioInstance(DomainModel):
         return ScenarioInstanceApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             aggregation=self.aggregation,
             country=self.country,
             instance=self.instance,

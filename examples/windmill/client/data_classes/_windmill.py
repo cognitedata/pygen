@@ -72,6 +72,7 @@ class Windmill(DomainModel):
         return WindmillApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             blades=[blade.as_apply() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[

@@ -14,6 +14,14 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.35.3] - 19-01-24
+### Fixed
+* For edge views, `retrieve` and `list` raised `AttributeError: 'NodeId' object has no attribute 'as_tuple'`.
+  This has been fixed by adding this method to the `cognite-sdk`, which means that `pygen` now requires
+  `cognite-sdk>=7.13.6`.
+* The field `existing_version` was not set in the `.as_apply()` method for the generated read data classes.
+  This has now been fixed.
+
 ## [0.35.2] - 18-01-24
 ### Fixed
 * If a view has a dependency on another `view` named `Field` importing the generated client would raise

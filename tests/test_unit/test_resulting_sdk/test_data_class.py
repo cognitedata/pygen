@@ -51,7 +51,7 @@ class TestToFromInstances:
             return
         assert len(resources.nodes) == 1
 
-        node_apply = node.as_apply(None, None)
+        node_apply = node.as_apply()
         # Bug in SDK that skips the type
         node_apply.type = node.type
         assert node_apply.dump() == resources.nodes[0].dump()

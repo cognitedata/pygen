@@ -70,6 +70,7 @@ class EquipmentModule(DomainModel):
         return EquipmentModuleApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             description=self.description,
             name=self.name,
             sensor_value=self.sensor_value,

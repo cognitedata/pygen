@@ -65,6 +65,7 @@ class WorkOrder(DomainModel):
         return WorkOrderApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             description=self.description,
             performed_by=self.performed_by,
             type_=self.type_,

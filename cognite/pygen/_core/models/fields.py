@@ -9,6 +9,7 @@ from functools import total_ordering
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -65,7 +66,7 @@ class Field(ABC):
     def from_property(
         cls,
         prop_name: str,
-        prop: dm.MappedProperty | dm.ConnectionDefinition,
+        prop: ViewProperty,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: pygen_config.PygenConfig,
         view_id: dm.ViewId,

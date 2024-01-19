@@ -67,6 +67,7 @@ class ConnectionItemB(DomainModel):
         return ConnectionItemBApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             inwards=[inward.as_apply() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
             name=self.name,
             self_edge=[

@@ -70,6 +70,7 @@ class ConnectionItemA(DomainModel):
         return ConnectionItemAApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             name=self.name,
             other_direct=self.other_direct.as_apply()
             if isinstance(self.other_direct, DomainModel)

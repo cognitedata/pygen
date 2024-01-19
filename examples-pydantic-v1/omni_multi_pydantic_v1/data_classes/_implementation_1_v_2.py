@@ -63,6 +63,7 @@ class Implementation1v2(SubInterface):
         return Implementation1v2Apply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             main_value=self.main_value,
             sub_value=self.sub_value,
             value_2=self.value_2,

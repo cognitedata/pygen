@@ -62,6 +62,7 @@ class Metmast(DomainModel):
         return MetmastApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             position=self.position,
             temperature=self.temperature,
             tilt_angle=self.tilt_angle,

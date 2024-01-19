@@ -56,6 +56,7 @@ class StartEndTime(DomainRelation):
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,

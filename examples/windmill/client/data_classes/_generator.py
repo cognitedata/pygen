@@ -63,6 +63,7 @@ class Generator(DomainModel):
         return GeneratorApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             generator_speed_controller=self.generator_speed_controller,
             generator_speed_controller_reference=self.generator_speed_controller_reference,
         )
