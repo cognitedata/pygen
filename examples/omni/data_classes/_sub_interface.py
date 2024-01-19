@@ -61,6 +61,7 @@ class SubInterface(MainInterface):
         return SubInterfaceApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             main_value=self.main_value,
             sub_value=self.sub_value,
         )

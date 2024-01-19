@@ -66,6 +66,7 @@ class CDFExternalReferencesListed(DomainModel):
         return CDFExternalReferencesListedApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             files=self.files,
             sequences=self.sequences,
             timeseries=self.timeseries,

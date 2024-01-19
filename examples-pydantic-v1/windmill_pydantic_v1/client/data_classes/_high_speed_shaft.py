@@ -65,6 +65,7 @@ class HighSpeedShaft(DomainModel):
         return HighSpeedShaftApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             bending_moment_y=self.bending_moment_y,
             bending_monent_x=self.bending_monent_x,
             torque=self.torque,

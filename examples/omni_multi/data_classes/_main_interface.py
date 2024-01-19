@@ -59,6 +59,7 @@ class MainInterface(DomainModel):
         return MainInterfaceApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             main_value=self.main_value,
         )
 

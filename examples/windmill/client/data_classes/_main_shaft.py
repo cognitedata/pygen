@@ -72,6 +72,7 @@ class MainShaft(DomainModel):
         return MainShaftApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             bending_x=self.bending_x,
             bending_y=self.bending_y,
             calculated_tilt_moment=self.calculated_tilt_moment,

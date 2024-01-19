@@ -103,6 +103,7 @@ class SensorPosition(DomainModel):
         return SensorPositionApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
             edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
             edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,

@@ -65,6 +65,7 @@ class Implementation1sPygenModelsOther(DomainModel):
         return Implementation1sPygenModelsOtherApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             main_value=self.main_value,
             value_1=self.value_1,
             value_2=self.value_2,

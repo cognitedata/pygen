@@ -61,3 +61,9 @@ class ScenarioInstanceClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>ScenarioInstanceClient</strong> generated from data model ("IntegrationTestsImmutable", "ScenarioInstance", "1")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.scenario_instance<br />
+"""

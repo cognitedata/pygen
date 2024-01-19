@@ -54,6 +54,7 @@ class ConnectionItemC(DomainModel):
         return ConnectionItemCApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             connection_item_a=[
                 connection_item_a.as_apply() if isinstance(connection_item_a, DomainModel) else connection_item_a
                 for connection_item_a in self.connection_item_a or []

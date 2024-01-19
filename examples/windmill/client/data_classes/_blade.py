@@ -60,6 +60,7 @@ class Blade(DomainModel):
         return BladeApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             is_damaged=self.is_damaged,
             name=self.name,
             sensor_positions=[

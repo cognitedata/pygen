@@ -58,6 +58,7 @@ class Gearbox(DomainModel):
         return GearboxApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             displacement_x=self.displacement_x,
             displacement_y=self.displacement_y,
             displacement_z=self.displacement_z,

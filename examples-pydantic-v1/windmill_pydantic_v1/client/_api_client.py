@@ -91,3 +91,19 @@ class WindmillClient:
                 raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
+
+    def _repr_html_(self) -> str:
+        return """<strong>WindmillClient</strong> generated from data model ("power-models", "Windmill", "1")<br />
+with the following APIs available<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.blade<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.gearbox<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.generator<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.high_speed_shaft<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.main_shaft<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.metmast<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.nacelle<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.power_inverter<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.rotor<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.sensor_position<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.windmill<br />
+"""

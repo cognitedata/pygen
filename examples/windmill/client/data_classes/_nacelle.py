@@ -87,6 +87,7 @@ class Nacelle(DomainModel):
         return NacelleApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             acc_from_back_side_x=self.acc_from_back_side_x,
             acc_from_back_side_y=self.acc_from_back_side_y,
             acc_from_back_side_z=self.acc_from_back_side_z,

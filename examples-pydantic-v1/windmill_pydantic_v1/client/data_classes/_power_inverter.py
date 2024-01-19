@@ -65,6 +65,7 @@ class PowerInverter(DomainModel):
         return PowerInverterApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             active_power_total=self.active_power_total,
             apparent_power_total=self.apparent_power_total,
             reactive_power_total=self.reactive_power_total,

@@ -86,6 +86,7 @@ class PrimitiveNullableListed(DomainModel):
         return PrimitiveNullableListedApply(
             space=self.space,
             external_id=self.external_id,
+            existing_version=self.version,
             boolean=self.boolean,
             date=self.date,
             float_32=self.float_32,
