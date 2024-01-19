@@ -41,7 +41,8 @@ class {{ data_class.read_name }}(DomainRelation):
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
-            external_id=self.external_id,{% for field in data_class %}
+            external_id=self.external_id,
+            existing_version=self.version,{% for field in data_class %}
             {{ field.name }}={{ field.as_apply() }},{% endfor %}
         )
 
