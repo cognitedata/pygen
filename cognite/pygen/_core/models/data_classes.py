@@ -8,7 +8,7 @@ from functools import total_ordering
 from typing import Literal, cast, overload
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.views import EdgeConnection
+from cognite.client.data_classes.data_modeling.views import EdgeConnection, ViewProperty
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -127,7 +127,7 @@ class DataClass:
 
     def update_fields(
         self,
-        properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
+        properties: dict[str, ViewProperty],
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
@@ -345,7 +345,7 @@ class EdgeDataClass(DataClass):
 
     def update_fields(
         self,
-        properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
+        properties: dict[str, ViewProperty],
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
