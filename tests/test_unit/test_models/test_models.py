@@ -337,12 +337,19 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 def test_data_class_from_view_expected_warning(name: str, expected_name: str, pygen_config: PygenConfig) -> None:
     # Arrange
     view = dm.View(
-        "dummy",
-        name,
-        "dummy",
-        {},
+        space="dummy",
+        external_id=name,
+        version="dummy",
+        properties={},
+        name=name,
         last_updated_time=1,
         created_time=1,
+        is_global=False,
+        description="missing",
+        used_for="node",
+        writable=True,
+        filter=None,
+        implements=None,
     )
 
     # Act
@@ -363,12 +370,19 @@ def test_data_class_from_view_expected_warning_file_name(
 ) -> None:
     # Arrange
     view = dm.View(
-        "dummy",
-        name,
-        "dummy",
-        {},
+        space="dummy",
+        external_id=name,
+        version="dummy",
+        properties={},
+        name=name,
         last_updated_time=1,
         created_time=1,
+        is_global=False,
+        description="missing",
+        used_for="node",
+        writable=True,
+        filter=None,
+        implements=None,
     )
 
     # Act
