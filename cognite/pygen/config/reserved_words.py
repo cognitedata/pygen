@@ -26,6 +26,7 @@ FIELD_NAMES = (
     | {
         # Pydantic from DomainModel and DomainModelApply
         "as_id",
+        "data_record",
         "as_tuple_id",
         "as_direct_reference",
         "to_pandas",
