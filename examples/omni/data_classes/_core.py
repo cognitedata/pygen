@@ -97,7 +97,7 @@ class DomainModelCore(Core):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DataRecordRead(BaseModel):
+class DataRecord(BaseModel):
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
