@@ -289,7 +289,10 @@ class DomainRelation(DomainModelCore):
     @classmethod
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
+        data.pop("instance_type", None)
         edge_type = data.pop("type", None)
+        start_node = data.pop("start_node")
+        end_node = data.pop("end_node")
         space = data.pop("space")
         external_id = data.pop("external_id")
         return cls(
@@ -297,6 +300,8 @@ class DomainRelation(DomainModelCore):
             external_id=external_id,
             data_record=DataRecord(**data),
             edge_type=edge_type,
+            start_node=start_node,
+            end_node=end_node,
             **unpack_properties(instance.properties),
         )
 
