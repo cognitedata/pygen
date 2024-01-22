@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._rotor import _create_rotor_filter
+from windmill_pydantic_v1.data_classes._rotor import _create_rotor_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["rotor_speed_controller", "rpm_low_speed_shaft"]
@@ -67,7 +67,7 @@ class RotorRpmLowSpeedShaftQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_rpm_low_speed_shaft' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotor_datapoints = client.rotor.rpm_low_speed_shaft(external_id="my_rpm_low_speed_shaft").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class RotorRpmLowSpeedShaftQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_rpm_low_speed_shaft' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotor_datapoints = client.rotor.rpm_low_speed_shaft(external_id="my_rpm_low_speed_shaft").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class RotorRpmLowSpeedShaftQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_rpm_low_speed_shaft' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotor_datapoints = client.rotor.rpm_low_speed_shaft(external_id="my_rpm_low_speed_shaft").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class RotorRpmLowSpeedShaftQuery:
             In this example,
             get weekly aggregates for the 'my_rpm_low_speed_shaft' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> rotor_datapoints = client.rotor.rpm_low_speed_shaft(
@@ -380,7 +380,7 @@ class RotorRpmLowSpeedShaftAPI:
 
             Retrieve all data for 5 rotor.rpm_low_speed_shaft timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotors = client.rotor.rpm_low_speed_shaft(limit=5).retrieve()
 
@@ -421,7 +421,7 @@ class RotorRpmLowSpeedShaftAPI:
 
             List rotor.rpm_low_speed_shaft and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotors = client.rotor.rpm_low_speed_shaft.list(limit=5)
 

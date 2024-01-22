@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._gearbox import _create_gearbox_filter
+from windmill_pydantic_v1.data_classes._gearbox import _create_gearbox_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["displacement_x", "displacement_y", "displacement_z"]
@@ -67,7 +67,7 @@ class GearboxDisplacementYQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_displacement_y' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearbox_datapoints = client.gearbox.displacement_y(external_id="my_displacement_y").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class GearboxDisplacementYQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_displacement_y' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearbox_datapoints = client.gearbox.displacement_y(external_id="my_displacement_y").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class GearboxDisplacementYQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_displacement_y' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearbox_datapoints = client.gearbox.displacement_y(external_id="my_displacement_y").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class GearboxDisplacementYQuery:
             In this example,
             get weekly aggregates for the 'my_displacement_y' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> gearbox_datapoints = client.gearbox.displacement_y(
@@ -380,7 +380,7 @@ class GearboxDisplacementYAPI:
 
             Retrieve all data for 5 gearbox.displacement_y timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearboxes = client.gearbox.displacement_y(limit=5).retrieve()
 
@@ -421,7 +421,7 @@ class GearboxDisplacementYAPI:
 
             List gearbox.displacement_y and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearboxes = client.gearbox.displacement_y.list(limit=5)
 

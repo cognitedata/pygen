@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     GeneratorList,
     GeneratorApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._generator import (
+from windmill_pydantic_v1.data_classes._generator import (
     _GENERATOR_PROPERTIES_BY_FIELD,
     _create_generator_filter,
 )
@@ -101,8 +101,8 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
             Create a new generator:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import GeneratorApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import GeneratorApply
                 >>> client = WindmillClient()
                 >>> generator = GeneratorApply(external_id="my_generator", ...)
                 >>> result = client.generator.apply(generator)
@@ -126,7 +126,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
             Delete generator by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.generator.delete("my_generator")
         """
@@ -156,7 +156,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
             Retrieve generator by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generator = client.generator.retrieve("my_generator")
 
@@ -226,7 +226,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
             Count generators in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.generator.aggregate("count", space="my_space")
 
@@ -312,7 +312,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
             List generators and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generators = client.generator.list(limit=5)
 

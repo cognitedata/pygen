@@ -4,7 +4,7 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WindmillMetmastAPI(EdgeAPI):
@@ -37,7 +37,7 @@ class WindmillMetmastAPI(EdgeAPI):
 
             List 5 metmast edges connected to "my_windmill":
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> windmill = client.windmill.metmast_edge.list("my_windmill", limit=5)
 

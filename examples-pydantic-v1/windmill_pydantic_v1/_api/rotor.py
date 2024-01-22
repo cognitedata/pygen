@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     RotorList,
     RotorApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._rotor import (
+from windmill_pydantic_v1.data_classes._rotor import (
     _ROTOR_PROPERTIES_BY_FIELD,
     _create_rotor_filter,
 )
@@ -101,8 +101,8 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
             Create a new rotor:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import RotorApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import RotorApply
                 >>> client = WindmillClient()
                 >>> rotor = RotorApply(external_id="my_rotor", ...)
                 >>> result = client.rotor.apply(rotor)
@@ -126,7 +126,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
             Delete rotor by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.rotor.delete("my_rotor")
         """
@@ -156,7 +156,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
             Retrieve rotor by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotor = client.rotor.retrieve("my_rotor")
 
@@ -226,7 +226,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
             Count rotors in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.rotor.aggregate("count", space="my_space")
 
@@ -312,7 +312,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
             List rotors and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> rotors = client.rotor.list(limit=5)
 

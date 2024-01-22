@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._nacelle import _create_nacelle_filter
+from windmill_pydantic_v1.data_classes._nacelle import _create_nacelle_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal[
@@ -69,7 +69,7 @@ class NacelleAccFromBackSideZQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_acc_from_back_side_z' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelle_datapoints = client.nacelle.acc_from_back_side_z(external_id="my_acc_from_back_side_z").retrieve(start="2w-ago")
         """
@@ -128,7 +128,7 @@ class NacelleAccFromBackSideZQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_acc_from_back_side_z' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelle_datapoints = client.nacelle.acc_from_back_side_z(external_id="my_acc_from_back_side_z").retrieve_array(start="2w-ago")
         """
@@ -196,7 +196,7 @@ class NacelleAccFromBackSideZQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_acc_from_back_side_z' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelle_datapoints = client.nacelle.acc_from_back_side_z(external_id="my_acc_from_back_side_z").retrieve_dataframe(start="2w-ago")
         """
@@ -273,7 +273,7 @@ class NacelleAccFromBackSideZQuery:
             In this example,
             get weekly aggregates for the 'my_acc_from_back_side_z' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> nacelle_datapoints = client.nacelle.acc_from_back_side_z(
@@ -392,7 +392,7 @@ class NacelleAccFromBackSideZAPI:
 
             Retrieve all data for 5 nacelle.acc_from_back_side_z timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelles = client.nacelle.acc_from_back_side_z(limit=5).retrieve()
 
@@ -448,7 +448,7 @@ class NacelleAccFromBackSideZAPI:
 
             List nacelle.acc_from_back_side_z and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelles = client.nacelle.acc_from_back_side_z.list(limit=5)
 

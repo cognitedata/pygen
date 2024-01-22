@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     MainShaftList,
     MainShaftApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._main_shaft import (
+from windmill_pydantic_v1.data_classes._main_shaft import (
     _MAINSHAFT_PROPERTIES_BY_FIELD,
     _create_main_shaft_filter,
 )
@@ -107,8 +107,8 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
             Create a new main_shaft:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import MainShaftApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import MainShaftApply
                 >>> client = WindmillClient()
                 >>> main_shaft = MainShaftApply(external_id="my_main_shaft", ...)
                 >>> result = client.main_shaft.apply(main_shaft)
@@ -132,7 +132,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
             Delete main_shaft by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.main_shaft.delete("my_main_shaft")
         """
@@ -162,7 +162,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
             Retrieve main_shaft by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shaft = client.main_shaft.retrieve("my_main_shaft")
 
@@ -232,7 +232,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
             Count main shafts in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.main_shaft.aggregate("count", space="my_space")
 
@@ -318,7 +318,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
             List main shafts and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shafts = client.main_shaft.list(limit=5)
 

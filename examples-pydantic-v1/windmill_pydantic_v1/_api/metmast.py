@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     MetmastList,
     MetmastApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._metmast import (
+from windmill_pydantic_v1.data_classes._metmast import (
     _METMAST_PROPERTIES_BY_FIELD,
     _create_metmast_filter,
 )
@@ -109,8 +109,8 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
             Create a new metmast:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import MetmastApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import MetmastApply
                 >>> client = WindmillClient()
                 >>> metmast = MetmastApply(external_id="my_metmast", ...)
                 >>> result = client.metmast.apply(metmast)
@@ -134,7 +134,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
             Delete metmast by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.metmast.delete("my_metmast")
         """
@@ -164,7 +164,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
             Retrieve metmast by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> metmast = client.metmast.retrieve("my_metmast")
 
@@ -242,7 +242,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
             Count metmasts in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.metmast.aggregate("count", space="my_space")
 
@@ -340,7 +340,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
             List metmasts and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> metmasts = client.metmast.list(limit=5)
 

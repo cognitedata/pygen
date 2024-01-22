@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     HighSpeedShaftList,
     HighSpeedShaftApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._high_speed_shaft import (
+from windmill_pydantic_v1.data_classes._high_speed_shaft import (
     _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
     _create_high_speed_shaft_filter,
 )
@@ -103,8 +103,8 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
             Create a new high_speed_shaft:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import HighSpeedShaftApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import HighSpeedShaftApply
                 >>> client = WindmillClient()
                 >>> high_speed_shaft = HighSpeedShaftApply(external_id="my_high_speed_shaft", ...)
                 >>> result = client.high_speed_shaft.apply(high_speed_shaft)
@@ -128,7 +128,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
             Delete high_speed_shaft by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.high_speed_shaft.delete("my_high_speed_shaft")
         """
@@ -158,7 +158,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
             Retrieve high_speed_shaft by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shaft = client.high_speed_shaft.retrieve("my_high_speed_shaft")
 
@@ -228,7 +228,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
             Count high speed shafts in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.high_speed_shaft.aggregate("count", space="my_space")
 
@@ -314,7 +314,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
             List high speed shafts and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shafts = client.high_speed_shaft.list(limit=5)
 

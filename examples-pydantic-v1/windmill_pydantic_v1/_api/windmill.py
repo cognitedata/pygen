@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -19,7 +19,7 @@ from windmill_pydantic_v1.client.data_classes import (
     WindmillApplyList,
     WindmillTextFields,
 )
-from windmill_pydantic_v1.client.data_classes._windmill import (
+from windmill_pydantic_v1.data_classes._windmill import (
     _WINDMILL_PROPERTIES_BY_FIELD,
     _create_windmill_filter,
 )
@@ -130,8 +130,8 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
             Create a new windmill:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import WindmillApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import WindmillApply
                 >>> client = WindmillClient()
                 >>> windmill = WindmillApply(external_id="my_windmill", ...)
                 >>> result = client.windmill.apply(windmill)
@@ -155,7 +155,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
             Delete windmill by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.windmill.delete("my_windmill")
         """
@@ -185,7 +185,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
             Retrieve windmill by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> windmill = client.windmill.retrieve("my_windmill")
 
@@ -252,7 +252,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
            Search for 'my_windmill' in all text properties:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> windmills = client.windmill.search('my_windmill')
 
@@ -376,7 +376,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
             Count windmills in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.windmill.aggregate("count", space="my_space")
 
@@ -516,7 +516,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
             List windmills and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> windmills = client.windmill.list(limit=5)
 

@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._main_shaft import _create_main_shaft_filter
+from windmill_pydantic_v1.data_classes._main_shaft import _create_main_shaft_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
@@ -67,7 +67,7 @@ class MainShaftBendingXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shaft_datapoints = client.main_shaft.bending_x(external_id="my_bending_x").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class MainShaftBendingXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shaft_datapoints = client.main_shaft.bending_x(external_id="my_bending_x").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class MainShaftBendingXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shaft_datapoints = client.main_shaft.bending_x(external_id="my_bending_x").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class MainShaftBendingXQuery:
             In this example,
             get weekly aggregates for the 'my_bending_x' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> main_shaft_datapoints = client.main_shaft.bending_x(
@@ -380,7 +380,7 @@ class MainShaftBendingXAPI:
 
             Retrieve all data for 5 main_shaft.bending_x timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shafts = client.main_shaft.bending_x(limit=5).retrieve()
 
@@ -421,7 +421,7 @@ class MainShaftBendingXAPI:
 
             List main_shaft.bending_x and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> main_shafts = client.main_shaft.bending_x.list(limit=5)
 

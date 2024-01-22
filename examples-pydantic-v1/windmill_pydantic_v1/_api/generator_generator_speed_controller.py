@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._generator import _create_generator_filter
+from windmill_pydantic_v1.data_classes._generator import _create_generator_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["generator_speed_controller", "generator_speed_controller_reference"]
@@ -67,7 +67,7 @@ class GeneratorGeneratorSpeedControllerQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_generator_speed_controller' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generator_datapoints = client.generator.generator_speed_controller(external_id="my_generator_speed_controller").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class GeneratorGeneratorSpeedControllerQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_generator_speed_controller' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generator_datapoints = client.generator.generator_speed_controller(external_id="my_generator_speed_controller").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class GeneratorGeneratorSpeedControllerQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_generator_speed_controller' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generator_datapoints = client.generator.generator_speed_controller(external_id="my_generator_speed_controller").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class GeneratorGeneratorSpeedControllerQuery:
             In this example,
             get weekly aggregates for the 'my_generator_speed_controller' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> generator_datapoints = client.generator.generator_speed_controller(
@@ -380,7 +380,7 @@ class GeneratorGeneratorSpeedControllerAPI:
 
             Retrieve all data for 5 generator.generator_speed_controller timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generators = client.generator.generator_speed_controller(limit=5).retrieve()
 
@@ -421,7 +421,7 @@ class GeneratorGeneratorSpeedControllerAPI:
 
             List generator.generator_speed_controller and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> generators = client.generator.generator_speed_controller.list(limit=5)
 

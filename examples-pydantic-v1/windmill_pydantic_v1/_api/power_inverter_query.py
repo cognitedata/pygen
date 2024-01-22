@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     PowerInverter,
 )

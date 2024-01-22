@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     NacelleList,
     NacelleApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._nacelle import (
+from windmill_pydantic_v1.data_classes._nacelle import (
     _NACELLE_PROPERTIES_BY_FIELD,
     _create_nacelle_filter,
 )
@@ -122,8 +122,8 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
             Create a new nacelle:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import NacelleApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import NacelleApply
                 >>> client = WindmillClient()
                 >>> nacelle = NacelleApply(external_id="my_nacelle", ...)
                 >>> result = client.nacelle.apply(nacelle)
@@ -147,7 +147,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
             Delete nacelle by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.nacelle.delete("my_nacelle")
         """
@@ -177,7 +177,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
             Retrieve nacelle by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelle = client.nacelle.retrieve("my_nacelle")
 
@@ -267,7 +267,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
             Count nacelles in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.nacelle.aggregate("count", space="my_space")
 
@@ -383,7 +383,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
             List nacelles and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> nacelles = client.nacelle.list(limit=5)
 

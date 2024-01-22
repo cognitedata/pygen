@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     GearboxList,
     GearboxApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._gearbox import (
+from windmill_pydantic_v1.data_classes._gearbox import (
     _GEARBOX_PROPERTIES_BY_FIELD,
     _create_gearbox_filter,
 )
@@ -103,8 +103,8 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
             Create a new gearbox:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import GearboxApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import GearboxApply
                 >>> client = WindmillClient()
                 >>> gearbox = GearboxApply(external_id="my_gearbox", ...)
                 >>> result = client.gearbox.apply(gearbox)
@@ -128,7 +128,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
             Delete gearbox by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.gearbox.delete("my_gearbox")
         """
@@ -158,7 +158,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
             Retrieve gearbox by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearbox = client.gearbox.retrieve("my_gearbox")
 
@@ -228,7 +228,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
             Count gearboxes in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.gearbox.aggregate("count", space="my_space")
 
@@ -314,7 +314,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
             List gearboxes and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> gearboxes = client.gearbox.list(limit=5)
 

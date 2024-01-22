@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     PowerInverterList,
     PowerInverterApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._power_inverter import (
+from windmill_pydantic_v1.data_classes._power_inverter import (
     _POWERINVERTER_PROPERTIES_BY_FIELD,
     _create_power_inverter_filter,
 )
@@ -103,8 +103,8 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
             Create a new power_inverter:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import PowerInverterApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import PowerInverterApply
                 >>> client = WindmillClient()
                 >>> power_inverter = PowerInverterApply(external_id="my_power_inverter", ...)
                 >>> result = client.power_inverter.apply(power_inverter)
@@ -128,7 +128,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
             Delete power_inverter by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.power_inverter.delete("my_power_inverter")
         """
@@ -158,7 +158,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
             Retrieve power_inverter by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> power_inverter = client.power_inverter.retrieve("my_power_inverter")
 
@@ -228,7 +228,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
             Count power inverters in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.power_inverter.aggregate("count", space="my_space")
 
@@ -314,7 +314,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
             List power inverters and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> power_inverters = client.power_inverter.list(limit=5)
 

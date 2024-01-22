@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -19,7 +19,7 @@ from windmill_pydantic_v1.client.data_classes import (
     BladeApplyList,
     BladeTextFields,
 )
-from windmill_pydantic_v1.client.data_classes._blade import (
+from windmill_pydantic_v1.data_classes._blade import (
     _BLADE_PROPERTIES_BY_FIELD,
     _create_blade_filter,
 )
@@ -113,8 +113,8 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
             Create a new blade:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import BladeApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import BladeApply
                 >>> client = WindmillClient()
                 >>> blade = BladeApply(external_id="my_blade", ...)
                 >>> result = client.blade.apply(blade)
@@ -138,7 +138,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
             Delete blade by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.blade.delete("my_blade")
         """
@@ -168,7 +168,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
             Retrieve blade by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> blade = client.blade.retrieve("my_blade")
 
@@ -219,7 +219,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
            Search for 'my_blade' in all text properties:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> blades = client.blade.search('my_blade')
 
@@ -318,7 +318,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
             Count blades in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.blade.aggregate("count", space="my_space")
 
@@ -428,7 +428,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
             List blades and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> blades = client.blade.list(limit=5)
 

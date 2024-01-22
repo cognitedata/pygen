@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from windmill_pydantic_v1.client.data_classes._high_speed_shaft import _create_high_speed_shaft_filter
+from windmill_pydantic_v1.data_classes._high_speed_shaft import _create_high_speed_shaft_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["bending_moment_y", "bending_monent_x", "torque"]
@@ -67,7 +67,7 @@ class HighSpeedShaftBendingMonentXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_monent_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shaft_datapoints = client.high_speed_shaft.bending_monent_x(external_id="my_bending_monent_x").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class HighSpeedShaftBendingMonentXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_monent_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shaft_datapoints = client.high_speed_shaft.bending_monent_x(external_id="my_bending_monent_x").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class HighSpeedShaftBendingMonentXQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_bending_monent_x' from 2 weeks ago up until now::
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shaft_datapoints = client.high_speed_shaft.bending_monent_x(external_id="my_bending_monent_x").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class HighSpeedShaftBendingMonentXQuery:
             In this example,
             get weekly aggregates for the 'my_bending_monent_x' for the first month of 2023 in Oslo time:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> from datetime import datetime, timezone
                 >>> client = WindmillClient()
                 >>> high_speed_shaft_datapoints = client.high_speed_shaft.bending_monent_x(
@@ -380,7 +380,7 @@ class HighSpeedShaftBendingMonentXAPI:
 
             Retrieve all data for 5 high_speed_shaft.bending_monent_x timeseries:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shafts = client.high_speed_shaft.bending_monent_x(limit=5).retrieve()
 
@@ -421,7 +421,7 @@ class HighSpeedShaftBendingMonentXAPI:
 
             List high_speed_shaft.bending_monent_x and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> high_speed_shafts = client.high_speed_shaft.bending_monent_x.list(limit=5)
 

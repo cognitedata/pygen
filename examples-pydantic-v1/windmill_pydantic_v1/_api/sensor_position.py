@@ -7,8 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from windmill_pydantic_v1.client.data_classes import (
+from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
@@ -18,7 +18,7 @@ from windmill_pydantic_v1.client.data_classes import (
     SensorPositionList,
     SensorPositionApplyList,
 )
-from windmill_pydantic_v1.client.data_classes._sensor_position import (
+from windmill_pydantic_v1.data_classes._sensor_position import (
     _SENSORPOSITION_PROPERTIES_BY_FIELD,
     _create_sensor_position_filter,
 )
@@ -127,8 +127,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
             Create a new sensor_position:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
-                >>> from windmill_pydantic_v1.client.data_classes import SensorPositionApply
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> from windmill_pydantic_v1.data_classes import SensorPositionApply
                 >>> client = WindmillClient()
                 >>> sensor_position = SensorPositionApply(external_id="my_sensor_position", ...)
                 >>> result = client.sensor_position.apply(sensor_position)
@@ -152,7 +152,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
             Delete sensor_position by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> client.sensor_position.delete("my_sensor_position")
         """
@@ -182,7 +182,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
             Retrieve sensor_position by id:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> sensor_position = client.sensor_position.retrieve("my_sensor_position")
 
@@ -260,7 +260,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
             Count sensor positions in space `my_space`:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> result = client.sensor_position.aggregate("count", space="my_space")
 
@@ -358,7 +358,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
             List sensor positions and limit to 5:
 
-                >>> from windmill_pydantic_v1.client import WindmillClient
+                >>> from windmill_pydantic_v1 import WindmillClient
                 >>> client = WindmillClient()
                 >>> sensor_positions = client.sensor_position.list(limit=5)
 
