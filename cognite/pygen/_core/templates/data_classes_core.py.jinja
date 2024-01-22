@@ -151,7 +151,7 @@ class DataRecordWrite(BaseModel):
 
 class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbid, populate_by_name=True{% endif %}):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
-    data_record: DataRecordWrite{% if not is_pydantic_v2 %}
+    data_record: DataRecordWrite = Field(default_factory=DataRecordWrite){% if not is_pydantic_v2 %}
 
     class Config:
         extra = Extra.forbid
@@ -317,7 +317,7 @@ class DomainRelationApply(BaseModel{% if is_pydantic_v2 %}, extra=Extra.forbid, 
     external_id_factory: ClassVar[
         Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
-    data_record: DataRecordWrite
+    data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255){% if not is_pydantic_v2 %}
 
     class Config:
