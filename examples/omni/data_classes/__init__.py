@@ -1,4 +1,6 @@
 from ._core import (
+    DataRecord,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -136,6 +138,8 @@ DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableApply.model_rebuild()
 
 __all__ = [
+    "DataRecord",
+    "DataRecordWrite",
     "ResourcesApply",
     "DomainModel",
     "DomainModelCore",

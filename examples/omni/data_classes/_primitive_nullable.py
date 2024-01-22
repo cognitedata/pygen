@@ -52,8 +52,6 @@ class PrimitiveNullable(DomainModel):
     It is used to when data is retrieved from CDF.
 
     Args:
-        space: The space where the node is located.
-        external_id: The external id of the primitive nullable.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -63,14 +61,10 @@ class PrimitiveNullable(DomainModel):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        created_time: The created time of the primitive nullable node.
-        last_updated_time: The last updated time of the primitive nullable node.
-        deleted_time: If present, the deleted time of the primitive nullable node.
-        version: The version of the primitive nullable node.
+        space: The space where the node is located.
+        external_id: The external id of the primitive nullable.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -80,6 +74,8 @@ class PrimitiveNullable(DomainModel):
     json_: Optional[dict] = Field(None, alias="json")
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
+    space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
 
     def as_apply(self) -> PrimitiveNullableApply:
         """Convert this read version of primitive nullable to the writing version."""
@@ -116,14 +112,9 @@ class PrimitiveNullableApply(DomainModelApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: Fail the ingestion request if the primitive nullable version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+        data_record: The data record of the primitive nullable node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -133,6 +124,8 @@ class PrimitiveNullableApply(DomainModelApply):
     json_: Optional[dict] = Field(None, alias="json")
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
+    space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
 
     def _to_instances_apply(
         self,

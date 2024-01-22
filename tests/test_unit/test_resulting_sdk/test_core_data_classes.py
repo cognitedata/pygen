@@ -11,9 +11,9 @@ from pydantic import Field
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from omni.data_classes._core import DomainModel, unpack_properties
+    from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
 else:
-    from omni_pydantic_v1.data_classes._core import DomainModel, unpack_properties
+    from omni_pydantic_v1.data_classes._core import DataRecord, DomainModel, unpack_properties
 
 
 class TestDomainModel:
@@ -40,15 +40,19 @@ class TestDomainModel:
 
         foo = Foo(
             external_id="foo",
-            version=1,
-            created_time=datetime.datetime(2023, 1, 1),
-            last_updated_time=datetime.datetime(2024, 1, 1),
+            data_record=DataRecord(
+                version=1,
+                created_time=datetime.datetime(2023, 1, 1),
+                last_updated_time=datetime.datetime(2024, 1, 1),
+            ),
         )
         bar = Bar(
             external_id="bar",
-            version=1,
-            created_time=datetime.datetime(2023, 1, 1),
-            last_updated_time=datetime.datetime(2024, 1, 1),
+            data_record=DataRecord(
+                version=1,
+                created_time=datetime.datetime(2023, 1, 1),
+                last_updated_time=datetime.datetime(2024, 1, 1),
+            ),
         )
         foo.bar = bar
         bar.foo = foo
@@ -60,13 +64,13 @@ class TestDomainModel:
         # Assert
         assert (
             foo_repr == "Foo(space='FooSpace', external_id='foo', "
-            "version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
-            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None)"
+            "data_record=DataRecord(version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
+            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None))"
         )
         assert (
             bar_repr == "Bar(space='BarSpace', external_id='bar', "
-            "version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
-            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None)"
+            "data_record=DataRecord(version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
+            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None))"
         )
 
 
