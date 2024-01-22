@@ -7,6 +7,7 @@ from cognite.client.data_classes import TimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -45,13 +46,10 @@ class PowerInverter(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the power inverter.
+        data_record: The data record of the power inverter node.
         active_power_total: The active power total field.
         apparent_power_total: The apparent power total field.
         reactive_power_total: The reactive power total field.
-        created_time: The created time of the power inverter node.
-        last_updated_time: The last updated time of the power inverter node.
-        deleted_time: If present, the deleted time of the power inverter node.
-        version: The version of the power inverter node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -65,7 +63,7 @@ class PowerInverter(DomainModel):
         return PowerInverterApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             active_power_total=self.active_power_total,
             apparent_power_total=self.apparent_power_total,
             reactive_power_total=self.reactive_power_total,
@@ -80,13 +78,10 @@ class PowerInverterApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the power inverter.
+        data_record: The data record of the power inverter node.
         active_power_total: The active power total field.
         apparent_power_total: The apparent power total field.
         reactive_power_total: The reactive power total field.
-        existing_version: Fail the ingestion request if the power inverter version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -131,7 +126,7 @@ class PowerInverterApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

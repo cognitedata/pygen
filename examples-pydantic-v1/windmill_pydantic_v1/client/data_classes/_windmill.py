@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -44,6 +45,7 @@ class Windmill(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the windmill.
+        data_record: The data record of the windmill node.
         blades: The blade field.
         capacity: The capacity field.
         metmast: The metmast field.
@@ -51,10 +53,6 @@ class Windmill(DomainModel):
         name: The name field.
         rotor: The rotor field.
         windfarm: The windfarm field.
-        created_time: The created time of the windmill node.
-        last_updated_time: The last updated time of the windmill node.
-        deleted_time: If present, the deleted time of the windmill node.
-        version: The version of the windmill node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -72,7 +70,7 @@ class Windmill(DomainModel):
         return WindmillApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             blades=[blade.as_apply() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[
@@ -93,6 +91,7 @@ class WindmillApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the windmill.
+        data_record: The data record of the windmill node.
         blades: The blade field.
         capacity: The capacity field.
         metmast: The metmast field.
@@ -100,10 +99,6 @@ class WindmillApply(DomainModelApply):
         name: The name field.
         rotor: The rotor field.
         windfarm: The windfarm field.
-        existing_version: Fail the ingestion request if the windmill version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -155,7 +150,7 @@ class WindmillApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

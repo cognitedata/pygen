@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -52,6 +53,7 @@ class Nacelle(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the nacelle.
+        data_record: The data record of the nacelle node.
         acc_from_back_side_x: The acc from back side x field.
         acc_from_back_side_y: The acc from back side y field.
         acc_from_back_side_z: The acc from back side z field.
@@ -62,10 +64,6 @@ class Nacelle(DomainModel):
         power_inverter: The power inverter field.
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
-        created_time: The created time of the nacelle node.
-        last_updated_time: The last updated time of the nacelle node.
-        deleted_time: If present, the deleted time of the nacelle node.
-        version: The version of the nacelle node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -86,7 +84,7 @@ class Nacelle(DomainModel):
         return NacelleApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             acc_from_back_side_x=self.acc_from_back_side_x,
             acc_from_back_side_y=self.acc_from_back_side_y,
             acc_from_back_side_z=self.acc_from_back_side_z,
@@ -112,6 +110,7 @@ class NacelleApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the nacelle.
+        data_record: The data record of the nacelle node.
         acc_from_back_side_x: The acc from back side x field.
         acc_from_back_side_y: The acc from back side y field.
         acc_from_back_side_z: The acc from back side z field.
@@ -122,10 +121,6 @@ class NacelleApply(DomainModelApply):
         power_inverter: The power inverter field.
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
-        existing_version: Fail the ingestion request if the nacelle version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -223,7 +218,7 @@ class NacelleApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

@@ -7,6 +7,7 @@ from cognite.client.data_classes import TimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -70,6 +71,7 @@ class SensorPosition(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the sensor position.
+        data_record: The data record of the sensor position node.
         edgewise_bend_mom_crosstalk_corrected: The edgewise bend mom crosstalk corrected field.
         edgewise_bend_mom_offset: The edgewise bend mom offset field.
         edgewise_bend_mom_offset_crosstalk_corrected: The edgewise bend mom offset crosstalk corrected field.
@@ -79,10 +81,6 @@ class SensorPosition(DomainModel):
         flapwise_bend_mom_offset: The flapwise bend mom offset field.
         flapwise_bend_mom_offset_crosstalk_corrected: The flapwise bend mom offset crosstalk corrected field.
         position: The position field.
-        created_time: The created time of the sensor position node.
-        last_updated_time: The last updated time of the sensor position node.
-        deleted_time: If present, the deleted time of the sensor position node.
-        version: The version of the sensor position node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -102,7 +100,7 @@ class SensorPosition(DomainModel):
         return SensorPositionApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
             edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
             edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
@@ -123,6 +121,7 @@ class SensorPositionApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the sensor position.
+        data_record: The data record of the sensor position node.
         edgewise_bend_mom_crosstalk_corrected: The edgewise bend mom crosstalk corrected field.
         edgewise_bend_mom_offset: The edgewise bend mom offset field.
         edgewise_bend_mom_offset_crosstalk_corrected: The edgewise bend mom offset crosstalk corrected field.
@@ -132,10 +131,6 @@ class SensorPositionApply(DomainModelApply):
         flapwise_bend_mom_offset: The flapwise bend mom offset field.
         flapwise_bend_mom_offset_crosstalk_corrected: The flapwise bend mom offset crosstalk corrected field.
         position: The position field.
-        existing_version: Fail the ingestion request if the sensor position version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -243,7 +238,7 @@ class SensorPositionApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
