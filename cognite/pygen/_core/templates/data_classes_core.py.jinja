@@ -203,7 +203,9 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
                         )
                 else:
                     properties[prop_name] = prop_value
-        return cls(space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties)
+        return cls(
+            space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
+        )
 
 
 T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)

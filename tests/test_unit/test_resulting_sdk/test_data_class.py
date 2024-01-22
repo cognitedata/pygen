@@ -121,10 +121,12 @@ def test_load_windmills_from_json(
         for windmill, json_item in zip(windmills, loaded_json):
             if IS_PYDANTIC_V2:
                 dumped_windmill = json.loads(
-                    windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True)
+                    windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
                 )
             else:
-                dumped_windmill = json.loads(windmill.json(by_alias=True, exclude=exclude, exclude_none=True))
+                dumped_windmill = json.loads(
+                    windmill.json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
+                )
             # The exclude=True is not recursive in pydantic, so we need to do it manually
             _recursive_exclude(dumped_windmill, exclude)
             assert dumped_windmill == json_item
