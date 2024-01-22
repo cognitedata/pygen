@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.35.4] - 22-01-24
+### Fixed
+* When generating an SDK from data model with a view implementing another view not in the data model, the `pygen`
+  would raise `KeyError: ViewId(space='<space>', external_id='<external ID>', version='<version>')`. This is now fixed
+
 ## [0.35.3] - 19-01-24
 ### Fixed
 * For edge views, `retrieve` and `list` raised `AttributeError: 'NodeId' object has no attribute 'as_tuple'`.

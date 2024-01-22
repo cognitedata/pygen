@@ -44,6 +44,7 @@ def test_view_implementing_view_outside_model() -> None:
             is_global=False,
         )
     ]
+
     actual = to_unique_parents_by_view_id(views)
 
-    assert actual == {}
+    assert actual == {views[0].as_id(): []}

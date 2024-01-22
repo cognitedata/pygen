@@ -122,8 +122,9 @@ class SDKGenerator:
 
 
 def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
+    existing_views = {view.as_id() for view in views}
     parents_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = {
-        view.as_id(): {parent for parent in view.implements or []} for view in views
+        view.as_id(): {parent for parent in view.implements or [] if parent in existing_views} for view in views
     }
     ancestors_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
     for view_id in TopologicalSorter(parents_by_view_id).static_order():
@@ -133,9 +134,14 @@ def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, li
 
     unique_parents_by_view_id: dict[dm.ViewId, list[dm.ViewId]] = {}
     for view in views:
-        ancestors = {grand_parent for parent in view.implements or [] for grand_parent in ancestors_by_view_id[parent]}
+        ancestors = {
+            grand_parent
+            for parent in view.implements or []
+            if parent in existing_views
+            for grand_parent in ancestors_by_view_id[parent]
+        }
         unique_parents_by_view_id[view.as_id()] = [
-            parent for parent in view.implements or [] if parent not in ancestors
+            parent for parent in view.implements or [] if parent in existing_views and parent not in ancestors
         ]
     return unique_parents_by_view_id
 
