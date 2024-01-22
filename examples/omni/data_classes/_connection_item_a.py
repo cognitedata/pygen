@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -48,14 +49,11 @@ class ConnectionItemA(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the connection item a.
+        data_record: The data record of the connection item a node.
         name: The name field.
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-        created_time: The created time of the connection item a node.
-        last_updated_time: The last updated time of the connection item a node.
-        deleted_time: If present, the deleted time of the connection item a node.
-        version: The version of the connection item a node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -70,7 +68,7 @@ class ConnectionItemA(DomainModel):
         return ConnectionItemAApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
             other_direct=self.other_direct.as_apply()
             if isinstance(self.other_direct, DomainModel)
@@ -90,14 +88,11 @@ class ConnectionItemAApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the connection item a.
+        data_record: The data record of the connection item a node.
         name: The name field.
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-        existing_version: Fail the ingestion request if the connection item a version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE

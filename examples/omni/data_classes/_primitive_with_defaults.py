@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -49,15 +50,12 @@ class PrimitiveWithDefaults(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the primitive with default.
+        data_record: The data record of the primitive with default node.
         auto_increment_int_32: The auto increment int 32 field.
         default_boolean: The default boolean field.
         default_float_32: The default float 32 field.
         default_object: The default object field.
         default_string: The default string field.
-        created_time: The created time of the primitive with default node.
-        last_updated_time: The last updated time of the primitive with default node.
-        deleted_time: If present, the deleted time of the primitive with default node.
-        version: The version of the primitive with default node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -73,7 +71,7 @@ class PrimitiveWithDefaults(DomainModel):
         return PrimitiveWithDefaultsApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             auto_increment_int_32=self.auto_increment_int_32,
             default_boolean=self.default_boolean,
             default_float_32=self.default_float_32,
@@ -90,15 +88,12 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the primitive with default.
+        data_record: The data record of the primitive with default node.
         auto_increment_int_32: The auto increment int 32 field.
         default_boolean: The default boolean field.
         default_float_32: The default float 32 field.
         default_object: The default object field.
         default_string: The default string field.
-        existing_version: Fail the ingestion request if the primitive with default version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE

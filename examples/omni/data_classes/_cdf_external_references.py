@@ -7,6 +7,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -15,7 +16,6 @@ from ._core import (
     DomainRelationApply,
     ResourcesApply,
     TimeSeries,
-    DataRecordWrite,
 )
 
 
@@ -47,13 +47,10 @@ class CDFExternalReferences(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf external reference.
+        data_record: The data record of the cdf external reference node.
         file: The file field.
         sequence: The sequence field.
         timeseries: The timesery field.
-        created_time: The created time of the cdf external reference node.
-        last_updated_time: The last updated time of the cdf external reference node.
-        deleted_time: If present, the deleted time of the cdf external reference node.
-        version: The version of the cdf external reference node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -82,13 +79,10 @@ class CDFExternalReferencesApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf external reference.
+        data_record: The data record of the cdf external reference node.
         file: The file field.
         sequence: The sequence field.
         timeseries: The timesery field.
-        existing_version: Fail the ingestion request if the cdf external reference version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE

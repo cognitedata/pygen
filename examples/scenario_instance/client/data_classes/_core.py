@@ -67,11 +67,8 @@ class ResourcesApplyResult:
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
 class Core(BaseModel, arbitrary_types_allowed=True):
-    def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
-        exclude = None
-        if not include_instance_properties:
-            exclude = set(type(self).__bases__[0].model_fields) - {"external_id"}
-        return pd.Series(self.model_dump(exclude=exclude))
+    def to_pandas(self) -> pd.Series:
+        return pd.Series(self.model_dump())
 
     def _repr_html_(self) -> str:
         """Returns HTML representation of DomainModel."""
@@ -97,11 +94,24 @@ class DomainModelCore(Core):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DomainModel(DomainModelCore):
+class DataRecord(BaseModel):
+    """The data record represents the metadata of a node.
+
+    Args:
+        created_time: The created time of the node.
+        last_updated_time: The last updated time of the node.
+        deleted_time: If present, the deleted time of the node.
+        version: The version of the node.
+    """
+
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
+
+
+class DomainModel(DomainModelCore):
+    data_record: DataRecord
 
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)
@@ -110,15 +120,35 @@ class DomainModel(DomainModelCore):
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
         data["node_type"] = data.pop("type", None)
-        return cls(**{**data, **unpack_properties(instance.properties)})
+        space = data.pop("space")
+        external_id = data.pop("external_id")
+        return cls(
+            space=space,
+            external_id=external_id,
+            data_record=DataRecord(**data),
+            **unpack_properties(instance.properties),
+        )
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
 
 
+class DataRecordWrite(BaseModel):
+    """The data record represents the metadata of a node.
+
+    Args:
+        existing_version: Fail the ingestion request if the node version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
+    existing_version: Optional[int] = None
+
+
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
-    existing_version: Optional[int] = None
+    data_record: DataRecordWrite
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -145,6 +175,8 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
         data["node_type"] = data.pop("type", None)
+        space = data.pop("space")
+        external_id = data.pop("external_id")
         sources = data.pop("sources", [])
         properties = {}
         for source in sources:
@@ -158,7 +190,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
                         )
                 else:
                     properties[prop_name] = prop_value
-        return cls(**{**data, **properties})
+        return cls(space=space, external_id=external_id, data_record=DataRecordWrite(**data), **properties)
 
 
 T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)
@@ -197,13 +229,9 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
     def as_external_ids(self) -> list[str]:
         return [node.external_id for node in self.data]
 
-    def to_pandas(self, include_instance_properties: bool = False) -> pd.DataFrame:
+    def to_pandas(self) -> pd.DataFrame:
         """
         Convert the list of nodes to a pandas.DataFrame.
-
-        Args:
-            include_instance_properties: Whether to include the properties from the instances in the columns
-                of the resulting DataFrame.
 
         Returns:
             A pandas.DataFrame with the nodes as rows.
@@ -212,14 +240,12 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         if df.empty:
             df = pd.DataFrame(columns=self._INSTANCE.model_fields)
         # Reorder columns to have the custom columns first
-        fixed_columns = set(self._PARENT_CLASS.model_fields)
+        fixed_columns = {"data_record", "space"}
         columns = ["external_id"] + [col for col in df if col not in fixed_columns]
-        if include_instance_properties:
-            columns += [col for col in self._PARENT_CLASS.model_fields if col != "external_id"]
         return df[columns]
 
     def _repr_html_(self) -> str:
-        return self.to_pandas(include_instance_properties=False)._repr_html_()  # type: ignore[operator]
+        return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
 class DomainModelList(CoreList[T_DomainModelCore]):
@@ -255,10 +281,7 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    version: int
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-    deleted_time: Optional[datetime.datetime] = None
+    data_record: DataRecord
 
     @classmethod
     def from_instance(cls: type[T_DomainRelation], instance: dm.Edge) -> T_DomainRelation:
@@ -282,7 +305,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[
         Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
-    existing_version: Optional[int] = None
+    data_record: DataRecordWrite
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
 
     @abstractmethod

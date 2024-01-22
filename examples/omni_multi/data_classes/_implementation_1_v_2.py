@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -46,13 +47,10 @@ class Implementation1v2(SubInterface):
     Args:
         space: The space where the node is located.
         external_id: The external id of the implementation 1 v 2.
+        data_record: The data record of the implementation 1 v 2 node.
         main_value: The main value field.
         sub_value: The sub value field.
         value_2: The value 2 field.
-        created_time: The created time of the implementation 1 v 2 node.
-        last_updated_time: The last updated time of the implementation 1 v 2 node.
-        deleted_time: If present, the deleted time of the implementation 1 v 2 node.
-        version: The version of the implementation 1 v 2 node.
     """
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
@@ -63,7 +61,7 @@ class Implementation1v2(SubInterface):
         return Implementation1v2Apply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             main_value=self.main_value,
             sub_value=self.sub_value,
             value_2=self.value_2,
@@ -78,13 +76,10 @@ class Implementation1v2Apply(SubInterfaceApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the implementation 1 v 2.
+        data_record: The data record of the implementation 1 v 2 node.
         main_value: The main value field.
         sub_value: The sub value field.
         value_2: The value 2 field.
-        existing_version: Fail the ingestion request if the implementation 1 v 2 version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")

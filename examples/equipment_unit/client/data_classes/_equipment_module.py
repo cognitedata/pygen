@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -48,14 +49,11 @@ class EquipmentModule(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the equipment module.
+        data_record: The data record of the equipment module node.
         description: The description field.
         name: The name field.
         sensor_value: The sensor value field.
         type_: The type field.
-        created_time: The created time of the equipment module node.
-        last_updated_time: The last updated time of the equipment module node.
-        deleted_time: If present, the deleted time of the equipment module node.
-        version: The version of the equipment module node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -70,7 +68,7 @@ class EquipmentModule(DomainModel):
         return EquipmentModuleApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             name=self.name,
             sensor_value=self.sensor_value,
@@ -86,14 +84,11 @@ class EquipmentModuleApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the equipment module.
+        data_record: The data record of the equipment module node.
         description: The description field.
         name: The name field.
         sensor_value: The sensor value field.
         type_: The type field.
-        existing_version: Fail the ingestion request if the equipment module version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE

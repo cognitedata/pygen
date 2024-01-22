@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -45,6 +46,7 @@ class Empty(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the empty.
+        data_record: The data record of the empty node.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -54,10 +56,6 @@ class Empty(DomainModel):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        created_time: The created time of the empty node.
-        last_updated_time: The last updated time of the empty node.
-        deleted_time: If present, the deleted time of the empty node.
-        version: The version of the empty node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -77,7 +75,7 @@ class Empty(DomainModel):
         return EmptyApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             boolean=self.boolean,
             date=self.date,
             float_32=self.float_32,
@@ -98,6 +96,7 @@ class EmptyApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the empty.
+        data_record: The data record of the empty node.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -107,10 +106,6 @@ class EmptyApply(DomainModelApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: Fail the ingestion request if the empty version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
