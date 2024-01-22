@@ -219,7 +219,7 @@ class NacelleApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
