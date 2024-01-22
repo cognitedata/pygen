@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -52,6 +53,9 @@ class PrimitiveNullable(DomainModel):
     It is used to when data is retrieved from CDF.
 
     Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive nullable.
+        data_record: The data record of the primitive nullable node.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -61,10 +65,10 @@ class PrimitiveNullable(DomainModel):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        space: The space where the node is located.
-        external_id: The external id of the primitive nullable.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -74,15 +78,13 @@ class PrimitiveNullable(DomainModel):
     json_: Optional[dict] = Field(None, alias="json")
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
-    space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
 
     def as_apply(self) -> PrimitiveNullableApply:
         """Convert this read version of primitive nullable to the writing version."""
         return PrimitiveNullableApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             boolean=self.boolean,
             date=self.date,
             float_32=self.float_32,
@@ -103,6 +105,7 @@ class PrimitiveNullableApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the primitive nullable.
+        data_record: The data record of the primitive nullable node.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -112,9 +115,10 @@ class PrimitiveNullableApply(DomainModelApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        data_record: The data record of the primitive nullable node.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -124,8 +128,6 @@ class PrimitiveNullableApply(DomainModelApply):
     json_: Optional[dict] = Field(None, alias="json")
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
-    space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
 
     def _to_instances_apply(
         self,
