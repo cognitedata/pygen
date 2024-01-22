@@ -97,11 +97,15 @@ class DomainModelCore(Core):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DomainModel(DomainModelCore):
+class DataRecordRead(BaseModel):
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
+
+
+class DomainModel(DomainModelCore):
+    data_record: DataRecord
 
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)
@@ -116,9 +120,13 @@ class DomainModel(DomainModelCore):
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
 
 
+class DataRecordWrite(BaseModel):
+    existing_version: Optional[int] = None
+
+
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
-    existing_version: Optional[int] = None
+    data_record: DataRecordWrite
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
