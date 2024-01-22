@@ -119,13 +119,14 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
-        data["node_type"] = data.pop("type", None)
+        node_type = data.pop("type", None)
         space = data.pop("space")
         external_id = data.pop("external_id")
         return cls(
             space=space,
             external_id=external_id,
             data_record=DataRecord(**data),
+            node_type=node_type,
             **unpack_properties(instance.properties),
         )
 
@@ -174,7 +175,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     def from_instance(cls: type[T_DomainModelApply], instance: InstanceApply) -> T_DomainModelApply:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
-        data["node_type"] = data.pop("type", None)
+        node_type = data.pop("type", None)
         space = data.pop("space")
         external_id = data.pop("external_id")
         sources = data.pop("sources", [])
@@ -190,7 +191,9 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
                         )
                 else:
                     properties[prop_name] = prop_value
-        return cls(space=space, external_id=external_id, data_record=DataRecordWrite(**data), **properties)
+        return cls(
+            space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
+        )
 
 
 T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)
@@ -284,10 +287,18 @@ class DomainRelation(DomainModelCore):
     data_record: DataRecord
 
     @classmethod
-    def from_instance(cls: type[T_DomainRelation], instance: dm.Edge) -> T_DomainRelation:
+    def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
-        data["edge_type"] = data.pop("type")
-        return cls(**{**data, **unpack_properties(instance.properties)})
+        edge_type = data.pop("type", None)
+        space = data.pop("space")
+        external_id = data.pop("external_id")
+        return cls(
+            space=space,
+            external_id=external_id,
+            data_record=DataRecord(**data),
+            edge_type=edge_type,
+            **unpack_properties(instance.properties),
+        )
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
