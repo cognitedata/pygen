@@ -1,3 +1,5 @@
+from cognite.client import data_modeling as dm
+
 from cognite.pygen._core.generators import MultiAPIGenerator, to_unique_parents_by_view_id
 
 
@@ -22,3 +24,27 @@ def test_to_parents_by_view_id_omni(omni_multi_api_generator: MultiAPIGenerator)
 
     # Assert
     assert actual == expected
+
+
+def test_view_implementing_view_outside_model() -> None:
+    views = [
+        dm.View(
+            space="some_space",
+            external_id="View1",
+            version="1",
+            properties={},
+            last_updated_time=0,
+            created_time=0,
+            description="",
+            name="",
+            filter=None,
+            implements=[dm.ViewId("some_space", "Unknown_to_model", "1")],
+            writable=True,
+            used_for="node",
+            is_global=False,
+        )
+    ]
+
+    actual = to_unique_parents_by_view_id(views)
+
+    assert actual == {views[0].as_id(): []}
