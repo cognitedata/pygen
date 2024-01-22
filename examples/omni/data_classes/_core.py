@@ -281,10 +281,7 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    version: int
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-    deleted_time: Optional[datetime.datetime] = None
+    data_record: DataRecord
 
     @classmethod
     def from_instance(cls: type[T_DomainRelation], instance: dm.Edge) -> T_DomainRelation:
@@ -308,7 +305,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[
         Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
-    existing_version: Optional[int] = None
+    data_record: DataRecordWrite
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
 
     @abstractmethod
