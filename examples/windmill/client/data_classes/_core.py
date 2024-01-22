@@ -148,7 +148,7 @@ class DataRecordWrite(BaseModel):
 
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
-    data_record: DataRecordWrite
+    data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -305,7 +305,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[
         Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
-    data_record: DataRecordWrite
+    data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
 
     @abstractmethod
