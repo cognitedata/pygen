@@ -16,14 +16,14 @@ from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
     from pydantic import TypeAdapter
-    from windmill.client.data_classes import DomainModelApply as WindmillDomainModelApply
-    from windmill.client.data_classes import ResourcesApply, WindmillApply
+    from windmill.data_classes import DomainModelApply as WindmillDomainModelApply
+    from windmill.data_classes import ResourcesApply, WindmillApply
 else:
     from pydantic import parse_obj_as
-    from windmill_pydantic_v1.client.data_classes import (
+    from windmill_pydantic_v1.data_classes import (
         DomainModelApply as WindmillDomainModelApply,
     )
-    from windmill_pydantic_v1.client.data_classes import (
+    from windmill_pydantic_v1.data_classes import (
         ResourcesApply,
         WindmillApply,
     )
