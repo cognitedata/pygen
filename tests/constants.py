@@ -164,7 +164,7 @@ class ExampleSDK:
 
 WINDMILL_SDK = ExampleSDK(
     data_model_ids=[DataModelId("power-models", "Windmill", "1")],
-    _top_level_package="windmill.client",
+    _top_level_package="windmill",
     client_name="WindmillClient",
     generate_sdk=True,
     _instance_space="windmill-instances",
