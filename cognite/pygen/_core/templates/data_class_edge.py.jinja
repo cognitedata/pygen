@@ -6,7 +6,7 @@ from typing import Literal, Optional, Union
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import DEFAULT_INSTANCE_SPACE, DomainModel, DomainModelCore, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
+from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
 
@@ -27,12 +27,9 @@ class {{ data_class.read_name }}(DomainRelation):
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        external_id: The external id of the {{ data_class.doc_name }}.
+        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-        created_time: The created time of the {{ data_class.doc_name }} node.
-        last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
-        deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
-        version: The version of the {{ data_class.doc_name }} node.
     """
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
@@ -42,7 +39,7 @@ class {{ data_class.read_name }}(DomainRelation):
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,{% for field in data_class %}
+            data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}
             {{ field.name }}={{ field.as_apply() }},{% endfor %}
         )
 
@@ -54,12 +51,9 @@ class {{ data_class.write_name }}(DomainRelationApply):
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        external_id: The external id of the {{ data_class.doc_name }}.
+        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-        existing_version: Fail the ingestion request if the {{ data_class.doc_name }} version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
@@ -113,7 +107,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
                 type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
-                existing_version=self.existing_version,
+                existing_version=self.data_recrod.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

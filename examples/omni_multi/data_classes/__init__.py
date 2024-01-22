@@ -1,4 +1,6 @@
 from ._core import (
+    DataRecord,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -50,6 +52,8 @@ from ._sub_interface import (
 
 
 __all__ = [
+    "DataRecord",
+    "DataRecordWrite",
     "ResourcesApply",
     "DomainModel",
     "DomainModelCore",

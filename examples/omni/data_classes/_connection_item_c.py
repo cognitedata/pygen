@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -32,12 +33,9 @@ class ConnectionItemC(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the connection item c.
+        data_record: The data record of the connection item c node.
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
-        created_time: The created time of the connection item c node.
-        last_updated_time: The last updated time of the connection item c node.
-        deleted_time: If present, the deleted time of the connection item c node.
-        version: The version of the connection item c node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -54,7 +52,7 @@ class ConnectionItemC(DomainModel):
         return ConnectionItemCApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             connection_item_a=[
                 connection_item_a.as_apply() if isinstance(connection_item_a, DomainModel) else connection_item_a
                 for connection_item_a in self.connection_item_a or []
@@ -74,12 +72,9 @@ class ConnectionItemCApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the connection item c.
+        data_record: The data record of the connection item c node.
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
-        existing_version: Fail the ingestion request if the connection item c version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -105,7 +100,7 @@ class ConnectionItemCApply(DomainModelApply):
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.existing_version,
+            existing_version=self.data_record.existing_version,
             type=self.node_type,
             sources=None,
         )

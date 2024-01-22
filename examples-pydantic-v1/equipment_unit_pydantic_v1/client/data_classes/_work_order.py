@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -45,13 +46,10 @@ class WorkOrder(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the work order.
+        data_record: The data record of the work order node.
         description: The description field.
         performed_by: The performed by field.
         type_: The type field.
-        created_time: The created time of the work order node.
-        last_updated_time: The last updated time of the work order node.
-        deleted_time: If present, the deleted time of the work order node.
-        version: The version of the work order node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -65,7 +63,7 @@ class WorkOrder(DomainModel):
         return WorkOrderApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             performed_by=self.performed_by,
             type_=self.type_,
@@ -80,13 +78,10 @@ class WorkOrderApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the work order.
+        data_record: The data record of the work order node.
         description: The description field.
         performed_by: The performed by field.
         type_: The type field.
-        existing_version: Fail the ingestion request if the work order version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -124,7 +119,7 @@ class WorkOrderApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

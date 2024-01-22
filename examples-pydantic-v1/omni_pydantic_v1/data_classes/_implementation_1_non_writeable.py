@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -44,13 +45,10 @@ class Implementation1NonWriteable(SubInterface):
     Args:
         space: The space where the node is located.
         external_id: The external id of the implementation 1 non writeable.
+        data_record: The data record of the implementation 1 non writeable node.
         main_value: The main value field.
         sub_value: The sub value field.
         value_1: The value 1 field.
-        created_time: The created time of the implementation 1 non writeable node.
-        last_updated_time: The last updated time of the implementation 1 non writeable node.
-        deleted_time: If present, the deleted time of the implementation 1 non writeable node.
-        version: The version of the implementation 1 non writeable node.
     """
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")

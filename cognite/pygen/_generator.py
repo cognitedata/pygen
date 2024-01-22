@@ -16,6 +16,7 @@ from cognite.client.exceptions import CogniteAPIError
 from typing_extensions import TypeAlias
 
 from ._core.generators import SDKGenerator
+from ._core.models import DataClass
 from ._settings import _load_pyproject_toml
 from ._version import __version__
 from .config import PygenConfig
@@ -84,9 +85,9 @@ def generate_sdk(
         client: The cognite client used for fetching the data model. This is required if you pass in
             data models ID(s) in the `model_id` argument and not a data model.
         top_level_package: The name of the top level package for the SDK. For example,
-            if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
-            the importing the client will be `from apm.client import APMClient`. If nothing is passed,
-            the package will be [external_id:snake].client of the first data model given, while
+            if we have top_level_package=`apm` and the client_name=`APMClient`, then
+            the importing the client will be `from apm import APMClient`. If nothing is passed,
+            the package will be [external_id:snake] of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         default_instance_space: The default instance space to use for the generated SDK. Defaults to the
@@ -157,9 +158,9 @@ def generate_sdk_notebook(
         client: The cognite client used for fetching the data model. This is required if you pass in
             data models ID(s) in the `model_id` argument and not a data model.
         top_level_package: The name of the top level package for the SDK. For example,
-            if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
-            the importing the client will be `from apm.client import APMClient`. If nothing is passed,
-            the package will be [external_id:snake].client of the first data model given, while
+            if we have top_level_package=`apm` and the client_name=`APMClient`, then
+            the importing the client will be `from apm import APMClient`. If nothing is passed,
+            the package will be [external_id:snake] of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         default_instance_space: The default instance space to use for the generated SDK. Defaults to the
@@ -204,11 +205,24 @@ def generate_sdk_notebook(
         print(f"{output_dir} already in sys.path")
     module = vars(importlib.import_module(top_level_package))
     print(f"Imported {top_level_package}")
+    print("You can now use the generated SDK in the current Python session.")
+    if isinstance(data_model, dm.DataModel):
+        view = data_model.views[0]
+    elif isinstance(data_model, Sequence):
+        view = data_model[0].views[0]
+    else:
+        view = None
+
+    if view:
+        print(
+            "The data classes are available by importing, for example, "
+            f"`from {top_level_package}.data_classes import {DataClass.to_base_name(view)}Apply`"
+        )
     return module[client_name](client)
 
 
 def _default_top_level_package(external_id: str) -> str:
-    return f"{to_snake(external_id)}.client"
+    return f"{to_snake(external_id)}"
 
 
 def _default_client_name(external_id: str) -> str:

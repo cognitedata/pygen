@@ -16,14 +16,14 @@ from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
     from pydantic import TypeAdapter
-    from windmill.client.data_classes import DomainModelApply as WindmillDomainModelApply
-    from windmill.client.data_classes import ResourcesApply, WindmillApply
+    from windmill.data_classes import DomainModelApply as WindmillDomainModelApply
+    from windmill.data_classes import ResourcesApply, WindmillApply
 else:
     from pydantic import parse_obj_as
-    from windmill_pydantic_v1.client.data_classes import (
+    from windmill_pydantic_v1.data_classes import (
         DomainModelApply as WindmillDomainModelApply,
     )
-    from windmill_pydantic_v1.client.data_classes import (
+    from windmill_pydantic_v1.data_classes import (
         ResourcesApply,
         WindmillApply,
     )
@@ -117,14 +117,16 @@ def test_load_windmills_from_json(
             created.extend(item.to_instances_apply())
 
         # Assert
-        exclude = {"external_id", "space"}
+        exclude = {"external_id", "space", "data_record"}
         for windmill, json_item in zip(windmills, loaded_json):
             if IS_PYDANTIC_V2:
                 dumped_windmill = json.loads(
-                    windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True)
+                    windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
                 )
             else:
-                dumped_windmill = json.loads(windmill.json(by_alias=True, exclude=exclude, exclude_none=True))
+                dumped_windmill = json.loads(
+                    windmill.json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
+                )
             # The exclude=True is not recursive in pydantic, so we need to do it manually
             _recursive_exclude(dumped_windmill, exclude)
             assert dumped_windmill == json_item

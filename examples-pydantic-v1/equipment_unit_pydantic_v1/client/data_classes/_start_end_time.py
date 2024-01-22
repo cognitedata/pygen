@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -37,13 +38,10 @@ class StartEndTime(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
+        data_record: The data record of the start end time edge.
         end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
-        created_time: The created time of the start end time node.
-        last_updated_time: The last updated time of the start end time node.
-        deleted_time: If present, the deleted time of the start end time node.
-        version: The version of the start end time node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -56,7 +54,7 @@ class StartEndTime(DomainRelation):
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,
@@ -71,13 +69,10 @@ class StartEndTimeApply(DomainRelationApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
+        data_record: The data record of the start end time edge.
         end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
-        existing_version: Fail the ingestion request if the start end time version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -129,7 +124,7 @@ class StartEndTimeApply(DomainRelationApply):
                 type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
-                existing_version=self.existing_version,
+                existing_version=self.data_recrod.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

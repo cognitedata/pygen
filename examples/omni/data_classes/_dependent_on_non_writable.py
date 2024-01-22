@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -46,12 +47,9 @@ class DependentOnNonWritable(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the dependent on non writable.
+        data_record: The data record of the dependent on non writable node.
         a_value: The a value field.
         to_non_writable: The to non writable field.
-        created_time: The created time of the dependent on non writable node.
-        last_updated_time: The last updated time of the dependent on non writable node.
-        deleted_time: If present, the deleted time of the dependent on non writable node.
-        version: The version of the dependent on non writable node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -68,7 +66,7 @@ class DependentOnNonWritable(DomainModel):
         return DependentOnNonWritableApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
             to_non_writable=[
                 to_non_writable.as_apply() if isinstance(to_non_writable, DomainModel) else to_non_writable
@@ -85,12 +83,9 @@ class DependentOnNonWritableApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the dependent on non writable.
+        data_record: The data record of the dependent on non writable node.
         a_value: The a value field.
         to_non_writable: The to non writable field.
-        existing_version: Fail the ingestion request if the dependent on non writable version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -123,7 +118,7 @@ class DependentOnNonWritableApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

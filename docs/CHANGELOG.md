@@ -14,6 +14,23 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.36.0] - 22-01-24
+### Changed (BREAKING)
+* The `node` and `edge` properties `version`, `created_time`, `last_updated_time`, `deleted_time`, and
+  `existing_version` have been moved from the generated data class to a sub class `data_record`. This is
+  to make it clear that these properties are not part of the data model, but are metadata about the data. They
+  are available under `my_windmill = my_client.windmill.retrieve('Utsira1')` as `my_windmill.data_record.version`,
+  and so on.
+* The default behavior of `generate_sdk` and `generate_sdk_notebook`, the parameter `top_level_package`
+  is no longer set to `<model_id:snake_case>.client` but instead `<model_id:snake_case>`. This means
+  if your data model is named `MyDataModel`, the generated SDK will be placed in the package `my_data_model`,
+  and thus you import the client as `from my_data_model import MyDataModelClient`. This is to make
+  it more intuitive to import the generated SDK client.
+
+### Change
+* The `.to_pandas()` method no longer hides parent properties by default. This was originally used to hide
+  the `data_record` properties, but since these are now in a sub class, this is no longer needed.
+
 ## [0.35.4] - 22-01-24
 ### Fixed
 * When generating an SDK from data model with a view implementing another view not in the data model, the `pygen`

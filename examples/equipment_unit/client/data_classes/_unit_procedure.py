@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelApply,
@@ -47,14 +48,11 @@ class UnitProcedure(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the unit procedure.
+        data_record: The data record of the unit procedure node.
         name: The name field.
         type_: The type field.
         work_orders: The work order field.
         work_units: The work unit field.
-        created_time: The created time of the unit procedure node.
-        last_updated_time: The last updated time of the unit procedure node.
-        deleted_time: If present, the deleted time of the unit procedure node.
-        version: The version of the unit procedure node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -69,7 +67,7 @@ class UnitProcedure(DomainModel):
         return UnitProcedureApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.version,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
             type_=self.type_,
             work_orders=[work_order.as_apply() for work_order in self.work_orders or []],
@@ -85,14 +83,11 @@ class UnitProcedureApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the unit procedure.
+        data_record: The data record of the unit procedure node.
         name: The name field.
         type_: The type field.
         work_orders: The work order field.
         work_units: The work unit field.
-        existing_version: Fail the ingestion request if the unit procedure version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -128,7 +123,7 @@ class UnitProcedureApply(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
