@@ -14,6 +14,12 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.36.1] - 23-01-24
+### Fix
+* If you use `generate_sdk_notebook` to generate multiple SDKs in one session with the default arguments, the
+  `pygen` temporary directory would be cleaned before generating each SDK and thus removing the previous SDKs. This
+  is now fixed by ensuring each SDK each generated in a separate temporary directory.
+
 ## [0.36.0] - 22-01-24
 ### Changed (BREAKING)
 * The `node` and `edge` properties `version`, `created_time`, `last_updated_time`, `deleted_time`, and
