@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import re
 import shutil
 import sys
 import tempfile
@@ -15,15 +16,17 @@ from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
 from typing_extensions import TypeAlias
 
-from ._core.generators import SDKGenerator
-from ._core.models import DataClass
-from ._settings import _load_pyproject_toml
-from ._version import __version__
-from .config import PygenConfig
-from .exceptions import DataModelNotFound
-from .utils.text import to_pascal, to_snake
+from cognite.pygen._core.generators import SDKGenerator
+from cognite.pygen._core.models import DataClass
+from cognite.pygen._settings import _load_pyproject_toml
+from cognite.pygen._version import __version__
+from cognite.pygen.config import PygenConfig
+from cognite.pygen.exceptions import DataModelNotFound
+from cognite.pygen.utils.text import to_pascal, to_snake
 
 DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
+
+_ILLEGAL_CHARACTERS_IN_FOLDER_NAME = '/\\?%*:|"<>!'
 
 
 @overload
@@ -172,7 +175,11 @@ def generate_sdk_notebook(
     Returns:
         The instantiated generated client class.
     """
-    output_dir = Path(tempfile.gettempdir()) / "pygen"
+    data_model = _get_data_model(model_id, client, print)
+    folder_name = _create_folder_name(
+        data_model.as_id() if isinstance(data_model, dm.DataModel) else data_model.as_ids()
+    )
+    output_dir = Path(tempfile.gettempdir()) / "pygen" / folder_name
     if clean_pygen_temp_dir and output_dir.exists():
         try:
             shutil.rmtree(output_dir)
@@ -181,7 +188,6 @@ def generate_sdk_notebook(
         else:
             print(f"Cleaned temporary directory {output_dir}")
 
-    data_model = _get_data_model(model_id, client, print)
     external_id = _extract_external_id(data_model)
     if top_level_package is None:
         top_level_package = _default_top_level_package(external_id)
@@ -234,6 +240,23 @@ def _extract_external_id(data_model: dm.DataModel | dm.DataModelList) -> str:
         return data_model.external_id.replace(" ", "_")
     else:
         return data_model[0].external_id.replace(" ", "_")
+
+
+def _create_folder_name(data_model: dm.DataModelId | list[dm.DataModelId]) -> str:
+    """Create a folder name from a data model.
+    >>> _create_folder_name(dm.DataModelId("space", "external_id", "version"))
+    'space_external_id_version'
+    >>> _create_folder_name(dm.DataModelId("space/", "\\external*id", "<version with spaces>"))
+    'space_external_id_version_with_spaces_'
+    """
+    if isinstance(data_model, dm.DataModelId):
+        name = f"{data_model.space}_{data_model.external_id}_{data_model.version}".replace(" ", "_")
+    else:
+        name = f"{data_model[0].space}_{data_model[0].external_id}_{data_model[0].version}".replace(" ", "_")
+
+    legal_name = re.sub(f"[{re.escape(_ILLEGAL_CHARACTERS_IN_FOLDER_NAME)}]", "_", name)
+    # Replace multiple underscores with a single underscore
+    return re.sub("_{2,}", "_", legal_name)
 
 
 def _get_data_model(model_id, client, logger) -> dm.DataModel | dm.DataModelList:
