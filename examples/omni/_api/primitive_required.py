@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 from collections.abc import Sequence
 from typing import overload
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -151,6 +152,12 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, Pr
                 >>> result = client.primitive_required.apply(primitive_required)
 
         """
+        warnings.warn(
+            "The .apply method is deprecated and will be removed in v1.0. "
+            "Please use the .apply method on the client instead. This means instead of "
+            "`my_client.primitive_required.apply(my_items)`, please use `my_client.apply(my_items)` instead.",
+            UserWarning,
+        )
         return self._apply(primitive_required, replace, write_none)
 
     def delete(
