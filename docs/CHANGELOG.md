@@ -21,6 +21,7 @@ Changes are grouped as follows
   `.apply` methods are the same, and thus it is more intuitive to have them on the client class. In addition,
   having the `.apply` method on each API class encourages the user to use an anti-pattern of creating nodes
   and edges in multiple small request, instead of batching them together in fewer requests, which is more efficient.
+  The exising `.apply` methods on the API classes are still available, but will be removed in version 1.
 
 ## [0.36.1] - 23-01-24
 ### Fix
