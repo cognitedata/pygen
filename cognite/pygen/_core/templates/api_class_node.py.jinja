@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime{% endif %}
 from collections.abc import Sequence
 from typing import overload
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
@@ -109,6 +110,15 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
 
         """
+        warnings.warn(
+            "The .apply method is deprecated and will be removed in v1.0. "
+            "Please use the .apply method on the client instead. This means instead of "
+            "`my_client.{{ api_class.parent_attribute }}.apply(my_items)` please use `my_client.apply(my_items)`."
+            "The motivation is that all apply methods are the same, and having one apply method per API "
+            " class encourages users to create items in small batches, which is inefficient.",
+            UserWarning,
+            stacklevel=2,
+        )
         return self._apply({{ data_class.variable }}, replace, write_none)
 {% endif %}
     def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
