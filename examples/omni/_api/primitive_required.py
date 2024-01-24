@@ -155,8 +155,11 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, Pr
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
             "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.primitive_required.apply(my_items)`, please use `my_client.apply(my_items)` instead.",
+            "`my_client.primitive_required.apply(my_items)` please use `my_client.apply(my_items)`."
+            "The motivation is that all apply methods are the same, and having one apply method per API "
+            " class encourages users to create items in small batches, which is inefficient.",
             UserWarning,
+            stacklevel=2,
         )
         return self._apply(primitive_required, replace, write_none)
 
