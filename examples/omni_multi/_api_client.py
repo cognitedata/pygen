@@ -111,7 +111,11 @@ class OmniMultiClient:
         self._client = client
         self._view_by_read_class = {
             k: v
-            for api in [self.omni_multi_a, self.omni_multi_b, self.omni_multi_c]
+            for api in [
+                self.omni_multi_a,
+                self.omni_multi_b,
+                self.omni_multi_c,
+            ]
             for k, v in api._view_by_read_class.items()
         }
 
