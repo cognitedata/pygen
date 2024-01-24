@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 {% for api in api_classes %}{% if not api.data_class.is_edge_class %}
 from ._api.{{ api.api_class.file_name }} import {{ api.api_class.name }}{% endif %}{% endfor %}
@@ -24,6 +26,7 @@ class {{ api.name }}:
         view_by_read_class = {% raw %}{{% endraw %}{% for view_id in api.sub_apis_by_view_id.keys() %}
             data_classes.{{ api_by_view_id[view_id].data_class.read_name }}: dm.ViewId("{{ view_id.space }}", "{{ view_id.external_id }}", "{{ view_id.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
+        self._view_by_read_class = view_by_read_class
         {% for sub in api.sub_apis_by_view_id.values() %}{% if not sub.is_edge_class %}
         self.{{ sub.parent_attribute }} = {{ sub.name }}(client, view_by_read_class){% endif %}{% endfor %}
 
@@ -50,6 +53,49 @@ class {{ client_name }}:
         client.config.client_name = "CognitePygen:{{ pygen_version }}"
 {% for api in multi_apis %}
         self.{{ api.parent_attribute }} = {{ api.name }}(client){% endfor %}
+
+        self._client = client
+        self._view_by_read_class = {% raw %}{{% endraw %}
+            k: v
+            for api in [{% for api in multi_apis %}self.{{ api.parent_attribute }},{% endfor %}]
+            for k,v in api._view_by_read_class.items()
+        {% raw %}}{% endraw %}
+
+
+    def apply(
+        self,
+        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesApplyResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        if isinstance(items, data_classes.DomainModelApply):
+            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        else:
+            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @classmethod
     def azure_project(

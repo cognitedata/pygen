@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.blade import BladeAPI
@@ -24,7 +26,7 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.36.1
+        pygen = 0.37.0
         cognite-sdk = 7.13.6
         pydantic = 1.10.7
 
@@ -42,7 +44,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.36.1"
+        client.config.client_name = "CognitePygen:0.37.0"
 
         view_by_read_class = {
             data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
@@ -57,6 +59,8 @@ class WindmillClient:
             data_classes.SensorPosition: dm.ViewId("power-models", "SensorPosition", "1"),
             data_classes.Windmill: dm.ViewId("power-models", "Windmill", "1"),
         }
+        self._view_by_read_class = view_by_read_class
+        self._client = client
 
         self.blade = BladeAPI(client, view_by_read_class)
         self.gearbox = GearboxAPI(client, view_by_read_class)
@@ -69,6 +73,41 @@ class WindmillClient:
         self.rotor = RotorAPI(client, view_by_read_class)
         self.sensor_position = SensorPositionAPI(client, view_by_read_class)
         self.windmill = WindmillAPI(client, view_by_read_class)
+
+    def apply(
+        self,
+        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesApplyResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        if isinstance(items, data_classes.DomainModelApply):
+            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        else:
+            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @classmethod
     def azure_project(
@@ -106,4 +145,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.rotor<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.sensor_position<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.windmill<br />
+<br />
+and with the methods:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.apply - Create or update any instance.<br />
 """

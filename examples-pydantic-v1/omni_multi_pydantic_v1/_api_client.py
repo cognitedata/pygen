@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.implementation_1_s_pygen_models import Implementation1sPygenModelsAPI
@@ -30,6 +32,7 @@ class OmniMultiAAPIs:
             data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
+        self._view_by_read_class = view_by_read_class
 
         self.implementation_1_s_pygen_models = Implementation1sPygenModelsAPI(client, view_by_read_class)
         self.main_interface = MainInterfaceAPI(client, view_by_read_class)
@@ -53,6 +56,7 @@ class OmniMultiBAPIs:
             data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
+        self._view_by_read_class = view_by_read_class
 
         self.implementation_1_v_2 = Implementation1v2API(client, view_by_read_class)
         self.main_interface = MainInterfaceAPI(client, view_by_read_class)
@@ -74,6 +78,7 @@ class OmniMultiCAPIs:
         view_by_read_class = {
             data_classes.Implementation1sPygenModelsOther: dm.ViewId("pygen-models-other", "Implementation1", "1"),
         }
+        self._view_by_read_class = view_by_read_class
 
         self.implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherAPI(client, view_by_read_class)
 
@@ -83,7 +88,7 @@ class OmniMultiClient:
     OmniMultiClient
 
     Generated with:
-        pygen = 0.36.1
+        pygen = 0.37.0
         cognite-sdk = 7.13.6
         pydantic = 1.10.7
 
@@ -97,11 +102,57 @@ class OmniMultiClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.36.1"
+        client.config.client_name = "CognitePygen:0.37.0"
 
         self.omni_multi_a = OmniMultiAAPIs(client)
         self.omni_multi_b = OmniMultiBAPIs(client)
         self.omni_multi_c = OmniMultiCAPIs(client)
+
+        self._client = client
+        self._view_by_read_class = {
+            k: v
+            for api in [
+                self.omni_multi_a,
+                self.omni_multi_b,
+                self.omni_multi_c,
+            ]
+            for k, v in api._view_by_read_class.items()
+        }
+
+    def apply(
+        self,
+        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesApplyResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        if isinstance(items, data_classes.DomainModelApply):
+            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        else:
+            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @classmethod
     def azure_project(

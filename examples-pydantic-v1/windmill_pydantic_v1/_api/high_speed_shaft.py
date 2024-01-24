@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import overload
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -110,6 +111,15 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
                 >>> result = client.high_speed_shaft.apply(high_speed_shaft)
 
         """
+        warnings.warn(
+            "The .apply method is deprecated and will be removed in v1.0. "
+            "Please use the .apply method on the client instead. This means instead of "
+            "`my_client.high_speed_shaft.apply(my_items)` please use `my_client.apply(my_items)`."
+            "The motivation is that all apply methods are the same, and having one apply method per API "
+            " class encourages users to create items in small batches, which is inefficient.",
+            UserWarning,
+            stacklevel=2,
+        )
         return self._apply(high_speed_shaft, replace, write_none)
 
     def delete(

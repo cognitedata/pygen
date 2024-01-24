@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.equipment_module import EquipmentModuleAPI
@@ -16,7 +18,7 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.36.1
+        pygen = 0.37.0
         cognite-sdk = 7.13.6
         pydantic = 1.10.7
 
@@ -34,7 +36,7 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.36.1"
+        client.config.client_name = "CognitePygen:0.37.0"
 
         view_by_read_class = {
             data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
@@ -42,10 +44,47 @@ class EquipmentUnitClient:
             data_classes.UnitProcedure: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"),
             data_classes.WorkOrder: dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
         }
+        self._view_by_read_class = view_by_read_class
+        self._client = client
 
         self.equipment_module = EquipmentModuleAPI(client, view_by_read_class)
         self.unit_procedure = UnitProcedureAPI(client, view_by_read_class)
         self.work_order = WorkOrderAPI(client, view_by_read_class)
+
+    def apply(
+        self,
+        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesApplyResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        if isinstance(items, data_classes.DomainModelApply):
+            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        else:
+            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @classmethod
     def azure_project(
@@ -75,4 +114,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.equipment_module<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.unit_procedure<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.work_order<br />
+<br />
+and with the methods:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.apply - Create or update any instance.<br />
 """
