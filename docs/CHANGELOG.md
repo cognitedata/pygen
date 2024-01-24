@@ -14,6 +14,14 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.37.0] - 24-01-24
+### Changed
+* The `.apply` method for the generated SDK is moved from the API class to the client class. For example,
+  instead of `my_client.windmill.apply(...)` you now do `my_client.apply(...)`. The motivation is that all
+  `.apply` methods are the same, and thus it is more intuitive to have them on the client class. In addition,
+  having the `.apply` method on each API class encourages the user to use an anti-pattern of creating nodes
+  and edges in multiple small request, instead of batching them together in fewer requests, which is more efficient.
+
 ## [0.36.1] - 23-01-24
 ### Fix
 * If you use `generate_sdk_notebook` to generate multiple SDKs in one session with the default arguments, the
