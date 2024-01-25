@@ -14,6 +14,12 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.37.1] - 25-01-24
+### Fixed
+* Doing `.apply` on with an edge with properties, would raise `AttributeError: '<DataClassName>' object has no attribute 'data_recrod'`.
+  This is now fixed.
+* When calling `.to_pandas()` `external_id` would be repeated twice. This is now fixed.
+
 ## [0.37.0] - 24-01-24
 ### Changed
 * The `.apply` method for the generated SDK is moved from the API class to the client class. For example,
