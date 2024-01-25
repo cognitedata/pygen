@@ -124,7 +124,7 @@ class StartEndTimeApply(DomainRelationApply):
                 type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
-                existing_version=self.data_recrod.existing_version,
+                existing_version=self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
