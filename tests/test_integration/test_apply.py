@@ -206,3 +206,13 @@ def test_update_to_null(
     assert retrieved.timestamp is None
     assert retrieved.date is None
     assert retrieved.json_ is None
+
+
+def test_set_empty_string(
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+) -> None:
+    update = primitive_nullable_node.model_copy()
+    update.text = ""
+    omni_client.primitive_nullable.apply(update, write_none=True)
+    retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
+    assert retrieved.text == ""

@@ -36,3 +36,11 @@ def test_query_circular(omni_client: OmniClient) -> None:
             assert len(a_item.outwards or []) > 0
             for b_item_circular in a_item.outwards:
                 assert isinstance(b_item_circular, dc.ConnectionItemB)
+
+
+def test_query_limit(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a(limit=5).query()
+
+    assert len(items) == 5
+    for item in items:
+        assert isinstance(item, dc.ConnectionItemA)
