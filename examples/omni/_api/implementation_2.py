@@ -57,7 +57,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> Implementation2QueryAPI[Implementation2List]:
         """Query starting at implementation 2.
@@ -412,7 +412,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> Implementation2List:
         """List/filter implementation 2

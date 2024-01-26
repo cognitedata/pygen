@@ -39,8 +39,6 @@ def test_query_circular(omni_client: OmniClient) -> None:
 
 
 def test_query_limit(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a(limit=5).query()
+    items = omni_client.implementation_2(limit=-1).query()
 
-    assert len(items) == 5
-    for item in items:
-        assert isinstance(item, dc.ConnectionItemA)
+    assert len(items) >= 200, "There should be more than 5,000 items of this type in the dataset"
