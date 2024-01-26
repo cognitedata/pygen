@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import re
 import math
+import re
+
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
