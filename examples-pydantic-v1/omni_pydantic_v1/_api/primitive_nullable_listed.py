@@ -56,7 +56,7 @@ class PrimitiveNullableListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableListedQueryAPI[PrimitiveNullableListedList]:
         """Query starting at primitive nullable listeds.
@@ -181,7 +181,7 @@ class PrimitiveNullableListedAPI(
         properties: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableListedList:
         """Search primitive nullable listeds
@@ -231,7 +231,7 @@ class PrimitiveNullableListedAPI(
         | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -251,7 +251,7 @@ class PrimitiveNullableListedAPI(
         | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -268,7 +268,7 @@ class PrimitiveNullableListedAPI(
         search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across primitive nullable listeds
@@ -323,7 +323,7 @@ class PrimitiveNullableListedAPI(
         search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for primitive nullable listeds
@@ -363,7 +363,7 @@ class PrimitiveNullableListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableListedList:
         """List/filter primitive nullable listeds

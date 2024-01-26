@@ -68,7 +68,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> UnitProcedureQueryAPI[UnitProcedureList]:
         """Query starting at unit procedures.
@@ -225,7 +225,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnitProcedureList:
         """Search unit procedures
@@ -283,7 +283,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -305,7 +305,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -326,7 +326,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across unit procedures
@@ -393,7 +393,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for unit procedures
@@ -445,7 +445,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> UnitProcedureList:

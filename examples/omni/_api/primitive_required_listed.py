@@ -56,7 +56,7 @@ class PrimitiveRequiredListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PrimitiveRequiredListedQueryAPI[PrimitiveRequiredListedList]:
         """Query starting at primitive required listeds.
@@ -181,7 +181,7 @@ class PrimitiveRequiredListedAPI(
         properties: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveRequiredListedList:
         """Search primitive required listeds
@@ -231,7 +231,7 @@ class PrimitiveRequiredListedAPI(
         | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -251,7 +251,7 @@ class PrimitiveRequiredListedAPI(
         | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -268,7 +268,7 @@ class PrimitiveRequiredListedAPI(
         search_property: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across primitive required listeds
@@ -323,7 +323,7 @@ class PrimitiveRequiredListedAPI(
         search_property: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for primitive required listeds
@@ -363,7 +363,7 @@ class PrimitiveRequiredListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveRequiredListedList:
         """List/filter primitive required listeds

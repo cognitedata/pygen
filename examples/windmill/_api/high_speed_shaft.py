@@ -58,7 +58,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> HighSpeedShaftQueryAPI[HighSpeedShaftList]:
         """Query starting at high speed shafts.
@@ -186,7 +186,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -202,7 +202,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         group_by: HighSpeedShaftFields | Sequence[HighSpeedShaftFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -217,7 +217,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         group_by: HighSpeedShaftFields | Sequence[HighSpeedShaftFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across high speed shafts
@@ -268,7 +268,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for high speed shafts
@@ -306,7 +306,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> HighSpeedShaftList:
         """List/filter high speed shafts

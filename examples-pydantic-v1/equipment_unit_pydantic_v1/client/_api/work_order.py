@@ -59,7 +59,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WorkOrderQueryAPI[WorkOrderList]:
         """Query starting at work orders.
@@ -200,7 +200,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkOrderList:
         """Search work orders
@@ -264,7 +264,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -288,7 +288,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -311,7 +311,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across work orders
@@ -384,7 +384,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for work orders
@@ -442,7 +442,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkOrderList:
         """List/filter work orders

@@ -69,7 +69,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> EmptyQueryAPI[EmptyList]:
         """Query starting at empties.
@@ -237,7 +237,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> EmptyList:
         """Search empties
@@ -328,7 +328,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -361,7 +361,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -393,7 +393,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across empties
@@ -493,7 +493,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for empties
@@ -578,7 +578,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> EmptyList:
         """List/filter empties

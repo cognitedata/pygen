@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import math
 import re
+
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
@@ -463,6 +465,10 @@ class QueryStep:
         else:
             self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
 
+    @property
+    def is_unlimited(self) -> bool:
+        return self.expression.limit in {None, -1, math.inf}
+
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
     # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
@@ -536,7 +542,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
     @property
     def is_finished(self):
         return all(
-            expression.total_retrieved >= expression.max_retrieve_limit
+            (not expression.is_unlimited and expression.total_retrieved >= expression.max_retrieve_limit)
             or expression.cursor is None
             or expression.last_batch_count == 0
             for expression in self

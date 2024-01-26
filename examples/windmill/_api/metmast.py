@@ -60,7 +60,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MetmastQueryAPI[MetmastList]:
         """Query starting at metmasts.
@@ -194,7 +194,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -212,7 +212,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -229,7 +229,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across metmasts
@@ -286,7 +286,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for metmasts
@@ -330,7 +330,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MetmastList:
         """List/filter metmasts

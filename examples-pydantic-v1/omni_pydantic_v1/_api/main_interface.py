@@ -55,7 +55,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MainInterfaceQueryAPI[MainInterfaceList]:
         """Query starting at main interfaces.
@@ -184,7 +184,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MainInterfaceList:
         """Search main interfaces
@@ -236,7 +236,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -256,7 +256,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -275,7 +275,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across main interfaces
@@ -336,7 +336,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for main interfaces
@@ -382,7 +382,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MainInterfaceList:
         """List/filter main interfaces

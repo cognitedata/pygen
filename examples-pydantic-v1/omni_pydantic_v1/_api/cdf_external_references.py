@@ -54,7 +54,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CDFExternalReferencesQueryAPI[CDFExternalReferencesList]:
         """Query starting at cdf external references.
@@ -184,7 +184,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -200,7 +200,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         group_by: CDFExternalReferencesFields | Sequence[CDFExternalReferencesFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -215,7 +215,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         group_by: CDFExternalReferencesFields | Sequence[CDFExternalReferencesFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across cdf external references
@@ -266,7 +266,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for cdf external references
@@ -304,7 +304,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CDFExternalReferencesList:
         """List/filter cdf external references

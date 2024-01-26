@@ -56,7 +56,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> GeneratorQueryAPI[GeneratorList]:
         """Query starting at generators.
@@ -184,7 +184,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -200,7 +200,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         group_by: GeneratorFields | Sequence[GeneratorFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -215,7 +215,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         group_by: GeneratorFields | Sequence[GeneratorFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across generators
@@ -266,7 +266,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for generators
@@ -304,7 +304,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GeneratorList:
         """List/filter generators
