@@ -61,7 +61,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> Implementation1QueryAPI[Implementation1List]:
         """Query starting at implementation 1.
@@ -208,7 +208,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> Implementation1List:
         """Search implementation 1
@@ -278,7 +278,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -304,7 +304,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -329,7 +329,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across implementation 1
@@ -408,7 +408,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for implementation 1
@@ -472,7 +472,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> Implementation1List:
         """List/filter implementation 1

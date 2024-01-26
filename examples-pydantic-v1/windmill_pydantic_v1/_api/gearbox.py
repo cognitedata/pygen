@@ -58,7 +58,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> GearboxQueryAPI[GearboxList]:
         """Query starting at gearboxes.
@@ -186,7 +186,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -202,7 +202,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         group_by: GearboxFields | Sequence[GearboxFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -217,7 +217,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         group_by: GearboxFields | Sequence[GearboxFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across gearboxes
@@ -268,7 +268,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for gearboxes
@@ -306,7 +306,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GearboxList:
         """List/filter gearboxes

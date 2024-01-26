@@ -69,7 +69,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableQueryAPI[PrimitiveNullableList]:
         """Query starting at primitive nullables.
@@ -237,7 +237,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableList:
         """Search primitive nullables
@@ -328,7 +328,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -361,7 +361,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -393,7 +393,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across primitive nullables
@@ -493,7 +493,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for primitive nullables
@@ -578,7 +578,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PrimitiveNullableList:
         """List/filter primitive nullables

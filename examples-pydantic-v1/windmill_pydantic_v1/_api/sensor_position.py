@@ -78,7 +78,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> SensorPositionQueryAPI[SensorPositionList]:
         """Query starting at sensor positions.
@@ -212,7 +212,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -230,7 +230,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -247,7 +247,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across sensor positions
@@ -304,7 +304,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for sensor positions
@@ -348,7 +348,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SensorPositionList:
         """List/filter sensor positions

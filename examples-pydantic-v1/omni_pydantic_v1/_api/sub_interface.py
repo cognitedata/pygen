@@ -57,7 +57,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> SubInterfaceQueryAPI[SubInterfaceList]:
         """Query starting at sub interfaces.
@@ -192,7 +192,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SubInterfaceList:
         """Search sub interfaces
@@ -250,7 +250,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -272,7 +272,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -293,7 +293,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across sub interfaces
@@ -360,7 +360,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for sub interfaces
@@ -412,7 +412,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SubInterfaceList:
         """List/filter sub interfaces

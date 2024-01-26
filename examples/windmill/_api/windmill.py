@@ -65,7 +65,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WindmillQueryAPI[WindmillList]:
         """Query starting at windmills.
@@ -234,7 +234,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WindmillList:
         """Search windmills
@@ -304,7 +304,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -330,7 +330,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -355,7 +355,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across windmills
@@ -434,7 +434,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for windmills
@@ -498,7 +498,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WindmillList:

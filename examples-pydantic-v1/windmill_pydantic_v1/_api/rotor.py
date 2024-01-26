@@ -56,7 +56,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> RotorQueryAPI[RotorList]:
         """Query starting at rotors.
@@ -184,7 +184,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -200,7 +200,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         group_by: RotorFields | Sequence[RotorFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -215,7 +215,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         group_by: RotorFields | Sequence[RotorFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across rotors
@@ -266,7 +266,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for rotors
@@ -304,7 +304,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RotorList:
         """List/filter rotors

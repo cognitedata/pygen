@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.37.2] - 25-01-26
+### Fixed
+* When calling the query method `my_client.my_view(limit=-1).query()`, setting `limit=-1` only returned the first 100 results. Instead
+  of all as expected. This is now fixed.
+
 ## [0.37.1] - 25-01-24
 ### Fixed
 * Doing `.apply` on with an edge with properties, would raise `AttributeError: '<DataClassName>' object has no attribute 'data_recrod'`.

@@ -62,7 +62,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MainShaftQueryAPI[MainShaftList]:
         """Query starting at main shafts.
@@ -190,7 +190,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -206,7 +206,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         group_by: MainShaftFields | Sequence[MainShaftFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -221,7 +221,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         group_by: MainShaftFields | Sequence[MainShaftFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across main shafts
@@ -272,7 +272,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for main shafts
@@ -310,7 +310,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MainShaftList:
         """List/filter main shafts
