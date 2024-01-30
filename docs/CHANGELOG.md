@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.0] - 30-01-24
+Beta release of `pygen`.
+### Changed
+* Similar to the change in `0.37.0`, the `.delete` method like the `.apply` method of the generated SDK is
+  moved from the API class to the client class. For example, instead of `my_client.windmill.delete(...)` you now
+  do `my_client.delete(...)`. The motivation is that all `.delete` methods are the same, and thus it is more intuitive
+  to have them on the client class. In addition, having the `.delete` method on each API class encourages the user to
+  use an anti-pattern of deleting nodes in multiple small request, instead of batching them together in fewer requests,
+  which is more efficient. The exising `.delete` methods on the API classes are still available,
+  but will be removed in version 1.
 
 ## [0.37.2] - 25-01-26
 ### Fixed
