@@ -113,6 +113,15 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
                 >>> client = OmniClient()
                 >>> client.implementation_1_non_writeable.delete("my_implementation_1_non_writeable")
         """
+        warnings.warn(
+            "The .delete method is deprecated and will be removed in v1.0. "
+            "Please use the .delete method on the client instead. This means instead of "
+            "`my_client.implementation_1_non_writeable.delete(my_ids)` please use `my_client.delete(my_ids)`."
+            "The motivation is that all delete methods are the same, and having one delete method per API "
+            " class encourages users to delete items in small batches, which is inefficient.",
+            UserWarning,
+            stacklevel=2,
+        )
         return self._delete(external_id, space)
 
     @overload

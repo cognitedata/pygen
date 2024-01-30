@@ -24,6 +24,8 @@ from ._api.primitive_required import PrimitiveRequiredAPI
 from ._api.primitive_required_listed import PrimitiveRequiredListedAPI
 from ._api.primitive_with_defaults import PrimitiveWithDefaultsAPI
 from ._api.sub_interface import SubInterfaceAPI
+from ._api._core import SequenceNotStr
+from .data_classes._core import DEFAULT_INSTANCE_SPACE
 from . import data_classes
 
 
@@ -32,7 +34,7 @@ class OmniClient:
     OmniClient
 
     Generated with:
-        pygen = 0.37.2
+        pygen = 0.99.0
         cognite-sdk = 7.13.6
         pydantic = 2.5.3
 
@@ -50,7 +52,7 @@ class OmniClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.37.2"
+        client.config.client_name = "CognitePygen:0.99.0"
 
         view_by_read_class = {
             data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
@@ -126,6 +128,33 @@ class OmniClient:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
         return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more items.
+
+        Args:
+            external_id: External id of the item(s) to delete.
+            space: The space where all the item(s) are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete item by id:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> client.delete("my_node_external_id")
+        """
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(space, id) for id in external_id],
+            )
 
     @classmethod
     def azure_project(
