@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.1] - 31-01-24
+### Added
+* Option for skipping interfaces in `cognite.pygen.utils.MockGenerator`.
+
 ## [0.99.0] - 30-01-24
 Beta release of `pygen`.
 ### Changed

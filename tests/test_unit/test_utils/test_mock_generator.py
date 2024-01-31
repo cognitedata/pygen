@@ -73,6 +73,33 @@ def test_generate_mock_data_multiple_views(
             assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
 
 
+def test_generate_mock_data_skip_interfaces(omni_data_classes: dict[str, OmniClasses]) -> None:
+    view_external_ids = [
+        OmniView.main_interface,
+        OmniView.sub_interface,
+        OmniView.implementation1,
+        OmniView.implementation2,
+        OmniView.implementation1_non_writeable,
+        OmniView.dependent_on_non_writable,
+    ]
+    interface_count = 2
+
+    views = [omni_data_classes[name].view for name in view_external_ids]
+
+    generator = MockGenerator(views, "sandbox", seed=42, skip_interfaces=True)
+
+    data = generator.generate_mock_data()
+
+    assert len(data) == len(views) - interface_count
+    for view, view_data in zip(views[interface_count:], data):
+        assert len(view_data.node) == 5
+        edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
+        if edge_type_count == 0:
+            assert len(view_data.edge) == 0
+        else:
+            assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+
+
 def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]) -> None:
     views = [class_.view for class_ in omni_data_classes.values()]
     primitive_required = omni_data_classes[OmniView.primitive_required].view
