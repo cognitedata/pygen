@@ -86,6 +86,7 @@ class MockGenerator:
         self._data_set_id = data_set_id
         self._seed = seed
         self._skip_interfaces = skip_interfaces
+        self._interfaces: set[dm.ViewId] = set()
 
     def __str__(self):
         args = [
@@ -165,6 +166,7 @@ class MockGenerator:
                         # This is for generators that have a state.
                         generator.reset()
 
+        self._interfaces = {interface for view in self._views for interface in view.implements or []}
         mock_data = MockData()
         for components in _connected_views(self._views):
             data = self._generate_views_mock_data(components, node_count, max_edge_per_type, null_values)
@@ -181,6 +183,8 @@ class MockGenerator:
     ) -> dict[dm.ViewId, ViewMockData]:
         output: dict[dm.ViewId, ViewMockData] = {}
         for view in views:
+            if self._skip_interfaces and view.as_id() in self._interfaces:
+                continue
             mapped_properties = {
                 name: prop
                 for name, prop in view.properties.items()
@@ -237,6 +241,8 @@ class MockGenerator:
     ) -> None:
         leaf_children_by_parent = self._to_leaf_children_by_parent(views)
         for view in views:
+            if self._skip_interfaces and view.as_id() in self._interfaces:
+                continue
             connection_properties = {
                 name: prop
                 for name, prop in view.properties.items()
