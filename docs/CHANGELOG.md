@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.2] - 02-02-24
+### Fixed
+* The `MockGenerator` raised a `NotImplementedError` when a direct relation was missing source. Now, it
+  will create a warning instead and skip the relation.
+
 ## [0.99.1] - 31-01-24
 ### Added
 * Option for skipping interfaces in `cognite.pygen.utils.MockGenerator`.
