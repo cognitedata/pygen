@@ -7,6 +7,7 @@ import itertools
 import random
 import string
 import typing
+import warnings
 from collections import UserList, defaultdict
 from collections.abc import Iterable
 from contextlib import contextmanager
@@ -310,7 +311,18 @@ class MockGenerator:
                                     )
                                 )
                     else:
-                        raise NotImplementedError(f"Connection {type(connection)} not implemented")
+                        if isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+                            warnings.warn(
+                                f"View {view_id}: DirectRelation {name} is missing source, "
+                                "do not know the target view the direct relation points to",
+                                stacklevel=2,
+                            )
+                        else:
+                            warnings.warn(
+                                f"View {view_id}: Connection {type(connection)} used by {name} "
+                                f"is not supported by the {type(self).__name__}.",
+                                stacklevel=2,
+                            )
 
     def _generate_mock_values(
         self,
