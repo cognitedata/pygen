@@ -11,6 +11,7 @@ from time import sleep
 from typing import Any, Callable, Optional, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client._api.files import FilesAPI
 from cognite.client.data_classes import FileMetadata, FileMetadataList, TimeSeries, TimeSeriesList
 from cognite.client.data_classes._base import CogniteResource, T_CogniteResource, T_CogniteResourceList
@@ -715,3 +716,21 @@ def _user_options(alternatives: list) -> int:
             return int(answer) - 1
         except ValueError:
             print("Invalid input, please try again")
+
+
+def _unpack_filter(filter_: dm.Filter) -> list[tuple[list[type[dm.filters.CompoundFilter]], dm.Filter]]:
+    """Unpacks a filter into a list of tuples of (compound filters, leaf filter)."""
+    return __unpack_filter(filter_, [])
+
+
+def __unpack_filter(
+    filter_: dm.Filter, parents: list[type[dm.filters.CompoundFilter]]
+) -> list[tuple[list[type[dm.filters.CompoundFilter]], dm.Filter]]:
+    """Unpacks a filter into a list of tuples of (compound filters, leaf filter)."""
+    if isinstance(filter_, dm.filters.CompoundFilter):
+        output = []
+        for child in filter_._filters:
+            output.extend(__unpack_filter(child, [*parents, type(filter_)]))
+        return output
+    else:
+        return [(parents, filter_)]
