@@ -617,6 +617,10 @@ class MockData(UserList[ViewMockData]):
                         print(f"Created space {instance_space}")
 
             if nodes or edges:
+                # There is an 'edge' if there is an outward and inward edge on two views, we can get duplicated edges.
+                # We should remove the duplicates.
+                edges = dm.EdgeApplyList({edge.as_id(): edge for edge in edges}.values())
+
                 created = client.data_modeling.instances.apply(
                     nodes,
                     edges,
