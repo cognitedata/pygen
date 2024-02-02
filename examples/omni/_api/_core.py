@@ -460,14 +460,14 @@ class QueryStep:
     last_batch_count: int = 0
 
     def update_expression_limit(self) -> None:
-        if self.max_retrieve_limit == -1:
+        if self.is_unlimited:
             self.expression.limit = None
         else:
-            self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
+            self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
 
     @property
     def is_unlimited(self) -> bool:
-        return self.expression.limit in {None, -1, math.inf}
+        return self.max_retrieve_limit in {None, -1, math.inf}
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
