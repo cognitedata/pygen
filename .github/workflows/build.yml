@@ -84,7 +84,7 @@ jobs:
       - name: Test CLI
         run: pygen --help
 
-      - uses: codecov/codecov-action@4
+      - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
 
