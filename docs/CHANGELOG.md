@@ -13,7 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.2] - 02-02-24
+## [0.99.3] - 02-02-24
+### Added
+* The `MockGenerator` now supports generating nodes for views with filters on `node.type` which are nested. For example,
+  if a view has a the filter `And(Equals(["node", "type"], {"space": "sp_types", "externalId": "myType"},
+  HasData(...))`, then the `MockGenerator` will generate nodes with the `node.type` set to
+  `{"space": "sp_types", "externalId": "myType"}`.
+
+## [0.99.2] - 01-02-24
 ### Fixed
 * The `MockGenerator` raised a `NotImplementedError` when a direct relation was missing source. Now, it
   will create a warning instead and skip the relation.
