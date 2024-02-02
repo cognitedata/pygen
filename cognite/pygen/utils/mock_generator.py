@@ -460,8 +460,7 @@ class ViewMockData:
             # Dumping and loading to avoid mutating the original node
             dumped = node.dump()
             dumped.pop("sources", None)
-            node.load(dumped)
-            nodes.append(node)
+            nodes.append(dm.NodeApply.load(dumped))
         return nodes
 
     def dump_yaml(self, folder: Path | str) -> None:
