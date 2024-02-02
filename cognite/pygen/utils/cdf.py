@@ -734,3 +734,25 @@ def __unpack_filter(
         return output
     else:
         return [(parents, filter_)]
+
+
+def _find_first_node_type(filter_: dm.filters.Filter | None) -> dm.DirectRelationReference | None:
+    """Finds the node type if the filter has a node type equals filter.
+
+    Args:
+        filter_: The filter to search in.
+
+    Returns:
+        The node type if found, otherwise None.
+    """
+    if filter_ is None:
+        return None
+
+    filters_ = _unpack_filter(filter_)
+    for parents, filter_ in filters_:
+        if isinstance(filter_, dm.filters.Equals) and dm.filters.Not not in parents:
+            dumped = filter_.dump()
+            property_, value = dumped["equals"]["property"], dumped["equals"]["value"]
+            if list(property_) == ["node", "type"] and "space" in value and "externalId" in value:
+                return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
+    return None

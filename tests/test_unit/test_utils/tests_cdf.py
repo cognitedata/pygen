@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.utils.cdf import _unpack_filter
+from cognite.pygen.utils.cdf import _find_first_node_type, _unpack_filter
 
 
 @pytest.mark.parametrize(
@@ -56,6 +58,33 @@ def test__unpack_filter(filter_: dm.Filter, expected) -> None:
     actual = _unpack_filter(filter_)
 
     assert len(actual) == len(expected)
-    for _i, (actual_item, expected_item) in enumerate(zip(actual, expected)):
+    for actual_item, expected_item in zip(actual, expected):
         assert actual_item[0] == expected_item[0]
         assert actual_item[1].dump() == expected_item[1].dump()
+
+
+@pytest.mark.parametrize(
+    "filter_, expected",
+    [
+        (None, None),
+        (
+            dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"}),
+            dm.DirectRelationReference("mySpace", "myType"),
+        ),
+        (
+            dm.filters.And(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})),
+            dm.DirectRelationReference("mySpace", "myType"),
+        ),
+        (
+            dm.filters.Equals(["node", "space"], "mySpace"),
+            None,
+        ),
+        (dm.filters.Not(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})), None),
+    ],
+)
+def test_find_node_type(filter_: dm.Filter | None, expected: dm.DirectRelationReference | None) -> None:
+    # Act
+    actual = _find_first_node_type(filter_)
+
+    # Assert
+    assert actual == expected

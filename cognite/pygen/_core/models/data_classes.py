@@ -12,6 +12,7 @@ from cognite.client.data_classes.data_modeling.views import EdgeConnection, View
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
+from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
@@ -117,7 +118,7 @@ class DataClass:
         )
 
         if used_for == "node":
-            node_type = find_node_type(view.filter)
+            node_type = _find_first_node_type(view.filter)
 
             return NodeDataClass(**args, node_type=node_type)
         elif used_for == "edge":
@@ -374,30 +375,3 @@ class EdgeDataClass(DataClass):
             )
         )
         super().update_fields(properties, data_class_by_view_id, views, config)
-
-
-def find_node_type(filter_: dm.filters.Filter | None) -> dm.DirectRelationReference | None:
-    """
-    Find the node type if the filter has a node type equals filter.
-
-    Args:
-        filter_: The filter to search in.
-
-    Returns:
-        The node type if found, otherwise None.
-    """
-    if filter_ is None:
-        return None
-    elif isinstance(filter_, dm.filters.Equals):
-        dumped = filter_.dump()
-        property_, value = dumped["equals"]["property"], dumped["equals"]["value"]
-        if list(property_) == ["node", "type"] and "space" in value and "externalId" in value:
-            return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
-        else:
-            return None
-    elif isinstance(filter_, (dm.filters.And, dm.filters.Or)):
-        for f in filter_._filters:
-            if node_type := find_node_type(f):
-                return node_type
-
-    return None

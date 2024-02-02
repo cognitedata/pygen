@@ -37,6 +37,7 @@ from cognite.client.exceptions import CogniteNotFoundError
 from typing_extensions import TypeAlias
 
 from cognite.pygen._version import __version__
+from cognite.pygen.utils.cdf import _find_first_node_type
 
 DataType: TypeAlias = typing.Union[int, float, bool, str, dict, None]
 ListAbleDataType: TypeAlias = typing.Union[
@@ -192,9 +193,7 @@ class MockGenerator:
                 if isinstance(prop, dm.MappedProperty) and not isinstance(prop.type, dm.DirectRelation)
             }
 
-            node_type: dm.DirectRelationReference | None = None
-            if isinstance(view.filter, dm.filters.Equals):
-                node_type = dm.DirectRelationReference.load(view.filter.dump()["equals"]["value"])
+            node_type = _find_first_node_type(view.filter)
 
             view_id = view.as_id()
             config = self._view_configs.get(view_id, self._default_config)

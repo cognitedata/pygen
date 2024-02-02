@@ -20,7 +20,6 @@ from cognite.pygen._core.models import (
     PrimitiveField,
     PrimitiveListField,
 )
-from cognite.pygen._core.models.data_classes import find_node_type
 from cognite.pygen._core.models.fields import EdgeClasses
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
@@ -740,30 +739,3 @@ def field_type_hints_test_cases():
 def test_fields_type_hints(field: Field, expected_read_hint: str, expected_write_hint: str) -> None:
     assert field.as_write_type_hint() == expected_write_hint
     assert field.as_read_type_hint() == expected_read_hint
-
-
-@pytest.mark.parametrize(
-    "filter_, expected",
-    [
-        (None, None),
-        (
-            dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"}),
-            dm.DirectRelationReference("mySpace", "myType"),
-        ),
-        (
-            dm.filters.And(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})),
-            dm.DirectRelationReference("mySpace", "myType"),
-        ),
-        (
-            dm.filters.Equals(["node", "space"], "mySpace"),
-            None,
-        ),
-        (dm.filters.Not(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})), None),
-    ],
-)
-def test_find_node_type(filter_: dm.Filter | None, expected: dm.DirectRelationReference | None) -> None:
-    # Act
-    actual = find_node_type(filter_)
-
-    # Assert
-    assert actual == expected
