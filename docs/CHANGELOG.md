@@ -16,8 +16,8 @@ Changes are grouped as follows
 ## [0.99.4] - 02-02-24
 ### Fixed
 * The `MockGenerator` now handles non-writable views with properties. This was an issue when generating nodes for
-  data models that contain non-writable. You can still generate data for the non-writable views, but the
-  `.deploy` methods skips these views.
+  data models that contain non-writable views. This is now fixed, the nodes from the non-writable views are
+  created without properties.
 * In the `query` call it was possible to get negative `limit` which would raise a `raise CogniteAPIError`.
   This is now fixed.
 
