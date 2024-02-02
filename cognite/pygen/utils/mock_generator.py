@@ -482,9 +482,9 @@ class ViewMockData:
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
             elif self.edge:
-                client.data_modeling.instances.apply(edges=self.edge)
+                created = client.data_modeling.instances.apply(edges=self.edge)
                 if verbose:
-                    print(f"Created {len(self.edge)} edges")
+                    print(f"Created {sum(1 for e in created.edges if e.was_modified)} edges")
             if self.timeseries:
                 client.time_series.upsert(self.timeseries)
                 if verbose:
