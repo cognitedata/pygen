@@ -218,7 +218,7 @@ class MockGenerator:
                         )
                     ]
                     if props
-                    else [],
+                    else None,
                 )
                 for node_id, *props in zip(node_ids, *properties.values())
             ]
@@ -453,6 +453,17 @@ class ViewMockData:
     sequence: SequenceList = field(default_factory=lambda: SequenceList([]))
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
+    @property
+    def _node_only(self) -> dm.NodeApplyList:
+        nodes = dm.NodeApplyList([])
+        for node in self.node:
+            # Dumping and loading to avoid mutating the original node
+            dumped = node.dump()
+            dumped.pop("sources", None)
+            node.load(dumped)
+            nodes.append(node)
+        return nodes
+
     def dump_yaml(self, folder: Path | str) -> None:
         """
         Dumps the mock data to the given folder in yaml format.
@@ -474,17 +485,18 @@ class ViewMockData:
             if client.data_modeling.spaces.retrieve(self.instance_space) is None:
                 client.data_modeling.spaces.apply(dm.SpaceApply(self.instance_space, name=self.instance_space))
 
-            if self.is_writeable and (self.node or self.edge):
-                created = client.data_modeling.instances.apply(self.node, self.edge)
+            if self.node or self.edge:
+                if self.is_writeable:
+                    nodes = self.node
+                else:
+                    nodes = self._node_only
+
+                created = client.data_modeling.instances.apply(nodes, self.edge)
                 if verbose:
                     print(
                         f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
-            elif self.edge:
-                created = client.data_modeling.instances.apply(edges=self.edge)
-                if verbose:
-                    print(f"Created {sum(1 for e in created.edges if e.was_modified)} edges")
             if self.timeseries:
                 client.time_series.upsert(self.timeseries)
                 if verbose:
@@ -546,7 +558,12 @@ class MockData(UserList[ViewMockData]):
     @property
     def writable_nodes(self) -> dm.NodeApplyList:
         return dm.NodeApplyList(
-            [node for view_mock_data in self if view_mock_data.is_writeable for node in view_mock_data.node if node]
+            [
+                node
+                for view_mock_data in self
+                for node in (view_mock_data.node if view_mock_data.is_writeable else view_mock_data._node_only)
+                if node
+            ]
         )
 
     @property
@@ -574,7 +591,12 @@ class MockData(UserList[ViewMockData]):
         for view_mock_data in self:
             view_mock_data.dump_yaml(folder)
 
-    def deploy(self, client: CogniteClient, verbose: bool = False) -> None:
+    def deploy(
+        self,
+        client: CogniteClient,
+        exclude: set[Literal["timeseries", "files", "sequences"]] | None = None,
+        verbose: bool = False,
+    ) -> None:
         """Deploys the mock data to CDF.
 
         This means calling the .apply() method for the instances (nodes and edges), and the .upsert() method for
@@ -582,6 +604,7 @@ class MockData(UserList[ViewMockData]):
 
         Args:
             client (CogniteClient): The client to use for deployment.
+            exclude (set[Literal["timeseries", "files", "sequences"]]): The resources to exclude from deployment.
             verbose (bool): Whether to print information about the deployment.
         """
         nodes = self.writable_nodes
@@ -607,15 +630,15 @@ class MockData(UserList[ViewMockData]):
                         f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
-            if timeseries := self.timeseries:
+            if (timeseries := self.timeseries) and (exclude is None or "timeseries" not in exclude):
                 client.time_series.upsert(timeseries)
                 if verbose:
                     print(f"Created/Updated {len(timeseries)} timeseries")
-            if sequences := self.sequences:
+            if (sequences := self.sequences) and (exclude is None or "sequences" not in exclude):
                 client.sequences.upsert(sequences)
                 if verbose:
                     print(f"Created/Updated {len(sequences)} sequences")
-            if files := self.files:
+            if (files := self.files) and (exclude is None or "files" not in exclude):
                 existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
