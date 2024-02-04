@@ -174,7 +174,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         if properties:
             properties = [properties_by_field.get(prop, prop) for prop in properties]
 
-        nodes = self._client.data_modeling.instances.search(view_id, query, "node", properties, filter_, limit)
+        nodes = self._client.data_modeling.instances.search(
+            view=view_id, query=query, instance_type="node", properties=properties, filter=filter_, limit=limit
+        )
         return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
     @overload
