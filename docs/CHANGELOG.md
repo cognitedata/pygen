@@ -25,6 +25,7 @@ Changes are grouped as follows
   also for nested calls.
 * Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
 * Filtering on an empty string in the generated SDK would return all values. This is now fixed.
+* After `cognite-sdk` `7.16.0` the generated SDK method `.search` failed. This is now fixed.
 
 ## [0.99.3] - 02-02-24
 ### Added
