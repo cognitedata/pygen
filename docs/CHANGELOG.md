@@ -27,6 +27,9 @@ Changes are grouped as follows
 * Filtering on an empty string in the generated SDK would return all values. This is now fixed.
 * After `cognite-sdk` `7.16.0` the generated SDK method `.search` failed. This is now fixed.
 
+### Changed
+* The generated SDK now complies with `black` `0.24.0` formatting.
+
 ## [0.99.3] - 02-02-24
 ### Added
 * The `MockGenerator` now supports generating nodes for views with filters on `node.type` which are nested. For example,
