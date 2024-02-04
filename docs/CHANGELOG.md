@@ -25,7 +25,9 @@ Changes are grouped as follows
   also for nested calls.
 * Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
 * Filtering on an empty string in the generated SDK would return all values. This is now fixed.
-* After `cognite-sdk` `7.16.0` the generated SDK method `.search` failed. This is now fixed.
+* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed. This is now fixed.
+* In the `timeseries` query method, if a timeseries type property is nullable and the value is missing, the generated
+  SDK would raise `KeyError` when trying to retrieve timeseries or datapoints. This is now fixed.
 
 ### Changed
 * The generated SDK now complies with `black` `0.24.0` formatting.
