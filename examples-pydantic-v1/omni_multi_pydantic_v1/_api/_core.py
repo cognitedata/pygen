@@ -174,7 +174,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         if properties:
             properties = [properties_by_field.get(prop, prop) for prop in properties]
 
-        nodes = self._client.data_modeling.instances.search(view_id, query, "node", properties, filter_, limit)
+        nodes = self._client.data_modeling.instances.search(
+            view=view_id, query=query, instance_type="node", properties=properties, filter=filter_, limit=limit
+        )
         return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
     @overload
@@ -316,7 +318,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         ]
         | None = None,
     ) -> T_DomainModelList:
-        nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
+        nodes = self._client.data_modeling.instances.list(
+            instance_type="node", sources=self._sources, limit=limit, filter=filter
+        )
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:
             self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_quad)
