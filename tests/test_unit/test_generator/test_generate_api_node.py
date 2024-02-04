@@ -1,3 +1,5 @@
+import difflib
+
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
@@ -17,7 +19,7 @@ def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator
     actual = code_formatter.format_code(actual)
 
     # Assert
-    assert actual == expected
+    assert actual == expected, "\n".join(difflib.unified_diff(expected.splitlines(), actual.splitlines()))
 
 
 def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
