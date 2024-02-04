@@ -20,6 +20,9 @@ Changes are grouped as follows
   created without properties.
 * In the `query` call it was possible to get negative `limit` which would raise a `raise CogniteAPIError`.
   This is now fixed.
+* In the `query` call when using `limit=-1` the default API limit was used in the generated SDK. This caused the
+  `query` to return only the first 100 results. This is now fixed so that `limit=-1` returns all results,
+  also for nested calls.
 
 ## [0.99.3] - 02-02-24
 ### Added
