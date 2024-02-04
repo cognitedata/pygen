@@ -464,13 +464,14 @@ def _retrieve_timeseries_external_ids_with_extra_bending_x(
     else:
         extra_list = extra_properties
     has_data = dm.filters.HasData(views=[view_id])
-    filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
+    has_property = dm.filters.Exists(property=view_id.as_property_ref("bending_x"))
+    filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
     cursor = None
     external_ids: dict[str, list[str]] = {}
     total_retrieved = 0
     while True:
-        query_limit = min(INSTANCE_QUERY_LIMIT, limit - total_retrieved)
+        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit - total_retrieved), 0)
         selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
         query = dm.query.Query(
             with_={
