@@ -293,6 +293,7 @@ class OmniFiles:
     core_api = api / "_core.py"
     client_init = client_dir / "__init__.py"
     cdf_external_data = data_classes / "_cdf_external_references.py"
+    cdf_external_timeseries_api = api / "cdf_external_references_timeseries.py"
     cdf_external_list_data = data_classes / "_cdf_external_references_listed.py"
     primitive_nullable_data = data_classes / "_primitive_nullable.py"
     primitive_nullable_list_data = data_classes / "_primitive_nullable_listed.py"
