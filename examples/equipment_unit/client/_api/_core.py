@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+import warnings
 
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
@@ -460,14 +461,14 @@ class QueryStep:
     last_batch_count: int = 0
 
     def update_expression_limit(self) -> None:
-        if self.max_retrieve_limit == -1:
-            self.expression.limit = None
+        if self.is_unlimited:
+            self.expression.limit = INSTANCE_QUERY_LIMIT
         else:
-            self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
+            self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
 
     @property
     def is_unlimited(self) -> bool:
-        return self.expression.limit in {None, -1, math.inf}
+        return self.max_retrieve_limit in {None, -1, math.inf}
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
@@ -599,6 +600,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                         continue
                     if end_id in end_nodes:
                         setattr(parent_node, attribute_name, end_nodes[end_id])
+                    else:
+                        warnings.warn(f"Unpacking of query result: Could not find node with id {end_id}", stacklevel=2)
 
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
