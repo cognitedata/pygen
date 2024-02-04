@@ -219,7 +219,7 @@ def _create_start_end_time_filter(
                 ],
             )
         )
-    if min_end_time or max_end_time:
+    if min_end_time is not None or max_end_time is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("end_time"),
@@ -227,7 +227,7 @@ def _create_start_end_time_filter(
                 lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
-    if min_start_time or max_start_time:
+    if min_start_time is not None or max_start_time is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start_time"),
@@ -235,9 +235,9 @@ def _create_start_end_time_filter(
                 lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["edge", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["edge", "space"], values=space))

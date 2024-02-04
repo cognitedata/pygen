@@ -23,6 +23,8 @@ Changes are grouped as follows
 * In the `query` call when using `limit=-1` the default API limit was used in the generated SDK. This caused the
   `query` to return only the first 100 results. This is now fixed so that `limit=-1` returns all results,
   also for nested calls.
+* Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
+* Filtering on an empty string in the generated SDK would return all values. This is now fixed.
 
 ## [0.99.3] - 02-02-24
 ### Added

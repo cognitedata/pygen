@@ -184,7 +184,7 @@ def _create_primitive_with_default_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if min_auto_increment_int_32 or max_auto_increment_int_32:
+    if min_auto_increment_int_32 is not None or max_auto_increment_int_32 is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("autoIncrementInt32"),
@@ -192,23 +192,23 @@ def _create_primitive_with_default_filter(
                 lte=max_auto_increment_int_32,
             )
         )
-    if default_boolean is not None and isinstance(default_boolean, bool):
+    if isinstance(default_boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultBoolean"), value=default_boolean))
-    if min_default_float_32 or max_default_float_32:
+    if min_default_float_32 is not None or max_default_float_32 is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("defaultFloat32"), gte=min_default_float_32, lte=max_default_float_32
             )
         )
-    if default_string is not None and isinstance(default_string, str):
+    if isinstance(default_string, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultString"), value=default_string))
     if default_string and isinstance(default_string, list):
         filters.append(dm.filters.In(view_id.as_property_ref("defaultString"), values=default_string))
-    if default_string_prefix:
+    if default_string_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("defaultString"), value=default_string_prefix))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))
