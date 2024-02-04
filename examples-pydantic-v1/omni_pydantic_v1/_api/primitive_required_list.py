@@ -128,14 +128,12 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequiredList | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequiredList | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveRequiredListList:
-        ...
+    ) -> PrimitiveRequiredListList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -204,10 +202,12 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -216,16 +216,17 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
         group_by: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] = None,
         query: str | None = None,
@@ -234,15 +235,16 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
         group_by: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
         query: str | None = None,

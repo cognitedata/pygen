@@ -1,6 +1,7 @@
 """This module contains the mock generator for the pygen package. It can be used to generate mock nodes,
 edges, timeseries, sequences, and files for a given data model/views.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -211,14 +212,16 @@ class MockGenerator:
                     space=self._instance_space,
                     external_id=node_id,
                     type=node_type,
-                    sources=[
-                        dm.NodeOrEdgeData(
-                            source=view.as_id(),
-                            properties=dict(zip(properties.keys(), props)),
-                        )
-                    ]
-                    if props
-                    else None,
+                    sources=(
+                        [
+                            dm.NodeOrEdgeData(
+                                source=view.as_id(),
+                                properties=dict(zip(properties.keys(), props)),
+                            )
+                        ]
+                        if props
+                        else None
+                    ),
                 )
                 for node_id, *props in zip(node_ids, *properties.values())
             ]

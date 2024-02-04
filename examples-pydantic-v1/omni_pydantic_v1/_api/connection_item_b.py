@@ -163,12 +163,12 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemB | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemB | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemBList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ConnectionItemBList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -259,10 +259,12 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: ConnectionItemBFields | Sequence[ConnectionItemBFields] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -273,16 +275,17 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: ConnectionItemBFields | Sequence[ConnectionItemBFields] | None = None,
         group_by: ConnectionItemBFields | Sequence[ConnectionItemBFields] = None,
         query: str | None = None,
@@ -293,15 +296,16 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: ConnectionItemBFields | Sequence[ConnectionItemBFields] | None = None,
         group_by: ConnectionItemBFields | Sequence[ConnectionItemBFields] | None = None,
         query: str | None = None,

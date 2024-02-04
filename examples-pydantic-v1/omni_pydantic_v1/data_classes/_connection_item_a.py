@@ -70,9 +70,9 @@ class ConnectionItemA(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
-            other_direct=self.other_direct.as_apply()
-            if isinstance(self.other_direct, DomainModel)
-            else self.other_direct,
+            other_direct=(
+                self.other_direct.as_apply() if isinstance(self.other_direct, DomainModel) else self.other_direct
+            ),
             outwards=[
                 outward.as_apply() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
             ],
@@ -122,9 +122,9 @@ class ConnectionItemAApply(DomainModelApply):
         if self.other_direct is not None:
             properties["otherDirect"] = {
                 "space": self.space if isinstance(self.other_direct, str) else self.other_direct.space,
-                "externalId": self.other_direct
-                if isinstance(self.other_direct, str)
-                else self.other_direct.external_id,
+                "externalId": (
+                    self.other_direct if isinstance(self.other_direct, str) else self.other_direct.external_id
+                ),
             }
 
         if self.self_direct is not None:

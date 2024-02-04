@@ -84,19 +84,16 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
         ids: Optional[Sequence[int]] = None,
         external_ids: Optional[SequenceNotStr[str]] = None,
         ignore_unknown_ids: bool = False,
-    ) -> T_CogniteResourceList:
-        ...
+    ) -> T_CogniteResourceList: ...
 
-    def create(self, items: T_CogniteResourceList) -> T_CogniteResourceList:
-        ...
+    def create(self, items: T_CogniteResourceList) -> T_CogniteResourceList: ...
 
     def delete(
         self,
         id: Optional[Union[int, Sequence[int]]] = None,
         external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
         ignore_unknown_ids: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):

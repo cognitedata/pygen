@@ -194,9 +194,11 @@ def _create_start_end_time_filter(
             dm.filters.In(
                 ["edge", "startNode"],
                 values=[
-                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -212,9 +214,11 @@ def _create_start_end_time_filter(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )

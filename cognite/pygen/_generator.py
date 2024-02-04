@@ -43,8 +43,7 @@ def generate_sdk(  # type: ignore[overload-overlap]
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[False] = False,
-) -> None:
-    ...
+) -> None: ...
 
 
 @overload
@@ -61,8 +60,7 @@ def generate_sdk(
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
-) -> dict[Path, str]:
-    ...
+) -> dict[Path, str]: ...
 
 
 def generate_sdk(
@@ -280,15 +278,13 @@ def _get_data_model(model_id, client, logger) -> dm.DataModel | dm.DataModelList
 @overload
 def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier, logger: Callable[[str], None]
-) -> dm.DataModel:
-    ...
+) -> dm.DataModel: ...
 
 
 @overload
 def _load_data_model(
     client: CogniteClient, model_id: Sequence[DataModelIdentifier], logger: Callable[[str], None]
-) -> dm.DataModelList:
-    ...
+) -> dm.DataModelList: ...
 
 
 def _load_data_model(

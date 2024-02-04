@@ -152,14 +152,12 @@ class PrimitiveNullableListedAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListed | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListed | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveNullableListedList:
-        ...
+    ) -> PrimitiveNullableListedList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -228,49 +226,53 @@ class PrimitiveNullableListedAPI(
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: PrimitiveNullableListedTextFields
-        | Sequence[PrimitiveNullableListedTextFields]
-        | None = None,
+        search_properties: (
+            PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         group_by: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] = None,
         query: str | None = None,
-        search_properties: PrimitiveNullableListedTextFields
-        | Sequence[PrimitiveNullableListedTextFields]
-        | None = None,
+        search_properties: (
+            PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         group_by: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,

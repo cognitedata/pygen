@@ -36,6 +36,7 @@ client_name = "WindmillClient"
 ```
 
 """
+
 import uuid
 from collections import defaultdict
 from hashlib import sha256

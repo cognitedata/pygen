@@ -152,14 +152,12 @@ class CDFExternalReferencesListedAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CDFExternalReferencesListed | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CDFExternalReferencesListed | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> CDFExternalReferencesListedList:
-        ...
+    ) -> CDFExternalReferencesListedList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -187,41 +185,45 @@ class CDFExternalReferencesListedAPI(
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         group_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         group_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,

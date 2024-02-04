@@ -173,12 +173,10 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Nacelle | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Nacelle | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> NacelleList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> NacelleList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -206,10 +204,12 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: NacelleFields | Sequence[NacelleFields] | None = None,
         group_by: None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -221,16 +221,17 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: NacelleFields | Sequence[NacelleFields] | None = None,
         group_by: NacelleFields | Sequence[NacelleFields] = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -242,15 +243,16 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: NacelleFields | Sequence[NacelleFields] | None = None,
         group_by: NacelleFields | Sequence[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,

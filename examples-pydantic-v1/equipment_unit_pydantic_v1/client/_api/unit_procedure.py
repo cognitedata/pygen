@@ -176,12 +176,10 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -278,10 +276,12 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -294,16 +294,17 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         group_by: UnitProcedureFields | Sequence[UnitProcedureFields] = None,
         query: str | None = None,
@@ -316,15 +317,16 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         group_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         query: str | None = None,

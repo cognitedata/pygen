@@ -102,8 +102,9 @@ class Implementation1sPygenModelsOtherAPI(
 
     def apply(
         self,
-        implementation_1_s_pygen_models_other: Implementation1sPygenModelsOtherApply
-        | Sequence[Implementation1sPygenModelsOtherApply],
+        implementation_1_s_pygen_models_other: (
+            Implementation1sPygenModelsOtherApply | Sequence[Implementation1sPygenModelsOtherApply]
+        ),
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -174,14 +175,12 @@ class Implementation1sPygenModelsOtherAPI(
     @overload
     def retrieve(
         self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1sPygenModelsOther | None:
-        ...
+    ) -> Implementation1sPygenModelsOther | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1sPygenModelsOtherList:
-        ...
+    ) -> Implementation1sPygenModelsOtherList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -209,9 +208,9 @@ class Implementation1sPygenModelsOtherAPI(
     def search(
         self,
         query: str,
-        properties: Implementation1sPygenModelsOtherTextFields
-        | Sequence[Implementation1sPygenModelsOtherTextFields]
-        | None = None,
+        properties: (
+            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -270,18 +269,20 @@ class Implementation1sPygenModelsOtherAPI(
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: Implementation1sPygenModelsOtherFields
-        | Sequence[Implementation1sPygenModelsOtherFields]
-        | None = None,
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
+        property: (
+            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
+        ) = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: Implementation1sPygenModelsOtherTextFields
-        | Sequence[Implementation1sPygenModelsOtherTextFields]
-        | None = None,
+        search_properties: (
+            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -292,24 +293,25 @@ class Implementation1sPygenModelsOtherAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: Implementation1sPygenModelsOtherFields
-        | Sequence[Implementation1sPygenModelsOtherFields]
-        | None = None,
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
+        property: (
+            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
+        ) = None,
         group_by: Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] = None,
         query: str | None = None,
-        search_properties: Implementation1sPygenModelsOtherTextFields
-        | Sequence[Implementation1sPygenModelsOtherTextFields]
-        | None = None,
+        search_properties: (
+            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -320,25 +322,26 @@ class Implementation1sPygenModelsOtherAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: Implementation1sPygenModelsOtherFields
-        | Sequence[Implementation1sPygenModelsOtherFields]
-        | None = None,
-        group_by: Implementation1sPygenModelsOtherFields
-        | Sequence[Implementation1sPygenModelsOtherFields]
-        | None = None,
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
+        property: (
+            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
+        ) = None,
+        group_by: (
+            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
+        ) = None,
         query: str | None = None,
-        search_property: Implementation1sPygenModelsOtherTextFields
-        | Sequence[Implementation1sPygenModelsOtherTextFields]
-        | None = None,
+        search_property: (
+            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -411,9 +414,9 @@ class Implementation1sPygenModelsOtherAPI(
         property: Implementation1sPygenModelsOtherFields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1sPygenModelsOtherTextFields
-        | Sequence[Implementation1sPygenModelsOtherTextFields]
-        | None = None,
+        search_property: (
+            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,

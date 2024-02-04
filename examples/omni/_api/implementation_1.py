@@ -173,12 +173,12 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1 | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1 | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1List:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Implementation1List: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -269,10 +269,12 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1Fields | Sequence[Implementation1Fields] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -289,16 +291,17 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1Fields | Sequence[Implementation1Fields] | None = None,
         group_by: Implementation1Fields | Sequence[Implementation1Fields] = None,
         query: str | None = None,
@@ -315,15 +318,16 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1Fields | Sequence[Implementation1Fields] | None = None,
         group_by: Implementation1Fields | Sequence[Implementation1Fields] | None = None,
         query: str | None = None,

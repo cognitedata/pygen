@@ -111,9 +111,9 @@ class GeneratorApply(DomainModelApply):
             ):
                 properties["generator_speed_controller_reference"] = self.generator_speed_controller_reference
             else:
-                properties[
-                    "generator_speed_controller_reference"
-                ] = self.generator_speed_controller_reference.external_id
+                properties["generator_speed_controller_reference"] = (
+                    self.generator_speed_controller_reference.external_id
+                )
 
         if properties:
             this_node = dm.NodeApply(

@@ -3,6 +3,7 @@ The goal of the model Omni is to cover all property types of a view.
 The test in this file is to ensure that the model Omni is up-to-date with the
 possible properties of a view.
 """
+
 import abc
 from collections.abc import Iterable
 from itertools import product

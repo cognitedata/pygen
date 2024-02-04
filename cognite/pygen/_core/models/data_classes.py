@@ -1,4 +1,5 @@
 """This represents the generated data classes in the SDK"""
+
 from __future__ import annotations
 
 import warnings
@@ -227,12 +228,10 @@ class DataClass:
         return (field for field in self if field.prop_name not in parent_fields)
 
     @overload
-    def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]:
-        ...
+    def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]: ...
 
     @overload
-    def fields_of_type(self, field_type: tuple[type[Field], ...]) -> Iterator[tuple[Field]]:
-        ...
+    def fields_of_type(self, field_type: tuple[type[Field], ...]) -> Iterator[tuple[Field]]: ...
 
     def fields_of_type(
         self, field_type: type[T_Field] | tuple[type[Field], ...]
