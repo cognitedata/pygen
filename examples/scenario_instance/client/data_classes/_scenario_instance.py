@@ -227,19 +227,19 @@ def _create_scenario_instance_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if aggregation is not None and isinstance(aggregation, str):
+    if isinstance(aggregation, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
     if aggregation and isinstance(aggregation, list):
         filters.append(dm.filters.In(view_id.as_property_ref("aggregation"), values=aggregation))
-    if aggregation_prefix:
+    if aggregation_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("aggregation"), value=aggregation_prefix))
-    if country is not None and isinstance(country, str):
+    if isinstance(country, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("country"), value=country))
     if country and isinstance(country, list):
         filters.append(dm.filters.In(view_id.as_property_ref("country"), values=country))
-    if country_prefix:
+    if country_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
-    if min_instance or max_instance:
+    if min_instance is not None or max_instance is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("instance"),
@@ -247,25 +247,25 @@ def _create_scenario_instance_filter(
                 lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
             )
         )
-    if market is not None and isinstance(market, str):
+    if isinstance(market, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
     if market and isinstance(market, list):
         filters.append(dm.filters.In(view_id.as_property_ref("market"), values=market))
-    if market_prefix:
+    if market_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("market"), value=market_prefix))
-    if price_area is not None and isinstance(price_area, str):
+    if isinstance(price_area, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("priceArea"), value=price_area))
     if price_area and isinstance(price_area, list):
         filters.append(dm.filters.In(view_id.as_property_ref("priceArea"), values=price_area))
-    if price_area_prefix:
+    if price_area_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("priceArea"), value=price_area_prefix))
-    if scenario is not None and isinstance(scenario, str):
+    if isinstance(scenario, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
     if scenario and isinstance(scenario, list):
         filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
-    if scenario_prefix:
+    if scenario_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
-    if min_start or max_start:
+    if min_start is not None or max_start is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start"),
@@ -273,9 +273,9 @@ def _create_scenario_instance_filter(
                 lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
             )
         )
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

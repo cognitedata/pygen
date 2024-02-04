@@ -145,21 +145,21 @@ def _create_implementation_2_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if main_value is not None and isinstance(main_value, str):
+    if isinstance(main_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("mainValue"), value=main_value))
     if main_value and isinstance(main_value, list):
         filters.append(dm.filters.In(view_id.as_property_ref("mainValue"), values=main_value))
-    if main_value_prefix:
+    if main_value_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("mainValue"), value=main_value_prefix))
-    if sub_value is not None and isinstance(sub_value, str):
+    if isinstance(sub_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("subValue"), value=sub_value))
     if sub_value and isinstance(sub_value, list):
         filters.append(dm.filters.In(view_id.as_property_ref("subValue"), values=sub_value))
-    if sub_value_prefix:
+    if sub_value_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("subValue"), value=sub_value_prefix))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

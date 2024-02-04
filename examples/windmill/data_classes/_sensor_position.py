@@ -303,11 +303,11 @@ def _create_sensor_position_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if min_position or max_position:
+    if min_position is not None or max_position is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("position"), gte=min_position, lte=max_position))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

@@ -169,33 +169,33 @@ def _create_implementation_1_s_pygen_model_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if main_value is not None and isinstance(main_value, str):
+    if isinstance(main_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("mainValue"), value=main_value))
     if main_value and isinstance(main_value, list):
         filters.append(dm.filters.In(view_id.as_property_ref("mainValue"), values=main_value))
-    if main_value_prefix:
+    if main_value_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("mainValue"), value=main_value_prefix))
-    if sub_value is not None and isinstance(sub_value, str):
+    if isinstance(sub_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("subValue"), value=sub_value))
     if sub_value and isinstance(sub_value, list):
         filters.append(dm.filters.In(view_id.as_property_ref("subValue"), values=sub_value))
-    if sub_value_prefix:
+    if sub_value_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("subValue"), value=sub_value_prefix))
-    if value_1 is not None and isinstance(value_1, str):
+    if isinstance(value_1, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("value1"), value=value_1))
     if value_1 and isinstance(value_1, list):
         filters.append(dm.filters.In(view_id.as_property_ref("value1"), values=value_1))
-    if value_1_prefix:
+    if value_1_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("value1"), value=value_1_prefix))
-    if value_2 is not None and isinstance(value_2, str):
+    if isinstance(value_2, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("value2"), value=value_2))
     if value_2 and isinstance(value_2, list):
         filters.append(dm.filters.In(view_id.as_property_ref("value2"), values=value_2))
-    if value_2_prefix:
+    if value_2_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("value2"), value=value_2_prefix))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))
