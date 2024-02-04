@@ -36,6 +36,15 @@ def test_filter_on_boolean(omni_client: OmniClient) -> None:
     assert not (is_true := [item for item in items if item.boolean]), f"Found items with boolean=True: {is_true}"
 
 
+def test_filter_on_minimum_0(omni_client: OmniClient) -> None:
+    items = omni_client.primitive_required.list(min_int_32=0, min_float_32=0.0, limit=-1)
+
+    assert len(items) > 0
+    assert not (
+        is_not_0 := [item for item in items if item.int_32 < 0 or item.float_32 < 0.0]
+    ), f"Found items that are below 0: {is_not_0}"
+
+
 def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
     all_items = omni_client.connection_item_a.list(limit=5)
     expected = next((item for item in all_items if item.other_direct), None)

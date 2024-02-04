@@ -35,6 +35,7 @@ from cognite.client.data_classes.data_modeling import (
     filters,
 )
 from cognite.client.exceptions import CogniteNotFoundError
+from cognite.client.utils.useful_types import SequenceNotStr
 
 from cognite.pygen.utils.text import to_snake
 
@@ -81,21 +82,18 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
     def retrieve_multiple(
         self,
         ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[Sequence[str]] = None,
+        external_ids: Optional[SequenceNotStr[str]] = None,
         ignore_unknown_ids: bool = False,
-    ) -> T_CogniteResourceList:
-        ...
+    ) -> T_CogniteResourceList: ...
 
-    def create(self, items: T_CogniteResourceList) -> T_CogniteResourceList:
-        ...
+    def create(self, items: T_CogniteResourceList) -> T_CogniteResourceList: ...
 
     def delete(
         self,
         id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, Sequence[str]]] = None,
+        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
         ignore_unknown_ids: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
@@ -105,7 +103,7 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
     def retrieve_multiple(
         self,
         ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[Sequence[str]] = None,
+        external_ids: Optional[SequenceNotStr[str]] = None,
         ignore_unknown_ids: bool = False,
     ) -> FileMetadataList:
         return self._files_api.retrieve_multiple(
@@ -121,7 +119,7 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
     def delete(
         self,
         id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, Sequence[str]]] = None,
+        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
         ignore_unknown_ids: bool = False,
     ) -> None:
         with suppress(CogniteNotFoundError):

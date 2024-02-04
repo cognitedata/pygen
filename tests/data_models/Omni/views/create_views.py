@@ -2,6 +2,7 @@
 Helper script to create views from containers for the MappedPropertyApply objects.
 (Faster than creating them manually)
 """
+
 from pathlib import Path
 
 from cognite.client import data_modeling as dm

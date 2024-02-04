@@ -163,27 +163,27 @@ def _create_work_order_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if description is not None and isinstance(description, str):
+    if isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
-    if description_prefix:
+    if description_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if performed_by is not None and isinstance(performed_by, str):
+    if isinstance(performed_by, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("performedBy"), value=performed_by))
     if performed_by and isinstance(performed_by, list):
         filters.append(dm.filters.In(view_id.as_property_ref("performedBy"), values=performed_by))
-    if performed_by_prefix:
+    if performed_by_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("performedBy"), value=performed_by_prefix))
-    if type_ is not None and isinstance(type_, str):
+    if isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
         filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
-    if type_prefix:
+    if type_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

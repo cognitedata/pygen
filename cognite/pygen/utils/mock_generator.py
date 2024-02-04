@@ -1,6 +1,7 @@
 """This module contains the mock generator for the pygen package. It can be used to generate mock nodes,
 edges, timeseries, sequences, and files for a given data model/views.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -211,20 +212,23 @@ class MockGenerator:
                     space=self._instance_space,
                     external_id=node_id,
                     type=node_type,
-                    sources=[
-                        dm.NodeOrEdgeData(
-                            source=view.as_id(),
-                            properties=dict(zip(properties.keys(), props)),
-                        )
-                    ]
-                    if props
-                    else [],
+                    sources=(
+                        [
+                            dm.NodeOrEdgeData(
+                                source=view.as_id(),
+                                properties=dict(zip(properties.keys(), props)),
+                            )
+                        ]
+                        if props
+                        else None
+                    ),
                 )
                 for node_id, *props in zip(node_ids, *properties.values())
             ]
             output[view.as_id()] = ViewMockData(
                 view.as_id(),
                 instance_space=self._instance_space,
+                is_writeable=view.writable,
                 node=dm.NodeApplyList(nodes),
                 timeseries=TimeSeriesList(external.timeseries),
                 sequence=SequenceList(external.sequence),
@@ -430,15 +434,37 @@ class MockGenerator:
 
 @dataclass
 class ViewMockData:
-    """Mock data for a given view."""
+    """Mock data for a given view.
+
+    Args:
+        view_id (dm.ViewId): The view id.
+        instance_space (str): The instance space.
+        is_writeable (bool): Whether the view is writeable. Defaults to True.
+        node (dm.NodeApplyList): The nodes.
+        edge (dm.EdgeApplyList): The edges.
+        timeseries (TimeSeriesList): The timeseries.
+        sequence (SequenceList): The sequences.
+        file (FileMetadataList): The files.
+    """
 
     view_id: dm.ViewId
     instance_space: str
+    is_writeable: bool = True
     node: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edge: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
     timeseries: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
     sequence: SequenceList = field(default_factory=lambda: SequenceList([]))
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
+
+    @property
+    def _node_only(self) -> dm.NodeApplyList:
+        nodes = dm.NodeApplyList([])
+        for node in self.node:
+            # Dumping and loading to avoid mutating the original node
+            dumped = node.dump()
+            dumped.pop("sources", None)
+            nodes.append(dm.NodeApply.load(dumped))
+        return nodes
 
     def dump_yaml(self, folder: Path | str) -> None:
         """
@@ -455,24 +481,32 @@ class ViewMockData:
             if values:
                 (folder_path / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
 
-    def deploy(self, client: CogniteClient) -> None:
+    def deploy(self, client: CogniteClient, verbose: bool = False) -> None:
         """Deploys the mock data to CDF."""
         with _log_pygen_mock_call(client) as client:
             if client.data_modeling.spaces.retrieve(self.instance_space) is None:
                 client.data_modeling.spaces.apply(dm.SpaceApply(self.instance_space, name=self.instance_space))
 
             if self.node or self.edge:
-                created = client.data_modeling.instances.apply(self.node, self.edge)
-                print(
-                    f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
-                    f"and {sum(1 for e in created.edges if e.was_modified)} edges"
-                )
+                if self.is_writeable:
+                    nodes = self.node
+                else:
+                    nodes = self._node_only
+
+                created = client.data_modeling.instances.apply(nodes, self.edge)
+                if verbose:
+                    print(
+                        f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                        f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+                    )
             if self.timeseries:
                 client.time_series.upsert(self.timeseries)
-                print(f"Created/Updated {len(self.timeseries)} timeseries")
+                if verbose:
+                    print(f"Created/Updated {len(self.timeseries)} timeseries")
             if self.sequence:
                 client.sequences.upsert(self.sequence)
-                print(f"Created/Updated {len(self.sequence)} sequences")
+                if verbose:
+                    print(f"Created/Updated {len(self.sequence)} sequences")
             if self.file:
                 existing = client.files.retrieve_multiple(
                     external_ids=self.file.as_external_ids(), ignore_unknown_ids=True
@@ -480,7 +514,8 @@ class ViewMockData:
                 new_files = FileMetadataList([file for file in self.file if file.external_id not in existing])
                 for file in new_files:
                     client.files.create(file)
-                print(f"Created {len(new_files)} files")
+                if verbose:
+                    print(f"Created {len(new_files)} files")
 
     def _repr_html_(self) -> str:
         table = pd.DataFrame(
@@ -523,6 +558,17 @@ class MockData(UserList[ViewMockData]):
         return dm.NodeApplyList([node for view_mock_data in self for node in view_mock_data.node if node])
 
     @property
+    def writable_nodes(self) -> dm.NodeApplyList:
+        return dm.NodeApplyList(
+            [
+                node
+                for view_mock_data in self
+                for node in (view_mock_data.node if view_mock_data.is_writeable else view_mock_data._node_only)
+                if node
+            ]
+        )
+
+    @property
     def edges(self) -> dm.EdgeApplyList:
         return dm.EdgeApplyList([edge for view_mock_data in self for edge in view_mock_data.edge if edge])
 
@@ -547,7 +593,12 @@ class MockData(UserList[ViewMockData]):
         for view_mock_data in self:
             view_mock_data.dump_yaml(folder)
 
-    def deploy(self, client: CogniteClient) -> None:
+    def deploy(
+        self,
+        client: CogniteClient,
+        exclude: set[Literal["timeseries", "files", "sequences"]] | None = None,
+        verbose: bool = False,
+    ) -> None:
         """Deploys the mock data to CDF.
 
         This means calling the .apply() method for the instances (nodes and edges), and the .upsert() method for
@@ -555,16 +606,24 @@ class MockData(UserList[ViewMockData]):
 
         Args:
             client (CogniteClient): The client to use for deployment.
+            exclude (set[Literal["timeseries", "files", "sequences"]]): The resources to exclude from deployment.
+            verbose (bool): Whether to print information about the deployment.
         """
-        nodes = self.nodes
+        nodes = self.writable_nodes
         edges = self.edges
         with _log_pygen_mock_call(client) as client:
             if self:
                 instance_space = self[0].instance_space
                 if client.data_modeling.spaces.retrieve(instance_space) is None:
                     client.data_modeling.spaces.apply(dm.SpaceApply(instance_space, name=instance_space))
+                    if verbose:
+                        print(f"Created space {instance_space}")
 
             if nodes or edges:
+                # There is an 'edge' if there is an outward and inward edge on two views, we can get duplicated edges.
+                # We should remove the duplicates.
+                edges = dm.EdgeApplyList({edge.as_id(): edge for edge in edges}.values())
+
                 created = client.data_modeling.instances.apply(
                     nodes,
                     edges,
@@ -572,24 +631,28 @@ class MockData(UserList[ViewMockData]):
                     auto_create_end_nodes=True,
                     auto_create_direct_relations=True,
                 )
-                print(
-                    f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
-                    f"and {sum(1 for e in created.edges if e.was_modified)} edges"
-                )
-            if timeseries := self.timeseries:
+                if verbose:
+                    print(
+                        f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
+                        f"and {sum(1 for e in created.edges if e.was_modified)} edges"
+                    )
+            if (timeseries := self.timeseries) and (exclude is None or "timeseries" not in exclude):
                 client.time_series.upsert(timeseries)
-                print(f"Created/Updated {len(timeseries)} timeseries")
-            if sequences := self.sequences:
+                if verbose:
+                    print(f"Created/Updated {len(timeseries)} timeseries")
+            if (sequences := self.sequences) and (exclude is None or "sequences" not in exclude):
                 client.sequences.upsert(sequences)
-                print(f"Created/Updated {len(sequences)} sequences")
-            if files := self.files:
+                if verbose:
+                    print(f"Created/Updated {len(sequences)} sequences")
+            if (files := self.files) and (exclude is None or "files" not in exclude):
                 existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
                     client.files.create(file)
-                print(f"Created {len(new_files)} files")
+                if verbose:
+                    print(f"Created {len(new_files)} files")
 
-    def clean(self, client: CogniteClient, delete_space: bool = False) -> None:
+    def clean(self, client: CogniteClient, delete_space: bool = False, verbose: bool = False) -> None:
         """Cleans the mock data from CDF.
 
         This means calling the .delete() method for the instances (nodes and edges), timeseries, sequences, and files.
@@ -597,20 +660,23 @@ class MockData(UserList[ViewMockData]):
         Args:
             client: The client to use for cleaning.
             delete_space: Whether to delete the instance space.
-
+            verbose: Whether to print information about the cleaning.
         """
         nodes = self.nodes
         edges = self.edges
         with _log_pygen_mock_call(client) as client:
             if nodes or edges:
                 client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
-                print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
+                if verbose:
+                    print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
             if timeseries := self.timeseries:
                 client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
-                print(f"Deleted {len(timeseries)} timeseries")
+                if verbose:
+                    print(f"Deleted {len(timeseries)} timeseries")
             if sequences := self.sequences:
                 client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
-                print(f"Deleted {len(sequences)} sequences")
+                if verbose:
+                    print(f"Deleted {len(sequences)} sequences")
             if files := self.files:
                 try:
                     client.files.delete(external_id=files.as_external_ids())
@@ -618,12 +684,14 @@ class MockData(UserList[ViewMockData]):
                     not_existing = {file["externalId"] for file in e.not_found}
                     files = FileMetadataList([file for file in files if file.external_id not in not_existing])
                     client.files.delete(external_id=files.as_external_ids())
-                print(f"Deleted {len(files)} files")
+                if verbose:
+                    print(f"Deleted {len(files)} files")
 
             if self and delete_space:
                 instance_space = self[0].instance_space
                 client.data_modeling.spaces.delete(instance_space)
-                print(f"Deleted space {instance_space}")
+                if verbose:
+                    print(f"Deleted space {instance_space}")
 
     def _repr_html_(self) -> str:
         table = pd.DataFrame(

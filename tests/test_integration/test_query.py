@@ -11,7 +11,7 @@ else:
 
 
 def test_query_with_direct_relation(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a(limit=5).query(retrieve_other_direct=True, retrieve_self_direct=True)
+    items = omni_client.connection_item_a(limit=-1).query(retrieve_other_direct=True, retrieve_self_direct=True)
 
     assert len(items) > 0
     for item in items:

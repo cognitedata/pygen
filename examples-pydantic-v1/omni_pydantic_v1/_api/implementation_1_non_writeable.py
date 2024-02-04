@@ -125,14 +125,12 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteable | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteable | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1NonWriteableList:
-        ...
+    ) -> Implementation1NonWriteableList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -160,9 +158,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     def search(
         self,
         query: str,
-        properties: Implementation1NonWriteableTextFields
-        | Sequence[Implementation1NonWriteableTextFields]
-        | None = None,
+        properties: (
+            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -221,16 +219,18 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: Implementation1NonWriteableTextFields
-        | Sequence[Implementation1NonWriteableTextFields]
-        | None = None,
+        search_properties: (
+            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -241,22 +241,23 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         group_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] = None,
         query: str | None = None,
-        search_properties: Implementation1NonWriteableTextFields
-        | Sequence[Implementation1NonWriteableTextFields]
-        | None = None,
+        search_properties: (
+            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -267,21 +268,22 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         group_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields
-        | Sequence[Implementation1NonWriteableTextFields]
-        | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -354,9 +356,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         property: Implementation1NonWriteableFields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields
-        | Sequence[Implementation1NonWriteableTextFields]
-        | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,

@@ -70,9 +70,9 @@ class ConnectionItemA(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
-            other_direct=self.other_direct.as_apply()
-            if isinstance(self.other_direct, DomainModel)
-            else self.other_direct,
+            other_direct=(
+                self.other_direct.as_apply() if isinstance(self.other_direct, DomainModel) else self.other_direct
+            ),
             outwards=[
                 outward.as_apply() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
             ],
@@ -122,9 +122,9 @@ class ConnectionItemAApply(DomainModelApply):
         if self.other_direct is not None:
             properties["otherDirect"] = {
                 "space": self.space if isinstance(self.other_direct, str) else self.other_direct.space,
-                "externalId": self.other_direct
-                if isinstance(self.other_direct, str)
-                else self.other_direct.external_id,
+                "externalId": (
+                    self.other_direct if isinstance(self.other_direct, str) else self.other_direct.external_id
+                ),
             }
 
         if self.self_direct is not None:
@@ -194,11 +194,11 @@ def _create_connection_item_a_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if name is not None and isinstance(name, str):
+    if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
+    if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if other_direct and isinstance(other_direct, str):
         filters.append(
@@ -254,9 +254,9 @@ def _create_connection_item_a_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in self_direct],
             )
         )
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

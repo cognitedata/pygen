@@ -464,13 +464,14 @@ def _retrieve_timeseries_external_ids_with_extra_generator_speed_controller(
     else:
         extra_list = extra_properties
     has_data = dm.filters.HasData(views=[view_id])
-    filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
+    has_property = dm.filters.Exists(property=view_id.as_property_ref("generator_speed_controller"))
+    filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
     cursor = None
     external_ids: dict[str, list[str]] = {}
     total_retrieved = 0
     while True:
-        query_limit = min(INSTANCE_QUERY_LIMIT, limit - total_retrieved)
+        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit - total_retrieved), 0)
         selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
         query = dm.query.Query(
             with_={

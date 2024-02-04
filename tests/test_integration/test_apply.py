@@ -159,7 +159,7 @@ def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient)
         cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClient) -> dc.PrimitiveNullableApply:
     node = dc.PrimitiveNullableApply(
         external_id="integration_test:PrimitiveNullable",
@@ -215,4 +215,5 @@ def test_set_empty_string(
     update.text = ""
     omni_client.primitive_nullable.apply(update, write_none=True)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
+    assert retrieved is not None, f"Node {primitive_nullable_node.external_id} not found"
     assert retrieved.text == ""

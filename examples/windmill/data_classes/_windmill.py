@@ -218,7 +218,7 @@ def _create_windmill_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if min_capacity or max_capacity:
+    if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if nacelle and isinstance(nacelle, str):
         filters.append(
@@ -244,11 +244,11 @@ def _create_windmill_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in nacelle],
             )
         )
-    if name is not None and isinstance(name, str):
+    if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
+    if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if rotor and isinstance(rotor, str):
         filters.append(
@@ -273,15 +273,15 @@ def _create_windmill_filter(
                 view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]
             )
         )
-    if windfarm is not None and isinstance(windfarm, str):
+    if isinstance(windfarm, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))
     if windfarm and isinstance(windfarm, list):
         filters.append(dm.filters.In(view_id.as_property_ref("windfarm"), values=windfarm))
-    if windfarm_prefix:
+    if windfarm_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("windfarm"), value=windfarm_prefix))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

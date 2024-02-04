@@ -211,12 +211,10 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> T_DomainModelCore:
-        ...
+    def __getitem__(self, item: int) -> T_DomainModelCore: ...
 
     @overload
-    def __getitem__(self: type[T_DomainModelList], item: slice) -> T_DomainModelList:
-        ...
+    def __getitem__(self: type[T_DomainModelList], item: slice) -> T_DomainModelList: ...
 
     def __getitem__(self, item: int | slice) -> T_DomainModelCore | T_DomainModelList:
         if isinstance(item, slice):

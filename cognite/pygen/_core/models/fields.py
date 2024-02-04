@@ -1,6 +1,7 @@
 """
 Fields represents the fields of the data classes in the generated SDK.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+import warnings
 
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
@@ -53,30 +54,22 @@ _T_co = TypeVar("_T_co", covariant=True)
 # This works because str.__contains__ does not accept an object (either in typeshed or at runtime)
 class SequenceNotStr(Protocol[_T_co]):
     @overload
-    def __getitem__(self, index: SupportsIndex, /) -> _T_co:
-        ...
+    def __getitem__(self, index: SupportsIndex, /) -> _T_co: ...
 
     @overload
-    def __getitem__(self, index: slice, /) -> Sequence[_T_co]:
-        ...
+    def __getitem__(self, index: slice, /) -> Sequence[_T_co]: ...
 
-    def __contains__(self, value: object, /) -> bool:
-        ...
+    def __contains__(self, value: object, /) -> bool: ...
 
-    def __len__(self) -> int:
-        ...
+    def __len__(self) -> int: ...
 
-    def __iter__(self) -> Iterator[_T_co]:
-        ...
+    def __iter__(self) -> Iterator[_T_co]: ...
 
-    def index(self, value: Any, /, start: int = 0, stop: int = ...) -> int:
-        ...
+    def index(self, value: Any, /, start: int = 0, stop: int = ...) -> int: ...
 
-    def count(self, value: Any, /) -> int:
-        ...
+    def count(self, value: Any, /) -> int: ...
 
-    def __reversed__(self) -> Iterator[_T_co]:
-        ...
+    def __reversed__(self) -> Iterator[_T_co]: ...
 
 
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
@@ -108,12 +101,10 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         external_id: str,
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: list[
-            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
-        ]
-        | None = None,
-    ) -> T_DomainModel | None:
-        ...
+        edge_api_name_type_direction_quad: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        ) = None,
+    ) -> T_DomainModel | None: ...
 
     @overload
     def _retrieve(
@@ -121,22 +112,19 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         external_id: SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: list[
-            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
-        ]
-        | None = None,
-    ) -> T_DomainModelList:
-        ...
+        edge_api_name_type_direction_quad: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        ) = None,
+    ) -> T_DomainModelList: ...
 
     def _retrieve(
         self,
         external_id: str | SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: list[
-            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
-        ]
-        | None = None,
+        edge_api_name_type_direction_quad: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        ) = None,
     ) -> T_DomainModel | T_DomainModelList | None:
         is_multiple = True
         if isinstance(external_id, str):
@@ -173,17 +161,21 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         if properties:
             properties = [properties_by_field.get(prop, prop) for prop in properties]
 
-        nodes = self._client.data_modeling.instances.search(view_id, query, "node", properties, filter_, limit)
+        nodes = self._client.data_modeling.instances.search(
+            view=view_id, query=query, instance_type="node", properties=properties, filter=filter_, limit=limit
+        )
         return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
     @overload
     def _aggregate(
         self,
         view_id: dm.ViewId,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: None = None,
@@ -191,17 +183,18 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def _aggregate(
         self,
         view_id: dm.ViewId,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         properties_by_field: dict[str, str],
         properties: str | Sequence[str] = None,
         group_by: str | Sequence[str] | None = None,
@@ -209,16 +202,17 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def _aggregate(
         self,
         view_id: dm.ViewId,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: str | Sequence[str] | None = None,
@@ -310,12 +304,13 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         limit: int,
         filter: dm.Filter,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: list[
-            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
-        ]
-        | None = None,
+        edge_api_name_type_direction_quad: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        ) = None,
     ) -> T_DomainModelList:
-        nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
+        nodes = self._client.data_modeling.instances.list(
+            instance_type="node", sources=self._sources, limit=limit, filter=filter
+        )
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:
             self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_quad)
@@ -326,10 +321,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
     def _retrieve_and_set_edge_types(
         cls,
         nodes: T_DomainModelList,
-        edge_api_name_type_direction_quad: list[
-            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
-        ]
-        | None = None,
+        edge_api_name_type_direction_quad: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        ) = None,
     ):
         for edge_api, edge_name, edge_type, direction in edge_api_name_type_direction_quad or []:
             is_type = dm.filters.Equals(
@@ -460,14 +454,14 @@ class QueryStep:
     last_batch_count: int = 0
 
     def update_expression_limit(self) -> None:
-        if self.max_retrieve_limit == -1:
-            self.expression.limit = None
+        if self.is_unlimited:
+            self.expression.limit = INSTANCE_QUERY_LIMIT
         else:
-            self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
+            self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
 
     @property
     def is_unlimited(self) -> bool:
-        return self.expression.limit in {None, -1, math.inf}
+        return self.max_retrieve_limit in {None, -1, math.inf}
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
@@ -485,12 +479,10 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> QueryStep:
-        ...
+    def __getitem__(self, item: int) -> QueryStep: ...
 
     @overload
-    def __getitem__(self: type[QueryBuilder[T_DomainModelList]], item: slice) -> QueryBuilder[T_DomainModelList]:
-        ...
+    def __getitem__(self: type[QueryBuilder[T_DomainModelList]], item: slice) -> QueryBuilder[T_DomainModelList]: ...
 
     def __getitem__(self, item: int | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
         if isinstance(item, slice):
@@ -553,9 +545,9 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         edges_by_type_by_source_node: dict[tuple[str, str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
             lambda: defaultdict(list)
         )
-        relation_by_type_by_start_node: dict[
-            tuple[str, str], dict[tuple[str, str], list[DomainRelation]]
-        ] = defaultdict(lambda: defaultdict(list))
+        relation_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[DomainRelation]]] = (
+            defaultdict(lambda: defaultdict(list))
+        )
         node_attribute_to_node_type: dict[str, str] = {}
 
         for step in self:
@@ -599,6 +591,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                         continue
                     if end_id in end_nodes:
                         setattr(parent_node, attribute_name, end_nodes[end_id])
+                    else:
+                        warnings.warn(f"Unpacking of query result: Could not find node with id {end_id}", stacklevel=2)
 
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
@@ -686,9 +680,11 @@ def _create_edge_filter(
             dm.filters.In(
                 ["edge", "startNode"],
                 values=[
-                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -704,9 +700,11 @@ def _create_edge_filter(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )

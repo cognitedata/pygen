@@ -30,8 +30,7 @@ if _has_typer:
     def common(
         ctx: typer.Context,
         version: bool = typer.Option(None, "--version", callback=_version_callback),
-    ):
-        ...
+    ): ...
 
     settings = load_settings()
     help_text = "Generate a Python SDK from Data Model(s)"

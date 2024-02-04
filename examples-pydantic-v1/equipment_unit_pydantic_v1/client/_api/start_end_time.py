@@ -151,12 +151,10 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> StartEndTime | None:
-        ...
+    def retrieve(self, external_id: str) -> StartEndTime | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> StartEndTimeList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str]) -> StartEndTimeList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
@@ -184,10 +182,12 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: StartEndTimeFields | Sequence[StartEndTimeFields] | None = None,
         group_by: None = None,
         min_end_time: datetime.datetime | None = None,
@@ -198,16 +198,17 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: StartEndTimeFields | Sequence[StartEndTimeFields] | None = None,
         group_by: StartEndTimeFields | Sequence[StartEndTimeFields] = None,
         min_end_time: datetime.datetime | None = None,
@@ -218,15 +219,16 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: StartEndTimeFields | Sequence[StartEndTimeFields] | None = None,
         group_by: StartEndTimeFields | Sequence[StartEndTimeFields] | None = None,
         min_end_time: datetime.datetime | None = None,

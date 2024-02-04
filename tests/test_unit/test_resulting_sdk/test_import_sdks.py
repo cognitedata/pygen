@@ -1,6 +1,7 @@
 """
 These are tests that apply to all generated SDKs.
 """
+
 import importlib
 from collections.abc import Iterable
 

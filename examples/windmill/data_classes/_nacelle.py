@@ -91,13 +91,15 @@ class Nacelle(DomainModel):
             acc_from_back_side_z=self.acc_from_back_side_z,
             gearbox=self.gearbox.as_apply() if isinstance(self.gearbox, DomainModel) else self.gearbox,
             generator=self.generator.as_apply() if isinstance(self.generator, DomainModel) else self.generator,
-            high_speed_shaft=self.high_speed_shaft.as_apply()
-            if isinstance(self.high_speed_shaft, DomainModel)
-            else self.high_speed_shaft,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_apply()
+                if isinstance(self.high_speed_shaft, DomainModel)
+                else self.high_speed_shaft
+            ),
             main_shaft=self.main_shaft.as_apply() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
-            power_inverter=self.power_inverter.as_apply()
-            if isinstance(self.power_inverter, DomainModel)
-            else self.power_inverter,
+            power_inverter=(
+                self.power_inverter.as_apply() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
+            ),
             yaw_direction=self.yaw_direction,
             yaw_error=self.yaw_error,
         )
@@ -184,9 +186,11 @@ class NacelleApply(DomainModelApply):
         if self.high_speed_shaft is not None:
             properties["high_speed_shaft"] = {
                 "space": self.space if isinstance(self.high_speed_shaft, str) else self.high_speed_shaft.space,
-                "externalId": self.high_speed_shaft
-                if isinstance(self.high_speed_shaft, str)
-                else self.high_speed_shaft.external_id,
+                "externalId": (
+                    self.high_speed_shaft
+                    if isinstance(self.high_speed_shaft, str)
+                    else self.high_speed_shaft.external_id
+                ),
             }
 
         if self.main_shaft is not None:
@@ -198,9 +202,9 @@ class NacelleApply(DomainModelApply):
         if self.power_inverter is not None:
             properties["power_inverter"] = {
                 "space": self.space if isinstance(self.power_inverter, str) else self.power_inverter.space,
-                "externalId": self.power_inverter
-                if isinstance(self.power_inverter, str)
-                else self.power_inverter.external_id,
+                "externalId": (
+                    self.power_inverter if isinstance(self.power_inverter, str) else self.power_inverter.external_id
+                ),
             }
 
         if self.yaw_direction is not None or write_none:
@@ -429,9 +433,9 @@ def _create_nacelle_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in power_inverter],
             )
         )
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

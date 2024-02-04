@@ -3,7 +3,6 @@ This is the main entry point for the pygen package. It contains the main functio
 generating SDKs.
 """
 
-
 from ._generator import generate_sdk, generate_sdk_notebook
 from ._version import __version__
 from .utils.cdf import load_cognite_client_from_toml

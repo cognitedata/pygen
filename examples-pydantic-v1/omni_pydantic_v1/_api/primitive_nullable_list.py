@@ -128,14 +128,12 @@ class PrimitiveNullableListAPI(NodeAPI[PrimitiveNullableList, PrimitiveNullableL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableList | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableList | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveNullableListList:
-        ...
+    ) -> PrimitiveNullableListList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -204,10 +202,12 @@ class PrimitiveNullableListAPI(NodeAPI[PrimitiveNullableList, PrimitiveNullableL
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListFields | Sequence[PrimitiveNullableListFields] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -216,16 +216,17 @@ class PrimitiveNullableListAPI(NodeAPI[PrimitiveNullableList, PrimitiveNullableL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregations: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListFields | Sequence[PrimitiveNullableListFields] | None = None,
         group_by: PrimitiveNullableListFields | Sequence[PrimitiveNullableListFields] = None,
         query: str | None = None,
@@ -234,15 +235,16 @@ class PrimitiveNullableListAPI(NodeAPI[PrimitiveNullableList, PrimitiveNullableL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | Sequence[Aggregations]
+            | Sequence[dm.aggregations.MetricAggregation]
+        ),
         property: PrimitiveNullableListFields | Sequence[PrimitiveNullableListFields] | None = None,
         group_by: PrimitiveNullableListFields | Sequence[PrimitiveNullableListFields] | None = None,
         query: str | None = None,

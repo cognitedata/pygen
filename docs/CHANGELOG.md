@@ -13,6 +13,25 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.4] - 02-02-24
+### Fixed
+* The `MockGenerator` now handles non-writable views with properties. This was an issue when generating nodes for
+  data models that contain non-writable views. This is now fixed, the nodes from the non-writable views are
+  created without properties.
+* In the `query` call it was possible to get negative `limit` which would raise a `raise CogniteAPIError`.
+  This is now fixed.
+* In the `query` call when using `limit=-1` the default API limit was used in the generated SDK. This caused the
+  `query` to return only the first 100 results. This is now fixed so that `limit=-1` returns all results,
+  also for nested calls.
+* Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
+* Filtering on an empty string in the generated SDK would return all values. This is now fixed.
+* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed. This is now fixed.
+* In the `timeseries` query method, if a timeseries type property is nullable and the value is missing, the generated
+  SDK would raise `KeyError` when trying to retrieve timeseries or datapoints. This is now fixed.
+
+### Changed
+* The generated SDK now complies with `black` `0.24.0` formatting.
+
 ## [0.99.3] - 02-02-24
 ### Added
 * The `MockGenerator` now supports generating nodes for views with filters on `node.type` which are nested. For example,

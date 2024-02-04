@@ -166,9 +166,9 @@ class SensorPositionApply(DomainModelApply):
             ):
                 properties["edgewise_bend_mom_crosstalk_corrected"] = self.edgewise_bend_mom_crosstalk_corrected
             else:
-                properties[
-                    "edgewise_bend_mom_crosstalk_corrected"
-                ] = self.edgewise_bend_mom_crosstalk_corrected.external_id
+                properties["edgewise_bend_mom_crosstalk_corrected"] = (
+                    self.edgewise_bend_mom_crosstalk_corrected.external_id
+                )
 
         if self.edgewise_bend_mom_offset is not None or write_none:
             if isinstance(self.edgewise_bend_mom_offset, str) or self.edgewise_bend_mom_offset is None:
@@ -181,13 +181,13 @@ class SensorPositionApply(DomainModelApply):
                 isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, str)
                 or self.edgewise_bend_mom_offset_crosstalk_corrected is None
             ):
-                properties[
-                    "edgewise_bend_mom_offset_crosstalk_corrected"
-                ] = self.edgewise_bend_mom_offset_crosstalk_corrected
+                properties["edgewise_bend_mom_offset_crosstalk_corrected"] = (
+                    self.edgewise_bend_mom_offset_crosstalk_corrected
+                )
             else:
-                properties[
-                    "edgewise_bend_mom_offset_crosstalk_corrected"
-                ] = self.edgewise_bend_mom_offset_crosstalk_corrected.external_id
+                properties["edgewise_bend_mom_offset_crosstalk_corrected"] = (
+                    self.edgewise_bend_mom_offset_crosstalk_corrected.external_id
+                )
 
         if self.edgewisewise_bend_mom is not None or write_none:
             if isinstance(self.edgewisewise_bend_mom, str) or self.edgewisewise_bend_mom is None:
@@ -208,9 +208,9 @@ class SensorPositionApply(DomainModelApply):
             ):
                 properties["flapwise_bend_mom_crosstalk_corrected"] = self.flapwise_bend_mom_crosstalk_corrected
             else:
-                properties[
-                    "flapwise_bend_mom_crosstalk_corrected"
-                ] = self.flapwise_bend_mom_crosstalk_corrected.external_id
+                properties["flapwise_bend_mom_crosstalk_corrected"] = (
+                    self.flapwise_bend_mom_crosstalk_corrected.external_id
+                )
 
         if self.flapwise_bend_mom_offset is not None or write_none:
             if isinstance(self.flapwise_bend_mom_offset, str) or self.flapwise_bend_mom_offset is None:
@@ -223,13 +223,13 @@ class SensorPositionApply(DomainModelApply):
                 isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, str)
                 or self.flapwise_bend_mom_offset_crosstalk_corrected is None
             ):
-                properties[
-                    "flapwise_bend_mom_offset_crosstalk_corrected"
-                ] = self.flapwise_bend_mom_offset_crosstalk_corrected
+                properties["flapwise_bend_mom_offset_crosstalk_corrected"] = (
+                    self.flapwise_bend_mom_offset_crosstalk_corrected
+                )
             else:
-                properties[
-                    "flapwise_bend_mom_offset_crosstalk_corrected"
-                ] = self.flapwise_bend_mom_offset_crosstalk_corrected.external_id
+                properties["flapwise_bend_mom_offset_crosstalk_corrected"] = (
+                    self.flapwise_bend_mom_offset_crosstalk_corrected.external_id
+                )
 
         if self.position is not None or write_none:
             properties["position"] = self.position
@@ -302,11 +302,11 @@ def _create_sensor_position_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if min_position or max_position:
+    if min_position is not None or max_position is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("position"), gte=min_position, lte=max_position))
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space is not None and isinstance(space, str):
+    if isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))
