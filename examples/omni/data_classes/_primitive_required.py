@@ -229,9 +229,9 @@ def _create_primitive_required_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if boolean is not None and isinstance(boolean, bool):
+    if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
-    if min_date or max_date:
+    if min_date is not None or max_date is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("date"),
@@ -239,21 +239,21 @@ def _create_primitive_required_filter(
                 lte=max_date.isoformat() if max_date else None,
             )
         )
-    if min_float_32 or max_float_32:
+    if min_float_32 is not None or max_float_32 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("float32"), gte=min_float_32, lte=max_float_32))
-    if min_float_64 or max_float_64:
+    if min_float_64 is not None or max_float_64 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("float64"), gte=min_float_64, lte=max_float_64))
-    if min_int_32 or max_int_32:
+    if min_int_32 is not None or max_int_32 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("int32"), gte=min_int_32, lte=max_int_32))
-    if min_int_64 or max_int_64:
+    if min_int_64 is not None or max_int_64 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("int64"), gte=min_int_64, lte=max_int_64))
-    if text is not None and isinstance(text, str):
+    if isinstance(text, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("text"), value=text))
     if text and isinstance(text, list):
         filters.append(dm.filters.In(view_id.as_property_ref("text"), values=text))
-    if text_prefix:
+    if text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("text"), value=text_prefix))
-    if min_timestamp or max_timestamp:
+    if min_timestamp is not None or max_timestamp is not None:
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("timestamp"),
@@ -261,7 +261,7 @@ def _create_primitive_required_filter(
                 lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None,
             )
         )
-    if external_id_prefix:
+    if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
