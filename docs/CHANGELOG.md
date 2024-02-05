@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.4] - 02-02-24
+## [0.99.5] - 05-02-24
+### Fixed
+* The `.apply` method failed with `AttributeError: 'list' object has no attribute 'nodes'` when using the generated SDK
+  with a list of nodes. This is now fixed.
+
+## [0.99.4] - 04-02-24
 ### Fixed
 * The `MockGenerator` now handles non-writable views with properties. This was an issue when generating nodes for
   data models that contain non-writable views. This is now fixed, the nodes from the non-writable views are
