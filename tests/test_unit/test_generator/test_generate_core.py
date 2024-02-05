@@ -1,6 +1,4 @@
-import platform
-
-import pytest
+import difflib
 
 from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
@@ -41,10 +39,7 @@ def test_generate_data_class_init_file(omni_multi_api_generator: MultiAPIGenerat
     assert actual == expected
 
 
-@pytest.mark.skipif(
-    not platform.platform().startswith("Windows"),
-    reason="There is currently some strange problem with the diff on non-windows",
-)
+# @pytest.mark.skipif(
 def test_create_api_client(omni_sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = OmniFiles.client.read_text()
@@ -54,4 +49,4 @@ def test_create_api_client(omni_sdk_generator: SDKGenerator, code_formatter: Cod
     actual = code_formatter.format_code(actual)
 
     # Assert
-    assert actual == expected
+    assert actual == expected, "\n".join(difflib.unified_diff(expected.splitlines(), actual.splitlines()))
