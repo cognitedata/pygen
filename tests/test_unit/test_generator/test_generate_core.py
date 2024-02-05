@@ -39,7 +39,6 @@ def test_generate_data_class_init_file(omni_multi_api_generator: MultiAPIGenerat
     assert actual == expected
 
 
-# @pytest.mark.skipif(
 def test_create_api_client(omni_sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = OmniFiles.client.read_text()
