@@ -18,7 +18,7 @@ class ScenarioInstanceClient:
     ScenarioInstanceClient
 
     Generated with:
-        pygen = 0.99.4
+        pygen = 0.99.5
         cognite-sdk = 7.17.1
         pydantic = 1.10.7
 
@@ -36,7 +36,7 @@ class ScenarioInstanceClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.4"
+        client.config.client_name = "CognitePygen:0.99.5"
 
         view_by_read_class = {
             data_classes.ScenarioInstance: dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
@@ -67,7 +67,9 @@ class ScenarioInstanceClient:
         if isinstance(items, data_classes.DomainModelApply):
             instances = items.to_instances_apply(self._view_by_read_class, write_none)
         else:
-            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+            instances = data_classes.ResourcesApply()
+            for item in items:
+                instances.extend(item.to_instances_apply(self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

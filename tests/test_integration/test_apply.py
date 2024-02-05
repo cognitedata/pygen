@@ -36,7 +36,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
     created: dc.ResourcesApplyResult | None = None
     try:
         # Act
-        created = omni_client.connection_item_c.apply(new_connection_c)
+        created = omni_client.apply(new_connection_c)
 
         # Assert
         assert len(created.nodes) == 3
@@ -90,7 +90,7 @@ def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: Cognit
         omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT = 1
 
         # Act
-        created = omni_client.connection_item_a.apply(new_item_a)
+        created = omni_client.apply(new_item_a)
 
         # Assert
         assert len(created.nodes) == 4
@@ -140,7 +140,7 @@ def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient)
 
     try:
         # Act
-        created = omni_client.connection_item_a.apply(new_connection_a)
+        created = omni_client.apply(new_connection_a)
 
         # Assert
         assert len(created.nodes) == 6
@@ -194,7 +194,7 @@ def test_update_to_null(
     update.date = None
     update.json_ = None
 
-    omni_client.primitive_nullable.apply(update, write_none=True)
+    omni_client.apply(update, write_none=True)
 
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved.text is None
@@ -213,7 +213,38 @@ def test_set_empty_string(
 ) -> None:
     update = primitive_nullable_node.model_copy()
     update.text = ""
-    omni_client.primitive_nullable.apply(update, write_none=True)
+    omni_client.apply(update, write_none=True)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved is not None, f"Node {primitive_nullable_node.external_id} not found"
     assert retrieved.text == ""
+
+
+def test_apply_multiple_list(
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+) -> None:
+    # Arrange
+    test_name = "integration_test:ApplyMultipleList"
+    new_items = [
+        dc.PrimitiveNullableApply(
+            external_id=f"{test_name}:PrimitiveNullable:{i}",
+            text="string",
+            int_32=i,
+            int_64=i,
+            float_32=i,
+            float_64=i,
+            boolean=True,
+            timestamp=datetime.datetime.fromisoformat("2021-01-01T00:00:00+00:00"),
+            date=datetime.date.fromisoformat("2021-01-01"),
+            json_={"a": 1, "b": 2},
+        )
+        for i in range(10)
+    ]
+
+    try:
+        # Act
+        created = omni_client.apply(new_items)
+
+        # Assert
+        assert len(created.nodes) == len(new_items)
+    finally:
+        cognite_client.data_modeling.instances.delete(nodes=[n.as_tuple_id() for n in new_items])
