@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import platform
+import difflib
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -187,10 +187,6 @@ def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, c
     assert actual == expected
 
 
-@pytest.mark.skipif(
-    not platform.platform().startswith("Windows"),
-    reason="There is currently some strange problem with the diff on non-windows",
-)
 def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = EquipmentSDKFiles.client.read_text()
@@ -200,4 +196,4 @@ def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeForm
     actual = code_formatter.format_code(actual)
 
     # Assert
-    assert actual == expected
+    assert actual == expected, "\n".join(difflib.unified_diff(expected.splitlines(), actual.splitlines()))
