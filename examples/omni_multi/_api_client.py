@@ -142,7 +142,9 @@ class OmniMultiClient:
         if isinstance(items, data_classes.DomainModelApply):
             instances = items.to_instances_apply(self._view_by_read_class, write_none)
         else:
-            instances = [item.to_instances_apply(self._view_by_read_class, write_none) for item in items]
+            instances = data_classes.ResourcesApply()
+            for item in items:
+                instances.extend(item.to_instances_apply(self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
