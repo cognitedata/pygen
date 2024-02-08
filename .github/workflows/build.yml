@@ -24,7 +24,7 @@ jobs:
           poetry config virtualenvs.create false
           # Necessary for running the mypy pre-commit hook
           poetry install -E all
-      - uses: pre-commit/action@v3.0.0
+      - uses: pre-commit/action@v3.0.1
 
   build-docs:
     runs-on: ubuntu-latest
