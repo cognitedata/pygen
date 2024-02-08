@@ -259,6 +259,18 @@ class MockGenerator:
             config = self._view_configs.get(view_id, self._default_config)
             for node in outputs[view_id].node:
                 for name, connection in connection_properties.items():
+                    if (
+                        isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
+                        and connection.source is not None
+                        and connection.source not in outputs
+                    ):
+                        warnings.warn(
+                            f"{view_id} property {name!r} points to a view {connection.source} "
+                            f"which is not in the data model. Skipping connection generation.",
+                            stacklevel=2,
+                        )
+                        continue
+
                     if isinstance(connection, MultiEdgeConnection):
                         if connection.source in leaf_children_by_parent:
                             sources: list[dm.NodeId] = []
@@ -963,19 +975,30 @@ class ViewMockConfig:
 
 def _connected_views(views: typing.Sequence[dm.View]) -> Iterable[list[dm.View]]:
     """Find the connected views in the data model."""
+    view_by_id = {view.as_id(): view for view in views}
+
     graph: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
     for view in views:
         dependencies = set()
         for prop in view.properties.values():
+            source: dm.ViewId | None = None
             if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.source:
-                dependencies.add(prop.source)
+                source = prop.source
             elif isinstance(prop, MultiEdgeConnection):
-                dependencies.add(prop.source)
+                source = prop.source
+
+            if source and source in view_by_id:
+                dependencies.add(source)
+            elif source:
+                warnings.warn(
+                    f"The view {source} referenced by {view.as_id()} is not in the data model. Skipping it.",
+                    stacklevel=2,
+                )
+
         graph[view.as_id()] |= dependencies
         for dep in dependencies:
             graph[dep] |= {view.as_id()}
 
-    view_by_id = {view.as_id(): view for view in views}
     for components in _connected_components(graph):
         yield [view_by_id[view_id] for view_id in components]
 

@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.6] - 08-02-24
+### Fixed
+* The `MockGenerator` would fail with a `KeyError` if a data models passed that contains a view that references a
+  another view that is not in the data model. This is now fixed and a warning is issued instead.
+
 ## [0.99.5] - 05-02-24
 ### Fixed
 * The `.apply` method failed with `AttributeError: 'list' object has no attribute 'nodes'` when using the generated SDK
