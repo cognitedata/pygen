@@ -102,8 +102,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         external_id: str,
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        edge_api_name_type_direction_view_id_penta: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ) -> T_DomainModel | None: ...
 
@@ -113,8 +113,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         external_id: SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        edge_api_name_type_direction_view_id_penta: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ) -> T_DomainModelList: ...
 
