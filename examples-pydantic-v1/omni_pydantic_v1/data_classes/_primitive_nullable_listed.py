@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -11,18 +12,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveNullableListed",
+    "PrimitiveNullableListedWrite",
     "PrimitiveNullableListedApply",
     "PrimitiveNullableListedList",
+    "PrimitiveNullableListedWriteList",
     "PrimitiveNullableListedApplyList",
     "PrimitiveNullableListedFields",
     "PrimitiveNullableListedTextFields",
@@ -79,9 +82,9 @@ class PrimitiveNullableListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveNullableListedApply:
+    def as_write(self) -> PrimitiveNullableListedWrite:
         """Convert this read version of primitive nullable listed to the writing version."""
-        return PrimitiveNullableListedApply(
+        return PrimitiveNullableListedWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -96,8 +99,17 @@ class PrimitiveNullableListed(DomainModel):
             timestamp=self.timestamp,
         )
 
+    def as_apply(self) -> PrimitiveNullableListedWrite:
+        """Convert this read version of primitive nullable listed to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class PrimitiveNullableListedApply(DomainModelApply):
+
+class PrimitiveNullableListedWrite(DomainModelWrite):
     """This represents the writing version of primitive nullable listed.
 
     It is used to when data is sent to CDF.
@@ -129,13 +141,13 @@ class PrimitiveNullableListedApply(DomainModelApply):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -191,20 +203,44 @@ class PrimitiveNullableListedApply(DomainModelApply):
         return resources
 
 
+class PrimitiveNullableListedApply(PrimitiveNullableListedWrite):
+    def __new__(cls, *args, **kwargs) -> PrimitiveNullableListedApply:
+        warnings.warn(
+            "PrimitiveNullableListedApply is deprecated and will be removed in v1.0. Use PrimitiveNullableListedWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "PrimitiveNullableListed.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class PrimitiveNullableListedList(DomainModelList[PrimitiveNullableListed]):
     """List of primitive nullable listeds in the read version."""
 
     _INSTANCE = PrimitiveNullableListed
 
-    def as_apply(self) -> PrimitiveNullableListedApplyList:
+    def as_write(self) -> PrimitiveNullableListedWriteList:
         """Convert these read versions of primitive nullable listed to the writing versions."""
-        return PrimitiveNullableListedApplyList([node.as_apply() for node in self.data])
+        return PrimitiveNullableListedWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PrimitiveNullableListedWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class PrimitiveNullableListedApplyList(DomainModelApplyList[PrimitiveNullableListedApply]):
+class PrimitiveNullableListedWriteList(DomainModelWriteList[PrimitiveNullableListedWrite]):
     """List of primitive nullable listeds in the writing version."""
 
-    _INSTANCE = PrimitiveNullableListedApply
+    _INSTANCE = PrimitiveNullableListedWrite
+
+
+class PrimitiveNullableListedApplyList(PrimitiveNullableListedWriteList): ...
 
 
 def _create_primitive_nullable_listed_filter(

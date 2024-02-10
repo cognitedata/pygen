@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     MainShaft,
-    MainShaftApply,
+    MainShaftWrite,
     MainShaftFields,
     MainShaftList,
-    MainShaftApplyList,
+    MainShaftWriteList,
 )
 from windmill.data_classes._main_shaft import (
     _MAINSHAFT_PROPERTIES_BY_FIELD,
@@ -40,7 +40,7 @@ from .main_shaft_torque import MainShaftTorqueAPI
 from .main_shaft_query import MainShaftQueryAPI
 
 
-class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
+class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[MainShaft]
         super().__init__(
@@ -48,7 +48,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             sources=view_id,
             class_type=MainShaft,
             class_list=MainShaftList,
-            class_apply_list=MainShaftApplyList,
+            class_write_list=MainShaftWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -89,10 +89,10 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
     def apply(
         self,
-        main_shaft: MainShaftApply | Sequence[MainShaftApply],
+        main_shaft: MainShaftWrite | Sequence[MainShaftWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) main shafts.
 
         Args:
@@ -109,18 +109,19 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             Create a new main_shaft:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import MainShaftApply
+                >>> from windmill.data_classes import MainShaftWrite
                 >>> client = WindmillClient()
-                >>> main_shaft = MainShaftApply(external_id="my_main_shaft", ...)
+                >>> main_shaft = MainShaftWrite(external_id="my_main_shaft", ...)
                 >>> result = client.main_shaft.apply(main_shaft)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.main_shaft.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.main_shaft.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

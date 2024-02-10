@@ -1,16 +1,17 @@
 from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
+import warnings
 from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
+from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelWrite, DomainRelation, DomainRelationWrite, DomainRelationList, ResourcesWrite{% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
@@ -34,17 +35,26 @@ class {{ data_class.read_name }}(DomainRelation):
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
-    def as_apply(self) -> {{ data_class.write_name }}:
+    def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}
-            {{ field.name }}={{ field.as_apply() }},{% endfor %}
+            {{ field.name }}={{ field.as_write() }},{% endfor %}
         )
 
+    def as_apply(self) -> {{ data_class.write_name }}:
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class {{ data_class.write_name }}(DomainRelationApply):
+
+class {{ data_class.write_name }}(DomainRelationWrite):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.
@@ -58,21 +68,21 @@ class {{ data_class.write_name }}(DomainRelationApply):
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        start_node: DomainModelApply,
+        start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
         _validate_end_node(start_node, self.end_node)
 
-        if isinstance(self.end_node, DomainModelApply):
+        if isinstance(self.end_node, DomainModelWrite):
             end_node = self.end_node.as_direct_reference()
         elif isinstance(self.end_node, str):
             end_node = dm.DirectRelationReference(self.space, self.end_node)
@@ -81,7 +91,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
-        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
+        self.external_id = external_id = DomainRelationWrite.external_id_factory(start_node, end_node, edge_type)
 
         write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
@@ -117,11 +127,23 @@ class {{ data_class.write_name }}(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.end_node, DomainModelApply):
-            other_resources = self.end_node._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.end_node, DomainModelWrite):
+            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
+
+
+class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
+    def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
+        warnings.warn(
+            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. Use {{ data_class.write_name }} instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "{{ data_class.read_name }}.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
 
 
 class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name }}]):
@@ -129,15 +151,27 @@ class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name
 
     _INSTANCE = {{ data_class.read_name }}
 
-    def as_apply(self) -> {{ data_class.write_list_name }}:
+    def as_write(self) -> {{ data_class.write_list_name }}:
         """Convert this read version of {{ data_class.doc_name }} list to the writing version."""
-        return {{ data_class.write_list_name }}([edge.as_apply() for edge in self])
+        return {{ data_class.write_list_name }}([edge.as_write() for edge in self])
+
+    def as_apply(self) -> {{ data_class.write_list_name }}:
+        """Convert these read versions of {{ data_class.doc_name }} list to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
+
+
+class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
 
 def {{ data_class.filter_name }}(
@@ -209,7 +243,7 @@ _EXPECTED_START_NODES_BY_END_NODE = {% raw %}{{% endraw %}{% for end_class, clas
 
 
 def _validate_end_node(
-    start_node: DomainModelApply, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
+    start_node: DomainModelWrite, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate

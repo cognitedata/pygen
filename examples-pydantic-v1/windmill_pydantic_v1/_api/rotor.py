@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Rotor,
-    RotorApply,
+    RotorWrite,
     RotorFields,
     RotorList,
-    RotorApplyList,
+    RotorWriteList,
 )
 from windmill_pydantic_v1.data_classes._rotor import (
     _ROTOR_PROPERTIES_BY_FIELD,
@@ -37,7 +37,7 @@ from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
 from .rotor_query import RotorQueryAPI
 
 
-class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
+class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Rotor]
         super().__init__(
@@ -45,7 +45,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             sources=view_id,
             class_type=Rotor,
             class_list=RotorList,
-            class_apply_list=RotorApplyList,
+            class_write_list=RotorWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,10 +83,10 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
     def apply(
         self,
-        rotor: RotorApply | Sequence[RotorApply],
+        rotor: RotorWrite | Sequence[RotorWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) rotors.
 
         Args:
@@ -103,18 +103,19 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             Create a new rotor:
 
                 >>> from windmill_pydantic_v1 import WindmillClient
-                >>> from windmill_pydantic_v1.data_classes import RotorApply
+                >>> from windmill_pydantic_v1.data_classes import RotorWrite
                 >>> client = WindmillClient()
-                >>> rotor = RotorApply(external_id="my_rotor", ...)
+                >>> rotor = RotorWrite(external_id="my_rotor", ...)
                 >>> result = client.rotor.apply(rotor)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.rotor.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.rotor.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

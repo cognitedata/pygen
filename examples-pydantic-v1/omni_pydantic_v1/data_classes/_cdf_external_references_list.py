@@ -145,7 +145,7 @@ class CDFExternalReferencesListList(DomainModelList[CDFExternalReferencesList]):
 
     def as_apply(self) -> CDFExternalReferencesListApplyList:
         """Convert these read versions of cdf external references list to the writing versions."""
-        return CDFExternalReferencesListApplyList([node.as_apply() for node in self.data])
+        return CDFExternalReferencesListApplyList([node.as_write() for node in self.data])
 
 
 class CDFExternalReferencesListApplyList(DomainModelApplyList[CDFExternalReferencesListApply]):

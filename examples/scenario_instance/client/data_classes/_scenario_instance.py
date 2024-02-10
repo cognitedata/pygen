@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -12,19 +13,21 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "ScenarioInstance",
+    "ScenarioInstanceWrite",
     "ScenarioInstanceApply",
     "ScenarioInstanceList",
+    "ScenarioInstanceWriteList",
     "ScenarioInstanceApplyList",
     "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
@@ -78,9 +81,9 @@ class ScenarioInstance(DomainModel):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
-    def as_apply(self) -> ScenarioInstanceApply:
+    def as_write(self) -> ScenarioInstanceWrite:
         """Convert this read version of scenario instance to the writing version."""
-        return ScenarioInstanceApply(
+        return ScenarioInstanceWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -94,8 +97,17 @@ class ScenarioInstance(DomainModel):
             start=self.start,
         )
 
+    def as_apply(self) -> ScenarioInstanceWrite:
+        """Convert this read version of scenario instance to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class ScenarioInstanceApply(DomainModelApply):
+
+class ScenarioInstanceWrite(DomainModelWrite):
     """This represents the writing version of scenario instance.
 
     It is used to when data is sent to CDF.
@@ -125,13 +137,13 @@ class ScenarioInstanceApply(DomainModelApply):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -190,20 +202,44 @@ class ScenarioInstanceApply(DomainModelApply):
         return resources
 
 
+class ScenarioInstanceApply(ScenarioInstanceWrite):
+    def __new__(cls, *args, **kwargs) -> ScenarioInstanceApply:
+        warnings.warn(
+            "ScenarioInstanceApply is deprecated and will be removed in v1.0. Use ScenarioInstanceWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "ScenarioInstance.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class ScenarioInstanceList(DomainModelList[ScenarioInstance]):
     """List of scenario instances in the read version."""
 
     _INSTANCE = ScenarioInstance
 
-    def as_apply(self) -> ScenarioInstanceApplyList:
+    def as_write(self) -> ScenarioInstanceWriteList:
         """Convert these read versions of scenario instance to the writing versions."""
-        return ScenarioInstanceApplyList([node.as_apply() for node in self.data])
+        return ScenarioInstanceWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> ScenarioInstanceWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class ScenarioInstanceApplyList(DomainModelApplyList[ScenarioInstanceApply]):
+class ScenarioInstanceWriteList(DomainModelWriteList[ScenarioInstanceWrite]):
     """List of scenario instances in the writing version."""
 
-    _INSTANCE = ScenarioInstanceApply
+    _INSTANCE = ScenarioInstanceWrite
+
+
+class ScenarioInstanceApplyList(ScenarioInstanceWriteList): ...
 
 
 def _create_scenario_instance_filter(

@@ -12,13 +12,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveNullableListed,
-    PrimitiveNullableListedApply,
+    PrimitiveNullableListedWrite,
     PrimitiveNullableListedFields,
     PrimitiveNullableListedList,
-    PrimitiveNullableListedApplyList,
+    PrimitiveNullableListedWriteList,
     PrimitiveNullableListedTextFields,
 )
 from omni.data_classes._primitive_nullable_listed import (
@@ -38,7 +38,7 @@ from .primitive_nullable_listed_query import PrimitiveNullableListedQueryAPI
 
 
 class PrimitiveNullableListedAPI(
-    NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedApply, PrimitiveNullableListedList]
+    NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedWrite, PrimitiveNullableListedList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveNullableListed]
@@ -47,7 +47,7 @@ class PrimitiveNullableListedAPI(
             sources=view_id,
             class_type=PrimitiveNullableListed,
             class_list=PrimitiveNullableListedList,
-            class_apply_list=PrimitiveNullableListedApplyList,
+            class_write_list=PrimitiveNullableListedWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,10 +83,10 @@ class PrimitiveNullableListedAPI(
 
     def apply(
         self,
-        primitive_nullable_listed: PrimitiveNullableListedApply | Sequence[PrimitiveNullableListedApply],
+        primitive_nullable_listed: PrimitiveNullableListedWrite | Sequence[PrimitiveNullableListedWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive nullable listeds.
 
         Args:
@@ -103,18 +103,19 @@ class PrimitiveNullableListedAPI(
             Create a new primitive_nullable_listed:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveNullableListedApply
+                >>> from omni.data_classes import PrimitiveNullableListedWrite
                 >>> client = OmniClient()
-                >>> primitive_nullable_listed = PrimitiveNullableListedApply(external_id="my_primitive_nullable_listed", ...)
+                >>> primitive_nullable_listed = PrimitiveNullableListedWrite(external_id="my_primitive_nullable_listed", ...)
                 >>> result = client.primitive_nullable_listed.apply(primitive_nullable_listed)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.primitive_nullable_listed.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.primitive_nullable_listed.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

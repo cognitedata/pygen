@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,21 +11,23 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._start_end_time import StartEndTime, StartEndTimeApply
+    from ._start_end_time import StartEndTime, StartEndTimeWrite
 
 
 __all__ = [
     "UnitProcedure",
+    "UnitProcedureWrite",
     "UnitProcedureApply",
     "UnitProcedureList",
+    "UnitProcedureWriteList",
     "UnitProcedureApplyList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
@@ -62,20 +65,29 @@ class UnitProcedure(DomainModel):
     work_orders: Optional[list[StartEndTime]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTime]] = Field(default=None, repr=False)
 
-    def as_apply(self) -> UnitProcedureApply:
+    def as_write(self) -> UnitProcedureWrite:
         """Convert this read version of unit procedure to the writing version."""
-        return UnitProcedureApply(
+        return UnitProcedureWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
             type_=self.type_,
-            work_orders=[work_order.as_apply() for work_order in self.work_orders or []],
-            work_units=[work_unit.as_apply() for work_unit in self.work_units or []],
+            work_orders=[work_order.as_write() for work_order in self.work_orders or []],
+            work_units=[work_unit.as_write() for work_unit in self.work_units or []],
         )
 
+    def as_apply(self) -> UnitProcedureWrite:
+        """Convert this read version of unit procedure to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class UnitProcedureApply(DomainModelApply):
+
+class UnitProcedureWrite(DomainModelWrite):
     """This represents the writing version of unit procedure.
 
     It is used to when data is sent to CDF.
@@ -94,16 +106,16 @@ class UnitProcedureApply(DomainModelApply):
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_orders: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
-    work_units: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
+    work_orders: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
+    work_units: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -136,8 +148,8 @@ class UnitProcedureApply(DomainModelApply):
             cache.add(self.as_tuple_id())
 
         for work_order in self.work_orders or []:
-            if isinstance(work_order, DomainRelationApply):
-                other_resources = work_order._to_instances_apply(
+            if isinstance(work_order, DomainRelationWrite):
+                other_resources = work_order._to_instances_write(
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
@@ -146,8 +158,8 @@ class UnitProcedureApply(DomainModelApply):
                 resources.extend(other_resources)
 
         for work_unit in self.work_units or []:
-            if isinstance(work_unit, DomainRelationApply):
-                other_resources = work_unit._to_instances_apply(
+            if isinstance(work_unit, DomainRelationWrite):
+                other_resources = work_unit._to_instances_write(
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
@@ -158,20 +170,44 @@ class UnitProcedureApply(DomainModelApply):
         return resources
 
 
+class UnitProcedureApply(UnitProcedureWrite):
+    def __new__(cls, *args, **kwargs) -> UnitProcedureApply:
+        warnings.warn(
+            "UnitProcedureApply is deprecated and will be removed in v1.0. Use UnitProcedureWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "UnitProcedure.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class UnitProcedureList(DomainModelList[UnitProcedure]):
     """List of unit procedures in the read version."""
 
     _INSTANCE = UnitProcedure
 
-    def as_apply(self) -> UnitProcedureApplyList:
+    def as_write(self) -> UnitProcedureWriteList:
         """Convert these read versions of unit procedure to the writing versions."""
-        return UnitProcedureApplyList([node.as_apply() for node in self.data])
+        return UnitProcedureWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> UnitProcedureWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class UnitProcedureApplyList(DomainModelApplyList[UnitProcedureApply]):
+class UnitProcedureWriteList(DomainModelWriteList[UnitProcedureWrite]):
     """List of unit procedures in the writing version."""
 
-    _INSTANCE = UnitProcedureApply
+    _INSTANCE = UnitProcedureWrite
+
+
+class UnitProcedureApplyList(UnitProcedureWriteList): ...
 
 
 def _create_unit_procedure_filter(

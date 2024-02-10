@@ -32,6 +32,8 @@ FIELD_NAMES = (
         "to_pandas",
         "_repr_html_",
         "external_id_factory",
+        "to_instances_write",
+        "_to_instances_write",
         "to_instances_apply",
         "_to_instances_apply",
         "from_instance",

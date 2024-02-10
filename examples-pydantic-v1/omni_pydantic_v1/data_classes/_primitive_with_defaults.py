@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,18 +11,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveWithDefaults",
+    "PrimitiveWithDefaultsWrite",
     "PrimitiveWithDefaultsApply",
     "PrimitiveWithDefaultsList",
+    "PrimitiveWithDefaultsWriteList",
     "PrimitiveWithDefaultsApplyList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
@@ -66,9 +69,9 @@ class PrimitiveWithDefaults(DomainModel):
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
 
-    def as_apply(self) -> PrimitiveWithDefaultsApply:
+    def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
-        return PrimitiveWithDefaultsApply(
+        return PrimitiveWithDefaultsWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -79,8 +82,17 @@ class PrimitiveWithDefaults(DomainModel):
             default_string=self.default_string,
         )
 
+    def as_apply(self) -> PrimitiveWithDefaultsWrite:
+        """Convert this read version of primitive with default to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class PrimitiveWithDefaultsApply(DomainModelApply):
+
+class PrimitiveWithDefaultsWrite(DomainModelWrite):
     """This represents the writing version of primitive with default.
 
     It is used to when data is sent to CDF.
@@ -104,13 +116,13 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
     default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -154,20 +166,44 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
         return resources
 
 
+class PrimitiveWithDefaultsApply(PrimitiveWithDefaultsWrite):
+    def __new__(cls, *args, **kwargs) -> PrimitiveWithDefaultsApply:
+        warnings.warn(
+            "PrimitiveWithDefaultsApply is deprecated and will be removed in v1.0. Use PrimitiveWithDefaultsWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "PrimitiveWithDefaults.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class PrimitiveWithDefaultsList(DomainModelList[PrimitiveWithDefaults]):
     """List of primitive with defaults in the read version."""
 
     _INSTANCE = PrimitiveWithDefaults
 
-    def as_apply(self) -> PrimitiveWithDefaultsApplyList:
+    def as_write(self) -> PrimitiveWithDefaultsWriteList:
         """Convert these read versions of primitive with default to the writing versions."""
-        return PrimitiveWithDefaultsApplyList([node.as_apply() for node in self.data])
+        return PrimitiveWithDefaultsWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PrimitiveWithDefaultsWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class PrimitiveWithDefaultsApplyList(DomainModelApplyList[PrimitiveWithDefaultsApply]):
+class PrimitiveWithDefaultsWriteList(DomainModelWriteList[PrimitiveWithDefaultsWrite]):
     """List of primitive with defaults in the writing version."""
 
-    _INSTANCE = PrimitiveWithDefaultsApply
+    _INSTANCE = PrimitiveWithDefaultsWrite
+
+
+class PrimitiveWithDefaultsApplyList(PrimitiveWithDefaultsWriteList): ...
 
 
 def _create_primitive_with_default_filter(

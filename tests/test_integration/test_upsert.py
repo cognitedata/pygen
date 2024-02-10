@@ -18,22 +18,22 @@ else:
 def test_node_without_properties(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:NodeWithoutProperties"
-    new_connection_c = dc.ConnectionItemCApply(
+    new_connection_c = dc.ConnectionItemCWrite(
         external_id=f"{test_name}:ConnectionPair",
         connection_item_a=[
-            dc.ConnectionItemAApply(
+            dc.ConnectionItemAWrite(
                 external_id=f"{test_name}:ConnectionPair:A",
                 name="ConnectionPair:A",
             )
         ],
         connection_item_b=[
-            dc.ConnectionItemBApply(
+            dc.ConnectionItemBWrite(
                 external_id=f"{test_name}:ConnectionPair:B",
                 name="ConnectionPair:B",
             )
         ],
     )
-    created: dc.ResourcesApplyResult | None = None
+    created: dc.ResourcesWriteResult | None = None
     try:
         # Act
         created = omni_client.apply(new_connection_c)
@@ -48,7 +48,6 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
         # Assert
         assert retrieved.external_id == new_connection_c.external_id
 
-        pytest.skip("Edge case not supported yet")
         # The issue is that there are two edges of the same type. The way we could distinguish between them
         # is to use a hasData filter on the end node.
         assert retrieved.connection_item_a[0] == new_connection_c.connection_item_a[0].external_id
@@ -64,26 +63,26 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
 def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyMultipleRequests"
-    new_item_a = dc.ConnectionItemAApply(
+    new_item_a = dc.ConnectionItemAWrite(
         external_id=f"{test_name}:Connection:A",
         name="Connection:A",
-        other_direct=dc.ConnectionItemCApply(
+        other_direct=dc.ConnectionItemCWrite(
             external_id=f"{test_name}:Connection:C",
             connection_item_a=[f"{test_name}:Connection:A"],
             connection_item_b=[],
         ),
         outwards=[
-            dc.ConnectionItemBApply(
+            dc.ConnectionItemBWrite(
                 external_id=f"{test_name}:Connection:B1",
                 name="Connection:B1",
             ),
-            dc.ConnectionItemBApply(
+            dc.ConnectionItemBWrite(
                 external_id=f"{test_name}:Connection:B2",
                 name="Connection:B2",
             ),
         ],
     )
-    resources = new_item_a.to_instances_apply()
+    resources = new_item_a.to_instances_write()
 
     limit = omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT
     try:
@@ -104,37 +103,37 @@ def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: Cognit
 def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyRecursive"
-    new_connection_a = dc.ConnectionItemAApply(
+    new_connection_a = dc.ConnectionItemAWrite(
         external_id=f"{test_name}:Connection:A",
         name="Connection:A",
-        other_direct=dc.ConnectionItemCApply(
+        other_direct=dc.ConnectionItemCWrite(
             external_id=f"{test_name}:Connection:C",
             connection_item_a=[],
             connection_item_b=[],
         ),
-        self_direct=dc.ConnectionItemAApply(
+        self_direct=dc.ConnectionItemAWrite(
             external_id=f"{test_name}:Connection:OtherA",
             name="Connection:OtherA",
         ),
         outwards=[
-            dc.ConnectionItemBApply(
+            dc.ConnectionItemBWrite(
                 external_id=f"{test_name}:Connection:B1",
                 name="Connection:B1",
                 self_edge=[
-                    dc.ConnectionItemBApply(
+                    dc.ConnectionItemBWrite(
                         external_id=f"{test_name}:Connection:B3",
                         name="Connection:B3",
                     ),
                 ],
             ),
-            dc.ConnectionItemBApply(
+            dc.ConnectionItemBWrite(
                 external_id=f"{test_name}:Connection:B2",
                 name="Connection:B2",
             ),
         ],
     )
 
-    resources = new_connection_a.to_instances_apply()
+    resources = new_connection_a.to_instances_write()
     node_ids = resources.nodes.as_ids()
     edge_ids = resources.edges.as_ids()
 

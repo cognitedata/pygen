@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,15 +11,24 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
-__all__ = ["Gearbox", "GearboxApply", "GearboxList", "GearboxApplyList", "GearboxFields", "GearboxTextFields"]
+__all__ = [
+    "Gearbox",
+    "GearboxWrite",
+    "GearboxApply",
+    "GearboxList",
+    "GearboxWriteList",
+    "GearboxApplyList",
+    "GearboxFields",
+    "GearboxTextFields",
+]
 
 
 GearboxTextFields = Literal["displacement_x", "displacement_y", "displacement_z"]
@@ -51,9 +61,9 @@ class Gearbox(DomainModel):
     displacement_y: Union[TimeSeries, str, None] = None
     displacement_z: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> GearboxApply:
+    def as_write(self) -> GearboxWrite:
         """Convert this read version of gearbox to the writing version."""
-        return GearboxApply(
+        return GearboxWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -62,8 +72,17 @@ class Gearbox(DomainModel):
             displacement_z=self.displacement_z,
         )
 
+    def as_apply(self) -> GearboxWrite:
+        """Convert this read version of gearbox to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class GearboxApply(DomainModelApply):
+
+class GearboxWrite(DomainModelWrite):
     """This represents the writing version of gearbox.
 
     It is used to when data is sent to CDF.
@@ -83,13 +102,13 @@ class GearboxApply(DomainModelApply):
     displacement_y: Union[TimeSeries, str, None] = None
     displacement_z: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -143,20 +162,44 @@ class GearboxApply(DomainModelApply):
         return resources
 
 
+class GearboxApply(GearboxWrite):
+    def __new__(cls, *args, **kwargs) -> GearboxApply:
+        warnings.warn(
+            "GearboxApply is deprecated and will be removed in v1.0. Use GearboxWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Gearbox.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class GearboxList(DomainModelList[Gearbox]):
     """List of gearboxes in the read version."""
 
     _INSTANCE = Gearbox
 
-    def as_apply(self) -> GearboxApplyList:
+    def as_write(self) -> GearboxWriteList:
         """Convert these read versions of gearbox to the writing versions."""
-        return GearboxApplyList([node.as_apply() for node in self.data])
+        return GearboxWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> GearboxWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class GearboxApplyList(DomainModelApplyList[GearboxApply]):
+class GearboxWriteList(DomainModelWriteList[GearboxWrite]):
     """List of gearboxes in the writing version."""
 
-    _INSTANCE = GearboxApply
+    _INSTANCE = GearboxWrite
+
+
+class GearboxApplyList(GearboxWriteList): ...
 
 
 def _create_gearbox_filter(

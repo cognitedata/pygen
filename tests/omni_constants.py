@@ -7,15 +7,15 @@ from cognite.client import data_modeling as dm
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from omni.data_classes import DomainModel, DomainModelApply
+    from omni.data_classes import DomainModel, DomainModelWrite
 else:
-    from omni_pydantic_v1.data_classes import DomainModel, DomainModelApply
+    from omni_pydantic_v1.data_classes import DomainModel
 
 
 @dataclass
 class OmniClasses:
     read: type[DomainModel]
-    write: type[DomainModelApply] | None
+    write: type[DomainModelWrite] | None
     api_name: str
     view: dm.View
 

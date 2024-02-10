@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     DependentOnNonWritable,
-    DependentOnNonWritableApply,
+    DependentOnNonWritableWrite,
     DependentOnNonWritableFields,
     DependentOnNonWritableList,
-    DependentOnNonWritableApplyList,
+    DependentOnNonWritableWriteList,
     DependentOnNonWritableTextFields,
 )
 from omni.data_classes._dependent_on_non_writable import (
@@ -38,7 +38,7 @@ from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(
-    NodeAPI[DependentOnNonWritable, DependentOnNonWritableApply, DependentOnNonWritableList]
+    NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[DependentOnNonWritable]
@@ -47,7 +47,7 @@ class DependentOnNonWritableAPI(
             sources=view_id,
             class_type=DependentOnNonWritable,
             class_list=DependentOnNonWritableList,
-            class_apply_list=DependentOnNonWritableApplyList,
+            class_write_list=DependentOnNonWritableWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -90,10 +90,10 @@ class DependentOnNonWritableAPI(
 
     def apply(
         self,
-        dependent_on_non_writable: DependentOnNonWritableApply | Sequence[DependentOnNonWritableApply],
+        dependent_on_non_writable: DependentOnNonWritableWrite | Sequence[DependentOnNonWritableWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) dependent on non writables.
 
         Note: This method iterates through all nodes and timeseries linked to dependent_on_non_writable and creates them including the edges
@@ -114,18 +114,19 @@ class DependentOnNonWritableAPI(
             Create a new dependent_on_non_writable:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import DependentOnNonWritableApply
+                >>> from omni.data_classes import DependentOnNonWritableWrite
                 >>> client = OmniClient()
-                >>> dependent_on_non_writable = DependentOnNonWritableApply(external_id="my_dependent_on_non_writable", ...)
+                >>> dependent_on_non_writable = DependentOnNonWritableWrite(external_id="my_dependent_on_non_writable", ...)
                 >>> result = client.dependent_on_non_writable.apply(dependent_on_non_writable)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.dependent_on_non_writable.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.dependent_on_non_writable.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
@@ -195,12 +196,13 @@ class DependentOnNonWritableAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.to_non_writable_edge,
                     "to_non_writable",
                     dm.DirectRelationReference("pygen-models", "toNonWritable"),
                     "outwards",
+                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
                 ),
             ],
         )
@@ -457,12 +459,13 @@ class DependentOnNonWritableAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.to_non_writable_edge,
                     "to_non_writable",
                     dm.DirectRelationReference("pygen-models", "toNonWritable"),
                     "outwards",
+                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
                 ),
             ],
         )

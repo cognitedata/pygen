@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_multi.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     MainInterface,
-    MainInterfaceApply,
+    MainInterfaceWrite,
     MainInterfaceFields,
     MainInterfaceList,
-    MainInterfaceApplyList,
+    MainInterfaceWriteList,
     MainInterfaceTextFields,
 )
 from omni_multi.data_classes._main_interface import (
@@ -36,7 +36,7 @@ from ._core import (
 from .main_interface_query import MainInterfaceQueryAPI
 
 
-class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceList]):
+class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[MainInterface]
         super().__init__(
@@ -44,7 +44,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             sources=view_id,
             class_type=MainInterface,
             class_list=MainInterfaceList,
-            class_apply_list=MainInterfaceApplyList,
+            class_write_list=MainInterfaceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,10 +86,10 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
 
     def apply(
         self,
-        main_interface: MainInterfaceApply | Sequence[MainInterfaceApply],
+        main_interface: MainInterfaceWrite | Sequence[MainInterfaceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) main interfaces.
 
         Args:
@@ -106,18 +106,19 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             Create a new main_interface:
 
                 >>> from omni_multi import OmniMultiClient
-                >>> from omni_multi.data_classes import MainInterfaceApply
+                >>> from omni_multi.data_classes import MainInterfaceWrite
                 >>> client = OmniMultiClient()
-                >>> main_interface = MainInterfaceApply(external_id="my_main_interface", ...)
+                >>> main_interface = MainInterfaceWrite(external_id="my_main_interface", ...)
                 >>> result = client.main_interface.apply(main_interface)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.main_interface.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.main_interface.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

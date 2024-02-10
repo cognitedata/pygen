@@ -11,16 +11,16 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit_pydantic_v1.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     UnitProcedure,
-    UnitProcedureApply,
+    UnitProcedureWrite,
     UnitProcedureFields,
     UnitProcedureList,
-    UnitProcedureApplyList,
+    UnitProcedureWriteList,
     UnitProcedureTextFields,
     StartEndTime,
-    StartEndTimeApply,
+    StartEndTimeWrite,
     StartEndTimeList,
 )
 from equipment_unit_pydantic_v1.client.data_classes._unit_procedure import (
@@ -41,7 +41,7 @@ from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
 
-class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureList]):
+class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[UnitProcedure]
         super().__init__(
@@ -49,15 +49,15 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             sources=view_id,
             class_type=UnitProcedure,
             class_list=UnitProcedureList,
-            class_apply_list=UnitProcedureApplyList,
+            class_write_list=UnitProcedureWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.work_orders_edge = UnitProcedureWorkOrdersAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
         )
         self.work_units_edge = UnitProcedureWorkUnitsAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
         )
 
     def __call__(
@@ -103,10 +103,10 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     def apply(
         self,
-        unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply],
+        unit_procedure: UnitProcedureWrite | Sequence[UnitProcedureWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) unit procedures.
 
         Note: This method iterates through all nodes and timeseries linked to unit_procedure and creates them including the edges
@@ -127,18 +127,19 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             Create a new unit_procedure:
 
                 >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
-                >>> from equipment_unit_pydantic_v1.client.data_classes import UnitProcedureApply
+                >>> from equipment_unit_pydantic_v1.client.data_classes import UnitProcedureWrite
                 >>> client = EquipmentUnitClient()
-                >>> unit_procedure = UnitProcedureApply(external_id="my_unit_procedure", ...)
+                >>> unit_procedure = UnitProcedureWrite(external_id="my_unit_procedure", ...)
                 >>> result = client.unit_procedure.apply(unit_procedure)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.unit_procedure.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.unit_procedure.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
@@ -206,18 +207,20 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.work_orders_edge,
                     "work_orders",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
                 ),
                 (
                     self.work_units_edge,
                     "work_units",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
                 ),
             ],
         )
@@ -500,18 +503,20 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.work_orders_edge,
                     "work_orders",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
                 ),
                 (
                     self.work_units_edge,
                     "work_units",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
                 ),
             ],
         )

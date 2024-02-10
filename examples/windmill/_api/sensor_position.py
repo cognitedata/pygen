@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     SensorPosition,
-    SensorPositionApply,
+    SensorPositionWrite,
     SensorPositionFields,
     SensorPositionList,
-    SensorPositionApplyList,
+    SensorPositionWriteList,
 )
 from windmill.data_classes._sensor_position import (
     _SENSORPOSITION_PROPERTIES_BY_FIELD,
@@ -47,7 +47,7 @@ from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
 from .sensor_position_query import SensorPositionQueryAPI
 
 
-class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPositionList]):
+class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[SensorPosition]
         super().__init__(
@@ -55,7 +55,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             sources=view_id,
             class_type=SensorPosition,
             class_list=SensorPositionList,
-            class_apply_list=SensorPositionApplyList,
+            class_write_list=SensorPositionWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -109,10 +109,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
     def apply(
         self,
-        sensor_position: SensorPositionApply | Sequence[SensorPositionApply],
+        sensor_position: SensorPositionWrite | Sequence[SensorPositionWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) sensor positions.
 
         Args:
@@ -129,18 +129,19 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             Create a new sensor_position:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import SensorPositionApply
+                >>> from windmill.data_classes import SensorPositionWrite
                 >>> client = WindmillClient()
-                >>> sensor_position = SensorPositionApply(external_id="my_sensor_position", ...)
+                >>> sensor_position = SensorPositionWrite(external_id="my_sensor_position", ...)
                 >>> result = client.sensor_position.apply(sensor_position)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.sensor_position.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.sensor_position.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

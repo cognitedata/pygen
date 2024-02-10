@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,19 +11,21 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
-from ._main_interface import MainInterface, MainInterfaceApply
+from ._main_interface import MainInterface, MainInterfaceWrite
 
 
 __all__ = [
     "SubInterface",
+    "SubInterfaceWrite",
     "SubInterfaceApply",
     "SubInterfaceList",
+    "SubInterfaceWriteList",
     "SubInterfaceApplyList",
     "SubInterfaceFields",
     "SubInterfaceTextFields",
@@ -54,9 +57,9 @@ class SubInterface(MainInterface):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-    def as_apply(self) -> SubInterfaceApply:
+    def as_write(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
-        return SubInterfaceApply(
+        return SubInterfaceWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -64,8 +67,17 @@ class SubInterface(MainInterface):
             sub_value=self.sub_value,
         )
 
+    def as_apply(self) -> SubInterfaceWrite:
+        """Convert this read version of sub interface to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class SubInterfaceApply(MainInterfaceApply):
+
+class SubInterfaceWrite(MainInterfaceWrite):
     """This represents the writing version of sub interface.
 
     It is used to when data is sent to CDF.
@@ -81,13 +93,13 @@ class SubInterfaceApply(MainInterfaceApply):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -120,20 +132,44 @@ class SubInterfaceApply(MainInterfaceApply):
         return resources
 
 
+class SubInterfaceApply(SubInterfaceWrite):
+    def __new__(cls, *args, **kwargs) -> SubInterfaceApply:
+        warnings.warn(
+            "SubInterfaceApply is deprecated and will be removed in v1.0. Use SubInterfaceWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "SubInterface.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class SubInterfaceList(DomainModelList[SubInterface]):
     """List of sub interfaces in the read version."""
 
     _INSTANCE = SubInterface
 
-    def as_apply(self) -> SubInterfaceApplyList:
+    def as_write(self) -> SubInterfaceWriteList:
         """Convert these read versions of sub interface to the writing versions."""
-        return SubInterfaceApplyList([node.as_apply() for node in self.data])
+        return SubInterfaceWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> SubInterfaceWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class SubInterfaceApplyList(DomainModelApplyList[SubInterfaceApply]):
+class SubInterfaceWriteList(DomainModelWriteList[SubInterfaceWrite]):
     """List of sub interfaces in the writing version."""
 
-    _INSTANCE = SubInterfaceApply
+    _INSTANCE = SubInterfaceWrite
+
+
+class SubInterfaceApplyList(SubInterfaceWriteList): ...
 
 
 def _create_sub_interface_filter(

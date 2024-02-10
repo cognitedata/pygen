@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     WorkOrder,
-    WorkOrderApply,
+    WorkOrderWrite,
     WorkOrderFields,
     WorkOrderList,
-    WorkOrderApplyList,
+    WorkOrderWriteList,
     WorkOrderTextFields,
 )
 from equipment_unit.client.data_classes._work_order import (
@@ -36,7 +36,7 @@ from ._core import (
 from .work_order_query import WorkOrderQueryAPI
 
 
-class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
+class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[WorkOrder]
         super().__init__(
@@ -44,7 +44,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             sources=view_id,
             class_type=WorkOrder,
             class_list=WorkOrderList,
-            class_apply_list=WorkOrderApplyList,
+            class_write_list=WorkOrderWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -98,10 +98,10 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
     def apply(
         self,
-        work_order: WorkOrderApply | Sequence[WorkOrderApply],
+        work_order: WorkOrderWrite | Sequence[WorkOrderWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) work orders.
 
         Args:
@@ -118,18 +118,19 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             Create a new work_order:
 
                 >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import WorkOrderApply
+                >>> from equipment_unit.client.data_classes import WorkOrderWrite
                 >>> client = EquipmentUnitClient()
-                >>> work_order = WorkOrderApply(external_id="my_work_order", ...)
+                >>> work_order = WorkOrderWrite(external_id="my_work_order", ...)
                 >>> result = client.work_order.apply(work_order)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.work_order.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.work_order.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

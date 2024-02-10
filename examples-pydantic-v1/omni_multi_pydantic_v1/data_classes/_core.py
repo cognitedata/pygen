@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping
@@ -35,19 +36,19 @@ DEFAULT_INSTANCE_SPACE = "omni-instances"
 
 
 @dataclass
-class ResourcesApply:
+class ResourcesWrite:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
     time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
 
-    def extend(self, other: ResourcesApply) -> None:
+    def extend(self, other: ResourcesWrite) -> None:
         self.nodes.extend(other.nodes)
         self.edges.extend(other.edges)
         self.time_series.extend(other.time_series)
 
 
 @dataclass
-class ResourcesApplyResult:
+class ResourcesWriteResult:
     nodes: dm.NodeApplyResultList
     edges: dm.EdgeApplyResultList
     time_series: TimeSeriesList
@@ -138,26 +139,36 @@ class DataRecordWrite(BaseModel):
     existing_version: Optional[int] = None
 
 
-class DomainModelApply(DomainModelCore):
-    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
+class DomainModelWrite(DomainModelCore):
+    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
     class Config:
         extra = Extra.forbid
         allow_population_by_field_name = True
 
+    def to_instances_write(
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+    ) -> ResourcesWrite:
+        return self._to_instances_write(set(), view_by_read_class, write_none)
+
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
-    ) -> ResourcesApply:
-        return self._to_instances_apply(set(), view_by_read_class, write_none)
+    ) -> ResourcesWrite:
+        warnings.warn(
+            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.to_instances_write(view_by_read_class, write_none)
 
     @abstractmethod
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
+    ) -> ResourcesWrite:
         raise NotImplementedError()
 
     @root_validator(pre=True, allow_reuse=True)
@@ -167,7 +178,7 @@ class DomainModelApply(DomainModelCore):
         return data
 
     @classmethod
-    def from_instance(cls: type[T_DomainModelApply], instance: InstanceApply) -> T_DomainModelApply:
+    def from_instance(cls: type[T_DomainModelWrite], instance: InstanceApply) -> T_DomainModelWrite:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
         node_type = data.pop("type", None)
@@ -191,7 +202,7 @@ class DomainModelApply(DomainModelCore):
         )
 
 
-T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)
+T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
 
 
 class CoreList(UserList, Generic[T_DomainModelCore]):
@@ -257,21 +268,31 @@ class DomainModelList(CoreList[T_DomainModelCore]):
 T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covariant=True)
 
 
-class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
-    _PARENT_CLASS = DomainModelApply
+class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
+    _PARENT_CLASS = DomainModelWrite
 
-    def to_instances_apply(
+    def to_instances_write(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
-    ) -> ResourcesApply:
+    ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
-        domains = ResourcesApply()
+        domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_apply(cache, view_by_read_class, write_none)
+            result = node._to_instances_write(cache, view_by_read_class, write_none)
             domains.extend(result)
         return domains
 
+    def to_instances_apply(
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+    ) -> ResourcesWrite:
+        warnings.warn(
+            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.to_instances_write(view_by_read_class, write_none)
 
-T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelApplyList, covariant=True)
+
+T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
 
 
 class DomainRelation(DomainModelCore):
@@ -303,16 +324,16 @@ T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
 def default_edge_external_id_factory(
-    start_node: DomainModelApply | str, end_node: DomainModelApply | str, edge_type: dm.DirectRelationReference
+    start_node: DomainModelWrite | str, end_node: DomainModelWrite | str, edge_type: dm.DirectRelationReference
 ) -> str:
     start = start_node if isinstance(start_node, str) else start_node.external_id
     end = end_node if isinstance(end_node, str) else end_node.external_id
     return f"{start}:{end}"
 
 
-class DomainRelationApply(BaseModel):
+class DomainRelationWrite(BaseModel):
     external_id_factory: ClassVar[
-        Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
+        Callable[[Union[DomainModelWrite, str], Union[DomainModelWrite, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
@@ -322,40 +343,40 @@ class DomainRelationApply(BaseModel):
         allow_population_by_field_name = True
 
     @abstractmethod
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        start_node: DomainModelApply,
+        start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
+    ) -> ResourcesWrite:
         raise NotImplementedError()
 
     @classmethod
     def create_edge(
-        cls, start_node: DomainModelApply | str, end_node: DomainModelApply | str, edge_type: dm.DirectRelationReference
+        cls, start_node: DomainModelWrite | str, end_node: DomainModelWrite | str, edge_type: dm.DirectRelationReference
     ) -> dm.EdgeApply:
-        if isinstance(start_node, DomainModelApply):
+        if isinstance(start_node, DomainModelWrite):
             space = start_node.space
-        elif isinstance(start_node, DomainModelApply):
+        elif isinstance(start_node, DomainModelWrite):
             space = start_node.space
         else:
-            raise TypeError(f"Either pass in a start or end node of type {DomainRelationApply.__name__}")
+            raise TypeError(f"Either pass in a start or end node of type {DomainRelationWrite.__name__}")
 
         if isinstance(end_node, str):
             end_ref = dm.DirectRelationReference(space, end_node)
-        elif isinstance(end_node, DomainModelApply):
+        elif isinstance(end_node, DomainModelWrite):
             end_ref = end_node.as_direct_reference()
         else:
-            raise TypeError(f"Expected str or subclass of {DomainRelationApply.__name__}, got {type(end_node)}")
+            raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(end_node)}")
 
         if isinstance(start_node, str):
             start_ref = dm.DirectRelationReference(space, start_node)
-        elif isinstance(start_node, DomainModelApply):
+        elif isinstance(start_node, DomainModelWrite):
             start_ref = start_node.as_direct_reference()
         else:
-            raise TypeError(f"Expected str or subclass of {DomainRelationApply.__name__}, got {type(start_node)}")
+            raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(start_node)}")
 
         return dm.EdgeApply(
             space=space,
@@ -369,29 +390,29 @@ class DomainRelationApply(BaseModel):
     def from_edge_to_resources(
         cls,
         cache: set[tuple[str, str]],
-        start_node: DomainModelApply | str,
-        end_node: DomainModelApply | str,
+        start_node: DomainModelWrite | str,
+        end_node: DomainModelWrite | str,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
-        edge = DomainRelationApply.create_edge(start_node, end_node, edge_type)
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
+        edge = DomainRelationWrite.create_edge(start_node, end_node, edge_type)
         if (edge.space, edge.external_id) not in cache:
             resources.edges.append(edge)
             cache.add((edge.space, edge.external_id))
 
-        if isinstance(end_node, DomainModelApply):
-            other_resources = end_node._to_instances_apply(cache, view_by_read_class, write_none)
+        if isinstance(end_node, DomainModelWrite):
+            other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)
             resources.extend(other_resources)
-        if isinstance(start_node, DomainModelApply):
-            other_resources = start_node._to_instances_apply(cache, view_by_read_class, write_none)
+        if isinstance(start_node, DomainModelWrite):
+            other_resources = start_node._to_instances_write(cache, view_by_read_class, write_none)
             resources.extend(other_resources)
 
         return resources
 
 
-T_DomainRelationApply = TypeVar("T_DomainRelationApply", bound=DomainRelationApply)
+T_DomainRelationWrite = TypeVar("T_DomainRelationWrite", bound=DomainRelationWrite)
 
 
 class DomainRelationList(CoreList[T_DomainRelation]):

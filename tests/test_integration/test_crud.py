@@ -16,11 +16,10 @@ from tests.omni_constants import OmniClasses
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni._api._core import SequenceNotStr
-    from omni.data_classes import DomainModelApply, ResourcesApplyResult
+    from omni.data_classes import DomainModelWrite, ResourcesWriteResult
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1._api._core import SequenceNotStr
-    from omni_pydantic_v1.data_classes import DomainModelApply, ResourcesApplyResult
 
 
 def omni_independent_view_ids() -> list[ParameterSet]:
@@ -38,8 +37,8 @@ class DomainAPI(Protocol):
     def delete(self, external_id: str | SequenceNotStr[str], space: str = ""): ...
 
     def apply(
-        self, items: DomainModelApply | Sequence[DomainModelApply], replace: bool = False
-    ) -> ResourcesApplyResult: ...
+        self, items: DomainModelWrite | Sequence[DomainModelWrite], replace: bool = False
+    ) -> ResourcesWriteResult: ...
 
     def list(self, limit: int = 25, **kwargs) -> Sequence: ...
 

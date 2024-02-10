@@ -193,8 +193,8 @@ class Field(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def as_apply(self) -> str:
-        """Used in the .as_apply() method for the read version of the data class."""
+    def as_write(self) -> str:
+        """Used in the .as_write() method for the read version of the data class."""
         raise NotImplementedError
 
     @property
@@ -254,7 +254,7 @@ class PrimitiveFieldCore(Field, ABC):
     def type_as_string(self) -> str:
         return _to_python_type(self.type_)
 
-    def as_apply(self) -> str:
+    def as_write(self) -> str:
         return f"self.{self.name}"
 
 
@@ -450,8 +450,8 @@ class EdgeOneToOne(EdgeToOneDataClass):
         else:
             return f"{left_side} {self.pydantic_field}(None, repr=False)"
 
-    def as_apply(self) -> str:
-        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+    def as_write(self) -> str:
+        return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @total_ordering
@@ -515,8 +515,8 @@ class EdgeOneToEndNode(EdgeField):
         else:
             return left_side
 
-    def as_apply(self) -> str:
-        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+    def as_write(self) -> str:
+        return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -543,9 +543,9 @@ class EdgeOneToManyNodes(EdgeOneToMany):
 
         return cast(NodeDataClass, self.data_class)
 
-    def as_apply(self) -> str:
+    def as_write(self) -> str:
         return (
-            f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
+            f"[{self.variable}.as_write() if isinstance({self.variable}, DomainModel) else {self.variable} "
             f"for {self.variable} in self.{self.name} or []]"
         )
 
@@ -580,8 +580,8 @@ class EdgeOneToManyEdges(EdgeOneToMany):
 
         return cast(EdgeDataClass, self.data_class)
 
-    def as_apply(self) -> str:
-        return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
+    def as_write(self) -> str:
+        return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []]"
 
     def as_read_type_hint(self) -> str:
         return self._type_hint(self.data_class.read_name)

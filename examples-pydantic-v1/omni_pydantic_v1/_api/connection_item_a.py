@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ConnectionItemA,
-    ConnectionItemAApply,
+    ConnectionItemAWrite,
     ConnectionItemAFields,
     ConnectionItemAList,
-    ConnectionItemAApplyList,
+    ConnectionItemAWriteList,
     ConnectionItemATextFields,
 )
 from omni_pydantic_v1.data_classes._connection_item_a import (
@@ -37,7 +37,7 @@ from .connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from .connection_item_a_query import ConnectionItemAQueryAPI
 
 
-class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, ConnectionItemAList]):
+class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ConnectionItemA]
         super().__init__(
@@ -45,7 +45,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             sources=view_id,
             class_type=ConnectionItemA,
             class_list=ConnectionItemAList,
-            class_apply_list=ConnectionItemAApplyList,
+            class_write_list=ConnectionItemAWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -94,10 +94,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
 
     def apply(
         self,
-        connection_item_a: ConnectionItemAApply | Sequence[ConnectionItemAApply],
+        connection_item_a: ConnectionItemAWrite | Sequence[ConnectionItemAWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item as.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_a and creates them including the edges
@@ -118,18 +118,19 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             Create a new connection_item_a:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import ConnectionItemAApply
+                >>> from omni_pydantic_v1.data_classes import ConnectionItemAWrite
                 >>> client = OmniClient()
-                >>> connection_item_a = ConnectionItemAApply(external_id="my_connection_item_a", ...)
+                >>> connection_item_a = ConnectionItemAWrite(external_id="my_connection_item_a", ...)
                 >>> result = client.connection_item_a.apply(connection_item_a)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.connection_item_a.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.connection_item_a.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
@@ -199,12 +200,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.outwards_edge,
                     "outwards",
                     dm.DirectRelationReference("pygen-models", "bidirectional"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
         )
@@ -487,12 +489,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.outwards_edge,
                     "outwards",
                     dm.DirectRelationReference("pygen-models", "bidirectional"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
         )

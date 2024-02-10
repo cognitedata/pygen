@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     EquipmentModule,
-    EquipmentModuleApply,
+    EquipmentModuleWrite,
     EquipmentModuleFields,
     EquipmentModuleList,
-    EquipmentModuleApplyList,
+    EquipmentModuleWriteList,
     EquipmentModuleTextFields,
 )
 from equipment_unit.client.data_classes._equipment_module import (
@@ -37,7 +37,7 @@ from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
 from .equipment_module_query import EquipmentModuleQueryAPI
 
 
-class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, EquipmentModuleList]):
+class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[EquipmentModule]
         super().__init__(
@@ -45,7 +45,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             sources=view_id,
             class_type=EquipmentModule,
             class_list=EquipmentModuleList,
-            class_apply_list=EquipmentModuleApplyList,
+            class_write_list=EquipmentModuleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -100,10 +100,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
 
     def apply(
         self,
-        equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply],
+        equipment_module: EquipmentModuleWrite | Sequence[EquipmentModuleWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) equipment modules.
 
         Args:
@@ -120,18 +120,19 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             Create a new equipment_module:
 
                 >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import EquipmentModuleApply
+                >>> from equipment_unit.client.data_classes import EquipmentModuleWrite
                 >>> client = EquipmentUnitClient()
-                >>> equipment_module = EquipmentModuleApply(external_id="my_equipment_module", ...)
+                >>> equipment_module = EquipmentModuleWrite(external_id="my_equipment_module", ...)
                 >>> result = client.equipment_module.apply(equipment_module)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.equipment_module.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.equipment_module.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Sequence
 
@@ -28,7 +29,7 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.99.6
+        pygen = 0.99.7
         cognite-sdk = 7.17.1
         pydantic = 1.10.7
 
@@ -46,7 +47,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.6"
+        client.config.client_name = "CognitePygen:0.99.7"
 
         view_by_read_class = {
             data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
@@ -76,12 +77,12 @@ class WindmillClient:
         self.sensor_position = SensorPositionAPI(client, view_by_read_class)
         self.windmill = WindmillAPI(client, view_by_read_class)
 
-    def apply(
+    def upsert(
         self,
-        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> data_classes.ResourcesApplyResult:
+    ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
         Args:
@@ -94,12 +95,12 @@ class WindmillClient:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
-        if isinstance(items, data_classes.DomainModelApply):
-            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        if isinstance(items, data_classes.DomainModelWrite):
+            instances = items.to_instances_write(self._view_by_read_class, write_none)
         else:
-            instances = data_classes.ResourcesApply()
+            instances = data_classes.ResourcesWrite()
             for item in items:
-                instances.extend(item.to_instances_apply(self._view_by_read_class, write_none))
+                instances.extend(item.to_instances_write(self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -111,7 +112,34 @@ class WindmillClient:
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
+
+    def apply(
+        self,
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesWriteResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        warnings.warn(
+            "The .apply method is deprecated and will be removed in v1.0. "
+            "Please use the .upsert method on the instead."
+            "The motivation is that .upsert is a more descriptive name for the operation.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.upsert(items, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -178,5 +206,6 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.windmill<br />
 <br />
 and with the methods:<br />
-&nbsp;&nbsp;&nbsp;&nbsp;.apply - Create or update any instance.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.upsert - Create or update any instance.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.delete - Delete instances.<br />
 """

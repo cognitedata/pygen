@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Metmast,
-    MetmastApply,
+    MetmastWrite,
     MetmastFields,
     MetmastList,
-    MetmastApplyList,
+    MetmastWriteList,
 )
 from windmill.data_classes._metmast import (
     _METMAST_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .metmast_wind_speed import MetmastWindSpeedAPI
 from .metmast_query import MetmastQueryAPI
 
 
-class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
+class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Metmast]
         super().__init__(
@@ -46,7 +46,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
             sources=view_id,
             class_type=Metmast,
             class_list=MetmastList,
-            class_apply_list=MetmastApplyList,
+            class_write_list=MetmastWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -91,10 +91,10 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
     def apply(
         self,
-        metmast: MetmastApply | Sequence[MetmastApply],
+        metmast: MetmastWrite | Sequence[MetmastWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) metmasts.
 
         Args:
@@ -111,18 +111,19 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
             Create a new metmast:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import MetmastApply
+                >>> from windmill.data_classes import MetmastWrite
                 >>> client = WindmillClient()
-                >>> metmast = MetmastApply(external_id="my_metmast", ...)
+                >>> metmast = MetmastWrite(external_id="my_metmast", ...)
                 >>> result = client.metmast.apply(metmast)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.metmast.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.metmast.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

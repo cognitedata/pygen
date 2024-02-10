@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,18 +11,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "Implementation1sPygenModelsOther",
+    "Implementation1sPygenModelsOtherWrite",
     "Implementation1sPygenModelsOtherApply",
     "Implementation1sPygenModelsOtherList",
+    "Implementation1sPygenModelsOtherWriteList",
     "Implementation1sPygenModelsOtherApplyList",
     "Implementation1sPygenModelsOtherFields",
     "Implementation1sPygenModelsOtherTextFields",
@@ -58,9 +61,9 @@ class Implementation1sPygenModelsOther(DomainModel):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def as_apply(self) -> Implementation1sPygenModelsOtherApply:
+    def as_write(self) -> Implementation1sPygenModelsOtherWrite:
         """Convert this read version of implementation 1 s pygen models other to the writing version."""
-        return Implementation1sPygenModelsOtherApply(
+        return Implementation1sPygenModelsOtherWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -69,8 +72,17 @@ class Implementation1sPygenModelsOther(DomainModel):
             value_2=self.value_2,
         )
 
+    def as_apply(self) -> Implementation1sPygenModelsOtherWrite:
+        """Convert this read version of implementation 1 s pygen models other to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class Implementation1sPygenModelsOtherApply(DomainModelApply):
+
+class Implementation1sPygenModelsOtherWrite(DomainModelWrite):
     """This represents the writing version of implementation 1 s pygen models other.
 
     It is used to when data is sent to CDF.
@@ -90,13 +102,13 @@ class Implementation1sPygenModelsOtherApply(DomainModelApply):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -134,20 +146,44 @@ class Implementation1sPygenModelsOtherApply(DomainModelApply):
         return resources
 
 
+class Implementation1sPygenModelsOtherApply(Implementation1sPygenModelsOtherWrite):
+    def __new__(cls, *args, **kwargs) -> Implementation1sPygenModelsOtherApply:
+        warnings.warn(
+            "Implementation1sPygenModelsOtherApply is deprecated and will be removed in v1.0. Use Implementation1sPygenModelsOtherWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Implementation1sPygenModelsOther.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class Implementation1sPygenModelsOtherList(DomainModelList[Implementation1sPygenModelsOther]):
     """List of implementation 1 s pygen models others in the read version."""
 
     _INSTANCE = Implementation1sPygenModelsOther
 
-    def as_apply(self) -> Implementation1sPygenModelsOtherApplyList:
+    def as_write(self) -> Implementation1sPygenModelsOtherWriteList:
         """Convert these read versions of implementation 1 s pygen models other to the writing versions."""
-        return Implementation1sPygenModelsOtherApplyList([node.as_apply() for node in self.data])
+        return Implementation1sPygenModelsOtherWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> Implementation1sPygenModelsOtherWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class Implementation1sPygenModelsOtherApplyList(DomainModelApplyList[Implementation1sPygenModelsOtherApply]):
+class Implementation1sPygenModelsOtherWriteList(DomainModelWriteList[Implementation1sPygenModelsOtherWrite]):
     """List of implementation 1 s pygen models others in the writing version."""
 
-    _INSTANCE = Implementation1sPygenModelsOtherApply
+    _INSTANCE = Implementation1sPygenModelsOtherWrite
+
+
+class Implementation1sPygenModelsOtherApplyList(Implementation1sPygenModelsOtherWriteList): ...
 
 
 def _create_implementation_1_s_pygen_models_other_filter(

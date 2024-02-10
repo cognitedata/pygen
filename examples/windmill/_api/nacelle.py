@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Nacelle,
-    NacelleApply,
+    NacelleWrite,
     NacelleFields,
     NacelleList,
-    NacelleApplyList,
+    NacelleWriteList,
 )
 from windmill.data_classes._nacelle import (
     _NACELLE_PROPERTIES_BY_FIELD,
@@ -40,7 +40,7 @@ from .nacelle_yaw_error import NacelleYawErrorAPI
 from .nacelle_query import NacelleQueryAPI
 
 
-class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
+class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Nacelle]
         super().__init__(
@@ -48,7 +48,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             sources=view_id,
             class_type=Nacelle,
             class_list=NacelleList,
-            class_apply_list=NacelleApplyList,
+            class_write_list=NacelleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -104,10 +104,10 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
     def apply(
         self,
-        nacelle: NacelleApply | Sequence[NacelleApply],
+        nacelle: NacelleWrite | Sequence[NacelleWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) nacelles.
 
         Args:
@@ -124,18 +124,19 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             Create a new nacelle:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import NacelleApply
+                >>> from windmill.data_classes import NacelleWrite
                 >>> client = WindmillClient()
-                >>> nacelle = NacelleApply(external_id="my_nacelle", ...)
+                >>> nacelle = NacelleWrite(external_id="my_nacelle", ...)
                 >>> result = client.nacelle.apply(nacelle)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.nacelle.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.nacelle.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

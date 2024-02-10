@@ -12,8 +12,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 from {{ top_level_package }}.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     {{ data_class.read_name }},{% if data_class.is_writable %}
     {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
     {{ data_class.field_names }},{% endif %}
@@ -42,7 +42,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
             class_type={{ data_class.read_name }},
             class_list={{ data_class.read_list_name }},{% if data_class.is_writable %}
-            class_apply_list={{ data_class.write_list_name }},{% endif %}
+            class_write_list={{ data_class.write_list_name }},{% endif %}
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id{% for edge_api in edge_apis %}
@@ -83,7 +83,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
@@ -112,10 +112,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.{{ api_class.parent_attribute }}.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.{{ api_class.parent_attribute }}.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
@@ -181,12 +182,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+            edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
                     self.{{ edge_api.parent_attribute }},
                     "{{ edge_api.field_name }}",
                     dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
                     "{{ edge_api.direction }}",
+                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
                 ),{% endfor %}
                                                ]
         )
@@ -402,12 +404,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+            edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
                     self.{{ edge_api.parent_attribute }},
                     "{{ edge_api.field_name }}",
                     dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
                     "{{ edge_api.direction }}",
+                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
                 ),{% endfor %}
                                                ]
         )

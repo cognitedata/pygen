@@ -12,13 +12,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from scenario_instance.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from scenario_instance.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ScenarioInstance,
-    ScenarioInstanceApply,
+    ScenarioInstanceWrite,
     ScenarioInstanceFields,
     ScenarioInstanceList,
-    ScenarioInstanceApplyList,
+    ScenarioInstanceWriteList,
     ScenarioInstanceTextFields,
 )
 from scenario_instance.client.data_classes._scenario_instance import (
@@ -38,7 +38,7 @@ from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
 from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 
-class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
+class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ScenarioInstance]
         super().__init__(
@@ -46,7 +46,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             sources=view_id,
             class_type=ScenarioInstance,
             class_list=ScenarioInstanceList,
-            class_apply_list=ScenarioInstanceApplyList,
+            class_write_list=ScenarioInstanceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -125,10 +125,10 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def apply(
         self,
-        scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply],
+        scenario_instance: ScenarioInstanceWrite | Sequence[ScenarioInstanceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) scenario instances.
 
         Args:
@@ -145,18 +145,19 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             Create a new scenario_instance:
 
                 >>> from scenario_instance.client import ScenarioInstanceClient
-                >>> from scenario_instance.client.data_classes import ScenarioInstanceApply
+                >>> from scenario_instance.client.data_classes import ScenarioInstanceWrite
                 >>> client = ScenarioInstanceClient()
-                >>> scenario_instance = ScenarioInstanceApply(external_id="my_scenario_instance", ...)
+                >>> scenario_instance = ScenarioInstanceWrite(external_id="my_scenario_instance", ...)
                 >>> result = client.scenario_instance.apply(scenario_instance)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.scenario_instance.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.scenario_instance.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

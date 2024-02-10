@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveWithDefaults,
-    PrimitiveWithDefaultsApply,
+    PrimitiveWithDefaultsWrite,
     PrimitiveWithDefaultsFields,
     PrimitiveWithDefaultsList,
-    PrimitiveWithDefaultsApplyList,
+    PrimitiveWithDefaultsWriteList,
     PrimitiveWithDefaultsTextFields,
 )
 from omni.data_classes._primitive_with_defaults import (
@@ -36,7 +36,7 @@ from ._core import (
 from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
-class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsApply, PrimitiveWithDefaultsList]):
+class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveWithDefaults]
         super().__init__(
@@ -44,7 +44,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             sources=view_id,
             class_type=PrimitiveWithDefaults,
             class_list=PrimitiveWithDefaultsList,
-            class_apply_list=PrimitiveWithDefaultsApplyList,
+            class_write_list=PrimitiveWithDefaultsWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -101,10 +101,10 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
 
     def apply(
         self,
-        primitive_with_default: PrimitiveWithDefaultsApply | Sequence[PrimitiveWithDefaultsApply],
+        primitive_with_default: PrimitiveWithDefaultsWrite | Sequence[PrimitiveWithDefaultsWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive with defaults.
 
         Args:
@@ -121,18 +121,19 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             Create a new primitive_with_default:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveWithDefaultsApply
+                >>> from omni.data_classes import PrimitiveWithDefaultsWrite
                 >>> client = OmniClient()
-                >>> primitive_with_default = PrimitiveWithDefaultsApply(external_id="my_primitive_with_default", ...)
+                >>> primitive_with_default = PrimitiveWithDefaultsWrite(external_id="my_primitive_with_default", ...)
                 >>> result = client.primitive_with_defaults.apply(primitive_with_default)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.primitive_with_defaults.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.primitive_with_defaults.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

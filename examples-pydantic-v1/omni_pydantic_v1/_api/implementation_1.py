@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Implementation1,
-    Implementation1Apply,
+    Implementation1Write,
     Implementation1Fields,
     Implementation1List,
-    Implementation1ApplyList,
+    Implementation1WriteList,
     Implementation1TextFields,
 )
 from omni_pydantic_v1.data_classes._implementation_1 import (
@@ -36,7 +36,7 @@ from ._core import (
 from .implementation_1_query import Implementation1QueryAPI
 
 
-class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implementation1List]):
+class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1]
         super().__init__(
@@ -44,7 +44,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
             sources=view_id,
             class_type=Implementation1,
             class_list=Implementation1List,
-            class_apply_list=Implementation1ApplyList,
+            class_write_list=Implementation1WriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -104,10 +104,10 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
 
     def apply(
         self,
-        implementation_1: Implementation1Apply | Sequence[Implementation1Apply],
+        implementation_1: Implementation1Write | Sequence[Implementation1Write],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) implementation 1.
 
         Args:
@@ -124,18 +124,19 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
             Create a new implementation_1:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import Implementation1Apply
+                >>> from omni_pydantic_v1.data_classes import Implementation1Write
                 >>> client = OmniClient()
-                >>> implementation_1 = Implementation1Apply(external_id="my_implementation_1", ...)
+                >>> implementation_1 = Implementation1Write(external_id="my_implementation_1", ...)
                 >>> result = client.implementation_1.apply(implementation_1)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.implementation_1.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.implementation_1.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

@@ -30,9 +30,9 @@ from cognite.pygen.warnings import (
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from omni.data_classes import DomainModel, DomainModelApply
+    from omni.data_classes import DomainModel, DomainModelWrite
 else:
-    from omni_pydantic_v1.data_classes import DomainModel, DomainModelApply
+    from omni_pydantic_v1.data_classes import DomainModel, DomainModelWrite
 
 
 def load_field_test_cases():
@@ -226,8 +226,8 @@ def load_data_classes_test_cases():
         view,
         NodeDataClass(
             read_name="Series",
-            write_name="SeriesApply",
-            write_list_name="SeriesApplyList",
+            write_name="SeriesWrite",
+            write_list_name="SeriesWriteList",
             read_list_name="SeriesList",
             doc_name="series",
             doc_list_name="series",
@@ -308,7 +308,7 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
         ("def", "def_"),
         *{
             (name, f"{name.casefold()}_")
-            for name in chain(dir(DomainModel), dir(DomainModelApply))
+            for name in chain(dir(DomainModel), dir(DomainModelWrite))
             if not name.startswith("_")
         },
     ],

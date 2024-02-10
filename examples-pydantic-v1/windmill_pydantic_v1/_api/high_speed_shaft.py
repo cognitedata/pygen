@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     HighSpeedShaft,
-    HighSpeedShaftApply,
+    HighSpeedShaftWrite,
     HighSpeedShaftFields,
     HighSpeedShaftList,
-    HighSpeedShaftApplyList,
+    HighSpeedShaftWriteList,
 )
 from windmill_pydantic_v1.data_classes._high_speed_shaft import (
     _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .high_speed_shaft_torque import HighSpeedShaftTorqueAPI
 from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
-class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedShaftList]):
+class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[HighSpeedShaft]
         super().__init__(
@@ -46,7 +46,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
             sources=view_id,
             class_type=HighSpeedShaft,
             class_list=HighSpeedShaftList,
-            class_apply_list=HighSpeedShaftApplyList,
+            class_write_list=HighSpeedShaftWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -85,10 +85,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
 
     def apply(
         self,
-        high_speed_shaft: HighSpeedShaftApply | Sequence[HighSpeedShaftApply],
+        high_speed_shaft: HighSpeedShaftWrite | Sequence[HighSpeedShaftWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) high speed shafts.
 
         Args:
@@ -105,18 +105,19 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
             Create a new high_speed_shaft:
 
                 >>> from windmill_pydantic_v1 import WindmillClient
-                >>> from windmill_pydantic_v1.data_classes import HighSpeedShaftApply
+                >>> from windmill_pydantic_v1.data_classes import HighSpeedShaftWrite
                 >>> client = WindmillClient()
-                >>> high_speed_shaft = HighSpeedShaftApply(external_id="my_high_speed_shaft", ...)
+                >>> high_speed_shaft = HighSpeedShaftWrite(external_id="my_high_speed_shaft", ...)
                 >>> result = client.high_speed_shaft.apply(high_speed_shaft)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.high_speed_shaft.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.high_speed_shaft.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

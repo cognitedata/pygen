@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,15 +11,24 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
-__all__ = ["Rotor", "RotorApply", "RotorList", "RotorApplyList", "RotorFields", "RotorTextFields"]
+__all__ = [
+    "Rotor",
+    "RotorWrite",
+    "RotorApply",
+    "RotorList",
+    "RotorWriteList",
+    "RotorApplyList",
+    "RotorFields",
+    "RotorTextFields",
+]
 
 
 RotorTextFields = Literal["rotor_speed_controller", "rpm_low_speed_shaft"]
@@ -48,9 +58,9 @@ class Rotor(DomainModel):
     rotor_speed_controller: Union[TimeSeries, str, None] = None
     rpm_low_speed_shaft: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> RotorApply:
+    def as_write(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
-        return RotorApply(
+        return RotorWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -58,8 +68,17 @@ class Rotor(DomainModel):
             rpm_low_speed_shaft=self.rpm_low_speed_shaft,
         )
 
+    def as_apply(self) -> RotorWrite:
+        """Convert this read version of rotor to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class RotorApply(DomainModelApply):
+
+class RotorWrite(DomainModelWrite):
     """This represents the writing version of rotor.
 
     It is used to when data is sent to CDF.
@@ -77,13 +96,13 @@ class RotorApply(DomainModelApply):
     rotor_speed_controller: Union[TimeSeries, str, None] = None
     rpm_low_speed_shaft: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -128,20 +147,44 @@ class RotorApply(DomainModelApply):
         return resources
 
 
+class RotorApply(RotorWrite):
+    def __new__(cls, *args, **kwargs) -> RotorApply:
+        warnings.warn(
+            "RotorApply is deprecated and will be removed in v1.0. Use RotorWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Rotor.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class RotorList(DomainModelList[Rotor]):
     """List of rotors in the read version."""
 
     _INSTANCE = Rotor
 
-    def as_apply(self) -> RotorApplyList:
+    def as_write(self) -> RotorWriteList:
         """Convert these read versions of rotor to the writing versions."""
-        return RotorApplyList([node.as_apply() for node in self.data])
+        return RotorWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> RotorWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class RotorApplyList(DomainModelApplyList[RotorApply]):
+class RotorWriteList(DomainModelWriteList[RotorWrite]):
     """List of rotors in the writing version."""
 
-    _INSTANCE = RotorApply
+    _INSTANCE = RotorWrite
+
+
+class RotorApplyList(RotorWriteList): ...
 
 
 def _create_rotor_filter(

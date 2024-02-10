@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,16 +11,25 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
-__all__ = ["Metmast", "MetmastApply", "MetmastList", "MetmastApplyList", "MetmastFields", "MetmastTextFields"]
+__all__ = [
+    "Metmast",
+    "MetmastWrite",
+    "MetmastApply",
+    "MetmastList",
+    "MetmastWriteList",
+    "MetmastApplyList",
+    "MetmastFields",
+    "MetmastTextFields",
+]
 
 
 MetmastTextFields = Literal["temperature", "tilt_angle", "wind_speed"]
@@ -55,9 +65,9 @@ class Metmast(DomainModel):
     tilt_angle: Union[TimeSeries, str, None] = None
     wind_speed: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> MetmastApply:
+    def as_write(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""
-        return MetmastApply(
+        return MetmastWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -67,8 +77,17 @@ class Metmast(DomainModel):
             wind_speed=self.wind_speed,
         )
 
+    def as_apply(self) -> MetmastWrite:
+        """Convert this read version of metmast to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class MetmastApply(DomainModelApply):
+
+class MetmastWrite(DomainModelWrite):
     """This represents the writing version of metmast.
 
     It is used to when data is sent to CDF.
@@ -90,13 +109,13 @@ class MetmastApply(DomainModelApply):
     tilt_angle: Union[TimeSeries, str, None] = None
     wind_speed: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -153,20 +172,44 @@ class MetmastApply(DomainModelApply):
         return resources
 
 
+class MetmastApply(MetmastWrite):
+    def __new__(cls, *args, **kwargs) -> MetmastApply:
+        warnings.warn(
+            "MetmastApply is deprecated and will be removed in v1.0. Use MetmastWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Metmast.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class MetmastList(DomainModelList[Metmast]):
     """List of metmasts in the read version."""
 
     _INSTANCE = Metmast
 
-    def as_apply(self) -> MetmastApplyList:
+    def as_write(self) -> MetmastWriteList:
         """Convert these read versions of metmast to the writing versions."""
-        return MetmastApplyList([node.as_apply() for node in self.data])
+        return MetmastWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> MetmastWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class MetmastApplyList(DomainModelApplyList[MetmastApply]):
+class MetmastWriteList(DomainModelWriteList[MetmastWrite]):
     """List of metmasts in the writing version."""
 
-    _INSTANCE = MetmastApply
+    _INSTANCE = MetmastWrite
+
+
+class MetmastApplyList(MetmastWriteList): ...
 
 
 def _create_metmast_filter(

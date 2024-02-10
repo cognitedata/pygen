@@ -65,7 +65,7 @@ class DataClass:
 
     @staticmethod
     def to_base_name(view: dm.View) -> str:
-        return (view.name or view.external_id).replace(" ", "_")
+        return view.external_id.replace(" ", "_")
 
     @classmethod
     def to_base_name_with_version(cls, view: dm.View) -> str:
@@ -103,9 +103,9 @@ class DataClass:
 
         args = dict(
             read_name=class_name,
-            write_name=f"{class_name}Apply",
+            write_name=f"{class_name}Write",
             read_list_name=f"{class_name}List",
-            write_list_name=f"{class_name}ApplyList",
+            write_list_name=f"{class_name}WriteList",
             doc_name=doc_name,
             doc_list_name=doc_list_name,
             variable=variable_name,
@@ -173,7 +173,7 @@ class DataClass:
         if self.implements:
             return ", ".join(f"{interface.write_name}" for interface in self.implements)
         else:
-            return "DomainModelApply"
+            return "DomainModelWrite"
 
     @property
     def text_field_names(self) -> str:
@@ -210,9 +210,11 @@ class DataClass:
         import_classes = [self.read_name]
         if self.is_writable:
             import_classes.append(self.write_name)
+            import_classes.append(f"{self.read_name}Apply")
         import_classes.append(self.read_list_name)
         if self.is_writable:
             import_classes.append(self.write_list_name)
+            import_classes.append(f"{self.read_name}ApplyList")
         if self.has_field_of_type(PrimitiveFieldCore):
             import_classes.append(self.field_names)
         if self.has_primitive_field_of_type(dm.Text):

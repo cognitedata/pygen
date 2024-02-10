@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Windmill,
-    WindmillApply,
+    WindmillWrite,
     WindmillFields,
     WindmillList,
-    WindmillApplyList,
+    WindmillWriteList,
     WindmillTextFields,
 )
 from windmill.data_classes._windmill import (
@@ -38,7 +38,7 @@ from .windmill_metmast import WindmillMetmastAPI
 from .windmill_query import WindmillQueryAPI
 
 
-class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
+class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Windmill]
         super().__init__(
@@ -46,7 +46,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             sources=view_id,
             class_type=Windmill,
             class_list=WindmillList,
-            class_apply_list=WindmillApplyList,
+            class_write_list=WindmillWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -108,10 +108,10 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
     def apply(
         self,
-        windmill: WindmillApply | Sequence[WindmillApply],
+        windmill: WindmillWrite | Sequence[WindmillWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) windmills.
 
         Note: This method iterates through all nodes and timeseries linked to windmill and creates them including the edges
@@ -132,18 +132,19 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             Create a new windmill:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import WindmillApply
+                >>> from windmill.data_classes import WindmillWrite
                 >>> client = WindmillClient()
-                >>> windmill = WindmillApply(external_id="my_windmill", ...)
+                >>> windmill = WindmillWrite(external_id="my_windmill", ...)
                 >>> result = client.windmill.apply(windmill)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.windmill.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.windmill.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
@@ -211,18 +212,20 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.blades_edge,
                     "blades",
                     dm.DirectRelationReference("power-models", "Windmill.blades"),
                     "outwards",
+                    dm.ViewId("power-models", "Blade", "1"),
                 ),
                 (
                     self.metmast_edge,
                     "metmast",
                     dm.DirectRelationReference("power-models", "Windmill.metmast"),
                     "outwards",
+                    dm.ViewId("power-models", "Metmast", "1"),
                 ),
             ],
         )
@@ -561,18 +564,20 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.blades_edge,
                     "blades",
                     dm.DirectRelationReference("power-models", "Windmill.blades"),
                     "outwards",
+                    dm.ViewId("power-models", "Blade", "1"),
                 ),
                 (
                     self.metmast_edge,
                     "metmast",
                     dm.DirectRelationReference("power-models", "Windmill.metmast"),
                     "outwards",
+                    dm.ViewId("power-models", "Metmast", "1"),
                 ),
             ],
         )

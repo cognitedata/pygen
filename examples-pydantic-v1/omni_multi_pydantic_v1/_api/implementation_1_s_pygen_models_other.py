@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_multi_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Implementation1sPygenModelsOther,
-    Implementation1sPygenModelsOtherApply,
+    Implementation1sPygenModelsOtherWrite,
     Implementation1sPygenModelsOtherFields,
     Implementation1sPygenModelsOtherList,
-    Implementation1sPygenModelsOtherApplyList,
+    Implementation1sPygenModelsOtherWriteList,
     Implementation1sPygenModelsOtherTextFields,
 )
 from omni_multi_pydantic_v1.data_classes._implementation_1_s_pygen_models_other import (
@@ -38,7 +38,7 @@ from .implementation_1_s_pygen_models_other_query import Implementation1sPygenMo
 
 class Implementation1sPygenModelsOtherAPI(
     NodeAPI[
-        Implementation1sPygenModelsOther, Implementation1sPygenModelsOtherApply, Implementation1sPygenModelsOtherList
+        Implementation1sPygenModelsOther, Implementation1sPygenModelsOtherWrite, Implementation1sPygenModelsOtherList
     ]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
@@ -48,7 +48,7 @@ class Implementation1sPygenModelsOtherAPI(
             sources=view_id,
             class_type=Implementation1sPygenModelsOther,
             class_list=Implementation1sPygenModelsOtherList,
-            class_apply_list=Implementation1sPygenModelsOtherApplyList,
+            class_write_list=Implementation1sPygenModelsOtherWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -103,11 +103,11 @@ class Implementation1sPygenModelsOtherAPI(
     def apply(
         self,
         implementation_1_s_pygen_models_other: (
-            Implementation1sPygenModelsOtherApply | Sequence[Implementation1sPygenModelsOtherApply]
+            Implementation1sPygenModelsOtherWrite | Sequence[Implementation1sPygenModelsOtherWrite]
         ),
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) implementation 1 s pygen models others.
 
         Args:
@@ -124,18 +124,19 @@ class Implementation1sPygenModelsOtherAPI(
             Create a new implementation_1_s_pygen_models_other:
 
                 >>> from omni_multi_pydantic_v1 import OmniMultiClient
-                >>> from omni_multi_pydantic_v1.data_classes import Implementation1sPygenModelsOtherApply
+                >>> from omni_multi_pydantic_v1.data_classes import Implementation1sPygenModelsOtherWrite
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherApply(external_id="my_implementation_1_s_pygen_models_other", ...)
+                >>> implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherWrite(external_id="my_implementation_1_s_pygen_models_other", ...)
                 >>> result = client.implementation_1_s_pygen_models_other.apply(implementation_1_s_pygen_models_other)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.implementation_1_s_pygen_models_other.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.implementation_1_s_pygen_models_other.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
