@@ -26,6 +26,9 @@ Changes are grouped as follows
 ### Fixed
 * In the `.list` and `.retrieve` methods if the underlying view has two edges with the same edge type, the
   returning nodes would se the external id of the edges incorrectly. This is now fixed.
+* When having more then `1000` instances the query method, for example, `windmill().query()` would fail to
+  retrieve all nodes that directly relates to the nodes. This is now fixed by increating the query
+  limit to `10000`.
 
 ## [0.99.6] - 08-02-24
 ### Fixed
