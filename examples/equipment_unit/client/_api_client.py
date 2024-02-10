@@ -59,7 +59,7 @@ class EquipmentUnitClient:
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> data_classes.ResourcesApplyResult:
+    ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
         Args:
@@ -89,14 +89,14 @@ class EquipmentUnitClient:
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     def apply(
         self,
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> data_classes.ResourcesApplyResult:
+    ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
         Args:

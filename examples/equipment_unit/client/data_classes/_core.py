@@ -59,7 +59,7 @@ class ResourcesWrite:
 
 
 @dataclass
-class ResourcesApplyResult:
+class ResourcesWriteResult:
     nodes: dm.NodeApplyResultList
     edges: dm.EdgeApplyResultList
     time_series: TimeSeriesList
@@ -151,13 +151,13 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
-    def to_instances_apply(
+    def to_instances_write(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
     ) -> ResourcesWrite:
-        return self._to_instances_apply(set(), view_by_read_class, write_none)
+        return self._to_instances_write(set(), view_by_read_class, write_none)
 
     @abstractmethod
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
@@ -172,7 +172,7 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         return data
 
     @classmethod
-    def from_instance(cls: type[T_DomainModelApply], instance: InstanceApply) -> T_DomainModelApply:
+    def from_instance(cls: type[T_DomainModelWrite], instance: InstanceApply) -> T_DomainModelWrite:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
         node_type = data.pop("type", None)
@@ -196,7 +196,7 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         )
 
 
-T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelWrite)
+T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
 
 
 class CoreList(UserList, Generic[T_DomainModelCore]):
@@ -262,21 +262,21 @@ class DomainModelList(CoreList[T_DomainModelCore]):
 T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covariant=True)
 
 
-class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
+class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
     _PARENT_CLASS = DomainModelWrite
 
-    def to_instances_apply(
+    def to_instances_write(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
     ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_apply(cache, view_by_read_class, write_none)
+            result = node._to_instances_write(cache, view_by_read_class, write_none)
             domains.extend(result)
         return domains
 
 
-T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelApplyList, covariant=True)
+T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
 
 
 class DomainRelation(DomainModelCore):
@@ -383,16 +383,16 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
             cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
-            other_resources = end_node._to_instances_apply(cache, view_by_read_class, write_none)
+            other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelWrite):
-            other_resources = start_node._to_instances_apply(cache, view_by_read_class, write_none)
+            other_resources = start_node._to_instances_write(cache, view_by_read_class, write_none)
             resources.extend(other_resources)
 
         return resources
 
 
-T_DomainRelationApply = TypeVar("T_DomainRelationApply", bound=DomainRelationWrite)
+T_DomainRelationWrite = TypeVar("T_DomainRelationWrite", bound=DomainRelationWrite)
 
 
 class DomainRelationList(CoreList[T_DomainRelation]):

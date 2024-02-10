@@ -12,12 +12,12 @@ from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
     DomainModelWrite,
-    ResourcesApplyResult,
+    ResourcesWriteResult,
     WorkOrder,
     WorkOrderWrite,
     WorkOrderFields,
     WorkOrderList,
-    WorkOrderApplyList,
+    WorkOrderWriteList,
     WorkOrderTextFields,
 )
 from equipment_unit.client.data_classes._work_order import (
@@ -44,7 +44,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             sources=view_id,
             class_type=WorkOrder,
             class_list=WorkOrderList,
-            class_apply_list=WorkOrderApplyList,
+            class_write_list=WorkOrderWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -101,7 +101,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         work_order: WorkOrderWrite | Sequence[WorkOrderWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) work orders.
 
         Args:

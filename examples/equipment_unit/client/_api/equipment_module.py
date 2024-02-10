@@ -12,12 +12,12 @@ from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
     DomainModelWrite,
-    ResourcesApplyResult,
+    ResourcesWriteResult,
     EquipmentModule,
     EquipmentModuleWrite,
     EquipmentModuleFields,
     EquipmentModuleList,
-    EquipmentModuleApplyList,
+    EquipmentModuleWriteList,
     EquipmentModuleTextFields,
 )
 from equipment_unit.client.data_classes._equipment_module import (
@@ -45,7 +45,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             sources=view_id,
             class_type=EquipmentModule,
             class_list=EquipmentModuleList,
-            class_apply_list=EquipmentModuleApplyList,
+            class_write_list=EquipmentModuleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -103,7 +103,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         equipment_module: EquipmentModuleWrite | Sequence[EquipmentModuleWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) equipment modules.
 
         Args:

@@ -7,38 +7,38 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     ResourcesWrite,
-    ResourcesApplyResult,
+    ResourcesWriteResult,
 )
 from ._equipment_module import (
     EquipmentModule,
-    EquipmentModuleWrite,
-    EquipmentModuleApplyList,
     EquipmentModuleFields,
     EquipmentModuleList,
     EquipmentModuleTextFields,
+    EquipmentModuleWrite,
+    EquipmentModuleWriteList,
 )
 from ._start_end_time import (
     StartEndTime,
-    StartEndTimeWrite,
-    StartEndTimeWriteList,
     StartEndTimeFields,
     StartEndTimeList,
+    StartEndTimeWrite,
+    StartEndTimeWriteList,
 )
 from ._unit_procedure import (
     UnitProcedure,
-    UnitProcedureWrite,
-    UnitProcedureApplyList,
     UnitProcedureFields,
     UnitProcedureList,
     UnitProcedureTextFields,
+    UnitProcedureWrite,
+    UnitProcedureWriteList,
 )
 from ._work_order import (
     WorkOrder,
-    WorkOrderWrite,
-    WorkOrderApplyList,
     WorkOrderFields,
     WorkOrderList,
     WorkOrderTextFields,
+    WorkOrderWrite,
+    WorkOrderWriteList,
 )
 
 StartEndTime.model_rebuild()
@@ -55,11 +55,11 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
-    "ResourcesApplyResult",
+    "ResourcesWriteResult",
     "EquipmentModule",
     "EquipmentModuleWrite",
     "EquipmentModuleList",
-    "EquipmentModuleApplyList",
+    "EquipmentModuleWriteList",
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
@@ -70,13 +70,13 @@ __all__ = [
     "UnitProcedure",
     "UnitProcedureWrite",
     "UnitProcedureList",
-    "UnitProcedureApplyList",
+    "UnitProcedureWriteList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
     "WorkOrder",
     "WorkOrderWrite",
     "WorkOrderList",
-    "WorkOrderApplyList",
+    "WorkOrderWriteList",
     "WorkOrderFields",
     "WorkOrderTextFields",
 ]

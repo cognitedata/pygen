@@ -12,12 +12,12 @@ from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
     DomainModelWrite,
-    ResourcesApplyResult,
+    ResourcesWriteResult,
     UnitProcedure,
     UnitProcedureWrite,
     UnitProcedureFields,
     UnitProcedureList,
-    UnitProcedureApplyList,
+    UnitProcedureWriteList,
     UnitProcedureTextFields,
     StartEndTime,
     StartEndTimeWrite,
@@ -49,7 +49,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             sources=view_id,
             class_type=UnitProcedure,
             class_list=UnitProcedureList,
-            class_apply_list=UnitProcedureApplyList,
+            class_write_list=UnitProcedureWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -106,7 +106,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         unit_procedure: UnitProcedureWrite | Sequence[UnitProcedureWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) unit procedures.
 
         Note: This method iterates through all nodes and timeseries linked to unit_procedure and creates them including the edges

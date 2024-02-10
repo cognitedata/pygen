@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -11,7 +12,7 @@ from ._core import (
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
-    DomainModelApplyList,
+    DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
     ResourcesWrite,
@@ -21,7 +22,9 @@ from ._core import (
 __all__ = [
     "WorkOrder",
     "WorkOrderWrite",
+    "WorkOrderApply",
     "WorkOrderList",
+    "WorkOrderWriteList",
     "WorkOrderApplyList",
     "WorkOrderFields",
     "WorkOrderTextFields",
@@ -58,7 +61,7 @@ class WorkOrder(DomainModel):
     performed_by: Optional[str] = Field(None, alias="performedBy")
     type_: Optional[str] = Field(None, alias="type")
 
-    def as_apply(self) -> WorkOrderWrite:
+    def as_write(self) -> WorkOrderWrite:
         """Convert this read version of work order to the writing version."""
         return WorkOrderWrite(
             space=self.space,
@@ -68,6 +71,15 @@ class WorkOrder(DomainModel):
             performed_by=self.performed_by,
             type_=self.type_,
         )
+
+    def as_apply(self) -> WorkOrderWrite:
+        """Convert this read version of work order to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class WorkOrderWrite(DomainModelWrite):
@@ -90,7 +102,7 @@ class WorkOrderWrite(DomainModelWrite):
     performed_by: Optional[str] = Field(None, alias="performedBy")
     type_: Optional[str] = Field(None, alias="type")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
@@ -134,20 +146,44 @@ class WorkOrderWrite(DomainModelWrite):
         return resources
 
 
+class WorkOrderApply(WorkOrderWrite):
+    def __new__(cls, *args, **kwargs) -> WorkOrderApply:
+        warnings.warn(
+            "WorkOrderApply is deprecated and will be removed in v1.0. Use WorkOrderWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "WorkOrder.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class WorkOrderList(DomainModelList[WorkOrder]):
     """List of work orders in the read version."""
 
     _INSTANCE = WorkOrder
 
-    def as_apply(self) -> WorkOrderApplyList:
+    def as_write(self) -> WorkOrderWriteList:
         """Convert these read versions of work order to the writing versions."""
-        return WorkOrderApplyList([node.as_write() for node in self.data])
+        return WorkOrderWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> WorkOrderWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class WorkOrderApplyList(DomainModelApplyList[WorkOrderWrite]):
+class WorkOrderWriteList(DomainModelWriteList[WorkOrderWrite]):
     """List of work orders in the writing version."""
 
     _INSTANCE = WorkOrderWrite
+
+
+class WorkOrderApplyList(WorkOrderWriteList): ...
 
 
 def _create_work_order_filter(
