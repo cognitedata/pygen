@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import re
 import warnings
+from itertools import groupby
 
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
@@ -122,8 +123,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         external_id: str | SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        edge_api_name_type_direction_view_id_penta: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ) -> T_DomainModel | T_DomainModelList | None:
         is_multiple = True
@@ -137,7 +138,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
         if retrieve_edges and nodes:
-            self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_quad)
+            self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_view_id_penta)
 
         if is_multiple:
             return nodes
@@ -317,28 +318,58 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
         return node_list
 
-    @classmethod
     def _retrieve_and_set_edge_types(
-        cls,
+        self,
         nodes: T_DomainModelList,
-        edge_api_name_type_direction_quad: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        edge_api_name_type_direction_view_id_penta: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ):
-        for edge_api, edge_name, edge_type, direction in edge_api_name_type_direction_quad or []:
-            is_type = dm.filters.Equals(
-                ["edge", "type"],
-                {"space": edge_type.space, "externalId": edge_type.external_id},
-            )
-            if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
-                edges = edge_api._list(limit=-1, filter_=is_type)
-            else:
-                is_nodes = dm.filters.In(
-                    ["edge", "startNode"] if direction == "outwards" else ["edge", "endNode"],
-                    values=[id_.dump(camel_case=True, include_instance_type=False) for id_ in ids],
+        for edge_type, values in groupby(edge_api_name_type_direction_view_id_penta or [], lambda x: x[2].as_tuple()):
+            edges: dict[dm.EdgeId, dm.Edge] = {}
+            value_list = list(values)
+            for edge_api, edge_name, edge_type, direction, view_id in value_list:
+                is_type = dm.filters.Equals(
+                    ["edge", "type"],
+                    {"space": edge_type.space, "externalId": edge_type.external_id},
                 )
-                edges = edge_api._list(limit=-1, filter_=dm.filters.And(is_type, is_nodes))
-            cls._set_edges(nodes, edges, edge_name, direction)
+                if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
+                    filter_ = is_type
+                else:
+                    is_nodes = dm.filters.In(
+                        ["edge", "startNode"] if direction == "outwards" else ["edge", "endNode"],
+                        values=[id_.dump(camel_case=True, include_instance_type=False) for id_ in ids],
+                    )
+                    filter_ = dm.filters.And(is_type, is_nodes)
+                result = edge_api._list(limit=-1, filter_=filter_)
+                edges.update({edge.as_id(): edge for edge in result})
+            edge_list = list(edges.values())
+            if len(value_list) == 1:
+                _, edge_name, _, direction, _ = value_list[0]
+                self._set_edges(nodes, edge_list, edge_name, direction)
+            else:
+                # This is an 'edge' case where we have view with multiple edges of the same type.
+                edge_by_end_node: dict[tuple[str, str], list[dm.Edge]] = defaultdict(list)
+                for edge in edge_list:
+                    node_id = edge.end_node.as_tuple() if direction == "outwards" else edge.start_node.as_tuple()
+                    edge_by_end_node[node_id].append(edge)
+
+                for no, (edge_api, edge_name, _, direction, view_id) in enumerate(value_list):
+                    if not edge_by_end_node:
+                        break
+                    if no == len(value_list) - 1:
+                        # Last edge, use all remaining nodes
+                        attribute_edges = [e for e_list in edge_by_end_node.values() for e in e_list]
+                    else:
+                        existing = self._client.data_modeling.instances.retrieve(
+                            nodes=list(edge_by_end_node), sources=view_id
+                        )
+                        attribute_edges = []
+                        for node in existing.nodes:
+                            attribute_edge = edge_by_end_node.pop(node.as_id().as_tuple(), [])
+                            attribute_edges.extend(attribute_edge)
+
+                    self._set_edges(nodes, attribute_edges, edge_name, direction)
 
     @staticmethod
     def _set_edges(

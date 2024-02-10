@@ -48,7 +48,6 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
         # Assert
         assert retrieved.external_id == new_connection_c.external_id
 
-        pytest.skip("Edge case not supported yet")
         # The issue is that there are two edges of the same type. The way we could distinguish between them
         # is to use a hasData filter on the end node.
         assert retrieved.connection_item_a[0] == new_connection_c.connection_item_a[0].external_id

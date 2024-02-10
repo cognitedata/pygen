@@ -186,18 +186,20 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.connection_item_a_edge,
                     "connection_item_a",
                     dm.DirectRelationReference("pygen-models", "unidirectional"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemA", "1"),
                 ),
                 (
                     self.connection_item_b_edge,
                     "connection_item_b",
                     dm.DirectRelationReference("pygen-models", "unidirectional"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
         )
