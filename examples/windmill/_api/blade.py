@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Blade,
     BladeWrite,
     BladeFields,
@@ -45,7 +45,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
             sources=view_id,
             class_type=Blade,
             class_list=BladeList,
-            class_apply_list=BladeWriteList,
+            class_write_list=BladeWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -94,7 +94,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
         blade: BladeWrite | Sequence[BladeWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) blades.
 
         Note: This method iterates through all nodes and timeseries linked to blade and creates them including the edges

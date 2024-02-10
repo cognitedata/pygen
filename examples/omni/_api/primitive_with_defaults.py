@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveWithDefaults,
     PrimitiveWithDefaultsWrite,
     PrimitiveWithDefaultsFields,
@@ -44,7 +44,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             sources=view_id,
             class_type=PrimitiveWithDefaults,
             class_list=PrimitiveWithDefaultsList,
-            class_apply_list=PrimitiveWithDefaultsWriteList,
+            class_write_list=PrimitiveWithDefaultsWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -104,7 +104,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
         primitive_with_default: PrimitiveWithDefaultsWrite | Sequence[PrimitiveWithDefaultsWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive with defaults.
 
         Args:

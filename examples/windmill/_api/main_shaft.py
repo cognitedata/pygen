@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     MainShaft,
     MainShaftWrite,
     MainShaftFields,
@@ -48,7 +48,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             sources=view_id,
             class_type=MainShaft,
             class_list=MainShaftList,
-            class_apply_list=MainShaftWriteList,
+            class_write_list=MainShaftWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -92,7 +92,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
         main_shaft: MainShaftWrite | Sequence[MainShaftWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) main shafts.
 
         Args:

@@ -12,8 +12,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveRequired,
     PrimitiveRequiredWrite,
     PrimitiveRequiredFields,
@@ -45,7 +45,7 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
             sources=view_id,
             class_type=PrimitiveRequired,
             class_list=PrimitiveRequiredList,
-            class_apply_list=PrimitiveRequiredWriteList,
+            class_write_list=PrimitiveRequiredWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -129,7 +129,7 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         primitive_required: PrimitiveRequiredWrite | Sequence[PrimitiveRequiredWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive requireds.
 
         Args:

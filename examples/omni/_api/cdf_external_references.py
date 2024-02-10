@@ -44,7 +44,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             sources=view_id,
             class_type=CDFExternalReferences,
             class_list=CDFExternalReferencesList,
-            class_apply_list=CDFExternalReferencesWriteList,
+            class_write_list=CDFExternalReferencesWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -84,7 +84,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         cdf_external_reference: CDFExternalReferencesWrite | Sequence[CDFExternalReferencesWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) cdf external references.
 
         Args:

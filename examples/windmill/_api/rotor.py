@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Rotor,
     RotorWrite,
     RotorFields,
@@ -45,7 +45,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             sources=view_id,
             class_type=Rotor,
             class_list=RotorList,
-            class_apply_list=RotorWriteList,
+            class_write_list=RotorWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,7 +86,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
         rotor: RotorWrite | Sequence[RotorWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) rotors.
 
         Args:

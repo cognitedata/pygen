@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     SensorPosition,
     SensorPositionWrite,
     SensorPositionFields,
@@ -55,7 +55,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             sources=view_id,
             class_type=SensorPosition,
             class_list=SensorPositionList,
-            class_apply_list=SensorPositionWriteList,
+            class_write_list=SensorPositionWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -112,7 +112,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         sensor_position: SensorPositionWrite | Sequence[SensorPositionWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) sensor positions.
 
         Args:

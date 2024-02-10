@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Nacelle,
     NacelleWrite,
     NacelleFields,
@@ -48,7 +48,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             sources=view_id,
             class_type=Nacelle,
             class_list=NacelleList,
-            class_apply_list=NacelleWriteList,
+            class_write_list=NacelleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -107,7 +107,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
         nacelle: NacelleWrite | Sequence[NacelleWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) nacelles.
 
         Args:

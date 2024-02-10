@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     HighSpeedShaft,
     HighSpeedShaftWrite,
     HighSpeedShaftFields,
@@ -46,7 +46,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             sources=view_id,
             class_type=HighSpeedShaft,
             class_list=HighSpeedShaftList,
-            class_apply_list=HighSpeedShaftWriteList,
+            class_write_list=HighSpeedShaftWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -88,7 +88,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
         high_speed_shaft: HighSpeedShaftWrite | Sequence[HighSpeedShaftWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) high speed shafts.
 
         Args:

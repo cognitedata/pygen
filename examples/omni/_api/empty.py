@@ -12,8 +12,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Empty,
     EmptyWrite,
     EmptyFields,
@@ -45,7 +45,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
             sources=view_id,
             class_type=Empty,
             class_list=EmptyList,
-            class_apply_list=EmptyWriteList,
+            class_write_list=EmptyWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -129,7 +129,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
         empty: EmptyWrite | Sequence[EmptyWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) empties.
 
         Args:

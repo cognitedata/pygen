@@ -12,8 +12,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveNullableListed,
     PrimitiveNullableListedWrite,
     PrimitiveNullableListedFields,
@@ -47,7 +47,7 @@ class PrimitiveNullableListedAPI(
             sources=view_id,
             class_type=PrimitiveNullableListed,
             class_list=PrimitiveNullableListedList,
-            class_apply_list=PrimitiveNullableListedWriteList,
+            class_write_list=PrimitiveNullableListedWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,7 +86,7 @@ class PrimitiveNullableListedAPI(
         primitive_nullable_listed: PrimitiveNullableListedWrite | Sequence[PrimitiveNullableListedWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive nullable listeds.
 
         Args:

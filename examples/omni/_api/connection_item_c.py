@@ -10,8 +10,8 @@ from cognite.client import data_modeling as dm
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ConnectionItemC,
     ConnectionItemCWrite,
     ConnectionItemCList,
@@ -42,7 +42,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
             sources=None,
             class_type=ConnectionItemC,
             class_list=ConnectionItemCList,
-            class_apply_list=ConnectionItemCWriteList,
+            class_write_list=ConnectionItemCWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,7 +83,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         connection_item_c: ConnectionItemCWrite | Sequence[ConnectionItemCWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item cs.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_c and creates them including the edges

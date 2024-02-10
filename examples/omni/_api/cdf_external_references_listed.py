@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     CDFExternalReferencesListed,
     CDFExternalReferencesListedWrite,
     CDFExternalReferencesListedFields,
@@ -46,7 +46,7 @@ class CDFExternalReferencesListedAPI(
             sources=view_id,
             class_type=CDFExternalReferencesListed,
             class_list=CDFExternalReferencesListedList,
-            class_apply_list=CDFExternalReferencesListedWriteList,
+            class_write_list=CDFExternalReferencesListedWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,7 +86,7 @@ class CDFExternalReferencesListedAPI(
         cdf_external_references_listed: CDFExternalReferencesListedWrite | Sequence[CDFExternalReferencesListedWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) cdf external references listeds.
 
         Args:

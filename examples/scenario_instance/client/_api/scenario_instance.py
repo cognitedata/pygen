@@ -12,8 +12,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from scenario_instance.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from scenario_instance.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ScenarioInstance,
     ScenarioInstanceWrite,
     ScenarioInstanceFields,
@@ -46,7 +46,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
             sources=view_id,
             class_type=ScenarioInstance,
             class_list=ScenarioInstanceList,
-            class_apply_list=ScenarioInstanceWriteList,
+            class_write_list=ScenarioInstanceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -128,7 +128,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         scenario_instance: ScenarioInstanceWrite | Sequence[ScenarioInstanceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) scenario instances.
 
         Args:

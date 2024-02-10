@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Generator,
     GeneratorWrite,
     GeneratorFields,
@@ -45,7 +45,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             sources=view_id,
             class_type=Generator,
             class_list=GeneratorList,
-            class_apply_list=GeneratorWriteList,
+            class_write_list=GeneratorWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,7 +86,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
         generator: GeneratorWrite | Sequence[GeneratorWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) generators.
 
         Args:

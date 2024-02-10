@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     MainInterface,
     MainInterfaceWrite,
     MainInterfaceFields,
@@ -44,7 +44,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             sources=view_id,
             class_type=MainInterface,
             class_list=MainInterfaceList,
-            class_apply_list=MainInterfaceWriteList,
+            class_write_list=MainInterfaceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -89,7 +89,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         main_interface: MainInterfaceWrite | Sequence[MainInterfaceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) main interfaces.
 
         Args:

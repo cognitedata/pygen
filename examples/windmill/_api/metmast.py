@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Metmast,
     MetmastWrite,
     MetmastFields,
@@ -46,7 +46,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             sources=view_id,
             class_type=Metmast,
             class_list=MetmastList,
-            class_apply_list=MetmastWriteList,
+            class_write_list=MetmastWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -94,7 +94,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
         metmast: MetmastWrite | Sequence[MetmastWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) metmasts.
 
         Args:

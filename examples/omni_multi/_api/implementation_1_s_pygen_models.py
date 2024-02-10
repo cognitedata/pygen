@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_multi.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Implementation1sPygenModels,
     Implementation1sPygenModelsWrite,
     Implementation1sPygenModelsFields,
@@ -46,7 +46,7 @@ class Implementation1sPygenModelsAPI(
             sources=view_id,
             class_type=Implementation1sPygenModels,
             class_list=Implementation1sPygenModelsList,
-            class_apply_list=Implementation1sPygenModelsWriteList,
+            class_write_list=Implementation1sPygenModelsWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -109,7 +109,7 @@ class Implementation1sPygenModelsAPI(
         implementation_1_s_pygen_model: Implementation1sPygenModelsWrite | Sequence[Implementation1sPygenModelsWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) implementation 1 s pygen models.
 
         Args:

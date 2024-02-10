@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PowerInverter,
     PowerInverterWrite,
     PowerInverterFields,
@@ -46,7 +46,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             sources=view_id,
             class_type=PowerInverter,
             class_list=PowerInverterList,
-            class_apply_list=PowerInverterWriteList,
+            class_write_list=PowerInverterWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -88,7 +88,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         power_inverter: PowerInverterWrite | Sequence[PowerInverterWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) power inverters.
 
         Args:

@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Gearbox,
     GearboxWrite,
     GearboxFields,
@@ -46,7 +46,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
             sources=view_id,
             class_type=Gearbox,
             class_list=GearboxList,
-            class_apply_list=GearboxWriteList,
+            class_write_list=GearboxWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -88,7 +88,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
         gearbox: GearboxWrite | Sequence[GearboxWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) gearboxes.
 
         Args:
