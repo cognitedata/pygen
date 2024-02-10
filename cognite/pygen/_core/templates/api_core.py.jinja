@@ -36,6 +36,8 @@ from {{ top_level_package }}.data_classes._core import (
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
 INSTANCE_QUERY_LIMIT = 1_000
+# This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
+ACTUAL_INSTANCE_QUERY_LIMIT = 10_000
 IN_FILTER_LIMIT = 5_000
 
 Aggregations = Literal["avg", "count", "max", "min", "sum"]
@@ -486,7 +488,7 @@ class QueryStep:
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
-            self.expression.limit = INSTANCE_QUERY_LIMIT
+            self.expression.limit = ACTUAL_INSTANCE_QUERY_LIMIT
         else:
             self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
 
