@@ -212,18 +212,20 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.blades_edge,
                     "blades",
                     dm.DirectRelationReference("power-models", "Windmill.blades"),
                     "outwards",
+                    dm.ViewId("power-models", "Blade", "1"),
                 ),
                 (
                     self.metmast_edge,
                     "metmast",
                     dm.DirectRelationReference("power-models", "Windmill.metmast"),
                     "outwards",
+                    dm.ViewId("power-models", "Metmast", "1"),
                 ),
             ],
         )
@@ -562,18 +564,20 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.blades_edge,
                     "blades",
                     dm.DirectRelationReference("power-models", "Windmill.blades"),
                     "outwards",
+                    dm.ViewId("power-models", "Blade", "1"),
                 ),
                 (
                     self.metmast_edge,
                     "metmast",
                     dm.DirectRelationReference("power-models", "Windmill.metmast"),
                     "outwards",
+                    dm.ViewId("power-models", "Metmast", "1"),
                 ),
             ],
         )

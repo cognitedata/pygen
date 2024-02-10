@@ -195,12 +195,13 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.sensor_positions_edge,
                     "sensor_positions",
                     dm.DirectRelationReference("power-models", "Blade.sensor_positions"),
                     "outwards",
+                    dm.ViewId("power-models", "SensorPosition", "1"),
                 ),
             ],
         )
@@ -469,12 +470,13 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.sensor_positions_edge,
                     "sensor_positions",
                     dm.DirectRelationReference("power-models", "Blade.sensor_positions"),
                     "outwards",
+                    dm.ViewId("power-models", "SensorPosition", "1"),
                 ),
             ],
         )
