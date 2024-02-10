@@ -32,7 +32,7 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni.data_classes import DomainModel, DomainModelWrite
 else:
-    from omni_pydantic_v1.data_classes import DomainModel
+    from omni_pydantic_v1.data_classes import DomainModel, DomainModelWrite
 
 
 def load_field_test_cases():
