@@ -11,10 +11,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     ResourcesApplyResult,
     WorkOrder,
-    WorkOrderApply,
+    WorkOrderWrite,
     WorkOrderFields,
     WorkOrderList,
     WorkOrderApplyList,
@@ -36,7 +36,7 @@ from ._core import (
 from .work_order_query import WorkOrderQueryAPI
 
 
-class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
+class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[WorkOrder]
         super().__init__(
@@ -98,7 +98,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
     def apply(
         self,
-        work_order: WorkOrderApply | Sequence[WorkOrderApply],
+        work_order: WorkOrderWrite | Sequence[WorkOrderWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -118,9 +118,9 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             Create a new work_order:
 
                 >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import WorkOrderApply
+                >>> from equipment_unit.client.data_classes import WorkOrderWrite
                 >>> client = EquipmentUnitClient()
-                >>> work_order = WorkOrderApply(external_id="my_work_order", ...)
+                >>> work_order = WorkOrderWrite(external_id="my_work_order", ...)
                 >>> result = client.work_order.apply(work_order)
 
         """

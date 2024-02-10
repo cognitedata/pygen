@@ -11,16 +11,16 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     ResourcesApplyResult,
     UnitProcedure,
-    UnitProcedureApply,
+    UnitProcedureWrite,
     UnitProcedureFields,
     UnitProcedureList,
     UnitProcedureApplyList,
     UnitProcedureTextFields,
     StartEndTime,
-    StartEndTimeApply,
+    StartEndTimeWrite,
     StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
@@ -41,7 +41,7 @@ from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
 
-class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureList]):
+class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[UnitProcedure]
         super().__init__(
@@ -54,10 +54,10 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         )
         self._view_id = view_id
         self.work_orders_edge = UnitProcedureWorkOrdersAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
         )
         self.work_units_edge = UnitProcedureWorkUnitsAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
         )
 
     def __call__(
@@ -103,7 +103,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     def apply(
         self,
-        unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply],
+        unit_procedure: UnitProcedureWrite | Sequence[UnitProcedureWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -127,9 +127,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             Create a new unit_procedure:
 
                 >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import UnitProcedureApply
+                >>> from equipment_unit.client.data_classes import UnitProcedureWrite
                 >>> client = EquipmentUnitClient()
-                >>> unit_procedure = UnitProcedureApply(external_id="my_unit_procedure", ...)
+                >>> unit_procedure = UnitProcedureWrite(external_id="my_unit_procedure", ...)
                 >>> result = client.unit_procedure.apply(unit_procedure)
 
         """

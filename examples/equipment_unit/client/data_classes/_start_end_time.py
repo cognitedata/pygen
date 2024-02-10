@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,17 +11,25 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     DomainRelation,
-    DomainRelationApply,
+    DomainRelationWrite,
     DomainRelationList,
-    ResourcesApply,
+    ResourcesWrite,
 )
-from ._unit_procedure import UnitProcedureApply
-from ._equipment_module import EquipmentModule, EquipmentModuleApply
-from ._work_order import WorkOrder, WorkOrderApply
+from ._unit_procedure import UnitProcedureWrite
+from ._equipment_module import EquipmentModule, EquipmentModuleWrite
+from ._work_order import WorkOrder, WorkOrderWrite
 
-__all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
+__all__ = [
+    "StartEndTime",
+    "StartEndTimeWrite",
+    "StartEndTimeApply",
+    "StartEndTimeList",
+    "StartEndTimeWriteList",
+    "StartEndTimeApplyList",
+    "StartEndTimeFields",
+]
 
 
 StartEndTimeFields = Literal["end_time", "start_time"]
@@ -49,9 +58,9 @@ class StartEndTime(DomainRelation):
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
-    def as_apply(self) -> StartEndTimeApply:
+    def as_write(self) -> StartEndTimeWrite:
         """Convert this read version of start end time to the writing version."""
-        return StartEndTimeApply(
+        return StartEndTimeWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -60,8 +69,17 @@ class StartEndTime(DomainRelation):
             start_time=self.start_time,
         )
 
+    def as_apply(self) -> StartEndTimeWrite:
+        """Convert this read version of primitive nullable to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class StartEndTimeApply(DomainRelationApply):
+
+class StartEndTimeWrite(DomainRelationWrite):
     """This represents the writing version of start end time.
 
     It is used to when data is sent to CDF.
@@ -76,25 +94,25 @@ class StartEndTimeApply(DomainRelationApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
+    end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        start_node: DomainModelApply,
+        start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
         _validate_end_node(start_node, self.end_node)
 
-        if isinstance(self.end_node, DomainModelApply):
+        if isinstance(self.end_node, DomainModelWrite):
             end_node = self.end_node.as_direct_reference()
         elif isinstance(self.end_node, str):
             end_node = dm.DirectRelationReference(self.space, self.end_node)
@@ -103,7 +121,7 @@ class StartEndTimeApply(DomainRelationApply):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
-        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
+        self.external_id = external_id = DomainRelationWrite.external_id_factory(start_node, end_node, edge_type)
 
         write_view = (view_by_read_class or {}).get(
             StartEndTime, dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
@@ -135,11 +153,23 @@ class StartEndTimeApply(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.end_node, DomainModelApply):
+        if isinstance(self.end_node, DomainModelWrite):
             other_resources = self.end_node._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
+
+
+class StartEndTimeApply(StartEndTimeWrite):
+    def __new__(cls, *args, **kwargs) -> StartEndTimeApply:
+        warnings.warn(
+            "StartEndTimeApply is deprecated and will be removed in v1.0. Use StartEndTimeWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "StartEndTime.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
 
 
 class StartEndTimeList(DomainRelationList[StartEndTime]):
@@ -147,15 +177,27 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
 
     _INSTANCE = StartEndTime
 
-    def as_apply(self) -> StartEndTimeApplyList:
+    def as_write(self) -> StartEndTimeWriteList:
         """Convert this read version of start end time list to the writing version."""
-        return StartEndTimeApplyList([edge.as_apply() for edge in self])
+        return StartEndTimeWriteList([edge.as_write() for edge in self])
+
+    def as_apply(self) -> StartEndTimeWriteList:
+        """Convert these read versions of start end time list to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
+class StartEndTimeWriteList(DomainRelationList[StartEndTimeWrite]):
     """List of start end times in the writing version."""
 
-    _INSTANCE = StartEndTimeApply
+    _INSTANCE = StartEndTimeWrite
+
+
+class StartEndTimeApplyList(StartEndTimeWriteList): ...
 
 
 def _create_start_end_time_filter(
@@ -251,13 +293,13 @@ def _create_start_end_time_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE = {
-    EquipmentModuleApply: {UnitProcedureApply},
-    WorkOrderApply: {UnitProcedureApply},
+    EquipmentModuleWrite: {UnitProcedureWrite},
+    WorkOrderWrite: {UnitProcedureWrite},
 }
 
 
 def _validate_end_node(
-    start_node: DomainModelApply, end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
+    start_node: DomainModelWrite, end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate

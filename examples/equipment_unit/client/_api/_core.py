@@ -18,8 +18,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import (
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainRelationApply,
+    DomainModelWrite,
+    DomainRelationWrite,
     ResourcesApplyResult,
     T_DomainModel,
     T_DomainModelApply,
@@ -383,7 +383,7 @@ class NodeAPI(
     def _apply(
         self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False, write_none: bool = False
     ) -> ResourcesApplyResult:
-        if isinstance(item, DomainModelApply):
+        if isinstance(item, DomainModelWrite):
             instances = item.to_instances_apply(self._view_by_read_class, write_none)
         else:
             instances = self._class_apply_list(item).to_instances_apply(self._view_by_read_class, write_none)

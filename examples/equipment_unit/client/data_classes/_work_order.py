@@ -10,17 +10,17 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     DomainModelApplyList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "WorkOrder",
-    "WorkOrderApply",
+    "WorkOrderWrite",
     "WorkOrderList",
     "WorkOrderApplyList",
     "WorkOrderFields",
@@ -58,9 +58,9 @@ class WorkOrder(DomainModel):
     performed_by: Optional[str] = Field(None, alias="performedBy")
     type_: Optional[str] = Field(None, alias="type")
 
-    def as_apply(self) -> WorkOrderApply:
+    def as_apply(self) -> WorkOrderWrite:
         """Convert this read version of work order to the writing version."""
-        return WorkOrderApply(
+        return WorkOrderWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -70,7 +70,7 @@ class WorkOrder(DomainModel):
         )
 
 
-class WorkOrderApply(DomainModelApply):
+class WorkOrderWrite(DomainModelWrite):
     """This represents the writing version of work order.
 
     It is used to when data is sent to CDF.
@@ -95,8 +95,8 @@ class WorkOrderApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -144,10 +144,10 @@ class WorkOrderList(DomainModelList[WorkOrder]):
         return WorkOrderApplyList([node.as_write() for node in self.data])
 
 
-class WorkOrderApplyList(DomainModelApplyList[WorkOrderApply]):
+class WorkOrderApplyList(DomainModelApplyList[WorkOrderWrite]):
     """List of work orders in the writing version."""
 
-    _INSTANCE = WorkOrderApply
+    _INSTANCE = WorkOrderWrite
 
 
 def _create_work_order_filter(

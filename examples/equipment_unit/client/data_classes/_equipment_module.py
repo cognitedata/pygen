@@ -11,18 +11,18 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     DomainModelApplyList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "EquipmentModule",
-    "EquipmentModuleApply",
+    "EquipmentModuleWrite",
     "EquipmentModuleList",
     "EquipmentModuleApplyList",
     "EquipmentModuleFields",
@@ -63,9 +63,9 @@ class EquipmentModule(DomainModel):
     sensor_value: Union[TimeSeries, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
-    def as_apply(self) -> EquipmentModuleApply:
+    def as_apply(self) -> EquipmentModuleWrite:
         """Convert this read version of equipment module to the writing version."""
-        return EquipmentModuleApply(
+        return EquipmentModuleWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -76,7 +76,7 @@ class EquipmentModule(DomainModel):
         )
 
 
-class EquipmentModuleApply(DomainModelApply):
+class EquipmentModuleWrite(DomainModelWrite):
     """This represents the writing version of equipment module.
 
     It is used to when data is sent to CDF.
@@ -103,8 +103,8 @@ class EquipmentModuleApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -161,10 +161,10 @@ class EquipmentModuleList(DomainModelList[EquipmentModule]):
         return EquipmentModuleApplyList([node.as_write() for node in self.data])
 
 
-class EquipmentModuleApplyList(DomainModelApplyList[EquipmentModuleApply]):
+class EquipmentModuleApplyList(DomainModelApplyList[EquipmentModuleWrite]):
     """List of equipment modules in the writing version."""
 
-    _INSTANCE = EquipmentModuleApply
+    _INSTANCE = EquipmentModuleWrite
 
 
 def _create_equipment_module_filter(

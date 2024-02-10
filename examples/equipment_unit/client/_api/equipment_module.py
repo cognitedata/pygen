@@ -11,10 +11,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     ResourcesApplyResult,
     EquipmentModule,
-    EquipmentModuleApply,
+    EquipmentModuleWrite,
     EquipmentModuleFields,
     EquipmentModuleList,
     EquipmentModuleApplyList,
@@ -37,7 +37,7 @@ from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
 from .equipment_module_query import EquipmentModuleQueryAPI
 
 
-class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, EquipmentModuleList]):
+class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[EquipmentModule]
         super().__init__(
@@ -100,7 +100,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
 
     def apply(
         self,
-        equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply],
+        equipment_module: EquipmentModuleWrite | Sequence[EquipmentModuleWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -120,9 +120,9 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             Create a new equipment_module:
 
                 >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import EquipmentModuleApply
+                >>> from equipment_unit.client.data_classes import EquipmentModuleWrite
                 >>> client = EquipmentUnitClient()
-                >>> equipment_module = EquipmentModuleApply(external_id="my_equipment_module", ...)
+                >>> equipment_module = EquipmentModuleWrite(external_id="my_equipment_module", ...)
                 >>> result = client.equipment_module.apply(equipment_module)
 
         """

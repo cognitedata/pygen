@@ -56,7 +56,7 @@ class EquipmentUnitClient:
 
     def upsert(
         self,
-        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> data_classes.ResourcesApplyResult:
@@ -72,10 +72,10 @@ class EquipmentUnitClient:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
-        if isinstance(items, data_classes.DomainModelApply):
+        if isinstance(items, data_classes.DomainModelWrite):
             instances = items.to_instances_apply(self._view_by_read_class, write_none)
         else:
-            instances = data_classes.ResourcesApply()
+            instances = data_classes.ResourcesWrite()
             for item in items:
                 instances.extend(item.to_instances_apply(self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
@@ -93,7 +93,7 @@ class EquipmentUnitClient:
 
     def apply(
         self,
-        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> data_classes.ResourcesApplyResult:

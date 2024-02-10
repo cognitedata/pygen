@@ -3,15 +3,15 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     ResourcesApplyResult,
 )
 from ._equipment_module import (
     EquipmentModule,
-    EquipmentModuleApply,
+    EquipmentModuleWrite,
     EquipmentModuleApplyList,
     EquipmentModuleFields,
     EquipmentModuleList,
@@ -19,14 +19,14 @@ from ._equipment_module import (
 )
 from ._start_end_time import (
     StartEndTime,
-    StartEndTimeApply,
-    StartEndTimeApplyList,
+    StartEndTimeWrite,
+    StartEndTimeWriteList,
     StartEndTimeFields,
     StartEndTimeList,
 )
 from ._unit_procedure import (
     UnitProcedure,
-    UnitProcedureApply,
+    UnitProcedureWrite,
     UnitProcedureApplyList,
     UnitProcedureFields,
     UnitProcedureList,
@@ -34,7 +34,7 @@ from ._unit_procedure import (
 )
 from ._work_order import (
     WorkOrder,
-    WorkOrderApply,
+    WorkOrderWrite,
     WorkOrderApplyList,
     WorkOrderFields,
     WorkOrderList,
@@ -42,39 +42,39 @@ from ._work_order import (
 )
 
 StartEndTime.model_rebuild()
-StartEndTimeApply.model_rebuild()
+StartEndTimeWrite.model_rebuild()
 UnitProcedure.model_rebuild()
-UnitProcedureApply.model_rebuild()
+UnitProcedureWrite.model_rebuild()
 
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
-    "ResourcesApply",
+    "ResourcesWrite",
     "DomainModel",
     "DomainModelCore",
-    "DomainModelApply",
+    "DomainModelWrite",
     "DomainModelList",
-    "DomainRelationApply",
+    "DomainRelationWrite",
     "ResourcesApplyResult",
     "EquipmentModule",
-    "EquipmentModuleApply",
+    "EquipmentModuleWrite",
     "EquipmentModuleList",
     "EquipmentModuleApplyList",
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
-    "StartEndTimeApply",
+    "StartEndTimeWrite",
     "StartEndTimeList",
-    "StartEndTimeApplyList",
+    "StartEndTimeWriteList",
     "StartEndTimeFields",
     "UnitProcedure",
-    "UnitProcedureApply",
+    "UnitProcedureWrite",
     "UnitProcedureList",
     "UnitProcedureApplyList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
     "WorkOrder",
-    "WorkOrderApply",
+    "WorkOrderWrite",
     "WorkOrderList",
     "WorkOrderApplyList",
     "WorkOrderFields",

@@ -6,7 +6,7 @@ from typing import Literal, Optional, Union
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
+from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelWrite, DomainRelation, DomainRelationWrite, DomainRelationList, ResourcesWrite{% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
 

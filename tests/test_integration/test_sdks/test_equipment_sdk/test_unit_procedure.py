@@ -7,12 +7,12 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from equipment_unit.client.data_classes import (
         EquipmentModule,
-        EquipmentModuleApply,
+        EquipmentModuleWrite,
         StartEndTime,
-        StartEndTimeApply,
         StartEndTimeList,
-        UnitProcedureApply,
+        StartEndTimeWrite,
         UnitProcedureList,
+        UnitProcedureWrite,
     )
 
     from examples.equipment_unit.client import EquipmentUnitClient
@@ -20,11 +20,8 @@ else:
     from equipment_unit_pydantic_v1.client import EquipmentUnitClient
     from equipment_unit_pydantic_v1.client.data_classes import (
         EquipmentModule,
-        EquipmentModuleApply,
         StartEndTime,
-        StartEndTimeApply,
         StartEndTimeList,
-        UnitProcedureApply,
         UnitProcedureList,
     )
 
@@ -84,15 +81,15 @@ def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> N
 
 
 def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_client: CogniteClient) -> None:
-    new_procedure = UnitProcedureApply(
+    new_procedure = UnitProcedureWrite(
         external_id="procedure:new_procedure",
         name="New procedure",
         type_="New type",
         work_units=[
-            StartEndTimeApply(
+            StartEndTimeWrite(
                 start_time="2021-01-01T00:00:00Z",
                 end_time="2021-01-01T00:00:00Z",
-                end_node=EquipmentModuleApply(
+                end_node=EquipmentModuleWrite(
                     external_id="module:new_module",
                     name="New module",
                     type_="New type",
