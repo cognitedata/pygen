@@ -12,9 +12,9 @@ from ._core import (
 from ._scenario_instance import (
     ScenarioInstance,
     ScenarioInstanceApply,
+    ScenarioInstanceApplyList,
     ScenarioInstanceFields,
     ScenarioInstanceList,
-    ScenarioInstanceListApplyList,
     ScenarioInstanceTextFields,
     ScenarioInstanceWrite,
     ScenarioInstanceWriteList,

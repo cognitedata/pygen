@@ -12,9 +12,9 @@ from ._core import (
 from ._equipment_module import (
     EquipmentModule,
     EquipmentModuleApply,
+    EquipmentModuleApplyList,
     EquipmentModuleFields,
     EquipmentModuleList,
-    EquipmentModuleListApplyList,
     EquipmentModuleTextFields,
     EquipmentModuleWrite,
     EquipmentModuleWriteList,
@@ -22,18 +22,18 @@ from ._equipment_module import (
 from ._start_end_time import (
     StartEndTime,
     StartEndTimeApply,
+    StartEndTimeApplyList,
     StartEndTimeFields,
     StartEndTimeList,
-    StartEndTimeListApplyList,
     StartEndTimeWrite,
     StartEndTimeWriteList,
 )
 from ._unit_procedure import (
     UnitProcedure,
     UnitProcedureApply,
+    UnitProcedureApplyList,
     UnitProcedureFields,
     UnitProcedureList,
-    UnitProcedureListApplyList,
     UnitProcedureTextFields,
     UnitProcedureWrite,
     UnitProcedureWriteList,
@@ -41,9 +41,9 @@ from ._unit_procedure import (
 from ._work_order import (
     WorkOrder,
     WorkOrderApply,
+    WorkOrderApplyList,
     WorkOrderFields,
     WorkOrderList,
-    WorkOrderListApplyList,
     WorkOrderTextFields,
     WorkOrderWrite,
     WorkOrderWriteList,

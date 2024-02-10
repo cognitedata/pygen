@@ -12,9 +12,9 @@ from ._core import (
 from ._blade import (
     Blade,
     BladeApply,
+    BladeApplyList,
     BladeFields,
     BladeList,
-    BladeListApplyList,
     BladeTextFields,
     BladeWrite,
     BladeWriteList,
@@ -22,82 +22,82 @@ from ._blade import (
 from ._gearbox import (
     Gearbox,
     GearboxApply,
+    GearboxApplyList,
     GearboxFields,
     GearboxList,
-    GearboxListApplyList,
     GearboxWrite,
     GearboxWriteList,
 )
 from ._generator import (
     Generator,
     GeneratorApply,
+    GeneratorApplyList,
     GeneratorFields,
     GeneratorList,
-    GeneratorListApplyList,
     GeneratorWrite,
     GeneratorWriteList,
 )
 from ._high_speed_shaft import (
     HighSpeedShaft,
     HighSpeedShaftApply,
+    HighSpeedShaftApplyList,
     HighSpeedShaftFields,
     HighSpeedShaftList,
-    HighSpeedShaftListApplyList,
     HighSpeedShaftWrite,
     HighSpeedShaftWriteList,
 )
 from ._main_shaft import (
     MainShaft,
     MainShaftApply,
+    MainShaftApplyList,
     MainShaftFields,
     MainShaftList,
-    MainShaftListApplyList,
     MainShaftWrite,
     MainShaftWriteList,
 )
 from ._metmast import (
     Metmast,
     MetmastApply,
+    MetmastApplyList,
     MetmastFields,
     MetmastList,
-    MetmastListApplyList,
     MetmastWrite,
     MetmastWriteList,
 )
 from ._nacelle import (
     Nacelle,
     NacelleApply,
+    NacelleApplyList,
     NacelleFields,
     NacelleList,
-    NacelleListApplyList,
     NacelleWrite,
     NacelleWriteList,
 )
 from ._power_inverter import (
     PowerInverter,
     PowerInverterApply,
+    PowerInverterApplyList,
     PowerInverterFields,
     PowerInverterList,
-    PowerInverterListApplyList,
     PowerInverterWrite,
     PowerInverterWriteList,
 )
-from ._rotor import Rotor, RotorApply, RotorFields, RotorList, RotorListApplyList, RotorWrite, RotorWriteList
+from ._rotor import Rotor, RotorApply, RotorApplyList, RotorFields, RotorList, RotorWrite, RotorWriteList
 from ._sensor_position import (
     SensorPosition,
     SensorPositionApply,
+    SensorPositionApplyList,
     SensorPositionFields,
     SensorPositionList,
-    SensorPositionListApplyList,
     SensorPositionWrite,
     SensorPositionWriteList,
 )
 from ._windmill import (
     Windmill,
     WindmillApply,
+    WindmillApplyList,
     WindmillFields,
     WindmillList,
-    WindmillListApplyList,
     WindmillTextFields,
     WindmillWrite,
     WindmillWriteList,
