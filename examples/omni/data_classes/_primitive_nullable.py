@@ -220,9 +220,18 @@ class PrimitiveNullableList(DomainModelList[PrimitiveNullable]):
 
     _INSTANCE = PrimitiveNullable
 
-    def as_apply(self) -> PrimitiveNullableWriteList:
+    def as_write(self) -> PrimitiveNullableWriteList:
         """Convert these read versions of primitive nullable to the writing versions."""
         return PrimitiveNullableWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PrimitiveNullableWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class PrimitiveNullableWriteList(DomainModelWriteList[PrimitiveNullableWrite]):

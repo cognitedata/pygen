@@ -1,6 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
+import warnings
 {% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Any, Literal, Optional, Union{% else %}from typing import Any, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
@@ -12,11 +13,11 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
+    DomainRelationWrite,
+    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
@@ -25,7 +26,7 @@ if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}"{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
@@ -51,14 +52,23 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}):
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 {% if data_class.is_writable or data_class.is_interface %}
-    def as_apply(self) -> {{ data_class.write_name }}:
+    def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}
-            {{ field.name }}={{ field.as_apply() }},{% endfor %}
+            {{ field.name }}={{ field.as_write() }},{% endfor %}
         )
+
+    def as_apply(self) -> {{ data_class.write_name }}:
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}):
@@ -76,15 +86,15 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
+    ) -> ResourcesWrite:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
-        resources = ResourcesApply()
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources{% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         cache.add(self.as_tuple_id())
@@ -176,21 +186,45 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
 {% endfor %}
         return resources
 
+
+class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
+    def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
+        warnings.warn(
+            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. Use {{ data_class.write_name }} instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "{{ data_class.read_name }}.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
 {% endif %}
 class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the read version."""
 
     _INSTANCE = {{ data_class.read_name }}
 {% if data_class.is_writable or data_class.is_interface %}
-    def as_apply(self) -> {{ data_class.write_list_name }}:
+    def as_write(self) -> {{ data_class.write_list_name }}:
         """Convert these read versions of {{ data_class.doc_name }} to the writing versions."""
         return {{ data_class.write_list_name }}([node.as_write() for node in self.data])
 
+    def as_apply(self) -> {{ data_class.write_list_name }}:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_name }}]):
+
+class {{ data_class.write_list_name }}(DomainModelWriteList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
+
+class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
+
 {% endif %}
 
 def {{ data_class.filter_name }}(
