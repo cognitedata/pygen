@@ -196,12 +196,13 @@ class DependentOnNonWritableAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.to_non_writable_edge,
                     "to_non_writable",
                     dm.DirectRelationReference("pygen-models", "toNonWritable"),
                     "outwards",
+                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
                 ),
             ],
         )
@@ -458,12 +459,13 @@ class DependentOnNonWritableAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.to_non_writable_edge,
                     "to_non_writable",
                     dm.DirectRelationReference("pygen-models", "toNonWritable"),
                     "outwards",
+                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
                 ),
             ],
         )
