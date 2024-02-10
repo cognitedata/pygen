@@ -210,9 +210,11 @@ class DataClass:
         import_classes = [self.read_name]
         if self.is_writable:
             import_classes.append(self.write_name)
+            import_classes.append(f"{self.read_name}Apply")
         import_classes.append(self.read_list_name)
         if self.is_writable:
             import_classes.append(self.write_list_name)
+            import_classes.append(f"{self.read_list_name}ApplyList")
         if self.has_field_of_type(PrimitiveFieldCore):
             import_classes.append(self.field_names)
         if self.has_primitive_field_of_type(dm.Text):

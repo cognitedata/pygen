@@ -11,40 +11,50 @@ from ._core import (
 )
 from ._implementation_1_s_pygen_models import (
     Implementation1sPygenModels,
+    Implementation1sPygenModelsApply,
     Implementation1sPygenModelsFields,
     Implementation1sPygenModelsList,
+    Implementation1sPygenModelsListApplyList,
     Implementation1sPygenModelsTextFields,
     Implementation1sPygenModelsWrite,
     Implementation1sPygenModelsWriteList,
 )
 from ._implementation_1_s_pygen_models_other import (
     Implementation1sPygenModelsOther,
+    Implementation1sPygenModelsOtherApply,
     Implementation1sPygenModelsOtherFields,
     Implementation1sPygenModelsOtherList,
+    Implementation1sPygenModelsOtherListApplyList,
     Implementation1sPygenModelsOtherTextFields,
     Implementation1sPygenModelsOtherWrite,
     Implementation1sPygenModelsOtherWriteList,
 )
 from ._implementation_1_v_2 import (
     Implementation1v2,
+    Implementation1v2Apply,
     Implementation1v2Fields,
     Implementation1v2List,
+    Implementation1v2ListApplyList,
     Implementation1v2TextFields,
     Implementation1v2Write,
     Implementation1v2WriteList,
 )
 from ._main_interface import (
     MainInterface,
+    MainInterfaceApply,
     MainInterfaceFields,
     MainInterfaceList,
+    MainInterfaceListApplyList,
     MainInterfaceTextFields,
     MainInterfaceWrite,
     MainInterfaceWriteList,
 )
 from ._sub_interface import (
     SubInterface,
+    SubInterfaceApply,
     SubInterfaceFields,
     SubInterfaceList,
+    SubInterfaceListApplyList,
     SubInterfaceTextFields,
     SubInterfaceWrite,
     SubInterfaceWriteList,

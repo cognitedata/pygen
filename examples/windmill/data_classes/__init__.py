@@ -9,35 +9,99 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
 )
-from ._blade import Blade, BladeFields, BladeList, BladeTextFields, BladeWrite, BladeWriteList
-from ._gearbox import Gearbox, GearboxFields, GearboxList, GearboxWrite, GearboxWriteList
-from ._generator import Generator, GeneratorFields, GeneratorList, GeneratorWrite, GeneratorWriteList
+from ._blade import (
+    Blade,
+    BladeApply,
+    BladeFields,
+    BladeList,
+    BladeListApplyList,
+    BladeTextFields,
+    BladeWrite,
+    BladeWriteList,
+)
+from ._gearbox import (
+    Gearbox,
+    GearboxApply,
+    GearboxFields,
+    GearboxList,
+    GearboxListApplyList,
+    GearboxWrite,
+    GearboxWriteList,
+)
+from ._generator import (
+    Generator,
+    GeneratorApply,
+    GeneratorFields,
+    GeneratorList,
+    GeneratorListApplyList,
+    GeneratorWrite,
+    GeneratorWriteList,
+)
 from ._high_speed_shaft import (
     HighSpeedShaft,
+    HighSpeedShaftApply,
     HighSpeedShaftFields,
     HighSpeedShaftList,
+    HighSpeedShaftListApplyList,
     HighSpeedShaftWrite,
     HighSpeedShaftWriteList,
 )
-from ._main_shaft import MainShaft, MainShaftFields, MainShaftList, MainShaftWrite, MainShaftWriteList
-from ._metmast import Metmast, MetmastFields, MetmastList, MetmastWrite, MetmastWriteList
-from ._nacelle import Nacelle, NacelleFields, NacelleList, NacelleWrite, NacelleWriteList
+from ._main_shaft import (
+    MainShaft,
+    MainShaftApply,
+    MainShaftFields,
+    MainShaftList,
+    MainShaftListApplyList,
+    MainShaftWrite,
+    MainShaftWriteList,
+)
+from ._metmast import (
+    Metmast,
+    MetmastApply,
+    MetmastFields,
+    MetmastList,
+    MetmastListApplyList,
+    MetmastWrite,
+    MetmastWriteList,
+)
+from ._nacelle import (
+    Nacelle,
+    NacelleApply,
+    NacelleFields,
+    NacelleList,
+    NacelleListApplyList,
+    NacelleWrite,
+    NacelleWriteList,
+)
 from ._power_inverter import (
     PowerInverter,
+    PowerInverterApply,
     PowerInverterFields,
     PowerInverterList,
+    PowerInverterListApplyList,
     PowerInverterWrite,
     PowerInverterWriteList,
 )
-from ._rotor import Rotor, RotorFields, RotorList, RotorWrite, RotorWriteList
+from ._rotor import Rotor, RotorApply, RotorFields, RotorList, RotorListApplyList, RotorWrite, RotorWriteList
 from ._sensor_position import (
     SensorPosition,
+    SensorPositionApply,
     SensorPositionFields,
     SensorPositionList,
+    SensorPositionListApplyList,
     SensorPositionWrite,
     SensorPositionWriteList,
 )
-from ._windmill import Windmill, WindmillFields, WindmillList, WindmillTextFields, WindmillWrite, WindmillWriteList
+from ._windmill import (
+    Windmill,
+    WindmillApply,
+    WindmillFields,
+    WindmillList,
+    WindmillListApplyList,
+    WindmillTextFields,
+    WindmillWrite,
+    WindmillWriteList,
+)
 
 Blade.model_rebuild()
 BladeWrite.model_rebuild()
