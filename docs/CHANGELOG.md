@@ -23,6 +23,9 @@ Changes are grouped as follows
   does not have to be unique. This is a potential breaking change, but since `pygen` is still in beta, it is
   allowed.
 
+### Fixed
+* In the `.list` and `.retrieve` methods if the underlying view has two edges with the same edge type, the
+  returning nodes would se the external id of the edges incorrectly. This is now fixed.
 
 ## [0.99.6] - 08-02-24
 ### Fixed

@@ -182,12 +182,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+            edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
                     self.{{ edge_api.parent_attribute }},
                     "{{ edge_api.field_name }}",
                     dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
                     "{{ edge_api.direction }}",
+                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
                 ),{% endfor %}
                                                ]
         )
@@ -403,12 +404,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+            edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
                     self.{{ edge_api.parent_attribute }},
                     "{{ edge_api.field_name }}",
                     dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
                     "{{ edge_api.direction }}",
+                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
                 ),{% endfor %}
                                                ]
         )

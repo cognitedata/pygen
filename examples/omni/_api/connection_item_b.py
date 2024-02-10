@@ -196,18 +196,20 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.inwards_edge,
                     "inwards",
                     dm.DirectRelationReference("pygen-models", "bidirectional"),
                     "inwards",
+                    dm.ViewId("pygen-models", "ConnectionItemA", "1"),
                 ),
                 (
                     self.self_edge_edge,
                     "self_edge",
                     dm.DirectRelationReference("pygen-models", "reflexive"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
         )
@@ -462,18 +464,20 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.inwards_edge,
                     "inwards",
                     dm.DirectRelationReference("pygen-models", "bidirectional"),
                     "inwards",
+                    dm.ViewId("pygen-models", "ConnectionItemA", "1"),
                 ),
                 (
                     self.self_edge_edge,
                     "self_edge",
                     dm.DirectRelationReference("pygen-models", "reflexive"),
                     "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
         )
