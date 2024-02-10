@@ -65,7 +65,7 @@ class DataClass:
 
     @staticmethod
     def to_base_name(view: dm.View) -> str:
-        return (view.name or view.external_id).replace(" ", "_")
+        return view.external_id.replace(" ", "_")
 
     @classmethod
     def to_base_name_with_version(cls, view: dm.View) -> str:
