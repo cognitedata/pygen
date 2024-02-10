@@ -64,13 +64,13 @@ class StartEndTime(DomainRelation):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
+            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,
         )
 
     def as_apply(self) -> StartEndTimeWrite:
-        """Convert this read version of primitive nullable to the writing version."""
+        """Convert this read version of start end time to the writing version."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -154,7 +154,7 @@ class StartEndTimeWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_apply(cache, view_by_read_class)
+            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
