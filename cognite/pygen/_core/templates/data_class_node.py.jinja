@@ -159,7 +159,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
 {% for field in data_class.fields_of_type(ft.EdgeOneToManyEdges) %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationWrite):
-                other_resources = {{ field.variable }}._to_instances_apply(
+                other_resources = {{ field.variable }}._to_instances_write(
                     cache,
                     self,
                     dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),

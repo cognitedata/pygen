@@ -149,7 +149,7 @@ class UnitProcedureWrite(DomainModelWrite):
 
         for work_order in self.work_orders or []:
             if isinstance(work_order, DomainRelationWrite):
-                other_resources = work_order._to_instances_apply(
+                other_resources = work_order._to_instances_write(
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
@@ -159,7 +159,7 @@ class UnitProcedureWrite(DomainModelWrite):
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, DomainRelationWrite):
-                other_resources = work_unit._to_instances_apply(
+                other_resources = work_unit._to_instances_write(
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),

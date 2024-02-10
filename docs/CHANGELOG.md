@@ -19,6 +19,7 @@ Changes are grouped as follows
   to use the `name` of the view if it was set, however, that can lead to name collisions as `name` for views
   does not have to be unique. This is a potential breaking change, but since `pygen` is still in beta, it is
   allowed.
+* The `apply` method
 
 ## [0.99.6] - 08-02-24
 ### Fixed
