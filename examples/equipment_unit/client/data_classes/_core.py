@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping
@@ -156,6 +157,16 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     ) -> ResourcesWrite:
         return self._to_instances_write(set(), view_by_read_class, write_none)
 
+    def to_instances_apply(
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+    ) -> ResourcesWrite:
+        warnings.warn(
+            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.to_instances_write(view_by_read_class, write_none)
+
     @abstractmethod
     def _to_instances_write(
         self,
@@ -274,6 +285,16 @@ class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
             result = node._to_instances_write(cache, view_by_read_class, write_none)
             domains.extend(result)
         return domains
+
+    def to_instances_apply(
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+    ) -> ResourcesWrite:
+        warnings.warn(
+            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.to_instances_write(view_by_read_class, write_none)
 
 
 T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)

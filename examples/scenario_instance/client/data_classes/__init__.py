@@ -31,8 +31,10 @@ __all__ = [
     "ResourcesWriteResult",
     "ScenarioInstance",
     "ScenarioInstanceWrite",
+    "ScenarioInstanceApply",
     "ScenarioInstanceList",
     "ScenarioInstanceWriteList",
+    "ScenarioInstanceApplyList",
     "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
 ]

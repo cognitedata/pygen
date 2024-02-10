@@ -380,7 +380,7 @@ class NodeAPI(
         super().__init__(client, sources, class_type, class_list, view_by_read_class)
         self._class_write_list = class_write_list
 
-    def _write(
+    def _apply(
         self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False
     ) -> ResourcesWriteResult:
         if isinstance(item, DomainModelWrite):

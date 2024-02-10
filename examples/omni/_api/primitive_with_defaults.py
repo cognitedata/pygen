@@ -137,7 +137,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             UserWarning,
             stacklevel=2,
         )
-        return self._write(primitive_with_default, replace, write_none)
+        return self._apply(primitive_with_default, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
