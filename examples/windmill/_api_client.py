@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Sequence
 
@@ -76,7 +77,7 @@ class WindmillClient:
         self.sensor_position = SensorPositionAPI(client, view_by_read_class)
         self.windmill = WindmillAPI(client, view_by_read_class)
 
-    def apply(
+    def upsert(
         self,
         items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
         replace: bool = False,
@@ -112,6 +113,33 @@ class WindmillClient:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
         return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+
+    def apply(
+        self,
+        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> data_classes.ResourcesApplyResult:
+        """Add or update (upsert) items.
+
+        Args:
+            items: One or more instances of the pygen generated data classes.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        """
+        warnings.warn(
+            "The .apply method is deprecated and will be removed in v1.0. "
+            "Please use the .upsert method on the instead."
+            "The motivation is that .upsert is a more descriptive name for the operation.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.upsert(items, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
