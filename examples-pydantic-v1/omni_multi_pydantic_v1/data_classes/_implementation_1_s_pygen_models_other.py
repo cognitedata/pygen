@@ -141,7 +141,7 @@ class Implementation1sPygenModelsOtherList(DomainModelList[Implementation1sPygen
 
     def as_apply(self) -> Implementation1sPygenModelsOtherApplyList:
         """Convert these read versions of implementation 1 s pygen models other to the writing versions."""
-        return Implementation1sPygenModelsOtherApplyList([node.as_apply() for node in self.data])
+        return Implementation1sPygenModelsOtherApplyList([node.as_write() for node in self.data])
 
 
 class Implementation1sPygenModelsOtherApplyList(DomainModelApplyList[Implementation1sPygenModelsOtherApply]):

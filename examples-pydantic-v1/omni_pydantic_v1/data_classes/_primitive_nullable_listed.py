@@ -198,7 +198,7 @@ class PrimitiveNullableListedList(DomainModelList[PrimitiveNullableListed]):
 
     def as_apply(self) -> PrimitiveNullableListedApplyList:
         """Convert these read versions of primitive nullable listed to the writing versions."""
-        return PrimitiveNullableListedApplyList([node.as_apply() for node in self.data])
+        return PrimitiveNullableListedApplyList([node.as_write() for node in self.data])
 
 
 class PrimitiveNullableListedApplyList(DomainModelApplyList[PrimitiveNullableListedApply]):

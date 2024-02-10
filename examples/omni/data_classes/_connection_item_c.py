@@ -138,7 +138,7 @@ class ConnectionItemCList(DomainModelList[ConnectionItemC]):
 
     def as_apply(self) -> ConnectionItemCWriteList:
         """Convert these read versions of connection item c to the writing versions."""
-        return ConnectionItemCWriteList([node.as_apply() for node in self.data])
+        return ConnectionItemCWriteList([node.as_write() for node in self.data])
 
 
 class ConnectionItemCWriteList(DomainModelWriteList[ConnectionItemCWrite]):

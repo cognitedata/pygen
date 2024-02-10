@@ -145,7 +145,7 @@ class BladeList(DomainModelList[Blade]):
 
     def as_apply(self) -> BladeApplyList:
         """Convert these read versions of blade to the writing versions."""
-        return BladeApplyList([node.as_apply() for node in self.data])
+        return BladeApplyList([node.as_write() for node in self.data])
 
 
 class BladeApplyList(DomainModelApplyList[BladeApply]):

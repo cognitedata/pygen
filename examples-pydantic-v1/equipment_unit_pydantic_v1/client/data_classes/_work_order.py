@@ -141,7 +141,7 @@ class WorkOrderList(DomainModelList[WorkOrder]):
 
     def as_apply(self) -> WorkOrderApplyList:
         """Convert these read versions of work order to the writing versions."""
-        return WorkOrderApplyList([node.as_apply() for node in self.data])
+        return WorkOrderApplyList([node.as_write() for node in self.data])
 
 
 class WorkOrderApplyList(DomainModelApplyList[WorkOrderApply]):

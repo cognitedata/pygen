@@ -279,7 +279,7 @@ class NacelleList(DomainModelList[Nacelle]):
 
     def as_apply(self) -> NacelleApplyList:
         """Convert these read versions of nacelle to the writing versions."""
-        return NacelleApplyList([node.as_apply() for node in self.data])
+        return NacelleApplyList([node.as_write() for node in self.data])
 
 
 class NacelleApplyList(DomainModelApplyList[NacelleApply]):

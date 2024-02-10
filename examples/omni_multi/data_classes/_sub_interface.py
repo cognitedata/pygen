@@ -127,7 +127,7 @@ class SubInterfaceList(DomainModelList[SubInterface]):
 
     def as_apply(self) -> SubInterfaceApplyList:
         """Convert these read versions of sub interface to the writing versions."""
-        return SubInterfaceApplyList([node.as_apply() for node in self.data])
+        return SubInterfaceApplyList([node.as_write() for node in self.data])
 
 
 class SubInterfaceApplyList(DomainModelApplyList[SubInterfaceApply]):

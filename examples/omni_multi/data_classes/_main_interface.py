@@ -121,7 +121,7 @@ class MainInterfaceList(DomainModelList[MainInterface]):
 
     def as_apply(self) -> MainInterfaceApplyList:
         """Convert these read versions of main interface to the writing versions."""
-        return MainInterfaceApplyList([node.as_apply() for node in self.data])
+        return MainInterfaceApplyList([node.as_write() for node in self.data])
 
 
 class MainInterfaceApplyList(DomainModelApplyList[MainInterfaceApply]):

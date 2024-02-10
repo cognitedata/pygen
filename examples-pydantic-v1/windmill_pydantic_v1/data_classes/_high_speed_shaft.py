@@ -157,7 +157,7 @@ class HighSpeedShaftList(DomainModelList[HighSpeedShaft]):
 
     def as_apply(self) -> HighSpeedShaftApplyList:
         """Convert these read versions of high speed shaft to the writing versions."""
-        return HighSpeedShaftApplyList([node.as_apply() for node in self.data])
+        return HighSpeedShaftApplyList([node.as_write() for node in self.data])
 
 
 class HighSpeedShaftApplyList(DomainModelApplyList[HighSpeedShaftApply]):

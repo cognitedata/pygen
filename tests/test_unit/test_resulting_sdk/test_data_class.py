@@ -43,7 +43,7 @@ class TestToFromInstances:
         read_cls = omni_data_classes[view_id.external_id].read
 
         domain_node = read_cls.from_instance(node)
-        domain_apply_node = domain_node.as_apply()
+        domain_apply_node = domain_node.as_write()
         domain_apply_node.to_pandas()
 
         resources = domain_apply_node.to_instances_apply()

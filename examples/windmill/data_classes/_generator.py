@@ -148,7 +148,7 @@ class GeneratorList(DomainModelList[Generator]):
 
     def as_apply(self) -> GeneratorApplyList:
         """Convert these read versions of generator to the writing versions."""
-        return GeneratorApplyList([node.as_apply() for node in self.data])
+        return GeneratorApplyList([node.as_write() for node in self.data])
 
 
 class GeneratorApplyList(DomainModelApplyList[GeneratorApply]):

@@ -187,7 +187,7 @@ class EmptyList(DomainModelList[Empty]):
 
     def as_apply(self) -> EmptyApplyList:
         """Convert these read versions of empty to the writing versions."""
-        return EmptyApplyList([node.as_apply() for node in self.data])
+        return EmptyApplyList([node.as_write() for node in self.data])
 
 
 class EmptyApplyList(DomainModelApplyList[EmptyApply]):

@@ -151,7 +151,7 @@ class GearboxList(DomainModelList[Gearbox]):
 
     def as_apply(self) -> GearboxApplyList:
         """Convert these read versions of gearbox to the writing versions."""
-        return GearboxApplyList([node.as_apply() for node in self.data])
+        return GearboxApplyList([node.as_write() for node in self.data])
 
 
 class GearboxApplyList(DomainModelApplyList[GearboxApply]):

@@ -152,7 +152,7 @@ class ConnectionItemBList(DomainModelList[ConnectionItemB]):
 
     def as_apply(self) -> ConnectionItemBApplyList:
         """Convert these read versions of connection item b to the writing versions."""
-        return ConnectionItemBApplyList([node.as_apply() for node in self.data])
+        return ConnectionItemBApplyList([node.as_write() for node in self.data])
 
 
 class ConnectionItemBApplyList(DomainModelApplyList[ConnectionItemBApply]):

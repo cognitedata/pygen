@@ -151,7 +151,7 @@ class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
 
     def as_apply(self) -> DependentOnNonWritableWriteList:
         """Convert these read versions of dependent on non writable to the writing versions."""
-        return DependentOnNonWritableWriteList([node.as_apply() for node in self.data])
+        return DependentOnNonWritableWriteList([node.as_write() for node in self.data])
 
 
 class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritableWrite]):

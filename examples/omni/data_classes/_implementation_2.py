@@ -125,7 +125,7 @@ class Implementation2List(DomainModelList[Implementation2]):
 
     def as_apply(self) -> Implementation2WriteList:
         """Convert these read versions of implementation 2 to the writing versions."""
-        return Implementation2WriteList([node.as_apply() for node in self.data])
+        return Implementation2WriteList([node.as_write() for node in self.data])
 
 
 class Implementation2WriteList(DomainModelWriteList[Implementation2Apply]):

@@ -194,7 +194,7 @@ class WindmillList(DomainModelList[Windmill]):
 
     def as_apply(self) -> WindmillApplyList:
         """Convert these read versions of windmill to the writing versions."""
-        return WindmillApplyList([node.as_apply() for node in self.data])
+        return WindmillApplyList([node.as_write() for node in self.data])
 
 
 class WindmillApplyList(DomainModelApplyList[WindmillApply]):

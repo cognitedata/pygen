@@ -127,7 +127,7 @@ def deploy():
         # Containers
         containers = example_sdk.load_containers(data_model_id)
         existing_containers = client.data_modeling.containers.retrieve(containers.as_ids())
-        new, changed, unchanged = _difference(existing_containers.as_apply(), containers)
+        new, changed, unchanged = _difference(existing_containers.as_write(), containers)
         if changed:
             raise ValueError(f"Containers {changed.as_ids()} require data migration")
         new_containers = client.data_modeling.containers.apply(new)
@@ -139,7 +139,7 @@ def deploy():
         # Views
         views = example_sdk.load_views(data_model_id)
         existing_views = client.data_modeling.views.retrieve(views.as_ids())
-        new, changed, unchanged = _difference(existing_views.as_apply(), views)
+        new, changed, unchanged = _difference(existing_views.as_write(), views)
         is_views_changed = bool(changed or new)
         if changed:
             client.data_modeling.views.delete(changed.as_ids())
@@ -155,7 +155,7 @@ def deploy():
         if not existing_data_models:
             is_changed = True
         else:
-            is_changed = existing_data_models.latest_version().as_apply() != data_model
+            is_changed = existing_data_models.latest_version().as_write() != data_model
         if is_changed or is_views_changed:
             client.data_modeling.data_models.delete(data_model_id)
             new_model = client.data_modeling.data_models.apply(data_model)

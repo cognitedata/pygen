@@ -160,7 +160,7 @@ class MetmastList(DomainModelList[Metmast]):
 
     def as_apply(self) -> MetmastApplyList:
         """Convert these read versions of metmast to the writing versions."""
-        return MetmastApplyList([node.as_apply() for node in self.data])
+        return MetmastApplyList([node.as_write() for node in self.data])
 
 
 class MetmastApplyList(DomainModelApplyList[MetmastApply]):

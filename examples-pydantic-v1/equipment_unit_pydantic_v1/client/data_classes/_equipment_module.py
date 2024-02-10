@@ -157,7 +157,7 @@ class EquipmentModuleList(DomainModelList[EquipmentModule]):
 
     def as_apply(self) -> EquipmentModuleApplyList:
         """Convert these read versions of equipment module to the writing versions."""
-        return EquipmentModuleApplyList([node.as_apply() for node in self.data])
+        return EquipmentModuleApplyList([node.as_write() for node in self.data])
 
 
 class EquipmentModuleApplyList(DomainModelApplyList[EquipmentModuleApply]):

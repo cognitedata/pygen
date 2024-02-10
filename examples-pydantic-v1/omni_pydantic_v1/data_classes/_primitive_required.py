@@ -198,7 +198,7 @@ class PrimitiveRequiredList(DomainModelList[PrimitiveRequired]):
 
     def as_apply(self) -> PrimitiveRequiredApplyList:
         """Convert these read versions of primitive required to the writing versions."""
-        return PrimitiveRequiredApplyList([node.as_apply() for node in self.data])
+        return PrimitiveRequiredApplyList([node.as_write() for node in self.data])
 
 
 class PrimitiveRequiredApplyList(DomainModelApplyList[PrimitiveRequiredApply]):

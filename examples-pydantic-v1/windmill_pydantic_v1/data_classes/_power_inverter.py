@@ -157,7 +157,7 @@ class PowerInverterList(DomainModelList[PowerInverter]):
 
     def as_apply(self) -> PowerInverterApplyList:
         """Convert these read versions of power inverter to the writing versions."""
-        return PowerInverterApplyList([node.as_apply() for node in self.data])
+        return PowerInverterApplyList([node.as_write() for node in self.data])
 
 
 class PowerInverterApplyList(DomainModelApplyList[PowerInverterApply]):

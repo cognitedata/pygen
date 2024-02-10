@@ -197,7 +197,7 @@ class ScenarioInstanceList(DomainModelList[ScenarioInstance]):
 
     def as_apply(self) -> ScenarioInstanceApplyList:
         """Convert these read versions of scenario instance to the writing versions."""
-        return ScenarioInstanceApplyList([node.as_apply() for node in self.data])
+        return ScenarioInstanceApplyList([node.as_write() for node in self.data])
 
 
 class ScenarioInstanceApplyList(DomainModelApplyList[ScenarioInstanceApply]):

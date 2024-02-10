@@ -161,7 +161,7 @@ class PrimitiveWithDefaultsList(DomainModelList[PrimitiveWithDefaults]):
 
     def as_apply(self) -> PrimitiveWithDefaultsWriteList:
         """Convert these read versions of primitive with default to the writing versions."""
-        return PrimitiveWithDefaultsWriteList([node.as_apply() for node in self.data])
+        return PrimitiveWithDefaultsWriteList([node.as_write() for node in self.data])
 
 
 class PrimitiveWithDefaultsWriteList(DomainModelWriteList[PrimitiveWithDefaultsWrite]):

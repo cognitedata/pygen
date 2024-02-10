@@ -184,7 +184,7 @@ class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}
 {% if data_class.is_writable or data_class.is_interface %}
     def as_apply(self) -> {{ data_class.write_list_name }}:
         """Convert these read versions of {{ data_class.doc_name }} to the writing versions."""
-        return {{ data_class.write_list_name }}([node.as_apply() for node in self.data])
+        return {{ data_class.write_list_name }}([node.as_write() for node in self.data])
 
 
 class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_name }}]):

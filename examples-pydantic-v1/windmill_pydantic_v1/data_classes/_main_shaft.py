@@ -187,7 +187,7 @@ class MainShaftList(DomainModelList[MainShaft]):
 
     def as_apply(self) -> MainShaftApplyList:
         """Convert these read versions of main shaft to the writing versions."""
-        return MainShaftApplyList([node.as_apply() for node in self.data])
+        return MainShaftApplyList([node.as_write() for node in self.data])
 
 
 class MainShaftApplyList(DomainModelApplyList[MainShaftApply]):

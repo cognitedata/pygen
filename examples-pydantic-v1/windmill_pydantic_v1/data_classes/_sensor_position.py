@@ -284,7 +284,7 @@ class SensorPositionList(DomainModelList[SensorPosition]):
 
     def as_apply(self) -> SensorPositionApplyList:
         """Convert these read versions of sensor position to the writing versions."""
-        return SensorPositionApplyList([node.as_apply() for node in self.data])
+        return SensorPositionApplyList([node.as_write() for node in self.data])
 
 
 class SensorPositionApplyList(DomainModelApplyList[SensorPositionApply]):

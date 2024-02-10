@@ -165,7 +165,7 @@ class UnitProcedureList(DomainModelList[UnitProcedure]):
 
     def as_apply(self) -> UnitProcedureApplyList:
         """Convert these read versions of unit procedure to the writing versions."""
-        return UnitProcedureApplyList([node.as_apply() for node in self.data])
+        return UnitProcedureApplyList([node.as_write() for node in self.data])
 
 
 class UnitProcedureApplyList(DomainModelApplyList[UnitProcedureApply]):
