@@ -142,14 +142,14 @@ class ConnectionItemBWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for inward in self.inwards or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=inward, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("pygen-models", "reflexive")
         for self_edge in self.self_edge or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=self, end_node=self_edge, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)

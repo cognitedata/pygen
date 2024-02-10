@@ -183,23 +183,23 @@ class WindmillWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.blades")
         for blade in self.blades or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=self, end_node=blade, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.metmast")
         for metmast in self.metmast or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=self, end_node=metmast, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
-        if isinstance(self.nacelle, DomainModelApply):
+        if isinstance(self.nacelle, DomainModelWrite):
             other_resources = self.nacelle._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.rotor, DomainModelApply):
+        if isinstance(self.rotor, DomainModelWrite):
             other_resources = self.rotor._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 

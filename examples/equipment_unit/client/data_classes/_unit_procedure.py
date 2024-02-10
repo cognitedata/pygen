@@ -148,7 +148,7 @@ class UnitProcedureWrite(DomainModelWrite):
             cache.add(self.as_tuple_id())
 
         for work_order in self.work_orders or []:
-            if isinstance(work_order, DomainRelationApply):
+            if isinstance(work_order, DomainRelationWrite):
                 other_resources = work_order._to_instances_apply(
                     cache,
                     self,
@@ -158,7 +158,7 @@ class UnitProcedureWrite(DomainModelWrite):
                 resources.extend(other_resources)
 
         for work_unit in self.work_units or []:
-            if isinstance(work_unit, DomainRelationApply):
+            if isinstance(work_unit, DomainRelationWrite):
                 other_resources = work_unit._to_instances_apply(
                     cache,
                     self,

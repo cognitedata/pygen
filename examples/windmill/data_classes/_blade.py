@@ -145,7 +145,7 @@ class BladeWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("power-models", "Blade.sensor_positions")
         for sensor_position in self.sensor_positions or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=sensor_position,

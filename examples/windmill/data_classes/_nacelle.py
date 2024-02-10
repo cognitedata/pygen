@@ -254,23 +254,23 @@ class NacelleWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.gearbox, DomainModelApply):
+        if isinstance(self.gearbox, DomainModelWrite):
             other_resources = self.gearbox._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.generator, DomainModelApply):
+        if isinstance(self.generator, DomainModelWrite):
             other_resources = self.generator._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.high_speed_shaft, DomainModelApply):
+        if isinstance(self.high_speed_shaft, DomainModelWrite):
             other_resources = self.high_speed_shaft._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.main_shaft, DomainModelApply):
+        if isinstance(self.main_shaft, DomainModelWrite):
             other_resources = self.main_shaft._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.power_inverter, DomainModelApply):
+        if isinstance(self.power_inverter, DomainModelWrite):
             other_resources = self.power_inverter._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 

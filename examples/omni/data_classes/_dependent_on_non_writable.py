@@ -144,7 +144,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "toNonWritable")
         for to_non_writable in self.to_non_writable or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=to_non_writable,

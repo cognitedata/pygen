@@ -125,7 +125,7 @@ class ConnectionItemCWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_a in self.connection_item_a or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=connection_item_a,
@@ -136,7 +136,7 @@ class ConnectionItemCWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_b in self.connection_item_b or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=connection_item_b,
