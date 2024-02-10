@@ -306,7 +306,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         filter: dm.Filter,
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
         ) = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list(

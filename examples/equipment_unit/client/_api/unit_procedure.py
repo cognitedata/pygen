@@ -207,18 +207,20 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.work_orders_edge,
                     "work_orders",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
                 ),
                 (
                     self.work_units_edge,
                     "work_units",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
                 ),
             ],
         )
@@ -501,18 +503,20 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_quad=[
+            edge_api_name_type_direction_view_id_penta=[
                 (
                     self.work_orders_edge,
                     "work_orders",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
                 ),
                 (
                     self.work_units_edge,
                     "work_units",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
                     "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
                 ),
             ],
         )
