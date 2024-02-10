@@ -305,8 +305,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         limit: int,
         filter: dm.Filter,
         retrieve_edges: bool = False,
-        edge_api_name_type_direction_quad: (
-            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
+        edge_api_name_type_direction_view_id_penta: (
+            list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list(
@@ -314,7 +314,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         )
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:
-            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_quad)
+            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_view_id_penta)
 
         return node_list
 
