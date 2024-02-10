@@ -14,10 +14,10 @@ from omni_multi.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Implementation1v2,
-    Implementation1v2Apply,
+    Implementation1v2Write,
     Implementation1v2Fields,
     Implementation1v2List,
-    Implementation1v2ApplyList,
+    Implementation1v2WriteList,
     Implementation1v2TextFields,
 )
 from omni_multi.data_classes._implementation_1_v_2 import (
@@ -36,7 +36,7 @@ from ._core import (
 from .implementation_1_v_2_query import Implementation1v2QueryAPI
 
 
-class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Apply, Implementation1v2List]):
+class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Implementation1v2List]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1v2]
         super().__init__(
@@ -44,7 +44,7 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Apply, Im
             sources=view_id,
             class_type=Implementation1v2,
             class_list=Implementation1v2List,
-            class_apply_list=Implementation1v2ApplyList,
+            class_apply_list=Implementation1v2WriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -98,7 +98,7 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Apply, Im
 
     def apply(
         self,
-        implementation_1_v_2: Implementation1v2Apply | Sequence[Implementation1v2Apply],
+        implementation_1_v_2: Implementation1v2Write | Sequence[Implementation1v2Write],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -118,9 +118,9 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Apply, Im
             Create a new implementation_1_v_2:
 
                 >>> from omni_multi import OmniMultiClient
-                >>> from omni_multi.data_classes import Implementation1v2Apply
+                >>> from omni_multi.data_classes import Implementation1v2Write
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_2 = Implementation1v2Apply(external_id="my_implementation_1_v_2", ...)
+                >>> implementation_1_v_2 = Implementation1v2Write(external_id="my_implementation_1_v_2", ...)
                 >>> result = client.implementation_1_v_2.apply(implementation_1_v_2)
 
         """

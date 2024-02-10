@@ -14,10 +14,10 @@ from omni_multi.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     MainInterface,
-    MainInterfaceApply,
+    MainInterfaceWrite,
     MainInterfaceFields,
     MainInterfaceList,
-    MainInterfaceApplyList,
+    MainInterfaceWriteList,
     MainInterfaceTextFields,
 )
 from omni_multi.data_classes._main_interface import (
@@ -36,7 +36,7 @@ from ._core import (
 from .main_interface_query import MainInterfaceQueryAPI
 
 
-class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceList]):
+class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[MainInterface]
         super().__init__(
@@ -44,7 +44,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             sources=view_id,
             class_type=MainInterface,
             class_list=MainInterfaceList,
-            class_apply_list=MainInterfaceApplyList,
+            class_apply_list=MainInterfaceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -86,7 +86,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
 
     def apply(
         self,
-        main_interface: MainInterfaceApply | Sequence[MainInterfaceApply],
+        main_interface: MainInterfaceWrite | Sequence[MainInterfaceWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -106,9 +106,9 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             Create a new main_interface:
 
                 >>> from omni_multi import OmniMultiClient
-                >>> from omni_multi.data_classes import MainInterfaceApply
+                >>> from omni_multi.data_classes import MainInterfaceWrite
                 >>> client = OmniMultiClient()
-                >>> main_interface = MainInterfaceApply(external_id="my_main_interface", ...)
+                >>> main_interface = MainInterfaceWrite(external_id="my_main_interface", ...)
                 >>> result = client.main_interface.apply(main_interface)
 
         """

@@ -11,10 +11,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
+    DomainModelApply,
+    ResourcesApplyResult,
     SubInterface,
-    SubInterfaceApply,
+    SubInterfaceWrite,
     SubInterfaceFields,
     SubInterfaceList,
     SubInterfaceWriteList,
@@ -36,7 +36,7 @@ from ._core import (
 from .sub_interface_query import SubInterfaceQueryAPI
 
 
-class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]):
+class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[SubInterface]
         super().__init__(
@@ -92,10 +92,10 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
 
     def apply(
         self,
-        sub_interface: SubInterfaceApply | Sequence[SubInterfaceApply],
+        sub_interface: SubInterfaceWrite | Sequence[SubInterfaceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesWriteResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) sub interfaces.
 
         Args:
@@ -112,9 +112,9 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             Create a new sub_interface:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import SubInterfaceApply
+                >>> from omni.data_classes import SubInterfaceWrite
                 >>> client = OmniClient()
-                >>> sub_interface = SubInterfaceApply(external_id="my_sub_interface", ...)
+                >>> sub_interface = SubInterfaceWrite(external_id="my_sub_interface", ...)
                 >>> result = client.sub_interface.apply(sub_interface)
 
         """

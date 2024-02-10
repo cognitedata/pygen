@@ -15,10 +15,10 @@ from scenario_instance.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     ScenarioInstance,
-    ScenarioInstanceApply,
+    ScenarioInstanceWrite,
     ScenarioInstanceFields,
     ScenarioInstanceList,
-    ScenarioInstanceApplyList,
+    ScenarioInstanceWriteList,
     ScenarioInstanceTextFields,
 )
 from scenario_instance.client.data_classes._scenario_instance import (
@@ -38,7 +38,7 @@ from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
 from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 
-class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
+class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ScenarioInstance]
         super().__init__(
@@ -46,7 +46,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             sources=view_id,
             class_type=ScenarioInstance,
             class_list=ScenarioInstanceList,
-            class_apply_list=ScenarioInstanceApplyList,
+            class_apply_list=ScenarioInstanceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -125,7 +125,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def apply(
         self,
-        scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply],
+        scenario_instance: ScenarioInstanceWrite | Sequence[ScenarioInstanceWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -145,9 +145,9 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             Create a new scenario_instance:
 
                 >>> from scenario_instance.client import ScenarioInstanceClient
-                >>> from scenario_instance.client.data_classes import ScenarioInstanceApply
+                >>> from scenario_instance.client.data_classes import ScenarioInstanceWrite
                 >>> client = ScenarioInstanceClient()
-                >>> scenario_instance = ScenarioInstanceApply(external_id="my_scenario_instance", ...)
+                >>> scenario_instance = ScenarioInstanceWrite(external_id="my_scenario_instance", ...)
                 >>> result = client.scenario_instance.apply(scenario_instance)
 
         """

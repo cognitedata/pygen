@@ -11,8 +11,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
+    DomainModelApply,
+    ResourcesApplyResult,
     DependentOnNonWritable,
     DependentOnNonWritableWrite,
     DependentOnNonWritableFields,
@@ -93,7 +93,7 @@ class DependentOnNonWritableAPI(
         dependent_on_non_writable: DependentOnNonWritableWrite | Sequence[DependentOnNonWritableWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesWriteResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) dependent on non writables.
 
         Note: This method iterates through all nodes and timeseries linked to dependent_on_non_writable and creates them including the edges

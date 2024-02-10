@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,21 +11,30 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._blade import Blade, BladeApply
-    from ._metmast import Metmast, MetmastApply
-    from ._nacelle import Nacelle, NacelleApply
-    from ._rotor import Rotor, RotorApply
+    from ._blade import Blade, BladeWrite
+    from ._metmast import Metmast, MetmastWrite
+    from ._nacelle import Nacelle, NacelleWrite
+    from ._rotor import Rotor, RotorWrite
 
 
-__all__ = ["Windmill", "WindmillApply", "WindmillList", "WindmillApplyList", "WindmillFields", "WindmillTextFields"]
+__all__ = [
+    "Windmill",
+    "WindmillWrite",
+    "WindmillApply",
+    "WindmillList",
+    "WindmillWriteList",
+    "WindmillApplyList",
+    "WindmillFields",
+    "WindmillTextFields",
+]
 
 
 WindmillTextFields = Literal["name", "windfarm"]
@@ -65,25 +75,34 @@ class Windmill(DomainModel):
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
     windfarm: Optional[str] = None
 
-    def as_apply(self) -> WindmillApply:
+    def as_write(self) -> WindmillWrite:
         """Convert this read version of windmill to the writing version."""
-        return WindmillApply(
+        return WindmillWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=[blade.as_apply() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[
-                metmast.as_apply() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
             ],
-            nacelle=self.nacelle.as_apply() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_apply() if isinstance(self.rotor, DomainModel) else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
             windfarm=self.windfarm,
         )
 
+    def as_apply(self) -> WindmillWrite:
+        """Convert this read version of windmill to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class WindmillApply(DomainModelApply):
+
+class WindmillWrite(DomainModelWrite):
     """This represents the writing version of windmill.
 
     It is used to when data is sent to CDF.
@@ -103,21 +122,21 @@ class WindmillApply(DomainModelApply):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[BladeApply], list[str], None] = Field(default=None, repr=False)
+    blades: Union[list[BladeWrite], list[str], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[MetmastApply], list[str], None] = Field(default=None, repr=False)
-    nacelle: Union[NacelleApply, str, dm.NodeId, None] = Field(None, repr=False)
+    metmast: Union[list[MetmastWrite], list[str], None] = Field(default=None, repr=False)
+    nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
-    rotor: Union[RotorApply, str, dm.NodeId, None] = Field(None, repr=False)
+    rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(None, repr=False)
     windfarm: Optional[str] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -177,14 +196,26 @@ class WindmillApply(DomainModelApply):
             resources.extend(other_resources)
 
         if isinstance(self.nacelle, DomainModelApply):
-            other_resources = self.nacelle._to_instances_apply(cache, view_by_read_class)
+            other_resources = self.nacelle._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         if isinstance(self.rotor, DomainModelApply):
-            other_resources = self.rotor._to_instances_apply(cache, view_by_read_class)
+            other_resources = self.rotor._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
+
+
+class WindmillApply(WindmillWrite):
+    def __new__(cls, *args, **kwargs) -> WindmillApply:
+        warnings.warn(
+            "WindmillApply is deprecated and will be removed in v1.0. Use WindmillWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Windmill.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
 
 
 class WindmillList(DomainModelList[Windmill]):
@@ -192,15 +223,27 @@ class WindmillList(DomainModelList[Windmill]):
 
     _INSTANCE = Windmill
 
-    def as_apply(self) -> WindmillApplyList:
+    def as_write(self) -> WindmillWriteList:
         """Convert these read versions of windmill to the writing versions."""
-        return WindmillApplyList([node.as_write() for node in self.data])
+        return WindmillWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> WindmillWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class WindmillApplyList(DomainModelApplyList[WindmillApply]):
+class WindmillWriteList(DomainModelWriteList[WindmillWrite]):
     """List of windmills in the writing version."""
 
-    _INSTANCE = WindmillApply
+    _INSTANCE = WindmillWrite
+
+
+class WindmillApplyList(WindmillWriteList): ...
 
 
 def _create_windmill_filter(

@@ -14,10 +14,10 @@ from omni_multi.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Implementation1sPygenModels,
-    Implementation1sPygenModelsApply,
+    Implementation1sPygenModelsWrite,
     Implementation1sPygenModelsFields,
     Implementation1sPygenModelsList,
-    Implementation1sPygenModelsApplyList,
+    Implementation1sPygenModelsWriteList,
     Implementation1sPygenModelsTextFields,
 )
 from omni_multi.data_classes._implementation_1_s_pygen_models import (
@@ -37,7 +37,7 @@ from .implementation_1_s_pygen_models_query import Implementation1sPygenModelsQu
 
 
 class Implementation1sPygenModelsAPI(
-    NodeAPI[Implementation1sPygenModels, Implementation1sPygenModelsApply, Implementation1sPygenModelsList]
+    NodeAPI[Implementation1sPygenModels, Implementation1sPygenModelsWrite, Implementation1sPygenModelsList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1sPygenModels]
@@ -46,7 +46,7 @@ class Implementation1sPygenModelsAPI(
             sources=view_id,
             class_type=Implementation1sPygenModels,
             class_list=Implementation1sPygenModelsList,
-            class_apply_list=Implementation1sPygenModelsApplyList,
+            class_apply_list=Implementation1sPygenModelsWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -106,7 +106,7 @@ class Implementation1sPygenModelsAPI(
 
     def apply(
         self,
-        implementation_1_s_pygen_model: Implementation1sPygenModelsApply | Sequence[Implementation1sPygenModelsApply],
+        implementation_1_s_pygen_model: Implementation1sPygenModelsWrite | Sequence[Implementation1sPygenModelsWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -126,9 +126,9 @@ class Implementation1sPygenModelsAPI(
             Create a new implementation_1_s_pygen_model:
 
                 >>> from omni_multi import OmniMultiClient
-                >>> from omni_multi.data_classes import Implementation1sPygenModelsApply
+                >>> from omni_multi.data_classes import Implementation1sPygenModelsWrite
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_model = Implementation1sPygenModelsApply(external_id="my_implementation_1_s_pygen_model", ...)
+                >>> implementation_1_s_pygen_model = Implementation1sPygenModelsWrite(external_id="my_implementation_1_s_pygen_model", ...)
                 >>> result = client.implementation_1_s_pygen_models.apply(implementation_1_s_pygen_model)
 
         """

@@ -11,10 +11,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
+    DomainModelApply,
+    ResourcesApplyResult,
     Implementation2,
-    Implementation2Apply,
+    Implementation2Write,
     Implementation2Fields,
     Implementation2List,
     Implementation2WriteList,
@@ -36,7 +36,7 @@ from ._core import (
 from .implementation_2_query import Implementation2QueryAPI
 
 
-class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implementation2List]):
+class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation2]
         super().__init__(
@@ -92,10 +92,10 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
 
     def apply(
         self,
-        implementation_2: Implementation2Apply | Sequence[Implementation2Apply],
+        implementation_2: Implementation2Write | Sequence[Implementation2Write],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesWriteResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) implementation 2.
 
         Args:
@@ -112,9 +112,9 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
             Create a new implementation_2:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import Implementation2Apply
+                >>> from omni.data_classes import Implementation2Write
                 >>> client = OmniClient()
-                >>> implementation_2 = Implementation2Apply(external_id="my_implementation_2", ...)
+                >>> implementation_2 = Implementation2Write(external_id="my_implementation_2", ...)
                 >>> result = client.implementation_2.apply(implementation_2)
 
         """

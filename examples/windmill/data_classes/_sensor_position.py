@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,19 +11,21 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "SensorPosition",
+    "SensorPositionWrite",
     "SensorPositionApply",
     "SensorPositionList",
+    "SensorPositionWriteList",
     "SensorPositionApplyList",
     "SensorPositionFields",
     "SensorPositionTextFields",
@@ -96,9 +99,9 @@ class SensorPosition(DomainModel):
     flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
     position: Optional[float] = None
 
-    def as_apply(self) -> SensorPositionApply:
+    def as_write(self) -> SensorPositionWrite:
         """Convert this read version of sensor position to the writing version."""
-        return SensorPositionApply(
+        return SensorPositionWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -113,8 +116,17 @@ class SensorPosition(DomainModel):
             position=self.position,
         )
 
+    def as_apply(self) -> SensorPositionWrite:
+        """Convert this read version of sensor position to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class SensorPositionApply(DomainModelApply):
+
+class SensorPositionWrite(DomainModelWrite):
     """This represents the writing version of sensor position.
 
     It is used to when data is sent to CDF.
@@ -146,13 +158,13 @@ class SensorPositionApply(DomainModelApply):
     flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
     position: Optional[float] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -278,20 +290,44 @@ class SensorPositionApply(DomainModelApply):
         return resources
 
 
+class SensorPositionApply(SensorPositionWrite):
+    def __new__(cls, *args, **kwargs) -> SensorPositionApply:
+        warnings.warn(
+            "SensorPositionApply is deprecated and will be removed in v1.0. Use SensorPositionWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "SensorPosition.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class SensorPositionList(DomainModelList[SensorPosition]):
     """List of sensor positions in the read version."""
 
     _INSTANCE = SensorPosition
 
-    def as_apply(self) -> SensorPositionApplyList:
+    def as_write(self) -> SensorPositionWriteList:
         """Convert these read versions of sensor position to the writing versions."""
-        return SensorPositionApplyList([node.as_write() for node in self.data])
+        return SensorPositionWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> SensorPositionWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class SensorPositionApplyList(DomainModelApplyList[SensorPositionApply]):
+class SensorPositionWriteList(DomainModelWriteList[SensorPositionWrite]):
     """List of sensor positions in the writing version."""
 
-    _INSTANCE = SensorPositionApply
+    _INSTANCE = SensorPositionWrite
+
+
+class SensorPositionApplyList(SensorPositionWriteList): ...
 
 
 def _create_sensor_position_filter(

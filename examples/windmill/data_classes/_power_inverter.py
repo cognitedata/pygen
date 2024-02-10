@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,19 +11,21 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "PowerInverter",
+    "PowerInverterWrite",
     "PowerInverterApply",
     "PowerInverterList",
+    "PowerInverterWriteList",
     "PowerInverterApplyList",
     "PowerInverterFields",
     "PowerInverterTextFields",
@@ -59,9 +62,9 @@ class PowerInverter(DomainModel):
     apparent_power_total: Union[TimeSeries, str, None] = None
     reactive_power_total: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> PowerInverterApply:
+    def as_write(self) -> PowerInverterWrite:
         """Convert this read version of power inverter to the writing version."""
-        return PowerInverterApply(
+        return PowerInverterWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -70,8 +73,17 @@ class PowerInverter(DomainModel):
             reactive_power_total=self.reactive_power_total,
         )
 
+    def as_apply(self) -> PowerInverterWrite:
+        """Convert this read version of power inverter to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class PowerInverterApply(DomainModelApply):
+
+class PowerInverterWrite(DomainModelWrite):
     """This represents the writing version of power inverter.
 
     It is used to when data is sent to CDF.
@@ -91,13 +103,13 @@ class PowerInverterApply(DomainModelApply):
     apparent_power_total: Union[TimeSeries, str, None] = None
     reactive_power_total: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -151,20 +163,44 @@ class PowerInverterApply(DomainModelApply):
         return resources
 
 
+class PowerInverterApply(PowerInverterWrite):
+    def __new__(cls, *args, **kwargs) -> PowerInverterApply:
+        warnings.warn(
+            "PowerInverterApply is deprecated and will be removed in v1.0. Use PowerInverterWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "PowerInverter.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class PowerInverterList(DomainModelList[PowerInverter]):
     """List of power inverters in the read version."""
 
     _INSTANCE = PowerInverter
 
-    def as_apply(self) -> PowerInverterApplyList:
+    def as_write(self) -> PowerInverterWriteList:
         """Convert these read versions of power inverter to the writing versions."""
-        return PowerInverterApplyList([node.as_write() for node in self.data])
+        return PowerInverterWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PowerInverterWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class PowerInverterApplyList(DomainModelApplyList[PowerInverterApply]):
+class PowerInverterWriteList(DomainModelWriteList[PowerInverterWrite]):
     """List of power inverters in the writing version."""
 
-    _INSTANCE = PowerInverterApply
+    _INSTANCE = PowerInverterWrite
+
+
+class PowerInverterApplyList(PowerInverterWriteList): ...
 
 
 def _create_power_inverter_filter(

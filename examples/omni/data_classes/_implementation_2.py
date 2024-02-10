@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -16,14 +17,16 @@ from ._core import (
     DomainRelationWrite,
     ResourcesWrite,
 )
-from ._sub_interface import SubInterface, SubInterfaceApply
+from ._sub_interface import SubInterface, SubInterfaceWrite
 
 
 __all__ = [
     "Implementation2",
+    "Implementation2Write",
     "Implementation2Apply",
     "Implementation2List",
     "Implementation2WriteList",
+    "Implementation2ApplyList",
     "Implementation2Fields",
     "Implementation2TextFields",
 ]
@@ -53,9 +56,9 @@ class Implementation2(SubInterface):
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
 
-    def as_apply(self) -> Implementation2Apply:
+    def as_write(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""
-        return Implementation2Apply(
+        return Implementation2Write(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -63,8 +66,17 @@ class Implementation2(SubInterface):
             sub_value=self.sub_value,
         )
 
+    def as_apply(self) -> Implementation2Write:
+        """Convert this read version of implementation 2 to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class Implementation2Apply(SubInterfaceApply):
+
+class Implementation2Write(SubInterfaceWrite):
     """This represents the writing version of implementation 2.
 
     It is used to when data is sent to CDF.
@@ -118,20 +130,44 @@ class Implementation2Apply(SubInterfaceApply):
         return resources
 
 
+class Implementation2Apply(Implementation2Write):
+    def __new__(cls, *args, **kwargs) -> Implementation2Apply:
+        warnings.warn(
+            "Implementation2Apply is deprecated and will be removed in v1.0. Use Implementation2Write instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Implementation2.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class Implementation2List(DomainModelList[Implementation2]):
     """List of implementation 2 in the read version."""
 
     _INSTANCE = Implementation2
 
-    def as_apply(self) -> Implementation2WriteList:
+    def as_write(self) -> Implementation2WriteList:
         """Convert these read versions of implementation 2 to the writing versions."""
         return Implementation2WriteList([node.as_write() for node in self.data])
 
+    def as_apply(self) -> Implementation2WriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class Implementation2WriteList(DomainModelWriteList[Implementation2Apply]):
+
+class Implementation2WriteList(DomainModelWriteList[Implementation2Write]):
     """List of implementation 2 in the writing version."""
 
-    _INSTANCE = Implementation2Apply
+    _INSTANCE = Implementation2Write
+
+
+class Implementation2ApplyList(Implementation2WriteList): ...
 
 
 def _create_implementation_2_filter(

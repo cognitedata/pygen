@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -19,7 +20,16 @@ from ._core import (
 )
 
 
-__all__ = ["Empty", "EmptyWrite", "EmptyList", "EmptyWriteList", "EmptyFields", "EmptyTextFields"]
+__all__ = [
+    "Empty",
+    "EmptyWrite",
+    "EmptyApply",
+    "EmptyList",
+    "EmptyWriteList",
+    "EmptyApplyList",
+    "EmptyFields",
+    "EmptyTextFields",
+]
 
 
 EmptyTextFields = Literal["text"]
@@ -70,7 +80,7 @@ class Empty(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-    def as_apply(self) -> EmptyWrite:
+    def as_write(self) -> EmptyWrite:
         """Convert this read version of empty to the writing version."""
         return EmptyWrite(
             space=self.space,
@@ -86,6 +96,15 @@ class Empty(DomainModel):
             text=self.text,
             timestamp=self.timestamp,
         )
+
+    def as_apply(self) -> EmptyWrite:
+        """Convert this read version of empty to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class EmptyWrite(DomainModelWrite):
@@ -180,20 +199,44 @@ class EmptyWrite(DomainModelWrite):
         return resources
 
 
+class EmptyApply(EmptyWrite):
+    def __new__(cls, *args, **kwargs) -> EmptyApply:
+        warnings.warn(
+            "EmptyApply is deprecated and will be removed in v1.0. Use EmptyWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Empty.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class EmptyList(DomainModelList[Empty]):
     """List of empties in the read version."""
 
     _INSTANCE = Empty
 
-    def as_apply(self) -> EmptyWriteList:
+    def as_write(self) -> EmptyWriteList:
         """Convert these read versions of empty to the writing versions."""
         return EmptyWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> EmptyWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class EmptyWriteList(DomainModelWriteList[EmptyWrite]):
     """List of empties in the writing version."""
 
     _INSTANCE = EmptyWrite
+
+
+class EmptyApplyList(EmptyWriteList): ...
 
 
 def _create_empty_filter(

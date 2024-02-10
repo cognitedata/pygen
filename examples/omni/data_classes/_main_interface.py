@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -21,8 +22,10 @@ from ._core import (
 __all__ = [
     "MainInterface",
     "MainInterfaceWrite",
+    "MainInterfaceApply",
     "MainInterfaceList",
     "MainInterfaceWriteList",
+    "MainInterfaceApplyList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
 ]
@@ -52,7 +55,7 @@ class MainInterface(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
-    def as_apply(self) -> MainInterfaceWrite:
+    def as_write(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""
         return MainInterfaceWrite(
             space=self.space,
@@ -60,6 +63,15 @@ class MainInterface(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             main_value=self.main_value,
         )
+
+    def as_apply(self) -> MainInterfaceWrite:
+        """Convert this read version of main interface to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class MainInterfaceWrite(DomainModelWrite):
@@ -114,20 +126,44 @@ class MainInterfaceWrite(DomainModelWrite):
         return resources
 
 
+class MainInterfaceApply(MainInterfaceWrite):
+    def __new__(cls, *args, **kwargs) -> MainInterfaceApply:
+        warnings.warn(
+            "MainInterfaceApply is deprecated and will be removed in v1.0. Use MainInterfaceWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "MainInterface.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class MainInterfaceList(DomainModelList[MainInterface]):
     """List of main interfaces in the read version."""
 
     _INSTANCE = MainInterface
 
-    def as_apply(self) -> MainInterfaceWriteList:
+    def as_write(self) -> MainInterfaceWriteList:
         """Convert these read versions of main interface to the writing versions."""
         return MainInterfaceWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> MainInterfaceWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class MainInterfaceWriteList(DomainModelWriteList[MainInterfaceWrite]):
     """List of main interfaces in the writing version."""
 
     _INSTANCE = MainInterfaceWrite
+
+
+class MainInterfaceApplyList(MainInterfaceWriteList): ...
 
 
 def _create_main_interface_filter(

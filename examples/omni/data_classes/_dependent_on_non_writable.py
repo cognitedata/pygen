@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -24,8 +25,10 @@ if TYPE_CHECKING:
 __all__ = [
     "DependentOnNonWritable",
     "DependentOnNonWritableWrite",
+    "DependentOnNonWritableApply",
     "DependentOnNonWritableList",
     "DependentOnNonWritableWriteList",
+    "DependentOnNonWritableApplyList",
     "DependentOnNonWritableFields",
     "DependentOnNonWritableTextFields",
 ]
@@ -61,7 +64,7 @@ class DependentOnNonWritable(DomainModel):
         default=None, repr=False, alias="toNonWritable"
     )
 
-    def as_apply(self) -> DependentOnNonWritableWrite:
+    def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
         return DependentOnNonWritableWrite(
             space=self.space,
@@ -69,10 +72,19 @@ class DependentOnNonWritable(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
             to_non_writable=[
-                to_non_writable.as_apply() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
                 for to_non_writable in self.to_non_writable or []
             ],
         )
+
+    def as_apply(self) -> DependentOnNonWritableWrite:
+        """Convert this read version of dependent on non writable to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class DependentOnNonWritableWrite(DomainModelWrite):
@@ -132,7 +144,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "toNonWritable")
         for to_non_writable in self.to_non_writable or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=to_non_writable,
@@ -144,20 +156,44 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         return resources
 
 
+class DependentOnNonWritableApply(DependentOnNonWritableWrite):
+    def __new__(cls, *args, **kwargs) -> DependentOnNonWritableApply:
+        warnings.warn(
+            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. Use DependentOnNonWritableWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "DependentOnNonWritable.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
     """List of dependent on non writables in the read version."""
 
     _INSTANCE = DependentOnNonWritable
 
-    def as_apply(self) -> DependentOnNonWritableWriteList:
+    def as_write(self) -> DependentOnNonWritableWriteList:
         """Convert these read versions of dependent on non writable to the writing versions."""
         return DependentOnNonWritableWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> DependentOnNonWritableWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritableWrite]):
     """List of dependent on non writables in the writing version."""
 
     _INSTANCE = DependentOnNonWritableWrite
+
+
+class DependentOnNonWritableApplyList(DependentOnNonWritableWriteList): ...
 
 
 def _create_dependent_on_non_writable_filter(

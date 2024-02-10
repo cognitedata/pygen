@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -22,8 +23,10 @@ from ._core import (
 __all__ = [
     "PrimitiveRequiredListed",
     "PrimitiveRequiredListedWrite",
+    "PrimitiveRequiredListedApply",
     "PrimitiveRequiredListedList",
     "PrimitiveRequiredListedWriteList",
+    "PrimitiveRequiredListedApplyList",
     "PrimitiveRequiredListedFields",
     "PrimitiveRequiredListedTextFields",
 ]
@@ -79,7 +82,7 @@ class PrimitiveRequiredListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveRequiredListedWrite:
+    def as_write(self) -> PrimitiveRequiredListedWrite:
         """Convert this read version of primitive required listed to the writing version."""
         return PrimitiveRequiredListedWrite(
             space=self.space,
@@ -95,6 +98,15 @@ class PrimitiveRequiredListed(DomainModel):
             text=self.text,
             timestamp=self.timestamp,
         )
+
+    def as_apply(self) -> PrimitiveRequiredListedWrite:
+        """Convert this read version of primitive required listed to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class PrimitiveRequiredListedWrite(DomainModelWrite):
@@ -191,20 +203,44 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
         return resources
 
 
+class PrimitiveRequiredListedApply(PrimitiveRequiredListedWrite):
+    def __new__(cls, *args, **kwargs) -> PrimitiveRequiredListedApply:
+        warnings.warn(
+            "PrimitiveRequiredListedApply is deprecated and will be removed in v1.0. Use PrimitiveRequiredListedWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "PrimitiveRequiredListed.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class PrimitiveRequiredListedList(DomainModelList[PrimitiveRequiredListed]):
     """List of primitive required listeds in the read version."""
 
     _INSTANCE = PrimitiveRequiredListed
 
-    def as_apply(self) -> PrimitiveRequiredListedWriteList:
+    def as_write(self) -> PrimitiveRequiredListedWriteList:
         """Convert these read versions of primitive required listed to the writing versions."""
         return PrimitiveRequiredListedWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PrimitiveRequiredListedWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class PrimitiveRequiredListedWriteList(DomainModelWriteList[PrimitiveRequiredListedWrite]):
     """List of primitive required listeds in the writing version."""
 
     _INSTANCE = PrimitiveRequiredListedWrite
+
+
+class PrimitiveRequiredListedApplyList(PrimitiveRequiredListedWriteList): ...
 
 
 def _create_primitive_required_listed_filter(

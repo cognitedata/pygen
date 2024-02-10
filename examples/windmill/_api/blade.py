@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Blade,
-    BladeApply,
+    BladeWrite,
     BladeFields,
     BladeList,
-    BladeApplyList,
+    BladeWriteList,
     BladeTextFields,
 )
 from windmill.data_classes._blade import (
@@ -37,7 +37,7 @@ from .blade_sensor_positions import BladeSensorPositionsAPI
 from .blade_query import BladeQueryAPI
 
 
-class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
+class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Blade]
         super().__init__(
@@ -45,7 +45,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             sources=view_id,
             class_type=Blade,
             class_list=BladeList,
-            class_apply_list=BladeApplyList,
+            class_apply_list=BladeWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -91,7 +91,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
     def apply(
         self,
-        blade: BladeApply | Sequence[BladeApply],
+        blade: BladeWrite | Sequence[BladeWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -115,9 +115,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             Create a new blade:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import BladeApply
+                >>> from windmill.data_classes import BladeWrite
                 >>> client = WindmillClient()
-                >>> blade = BladeApply(external_id="my_blade", ...)
+                >>> blade = BladeWrite(external_id="my_blade", ...)
                 >>> result = client.blade.apply(blade)
 
         """

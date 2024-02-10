@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,19 +11,21 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "Generator",
+    "GeneratorWrite",
     "GeneratorApply",
     "GeneratorList",
+    "GeneratorWriteList",
     "GeneratorApplyList",
     "GeneratorFields",
     "GeneratorTextFields",
@@ -56,9 +59,9 @@ class Generator(DomainModel):
     generator_speed_controller: Union[TimeSeries, str, None] = None
     generator_speed_controller_reference: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> GeneratorApply:
+    def as_write(self) -> GeneratorWrite:
         """Convert this read version of generator to the writing version."""
-        return GeneratorApply(
+        return GeneratorWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -66,8 +69,17 @@ class Generator(DomainModel):
             generator_speed_controller_reference=self.generator_speed_controller_reference,
         )
 
+    def as_apply(self) -> GeneratorWrite:
+        """Convert this read version of generator to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class GeneratorApply(DomainModelApply):
+
+class GeneratorWrite(DomainModelWrite):
     """This represents the writing version of generator.
 
     It is used to when data is sent to CDF.
@@ -85,13 +97,13 @@ class GeneratorApply(DomainModelApply):
     generator_speed_controller: Union[TimeSeries, str, None] = None
     generator_speed_controller_reference: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -141,20 +153,44 @@ class GeneratorApply(DomainModelApply):
         return resources
 
 
+class GeneratorApply(GeneratorWrite):
+    def __new__(cls, *args, **kwargs) -> GeneratorApply:
+        warnings.warn(
+            "GeneratorApply is deprecated and will be removed in v1.0. Use GeneratorWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Generator.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class GeneratorList(DomainModelList[Generator]):
     """List of generators in the read version."""
 
     _INSTANCE = Generator
 
-    def as_apply(self) -> GeneratorApplyList:
+    def as_write(self) -> GeneratorWriteList:
         """Convert these read versions of generator to the writing versions."""
-        return GeneratorApplyList([node.as_write() for node in self.data])
+        return GeneratorWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> GeneratorWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class GeneratorApplyList(DomainModelApplyList[GeneratorApply]):
+class GeneratorWriteList(DomainModelWriteList[GeneratorWrite]):
     """List of generators in the writing version."""
 
-    _INSTANCE = GeneratorApply
+    _INSTANCE = GeneratorWrite
+
+
+class GeneratorApplyList(GeneratorWriteList): ...
 
 
 def _create_generator_filter(

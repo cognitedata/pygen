@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,18 +11,27 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._sensor_position import SensorPosition, SensorPositionApply
+    from ._sensor_position import SensorPosition, SensorPositionWrite
 
 
-__all__ = ["Blade", "BladeApply", "BladeList", "BladeApplyList", "BladeFields", "BladeTextFields"]
+__all__ = [
+    "Blade",
+    "BladeWrite",
+    "BladeApply",
+    "BladeList",
+    "BladeWriteList",
+    "BladeApplyList",
+    "BladeFields",
+    "BladeTextFields",
+]
 
 
 BladeTextFields = Literal["name"]
@@ -53,22 +63,31 @@ class Blade(DomainModel):
     name: Optional[str] = None
     sensor_positions: Union[list[SensorPosition], list[str], None] = Field(default=None, repr=False)
 
-    def as_apply(self) -> BladeApply:
+    def as_write(self) -> BladeWrite:
         """Convert this read version of blade to the writing version."""
-        return BladeApply(
+        return BladeWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             is_damaged=self.is_damaged,
             name=self.name,
             sensor_positions=[
-                sensor_position.as_apply() if isinstance(sensor_position, DomainModel) else sensor_position
+                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
                 for sensor_position in self.sensor_positions or []
             ],
         )
 
+    def as_apply(self) -> BladeWrite:
+        """Convert this read version of blade to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class BladeApply(DomainModelApply):
+
+class BladeWrite(DomainModelWrite):
     """This represents the writing version of blade.
 
     It is used to when data is sent to CDF.
@@ -86,15 +105,15 @@ class BladeApply(DomainModelApply):
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
-    sensor_positions: Union[list[SensorPositionApply], list[str], None] = Field(default=None, repr=False)
+    sensor_positions: Union[list[SensorPositionWrite], list[str], None] = Field(default=None, repr=False)
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -138,20 +157,44 @@ class BladeApply(DomainModelApply):
         return resources
 
 
+class BladeApply(BladeWrite):
+    def __new__(cls, *args, **kwargs) -> BladeApply:
+        warnings.warn(
+            "BladeApply is deprecated and will be removed in v1.0. Use BladeWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Blade.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class BladeList(DomainModelList[Blade]):
     """List of blades in the read version."""
 
     _INSTANCE = Blade
 
-    def as_apply(self) -> BladeApplyList:
+    def as_write(self) -> BladeWriteList:
         """Convert these read versions of blade to the writing versions."""
-        return BladeApplyList([node.as_write() for node in self.data])
+        return BladeWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> BladeWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class BladeApplyList(DomainModelApplyList[BladeApply]):
+class BladeWriteList(DomainModelWriteList[BladeWrite]):
     """List of blades in the writing version."""
 
-    _INSTANCE = BladeApply
+    _INSTANCE = BladeWrite
+
+
+class BladeApplyList(BladeWriteList): ...
 
 
 def _create_blade_filter(

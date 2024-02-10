@@ -3,114 +3,114 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
+    DomainModelWrite,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
-    ResourcesApplyResult,
+    DomainRelationWrite,
+    ResourcesWrite,
+    ResourcesWriteResult,
 )
-from ._blade import Blade, BladeApply, BladeApplyList, BladeFields, BladeList, BladeTextFields
-from ._gearbox import Gearbox, GearboxApply, GearboxApplyList, GearboxFields, GearboxList
-from ._generator import Generator, GeneratorApply, GeneratorApplyList, GeneratorFields, GeneratorList
+from ._blade import Blade, BladeFields, BladeList, BladeTextFields, BladeWrite, BladeWriteList
+from ._gearbox import Gearbox, GearboxFields, GearboxList, GearboxWrite, GearboxWriteList
+from ._generator import Generator, GeneratorFields, GeneratorList, GeneratorWrite, GeneratorWriteList
 from ._high_speed_shaft import (
     HighSpeedShaft,
-    HighSpeedShaftApply,
-    HighSpeedShaftApplyList,
     HighSpeedShaftFields,
     HighSpeedShaftList,
+    HighSpeedShaftWrite,
+    HighSpeedShaftWriteList,
 )
-from ._main_shaft import MainShaft, MainShaftApply, MainShaftApplyList, MainShaftFields, MainShaftList
-from ._metmast import Metmast, MetmastApply, MetmastApplyList, MetmastFields, MetmastList
-from ._nacelle import Nacelle, NacelleApply, NacelleApplyList, NacelleFields, NacelleList
+from ._main_shaft import MainShaft, MainShaftFields, MainShaftList, MainShaftWrite, MainShaftWriteList
+from ._metmast import Metmast, MetmastFields, MetmastList, MetmastWrite, MetmastWriteList
+from ._nacelle import Nacelle, NacelleFields, NacelleList, NacelleWrite, NacelleWriteList
 from ._power_inverter import (
     PowerInverter,
-    PowerInverterApply,
-    PowerInverterApplyList,
     PowerInverterFields,
     PowerInverterList,
+    PowerInverterWrite,
+    PowerInverterWriteList,
 )
-from ._rotor import Rotor, RotorApply, RotorApplyList, RotorFields, RotorList
+from ._rotor import Rotor, RotorFields, RotorList, RotorWrite, RotorWriteList
 from ._sensor_position import (
     SensorPosition,
-    SensorPositionApply,
-    SensorPositionApplyList,
     SensorPositionFields,
     SensorPositionList,
+    SensorPositionWrite,
+    SensorPositionWriteList,
 )
-from ._windmill import Windmill, WindmillApply, WindmillApplyList, WindmillFields, WindmillList, WindmillTextFields
+from ._windmill import Windmill, WindmillFields, WindmillList, WindmillTextFields, WindmillWrite, WindmillWriteList
 
 Blade.model_rebuild()
-BladeApply.model_rebuild()
+BladeWrite.model_rebuild()
 Nacelle.model_rebuild()
-NacelleApply.model_rebuild()
+NacelleWrite.model_rebuild()
 Windmill.model_rebuild()
-WindmillApply.model_rebuild()
+WindmillWrite.model_rebuild()
 
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
-    "ResourcesApply",
+    "ResourcesWrite",
     "DomainModel",
     "DomainModelCore",
-    "DomainModelApply",
+    "DomainModelWrite",
     "DomainModelList",
-    "DomainRelationApply",
-    "ResourcesApplyResult",
+    "DomainRelationWrite",
+    "ResourcesWriteResult",
     "Blade",
-    "BladeApply",
+    "BladeWrite",
     "BladeList",
-    "BladeApplyList",
+    "BladeWriteList",
     "BladeFields",
     "BladeTextFields",
     "Gearbox",
-    "GearboxApply",
+    "GearboxWrite",
     "GearboxList",
-    "GearboxApplyList",
+    "GearboxWriteList",
     "GearboxFields",
     "Generator",
-    "GeneratorApply",
+    "GeneratorWrite",
     "GeneratorList",
-    "GeneratorApplyList",
+    "GeneratorWriteList",
     "GeneratorFields",
     "HighSpeedShaft",
-    "HighSpeedShaftApply",
+    "HighSpeedShaftWrite",
     "HighSpeedShaftList",
-    "HighSpeedShaftApplyList",
+    "HighSpeedShaftWriteList",
     "HighSpeedShaftFields",
     "MainShaft",
-    "MainShaftApply",
+    "MainShaftWrite",
     "MainShaftList",
-    "MainShaftApplyList",
+    "MainShaftWriteList",
     "MainShaftFields",
     "Metmast",
-    "MetmastApply",
+    "MetmastWrite",
     "MetmastList",
-    "MetmastApplyList",
+    "MetmastWriteList",
     "MetmastFields",
     "Nacelle",
-    "NacelleApply",
+    "NacelleWrite",
     "NacelleList",
-    "NacelleApplyList",
+    "NacelleWriteList",
     "NacelleFields",
     "PowerInverter",
-    "PowerInverterApply",
+    "PowerInverterWrite",
     "PowerInverterList",
-    "PowerInverterApplyList",
+    "PowerInverterWriteList",
     "PowerInverterFields",
     "Rotor",
-    "RotorApply",
+    "RotorWrite",
     "RotorList",
-    "RotorApplyList",
+    "RotorWriteList",
     "RotorFields",
     "SensorPosition",
-    "SensorPositionApply",
+    "SensorPositionWrite",
     "SensorPositionList",
-    "SensorPositionApplyList",
+    "SensorPositionWriteList",
     "SensorPositionFields",
     "Windmill",
-    "WindmillApply",
+    "WindmillWrite",
     "WindmillList",
-    "WindmillApplyList",
+    "WindmillWriteList",
     "WindmillFields",
     "WindmillTextFields",
 ]

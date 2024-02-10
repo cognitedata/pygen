@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     PowerInverter,
-    PowerInverterApply,
+    PowerInverterWrite,
     PowerInverterFields,
     PowerInverterList,
-    PowerInverterApplyList,
+    PowerInverterWriteList,
 )
 from windmill.data_classes._power_inverter import (
     _POWERINVERTER_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .power_inverter_reactive_power_total import PowerInverterReactivePowerTotal
 from .power_inverter_query import PowerInverterQueryAPI
 
 
-class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterList]):
+class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PowerInverter]
         super().__init__(
@@ -46,7 +46,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
             sources=view_id,
             class_type=PowerInverter,
             class_list=PowerInverterList,
-            class_apply_list=PowerInverterApplyList,
+            class_apply_list=PowerInverterWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -85,7 +85,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
 
     def apply(
         self,
-        power_inverter: PowerInverterApply | Sequence[PowerInverterApply],
+        power_inverter: PowerInverterWrite | Sequence[PowerInverterWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -105,9 +105,9 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
             Create a new power_inverter:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import PowerInverterApply
+                >>> from windmill.data_classes import PowerInverterWrite
                 >>> client = WindmillClient()
-                >>> power_inverter = PowerInverterApply(external_id="my_power_inverter", ...)
+                >>> power_inverter = PowerInverterWrite(external_id="my_power_inverter", ...)
                 >>> result = client.power_inverter.apply(power_inverter)
 
         """

@@ -11,51 +11,51 @@ from ._core import (
 )
 from ._cdf_external_references import (
     CDFExternalReferences,
-    CDFExternalReferencesWrite,
-    CDFExternalReferencesWriteList,
     CDFExternalReferencesFields,
     CDFExternalReferencesList,
+    CDFExternalReferencesWrite,
+    CDFExternalReferencesWriteList,
 )
 from ._cdf_external_references_listed import (
     CDFExternalReferencesListed,
-    CDFExternalReferencesListedWrite,
-    CDFExternalReferencesListedWriteList,
     CDFExternalReferencesListedFields,
     CDFExternalReferencesListedList,
+    CDFExternalReferencesListedWrite,
+    CDFExternalReferencesListedWriteList,
 )
 from ._connection_item_a import (
     ConnectionItemA,
-    ConnectionItemAWrite,
-    ConnectionItemAWriteList,
     ConnectionItemAFields,
     ConnectionItemAList,
     ConnectionItemATextFields,
+    ConnectionItemAWrite,
+    ConnectionItemAWriteList,
 )
 from ._connection_item_b import (
     ConnectionItemB,
-    ConnectionItemBWrite,
-    ConnectionItemBWriteList,
     ConnectionItemBFields,
     ConnectionItemBList,
     ConnectionItemBTextFields,
+    ConnectionItemBWrite,
+    ConnectionItemBWriteList,
 )
-from ._connection_item_c import ConnectionItemC, ConnectionItemCWrite, ConnectionItemCWriteList, ConnectionItemCList
+from ._connection_item_c import ConnectionItemC, ConnectionItemCList, ConnectionItemCWrite, ConnectionItemCWriteList
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
-    DependentOnNonWritableWrite,
-    DependentOnNonWritableWriteList,
     DependentOnNonWritableFields,
     DependentOnNonWritableList,
     DependentOnNonWritableTextFields,
+    DependentOnNonWritableWrite,
+    DependentOnNonWritableWriteList,
 )
-from ._empty import Empty, EmptyWrite, EmptyWriteList, EmptyFields, EmptyList, EmptyTextFields
+from ._empty import Empty, EmptyFields, EmptyList, EmptyTextFields, EmptyWrite, EmptyWriteList
 from ._implementation_1 import (
     Implementation1,
-    Implementation1Apply,
-    Implementation1WriteList,
     Implementation1Fields,
     Implementation1List,
     Implementation1TextFields,
+    Implementation1Write,
+    Implementation1WriteList,
 )
 from ._implementation_1_non_writeable import (
     Implementation1NonWriteable,
@@ -65,67 +65,67 @@ from ._implementation_1_non_writeable import (
 )
 from ._implementation_2 import (
     Implementation2,
-    Implementation2Apply,
-    Implementation2WriteList,
     Implementation2Fields,
     Implementation2List,
     Implementation2TextFields,
+    Implementation2Write,
+    Implementation2WriteList,
 )
 from ._main_interface import (
     MainInterface,
-    MainInterfaceWrite,
-    MainInterfaceWriteList,
     MainInterfaceFields,
     MainInterfaceList,
     MainInterfaceTextFields,
+    MainInterfaceWrite,
+    MainInterfaceWriteList,
 )
 from ._primitive_nullable import (
     PrimitiveNullable,
-    PrimitiveNullableApply,
-    PrimitiveNullableWriteList,
     PrimitiveNullableFields,
     PrimitiveNullableList,
     PrimitiveNullableTextFields,
+    PrimitiveNullableWrite,
+    PrimitiveNullableWriteList,
 )
 from ._primitive_nullable_listed import (
     PrimitiveNullableListed,
-    PrimitiveNullableListedWrite,
-    PrimitiveNullableListedWriteList,
     PrimitiveNullableListedFields,
     PrimitiveNullableListedList,
     PrimitiveNullableListedTextFields,
+    PrimitiveNullableListedWrite,
+    PrimitiveNullableListedWriteList,
 )
 from ._primitive_required import (
     PrimitiveRequired,
-    PrimitiveRequiredWrite,
-    PrimitiveRequiredWriteList,
     PrimitiveRequiredFields,
     PrimitiveRequiredList,
     PrimitiveRequiredTextFields,
+    PrimitiveRequiredWrite,
+    PrimitiveRequiredWriteList,
 )
 from ._primitive_required_listed import (
     PrimitiveRequiredListed,
-    PrimitiveRequiredListedWrite,
-    PrimitiveRequiredListedWriteList,
     PrimitiveRequiredListedFields,
     PrimitiveRequiredListedList,
     PrimitiveRequiredListedTextFields,
+    PrimitiveRequiredListedWrite,
+    PrimitiveRequiredListedWriteList,
 )
 from ._primitive_with_defaults import (
     PrimitiveWithDefaults,
-    PrimitiveWithDefaultsWrite,
-    PrimitiveWithDefaultsWriteList,
     PrimitiveWithDefaultsFields,
     PrimitiveWithDefaultsList,
     PrimitiveWithDefaultsTextFields,
+    PrimitiveWithDefaultsWrite,
+    PrimitiveWithDefaultsWriteList,
 )
 from ._sub_interface import (
     SubInterface,
-    SubInterfaceApply,
-    SubInterfaceWriteList,
     SubInterfaceFields,
     SubInterfaceList,
     SubInterfaceTextFields,
+    SubInterfaceWrite,
+    SubInterfaceWriteList,
 )
 
 ConnectionItemA.model_rebuild()
@@ -186,7 +186,7 @@ __all__ = [
     "EmptyFields",
     "EmptyTextFields",
     "Implementation1",
-    "Implementation1Apply",
+    "Implementation1Write",
     "Implementation1List",
     "Implementation1WriteList",
     "Implementation1Fields",
@@ -196,7 +196,7 @@ __all__ = [
     "Implementation1NonWriteableFields",
     "Implementation1NonWriteableTextFields",
     "Implementation2",
-    "Implementation2Apply",
+    "Implementation2Write",
     "Implementation2List",
     "Implementation2WriteList",
     "Implementation2Fields",
@@ -208,7 +208,7 @@ __all__ = [
     "MainInterfaceFields",
     "MainInterfaceTextFields",
     "PrimitiveNullable",
-    "PrimitiveNullableApply",
+    "PrimitiveNullableWrite",
     "PrimitiveNullableList",
     "PrimitiveNullableWriteList",
     "PrimitiveNullableFields",
@@ -238,7 +238,7 @@ __all__ = [
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
     "SubInterface",
-    "SubInterfaceApply",
+    "SubInterfaceWrite",
     "SubInterfaceList",
     "SubInterfaceWriteList",
     "SubInterfaceFields",

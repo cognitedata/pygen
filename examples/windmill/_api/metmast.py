@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Metmast,
-    MetmastApply,
+    MetmastWrite,
     MetmastFields,
     MetmastList,
-    MetmastApplyList,
+    MetmastWriteList,
 )
 from windmill.data_classes._metmast import (
     _METMAST_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .metmast_wind_speed import MetmastWindSpeedAPI
 from .metmast_query import MetmastQueryAPI
 
 
-class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
+class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Metmast]
         super().__init__(
@@ -46,7 +46,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
             sources=view_id,
             class_type=Metmast,
             class_list=MetmastList,
-            class_apply_list=MetmastApplyList,
+            class_apply_list=MetmastWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -91,7 +91,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
 
     def apply(
         self,
-        metmast: MetmastApply | Sequence[MetmastApply],
+        metmast: MetmastWrite | Sequence[MetmastWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -111,9 +111,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
             Create a new metmast:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import MetmastApply
+                >>> from windmill.data_classes import MetmastWrite
                 >>> client = WindmillClient()
-                >>> metmast = MetmastApply(external_id="my_metmast", ...)
+                >>> metmast = MetmastWrite(external_id="my_metmast", ...)
                 >>> result = client.metmast.apply(metmast)
 
         """

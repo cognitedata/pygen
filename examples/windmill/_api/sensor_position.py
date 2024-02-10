@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     SensorPosition,
-    SensorPositionApply,
+    SensorPositionWrite,
     SensorPositionFields,
     SensorPositionList,
-    SensorPositionApplyList,
+    SensorPositionWriteList,
 )
 from windmill.data_classes._sensor_position import (
     _SENSORPOSITION_PROPERTIES_BY_FIELD,
@@ -47,7 +47,7 @@ from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
 from .sensor_position_query import SensorPositionQueryAPI
 
 
-class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPositionList]):
+class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[SensorPosition]
         super().__init__(
@@ -55,7 +55,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             sources=view_id,
             class_type=SensorPosition,
             class_list=SensorPositionList,
-            class_apply_list=SensorPositionApplyList,
+            class_apply_list=SensorPositionWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -109,7 +109,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
 
     def apply(
         self,
-        sensor_position: SensorPositionApply | Sequence[SensorPositionApply],
+        sensor_position: SensorPositionWrite | Sequence[SensorPositionWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -129,9 +129,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             Create a new sensor_position:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import SensorPositionApply
+                >>> from windmill.data_classes import SensorPositionWrite
                 >>> client = WindmillClient()
-                >>> sensor_position = SensorPositionApply(external_id="my_sensor_position", ...)
+                >>> sensor_position = SensorPositionWrite(external_id="my_sensor_position", ...)
                 >>> result = client.sensor_position.apply(sensor_position)
 
         """

@@ -12,10 +12,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
+    DomainModelApply,
+    ResourcesApplyResult,
     PrimitiveNullable,
-    PrimitiveNullableApply,
+    PrimitiveNullableWrite,
     PrimitiveNullableFields,
     PrimitiveNullableList,
     PrimitiveNullableWriteList,
@@ -37,7 +37,7 @@ from ._core import (
 from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
-class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, PrimitiveNullableList]):
+class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveNullable]
         super().__init__(
@@ -126,10 +126,10 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
 
     def apply(
         self,
-        primitive_nullable: PrimitiveNullableApply | Sequence[PrimitiveNullableApply],
+        primitive_nullable: PrimitiveNullableWrite | Sequence[PrimitiveNullableWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesWriteResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) primitive nullables.
 
         Args:
@@ -146,9 +146,9 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
             Create a new primitive_nullable:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveNullableApply
+                >>> from omni.data_classes import PrimitiveNullableWrite
                 >>> client = OmniClient()
-                >>> primitive_nullable = PrimitiveNullableApply(external_id="my_primitive_nullable", ...)
+                >>> primitive_nullable = PrimitiveNullableWrite(external_id="my_primitive_nullable", ...)
                 >>> result = client.primitive_nullable.apply(primitive_nullable)
 
         """

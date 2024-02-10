@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -22,7 +23,14 @@ if TYPE_CHECKING:
     from ._connection_item_b import ConnectionItemB, ConnectionItemBWrite
 
 
-__all__ = ["ConnectionItemC", "ConnectionItemCWrite", "ConnectionItemCList", "ConnectionItemCWriteList"]
+__all__ = [
+    "ConnectionItemC",
+    "ConnectionItemCWrite",
+    "ConnectionItemCApply",
+    "ConnectionItemCList",
+    "ConnectionItemCWriteList",
+    "ConnectionItemCApplyList",
+]
 
 
 class ConnectionItemC(DomainModel):
@@ -47,21 +55,30 @@ class ConnectionItemC(DomainModel):
         default=None, repr=False, alias="connectionItemB"
     )
 
-    def as_apply(self) -> ConnectionItemCWrite:
+    def as_write(self) -> ConnectionItemCWrite:
         """Convert this read version of connection item c to the writing version."""
         return ConnectionItemCWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             connection_item_a=[
-                connection_item_a.as_apply() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
                 for connection_item_a in self.connection_item_a or []
             ],
             connection_item_b=[
-                connection_item_b.as_apply() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
                 for connection_item_b in self.connection_item_b or []
             ],
         )
+
+    def as_apply(self) -> ConnectionItemCWrite:
+        """Convert this read version of connection item c to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class ConnectionItemCWrite(DomainModelWrite):
@@ -108,7 +125,7 @@ class ConnectionItemCWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_a in self.connection_item_a or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=connection_item_a,
@@ -119,7 +136,7 @@ class ConnectionItemCWrite(DomainModelWrite):
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_b in self.connection_item_b or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=connection_item_b,
@@ -131,20 +148,44 @@ class ConnectionItemCWrite(DomainModelWrite):
         return resources
 
 
+class ConnectionItemCApply(ConnectionItemCWrite):
+    def __new__(cls, *args, **kwargs) -> ConnectionItemCApply:
+        warnings.warn(
+            "ConnectionItemCApply is deprecated and will be removed in v1.0. Use ConnectionItemCWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "ConnectionItemC.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class ConnectionItemCList(DomainModelList[ConnectionItemC]):
     """List of connection item cs in the read version."""
 
     _INSTANCE = ConnectionItemC
 
-    def as_apply(self) -> ConnectionItemCWriteList:
+    def as_write(self) -> ConnectionItemCWriteList:
         """Convert these read versions of connection item c to the writing versions."""
         return ConnectionItemCWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> ConnectionItemCWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
 class ConnectionItemCWriteList(DomainModelWriteList[ConnectionItemCWrite]):
     """List of connection item cs in the writing version."""
 
     _INSTANCE = ConnectionItemCWrite
+
+
+class ConnectionItemCApplyList(ConnectionItemCWriteList): ...
 
 
 def _create_connection_item_c_filter(

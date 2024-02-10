@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Windmill,
-    WindmillApply,
+    WindmillWrite,
     WindmillFields,
     WindmillList,
-    WindmillApplyList,
+    WindmillWriteList,
     WindmillTextFields,
 )
 from windmill.data_classes._windmill import (
@@ -38,7 +38,7 @@ from .windmill_metmast import WindmillMetmastAPI
 from .windmill_query import WindmillQueryAPI
 
 
-class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
+class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Windmill]
         super().__init__(
@@ -46,7 +46,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             sources=view_id,
             class_type=Windmill,
             class_list=WindmillList,
-            class_apply_list=WindmillApplyList,
+            class_apply_list=WindmillWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -108,7 +108,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
     def apply(
         self,
-        windmill: WindmillApply | Sequence[WindmillApply],
+        windmill: WindmillWrite | Sequence[WindmillWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -132,9 +132,9 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             Create a new windmill:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import WindmillApply
+                >>> from windmill.data_classes import WindmillWrite
                 >>> client = WindmillClient()
-                >>> windmill = WindmillApply(external_id="my_windmill", ...)
+                >>> windmill = WindmillWrite(external_id="my_windmill", ...)
                 >>> result = client.windmill.apply(windmill)
 
         """

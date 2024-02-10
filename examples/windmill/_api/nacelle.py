@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Nacelle,
-    NacelleApply,
+    NacelleWrite,
     NacelleFields,
     NacelleList,
-    NacelleApplyList,
+    NacelleWriteList,
 )
 from windmill.data_classes._nacelle import (
     _NACELLE_PROPERTIES_BY_FIELD,
@@ -40,7 +40,7 @@ from .nacelle_yaw_error import NacelleYawErrorAPI
 from .nacelle_query import NacelleQueryAPI
 
 
-class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
+class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Nacelle]
         super().__init__(
@@ -48,7 +48,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             sources=view_id,
             class_type=Nacelle,
             class_list=NacelleList,
-            class_apply_list=NacelleApplyList,
+            class_apply_list=NacelleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -104,7 +104,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
 
     def apply(
         self,
-        nacelle: NacelleApply | Sequence[NacelleApply],
+        nacelle: NacelleWrite | Sequence[NacelleWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -124,9 +124,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             Create a new nacelle:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import NacelleApply
+                >>> from windmill.data_classes import NacelleWrite
                 >>> client = WindmillClient()
-                >>> nacelle = NacelleApply(external_id="my_nacelle", ...)
+                >>> nacelle = NacelleWrite(external_id="my_nacelle", ...)
                 >>> result = client.nacelle.apply(nacelle)
 
         """

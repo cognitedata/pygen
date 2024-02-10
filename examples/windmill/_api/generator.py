@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Generator,
-    GeneratorApply,
+    GeneratorWrite,
     GeneratorFields,
     GeneratorList,
-    GeneratorApplyList,
+    GeneratorWriteList,
 )
 from windmill.data_classes._generator import (
     _GENERATOR_PROPERTIES_BY_FIELD,
@@ -37,7 +37,7 @@ from .generator_generator_speed_controller_reference import GeneratorGeneratorSp
 from .generator_query import GeneratorQueryAPI
 
 
-class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
+class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Generator]
         super().__init__(
@@ -45,7 +45,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
             sources=view_id,
             class_type=Generator,
             class_list=GeneratorList,
-            class_apply_list=GeneratorApplyList,
+            class_apply_list=GeneratorWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,7 +83,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
 
     def apply(
         self,
-        generator: GeneratorApply | Sequence[GeneratorApply],
+        generator: GeneratorWrite | Sequence[GeneratorWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -103,9 +103,9 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorApply, GeneratorList]):
             Create a new generator:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import GeneratorApply
+                >>> from windmill.data_classes import GeneratorWrite
                 >>> client = WindmillClient()
-                >>> generator = GeneratorApply(external_id="my_generator", ...)
+                >>> generator = GeneratorWrite(external_id="my_generator", ...)
                 >>> result = client.generator.apply(generator)
 
         """

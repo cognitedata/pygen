@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -16,14 +17,16 @@ from ._core import (
     DomainRelationWrite,
     ResourcesWrite,
 )
-from ._sub_interface import SubInterface, SubInterfaceApply
+from ._sub_interface import SubInterface, SubInterfaceWrite
 
 
 __all__ = [
     "Implementation1",
+    "Implementation1Write",
     "Implementation1Apply",
     "Implementation1List",
     "Implementation1WriteList",
+    "Implementation1ApplyList",
     "Implementation1Fields",
     "Implementation1TextFields",
 ]
@@ -59,9 +62,9 @@ class Implementation1(SubInterface):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def as_apply(self) -> Implementation1Apply:
+    def as_write(self) -> Implementation1Write:
         """Convert this read version of implementation 1 to the writing version."""
-        return Implementation1Apply(
+        return Implementation1Write(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -71,8 +74,17 @@ class Implementation1(SubInterface):
             value_2=self.value_2,
         )
 
+    def as_apply(self) -> Implementation1Write:
+        """Convert this read version of implementation 1 to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class Implementation1Apply(SubInterfaceApply):
+
+class Implementation1Write(SubInterfaceWrite):
     """This represents the writing version of implementation 1.
 
     It is used to when data is sent to CDF.
@@ -136,20 +148,44 @@ class Implementation1Apply(SubInterfaceApply):
         return resources
 
 
+class Implementation1Apply(Implementation1Write):
+    def __new__(cls, *args, **kwargs) -> Implementation1Apply:
+        warnings.warn(
+            "Implementation1Apply is deprecated and will be removed in v1.0. Use Implementation1Write instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Implementation1.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class Implementation1List(DomainModelList[Implementation1]):
     """List of implementation 1 in the read version."""
 
     _INSTANCE = Implementation1
 
-    def as_apply(self) -> Implementation1WriteList:
+    def as_write(self) -> Implementation1WriteList:
         """Convert these read versions of implementation 1 to the writing versions."""
         return Implementation1WriteList([node.as_write() for node in self.data])
 
+    def as_apply(self) -> Implementation1WriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class Implementation1WriteList(DomainModelWriteList[Implementation1Apply]):
+
+class Implementation1WriteList(DomainModelWriteList[Implementation1Write]):
     """List of implementation 1 in the writing version."""
 
-    _INSTANCE = Implementation1Apply
+    _INSTANCE = Implementation1Write
+
+
+class Implementation1ApplyList(Implementation1WriteList): ...
 
 
 def _create_implementation_1_filter(

@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Gearbox,
-    GearboxApply,
+    GearboxWrite,
     GearboxFields,
     GearboxList,
-    GearboxApplyList,
+    GearboxWriteList,
 )
 from windmill.data_classes._gearbox import (
     _GEARBOX_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .gearbox_displacement_z import GearboxDisplacementZAPI
 from .gearbox_query import GearboxQueryAPI
 
 
-class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
+class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Gearbox]
         super().__init__(
@@ -46,7 +46,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             sources=view_id,
             class_type=Gearbox,
             class_list=GearboxList,
-            class_apply_list=GearboxApplyList,
+            class_apply_list=GearboxWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -85,7 +85,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
     def apply(
         self,
-        gearbox: GearboxApply | Sequence[GearboxApply],
+        gearbox: GearboxWrite | Sequence[GearboxWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -105,9 +105,9 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             Create a new gearbox:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import GearboxApply
+                >>> from windmill.data_classes import GearboxWrite
                 >>> client = WindmillClient()
-                >>> gearbox = GearboxApply(external_id="my_gearbox", ...)
+                >>> gearbox = GearboxWrite(external_id="my_gearbox", ...)
                 >>> result = client.gearbox.apply(gearbox)
 
         """

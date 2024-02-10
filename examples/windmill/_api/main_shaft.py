@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     MainShaft,
-    MainShaftApply,
+    MainShaftWrite,
     MainShaftFields,
     MainShaftList,
-    MainShaftApplyList,
+    MainShaftWriteList,
 )
 from windmill.data_classes._main_shaft import (
     _MAINSHAFT_PROPERTIES_BY_FIELD,
@@ -40,7 +40,7 @@ from .main_shaft_torque import MainShaftTorqueAPI
 from .main_shaft_query import MainShaftQueryAPI
 
 
-class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
+class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[MainShaft]
         super().__init__(
@@ -48,7 +48,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             sources=view_id,
             class_type=MainShaft,
             class_list=MainShaftList,
-            class_apply_list=MainShaftApplyList,
+            class_apply_list=MainShaftWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -89,7 +89,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
 
     def apply(
         self,
-        main_shaft: MainShaftApply | Sequence[MainShaftApply],
+        main_shaft: MainShaftWrite | Sequence[MainShaftWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -109,9 +109,9 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             Create a new main_shaft:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import MainShaftApply
+                >>> from windmill.data_classes import MainShaftWrite
                 >>> client = WindmillClient()
-                >>> main_shaft = MainShaftApply(external_id="my_main_shaft", ...)
+                >>> main_shaft = MainShaftWrite(external_id="my_main_shaft", ...)
                 >>> result = client.main_shaft.apply(main_shaft)
 
         """

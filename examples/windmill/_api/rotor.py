@@ -14,10 +14,10 @@ from windmill.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Rotor,
-    RotorApply,
+    RotorWrite,
     RotorFields,
     RotorList,
-    RotorApplyList,
+    RotorWriteList,
 )
 from windmill.data_classes._rotor import (
     _ROTOR_PROPERTIES_BY_FIELD,
@@ -37,7 +37,7 @@ from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
 from .rotor_query import RotorQueryAPI
 
 
-class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
+class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Rotor]
         super().__init__(
@@ -45,7 +45,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             sources=view_id,
             class_type=Rotor,
             class_list=RotorList,
-            class_apply_list=RotorApplyList,
+            class_apply_list=RotorWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,7 +83,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
 
     def apply(
         self,
-        rotor: RotorApply | Sequence[RotorApply],
+        rotor: RotorWrite | Sequence[RotorWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesApplyResult:
@@ -103,9 +103,9 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             Create a new rotor:
 
                 >>> from windmill import WindmillClient
-                >>> from windmill.data_classes import RotorApply
+                >>> from windmill.data_classes import RotorWrite
                 >>> client = WindmillClient()
-                >>> rotor = RotorApply(external_id="my_rotor", ...)
+                >>> rotor = RotorWrite(external_id="my_rotor", ...)
                 >>> result = client.rotor.apply(rotor)
 
         """
