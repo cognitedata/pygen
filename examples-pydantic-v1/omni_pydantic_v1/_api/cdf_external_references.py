@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     CDFExternalReferences,
-    CDFExternalReferencesApply,
+    CDFExternalReferencesWrite,
     CDFExternalReferencesFields,
     CDFExternalReferencesList,
-    CDFExternalReferencesApplyList,
+    CDFExternalReferencesWriteList,
 )
 from omni_pydantic_v1.data_classes._cdf_external_references import (
     _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
@@ -36,7 +36,7 @@ from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesA
 from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
-class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesApply, CDFExternalReferencesList]):
+class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[CDFExternalReferences]
         super().__init__(
@@ -44,7 +44,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             sources=view_id,
             class_type=CDFExternalReferences,
             class_list=CDFExternalReferencesList,
-            class_apply_list=CDFExternalReferencesApplyList,
+            class_write_list=CDFExternalReferencesWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -81,10 +81,10 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
 
     def apply(
         self,
-        cdf_external_reference: CDFExternalReferencesApply | Sequence[CDFExternalReferencesApply],
+        cdf_external_reference: CDFExternalReferencesWrite | Sequence[CDFExternalReferencesWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) cdf external references.
 
         Args:
@@ -101,18 +101,19 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             Create a new cdf_external_reference:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import CDFExternalReferencesApply
+                >>> from omni_pydantic_v1.data_classes import CDFExternalReferencesWrite
                 >>> client = OmniClient()
-                >>> cdf_external_reference = CDFExternalReferencesApply(external_id="my_cdf_external_reference", ...)
+                >>> cdf_external_reference = CDFExternalReferencesWrite(external_id="my_cdf_external_reference", ...)
                 >>> result = client.cdf_external_references.apply(cdf_external_reference)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.cdf_external_references.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.cdf_external_references.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

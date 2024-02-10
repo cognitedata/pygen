@@ -12,13 +12,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveRequired,
-    PrimitiveRequiredApply,
+    PrimitiveRequiredWrite,
     PrimitiveRequiredFields,
     PrimitiveRequiredList,
-    PrimitiveRequiredApplyList,
+    PrimitiveRequiredWriteList,
     PrimitiveRequiredTextFields,
 )
 from omni_pydantic_v1.data_classes._primitive_required import (
@@ -37,7 +37,7 @@ from ._core import (
 from .primitive_required_query import PrimitiveRequiredQueryAPI
 
 
-class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, PrimitiveRequiredList]):
+class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveRequired]
         super().__init__(
@@ -45,7 +45,7 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, Pr
             sources=view_id,
             class_type=PrimitiveRequired,
             class_list=PrimitiveRequiredList,
-            class_apply_list=PrimitiveRequiredApplyList,
+            class_write_list=PrimitiveRequiredWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -126,10 +126,10 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, Pr
 
     def apply(
         self,
-        primitive_required: PrimitiveRequiredApply | Sequence[PrimitiveRequiredApply],
+        primitive_required: PrimitiveRequiredWrite | Sequence[PrimitiveRequiredWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive requireds.
 
         Args:
@@ -146,18 +146,19 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, Pr
             Create a new primitive_required:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import PrimitiveRequiredApply
+                >>> from omni_pydantic_v1.data_classes import PrimitiveRequiredWrite
                 >>> client = OmniClient()
-                >>> primitive_required = PrimitiveRequiredApply(external_id="my_primitive_required", ...)
+                >>> primitive_required = PrimitiveRequiredWrite(external_id="my_primitive_required", ...)
                 >>> result = client.primitive_required.apply(primitive_required)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.primitive_required.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.primitive_required.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

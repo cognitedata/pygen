@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Gearbox,
-    GearboxApply,
+    GearboxWrite,
     GearboxFields,
     GearboxList,
-    GearboxApplyList,
+    GearboxWriteList,
 )
 from windmill_pydantic_v1.data_classes._gearbox import (
     _GEARBOX_PROPERTIES_BY_FIELD,
@@ -38,7 +38,7 @@ from .gearbox_displacement_z import GearboxDisplacementZAPI
 from .gearbox_query import GearboxQueryAPI
 
 
-class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
+class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Gearbox]
         super().__init__(
@@ -46,7 +46,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             sources=view_id,
             class_type=Gearbox,
             class_list=GearboxList,
-            class_apply_list=GearboxApplyList,
+            class_write_list=GearboxWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -85,10 +85,10 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
 
     def apply(
         self,
-        gearbox: GearboxApply | Sequence[GearboxApply],
+        gearbox: GearboxWrite | Sequence[GearboxWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) gearboxes.
 
         Args:
@@ -105,18 +105,19 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             Create a new gearbox:
 
                 >>> from windmill_pydantic_v1 import WindmillClient
-                >>> from windmill_pydantic_v1.data_classes import GearboxApply
+                >>> from windmill_pydantic_v1.data_classes import GearboxWrite
                 >>> client = WindmillClient()
-                >>> gearbox = GearboxApply(external_id="my_gearbox", ...)
+                >>> gearbox = GearboxWrite(external_id="my_gearbox", ...)
                 >>> result = client.gearbox.apply(gearbox)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.gearbox.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.gearbox.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

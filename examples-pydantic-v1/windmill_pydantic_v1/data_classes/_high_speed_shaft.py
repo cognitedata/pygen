@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -10,18 +11,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "HighSpeedShaft",
+    "HighSpeedShaftWrite",
     "HighSpeedShaftApply",
     "HighSpeedShaftList",
+    "HighSpeedShaftWriteList",
     "HighSpeedShaftApplyList",
     "HighSpeedShaftFields",
     "HighSpeedShaftTextFields",
@@ -58,9 +61,9 @@ class HighSpeedShaft(DomainModel):
     bending_monent_x: Union[TimeSeries, str, None] = None
     torque: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> HighSpeedShaftApply:
+    def as_write(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""
-        return HighSpeedShaftApply(
+        return HighSpeedShaftWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -69,8 +72,17 @@ class HighSpeedShaft(DomainModel):
             torque=self.torque,
         )
 
+    def as_apply(self) -> HighSpeedShaftWrite:
+        """Convert this read version of high speed shaft to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class HighSpeedShaftApply(DomainModelApply):
+
+class HighSpeedShaftWrite(DomainModelWrite):
     """This represents the writing version of high speed shaft.
 
     It is used to when data is sent to CDF.
@@ -90,13 +102,13 @@ class HighSpeedShaftApply(DomainModelApply):
     bending_monent_x: Union[TimeSeries, str, None] = None
     torque: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -150,20 +162,44 @@ class HighSpeedShaftApply(DomainModelApply):
         return resources
 
 
+class HighSpeedShaftApply(HighSpeedShaftWrite):
+    def __new__(cls, *args, **kwargs) -> HighSpeedShaftApply:
+        warnings.warn(
+            "HighSpeedShaftApply is deprecated and will be removed in v1.0. Use HighSpeedShaftWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "HighSpeedShaft.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class HighSpeedShaftList(DomainModelList[HighSpeedShaft]):
     """List of high speed shafts in the read version."""
 
     _INSTANCE = HighSpeedShaft
 
-    def as_apply(self) -> HighSpeedShaftApplyList:
+    def as_write(self) -> HighSpeedShaftWriteList:
         """Convert these read versions of high speed shaft to the writing versions."""
-        return HighSpeedShaftApplyList([node.as_write() for node in self.data])
+        return HighSpeedShaftWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> HighSpeedShaftWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class HighSpeedShaftApplyList(DomainModelApplyList[HighSpeedShaftApply]):
+class HighSpeedShaftWriteList(DomainModelWriteList[HighSpeedShaftWrite]):
     """List of high speed shafts in the writing version."""
 
-    _INSTANCE = HighSpeedShaftApply
+    _INSTANCE = HighSpeedShaftWrite
+
+
+class HighSpeedShaftApplyList(HighSpeedShaftWriteList): ...
 
 
 def _create_high_speed_shaft_filter(

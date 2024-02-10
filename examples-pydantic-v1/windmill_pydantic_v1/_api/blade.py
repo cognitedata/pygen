@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Blade,
-    BladeApply,
+    BladeWrite,
     BladeFields,
     BladeList,
-    BladeApplyList,
+    BladeWriteList,
     BladeTextFields,
 )
 from windmill_pydantic_v1.data_classes._blade import (
@@ -37,7 +37,7 @@ from .blade_sensor_positions import BladeSensorPositionsAPI
 from .blade_query import BladeQueryAPI
 
 
-class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
+class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Blade]
         super().__init__(
@@ -45,7 +45,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             sources=view_id,
             class_type=Blade,
             class_list=BladeList,
-            class_apply_list=BladeApplyList,
+            class_write_list=BladeWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -91,10 +91,10 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
     def apply(
         self,
-        blade: BladeApply | Sequence[BladeApply],
+        blade: BladeWrite | Sequence[BladeWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) blades.
 
         Note: This method iterates through all nodes and timeseries linked to blade and creates them including the edges
@@ -115,18 +115,19 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             Create a new blade:
 
                 >>> from windmill_pydantic_v1 import WindmillClient
-                >>> from windmill_pydantic_v1.data_classes import BladeApply
+                >>> from windmill_pydantic_v1.data_classes import BladeWrite
                 >>> client = WindmillClient()
-                >>> blade = BladeApply(external_id="my_blade", ...)
+                >>> blade = BladeWrite(external_id="my_blade", ...)
                 >>> result = client.blade.apply(blade)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.blade.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.blade.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_multi_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Implementation1sPygenModels,
-    Implementation1sPygenModelsApply,
+    Implementation1sPygenModelsWrite,
     Implementation1sPygenModelsFields,
     Implementation1sPygenModelsList,
-    Implementation1sPygenModelsApplyList,
+    Implementation1sPygenModelsWriteList,
     Implementation1sPygenModelsTextFields,
 )
 from omni_multi_pydantic_v1.data_classes._implementation_1_s_pygen_models import (
@@ -37,7 +37,7 @@ from .implementation_1_s_pygen_models_query import Implementation1sPygenModelsQu
 
 
 class Implementation1sPygenModelsAPI(
-    NodeAPI[Implementation1sPygenModels, Implementation1sPygenModelsApply, Implementation1sPygenModelsList]
+    NodeAPI[Implementation1sPygenModels, Implementation1sPygenModelsWrite, Implementation1sPygenModelsList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1sPygenModels]
@@ -46,7 +46,7 @@ class Implementation1sPygenModelsAPI(
             sources=view_id,
             class_type=Implementation1sPygenModels,
             class_list=Implementation1sPygenModelsList,
-            class_apply_list=Implementation1sPygenModelsApplyList,
+            class_write_list=Implementation1sPygenModelsWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -106,10 +106,10 @@ class Implementation1sPygenModelsAPI(
 
     def apply(
         self,
-        implementation_1_s_pygen_model: Implementation1sPygenModelsApply | Sequence[Implementation1sPygenModelsApply],
+        implementation_1_s_pygen_model: Implementation1sPygenModelsWrite | Sequence[Implementation1sPygenModelsWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) implementation 1 s pygen models.
 
         Args:
@@ -126,18 +126,19 @@ class Implementation1sPygenModelsAPI(
             Create a new implementation_1_s_pygen_model:
 
                 >>> from omni_multi_pydantic_v1 import OmniMultiClient
-                >>> from omni_multi_pydantic_v1.data_classes import Implementation1sPygenModelsApply
+                >>> from omni_multi_pydantic_v1.data_classes import Implementation1sPygenModelsWrite
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_model = Implementation1sPygenModelsApply(external_id="my_implementation_1_s_pygen_model", ...)
+                >>> implementation_1_s_pygen_model = Implementation1sPygenModelsWrite(external_id="my_implementation_1_s_pygen_model", ...)
                 >>> result = client.implementation_1_s_pygen_models.apply(implementation_1_s_pygen_model)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.implementation_1_s_pygen_models.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.implementation_1_s_pygen_models.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

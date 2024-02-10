@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ConnectionItemB,
-    ConnectionItemBApply,
+    ConnectionItemBWrite,
     ConnectionItemBFields,
     ConnectionItemBList,
-    ConnectionItemBApplyList,
+    ConnectionItemBWriteList,
     ConnectionItemBTextFields,
 )
 from omni_pydantic_v1.data_classes._connection_item_b import (
@@ -38,7 +38,7 @@ from .connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
 from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
-class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, ConnectionItemBList]):
+class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ConnectionItemB]
         super().__init__(
@@ -46,7 +46,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
             sources=view_id,
             class_type=ConnectionItemB,
             class_list=ConnectionItemBList,
-            class_apply_list=ConnectionItemBApplyList,
+            class_write_list=ConnectionItemBWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -90,10 +90,10 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
 
     def apply(
         self,
-        connection_item_b: ConnectionItemBApply | Sequence[ConnectionItemBApply],
+        connection_item_b: ConnectionItemBWrite | Sequence[ConnectionItemBWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item bs.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_b and creates them including the edges
@@ -114,18 +114,19 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
             Create a new connection_item_b:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import ConnectionItemBApply
+                >>> from omni_pydantic_v1.data_classes import ConnectionItemBWrite
                 >>> client = OmniClient()
-                >>> connection_item_b = ConnectionItemBApply(external_id="my_connection_item_b", ...)
+                >>> connection_item_b = ConnectionItemBWrite(external_id="my_connection_item_b", ...)
                 >>> result = client.connection_item_b.apply(connection_item_b)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.connection_item_b.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.connection_item_b.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

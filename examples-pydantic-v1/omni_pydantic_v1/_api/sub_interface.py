@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     SubInterface,
-    SubInterfaceApply,
+    SubInterfaceWrite,
     SubInterfaceFields,
     SubInterfaceList,
-    SubInterfaceApplyList,
+    SubInterfaceWriteList,
     SubInterfaceTextFields,
 )
 from omni_pydantic_v1.data_classes._sub_interface import (
@@ -36,7 +36,7 @@ from ._core import (
 from .sub_interface_query import SubInterfaceQueryAPI
 
 
-class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]):
+class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[SubInterface]
         super().__init__(
@@ -44,7 +44,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             sources=view_id,
             class_type=SubInterface,
             class_list=SubInterfaceList,
-            class_apply_list=SubInterfaceApplyList,
+            class_write_list=SubInterfaceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -92,10 +92,10 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
 
     def apply(
         self,
-        sub_interface: SubInterfaceApply | Sequence[SubInterfaceApply],
+        sub_interface: SubInterfaceWrite | Sequence[SubInterfaceWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) sub interfaces.
 
         Args:
@@ -112,18 +112,19 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             Create a new sub_interface:
 
                 >>> from omni_pydantic_v1 import OmniClient
-                >>> from omni_pydantic_v1.data_classes import SubInterfaceApply
+                >>> from omni_pydantic_v1.data_classes import SubInterfaceWrite
                 >>> client = OmniClient()
-                >>> sub_interface = SubInterfaceApply(external_id="my_sub_interface", ...)
+                >>> sub_interface = SubInterfaceWrite(external_id="my_sub_interface", ...)
                 >>> result = client.sub_interface.apply(sub_interface)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .apply method on the client instead. This means instead of "
-            "`my_client.sub_interface.apply(my_items)` please use `my_client.apply(my_items)`."
+            "Please use the .upsert method on the client instead. This means instead of "
+            "`my_client.sub_interface.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient.",
+            " class encourages users to create items in small batches, which is inefficient."
+            "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )

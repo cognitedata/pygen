@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -11,22 +12,31 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._gearbox import Gearbox, GearboxApply
-    from ._generator import Generator, GeneratorApply
-    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftApply
-    from ._main_shaft import MainShaft, MainShaftApply
-    from ._power_inverter import PowerInverter, PowerInverterApply
+    from ._gearbox import Gearbox, GearboxWrite
+    from ._generator import Generator, GeneratorWrite
+    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftWrite
+    from ._main_shaft import MainShaft, MainShaftWrite
+    from ._power_inverter import PowerInverter, PowerInverterWrite
 
 
-__all__ = ["Nacelle", "NacelleApply", "NacelleList", "NacelleApplyList", "NacelleFields", "NacelleTextFields"]
+__all__ = [
+    "Nacelle",
+    "NacelleWrite",
+    "NacelleApply",
+    "NacelleList",
+    "NacelleWriteList",
+    "NacelleApplyList",
+    "NacelleFields",
+    "NacelleTextFields",
+]
 
 
 NacelleTextFields = Literal[
@@ -79,32 +89,41 @@ class Nacelle(DomainModel):
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> NacelleApply:
+    def as_write(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
-        return NacelleApply(
+        return NacelleWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             acc_from_back_side_x=self.acc_from_back_side_x,
             acc_from_back_side_y=self.acc_from_back_side_y,
             acc_from_back_side_z=self.acc_from_back_side_z,
-            gearbox=self.gearbox.as_apply() if isinstance(self.gearbox, DomainModel) else self.gearbox,
-            generator=self.generator.as_apply() if isinstance(self.generator, DomainModel) else self.generator,
+            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
+            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
             high_speed_shaft=(
-                self.high_speed_shaft.as_apply()
+                self.high_speed_shaft.as_write()
                 if isinstance(self.high_speed_shaft, DomainModel)
                 else self.high_speed_shaft
             ),
-            main_shaft=self.main_shaft.as_apply() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
+            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
             power_inverter=(
-                self.power_inverter.as_apply() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
+                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
             ),
             yaw_direction=self.yaw_direction,
             yaw_error=self.yaw_error,
         )
 
+    def as_apply(self) -> NacelleWrite:
+        """Convert this read version of nacelle to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class NacelleApply(DomainModelApply):
+
+class NacelleWrite(DomainModelWrite):
     """This represents the writing version of nacelle.
 
     It is used to when data is sent to CDF.
@@ -130,21 +149,21 @@ class NacelleApply(DomainModelApply):
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
     acc_from_back_side_y: Union[TimeSeries, str, None] = None
     acc_from_back_side_z: Union[TimeSeries, str, None] = None
-    gearbox: Union[GearboxApply, str, dm.NodeId, None] = Field(None, repr=False)
-    generator: Union[GeneratorApply, str, dm.NodeId, None] = Field(None, repr=False)
-    high_speed_shaft: Union[HighSpeedShaftApply, str, dm.NodeId, None] = Field(None, repr=False)
-    main_shaft: Union[MainShaftApply, str, dm.NodeId, None] = Field(None, repr=False)
-    power_inverter: Union[PowerInverterApply, str, dm.NodeId, None] = Field(None, repr=False)
+    gearbox: Union[GearboxWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    generator: Union[GeneratorWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    high_speed_shaft: Union[HighSpeedShaftWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    main_shaft: Union[MainShaftWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    power_inverter: Union[PowerInverterWrite, str, dm.NodeId, None] = Field(None, repr=False)
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -234,24 +253,24 @@ class NacelleApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.gearbox, DomainModelApply):
-            other_resources = self.gearbox._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.gearbox, DomainModelWrite):
+            other_resources = self.gearbox._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.generator, DomainModelApply):
-            other_resources = self.generator._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.generator, DomainModelWrite):
+            other_resources = self.generator._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.high_speed_shaft, DomainModelApply):
-            other_resources = self.high_speed_shaft._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.high_speed_shaft, DomainModelWrite):
+            other_resources = self.high_speed_shaft._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.main_shaft, DomainModelApply):
-            other_resources = self.main_shaft._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.main_shaft, DomainModelWrite):
+            other_resources = self.main_shaft._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        if isinstance(self.power_inverter, DomainModelApply):
-            other_resources = self.power_inverter._to_instances_apply(cache, view_by_read_class)
+        if isinstance(self.power_inverter, DomainModelWrite):
+            other_resources = self.power_inverter._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         if isinstance(self.acc_from_back_side_x, TimeSeries):
@@ -272,20 +291,44 @@ class NacelleApply(DomainModelApply):
         return resources
 
 
+class NacelleApply(NacelleWrite):
+    def __new__(cls, *args, **kwargs) -> NacelleApply:
+        warnings.warn(
+            "NacelleApply is deprecated and will be removed in v1.0. Use NacelleWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "Nacelle.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class NacelleList(DomainModelList[Nacelle]):
     """List of nacelles in the read version."""
 
     _INSTANCE = Nacelle
 
-    def as_apply(self) -> NacelleApplyList:
+    def as_write(self) -> NacelleWriteList:
         """Convert these read versions of nacelle to the writing versions."""
-        return NacelleApplyList([node.as_write() for node in self.data])
+        return NacelleWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> NacelleWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class NacelleApplyList(DomainModelApplyList[NacelleApply]):
+class NacelleWriteList(DomainModelWriteList[NacelleWrite]):
     """List of nacelles in the writing version."""
 
-    _INSTANCE = NacelleApply
+    _INSTANCE = NacelleWrite
+
+
+class NacelleApplyList(NacelleWriteList): ...
 
 
 def _create_nacelle_filter(

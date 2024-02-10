@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -11,18 +12,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveRequired",
+    "PrimitiveRequiredWrite",
     "PrimitiveRequiredApply",
     "PrimitiveRequiredList",
+    "PrimitiveRequiredWriteList",
     "PrimitiveRequiredApplyList",
     "PrimitiveRequiredFields",
     "PrimitiveRequiredTextFields",
@@ -79,9 +82,9 @@ class PrimitiveRequired(DomainModel):
     text: str
     timestamp: datetime.datetime
 
-    def as_apply(self) -> PrimitiveRequiredApply:
+    def as_write(self) -> PrimitiveRequiredWrite:
         """Convert this read version of primitive required to the writing version."""
-        return PrimitiveRequiredApply(
+        return PrimitiveRequiredWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -96,8 +99,17 @@ class PrimitiveRequired(DomainModel):
             timestamp=self.timestamp,
         )
 
+    def as_apply(self) -> PrimitiveRequiredWrite:
+        """Convert this read version of primitive required to the writing version."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
-class PrimitiveRequiredApply(DomainModelApply):
+
+class PrimitiveRequiredWrite(DomainModelWrite):
     """This represents the writing version of primitive required.
 
     It is used to when data is sent to CDF.
@@ -129,13 +141,13 @@ class PrimitiveRequiredApply(DomainModelApply):
     text: str
     timestamp: datetime.datetime
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -191,20 +203,44 @@ class PrimitiveRequiredApply(DomainModelApply):
         return resources
 
 
+class PrimitiveRequiredApply(PrimitiveRequiredWrite):
+    def __new__(cls, *args, **kwargs) -> PrimitiveRequiredApply:
+        warnings.warn(
+            "PrimitiveRequiredApply is deprecated and will be removed in v1.0. Use PrimitiveRequiredWrite instead."
+            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
+            "PrimitiveRequired.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
+
+
 class PrimitiveRequiredList(DomainModelList[PrimitiveRequired]):
     """List of primitive requireds in the read version."""
 
     _INSTANCE = PrimitiveRequired
 
-    def as_apply(self) -> PrimitiveRequiredApplyList:
+    def as_write(self) -> PrimitiveRequiredWriteList:
         """Convert these read versions of primitive required to the writing versions."""
-        return PrimitiveRequiredApplyList([node.as_write() for node in self.data])
+        return PrimitiveRequiredWriteList([node.as_write() for node in self.data])
+
+    def as_apply(self) -> PrimitiveRequiredWriteList:
+        """Convert these read versions of primitive nullable to the writing versions."""
+        warnings.warn(
+            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return self.as_write()
 
 
-class PrimitiveRequiredApplyList(DomainModelApplyList[PrimitiveRequiredApply]):
+class PrimitiveRequiredWriteList(DomainModelWriteList[PrimitiveRequiredWrite]):
     """List of primitive requireds in the writing version."""
 
-    _INSTANCE = PrimitiveRequiredApply
+    _INSTANCE = PrimitiveRequiredWrite
+
+
+class PrimitiveRequiredApplyList(PrimitiveRequiredWriteList): ...
 
 
 def _create_primitive_required_filter(
