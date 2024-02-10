@@ -104,7 +104,7 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
         ],
     )
 
-    instances = new_procedure.to_instances_apply()
+    instances = new_procedure.to_instances_write()
     try:
         created = workorder.unit_procedure.apply(new_procedure)
 
