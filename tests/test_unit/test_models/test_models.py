@@ -226,8 +226,8 @@ def load_data_classes_test_cases():
         view,
         NodeDataClass(
             read_name="Series",
-            write_name="SeriesApply",
-            write_list_name="SeriesApplyList",
+            write_name="SeriesWrite",
+            write_list_name="SeriesWriteList",
             read_list_name="SeriesList",
             doc_name="series",
             doc_list_name="series",

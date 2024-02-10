@@ -16,16 +16,16 @@ from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
     from pydantic import TypeAdapter
-    from windmill.data_classes import DomainModelApply as WindmillDomainModelApply
-    from windmill.data_classes import ResourcesApply, WindmillApply
+    from windmill.data_classes import DomainModelWrite as WindmillDomainModelWrite
+    from windmill.data_classes import ResourcesWrite, WindmillWrite
 else:
     from pydantic import parse_obj_as
     from windmill_pydantic_v1.data_classes import (
-        DomainModelApply as WindmillDomainModelApply,
+        DomainModelWrite as WindmillDomainModelWrite,
     )
     from windmill_pydantic_v1.data_classes import (
-        ResourcesApply,
-        WindmillApply,
+        ResourcesWrite,
+        WindmillWrite,
     )
 
 
@@ -43,18 +43,18 @@ class TestToFromInstances:
         read_cls = omni_data_classes[view_id.external_id].read
 
         domain_node = read_cls.from_instance(node)
-        domain_apply_node = domain_node.as_write()
-        domain_apply_node.to_pandas()
+        domain_write_node = domain_node.as_write()
+        domain_write_node.to_pandas()
 
-        resources = domain_apply_node.to_instances_apply()
+        resources = domain_write_node.to_instances_write()
         if not node.properties[view_id]:
             return
         assert len(resources.nodes) == 1
 
-        node_apply = node.as_apply()
+        node_write = node.as_write()
         # Bug in SDK that skips the type
-        node_apply.type = node.type
-        assert node_apply.dump() == resources.nodes[0].dump()
+        node_write.type = node.type
+        assert node_write.dump() == resources.nodes[0].dump()
 
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
     def test_writeable_to_instances(self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses]):
@@ -69,18 +69,18 @@ class TestToFromInstances:
             return
 
         read_cls = omni_data_classes[view_id.external_id].write
-        node_apply = node.as_apply(None, None)
+        node_write = node.as_write()
         # Bug in SDK that skips the type
-        node_apply.type = node.type
-        domain_apply_node = read_cls.from_instance(node_apply)
-        domain_apply_node.to_pandas()
+        node_write.type = node.type
+        domain_write_node = read_cls.from_instance(node_write)
+        domain_write_node.to_pandas()
 
-        resources = domain_apply_node.to_instances_write()
+        resources = domain_write_node.to_instances_write()
         if not node.properties[view_id]:
             return
         assert len(resources.nodes) == 1
 
-        assert node_apply.dump() == resources.nodes[0].dump()
+        assert node_write.dump() == resources.nodes[0].dump()
 
 
 @pytest.mark.parametrize(
@@ -103,18 +103,18 @@ def test_load_windmills_from_json(
     # Arrange
     raw_json = WindMillFiles.Data.wind_mill_json.read_text()
     try:
-        WindmillDomainModelApply.external_id_factory = factory
+        WindmillDomainModelWrite.external_id_factory = factory
 
         loaded_json = json.loads(raw_json)
 
         # Act
         if IS_PYDANTIC_V2:
-            windmills = TypeAdapter(list[WindmillApply]).validate_json(raw_json)
+            windmills = TypeAdapter(list[WindmillWrite]).validate_json(raw_json)
         else:
-            windmills = parse_obj_as(list[WindmillApply], loaded_json)
-        created = ResourcesApply()
+            windmills = parse_obj_as(list[WindmillWrite], loaded_json)
+        created = ResourcesWrite()
         for item in windmills:
-            created.extend(item.to_instances_apply())
+            created.extend(item.to_instances_write())
 
         # Assert
         exclude = {"external_id", "space", "data_record"}
@@ -134,7 +134,7 @@ def test_load_windmills_from_json(
         assert len(created.nodes) == expected_node_count
         assert len(created.edges) == expected_edge_count
     finally:
-        WindmillDomainModelApply.external_id_factory = None
+        WindmillDomainModelWrite.external_id_factory = None
 
 
 def _recursive_exclude(d: dict, exclude: set[str]) -> None:

@@ -22,7 +22,7 @@ def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[str, OmniC
     available_data_classes = vars(omni_classes)
     for view in omni_data_model.views:
         read_name = to_pascal(view.external_id)
-        write_name = read_name + "Apply"
+        write_name = read_name + "Write"
         api_name = to_snake(view.external_id)
         read_class = available_data_classes[read_name]
         write_class = available_data_classes.get(write_name)

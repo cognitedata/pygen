@@ -158,7 +158,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
 
 {% for field in data_class.fields_of_type(ft.EdgeOneToManyEdges) %}
         for {{ field.variable }} in self.{{ field.name }} or []:
-            if isinstance({{ field.variable }}, DomainRelationApply):
+            if isinstance({{ field.variable }}, DomainRelationWrite):
                 other_resources = {{ field.variable }}._to_instances_apply(
                     cache,
                     self,
@@ -169,15 +169,15 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_read_class=view_by_read_class
             ){% else %}
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
             ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
-        if isinstance(self.{{ field.name }}, DomainModelApply):
+        if isinstance(self.{{ field.name }}, DomainModelWrite):
             other_resources = self.{{ field.name }}._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
