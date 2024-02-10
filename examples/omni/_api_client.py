@@ -97,10 +97,10 @@ class OmniClient:
 
     def upsert(
         self,
-        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> data_classes.ResourcesApplyResult:
+    ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
         Args:
@@ -113,12 +113,12 @@ class OmniClient:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
-        if isinstance(items, data_classes.DomainModelApply):
-            instances = items.to_instances_apply(self._view_by_read_class, write_none)
+        if isinstance(items, data_classes.DomainModelWrite):
+            instances = items.to_instances_write(self._view_by_read_class, write_none)
         else:
-            instances = data_classes.ResourcesApply()
+            instances = data_classes.ResourcesWrite()
             for item in items:
-                instances.extend(item.to_instances_apply(self._view_by_read_class, write_none))
+                instances.extend(item.to_instances_write(self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -130,14 +130,14 @@ class OmniClient:
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return data_classes.ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     def apply(
         self,
-        items: data_classes.DomainModelApply | Sequence[data_classes.DomainModelApply],
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> data_classes.ResourcesApplyResult:
+    ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
         Args:

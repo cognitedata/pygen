@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Implementation2,
     Implementation2Apply,
     Implementation2Fields,
     Implementation2List,
-    Implementation2ApplyList,
+    Implementation2WriteList,
     Implementation2TextFields,
 )
 from omni.data_classes._implementation_2 import (
@@ -44,7 +44,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
             sources=view_id,
             class_type=Implementation2,
             class_list=Implementation2List,
-            class_apply_list=Implementation2ApplyList,
+            class_apply_list=Implementation2WriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -95,7 +95,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implemen
         implementation_2: Implementation2Apply | Sequence[Implementation2Apply],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) implementation 2.
 
         Args:

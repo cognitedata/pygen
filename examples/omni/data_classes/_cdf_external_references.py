@@ -10,20 +10,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
     TimeSeries,
 )
 
 
 __all__ = [
     "CDFExternalReferences",
-    "CDFExternalReferencesApply",
+    "CDFExternalReferencesWrite",
     "CDFExternalReferencesList",
-    "CDFExternalReferencesApplyList",
+    "CDFExternalReferencesWriteList",
     "CDFExternalReferencesFields",
     "CDFExternalReferencesTextFields",
 ]
@@ -59,9 +59,9 @@ class CDFExternalReferences(DomainModel):
     sequence: Union[str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
-    def as_apply(self) -> CDFExternalReferencesApply:
+    def as_apply(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
-        return CDFExternalReferencesApply(
+        return CDFExternalReferencesWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -71,7 +71,7 @@ class CDFExternalReferences(DomainModel):
         )
 
 
-class CDFExternalReferencesApply(DomainModelApply):
+class CDFExternalReferencesWrite(DomainModelWrite):
     """This represents the writing version of cdf external reference.
 
     It is used to when data is sent to CDF.
@@ -91,13 +91,13 @@ class CDFExternalReferencesApply(DomainModelApply):
     sequence: Union[str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -146,15 +146,15 @@ class CDFExternalReferencesList(DomainModelList[CDFExternalReferences]):
 
     _INSTANCE = CDFExternalReferences
 
-    def as_apply(self) -> CDFExternalReferencesApplyList:
+    def as_apply(self) -> CDFExternalReferencesWriteList:
         """Convert these read versions of cdf external reference to the writing versions."""
-        return CDFExternalReferencesApplyList([node.as_apply() for node in self.data])
+        return CDFExternalReferencesWriteList([node.as_apply() for node in self.data])
 
 
-class CDFExternalReferencesApplyList(DomainModelApplyList[CDFExternalReferencesApply]):
+class CDFExternalReferencesWriteList(DomainModelWriteList[CDFExternalReferencesWrite]):
     """List of cdf external references in the writing version."""
 
-    _INSTANCE = CDFExternalReferencesApply
+    _INSTANCE = CDFExternalReferencesWrite
 
 
 def _create_cdf_external_reference_filter(

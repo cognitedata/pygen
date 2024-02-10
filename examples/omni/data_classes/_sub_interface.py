@@ -10,20 +10,20 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
-from ._main_interface import MainInterface, MainInterfaceApply
+from ._main_interface import MainInterface, MainInterfaceWrite
 
 
 __all__ = [
     "SubInterface",
     "SubInterfaceApply",
     "SubInterfaceList",
-    "SubInterfaceApplyList",
+    "SubInterfaceWriteList",
     "SubInterfaceFields",
     "SubInterfaceTextFields",
 ]
@@ -65,7 +65,7 @@ class SubInterface(MainInterface):
         )
 
 
-class SubInterfaceApply(MainInterfaceApply):
+class SubInterfaceApply(MainInterfaceWrite):
     """This represents the writing version of sub interface.
 
     It is used to when data is sent to CDF.
@@ -81,13 +81,13 @@ class SubInterfaceApply(MainInterfaceApply):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -125,12 +125,12 @@ class SubInterfaceList(DomainModelList[SubInterface]):
 
     _INSTANCE = SubInterface
 
-    def as_apply(self) -> SubInterfaceApplyList:
+    def as_apply(self) -> SubInterfaceWriteList:
         """Convert these read versions of sub interface to the writing versions."""
-        return SubInterfaceApplyList([node.as_apply() for node in self.data])
+        return SubInterfaceWriteList([node.as_apply() for node in self.data])
 
 
-class SubInterfaceApplyList(DomainModelApplyList[SubInterfaceApply]):
+class SubInterfaceWriteList(DomainModelWriteList[SubInterfaceApply]):
     """List of sub interfaces in the writing version."""
 
     _INSTANCE = SubInterfaceApply

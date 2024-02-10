@@ -75,7 +75,7 @@ class TestToFromInstances:
         domain_apply_node = read_cls.from_instance(node_apply)
         domain_apply_node.to_pandas()
 
-        resources = domain_apply_node.to_instances_apply()
+        resources = domain_apply_node.to_instances_write()
         if not node.properties[view_id]:
             return
         assert len(resources.nodes) == 1

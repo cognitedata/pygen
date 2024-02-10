@@ -10,11 +10,11 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 from ._sub_interface import SubInterface, SubInterfaceApply
 
@@ -23,7 +23,7 @@ __all__ = [
     "Implementation1",
     "Implementation1Apply",
     "Implementation1List",
-    "Implementation1ApplyList",
+    "Implementation1WriteList",
     "Implementation1Fields",
     "Implementation1TextFields",
 ]
@@ -91,13 +91,13 @@ class Implementation1Apply(SubInterfaceApply):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -141,12 +141,12 @@ class Implementation1List(DomainModelList[Implementation1]):
 
     _INSTANCE = Implementation1
 
-    def as_apply(self) -> Implementation1ApplyList:
+    def as_apply(self) -> Implementation1WriteList:
         """Convert these read versions of implementation 1 to the writing versions."""
-        return Implementation1ApplyList([node.as_apply() for node in self.data])
+        return Implementation1WriteList([node.as_apply() for node in self.data])
 
 
-class Implementation1ApplyList(DomainModelApplyList[Implementation1Apply]):
+class Implementation1WriteList(DomainModelWriteList[Implementation1Apply]):
     """List of implementation 1 in the writing version."""
 
     _INSTANCE = Implementation1Apply

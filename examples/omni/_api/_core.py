@@ -18,15 +18,15 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import (
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainRelationApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    DomainRelationWrite,
+    ResourcesWriteResult,
     T_DomainModel,
-    T_DomainModelApply,
-    T_DomainModelApplyList,
+    T_DomainModelWrite,
+    T_DomainModelWriteList,
     T_DomainModelList,
     T_DomainRelation,
-    T_DomainRelationApply,
+    T_DomainRelationWrite,
     T_DomainRelationList,
     DomainModelCore,
     DomainRelation,
@@ -366,7 +366,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
 
 class NodeAPI(
-    Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList]
+    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList]
 ):
     def __init__(
         self,
@@ -374,17 +374,17 @@ class NodeAPI(
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
         class_type: type[T_DomainModel],
         class_list: type[T_DomainModelList],
-        class_apply_list: type[T_DomainModelApplyList],
+        class_apply_list: type[T_DomainModelWriteList],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         super().__init__(client, sources, class_type, class_list, view_by_read_class)
         self._class_apply_list = class_apply_list
 
     def _apply(
-        self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False, write_none: bool = False
-    ) -> ResourcesApplyResult:
-        if isinstance(item, DomainModelApply):
-            instances = item.to_instances_apply(self._view_by_read_class, write_none)
+        self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False
+    ) -> ResourcesWriteResult:
+        if isinstance(item, DomainModelWrite):
+            instances = item.to_instances_write(self._view_by_read_class, write_none)
         else:
             instances = self._class_apply_list(item).to_instances_apply(self._view_by_read_class, write_none)
         result = self._client.data_modeling.instances.apply(
@@ -398,7 +398,7 @@ class NodeAPI(
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
 
 class EdgeAPI:
@@ -413,13 +413,13 @@ class EdgeAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_)
 
 
-class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
+class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, T_DomainRelationList]):
     def __init__(
         self,
         client: CogniteClient,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         class_type: type[T_DomainRelation],
-        class_apply_type: type[T_DomainRelationApply],
+        class_apply_type: type[T_DomainRelationWrite],
         class_list: type[T_DomainRelationList],
     ):
         super().__init__(client)

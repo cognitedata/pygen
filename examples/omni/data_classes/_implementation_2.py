@@ -10,11 +10,11 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 from ._sub_interface import SubInterface, SubInterfaceApply
 
@@ -23,7 +23,7 @@ __all__ = [
     "Implementation2",
     "Implementation2Apply",
     "Implementation2List",
-    "Implementation2ApplyList",
+    "Implementation2WriteList",
     "Implementation2Fields",
     "Implementation2TextFields",
 ]
@@ -79,13 +79,13 @@ class Implementation2Apply(SubInterfaceApply):
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -123,12 +123,12 @@ class Implementation2List(DomainModelList[Implementation2]):
 
     _INSTANCE = Implementation2
 
-    def as_apply(self) -> Implementation2ApplyList:
+    def as_apply(self) -> Implementation2WriteList:
         """Convert these read versions of implementation 2 to the writing versions."""
-        return Implementation2ApplyList([node.as_apply() for node in self.data])
+        return Implementation2WriteList([node.as_apply() for node in self.data])
 
 
-class Implementation2ApplyList(DomainModelApplyList[Implementation2Apply]):
+class Implementation2WriteList(DomainModelWriteList[Implementation2Apply]):
     """List of implementation 2 in the writing version."""
 
     _INSTANCE = Implementation2Apply

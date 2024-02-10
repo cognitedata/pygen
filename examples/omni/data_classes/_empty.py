@@ -11,15 +11,15 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
-__all__ = ["Empty", "EmptyApply", "EmptyList", "EmptyApplyList", "EmptyFields", "EmptyTextFields"]
+__all__ = ["Empty", "EmptyWrite", "EmptyList", "EmptyWriteList", "EmptyFields", "EmptyTextFields"]
 
 
 EmptyTextFields = Literal["text"]
@@ -70,9 +70,9 @@ class Empty(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-    def as_apply(self) -> EmptyApply:
+    def as_apply(self) -> EmptyWrite:
         """Convert this read version of empty to the writing version."""
-        return EmptyApply(
+        return EmptyWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -88,7 +88,7 @@ class Empty(DomainModel):
         )
 
 
-class EmptyApply(DomainModelApply):
+class EmptyWrite(DomainModelWrite):
     """This represents the writing version of empty.
 
     It is used to when data is sent to CDF.
@@ -120,13 +120,13 @@ class EmptyApply(DomainModelApply):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -185,15 +185,15 @@ class EmptyList(DomainModelList[Empty]):
 
     _INSTANCE = Empty
 
-    def as_apply(self) -> EmptyApplyList:
+    def as_apply(self) -> EmptyWriteList:
         """Convert these read versions of empty to the writing versions."""
-        return EmptyApplyList([node.as_apply() for node in self.data])
+        return EmptyWriteList([node.as_apply() for node in self.data])
 
 
-class EmptyApplyList(DomainModelApplyList[EmptyApply]):
+class EmptyWriteList(DomainModelWriteList[EmptyWrite]):
     """List of empties in the writing version."""
 
-    _INSTANCE = EmptyApply
+    _INSTANCE = EmptyWrite
 
 
 def _create_empty_filter(

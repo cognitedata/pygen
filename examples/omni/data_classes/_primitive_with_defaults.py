@@ -10,19 +10,19 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveWithDefaults",
-    "PrimitiveWithDefaultsApply",
+    "PrimitiveWithDefaultsWrite",
     "PrimitiveWithDefaultsList",
-    "PrimitiveWithDefaultsApplyList",
+    "PrimitiveWithDefaultsWriteList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
 ]
@@ -66,9 +66,9 @@ class PrimitiveWithDefaults(DomainModel):
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
 
-    def as_apply(self) -> PrimitiveWithDefaultsApply:
+    def as_apply(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
-        return PrimitiveWithDefaultsApply(
+        return PrimitiveWithDefaultsWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -80,7 +80,7 @@ class PrimitiveWithDefaults(DomainModel):
         )
 
 
-class PrimitiveWithDefaultsApply(DomainModelApply):
+class PrimitiveWithDefaultsWrite(DomainModelWrite):
     """This represents the writing version of primitive with default.
 
     It is used to when data is sent to CDF.
@@ -104,13 +104,13 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
     default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -159,15 +159,15 @@ class PrimitiveWithDefaultsList(DomainModelList[PrimitiveWithDefaults]):
 
     _INSTANCE = PrimitiveWithDefaults
 
-    def as_apply(self) -> PrimitiveWithDefaultsApplyList:
+    def as_apply(self) -> PrimitiveWithDefaultsWriteList:
         """Convert these read versions of primitive with default to the writing versions."""
-        return PrimitiveWithDefaultsApplyList([node.as_apply() for node in self.data])
+        return PrimitiveWithDefaultsWriteList([node.as_apply() for node in self.data])
 
 
-class PrimitiveWithDefaultsApplyList(DomainModelApplyList[PrimitiveWithDefaultsApply]):
+class PrimitiveWithDefaultsWriteList(DomainModelWriteList[PrimitiveWithDefaultsWrite]):
     """List of primitive with defaults in the writing version."""
 
-    _INSTANCE = PrimitiveWithDefaultsApply
+    _INSTANCE = PrimitiveWithDefaultsWrite
 
 
 def _create_primitive_with_default_filter(

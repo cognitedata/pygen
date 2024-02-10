@@ -118,7 +118,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelApply):
-            other_resources = self.end_node._to_instances_apply(cache, view_by_read_class)
+            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources

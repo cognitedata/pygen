@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     SubInterface,
     SubInterfaceApply,
     SubInterfaceFields,
     SubInterfaceList,
-    SubInterfaceApplyList,
+    SubInterfaceWriteList,
     SubInterfaceTextFields,
 )
 from omni.data_classes._sub_interface import (
@@ -44,7 +44,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             sources=view_id,
             class_type=SubInterface,
             class_list=SubInterfaceList,
-            class_apply_list=SubInterfaceApplyList,
+            class_apply_list=SubInterfaceWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -95,7 +95,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
         sub_interface: SubInterfaceApply | Sequence[SubInterfaceApply],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) sub interfaces.
 
         Args:

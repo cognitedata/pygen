@@ -12,13 +12,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     PrimitiveRequiredListed,
-    PrimitiveRequiredListedApply,
+    PrimitiveRequiredListedWrite,
     PrimitiveRequiredListedFields,
     PrimitiveRequiredListedList,
-    PrimitiveRequiredListedApplyList,
+    PrimitiveRequiredListedWriteList,
     PrimitiveRequiredListedTextFields,
 )
 from omni.data_classes._primitive_required_listed import (
@@ -38,7 +38,7 @@ from .primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
 
 
 class PrimitiveRequiredListedAPI(
-    NodeAPI[PrimitiveRequiredListed, PrimitiveRequiredListedApply, PrimitiveRequiredListedList]
+    NodeAPI[PrimitiveRequiredListed, PrimitiveRequiredListedWrite, PrimitiveRequiredListedList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveRequiredListed]
@@ -47,7 +47,7 @@ class PrimitiveRequiredListedAPI(
             sources=view_id,
             class_type=PrimitiveRequiredListed,
             class_list=PrimitiveRequiredListedList,
-            class_apply_list=PrimitiveRequiredListedApplyList,
+            class_apply_list=PrimitiveRequiredListedWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,10 +83,10 @@ class PrimitiveRequiredListedAPI(
 
     def apply(
         self,
-        primitive_required_listed: PrimitiveRequiredListedApply | Sequence[PrimitiveRequiredListedApply],
+        primitive_required_listed: PrimitiveRequiredListedWrite | Sequence[PrimitiveRequiredListedWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) primitive required listeds.
 
         Args:
@@ -103,9 +103,9 @@ class PrimitiveRequiredListedAPI(
             Create a new primitive_required_listed:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveRequiredListedApply
+                >>> from omni.data_classes import PrimitiveRequiredListedWrite
                 >>> client = OmniClient()
-                >>> primitive_required_listed = PrimitiveRequiredListedApply(external_id="my_primitive_required_listed", ...)
+                >>> primitive_required_listed = PrimitiveRequiredListedWrite(external_id="my_primitive_required_listed", ...)
                 >>> result = client.primitive_required_listed.apply(primitive_required_listed)
 
         """

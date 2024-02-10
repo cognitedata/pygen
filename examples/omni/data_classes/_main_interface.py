@@ -10,19 +10,19 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "MainInterface",
-    "MainInterfaceApply",
+    "MainInterfaceWrite",
     "MainInterfaceList",
-    "MainInterfaceApplyList",
+    "MainInterfaceWriteList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
 ]
@@ -52,9 +52,9 @@ class MainInterface(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
-    def as_apply(self) -> MainInterfaceApply:
+    def as_apply(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""
-        return MainInterfaceApply(
+        return MainInterfaceWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -62,7 +62,7 @@ class MainInterface(DomainModel):
         )
 
 
-class MainInterfaceApply(DomainModelApply):
+class MainInterfaceWrite(DomainModelWrite):
     """This represents the writing version of main interface.
 
     It is used to when data is sent to CDF.
@@ -78,13 +78,13 @@ class MainInterfaceApply(DomainModelApply):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -119,15 +119,15 @@ class MainInterfaceList(DomainModelList[MainInterface]):
 
     _INSTANCE = MainInterface
 
-    def as_apply(self) -> MainInterfaceApplyList:
+    def as_apply(self) -> MainInterfaceWriteList:
         """Convert these read versions of main interface to the writing versions."""
-        return MainInterfaceApplyList([node.as_apply() for node in self.data])
+        return MainInterfaceWriteList([node.as_apply() for node in self.data])
 
 
-class MainInterfaceApplyList(DomainModelApplyList[MainInterfaceApply]):
+class MainInterfaceWriteList(DomainModelWriteList[MainInterfaceWrite]):
     """List of main interfaces in the writing version."""
 
-    _INSTANCE = MainInterfaceApply
+    _INSTANCE = MainInterfaceWrite
 
 
 def _create_main_interface_filter(

@@ -11,19 +11,19 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveNullableListed",
-    "PrimitiveNullableListedApply",
+    "PrimitiveNullableListedWrite",
     "PrimitiveNullableListedList",
-    "PrimitiveNullableListedApplyList",
+    "PrimitiveNullableListedWriteList",
     "PrimitiveNullableListedFields",
     "PrimitiveNullableListedTextFields",
 ]
@@ -79,9 +79,9 @@ class PrimitiveNullableListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveNullableListedApply:
+    def as_apply(self) -> PrimitiveNullableListedWrite:
         """Convert this read version of primitive nullable listed to the writing version."""
-        return PrimitiveNullableListedApply(
+        return PrimitiveNullableListedWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -97,7 +97,7 @@ class PrimitiveNullableListed(DomainModel):
         )
 
 
-class PrimitiveNullableListedApply(DomainModelApply):
+class PrimitiveNullableListedWrite(DomainModelWrite):
     """This represents the writing version of primitive nullable listed.
 
     It is used to when data is sent to CDF.
@@ -129,13 +129,13 @@ class PrimitiveNullableListedApply(DomainModelApply):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -196,15 +196,15 @@ class PrimitiveNullableListedList(DomainModelList[PrimitiveNullableListed]):
 
     _INSTANCE = PrimitiveNullableListed
 
-    def as_apply(self) -> PrimitiveNullableListedApplyList:
+    def as_apply(self) -> PrimitiveNullableListedWriteList:
         """Convert these read versions of primitive nullable listed to the writing versions."""
-        return PrimitiveNullableListedApplyList([node.as_apply() for node in self.data])
+        return PrimitiveNullableListedWriteList([node.as_apply() for node in self.data])
 
 
-class PrimitiveNullableListedApplyList(DomainModelApplyList[PrimitiveNullableListedApply]):
+class PrimitiveNullableListedWriteList(DomainModelWriteList[PrimitiveNullableListedWrite]):
     """List of primitive nullable listeds in the writing version."""
 
-    _INSTANCE = PrimitiveNullableListedApply
+    _INSTANCE = PrimitiveNullableListedWrite
 
 
 def _create_primitive_nullable_listed_filter(

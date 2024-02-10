@@ -11,13 +11,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     CDFExternalReferencesListed,
-    CDFExternalReferencesListedApply,
+    CDFExternalReferencesListedWrite,
     CDFExternalReferencesListedFields,
     CDFExternalReferencesListedList,
-    CDFExternalReferencesListedApplyList,
+    CDFExternalReferencesListedWriteList,
 )
 from omni.data_classes._cdf_external_references_listed import (
     _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
@@ -37,7 +37,7 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 
 
 class CDFExternalReferencesListedAPI(
-    NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedApply, CDFExternalReferencesListedList]
+    NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedWrite, CDFExternalReferencesListedList]
 ):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[CDFExternalReferencesListed]
@@ -46,7 +46,7 @@ class CDFExternalReferencesListedAPI(
             sources=view_id,
             class_type=CDFExternalReferencesListed,
             class_list=CDFExternalReferencesListedList,
-            class_apply_list=CDFExternalReferencesListedApplyList,
+            class_apply_list=CDFExternalReferencesListedWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -83,10 +83,10 @@ class CDFExternalReferencesListedAPI(
 
     def apply(
         self,
-        cdf_external_references_listed: CDFExternalReferencesListedApply | Sequence[CDFExternalReferencesListedApply],
+        cdf_external_references_listed: CDFExternalReferencesListedWrite | Sequence[CDFExternalReferencesListedWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) cdf external references listeds.
 
         Args:
@@ -103,9 +103,9 @@ class CDFExternalReferencesListedAPI(
             Create a new cdf_external_references_listed:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import CDFExternalReferencesListedApply
+                >>> from omni.data_classes import CDFExternalReferencesListedWrite
                 >>> client = OmniClient()
-                >>> cdf_external_references_listed = CDFExternalReferencesListedApply(external_id="my_cdf_external_references_listed", ...)
+                >>> cdf_external_references_listed = CDFExternalReferencesListedWrite(external_id="my_cdf_external_references_listed", ...)
                 >>> result = client.cdf_external_references_listed.apply(cdf_external_references_listed)
 
         """

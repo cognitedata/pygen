@@ -11,19 +11,19 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 
 __all__ = [
     "PrimitiveRequiredListed",
-    "PrimitiveRequiredListedApply",
+    "PrimitiveRequiredListedWrite",
     "PrimitiveRequiredListedList",
-    "PrimitiveRequiredListedApplyList",
+    "PrimitiveRequiredListedWriteList",
     "PrimitiveRequiredListedFields",
     "PrimitiveRequiredListedTextFields",
 ]
@@ -79,9 +79,9 @@ class PrimitiveRequiredListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveRequiredListedApply:
+    def as_apply(self) -> PrimitiveRequiredListedWrite:
         """Convert this read version of primitive required listed to the writing version."""
-        return PrimitiveRequiredListedApply(
+        return PrimitiveRequiredListedWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -97,7 +97,7 @@ class PrimitiveRequiredListed(DomainModel):
         )
 
 
-class PrimitiveRequiredListedApply(DomainModelApply):
+class PrimitiveRequiredListedWrite(DomainModelWrite):
     """This represents the writing version of primitive required listed.
 
     It is used to when data is sent to CDF.
@@ -129,13 +129,13 @@ class PrimitiveRequiredListedApply(DomainModelApply):
     text: list[str]
     timestamp: list[datetime.datetime]
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -196,15 +196,15 @@ class PrimitiveRequiredListedList(DomainModelList[PrimitiveRequiredListed]):
 
     _INSTANCE = PrimitiveRequiredListed
 
-    def as_apply(self) -> PrimitiveRequiredListedApplyList:
+    def as_apply(self) -> PrimitiveRequiredListedWriteList:
         """Convert these read versions of primitive required listed to the writing versions."""
-        return PrimitiveRequiredListedApplyList([node.as_apply() for node in self.data])
+        return PrimitiveRequiredListedWriteList([node.as_apply() for node in self.data])
 
 
-class PrimitiveRequiredListedApplyList(DomainModelApplyList[PrimitiveRequiredListedApply]):
+class PrimitiveRequiredListedWriteList(DomainModelWriteList[PrimitiveRequiredListedWrite]):
     """List of primitive required listeds in the writing version."""
 
-    _INSTANCE = PrimitiveRequiredListedApply
+    _INSTANCE = PrimitiveRequiredListedWrite
 
 
 def _create_primitive_required_listed_filter(

@@ -10,12 +10,12 @@ from cognite.client import data_modeling as dm
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     ConnectionItemC,
-    ConnectionItemCApply,
+    ConnectionItemCWrite,
     ConnectionItemCList,
-    ConnectionItemCApplyList,
+    ConnectionItemCWriteList,
 )
 from omni.data_classes._connection_item_c import (
     _create_connection_item_c_filter,
@@ -34,7 +34,7 @@ from .connection_item_c_connection_item_b import ConnectionItemCConnectionItemBA
 from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
-class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, ConnectionItemCList]):
+class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ConnectionItemC]
         super().__init__(
@@ -42,7 +42,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, Connecti
             sources=None,
             class_type=ConnectionItemC,
             class_list=ConnectionItemCList,
-            class_apply_list=ConnectionItemCApplyList,
+            class_apply_list=ConnectionItemCWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -80,10 +80,10 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, Connecti
 
     def apply(
         self,
-        connection_item_c: ConnectionItemCApply | Sequence[ConnectionItemCApply],
+        connection_item_c: ConnectionItemCWrite | Sequence[ConnectionItemCWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item cs.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_c and creates them including the edges
@@ -104,9 +104,9 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, Connecti
             Create a new connection_item_c:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import ConnectionItemCApply
+                >>> from omni.data_classes import ConnectionItemCWrite
                 >>> client = OmniClient()
-                >>> connection_item_c = ConnectionItemCApply(external_id="my_connection_item_c", ...)
+                >>> connection_item_c = ConnectionItemCWrite(external_id="my_connection_item_c", ...)
                 >>> result = client.connection_item_c.apply(connection_item_c)
 
         """

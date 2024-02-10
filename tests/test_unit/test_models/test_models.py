@@ -30,9 +30,9 @@ from cognite.pygen.warnings import (
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from omni.data_classes import DomainModel, DomainModelApply
+    from omni.data_classes import DomainModel, DomainModelWrite
 else:
-    from omni_pydantic_v1.data_classes import DomainModel, DomainModelApply
+    from omni_pydantic_v1.data_classes import DomainModel
 
 
 def load_field_test_cases():
@@ -308,7 +308,7 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
         ("def", "def_"),
         *{
             (name, f"{name.casefold()}_")
-            for name in chain(dir(DomainModel), dir(DomainModelApply))
+            for name in chain(dir(DomainModel), dir(DomainModelWrite))
             if not name.startswith("_")
         },
     ],

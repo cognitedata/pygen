@@ -12,13 +12,13 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
-    DomainModelApply,
-    ResourcesApplyResult,
+    DomainModelWrite,
+    ResourcesWriteResult,
     Empty,
-    EmptyApply,
+    EmptyWrite,
     EmptyFields,
     EmptyList,
-    EmptyApplyList,
+    EmptyWriteList,
     EmptyTextFields,
 )
 from omni.data_classes._empty import (
@@ -37,7 +37,7 @@ from ._core import (
 from .empty_query import EmptyQueryAPI
 
 
-class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
+class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Empty]
         super().__init__(
@@ -45,7 +45,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
             sources=view_id,
             class_type=Empty,
             class_list=EmptyList,
-            class_apply_list=EmptyApplyList,
+            class_apply_list=EmptyWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -126,10 +126,10 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
 
     def apply(
         self,
-        empty: EmptyApply | Sequence[EmptyApply],
+        empty: EmptyWrite | Sequence[EmptyWrite],
         replace: bool = False,
         write_none: bool = False,
-    ) -> ResourcesApplyResult:
+    ) -> ResourcesWriteResult:
         """Add or update (upsert) empties.
 
         Args:
@@ -146,9 +146,9 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
             Create a new empty:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import EmptyApply
+                >>> from omni.data_classes import EmptyWrite
                 >>> client = OmniClient()
-                >>> empty = EmptyApply(external_id="my_empty", ...)
+                >>> empty = EmptyWrite(external_id="my_empty", ...)
                 >>> result = client.empty.apply(empty)
 
         """

@@ -10,23 +10,23 @@ from ._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelApply,
-    DomainModelApplyList,
+    DomainModelWrite,
+    DomainModelWriteList,
     DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
+    DomainRelationWrite,
+    ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_a import ConnectionItemA, ConnectionItemAApply
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBApply
+    from ._connection_item_a import ConnectionItemA, ConnectionItemAWrite
+    from ._connection_item_b import ConnectionItemB, ConnectionItemBWrite
 
 
 __all__ = [
     "ConnectionItemB",
-    "ConnectionItemBApply",
+    "ConnectionItemBWrite",
     "ConnectionItemBList",
-    "ConnectionItemBApplyList",
+    "ConnectionItemBWriteList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
 ]
@@ -60,9 +60,9 @@ class ConnectionItemB(DomainModel):
     name: Optional[str] = None
     self_edge: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
 
-    def as_apply(self) -> ConnectionItemBApply:
+    def as_apply(self) -> ConnectionItemBWrite:
         """Convert this read version of connection item b to the writing version."""
-        return ConnectionItemBApply(
+        return ConnectionItemBWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -75,7 +75,7 @@ class ConnectionItemB(DomainModel):
         )
 
 
-class ConnectionItemBApply(DomainModelApply):
+class ConnectionItemBWrite(DomainModelWrite):
     """This represents the writing version of connection item b.
 
     It is used to when data is sent to CDF.
@@ -91,17 +91,17 @@ class ConnectionItemBApply(DomainModelApply):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemAApply], list[str], None] = Field(default=None, repr=False)
+    inwards: Union[list[ConnectionItemAWrite], list[str], None] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemBApply], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
+    self_edge: Union[list[ConnectionItemBWrite], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
 
-    def _to_instances_apply(
+    def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
-    ) -> ResourcesApply:
-        resources = ResourcesApply()
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
 
@@ -130,14 +130,14 @@ class ConnectionItemBApply(DomainModelApply):
 
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for inward in self.inwards or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=inward, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("pygen-models", "reflexive")
         for self_edge in self.self_edge or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
+            other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node=self, end_node=self_edge, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
@@ -150,15 +150,15 @@ class ConnectionItemBList(DomainModelList[ConnectionItemB]):
 
     _INSTANCE = ConnectionItemB
 
-    def as_apply(self) -> ConnectionItemBApplyList:
+    def as_apply(self) -> ConnectionItemBWriteList:
         """Convert these read versions of connection item b to the writing versions."""
-        return ConnectionItemBApplyList([node.as_apply() for node in self.data])
+        return ConnectionItemBWriteList([node.as_apply() for node in self.data])
 
 
-class ConnectionItemBApplyList(DomainModelApplyList[ConnectionItemBApply]):
+class ConnectionItemBWriteList(DomainModelWriteList[ConnectionItemBWrite]):
     """List of connection item bs in the writing version."""
 
-    _INSTANCE = ConnectionItemBApply
+    _INSTANCE = ConnectionItemBWrite
 
 
 def _create_connection_item_b_filter(
