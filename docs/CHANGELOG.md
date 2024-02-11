@@ -17,6 +17,8 @@ Changes are grouped as follows
 ### Fixed
 * Using the `Apply` classes could raise `pydantic.errors.PydanticUserError: `<YOUR MODEL>` is not fully defined;...`
   This is now fixed.
+### Added
+* Helper method `.as_id` to `DomainRelation` base class.
 
 ## [0.99.7] - 10-02-24
 ### Changed
