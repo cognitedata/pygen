@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.7] - 08-02-24
+## [0.99.8] - 11-02-24
+### Fixed
+* Using the `Apply` classes could raise `pydantic.errors.PydanticUserError: `<YOUR MODEL>` is not fully defined;...`
+  This is now fixed.
+
+## [0.99.7] - 10-02-24
 ### Changed
 * The method `.apply` and write data classes, for example, `WindmillApply` has been renamed to `.upsert`
   and `WindmillWrite` to better reflect the operation. The old method and classes are still available, but
