@@ -20,9 +20,12 @@ else:
     from equipment_unit_pydantic_v1.client import EquipmentUnitClient
     from equipment_unit_pydantic_v1.client.data_classes import (
         EquipmentModule,
+        EquipmentModuleWrite,
         StartEndTime,
         StartEndTimeList,
+        StartEndTimeWrite,
         UnitProcedureList,
+        UnitProcedureWrite,
     )
 
 
