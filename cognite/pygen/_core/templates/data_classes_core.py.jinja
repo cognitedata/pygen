@@ -317,6 +317,9 @@ class DomainRelation(DomainModelCore):
     start_node: dm.DirectRelationReference
     data_record: DataRecord
 
+    def as_id(self) -> dm.EdgeId:
+        return dm.EdgeId(space=self.space, external_id=self.external_id)
+
     @classmethod
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
@@ -436,7 +439,7 @@ class DomainRelationList(CoreList[T_DomainRelation]):
     _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
-        return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self]
+        return [edge.as_id() for edge in self]
 
 
 T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)

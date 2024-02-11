@@ -305,6 +305,9 @@ class DomainRelation(DomainModelCore):
     start_node: dm.DirectRelationReference
     data_record: DataRecord
 
+    def as_id(self) -> dm.EdgeId:
+        return dm.EdgeId(space=self.space, external_id=self.external_id)
+
     @classmethod
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
