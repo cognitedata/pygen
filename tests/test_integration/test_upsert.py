@@ -182,7 +182,10 @@ def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClie
 def test_update_to_null(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
-    update = primitive_nullable_node.model_copy()
+    if IS_PYDANTIC_V2:
+        update = primitive_nullable_node.model_copy()
+    else:
+        update = primitive_nullable_node.copy()
     update.text = None
     update.int_32 = None
     update.int_64 = None
@@ -210,7 +213,10 @@ def test_update_to_null(
 def test_set_empty_string(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
-    update = primitive_nullable_node.model_copy()
+    if IS_PYDANTIC_V2:
+        update = primitive_nullable_node.model_copy()
+    else:
+        update = primitive_nullable_node.copy()
     update.text = ""
     omni_client.apply(update, write_none=True)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)

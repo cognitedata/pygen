@@ -51,8 +51,10 @@ from ._work_order import (
 
 StartEndTime.model_rebuild()
 StartEndTimeWrite.model_rebuild()
+StartEndTimeApply.model_rebuild()
 UnitProcedure.model_rebuild()
 UnitProcedureWrite.model_rebuild()
+UnitProcedureApply.model_rebuild()
 
 __all__ = [
     "DataRecord",

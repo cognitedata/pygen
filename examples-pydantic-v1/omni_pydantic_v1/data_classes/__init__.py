@@ -183,12 +183,21 @@ ConnectionItemAWrite.update_forward_refs(
     ConnectionItemBWrite=ConnectionItemBWrite,
     ConnectionItemCWrite=ConnectionItemCWrite,
 )
+ConnectionItemAApply.update_forward_refs(
+    ConnectionItemAWrite=ConnectionItemAWrite,
+    ConnectionItemBWrite=ConnectionItemBWrite,
+    ConnectionItemCWrite=ConnectionItemCWrite,
+)
 
 ConnectionItemB.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,
 )
 ConnectionItemBWrite.update_forward_refs(
+    ConnectionItemAWrite=ConnectionItemAWrite,
+    ConnectionItemBWrite=ConnectionItemBWrite,
+)
+ConnectionItemBApply.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
@@ -201,11 +210,16 @@ ConnectionItemCWrite.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
+ConnectionItemCApply.update_forward_refs(
+    ConnectionItemAWrite=ConnectionItemAWrite,
+    ConnectionItemBWrite=ConnectionItemBWrite,
+)
 
 DependentOnNonWritable.update_forward_refs(
     Implementation1NonWriteable=Implementation1NonWriteable,
 )
 DependentOnNonWritableWrite.update_forward_refs()
+DependentOnNonWritableApply.update_forward_refs()
 
 __all__ = [
     "DataRecord",

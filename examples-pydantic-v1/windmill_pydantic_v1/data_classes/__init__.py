@@ -110,6 +110,9 @@ Blade.update_forward_refs(
 BladeWrite.update_forward_refs(
     SensorPositionWrite=SensorPositionWrite,
 )
+BladeApply.update_forward_refs(
+    SensorPositionWrite=SensorPositionWrite,
+)
 
 Nacelle.update_forward_refs(
     Gearbox=Gearbox,
@@ -125,6 +128,13 @@ NacelleWrite.update_forward_refs(
     MainShaftWrite=MainShaftWrite,
     PowerInverterWrite=PowerInverterWrite,
 )
+NacelleApply.update_forward_refs(
+    GearboxWrite=GearboxWrite,
+    GeneratorWrite=GeneratorWrite,
+    HighSpeedShaftWrite=HighSpeedShaftWrite,
+    MainShaftWrite=MainShaftWrite,
+    PowerInverterWrite=PowerInverterWrite,
+)
 
 Windmill.update_forward_refs(
     Blade=Blade,
@@ -133,6 +143,12 @@ Windmill.update_forward_refs(
     Rotor=Rotor,
 )
 WindmillWrite.update_forward_refs(
+    BladeWrite=BladeWrite,
+    MetmastWrite=MetmastWrite,
+    NacelleWrite=NacelleWrite,
+    RotorWrite=RotorWrite,
+)
+WindmillApply.update_forward_refs(
     BladeWrite=BladeWrite,
     MetmastWrite=MetmastWrite,
     NacelleWrite=NacelleWrite,

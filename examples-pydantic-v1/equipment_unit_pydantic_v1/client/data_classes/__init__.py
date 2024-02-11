@@ -58,11 +58,18 @@ StartEndTimeWrite.update_forward_refs(
     EquipmentModuleWrite=EquipmentModuleWrite,
     WorkOrderWrite=WorkOrderWrite,
 )
+StartEndTimeApply.update_forward_refs(
+    EquipmentModuleWrite=EquipmentModuleWrite,
+    WorkOrderWrite=WorkOrderWrite,
+)
 
 UnitProcedure.update_forward_refs(
     StartEndTime=StartEndTime,
 )
 UnitProcedureWrite.update_forward_refs(
+    StartEndTimeWrite=StartEndTimeWrite,
+)
+UnitProcedureApply.update_forward_refs(
     StartEndTimeWrite=StartEndTimeWrite,
 )
 
