@@ -13,11 +13,15 @@ from ._core import (
 {% endfor %}
 {% if is_pydantic_v2 %}{% for (read_name, write_name) in dependencies_by_names %}{{ read_name }}.model_rebuild()
 {{ write_name }}.model_rebuild()
+{{ read_name }}Apply.model_rebuild()
 {% endfor %}{% else %}{% for (read_name, write_name), dependencies in dependencies_by_names.items() %}
 {{ read_name }}.update_forward_refs({% for dependency in dependencies %}
     {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
 )
 {{ write_name }}.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
+    {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
+)
+{{ read_name }}Apply.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
     {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
 )
 {% endfor %}{% endif %}

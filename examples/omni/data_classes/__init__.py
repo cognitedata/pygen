@@ -174,12 +174,16 @@ from ._sub_interface import (
 
 ConnectionItemA.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
+ConnectionItemAApply.model_rebuild()
 ConnectionItemB.model_rebuild()
 ConnectionItemBWrite.model_rebuild()
+ConnectionItemBApply.model_rebuild()
 ConnectionItemC.model_rebuild()
 ConnectionItemCWrite.model_rebuild()
+ConnectionItemCApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
+DependentOnNonWritableApply.model_rebuild()
 
 __all__ = [
     "DataRecord",
