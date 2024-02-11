@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.9] - 11-02-24
+### Fixed
+* The `data_class.__init__.py` file would reference write classes that does not exist in the generated SDK. This
+  occurs if a view is non-writable (and is not an interface). This is now fixed.
+
 ## [0.99.8] - 11-02-24
 ### Fixed
 * Using the `Apply` classes could raise `pydantic.errors.PydanticUserError: `<YOUR MODEL>` is not fully defined;...`
