@@ -11,21 +11,19 @@ else:
 
 
 def test_query_with_direct_relation(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a(limit=-1, space="omni_temp").query(
-        retrieve_other_direct=True, retrieve_self_direct=True
-    )
+    items = omni_client.connection_item_a(limit=-1).query(retrieve_other_direct=True, retrieve_self_direct=True)
 
     assert len(items) > 0
     incorrect_other = [
         item.other_direct
         for item in items
-        if not isinstance(item.other_direct, dc.ConnectionItemC) or item.other_direct is None
+        if not (isinstance(item.other_direct, dc.ConnectionItemC) or item.other_direct is None)
     ]
     assert len(incorrect_other) == 0, f"Other direct relation should be set, got {incorrect_other}"
     incorrect_self = [
         item.self_direct
         for item in items
-        if not isinstance(item.self_direct, dc.ConnectionItemA) or item.self_direct is None
+        if not (isinstance(item.self_direct, dc.ConnectionItemA) or item.self_direct is None)
     ]
     assert len(incorrect_self) == 0, f"Self direct relation should be set, got {incorrect_self}"
 
