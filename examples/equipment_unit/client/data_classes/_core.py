@@ -423,7 +423,7 @@ class DomainRelationList(CoreList[T_DomainRelation]):
     _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
-        return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self]
+        return [edge.as_id() for edge in self]
 
 
 T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)
