@@ -263,6 +263,7 @@ class MockGenerator:
                         isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
                         and connection.source is not None
                         and connection.source not in outputs
+                        and connection.source not in leaf_children_by_parent
                     ):
                         warnings.warn(
                             f"{view_id} property {name!r} points to a view {connection.source} "
@@ -300,10 +301,17 @@ class MockGenerator:
                         and isinstance(connection.type, dm.DirectRelation)
                         and connection.source
                     ):
+                        if connection.source in leaf_children_by_parent:
+                            sources = []
+                            for child in leaf_children_by_parent[connection.source]:
+                                sources.extend(outputs[child].node.as_ids())
+                        else:
+                            sources = outputs[connection.source].node.as_ids()
+
                         if (
                             not connection.nullable
                             or random.random() < (1 - (config.null_values or default_nullable_fraction))
-                        ) and (sources := outputs[connection.source].node.as_ids()):
+                        ) and sources:
                             other_node = choice(sources)
                             if node.sources is None:
                                 node.sources = []
