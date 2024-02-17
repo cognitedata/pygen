@@ -254,7 +254,7 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         # Reorder columns to have the custom columns first
         fixed_columns = {"data_record", "space"}
         columns = [col for col in df if col not in fixed_columns]
-        return df[columns + list(fixed_columns)]
+        return df[columns]
 
     def _repr_html_(self) -> str:
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
