@@ -251,9 +251,13 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         df = pd.DataFrame(self.dump())
         if df.empty:
             df = pd.DataFrame(columns=self._INSTANCE.model_fields)
-        # Reorder columns to have the custom columns first
-        fixed_columns = {"data_record", "space"}
-        columns = [col for col in df if col not in fixed_columns]
+        # Reorder columns to have the most relevant first
+        id_columns = ["space", "external_id"]
+        end_columns = ["node_type", "data_record"]
+        fixed_columns = set(id_columns + end_columns)
+        columns = (
+            id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
+        )
         return df[columns]
 
     def _repr_html_(self) -> str:
