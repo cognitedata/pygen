@@ -15,6 +15,8 @@ Changes are grouped as follows
 
 ## [0.99.10] - 17-02-24
 ### Fixed
+* When having Edges with properties, it was possible to hit a `RecursionError: maximum recursion depth exceeded` due
+  to poor handling of recusrion when using the `.upsert` method. This is now fixed.
 * In the `MockGenerator` the `.deploy` command would fail if there are duplicates files, timeseries or sequences.
   This is now fixed.
 * In the `MockGenerator` when `skip_interfaces` is set to `True`, it would skip generating connections

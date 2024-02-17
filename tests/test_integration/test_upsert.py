@@ -36,7 +36,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
     created: dc.ResourcesWriteResult | None = None
     try:
         # Act
-        created = omni_client.apply(new_connection_c)
+        created = omni_client.upsert(new_connection_c)
 
         # Assert
         assert len(created.nodes) == 3
@@ -60,7 +60,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
             )
 
 
-def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
+def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyMultipleRequests"
     new_item_a = dc.ConnectionItemAWrite(
@@ -89,7 +89,7 @@ def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: Cognit
         omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT = 1
 
         # Act
-        created = omni_client.apply(new_item_a)
+        created = omni_client.upsert(new_item_a)
 
         # Assert
         assert len(created.nodes) == 4
@@ -100,7 +100,7 @@ def test_apply_multiple_requests(omni_client: OmniClient, cognite_client: Cognit
         cognite_client.data_modeling.instances.delete(resources.nodes.as_ids(), resources.edges.as_ids())
 
 
-def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
+def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyRecursive"
     new_connection_a = dc.ConnectionItemAWrite(
@@ -139,7 +139,7 @@ def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient)
 
     try:
         # Act
-        created = omni_client.apply(new_connection_a)
+        created = omni_client.upsert(new_connection_a)
 
         # Assert
         assert len(created.nodes) == 6
@@ -196,7 +196,7 @@ def test_update_to_null(
     update.date = None
     update.json_ = None
 
-    omni_client.apply(update, write_none=True)
+    omni_client.upsert(update, write_none=True)
 
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved.text is None
@@ -218,13 +218,13 @@ def test_set_empty_string(
     else:
         update = primitive_nullable_node.copy()
     update.text = ""
-    omni_client.apply(update, write_none=True)
+    omni_client.upsert(update, write_none=True)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved is not None, f"Node {primitive_nullable_node.external_id} not found"
     assert retrieved.text == ""
 
 
-def test_apply_multiple_list(
+def test_upsert_multiple_list(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
     # Arrange
@@ -247,7 +247,7 @@ def test_apply_multiple_list(
 
     try:
         # Act
-        created = omni_client.apply(new_items)
+        created = omni_client.upsert(new_items)
 
         # Assert
         assert len(created.nodes) == len(new_items)
