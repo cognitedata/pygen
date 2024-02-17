@@ -16,7 +16,7 @@ Changes are grouped as follows
 ## [0.99.10] - 17-02-24
 ### Fixed
 * When having Edges with properties, it was possible to hit a `RecursionError: maximum recursion depth exceeded` due
-  to poor handling of recusrion when using the `.upsert` method. This is now fixed.
+  to poor handling of recursion when using the `.upsert` method. This is now fixed.
 * In the `MockGenerator` the `.deploy` command would fail if there are duplicates files, timeseries or sequences.
   This is now fixed.
 * In the `MockGenerator` when `skip_interfaces` is set to `True`, it would skip generating connections
@@ -74,7 +74,8 @@ Changes are grouped as follows
   also for nested calls.
 * Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
 * Filtering on an empty string in the generated SDK would return all values. This is now fixed.
-* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed. This is now fixed.
+* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed with `AttributeError: 'int' has no attribute '_involved_filter_types`.
+  This is now fixed.
 * In the `timeseries` query method, if a timeseries type property is nullable and the value is missing, the generated
   SDK would raise `KeyError` when trying to retrieve timeseries or datapoints. This is now fixed.
 
