@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - v*
+      - prep-99.10
 
 env:
   PYTHON_VERSION: '3.9'
