@@ -708,7 +708,11 @@ class MockData(UserList[ViewMockData]):
                 if verbose:
                     print(f"Created/Updated {len(sequences)} sequences")
             if (files := self.unique_files) and (exclude is None or "files" not in exclude):
-                existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
+                existing = set(
+                    client.files.retrieve_multiple(
+                        external_ids=files.as_external_ids(), ignore_unknown_ids=True
+                    ).as_external_ids()
+                )
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
                     client.files.create(file)
