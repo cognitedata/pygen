@@ -368,6 +368,10 @@ class DomainRelation(DomainModelCore):
     start_node: dm.DirectRelationReference
     data_record: DataRecord
 
+    @property
+    def data_records(self) -> DataRecordList:
+        return DataRecordList([node.data_record for node in self])
+
     def as_id(self) -> dm.EdgeId:
         return dm.EdgeId(space=self.space, external_id=self.external_id)
 
@@ -408,6 +412,10 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
     ] = default_edge_external_id_factory
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
+
+    @property
+    def data_records(self) -> DataRecordWriteList:
+        return DataRecordWriteList([node.data_record for node in self])
 
     @abstractmethod
     def _to_instances_write(
