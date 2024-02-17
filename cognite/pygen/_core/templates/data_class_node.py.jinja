@@ -37,7 +37,7 @@ __all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_clas
 {% raw %}}{% endraw %}{% endif %}
 
 
-class {{ data_class.read_name }}({{ data_class.read_base_class }}):
+class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -71,7 +71,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}):
         return self.as_write()
 
 
-class {{ data_class.write_name }}({{ data_class.write_base_class }}):
+class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.

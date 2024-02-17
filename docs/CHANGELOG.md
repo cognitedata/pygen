@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.10] - 17-02-24
+### Fixed
+* When having Edges with properties, it was possible to hit a `RecursionError: maximum recursion depth exceeded` due
+  to poor handling of recursion when using the `.upsert` method. This is now fixed.
+* In the `MockGenerator` the `.deploy` command would fail if there are duplicates files, timeseries or sequences.
+  This is now fixed.
+* In the `MockGenerator` when `skip_interfaces` is set to `True`, it would skip generating connections
+  (edges/direct relations) to the interfaces. This is now fixed by generating the connections to the children of the
+  interfaces instead.
+
 ## [0.99.9] - 11-02-24
 ### Fixed
 * The `data_class.__init__.py` file would reference write classes that does not exist in the generated SDK. This
@@ -53,6 +63,13 @@ Changes are grouped as follows
   with a list of nodes. This is now fixed.
 
 ## [0.99.4] - 04-02-24
+### Added
+* Property `data_records` to generated list classes.
+
+### Changed
+* The `to_pandas` method of list classes now returns columns in order `space`, `external_id`, `[other properties]`,
+  `node_type`, `data_record`.
+
 ### Fixed
 * The `MockGenerator` now handles non-writable views with properties. This was an issue when generating nodes for
   data models that contain non-writable views. This is now fixed, the nodes from the non-writable views are
@@ -64,7 +81,8 @@ Changes are grouped as follows
   also for nested calls.
 * Filtering an integer or float value in the generate SDK on `0` or `0.0` would return all values. This is now fixed.
 * Filtering on an empty string in the generated SDK would return all values. This is now fixed.
-* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed. This is now fixed.
+* With `cognite-sdk>=7.16.0` the generated SDK method `.search` failed with `AttributeError: 'int' has no attribute '_involved_filter_types`.
+  This is now fixed.
 * In the `timeseries` query method, if a timeseries type property is nullable and the value is missing, the generated
   SDK would raise `KeyError` when trying to retrieve timeseries or datapoints. This is now fixed.
 

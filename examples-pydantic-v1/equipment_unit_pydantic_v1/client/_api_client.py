@@ -21,7 +21,7 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.99.9
+        pygen = 0.99.10
         cognite-sdk = 7.17.1
         pydantic = 1.10.7
 
@@ -39,7 +39,7 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.9"
+        client.config.client_name = "CognitePygen:0.99.10"
 
         view_by_read_class = {
             data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
@@ -76,8 +76,9 @@ class EquipmentUnitClient:
             instances = items.to_instances_write(self._view_by_read_class, write_none)
         else:
             instances = data_classes.ResourcesWrite()
+            cache: set[tuple[str, str]] = set()
             for item in items:
-                instances.extend(item.to_instances_write(self._view_by_read_class, write_none))
+                instances.extend(item._to_instances_write(cache, self._view_by_read_class, write_none))
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

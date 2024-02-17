@@ -220,7 +220,7 @@ def generate_sdk_notebook(
     if view:
         print(
             "The data classes are available by importing, for example, "
-            f"`from {top_level_package}.data_classes import {DataClass.to_base_name(view)}Apply`"
+            f"`from {top_level_package}.data_classes import {DataClass.to_base_name(view)}Write`"
         )
     return module[client_name](client)
 

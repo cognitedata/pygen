@@ -263,6 +263,7 @@ class MockGenerator:
                         isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
                         and connection.source is not None
                         and connection.source not in outputs
+                        and connection.source not in leaf_children_by_parent
                     ):
                         warnings.warn(
                             f"{view_id} property {name!r} points to a view {connection.source} "
@@ -300,10 +301,17 @@ class MockGenerator:
                         and isinstance(connection.type, dm.DirectRelation)
                         and connection.source
                     ):
+                        if connection.source in leaf_children_by_parent:
+                            sources = []
+                            for child in leaf_children_by_parent[connection.source]:
+                                sources.extend(outputs[child].node.as_ids())
+                        else:
+                            sources = outputs[connection.source].node.as_ids()
+
                         if (
                             not connection.nullable
                             or random.random() < (1 - (config.null_values or default_nullable_fraction))
-                        ) and (sources := outputs[connection.source].node.as_ids()):
+                        ) and sources:
                             other_node = choice(sources)
                             if node.sources is None:
                                 node.sources = []
@@ -381,6 +389,9 @@ class MockGenerator:
                             data_set_id=self._data_set_id,
                             is_step=False,
                             is_string=False,
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for timeseries_set in values
                         for ts in (
@@ -400,6 +411,9 @@ class MockGenerator:
                             source=self._instance_space,
                             data_set_id=self._data_set_id,
                             mime_type="text/plain",
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
@@ -413,7 +427,18 @@ class MockGenerator:
                             external_id=seq,
                             name=seq,
                             data_set_id=self._data_set_id,
-                            columns=[SequenceColumn(external_id="value", value_type=cast(Literal["Double"], "DOUBLE"))],
+                            columns=[
+                                SequenceColumn(
+                                    external_id="value",
+                                    value_type=cast(Literal["Double"], "DOUBLE"),
+                                    metadata={
+                                        "source": f"Pygen{type(self).__name__}",
+                                    },
+                                )
+                            ],
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for seq_set in values
                         for seq in (cast(list[str], seq_set) if isinstance(seq_set, list) else [cast(str, seq_set)])
@@ -558,6 +583,9 @@ class ViewMockData:
         return table._repr_html_()  # type: ignore[operator]
 
 
+_T_ResourceList = typing.TypeVar("_T_ResourceList", bound=typing.Union[TimeSeriesList, SequenceList, FileMetadataList])
+
+
 class MockData(UserList[ViewMockData]):
     """Mock data for a given data model."""
 
@@ -595,6 +623,29 @@ class MockData(UserList[ViewMockData]):
     @property
     def files(self) -> FileMetadataList:
         return FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
+
+    @property
+    def unique_timeseries(self) -> TimeSeriesList:
+        return self._unique_resources(self.timeseries)
+
+    @property
+    def unique_sequences(self) -> SequenceList:
+        return self._unique_resources(self.sequences)
+
+    @property
+    def unique_files(self) -> FileMetadataList:
+        return self._unique_resources(self.files)
+
+    @staticmethod
+    def _unique_resources(resource_list: _T_ResourceList) -> _T_ResourceList:
+        seen: set[str] = set()
+        unique_resources = type(resource_list)([])
+        for resource in resource_list:
+            if resource.external_id in seen:
+                continue
+            seen.add(resource.external_id)
+            unique_resources.append(resource)
+        return unique_resources  # type: ignore[return-value]
 
     def dump_yaml(self, folder: Path | str) -> None:
         """Dumps the mock data to a folder in yaml format.
@@ -648,16 +699,20 @@ class MockData(UserList[ViewMockData]):
                         f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
-            if (timeseries := self.timeseries) and (exclude is None or "timeseries" not in exclude):
+            if (timeseries := self.unique_timeseries) and (exclude is None or "timeseries" not in exclude):
                 client.time_series.upsert(timeseries)
                 if verbose:
                     print(f"Created/Updated {len(timeseries)} timeseries")
-            if (sequences := self.sequences) and (exclude is None or "sequences" not in exclude):
+            if (sequences := self.unique_sequences) and (exclude is None or "sequences" not in exclude):
                 client.sequences.upsert(sequences)
                 if verbose:
                     print(f"Created/Updated {len(sequences)} sequences")
-            if (files := self.files) and (exclude is None or "files" not in exclude):
-                existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
+            if (files := self.unique_files) and (exclude is None or "files" not in exclude):
+                existing = set(
+                    client.files.retrieve_multiple(
+                        external_ids=files.as_external_ids(), ignore_unknown_ids=True
+                    ).as_external_ids()
+                )
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
                     client.files.create(file)
@@ -681,15 +736,15 @@ class MockData(UserList[ViewMockData]):
                 client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
                 if verbose:
                     print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
-            if timeseries := self.timeseries:
+            if timeseries := self.unique_timeseries:
                 client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
                 if verbose:
                     print(f"Deleted {len(timeseries)} timeseries")
-            if sequences := self.sequences:
+            if sequences := self.unique_sequences:
                 client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
                 if verbose:
                     print(f"Deleted {len(sequences)} sequences")
-            if files := self.files:
+            if files := self.unique_files:
                 try:
                     client.files.delete(external_id=files.as_external_ids())
                 except CogniteNotFoundError as e:

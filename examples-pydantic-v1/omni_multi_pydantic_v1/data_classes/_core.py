@@ -139,6 +139,57 @@ class DataRecordWrite(BaseModel):
     existing_version: Optional[int] = None
 
 
+T_DataRecord = TypeVar("T_DataRecord", bound=Union[DataRecord, DataRecordWrite])
+
+
+class _DataRecordListCore(UserList, Generic[T_DataRecord]):
+    def __init__(self, nodes: Collection[T_DataRecord] | None = None):
+        super().__init__(nodes or [])
+
+    # The dunder implementations are to get proper type hints
+    def __iter__(self) -> Iterator[T_DataRecord]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> T_DataRecord: ...
+
+    @overload
+    def __getitem__(
+        self: type[_DataRecordListCore[T_DataRecord]], item: slice
+    ) -> type[_DataRecordListCore[T_DataRecord]]: ...
+
+    def __getitem__(self, item: int | slice) -> T_DataRecord | type[_DataRecordListCore[T_DataRecord]]:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
+
+    def to_pandas(self) -> pd.DataFrame:
+        """
+        Convert the list of nodes to a pandas.DataFrame.
+
+        Returns:
+            A pandas.DataFrame with the nodes as rows.
+        """
+        df = pd.DataFrame([item.model_dump() for item in self])
+        if df.empty:
+            df = pd.DataFrame(columns=self._INSTANCE.model_fields)
+        return df
+
+    def _repr_html_(self) -> str:
+        return self.to_pandas()._repr_html_()  # type: ignore[operator]
+
+
+class DataRecordList(_DataRecordListCore[DataRecord]):
+    _INSTANCE = DataRecord
+
+
+class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
+    _INSTANCE = DataRecordWrite
+
+
 class DomainModelWrite(DomainModelCore):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
@@ -246,9 +297,13 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         df = pd.DataFrame(self.dump())
         if df.empty:
             df = pd.DataFrame(columns=self._INSTANCE.__fields__)
-        # Reorder columns to have the custom columns first
-        fixed_columns = {"data_record", "space"}
-        columns = [col for col in df if col not in fixed_columns]
+        # Reorder columns to have the most relevant first
+        id_columns = ["space", "external_id"]
+        end_columns = ["node_type", "data_record"]
+        fixed_columns = set(id_columns + end_columns)
+        columns = (
+            id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
+        )
         return df[columns]
 
     def _repr_html_(self) -> str:
@@ -261,6 +316,10 @@ class DomainModelList(CoreList[T_DomainModelCore]):
     def __init__(self, nodes: Collection[T_DomainModelCore] = None):
         super().__init__(nodes or [])
 
+    @property
+    def data_records(self) -> DataRecordList:
+        return DataRecordList([node.data_record for node in self])
+
     def as_node_ids(self) -> list[dm.NodeId]:
         return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
 
@@ -270,6 +329,10 @@ T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covarian
 
 class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
     _PARENT_CLASS = DomainModelWrite
+
+    @property
+    def data_records(self) -> DataRecordWriteList:
+        return DataRecordWriteList([node.data_record for node in self])
 
     def to_instances_write(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -299,6 +362,10 @@ class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
     data_record: DataRecord
+
+    @property
+    def data_records(self) -> DataRecordList:
+        return DataRecordList([node.data_record for node in self])
 
     def as_id(self) -> dm.EdgeId:
         return dm.EdgeId(space=self.space, external_id=self.external_id)
@@ -344,6 +411,10 @@ class DomainRelationWrite(BaseModel):
     class Config:
         extra = Extra.forbid
         allow_population_by_field_name = True
+
+    @property
+    def data_records(self) -> DataRecordWriteList:
+        return DataRecordWriteList([node.data_record for node in self])
 
     @abstractmethod
     def _to_instances_write(
@@ -401,9 +472,10 @@ class DomainRelationWrite(BaseModel):
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         edge = DomainRelationWrite.create_edge(start_node, end_node, edge_type)
-        if (edge.space, edge.external_id) not in cache:
-            resources.edges.append(edge)
-            cache.add((edge.space, edge.external_id))
+        if (edge.space, edge.external_id) in cache:
+            return resources
+        resources.edges.append(edge)
+        cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
             other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)

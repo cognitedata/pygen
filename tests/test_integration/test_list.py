@@ -19,14 +19,10 @@ def test_list_empty_to_pandas(omni_client: OmniClient) -> None:
     # Assert
     assert empty_df.empty
     if IS_PYDANTIC_V2:
-        assert sorted(empty_df.columns) == sorted(
-            set(dc.Empty.model_fields) - (set(dc.DomainModel.model_fields) - {"external_id"})
-        )
+        assert sorted(empty_df.columns) == sorted(set(dc.Empty.model_fields) | (set(dc.DomainModel.model_fields)))
 
     else:
-        assert sorted(empty_df.columns) == sorted(
-            set(dc.Empty.__fields__) - (set(dc.DomainModel.__fields__) - {"external_id"})
-        )
+        assert sorted(empty_df.columns) == sorted(set(dc.Empty.__fields__) | (set(dc.DomainModel.__fields__)))
 
 
 def test_filter_on_boolean(omni_client: OmniClient) -> None:
