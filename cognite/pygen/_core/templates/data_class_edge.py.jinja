@@ -21,7 +21,7 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 {% raw %}}{% endraw %}{% endif %}
 
 
-class {{ data_class.read_name }}(DomainRelation):
+class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -54,7 +54,7 @@ class {{ data_class.read_name }}(DomainRelation):
         return self.as_write()
 
 
-class {{ data_class.write_name }}(DomainRelationWrite):
+class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.
