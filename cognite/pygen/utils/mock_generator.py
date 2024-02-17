@@ -558,6 +558,9 @@ class ViewMockData:
         return table._repr_html_()  # type: ignore[operator]
 
 
+_T_ResourceList = typing.TypeVar("_T_ResourceList", bound=typing.Union[TimeSeriesList, SequenceList, FileMetadataList])
+
+
 class MockData(UserList[ViewMockData]):
     """Mock data for a given data model."""
 
@@ -595,6 +598,29 @@ class MockData(UserList[ViewMockData]):
     @property
     def files(self) -> FileMetadataList:
         return FileMetadataList([file for view_mock_data in self for file in view_mock_data.file if file])
+
+    @property
+    def unique_timeseries(self) -> TimeSeriesList:
+        return self._unique_resources(self.timeseries)
+
+    @property
+    def unique_sequences(self) -> SequenceList:
+        return self._unique_resources(self.sequences)
+
+    @property
+    def unique_files(self) -> FileMetadataList:
+        return self._unique_resources(self.files)
+
+    @staticmethod
+    def _unique_resources(resource_list: _T_ResourceList) -> _T_ResourceList:
+        seen: set[str] = set()
+        unique_resources = type(resource_list)([])
+        for resource in resource_list:
+            if resource.external_id in seen:
+                continue
+            seen.add(resource.external_id)
+            unique_resources.append(resource)
+        return unique_resources  # type: ignore[return-value]
 
     def dump_yaml(self, folder: Path | str) -> None:
         """Dumps the mock data to a folder in yaml format.
@@ -648,15 +674,15 @@ class MockData(UserList[ViewMockData]):
                         f"Created {sum(1 for n in created.nodes if n.was_modified)} nodes "
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
-            if (timeseries := self.timeseries) and (exclude is None or "timeseries" not in exclude):
+            if (timeseries := self.unique_timeseries) and (exclude is None or "timeseries" not in exclude):
                 client.time_series.upsert(timeseries)
                 if verbose:
                     print(f"Created/Updated {len(timeseries)} timeseries")
-            if (sequences := self.sequences) and (exclude is None or "sequences" not in exclude):
+            if (sequences := self.unique_sequences) and (exclude is None or "sequences" not in exclude):
                 client.sequences.upsert(sequences)
                 if verbose:
                     print(f"Created/Updated {len(sequences)} sequences")
-            if (files := self.files) and (exclude is None or "files" not in exclude):
+            if (files := self.unique_files) and (exclude is None or "files" not in exclude):
                 existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
@@ -681,15 +707,15 @@ class MockData(UserList[ViewMockData]):
                 client.data_modeling.instances.delete(nodes.as_ids(), edges.as_ids())
                 if verbose:
                     print(f"Deleted {len(nodes)} nodes and {len(edges)} edges ")
-            if timeseries := self.timeseries:
+            if timeseries := self.unique_timeseries:
                 client.time_series.delete(external_id=timeseries.as_external_ids(), ignore_unknown_ids=True)
                 if verbose:
                     print(f"Deleted {len(timeseries)} timeseries")
-            if sequences := self.sequences:
+            if sequences := self.unique_sequences:
                 client.sequences.delete(external_id=sequences.as_external_ids(), ignore_unknown_ids=True)
                 if verbose:
                     print(f"Deleted {len(sequences)} sequences")
-            if files := self.files:
+            if files := self.unique_files:
                 try:
                     client.files.delete(external_id=files.as_external_ids())
                 except CogniteNotFoundError as e:
