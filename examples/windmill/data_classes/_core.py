@@ -402,9 +402,10 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         edge = DomainRelationWrite.create_edge(start_node, end_node, edge_type)
-        if (edge.space, edge.external_id) not in cache:
-            resources.edges.append(edge)
-            cache.add((edge.space, edge.external_id))
+        if (edge.space, edge.external_id) in cache:
+            return resources
+        resources.edges.append(edge)
+        cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
             other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)
