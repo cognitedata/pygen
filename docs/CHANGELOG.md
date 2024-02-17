@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.10] - 17-02-24
+### Fixed
+* In the `MockGenerator` the `.deploy` command would fail if there are duplicates files, timeseries or sequences.
+  This is now fixed.
+* In the `MockGenerator` when `skip_interfaces` is set to `True`, it would skip generating connections
+  (edges/direct relations) to the interfaces. This is now fixed by generating the connections to the children of the
+  interfaces instead.
+
 ## [0.99.9] - 11-02-24
 ### Fixed
 * The `data_class.__init__.py` file would reference write classes that does not exist in the generated SDK. This
