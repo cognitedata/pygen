@@ -63,6 +63,13 @@ Changes are grouped as follows
   with a list of nodes. This is now fixed.
 
 ## [0.99.4] - 04-02-24
+### Added
+* Property `data_records` to generated list classes.
+
+### Changed
+* The `to_pandas` method of list classes now returns columns in order `space`, `external_id`, `[other properties]`,
+  `node_type`, `data_record`.
+
 ### Fixed
 * The `MockGenerator` now handles non-writable views with properties. This was an issue when generating nodes for
   data models that contain non-writable views. This is now fixed, the nodes from the non-writable views are
