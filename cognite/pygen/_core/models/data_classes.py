@@ -326,6 +326,10 @@ class DataClass:
         else:
             return "import pydantic"
 
+    @property
+    def has_any_field_model_prefix(self) -> bool:
+        return any(field_.name.startswith("model") for field_ in self)
+
 
 @dataclass
 class NodeDataClass(DataClass):
