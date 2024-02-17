@@ -381,6 +381,9 @@ class MockGenerator:
                             data_set_id=self._data_set_id,
                             is_step=False,
                             is_string=False,
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for timeseries_set in values
                         for ts in (
@@ -400,6 +403,9 @@ class MockGenerator:
                             source=self._instance_space,
                             data_set_id=self._data_set_id,
                             mime_type="text/plain",
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
@@ -413,7 +419,18 @@ class MockGenerator:
                             external_id=seq,
                             name=seq,
                             data_set_id=self._data_set_id,
-                            columns=[SequenceColumn(external_id="value", value_type=cast(Literal["Double"], "DOUBLE"))],
+                            columns=[
+                                SequenceColumn(
+                                    external_id="value",
+                                    value_type=cast(Literal["Double"], "DOUBLE"),
+                                    metadata={
+                                        "source": f"Pygen{type(self).__name__}",
+                                    },
+                                )
+                            ],
+                            metadata={
+                                "source": f"Pygen{type(self).__name__}",
+                            },
                         )
                         for seq_set in values
                         for seq in (cast(list[str], seq_set) if isinstance(seq_set, list) else [cast(str, seq_set)])
