@@ -67,9 +67,10 @@ class ResourcesWriteResult:
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
-class Core(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True{% endif %}):{% if not is_pydantic_v2 %}
+class Core(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True, populate_by_name=True{% endif %}):{% if not is_pydantic_v2 %}
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
 {% endif %}
     def to_pandas(self) -> pd.Series:
         return pd.Series(self.{% if is_pydantic_v2 %}model_dump{% else %}dict{% endif %}())
@@ -81,7 +82,7 @@ class Core(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True{% endi
 
 class DomainModelCore(Core):
     space: str
-    external_id: str = Field(min_length=1, max_length=255)
+    external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
     def as_tuple_id(self) -> tuple[str, str]:
         return self.space, self.external_id

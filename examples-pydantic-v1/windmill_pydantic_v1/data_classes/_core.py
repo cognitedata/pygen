@@ -58,6 +58,7 @@ class ResourcesWriteResult:
 class Core(BaseModel):
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
 
     def to_pandas(self) -> pd.Series:
         return pd.Series(self.dict())
@@ -69,7 +70,7 @@ class Core(BaseModel):
 
 class DomainModelCore(Core):
     space: str
-    external_id: str = Field(min_length=1, max_length=255)
+    external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
     def as_tuple_id(self) -> tuple[str, str]:
         return self.space, self.external_id

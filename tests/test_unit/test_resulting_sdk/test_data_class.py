@@ -117,7 +117,7 @@ def test_load_windmills_from_json(
             created.extend(item.to_instances_write())
 
         # Assert
-        exclude = {"external_id", "space", "data_record"}
+        exclude = {"external_id", "space", "data_record", "externalId"}
         for windmill, json_item in zip(windmills, loaded_json):
             if IS_PYDANTIC_V2:
                 dumped_windmill = json.loads(
