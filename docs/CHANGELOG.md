@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.11] - 23-02-24
+### Added
+* Allowed `externalId` as alias for `external_id` in the generated data classes.
+
 ## [0.99.10] - 17-02-24
 ### Fixed
 * When having Edges with properties, it was possible to hit a `RecursionError: maximum recursion depth exceeded` due
