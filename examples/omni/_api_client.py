@@ -138,6 +138,7 @@ class OmniClient:
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
