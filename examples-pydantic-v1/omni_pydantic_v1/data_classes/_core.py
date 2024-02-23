@@ -69,7 +69,7 @@ class Core(BaseModel):
 
 class DomainModelCore(Core):
     space: str
-    external_id: str = Field(min_length=1, max_length=255)
+    external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
     def as_tuple_id(self) -> tuple[str, str]:
         return self.space, self.external_id
