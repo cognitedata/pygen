@@ -67,7 +67,7 @@ class ResourcesWriteResult:
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
-class Core(BaseModel, arbitrary_types_allowed=True):
+class Core(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
     def to_pandas(self) -> pd.Series:
         return pd.Series(self.model_dump())
 

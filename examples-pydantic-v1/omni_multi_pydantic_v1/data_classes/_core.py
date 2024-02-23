@@ -58,6 +58,7 @@ class ResourcesWriteResult:
 class Core(BaseModel):
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
 
     def to_pandas(self) -> pd.Series:
         return pd.Series(self.dict())
