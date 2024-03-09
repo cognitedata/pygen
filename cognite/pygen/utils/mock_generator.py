@@ -643,8 +643,9 @@ class MockData(UserList[ViewMockData]):
         for resource in resource_list:
             if resource.external_id in seen:
                 continue
-            seen.add(resource.external_id)
-            unique_resources.append(resource)
+            if resource.external_id:
+                seen.add(resource.external_id)
+                unique_resources.append(resource)
         return unique_resources  # type: ignore[return-value]
 
     def dump_yaml(self, folder: Path | str) -> None:
