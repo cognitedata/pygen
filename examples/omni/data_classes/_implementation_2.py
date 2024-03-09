@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 from ._sub_interface import SubInterface, SubInterfaceWrite
@@ -39,6 +41,49 @@ _IMPLEMENTATION2_PROPERTIES_BY_FIELD = {
     "main_value": "mainValue",
     "sub_value": "subValue",
 }
+
+
+class Implementation2GraphQL(GraphQLCore):
+    """This represents the reading version of implementation 2, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 2.
+        data_record: The data record of the implementation 2 node.
+        main_value: The main value field.
+        sub_value: The sub value field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "Implementation2", "1")
+
+    def as_read(self) -> Implementation2:
+        """Convert this GraphQL format of implementation 2 to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Implementation2(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
+
+    def as_write(self) -> Implementation2Write:
+        """Convert this GraphQL format of implementation 2 to the writing format."""
+        return Implementation2Write(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
 
 
 class Implementation2(SubInterface):

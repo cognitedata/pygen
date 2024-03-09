@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -41,6 +43,61 @@ _BLADE_PROPERTIES_BY_FIELD = {
     "is_damaged": "is_damaged",
     "name": "name",
 }
+
+
+class BladeGraphQL(GraphQLCore):
+    """This represents the reading version of blade, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the blade.
+        data_record: The data record of the blade node.
+        is_damaged: The is damaged field.
+        name: The name field.
+        sensor_positions: The sensor position field.
+    """
+
+    view_id = dm.ViewId("power-models", "Blade", "1")
+    is_damaged: Optional[bool] = None
+    name: Optional[str] = None
+    sensor_positions: Optional[list[SensorPositionGraphQL]] = Field(default=None, repr=False)
+
+    def as_read(self) -> Blade:
+        """Convert this GraphQL format of blade to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Blade(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            is_damaged=self.is_damaged,
+            name=self.name,
+            sensor_positions=[
+                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
+                for sensor_position in self.sensor_positions or []
+            ],
+        )
+
+    def as_write(self) -> BladeWrite:
+        """Convert this GraphQL format of blade to the writing format."""
+        return BladeWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            is_damaged=self.is_damaged,
+            name=self.name,
+            sensor_positions=[
+                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
+                for sensor_position in self.sensor_positions or []
+            ],
+        )
 
 
 class Blade(DomainModel):

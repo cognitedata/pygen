@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
@@ -39,6 +41,51 @@ _GENERATOR_PROPERTIES_BY_FIELD = {
     "generator_speed_controller": "generator_speed_controller",
     "generator_speed_controller_reference": "generator_speed_controller_reference",
 }
+
+
+class GeneratorGraphQL(GraphQLCore):
+    """This represents the reading version of generator, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the generator.
+        data_record: The data record of the generator node.
+        generator_speed_controller: The generator speed controller field.
+        generator_speed_controller_reference: The generator speed controller reference field.
+    """
+
+    view_id = dm.ViewId("power-models", "Generator", "1")
+    generator_speed_controller: Union[TimeSeries, str, None] = None
+    generator_speed_controller_reference: Union[TimeSeries, str, None] = None
+
+    def as_read(self) -> Generator:
+        """Convert this GraphQL format of generator to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Generator(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            generator_speed_controller=self.generator_speed_controller,
+            generator_speed_controller_reference=self.generator_speed_controller_reference,
+        )
+
+    def as_write(self) -> GeneratorWrite:
+        """Convert this GraphQL format of generator to the writing format."""
+        return GeneratorWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            generator_speed_controller=self.generator_speed_controller,
+            generator_speed_controller_reference=self.generator_speed_controller_reference,
+        )
 
 
 class Generator(DomainModel):

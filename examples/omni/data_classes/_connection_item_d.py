@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -40,6 +42,75 @@ ConnectionItemDFields = Literal["name"]
 _CONNECTIONITEMD_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
+
+
+class ConnectionItemDGraphQL(GraphQLCore):
+    """This represents the reading version of connection item d, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the connection item d.
+        data_record: The data record of the connection item d node.
+        direct_multi: The direct multi field.
+        direct_single: The direct single field.
+        name: The name field.
+        outwards_single: The outwards single field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+    direct_multi: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="directMulti")
+    direct_single: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="directSingle")
+    name: Optional[str] = None
+    outwards_single: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="outwardsSingle")
+
+    def as_read(self) -> ConnectionItemD:
+        """Convert this GraphQL format of connection item d to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return ConnectionItemD(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            direct_multi=(
+                self.direct_multi.as_read() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
+            ),
+            direct_single=(
+                self.direct_single.as_read() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
+            ),
+            name=self.name,
+            outwards_single=(
+                self.outwards_single.as_read()
+                if isinstance(self.outwards_single, GraphQLCore)
+                else self.outwards_single
+            ),
+        )
+
+    def as_write(self) -> ConnectionItemDWrite:
+        """Convert this GraphQL format of connection item d to the writing format."""
+        return ConnectionItemDWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            direct_multi=(
+                self.direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else self.direct_multi
+            ),
+            direct_single=(
+                self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
+            ),
+            name=self.name,
+            outwards_single=(
+                self.outwards_single.as_write()
+                if isinstance(self.outwards_single, DomainModel)
+                else self.outwards_single
+            ),
+        )
 
 
 class ConnectionItemD(DomainModel):

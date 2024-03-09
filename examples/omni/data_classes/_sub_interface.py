@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 from ._main_interface import MainInterface, MainInterfaceWrite
@@ -39,6 +41,50 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
     "main_value": "mainValue",
     "sub_value": "subValue",
 }
+
+
+class SubInterfaceGraphQL(GraphQLCore):
+    """This represents the reading version of sub interface, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the sub interface.
+        data_record: The data record of the sub interface node.
+        main_value: The main value field.
+        sub_value: The sub value field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    sub_value: Optional[str] = Field(None, alias="subValue")
+
+    def as_read(self) -> SubInterface:
+        """Convert this GraphQL format of sub interface to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return SubInterface(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
+
+    def as_write(self) -> SubInterfaceWrite:
+        """Convert this GraphQL format of sub interface to the writing format."""
+        return SubInterfaceWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
 
 
 class SubInterface(MainInterface):

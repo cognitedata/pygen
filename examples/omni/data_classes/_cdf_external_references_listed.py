@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
@@ -40,6 +42,55 @@ _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD = {
     "sequences": "sequences",
     "timeseries": "timeseries",
 }
+
+
+class CDFExternalReferencesListedGraphQL(GraphQLCore):
+    """This represents the reading version of cdf external references listed, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the cdf external references listed.
+        data_record: The data record of the cdf external references listed node.
+        files: The file field.
+        sequences: The sequence field.
+        timeseries: The timesery field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    files: Optional[list[str]] = None
+    sequences: Optional[list[str]] = None
+    timeseries: Union[list[TimeSeries], list[str], None] = None
+
+    def as_read(self) -> CDFExternalReferencesListed:
+        """Convert this GraphQL format of cdf external references listed to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return CDFExternalReferencesListed(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            files=self.files,
+            sequences=self.sequences,
+            timeseries=self.timeseries,
+        )
+
+    def as_write(self) -> CDFExternalReferencesListedWrite:
+        """Convert this GraphQL format of cdf external references listed to the writing format."""
+        return CDFExternalReferencesListedWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            files=self.files,
+            sequences=self.sequences,
+            timeseries=self.timeseries,
+        )
 
 
 class CDFExternalReferencesListed(DomainModel):

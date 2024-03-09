@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
@@ -65,6 +67,79 @@ _SENSORPOSITION_PROPERTIES_BY_FIELD = {
     "flapwise_bend_mom_offset_crosstalk_corrected": "flapwise_bend_mom_offset_crosstalk_corrected",
     "position": "position",
 }
+
+
+class SensorPositionGraphQL(GraphQLCore):
+    """This represents the reading version of sensor position, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the sensor position.
+        data_record: The data record of the sensor position node.
+        edgewise_bend_mom_crosstalk_corrected: The edgewise bend mom crosstalk corrected field.
+        edgewise_bend_mom_offset: The edgewise bend mom offset field.
+        edgewise_bend_mom_offset_crosstalk_corrected: The edgewise bend mom offset crosstalk corrected field.
+        edgewisewise_bend_mom: The edgewisewise bend mom field.
+        flapwise_bend_mom: The flapwise bend mom field.
+        flapwise_bend_mom_crosstalk_corrected: The flapwise bend mom crosstalk corrected field.
+        flapwise_bend_mom_offset: The flapwise bend mom offset field.
+        flapwise_bend_mom_offset_crosstalk_corrected: The flapwise bend mom offset crosstalk corrected field.
+        position: The position field.
+    """
+
+    view_id = dm.ViewId("power-models", "SensorPosition", "1")
+    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    edgewise_bend_mom_offset: Union[TimeSeries, str, None] = None
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    edgewisewise_bend_mom: Union[TimeSeries, str, None] = None
+    flapwise_bend_mom: Union[TimeSeries, str, None] = None
+    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    flapwise_bend_mom_offset: Union[TimeSeries, str, None] = None
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    position: Optional[float] = None
+
+    def as_read(self) -> SensorPosition:
+        """Convert this GraphQL format of sensor position to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return SensorPosition(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
+            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
+            edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
+            edgewisewise_bend_mom=self.edgewisewise_bend_mom,
+            flapwise_bend_mom=self.flapwise_bend_mom,
+            flapwise_bend_mom_crosstalk_corrected=self.flapwise_bend_mom_crosstalk_corrected,
+            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset,
+            flapwise_bend_mom_offset_crosstalk_corrected=self.flapwise_bend_mom_offset_crosstalk_corrected,
+            position=self.position,
+        )
+
+    def as_write(self) -> SensorPositionWrite:
+        """Convert this GraphQL format of sensor position to the writing format."""
+        return SensorPositionWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
+            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
+            edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
+            edgewisewise_bend_mom=self.edgewisewise_bend_mom,
+            flapwise_bend_mom=self.flapwise_bend_mom,
+            flapwise_bend_mom_crosstalk_corrected=self.flapwise_bend_mom_crosstalk_corrected,
+            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset,
+            flapwise_bend_mom_offset_crosstalk_corrected=self.flapwise_bend_mom_offset_crosstalk_corrected,
+            position=self.position,
+        )
 
 
 class SensorPosition(DomainModel):

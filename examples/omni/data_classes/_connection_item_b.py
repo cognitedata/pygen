@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -41,6 +43,61 @@ ConnectionItemBFields = Literal["name"]
 _CONNECTIONITEMB_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
+
+
+class ConnectionItemBGraphQL(GraphQLCore):
+    """This represents the reading version of connection item b, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the connection item b.
+        data_record: The data record of the connection item b node.
+        inwards: The inward field.
+        name: The name field.
+        self_edge: The self edge field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "ConnectionItemB", "1")
+    inwards: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False)
+    name: Optional[str] = None
+    self_edge: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="selfEdge")
+
+    def as_read(self) -> ConnectionItemB:
+        """Convert this GraphQL format of connection item b to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return ConnectionItemB(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
+            name=self.name,
+            self_edge=[
+                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
+                for self_edge in self.self_edge or []
+            ],
+        )
+
+    def as_write(self) -> ConnectionItemBWrite:
+        """Convert this GraphQL format of connection item b to the writing format."""
+        return ConnectionItemBWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
+            name=self.name,
+            self_edge=[
+                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
+                for self_edge in self.self_edge or []
+            ],
+        )
 
 
 class ConnectionItemB(DomainModel):

@@ -47,7 +47,7 @@ _CONNECTIONITEMA_PROPERTIES_BY_FIELD = {
 
 
 class ConnectionItemAGraphQL(GraphQLCore):
-    """This represents the reading version of connection item A, used
+    """This represents the reading version of connection item a, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
@@ -60,19 +60,18 @@ class ConnectionItemAGraphQL(GraphQLCore):
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
     name: Optional[str] = None
-    other_direct: Optional[ConnectionItemC] = Field(None, repr=False, alias="otherDirect")
-    outwards: Optional[list[ConnectionItemB]] = Field(default=None, repr=False)
-    self_direct: Optional[ConnectionItemA] = Field(None, repr=False, alias="selfDirect")
+    other_direct: Optional[ConnectionItemCGraphQL] = Field(None, repr=False, alias="otherDirect")
+    outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
+    self_direct: Optional[ConnectionItemAGraphQL] = Field(None, repr=False, alias="selfDirect")
 
     def as_read(self) -> ConnectionItemA:
-        """Convert this read version of connection item a to the reading version."""
+        """Convert this GraphQL format of connection item a to the reading format."""
         if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read version because it lacks a data record.")
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return ConnectionItemA(
             space=self.space,
             external_id=self.external_id,
@@ -83,19 +82,16 @@ class ConnectionItemAGraphQL(GraphQLCore):
             ),
             name=self.name,
             other_direct=(
-                self.other_direct.as_read() if isinstance(self.other_direct, DomainModelCore) else self.other_direct
+                self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
             outwards=[
-                outward.as_read() if isinstance(outward, DomainModelCore) else outward
-                for outward in self.outwards or []
+                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
             ],
-            self_direct=(
-                self.self_direct.as_read() if isinstance(self.self_direct, DomainModelCore) else self.self_direct
-            ),
+            self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
     def as_write(self) -> ConnectionItemAWrite:
-        """Convert this GraphQL format of connection item a to the writing version."""
+        """Convert this GraphQL format of connection item a to the writing format."""
         return ConnectionItemAWrite(
             space=self.space,
             external_id=self.external_id,

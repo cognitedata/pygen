@@ -10,6 +10,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -17,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
@@ -49,6 +51,75 @@ _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
     "scenario": "scenario",
     "start": "start",
 }
+
+
+class ScenarioInstanceGraphQL(GraphQLCore):
+    """This represents the reading version of scenario instance, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the scenario instance.
+        data_record: The data record of the scenario instance node.
+        aggregation: The aggregation field.
+        country: The country field.
+        instance: The instance field.
+        market: The market field.
+        price_area: The price area field.
+        price_forecast: The price forecast field.
+        scenario: The scenario field.
+        start: The start field.
+    """
+
+    view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+    aggregation: Optional[str] = None
+    country: Optional[str] = None
+    instance: Optional[datetime.datetime] = None
+    market: Optional[str] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
+    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
+    scenario: Optional[str] = None
+    start: Optional[datetime.datetime] = None
+
+    def as_read(self) -> ScenarioInstance:
+        """Convert this GraphQL format of scenario instance to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return ScenarioInstance(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            aggregation=self.aggregation,
+            country=self.country,
+            instance=self.instance,
+            market=self.market,
+            price_area=self.price_area,
+            price_forecast=self.price_forecast,
+            scenario=self.scenario,
+            start=self.start,
+        )
+
+    def as_write(self) -> ScenarioInstanceWrite:
+        """Convert this GraphQL format of scenario instance to the writing format."""
+        return ScenarioInstanceWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            aggregation=self.aggregation,
+            country=self.country,
+            instance=self.instance,
+            market=self.market,
+            price_area=self.price_area,
+            price_forecast=self.price_forecast,
+            scenario=self.scenario,
+            start=self.start,
+        )
 
 
 class ScenarioInstance(DomainModel):

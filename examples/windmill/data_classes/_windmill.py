@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -45,6 +47,75 @@ _WINDMILL_PROPERTIES_BY_FIELD = {
     "name": "name",
     "windfarm": "windfarm",
 }
+
+
+class WindmillGraphQL(GraphQLCore):
+    """This represents the reading version of windmill, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the windmill.
+        data_record: The data record of the windmill node.
+        blades: The blade field.
+        capacity: The capacity field.
+        metmast: The metmast field.
+        nacelle: The nacelle field.
+        name: The name field.
+        rotor: The rotor field.
+        windfarm: The windfarm field.
+    """
+
+    view_id = dm.ViewId("power-models", "Windmill", "1")
+    blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
+    capacity: Optional[float] = None
+    metmast: Optional[list[MetmastGraphQL]] = Field(default=None, repr=False)
+    nacelle: Optional[NacelleGraphQL] = Field(None, repr=False)
+    name: Optional[str] = None
+    rotor: Optional[RotorGraphQL] = Field(None, repr=False)
+    windfarm: Optional[str] = None
+
+    def as_read(self) -> Windmill:
+        """Convert this GraphQL format of windmill to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Windmill(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            capacity=self.capacity,
+            metmast=[
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
+            name=self.name,
+            rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
+            windfarm=self.windfarm,
+        )
+
+    def as_write(self) -> WindmillWrite:
+        """Convert this GraphQL format of windmill to the writing format."""
+        return WindmillWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            capacity=self.capacity,
+            metmast=[
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            name=self.name,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
+            windfarm=self.windfarm,
+        )
 
 
 class Windmill(DomainModel):

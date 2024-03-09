@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -41,6 +43,59 @@ _UNITPROCEDURE_PROPERTIES_BY_FIELD = {
     "name": "name",
     "type_": "type",
 }
+
+
+class UnitProcedureGraphQL(GraphQLCore):
+    """This represents the reading version of unit procedure, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the unit procedure.
+        data_record: The data record of the unit procedure node.
+        name: The name field.
+        type_: The type field.
+        work_orders: The work order field.
+        work_units: The work unit field.
+    """
+
+    view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+    name: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
+    work_orders: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
+    work_units: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
+
+    def as_read(self) -> UnitProcedure:
+        """Convert this GraphQL format of unit procedure to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return UnitProcedure(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            name=self.name,
+            type_=self.type_,
+            work_orders=[work_order.as_read() for work_order in self.work_orders or []],
+            work_units=[work_unit.as_read() for work_unit in self.work_units or []],
+        )
+
+    def as_write(self) -> UnitProcedureWrite:
+        """Convert this GraphQL format of unit procedure to the writing format."""
+        return UnitProcedureWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            name=self.name,
+            type_=self.type_,
+            work_orders=[work_order.as_write() for work_order in self.work_orders or []],
+            work_units=[work_unit.as_write() for work_unit in self.work_units or []],
+        )
 
 
 class UnitProcedure(DomainModel):

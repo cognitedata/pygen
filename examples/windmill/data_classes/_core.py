@@ -76,6 +76,18 @@ class Core(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
         return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
 
 
+class DataRecordGraphQL(Core):
+    last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
+    created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
+
+
+class GraphQLCore(Core):
+    view_id: ClassVar[dm.ViewId]
+    space: Optional[str] = None
+    external_id: Optional[str] = Field(None, alias="externalId")
+    data_record: Optional[DataRecordGraphQL] = Field(None, alias="dataRecord")
+
+
 class DomainModelCore(Core):
     space: str
     external_id: str = Field(min_length=1, max_length=255, alias="externalId")
