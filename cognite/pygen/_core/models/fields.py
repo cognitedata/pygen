@@ -518,8 +518,7 @@ class EdgeOneToOneAny(EdgeField):
         return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
-        left_side = "Union[str, dm.NodeId, None] ="
-        return self._type_hint(left_side)
+        return self.as_read_type_hint()
 
     def _type_hint(self, left_side: str) -> str:
         # Edge fields are always nullable

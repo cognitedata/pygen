@@ -124,6 +124,16 @@ class ConnectionItemEWrite(DomainModelWrite):
 
         properties: dict[str, Any] = {}
 
+        if self.direct_no_source is not None:
+            properties["directNoSource"] = {
+                "space": self.space if isinstance(self.direct_no_source, str) else self.direct_no_source.space,
+                "externalId": (
+                    self.direct_no_source
+                    if isinstance(self.direct_no_source, str)
+                    else self.direct_no_source.external_id
+                ),
+            }
+
         if self.name is not None or write_none:
             properties["name"] = self.name
 
