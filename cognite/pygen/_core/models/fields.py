@@ -179,6 +179,7 @@ class Field(ABC):
             target_data_class = data_class_by_view_id[prop.source]
             return EdgeTypedOneToOne(
                 name=name,
+                variable=variable,
                 edge_type=prop.type,
                 edge_direction=prop.direction,
                 prop_name=prop_name,
@@ -469,6 +470,7 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
 
     edge_type: dm.DirectRelationReference
     edge_direction: Literal["outwards", "inwards"]
+    variable: str
 
     def as_read_type_hint(self) -> str:
         if self.edge_direction == "outwards":
