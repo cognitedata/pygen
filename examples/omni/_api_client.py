@@ -119,12 +119,19 @@ class OmniClient:
 
         """
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none)
+            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
             for item in items:
-                instances.extend(item._to_instances_write(cache, self._view_by_read_class, write_none))
+                instances.extend(
+                    item._to_instances_write(
+                        cache,
+                        self._view_by_read_class,
+                        write_none,
+                        allow_version_increase,
+                    )
+                )
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

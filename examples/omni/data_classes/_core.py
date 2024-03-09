@@ -204,9 +204,12 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
     def to_instances_write(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+        self,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
+        write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), view_by_read_class, write_none)
+        return self._to_instances_write(set(), view_by_read_class, write_none, allow_version_increase)
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -224,6 +227,7 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
 
