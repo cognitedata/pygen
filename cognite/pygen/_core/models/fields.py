@@ -161,7 +161,13 @@ class Field(ABC):
                 doc_name=doc_name,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-            raise NotImplementedError("DirectRelation without source is not yet supported")
+            return EdgeOneToOneAny(
+                name=name,
+                prop_name=prop_name,
+                description=prop.description,
+                pydantic_field=pydantic_field,
+                doc_name=doc_name,
+            )
         elif isinstance(prop, dm.MappedProperty):
             return PrimitiveField(
                 name=name,
@@ -501,6 +507,29 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
 
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+
+
+@dataclass(frozen=True)
+class EdgeOneToOneAny(EdgeField):
+    """This represent a direct relation that has not specified the end class (i.e. no source was set)."""
+
+    def as_read_type_hint(self) -> str:
+        left_side = "Union[str, dm.NodeId, None] ="
+        return self._type_hint(left_side)
+
+    def as_write_type_hint(self) -> str:
+        left_side = "Union[str, dm.NodeId, None] ="
+        return self._type_hint(left_side)
+
+    def _type_hint(self, left_side: str) -> str:
+        # Edge fields are always nullable
+        if self.need_alias:
+            return f'{left_side} {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"{left_side} None"
+
+    def as_write(self) -> str:
+        return f"self.{self.name}"
 
 
 @total_ordering

@@ -51,12 +51,14 @@ class ConnectionItemE(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
         None, repr=False, alias="inwardsSingle"
     )
@@ -68,6 +70,7 @@ class ConnectionItemE(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
+            direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
             ),
@@ -93,12 +96,14 @@ class ConnectionItemEWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
         None, repr=False, alias="inwardsSingle"
     )
