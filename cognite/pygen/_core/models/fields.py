@@ -40,6 +40,7 @@ __all__ = [
     "EdgeOneToMany",
     "EdgeOneToEndNode",
     "T_Field",
+    "EdgeTypedOneToOne",
 ]
 
 
@@ -179,7 +180,7 @@ class Field(ABC):
             return EdgeTypedOneToOne(
                 name=name,
                 edge_type=prop.type,
-                direction=prop.direction,
+                edge_direction=prop.direction,
                 prop_name=prop_name,
                 description=prop.description,
                 data_class=target_data_class,
@@ -464,20 +465,29 @@ class EdgeOneToOne(EdgeToOneDataClass):
 
 @dataclass(frozen=True)
 class EdgeTypedOneToOne(EdgeToOneDataClass):
-    """This represents a one-to-one relation, which direct relation."""
+    """This represents a one-to-one relation that is implemented as an edge"""
 
     edge_type: dm.DirectRelationReference
-    direction: Literal["outwards", "inwards"]
+    edge_direction: Literal["outwards", "inwards"]
 
     def as_read_type_hint(self) -> str:
-        left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
+        if self.edge_direction == "outwards":
+            left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
+        else:
+            left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None] ="
         return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
-            left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+            if self.edge_direction == "outwards":
+                left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+            else:
+                left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None] ="
         else:
-            left_side = "Union[str, dm.NodeId, None] ="
+            if self.edge_direction == "outwards":
+                left_side = "Union[str, dm.NodeId, None] ="
+            else:
+                left_side = "Union[list[str], list[dm.NodeId], None] ="
         return self._type_hint(left_side)
 
     def _type_hint(self, left_side: str) -> str:
