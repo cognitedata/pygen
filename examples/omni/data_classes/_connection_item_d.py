@@ -174,21 +174,16 @@ class ConnectionItemDWrite(DomainModelWrite):
             other_resources = self.direct_single._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
-        edge_type = dm.DirectRelationReference("pygen-models", "bidirectionalSingle")
         if self.outwards_single is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
                 end_node=self.outwards_single,
-                edge_type=edge_type,
+                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
                 view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
-            resources.extend(other_resources)
-
-        if isinstance(self.outwards_single, DomainModelWrite):
-            other_resources = self.outwards_single._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources

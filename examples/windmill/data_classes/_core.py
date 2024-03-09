@@ -438,19 +438,24 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
 
     @classmethod
     def create_edge(
-        cls, start_node: DomainModelWrite | str, end_node: DomainModelWrite | str, edge_type: dm.DirectRelationReference
+        cls,
+        start_node: DomainModelWrite | str | dm.NodeId,
+        end_node: DomainModelWrite | str | dm.NodeId,
+        edge_type: dm.DirectRelationReference,
     ) -> dm.EdgeApply:
-        if isinstance(start_node, DomainModelWrite):
+        if isinstance(start_node, (DomainModelWrite, dm.NodeId)):
             space = start_node.space
-        elif isinstance(start_node, DomainModelWrite):
-            space = start_node.space
+        elif isinstance(end_node, (DomainModelWrite, dm.NodeId)):
+            space = end_node.space
         else:
-            raise TypeError(f"Either pass in a start or end node of type {DomainRelationWrite.__name__}")
+            space = DEFAULT_INSTANCE_SPACE
 
         if isinstance(end_node, str):
             end_ref = dm.DirectRelationReference(space, end_node)
         elif isinstance(end_node, DomainModelWrite):
             end_ref = end_node.as_direct_reference()
+        elif isinstance(end_node, dm.NodeId):
+            end_ref = dm.DirectRelationReference(end_node.space, end_node.external_id)
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(end_node)}")
 
@@ -458,6 +463,8 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
             start_ref = dm.DirectRelationReference(space, start_node)
         elif isinstance(start_node, DomainModelWrite):
             start_ref = start_node.as_direct_reference()
+        elif isinstance(start_node, dm.NodeId):
+            start_ref = dm.DirectRelationReference(start_node.space, start_node.external_id)
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(start_node)}")
 
@@ -473,8 +480,8 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
     def from_edge_to_resources(
         cls,
         cache: set[tuple[str, str]],
-        start_node: DomainModelWrite | str,
-        end_node: DomainModelWrite | str,
+        start_node: DomainModelWrite | str | dm.NodeId,
+        end_node: DomainModelWrite | str | dm.NodeId,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,

@@ -138,6 +138,18 @@ class ConnectionItemEWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        for inwards_single in self.inwards_single or []:
+            other_resources = DomainRelationWrite.from_edge_to_resources(
+                cache,
+                start_node=inwards_single,
+                end_node=self,
+                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
+            )
+            resources.extend(other_resources)
+
         return resources
 
 
