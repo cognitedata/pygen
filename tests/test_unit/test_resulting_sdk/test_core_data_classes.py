@@ -11,8 +11,10 @@ from pydantic import Field
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
+    from omni import data_classes as dc
     from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
 else:
+    from omni_pydantic_v1 import data_classes as dc
     from omni_pydantic_v1.data_classes._core import DataRecord, DomainModel, unpack_properties
 
 
@@ -72,6 +74,25 @@ class TestDomainModel:
             "data_record=DataRecord(version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
             "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None))"
         )
+
+
+class TestDomainModelWrite:
+    def test_to_instances_write_with_allow_version_increase(self) -> None:
+        # Arrange
+        domain_node = dc.PrimitiveNullableWrite(
+            external_id="1",
+            data_record=dc.DataRecordWrite(existing_version=1),
+            float64=1.0,
+        )
+
+        # Act
+        result = domain_node.to_instances_write(allow_version_increase=True)
+
+        # Assert
+        assert len(result.nodes) == 1
+        node = result.nodes[0]
+        assert node.external_id == "1"
+        assert node.existing_version is None
 
 
 def unpack_properties_test_cases():

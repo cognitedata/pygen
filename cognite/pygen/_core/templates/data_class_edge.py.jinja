@@ -75,6 +75,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -116,7 +117,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
                 type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

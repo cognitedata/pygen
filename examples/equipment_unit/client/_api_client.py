@@ -59,6 +59,7 @@ class EquipmentUnitClient:
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
@@ -68,17 +69,27 @@ class EquipmentUnitClient:
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
+            allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
+                If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
+                the version to increase.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none)
+            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
             for item in items:
-                instances.extend(item._to_instances_write(cache, self._view_by_read_class, write_none))
+                instances.extend(
+                    item._to_instances_write(
+                        cache,
+                        self._view_by_read_class,
+                        write_none,
+                        allow_version_increase,
+                    )
+                )
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
