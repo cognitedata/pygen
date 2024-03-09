@@ -63,7 +63,7 @@ class ConnectionItemA(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
@@ -111,7 +111,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemBWrite], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def _to_instances_write(
@@ -165,7 +165,13 @@ class ConnectionItemAWrite(DomainModelWrite):
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for outward in self.outwards or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=outward, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=outward,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

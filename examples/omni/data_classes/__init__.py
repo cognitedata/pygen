@@ -55,6 +55,26 @@ from ._connection_item_c import (
     ConnectionItemCWrite,
     ConnectionItemCWriteList,
 )
+from ._connection_item_d import (
+    ConnectionItemD,
+    ConnectionItemDApply,
+    ConnectionItemDApplyList,
+    ConnectionItemDFields,
+    ConnectionItemDList,
+    ConnectionItemDTextFields,
+    ConnectionItemDWrite,
+    ConnectionItemDWriteList,
+)
+from ._connection_item_e import (
+    ConnectionItemE,
+    ConnectionItemEApply,
+    ConnectionItemEApplyList,
+    ConnectionItemEFields,
+    ConnectionItemEList,
+    ConnectionItemETextFields,
+    ConnectionItemEWrite,
+    ConnectionItemEWriteList,
+)
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
     DependentOnNonWritableApply,
@@ -181,6 +201,12 @@ ConnectionItemBApply.model_rebuild()
 ConnectionItemC.model_rebuild()
 ConnectionItemCWrite.model_rebuild()
 ConnectionItemCApply.model_rebuild()
+ConnectionItemD.model_rebuild()
+ConnectionItemDWrite.model_rebuild()
+ConnectionItemDApply.model_rebuild()
+ConnectionItemE.model_rebuild()
+ConnectionItemEWrite.model_rebuild()
+ConnectionItemEApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
 DependentOnNonWritableApply.model_rebuild()
@@ -231,6 +257,22 @@ __all__ = [
     "ConnectionItemCList",
     "ConnectionItemCWriteList",
     "ConnectionItemCApplyList",
+    "ConnectionItemD",
+    "ConnectionItemDWrite",
+    "ConnectionItemDApply",
+    "ConnectionItemDList",
+    "ConnectionItemDWriteList",
+    "ConnectionItemDApplyList",
+    "ConnectionItemDFields",
+    "ConnectionItemDTextFields",
+    "ConnectionItemE",
+    "ConnectionItemEWrite",
+    "ConnectionItemEApply",
+    "ConnectionItemEList",
+    "ConnectionItemEWriteList",
+    "ConnectionItemEApplyList",
+    "ConnectionItemEFields",
+    "ConnectionItemETextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableWrite",
     "DependentOnNonWritableApply",

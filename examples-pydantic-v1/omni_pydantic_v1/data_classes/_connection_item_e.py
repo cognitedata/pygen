@@ -19,68 +19,63 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_a import ConnectionItemA, ConnectionItemAWrite
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBWrite
+    from ._connection_item_d import ConnectionItemD, ConnectionItemDWrite
 
 
 __all__ = [
-    "ConnectionItemB",
-    "ConnectionItemBWrite",
-    "ConnectionItemBApply",
-    "ConnectionItemBList",
-    "ConnectionItemBWriteList",
-    "ConnectionItemBApplyList",
-    "ConnectionItemBFields",
-    "ConnectionItemBTextFields",
+    "ConnectionItemE",
+    "ConnectionItemEWrite",
+    "ConnectionItemEApply",
+    "ConnectionItemEList",
+    "ConnectionItemEWriteList",
+    "ConnectionItemEApplyList",
+    "ConnectionItemEFields",
+    "ConnectionItemETextFields",
 ]
 
 
-ConnectionItemBTextFields = Literal["name"]
-ConnectionItemBFields = Literal["name"]
+ConnectionItemETextFields = Literal["name"]
+ConnectionItemEFields = Literal["name"]
 
-_CONNECTIONITEMB_PROPERTIES_BY_FIELD = {
+_CONNECTIONITEME_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
 
-class ConnectionItemB(DomainModel):
-    """This represents the reading version of connection item b.
+class ConnectionItemE(DomainModel):
+    """This represents the reading version of connection item e.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the connection item b.
-        data_record: The data record of the connection item b node.
-        inwards: The inward field.
+        external_id: The external id of the connection item e.
+        data_record: The data record of the connection item e node.
+        inwards_single: The inwards single field.
         name: The name field.
-        self_edge: The self edge field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
-        default=None, repr=False, alias="selfEdge"
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+        None, repr=False, alias="inwardsSingle"
     )
+    name: Optional[str] = None
 
-    def as_write(self) -> ConnectionItemBWrite:
-        """Convert this read version of connection item b to the writing version."""
-        return ConnectionItemBWrite(
+    def as_write(self) -> ConnectionItemEWrite:
+        """Convert this read version of connection item e to the writing version."""
+        return ConnectionItemEWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
+            inwards_single=(
+                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
+            ),
             name=self.name,
-            self_edge=[
-                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
-                for self_edge in self.self_edge or []
-            ],
         )
 
-    def as_apply(self) -> ConnectionItemBWrite:
-        """Convert this read version of connection item b to the writing version."""
+    def as_apply(self) -> ConnectionItemEWrite:
+        """Convert this read version of connection item e to the writing version."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -89,27 +84,25 @@ class ConnectionItemB(DomainModel):
         return self.as_write()
 
 
-class ConnectionItemBWrite(DomainModelWrite):
-    """This represents the writing version of connection item b.
+class ConnectionItemEWrite(DomainModelWrite):
+    """This represents the writing version of connection item e.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the connection item b.
-        data_record: The data record of the connection item b node.
-        inwards: The inward field.
+        external_id: The external id of the connection item e.
+        data_record: The data record of the connection item e node.
+        inwards_single: The inwards single field.
         name: The name field.
-        self_edge: The self edge field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
-        default=None, repr=False, alias="selfEdge"
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
+        None, repr=False, alias="inwardsSingle"
     )
+    name: Optional[str] = None
 
     def _to_instances_write(
         self,
@@ -122,7 +115,7 @@ class ConnectionItemBWrite(DomainModelWrite):
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_read_class or {}).get(ConnectionItemB, dm.ViewId("pygen-models", "ConnectionItemB", "1"))
+        write_view = (view_by_read_class or {}).get(ConnectionItemE, dm.ViewId("pygen-models", "ConnectionItemE", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -145,26 +138,12 @@ class ConnectionItemBWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
-        for inward in self.inwards or []:
+        for inwards_single in self.inwards_single or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
-                start_node=inward,
+                start_node=inwards_single,
                 end_node=self,
-                edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        edge_type = dm.DirectRelationReference("pygen-models", "reflexive")
-        for self_edge in self.self_edge or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self,
-                end_node=self_edge,
-                edge_type=edge_type,
+                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
                 view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
@@ -174,28 +153,28 @@ class ConnectionItemBWrite(DomainModelWrite):
         return resources
 
 
-class ConnectionItemBApply(ConnectionItemBWrite):
-    def __new__(cls, *args, **kwargs) -> ConnectionItemBApply:
+class ConnectionItemEApply(ConnectionItemEWrite):
+    def __new__(cls, *args, **kwargs) -> ConnectionItemEApply:
         warnings.warn(
-            "ConnectionItemBApply is deprecated and will be removed in v1.0. Use ConnectionItemBWrite instead."
+            "ConnectionItemEApply is deprecated and will be removed in v1.0. Use ConnectionItemEWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "ConnectionItemB.",
+            "ConnectionItemE.",
             UserWarning,
             stacklevel=2,
         )
         return super().__new__(cls)
 
 
-class ConnectionItemBList(DomainModelList[ConnectionItemB]):
-    """List of connection item bs in the read version."""
+class ConnectionItemEList(DomainModelList[ConnectionItemE]):
+    """List of connection item es in the read version."""
 
-    _INSTANCE = ConnectionItemB
+    _INSTANCE = ConnectionItemE
 
-    def as_write(self) -> ConnectionItemBWriteList:
-        """Convert these read versions of connection item b to the writing versions."""
-        return ConnectionItemBWriteList([node.as_write() for node in self.data])
+    def as_write(self) -> ConnectionItemEWriteList:
+        """Convert these read versions of connection item e to the writing versions."""
+        return ConnectionItemEWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> ConnectionItemBWriteList:
+    def as_apply(self) -> ConnectionItemEWriteList:
         """Convert these read versions of primitive nullable to the writing versions."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
@@ -205,16 +184,16 @@ class ConnectionItemBList(DomainModelList[ConnectionItemB]):
         return self.as_write()
 
 
-class ConnectionItemBWriteList(DomainModelWriteList[ConnectionItemBWrite]):
-    """List of connection item bs in the writing version."""
+class ConnectionItemEWriteList(DomainModelWriteList[ConnectionItemEWrite]):
+    """List of connection item es in the writing version."""
 
-    _INSTANCE = ConnectionItemBWrite
-
-
-class ConnectionItemBApplyList(ConnectionItemBWriteList): ...
+    _INSTANCE = ConnectionItemEWrite
 
 
-def _create_connection_item_b_filter(
+class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
+
+
+def _create_connection_item_e_filter(
     view_id: dm.ViewId,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,

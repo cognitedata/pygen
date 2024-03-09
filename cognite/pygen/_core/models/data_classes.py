@@ -154,6 +154,9 @@ class DataClass:
                 self.view_id,
                 pydantic_field=pydantic_field,
             )
+            if field_ is None:
+                # Reverse direct relations are skipped
+                continue
             self.fields.append(field_)
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):

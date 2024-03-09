@@ -60,7 +60,7 @@ class DependentOnNonWritable(DomainModel):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[Implementation1NonWriteable], list[str], None] = Field(
+    to_non_writable: Union[list[Implementation1NonWriteable], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="toNonWritable"
     )
 
@@ -151,6 +151,8 @@ class DependentOnNonWritableWrite(DomainModelWrite):
                 end_node=to_non_writable,
                 edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

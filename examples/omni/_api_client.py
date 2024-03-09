@@ -13,6 +13,8 @@ from ._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
 from ._api.connection_item_a import ConnectionItemAAPI
 from ._api.connection_item_b import ConnectionItemBAPI
 from ._api.connection_item_c import ConnectionItemCAPI
+from ._api.connection_item_d import ConnectionItemDAPI
+from ._api.connection_item_e import ConnectionItemEAPI
 from ._api.dependent_on_non_writable import DependentOnNonWritableAPI
 from ._api.empty import EmptyAPI
 from ._api.implementation_1 import Implementation1API
@@ -61,6 +63,8 @@ class OmniClient:
             data_classes.ConnectionItemA: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
             data_classes.ConnectionItemB: dm.ViewId("pygen-models", "ConnectionItemB", "1"),
             data_classes.ConnectionItemC: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
+            data_classes.ConnectionItemD: dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+            data_classes.ConnectionItemE: dm.ViewId("pygen-models", "ConnectionItemE", "1"),
             data_classes.DependentOnNonWritable: dm.ViewId("pygen-models", "DependentOnNonWritable", "1"),
             data_classes.Empty: dm.ViewId("pygen-models", "Empty", "1"),
             data_classes.Implementation1: dm.ViewId("pygen-models", "Implementation1", "1"),
@@ -82,6 +86,8 @@ class OmniClient:
         self.connection_item_a = ConnectionItemAAPI(client, view_by_read_class)
         self.connection_item_b = ConnectionItemBAPI(client, view_by_read_class)
         self.connection_item_c = ConnectionItemCAPI(client, view_by_read_class)
+        self.connection_item_d = ConnectionItemDAPI(client, view_by_read_class)
+        self.connection_item_e = ConnectionItemEAPI(client, view_by_read_class)
         self.dependent_on_non_writable = DependentOnNonWritableAPI(client, view_by_read_class)
         self.empty = EmptyAPI(client, view_by_read_class)
         self.implementation_1 = Implementation1API(client, view_by_read_class)
@@ -228,6 +234,8 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_d<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_e<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.dependent_on_non_writable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.empty<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_1<br />

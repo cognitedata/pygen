@@ -253,3 +253,29 @@ def test_upsert_multiple_list(
         assert len(created.nodes) == len(new_items)
     finally:
         cognite_client.data_modeling.instances.delete(nodes=[n.as_tuple_id() for n in new_items])
+
+
+def test_upsert_recursive_with_single_edge(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
+    # Arrange
+    test_name = "integration_test:ApplyRecursiveWithSingleEdge"
+    new_items = dc.ConnectionItemDWrite(
+        external_id=f"{test_name}:Connection:D",
+        name="Connection:D",
+        outwards_single=dc.ConnectionItemEWrite(
+            external_id=f"{test_name}:Connection:E",
+            name="Connection:E",
+        ),
+    )
+    resources = dc.ResourcesWriteResult()
+    try:
+        # Act
+        resources = omni_client.upsert(new_items)
+
+        # Assert
+        assert len(resources.nodes) == 2
+        assert len(resources.edges) == 1
+    finally:
+        if resources.nodes:
+            cognite_client.data_modeling.instances.delete(resources.nodes.as_ids())
+        if resources.edges:
+            cognite_client.data_modeling.instances.delete(edges=resources.edges.as_ids())

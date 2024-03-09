@@ -392,8 +392,17 @@ class APIGenerator:
 
     def create_edge_apis(self, query_api_by_view_id: dict[dm.ViewId, QueryAPIClass]) -> None:
         self._edge_apis = [
-            EdgeAPIClass.from_fields(field, self.data_class, self.base_name, query_api_by_view_id, self._config)
-            for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
+            EdgeAPIClass.from_fields(
+                field,  # type: ignore[arg-type]
+                self.data_class,
+                self.base_name,
+                query_api_by_view_id,
+                self._config,
+            )
+            for field in itertools.chain(
+                self.data_class.fields_of_type(fields.EdgeOneToMany),  # type: ignore[type-abstract]
+                self.data_class.fields_of_type(fields.EdgeTypedOneToOne),
+            )
         ]
 
     @property

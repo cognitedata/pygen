@@ -10,7 +10,11 @@ from functools import total_ordering
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.views import ViewProperty
+from cognite.client.data_classes.data_modeling.views import (
+    ReverseDirectRelation,
+    SingleEdgeConnection,
+    ViewProperty,
+)
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -36,6 +40,7 @@ __all__ = [
     "EdgeOneToMany",
     "EdgeOneToEndNode",
     "T_Field",
+    "EdgeTypedOneToOne",
 ]
 
 
@@ -72,7 +77,7 @@ class Field(ABC):
         config: pygen_config.PygenConfig,
         view_id: dm.ViewId,
         pydantic_field: Literal["Field", "pydantic.Field"],
-    ) -> Field:
+    ) -> Field | None:
         field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
         if is_reserved_word(name, "field", view_id, prop_name):
@@ -144,24 +149,9 @@ class Field(ABC):
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
-        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-            if prop.source is not None:
-                # Connected in View
-                target_data_class = data_class_by_view_id[prop.source]
-            else:
-                raise NotImplementedError()
-                # # Connected in Container
-                # # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
-                # #   view ExternalId. This is not always true.
-                # if (
-                #     view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
-                # ) in data_class_by_view_id:
-                # elif prop.type.container and (
-                #         view_id_no_version := ViewSpaceExternalId(
-                #             prop.type.container.space, prop.type.container.external_id
-                #     in data_class_by_view_id
-                # ):
-
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.source:
+            # Connected in View
+            target_data_class = data_class_by_view_id[prop.source]
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,
@@ -170,6 +160,8 @@ class Field(ABC):
                 pydantic_field=pydantic_field,
                 doc_name=doc_name,
             )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+            raise NotImplementedError("DirectRelation without source is not yet supported")
         elif isinstance(prop, dm.MappedProperty):
             return PrimitiveField(
                 name=name,
@@ -181,8 +173,26 @@ class Field(ABC):
                 pydantic_field=pydantic_field,
                 description=prop.description,
             )
+        elif isinstance(prop, SingleEdgeConnection) and prop.edge_source:
+            raise NotImplementedError("SingleEdgeConnection with edge properties is not yet supported")
+        elif isinstance(prop, SingleEdgeConnection):
+            target_data_class = data_class_by_view_id[prop.source]
+            return EdgeTypedOneToOne(
+                name=name,
+                variable=variable,
+                edge_type=prop.type,
+                edge_direction=prop.direction,
+                prop_name=prop_name,
+                description=prop.description,
+                data_class=target_data_class,
+                pydantic_field=pydantic_field,
+                doc_name=doc_name,
+            )
+        elif isinstance(prop, ReverseDirectRelation):
+            # ReverseDirectRelation are skipped as they are not used in the generated SDK.
+            return None
         else:
-            raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
+            raise NotImplementedError(f"Property type={type(prop)} is not yet supported")
 
     @abstractmethod
     def as_read_type_hint(self) -> str:
@@ -454,6 +464,45 @@ class EdgeOneToOne(EdgeToOneDataClass):
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
+@dataclass(frozen=True)
+class EdgeTypedOneToOne(EdgeToOneDataClass):
+    """This represents a one-to-one relation that is implemented as an edge"""
+
+    edge_type: dm.DirectRelationReference
+    edge_direction: Literal["outwards", "inwards"]
+    variable: str
+
+    def as_read_type_hint(self) -> str:
+        if self.edge_direction == "outwards":
+            left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
+        else:
+            left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None] ="
+        return self._type_hint(left_side)
+
+    def as_write_type_hint(self) -> str:
+        if self.data_class.is_writable or self.data_class.is_interface:
+            if self.edge_direction == "outwards":
+                left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+            else:
+                left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None] ="
+        else:
+            if self.edge_direction == "outwards":
+                left_side = "Union[str, dm.NodeId, None] ="
+            else:
+                left_side = "Union[list[str], list[dm.NodeId], None] ="
+        return self._type_hint(left_side)
+
+    def _type_hint(self, left_side: str) -> str:
+        # Edge fields are always nullable
+        if self.need_alias:
+            return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
+        else:
+            return f"{left_side} {self.pydantic_field}(None, repr=False)"
+
+    def as_write(self) -> str:
+        return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+
+
 @total_ordering
 @dataclass(frozen=True)
 class EdgeClasses:
@@ -550,12 +599,12 @@ class EdgeOneToManyNodes(EdgeOneToMany):
         )
 
     def as_read_type_hint(self) -> str:
-        left_side = f"Union[list[{self.data_class.read_name}], list[str], None]"
+        left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None]"
         return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
-            left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+            left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None]"
         else:
             left_side = "Union[list[str], None]"
         return self._type_hint(left_side)

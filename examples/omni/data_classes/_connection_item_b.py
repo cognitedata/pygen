@@ -59,9 +59,11 @@ class ConnectionItemB(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemA], list[str], None] = Field(default=None, repr=False)
+    inwards: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
+    self_edge: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
+        default=None, repr=False, alias="selfEdge"
+    )
 
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this read version of connection item b to the writing version."""
@@ -103,9 +105,11 @@ class ConnectionItemBWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemAWrite], list[str], None] = Field(default=None, repr=False)
+    inwards: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemBWrite], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
+    self_edge: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
+        default=None, repr=False, alias="selfEdge"
+    )
 
     def _to_instances_write(
         self,
@@ -144,14 +148,26 @@ class ConnectionItemBWrite(DomainModelWrite):
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for inward in self.inwards or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=inward, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=inward,
+                end_node=self,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("pygen-models", "reflexive")
         for self_edge in self.self_edge or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=self_edge, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=self_edge,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
