@@ -204,9 +204,12 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
     def to_instances_write(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+        self,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
+        write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), view_by_read_class, write_none)
+        return self._to_instances_write(set(), view_by_read_class, write_none, allow_version_increase)
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -224,6 +227,7 @@ class DomainModelWrite(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
 
@@ -340,12 +344,15 @@ class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
         return DataRecordWriteList([node.data_record for node in self])
 
     def to_instances_write(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+        self,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
+        write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_write(cache, view_by_read_class, write_none)
+            result = node._to_instances_write(cache, view_by_read_class, write_none, allow_version_increase)
             domains.extend(result)
         return domains
 
@@ -425,6 +432,7 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
 
@@ -470,6 +478,7 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         edge = DomainRelationWrite.create_edge(start_node, end_node, edge_type)
@@ -479,10 +488,20 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
         cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
-            other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)
+            other_resources = end_node._to_instances_write(
+                cache,
+                view_by_read_class,
+                write_none,
+                allow_version_increase,
+            )
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelWrite):
-            other_resources = start_node._to_instances_write(cache, view_by_read_class, write_none)
+            other_resources = start_node._to_instances_write(
+                cache,
+                view_by_read_class,
+                write_none,
+                allow_version_increase,
+            )
             resources.extend(other_resources)
 
         return resources

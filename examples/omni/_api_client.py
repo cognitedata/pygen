@@ -113,7 +113,6 @@ class OmniClient:
             allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
                 If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
                 the version to increase.
-
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
