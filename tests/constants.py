@@ -140,7 +140,7 @@ class ExampleSDK:
         if not isoformat_dates:
             return nodes
         for node in nodes:
-            for source in node.sources:
+            for source in node.sources or []:
                 for name in list(source.properties):
                     if isinstance(source.properties[name], date):
                         source.properties[name] = source.properties[name].isoformat()
