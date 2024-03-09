@@ -48,10 +48,10 @@ class ConnectionItemC(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemA], list[str], None] = Field(
+    connection_item_a: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemB], list[str], None] = Field(
+    connection_item_b: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -96,10 +96,10 @@ class ConnectionItemCWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemAWrite], list[str], None] = Field(
+    connection_item_a: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemBWrite], list[str], None] = Field(
+    connection_item_b: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -132,6 +132,8 @@ class ConnectionItemCWrite(DomainModelWrite):
                 end_node=connection_item_a,
                 edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
@@ -143,6 +145,8 @@ class ConnectionItemCWrite(DomainModelWrite):
                 end_node=connection_item_b,
                 edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

@@ -55,6 +55,26 @@ from ._connection_item_c import (
     ConnectionItemCWrite,
     ConnectionItemCWriteList,
 )
+from ._connection_item_d import (
+    ConnectionItemD,
+    ConnectionItemDApply,
+    ConnectionItemDApplyList,
+    ConnectionItemDFields,
+    ConnectionItemDList,
+    ConnectionItemDTextFields,
+    ConnectionItemDWrite,
+    ConnectionItemDWriteList,
+)
+from ._connection_item_e import (
+    ConnectionItemE,
+    ConnectionItemEApply,
+    ConnectionItemEApplyList,
+    ConnectionItemEFields,
+    ConnectionItemEList,
+    ConnectionItemETextFields,
+    ConnectionItemEWrite,
+    ConnectionItemEWriteList,
+)
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
     DependentOnNonWritableApply,
@@ -215,6 +235,26 @@ ConnectionItemCApply.update_forward_refs(
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
 
+ConnectionItemD.update_forward_refs(
+    ConnectionItemE=ConnectionItemE,
+)
+ConnectionItemDWrite.update_forward_refs(
+    ConnectionItemEWrite=ConnectionItemEWrite,
+)
+ConnectionItemDApply.update_forward_refs(
+    ConnectionItemEWrite=ConnectionItemEWrite,
+)
+
+ConnectionItemE.update_forward_refs(
+    ConnectionItemD=ConnectionItemD,
+)
+ConnectionItemEWrite.update_forward_refs(
+    ConnectionItemDWrite=ConnectionItemDWrite,
+)
+ConnectionItemEApply.update_forward_refs(
+    ConnectionItemDWrite=ConnectionItemDWrite,
+)
+
 DependentOnNonWritable.update_forward_refs(
     Implementation1NonWriteable=Implementation1NonWriteable,
 )
@@ -267,6 +307,22 @@ __all__ = [
     "ConnectionItemCList",
     "ConnectionItemCWriteList",
     "ConnectionItemCApplyList",
+    "ConnectionItemD",
+    "ConnectionItemDWrite",
+    "ConnectionItemDApply",
+    "ConnectionItemDList",
+    "ConnectionItemDWriteList",
+    "ConnectionItemDApplyList",
+    "ConnectionItemDFields",
+    "ConnectionItemDTextFields",
+    "ConnectionItemE",
+    "ConnectionItemEWrite",
+    "ConnectionItemEApply",
+    "ConnectionItemEList",
+    "ConnectionItemEWriteList",
+    "ConnectionItemEApplyList",
+    "ConnectionItemEFields",
+    "ConnectionItemETextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableWrite",
     "DependentOnNonWritableApply",

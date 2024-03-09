@@ -67,9 +67,9 @@ class Windmill(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[Blade], list[str], None] = Field(default=None, repr=False)
+    blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[Metmast], list[str], None] = Field(default=None, repr=False)
+    metmast: Union[list[Metmast], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
@@ -122,9 +122,9 @@ class WindmillWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[BladeWrite], list[str], None] = Field(default=None, repr=False)
+    blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[MetmastWrite], list[str], None] = Field(default=None, repr=False)
+    metmast: Union[list[MetmastWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
     rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(None, repr=False)
@@ -185,14 +185,26 @@ class WindmillWrite(DomainModelWrite):
         edge_type = dm.DirectRelationReference("power-models", "Windmill.blades")
         for blade in self.blades or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=blade, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=blade,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.metmast")
         for metmast in self.metmast or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=metmast, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=metmast,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
