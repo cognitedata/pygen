@@ -51,12 +51,14 @@ class ConnectionItemE(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
         None, repr=False, alias="inwardsSingle"
     )
@@ -68,6 +70,7 @@ class ConnectionItemE(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
+            direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
             ),
@@ -93,12 +96,14 @@ class ConnectionItemEWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
         None, repr=False, alias="inwardsSingle"
     )
@@ -118,6 +123,16 @@ class ConnectionItemEWrite(DomainModelWrite):
         write_view = (view_by_read_class or {}).get(ConnectionItemE, dm.ViewId("pygen-models", "ConnectionItemE", "1"))
 
         properties: dict[str, Any] = {}
+
+        if self.direct_no_source is not None:
+            properties["directNoSource"] = {
+                "space": self.space if isinstance(self.direct_no_source, str) else self.direct_no_source.space,
+                "externalId": (
+                    self.direct_no_source
+                    if isinstance(self.direct_no_source, str)
+                    else self.direct_no_source.external_id
+                ),
+            }
 
         if self.name is not None or write_none:
             properties["name"] = self.name

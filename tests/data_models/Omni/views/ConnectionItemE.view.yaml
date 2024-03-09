@@ -58,3 +58,10 @@ properties:
         type: view
       identifier: directMulti
     connectionType: multi_reverse_direct_relation
+  directNoSource:
+    container:
+      space: pygen-models
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: direct1
+    name: directNoSource

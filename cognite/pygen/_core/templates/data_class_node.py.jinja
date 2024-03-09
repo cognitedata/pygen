@@ -115,7 +115,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         )){% endif %}
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         properties: dict[str, Any] = {}
-        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
+        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne, ft.EdgeOneToOneAny)) %}
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:{% if field.is_edge %}
             properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
