@@ -209,9 +209,17 @@ class Field(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def as_graphql_type_hint(self) -> str:
+        raise NotImplementedError()
+
+    @abstractmethod
     def as_write(self) -> str:
         """Used in the .as_write() method for the read version of the data class."""
         raise NotImplementedError
+
+    @abstractmethod
+    def as_read(self) -> str:
+        """Used in the .as_read() method for the graphQL version of the data class."""
 
     @property
     def argument_documentation(self) -> str:
@@ -273,6 +281,9 @@ class PrimitiveFieldCore(Field, ABC):
     def as_write(self) -> str:
         return f"self.{self.name}"
 
+    def as_read(self) -> str:
+        return f"self.{self.name}"
+
 
 @dataclass(frozen=True)
 class ListFieldCore(PrimitiveFieldCore):
@@ -288,6 +299,9 @@ class ListFieldCore(PrimitiveFieldCore):
             return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
             return f"Optional[list[{self.type_as_string}]] = None"
+
+    def as_graphql_type_hint(self) -> str:
+        return self.as_read_type_hint()
 
     def as_write_type_hint(self) -> str:
         type_ = self.type_as_string
@@ -330,6 +344,12 @@ class PrimitiveField(PrimitiveFieldCore):
         else:
             return f"{self.type_as_string}"
 
+    def as_graphql_type_hint(self) -> str:
+        if self.need_alias:
+            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[{self.type_as_string}] = None"
+
     def as_write_type_hint(self) -> str:
         out_type = self.type_as_string
         if self.is_nullable and self.need_alias:
@@ -369,6 +389,9 @@ class CDFExternalField(PrimitiveFieldCore):
         return isinstance(self.type_, dm.data_types.ListablePropertyType) and self.type_.is_list
 
     def as_read_type_hint(self) -> str:
+        return self.as_write_type_hint()
+
+    def as_graphql_type_hint(self) -> str:
         return self.as_write_type_hint()
 
     def as_write_type_hint(self) -> str:
@@ -452,6 +475,10 @@ class EdgeOneToOne(EdgeToOneDataClass):
         left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
         return self._type_hint(left_side)
 
+    def as_graphql_type_hint(self) -> str:
+        left_side = f"Optional[{self.data_class.graphql_name}] ="
+        return self._type_hint(left_side)
+
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
             left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
@@ -469,6 +496,9 @@ class EdgeOneToOne(EdgeToOneDataClass):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
+    def as_read(self) -> str:
+        return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
+
 
 @dataclass(frozen=True)
 class EdgeTypedOneToOne(EdgeToOneDataClass):
@@ -483,6 +513,13 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
             left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
         else:
             left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None] ="
+        return self._type_hint(left_side)
+
+    def as_graphql_type_hint(self) -> str:
+        if self.edge_direction == "outwards":
+            left_side = f"Optional[{self.data_class.graphql_name}] ="
+        else:
+            left_side = f"Optional[list[{self.data_class.graphql_name}]] ="
         return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
@@ -508,6 +545,9 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
+    def as_read(self) -> str:
+        return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
+
 
 @dataclass(frozen=True)
 class EdgeOneToOneAny(EdgeField):
@@ -520,6 +560,10 @@ class EdgeOneToOneAny(EdgeField):
     def as_write_type_hint(self) -> str:
         return self.as_read_type_hint()
 
+    def as_graphql_type_hint(self) -> str:
+        left_side = "Optional[str] ="
+        return self._type_hint(left_side)
+
     def _type_hint(self, left_side: str) -> str:
         # Edge fields are always nullable
         if self.need_alias:
@@ -528,6 +572,9 @@ class EdgeOneToOneAny(EdgeField):
             return f"{left_side} None"
 
     def as_write(self) -> str:
+        return f"self.{self.name}"
+
+    def as_read(self) -> str:
         return f"self.{self.name}"
 
 
@@ -571,6 +618,15 @@ class EdgeOneToEndNode(EdgeField):
     def as_read_type_hint(self) -> str:
         return self._type_hint([data_class.read_name for data_class in self.end_classes])
 
+    def as_graphql_type_hint(self) -> str:
+        data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        data_class_names_hint = ", ".join(sorted(data_class_names))
+        left_side = f"Optional[{data_class_names_hint}]"
+        if self.need_alias:
+            return f'{left_side} = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"{left_side} = None"
+
     def as_write_type_hint(self) -> str:
         return self._type_hint(
             [
@@ -594,6 +650,9 @@ class EdgeOneToEndNode(EdgeField):
 
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+
+    def as_read(self) -> str:
+        return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -625,6 +684,13 @@ class EdgeOneToManyNodes(EdgeOneToMany):
             f"[{self.variable}.as_write() if isinstance({self.variable}, DomainModel) else {self.variable} "
             f"for {self.variable} in self.{self.name} or []]"
         )
+
+    def as_read(self) -> str:
+        return self.as_write()
+
+    def as_graphql_type_hint(self) -> str:
+        left_side = f"Optional[list[{self.data_class.graphql_name}]]"
+        return self._type_hint(left_side)
 
     def as_read_type_hint(self) -> str:
         left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None]"
@@ -660,8 +726,14 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     def as_write(self) -> str:
         return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []]"
 
+    def as_read(self) -> str:
+        return f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []]"
+
     def as_read_type_hint(self) -> str:
         return self._type_hint(self.data_class.read_name)
+
+    def as_graphql_type_hint(self) -> str:
+        return self._type_hint(self.data_class.graphql_name)
 
     def as_write_type_hint(self) -> str:
         return self._type_hint(self.data_class.write_name)

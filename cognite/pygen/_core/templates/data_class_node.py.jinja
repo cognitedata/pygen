@@ -10,6 +10,7 @@ from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as Cog
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -17,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
@@ -36,6 +38,45 @@ __all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_clas
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
+class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+    """This represents the reading version of {{ data_class.doc_name }}, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.
+        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+    """{% for field in data_class.non_parent_fields %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+
+    def as_read(self) -> {{ data_class.read_name }}:
+        """Convert this read format of {{ data_class.doc_name }} to the reading version."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return {{ data_class.read_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),{% for field in data_class %}
+            {{ field.name }}={{ field.as_read() }},{% endfor %}
+        )
+
+{% if data_class.is_writable or data_class.is_interface %}
+    def as_write(self) -> {{ data_class.write_name }}:
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
+        return {{ data_class.write_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
+            {{ field.name }}={{ field.as_write() }},{% endfor %}
+        )
+{% endif %}
 
 class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.

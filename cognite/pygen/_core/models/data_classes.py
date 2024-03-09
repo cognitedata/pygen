@@ -38,6 +38,7 @@ class DataClass:
 
     read_name: str
     write_name: str
+    graphql_name: str
     read_list_name: str
     write_list_name: str
     doc_name: str
@@ -104,6 +105,7 @@ class DataClass:
         args = dict(
             read_name=class_name,
             write_name=f"{class_name}Write",
+            graphql_name=f"{class_name}GraphQL",
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}WriteList",
             doc_name=doc_name,

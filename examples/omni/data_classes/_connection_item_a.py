@@ -50,6 +50,8 @@ class ConnectionItemAGraphQL(GraphQLCore):
     """This represents the reading version of connection item A, used
     when data is retrieved from CDF using GraphQL.
 
+    It is used when retrieving data from CDF using GraphQL.
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the connection item a.
@@ -97,7 +99,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
         return ConnectionItemAWrite(
             space=self.space,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
+            data_record=DataRecordWrite(existing_version=0),
             name=self.name,
             other_direct=(
                 self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct

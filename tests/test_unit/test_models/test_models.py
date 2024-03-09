@@ -227,6 +227,7 @@ def load_data_classes_test_cases():
         NodeDataClass(
             read_name="Series",
             write_name="SeriesWrite",
+            graphql_name="SeriesGraphQL",
             write_list_name="SeriesWriteList",
             read_list_name="SeriesList",
             doc_name="series",
@@ -456,6 +457,7 @@ def create_fields_test_cases():
     data_class = NodeDataClass(
         read_name="Role",
         write_name="RoleApply",
+        graphql_name="RoleGraphQL",
         read_list_name="RoleList",
         write_list_name="RoleListApply",
         doc_name="role",
@@ -540,6 +542,7 @@ def create_fields_test_cases():
     data_class = NodeDataClass(
         read_name="Person",
         write_name="PersonApply",
+        graphql_name="PersonGraphQL",
         read_list_name="PersonList",
         write_list_name="PersonListApply",
         doc_name="person",
