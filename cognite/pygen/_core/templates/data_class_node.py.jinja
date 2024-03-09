@@ -171,7 +171,13 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node={{field.variable}},
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             ){% else %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class

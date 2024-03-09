@@ -587,12 +587,12 @@ class EdgeOneToManyNodes(EdgeOneToMany):
         )
 
     def as_read_type_hint(self) -> str:
-        left_side = f"Union[list[{self.data_class.read_name}], list[str], None]"
+        left_side = f"Union[list[{self.data_class.read_name}], list[str], list[dm.NodeId], None]"
         return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
-            left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+            left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None]"
         else:
             left_side = "Union[list[str], None]"
         return self._type_hint(left_side)
