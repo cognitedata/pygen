@@ -1,0 +1,60 @@
+space: pygen-models
+externalId: ConnectionItemE
+name: ConnectionItemE
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: pygen-models
+      externalId: ConnectionItemE
+properties:
+  name:
+    container:
+      space: pygen-models
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  inwardsSingle:
+    type:
+      space: pygen-models
+      externalId: bidirectionalSingle
+    source:
+      space: pygen-models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+    direction: inwards
+    name: inwards
+    connectionType: single_edge_connection
+  directReverseSingle:
+    source:
+      space: pygen-models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+    through:
+      source:
+        space: pygen-models
+        externalId: ConnectionItemD
+        version: '1'
+        type: view
+      identifier: directSingle
+    connectionType: single_reverse_direct_relation
+  directMulti:
+    source:
+      space: pygen-models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+    through:
+      source:
+        space: pygen-models
+        externalId: ConnectionItemD
+        version: '1'
+        type: view
+      identifier: directMulti
+    connectionType: multi_reverse_direct_relation
