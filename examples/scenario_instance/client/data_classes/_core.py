@@ -61,9 +61,9 @@ class ResourcesWrite:
 
 @dataclass
 class ResourcesWriteResult:
-    nodes: dm.NodeApplyResultList
-    edges: dm.EdgeApplyResultList
-    time_series: TimeSeriesList
+    nodes: dm.NodeApplyResultList = field(default_factory=lambda: dm.NodeApplyResultList([]))
+    edges: dm.EdgeApplyResultList = field(default_factory=lambda: dm.EdgeApplyResultList([]))
+    time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class

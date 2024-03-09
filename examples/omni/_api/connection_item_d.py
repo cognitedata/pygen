@@ -33,6 +33,7 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
+from .connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
 from .connection_item_d_query import ConnectionItemDQueryAPI
 
 
@@ -48,6 +49,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
+        self.outwards_single_edge = ConnectionItemDOutwardsSingleAPI(client)
 
     def __call__(
         self,
