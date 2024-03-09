@@ -396,7 +396,7 @@ views:
   usedFor: node
   isGlobal: false
   properties:
-    directMulti:
+    directReverseMulti:
       source:
         space: pygen-models
         externalId: ConnectionItemD
@@ -457,8 +457,8 @@ views:
       defaultValue: null
       name: name
       description: null
-  lastUpdatedTime: 1709987539845
-  createdTime: 1709987539845
+  lastUpdatedTime: 1709990044031
+  createdTime: 1709990044031
 - space: pygen-models
   externalId: DependentOnNonWritable
   name: DependentOnNonWritable
@@ -1578,5 +1578,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1709987541828
-createdTime: 1709987541828
+lastUpdatedTime: 1709990045856
+createdTime: 1709990045856
