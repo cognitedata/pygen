@@ -150,17 +150,6 @@ class Field(ABC):
                 target_data_class = data_class_by_view_id[prop.source]
             else:
                 raise NotImplementedError()
-                # # Connected in Container
-                # # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
-                # #   view ExternalId. This is not always true.
-                # if (
-                #     view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
-                # ) in data_class_by_view_id:
-                # elif prop.type.container and (
-                #         view_id_no_version := ViewSpaceExternalId(
-                #             prop.type.container.space, prop.type.container.external_id
-                #     in data_class_by_view_id
-                # ):
 
             return EdgeOneToOne(
                 name=name,
@@ -182,7 +171,7 @@ class Field(ABC):
                 description=prop.description,
             )
         else:
-            raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
+            raise NotImplementedError(f"Property type={type(prop)} is not yet supported")
 
     @abstractmethod
     def as_read_type_hint(self) -> str:

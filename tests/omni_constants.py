@@ -24,6 +24,8 @@ class OmniView:
     connection_item_a: str = "ConnectionItemA"
     connection_item_b: str = "ConnectionItemB"
     connection_item_c: str = "ConnectionItemC"
+    connection_item_d: str = "ConnectionItemD"
+    connection_item_e: str = "ConnectionItemE"
 
     primitive_nullable: str = "PrimitiveNullable"
     primitive_nullable_listed: str = "PrimitiveNullableListed"
