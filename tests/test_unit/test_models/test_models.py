@@ -487,8 +487,8 @@ def create_fields_test_cases():
             edge_type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
             edge_direction="outwards",
         ),
-        "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
-        "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
+        "Union[list[Role], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+        "Union[list[RoleApply], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
         id="List of edges",
     )
     prop = {
