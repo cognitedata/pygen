@@ -10,7 +10,7 @@ from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
 from .data_classes import DataClass, EdgeDataClass
-from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges, EdgeOneToManyNodes
+from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges, EdgeOneToManyNodes, EdgeTypedOneToOne
 from .filter_method import FilterMethod, FilterParameter
 
 
@@ -116,7 +116,7 @@ class EdgeAPIClass(APIClass):
     @classmethod
     def from_fields(
         cls,
-        field: EdgeOneToMany,
+        field: EdgeOneToMany | EdgeTypedOneToOne,
         data_class: DataClass,
         base_name: str,
         query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
@@ -141,7 +141,7 @@ class EdgeAPIClass(APIClass):
             except StopIteration:
                 raise ValueError("Could not find end class") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
-        elif isinstance(field, EdgeOneToManyNodes):
+        elif isinstance(field, (EdgeOneToManyNodes, EdgeTypedOneToOne)):
             edge_class = None
             end_class = field.data_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
