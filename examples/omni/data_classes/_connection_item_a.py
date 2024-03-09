@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -42,6 +44,69 @@ ConnectionItemAFields = Literal["name"]
 _CONNECTIONITEMA_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
+
+
+class ConnectionItemAGraphQL(GraphQLCore):
+    """This represents the reading version of connection item A, used
+    when data is retrieved from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the connection item a.
+        data_record: The data record of the connection item a node.
+        name: The name field.
+        other_direct: The other direct field.
+        outwards: The outward field.
+        self_direct: The self direct field.
+
+    """
+
+    view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    name: Optional[str] = None
+    other_direct: Optional[ConnectionItemC] = Field(None, repr=False, alias="otherDirect")
+    outwards: Optional[list[ConnectionItemB]] = Field(default=None, repr=False)
+    self_direct: Optional[ConnectionItemA] = Field(None, repr=False, alias="selfDirect")
+
+    def as_read(self) -> ConnectionItemA:
+        """Convert this read version of connection item a to the reading version."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read version because it lacks a data record.")
+        return ConnectionItemA(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            name=self.name,
+            other_direct=(
+                self.other_direct.as_read() if isinstance(self.other_direct, DomainModelCore) else self.other_direct
+            ),
+            outwards=[
+                outward.as_read() if isinstance(outward, DomainModelCore) else outward
+                for outward in self.outwards or []
+            ],
+            self_direct=(
+                self.self_direct.as_read() if isinstance(self.self_direct, DomainModelCore) else self.self_direct
+            ),
+        )
+
+    def as_write(self) -> ConnectionItemAWrite:
+        """Convert this GraphQL format of connection item a to the writing version."""
+        return ConnectionItemAWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
+            name=self.name,
+            other_direct=(
+                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
+            ),
+            outwards=[
+                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
+            ],
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
+        )
 
 
 class ConnectionItemA(DomainModel):
