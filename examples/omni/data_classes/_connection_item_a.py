@@ -63,7 +63,7 @@ class ConnectionItemA(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
@@ -111,7 +111,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemBWrite], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def _to_instances_write(
