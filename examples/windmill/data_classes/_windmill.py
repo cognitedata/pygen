@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator, validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -76,6 +77,14 @@ class WindmillGraphQL(GraphQLCore):
     name: Optional[str] = None
     rotor: Optional[RotorGraphQL] = Field(None, repr=False)
     windfarm: Optional[str] = None
+
+    @field_validator("blades", "metmast", "nacelle", "rotor", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> Windmill:
         """Convert this GraphQL format of windmill to the reading format."""
