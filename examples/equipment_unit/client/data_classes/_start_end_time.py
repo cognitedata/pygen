@@ -56,7 +56,7 @@ class StartEndTimeGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
-    end_node: Optional[EquipmentModuleGraphQL, WorkOrderGraphQL] = None
+    end_node: Union[EquipmentModuleGraphQL, WorkOrderGraphQL, None] = None
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 

@@ -9,7 +9,7 @@ from cognite.client import data_modeling as dm{% if data_class.use_pydantic_fiel
 
 from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelWrite, DomainRelation, DomainRelationWrite, DomainRelationList, GraphQLCore, ResourcesWrite{% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
-from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
+from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 

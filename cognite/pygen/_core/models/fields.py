@@ -621,7 +621,7 @@ class EdgeOneToEndNode(EdgeField):
     def as_graphql_type_hint(self) -> str:
         data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
         data_class_names_hint = ", ".join(sorted(data_class_names))
-        left_side = f"Optional[{data_class_names_hint}]"
+        left_side = f"Union[{data_class_names_hint}, None]"
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
