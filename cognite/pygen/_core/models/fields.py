@@ -686,7 +686,10 @@ class EdgeOneToManyNodes(EdgeOneToMany):
         )
 
     def as_read(self) -> str:
-        return self.as_write()
+        return (
+            f"[{self.variable}.as_read() if isinstance({self.variable}, GraphQLCore) else {self.variable} "
+            f"for {self.variable} in self.{self.name} or []]"
+        )
 
     def as_graphql_type_hint(self) -> str:
         left_side = f"Optional[list[{self.data_class.graphql_name}]]"
