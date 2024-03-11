@@ -181,7 +181,7 @@ class WindmillClient:
             )
 
     def query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
-        result = self._client.data_modeling.graphql.query(("power-models", "Windmill", "1"), query)
+        result = self._client.data_modeling.graphql.query(("power-models", "Windmill", "1"), query, variables)
         return GraphQLQuery(result).parse()
 
     @classmethod

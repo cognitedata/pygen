@@ -7,6 +7,7 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -117,6 +118,7 @@ from ._windmill import (
 Blade.model_rebuild()
 BladeWrite.model_rebuild()
 BladeApply.model_rebuild()
+BladeGraphQL.model_rebuild()
 Nacelle.model_rebuild()
 NacelleWrite.model_rebuild()
 NacelleApply.model_rebuild()
@@ -136,6 +138,8 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "Blade",
     "BladeGraphQL",

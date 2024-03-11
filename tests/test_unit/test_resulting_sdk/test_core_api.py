@@ -1,3 +1,6 @@
+from typing import Any
+
+import pytest
 from cognite.client import data_modeling as dm
 
 from tests.constants import IS_PYDANTIC_V2
@@ -9,7 +12,8 @@ if IS_PYDANTIC_V2:
         UnitProcedure,
         UnitProcedureList,
     )
-
+    from windmill import data_classes as wdc
+    from windmill._api._core import GraphQLQuery
 else:
     from equipment_unit_pydantic_v1.client._api._core import QueryBuilder, QueryStep
     from equipment_unit_pydantic_v1.client.data_classes import (
@@ -17,6 +21,8 @@ else:
         UnitProcedure,
         UnitProcedureList,
     )
+    from windmill._api._core import GraphQLQuery
+    from windmill_pydantic_v1 import data_classes as wdc
 
 
 class TestQueryBuilderT:
@@ -164,3 +170,16 @@ properties:
             assert isinstance(procedure, UnitProcedure)
             for work_unit in procedure.work_units:
                 assert isinstance(work_unit, StartEndTime)
+
+
+def parse_graphql_query():
+    result = {"listBlade": {"items": [{"__typename": "Blade", "name": "A"}]}}
+
+    yield pytest.param(result, wdc.GraphQLList([wdc.BladeGraphQL(name="A")]), id="listBlade")
+
+
+class TestGraphQLQuery:
+    @pytest.mark.parametrize("result, expected", parse_graphql_query())
+    def test_parse_query(self, result: dict[str, Any], expected: wdc.GraphQLList) -> None:
+        actual = GraphQLQuery(result).parse()
+        assert actual == expected
