@@ -20,6 +20,7 @@ from ._core import (
 {% endfor %}{% else %}{% for (read_name, graphql_name, write_name, has_write_class), dependencies in dependencies_by_names.items() %}
 {{ read_name }}.update_forward_refs({% for dependency in dependencies %}
     {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
+)
 {{ graphql_name }}.update_forward_refs({% for dependency in dependencies %}
     {{ dependency.graphql_name }}={{ dependency.graphql_name }},{%  endfor %}
 ){% if has_write_class %}
