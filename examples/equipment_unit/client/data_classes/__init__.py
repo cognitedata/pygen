@@ -6,6 +6,7 @@ from ._core import (
     DomainModelWrite,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -14,6 +15,7 @@ from ._equipment_module import (
     EquipmentModuleApply,
     EquipmentModuleApplyList,
     EquipmentModuleFields,
+    EquipmentModuleGraphQL,
     EquipmentModuleList,
     EquipmentModuleTextFields,
     EquipmentModuleWrite,
@@ -24,6 +26,7 @@ from ._start_end_time import (
     StartEndTimeApply,
     StartEndTimeApplyList,
     StartEndTimeFields,
+    StartEndTimeGraphQL,
     StartEndTimeList,
     StartEndTimeWrite,
     StartEndTimeWriteList,
@@ -33,6 +36,7 @@ from ._unit_procedure import (
     UnitProcedureApply,
     UnitProcedureApplyList,
     UnitProcedureFields,
+    UnitProcedureGraphQL,
     UnitProcedureList,
     UnitProcedureTextFields,
     UnitProcedureWrite,
@@ -43,6 +47,7 @@ from ._work_order import (
     WorkOrderApply,
     WorkOrderApplyList,
     WorkOrderFields,
+    WorkOrderGraphQL,
     WorkOrderList,
     WorkOrderTextFields,
     WorkOrderWrite,
@@ -56,6 +61,9 @@ UnitProcedure.model_rebuild()
 UnitProcedureWrite.model_rebuild()
 UnitProcedureApply.model_rebuild()
 
+
+_GRAPHQL_DATA_CLASS_BY_VIEW_ID = {_cls.view_id: _cls for _cls in GraphQLCore.__subclasses__()}
+
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
@@ -67,6 +75,7 @@ __all__ = [
     "DomainRelationWrite",
     "ResourcesWriteResult",
     "EquipmentModule",
+    "EquipmentModuleGraphQL",
     "EquipmentModuleWrite",
     "EquipmentModuleApply",
     "EquipmentModuleList",
@@ -75,6 +84,7 @@ __all__ = [
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
+    "StartEndTimeGraphQL",
     "StartEndTimeWrite",
     "StartEndTimeApply",
     "StartEndTimeList",
@@ -82,6 +92,7 @@ __all__ = [
     "StartEndTimeApplyList",
     "StartEndTimeFields",
     "UnitProcedure",
+    "UnitProcedureGraphQL",
     "UnitProcedureWrite",
     "UnitProcedureApply",
     "UnitProcedureList",
@@ -90,6 +101,7 @@ __all__ = [
     "UnitProcedureFields",
     "UnitProcedureTextFields",
     "WorkOrder",
+    "WorkOrderGraphQL",
     "WorkOrderWrite",
     "WorkOrderApply",
     "WorkOrderList",
