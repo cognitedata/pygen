@@ -7,6 +7,7 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -67,8 +68,6 @@ from ._sub_interface import (
 )
 
 
-_GRAPHQL_DATA_CLASS_BY_VIEW_ID = {_cls.view_id: _cls for _cls in GraphQLCore.__subclasses__()}
-
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
@@ -78,6 +77,8 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "Implementation1sPygenModels",
     "Implementation1sPygenModelsGraphQL",

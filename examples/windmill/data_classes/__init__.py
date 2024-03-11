@@ -116,13 +116,15 @@ from ._windmill import (
 )
 
 Blade.model_rebuild()
+BladeGraphQL.model_rebuild()
 BladeWrite.model_rebuild()
 BladeApply.model_rebuild()
-BladeGraphQL.model_rebuild()
 Nacelle.model_rebuild()
+NacelleGraphQL.model_rebuild()
 NacelleWrite.model_rebuild()
 NacelleApply.model_rebuild()
 Windmill.model_rebuild()
+WindmillGraphQL.model_rebuild()
 WindmillWrite.model_rebuild()
 WindmillApply.model_rebuild()
 

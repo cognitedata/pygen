@@ -799,5 +799,5 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
         "Rotor": data_classes.RotorGraphQL,
         "SensorPosition": data_classes.SensorPositionGraphQL,
         "Windmill": data_classes.WindmillGraphQL,
-    }
+    },
 }

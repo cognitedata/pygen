@@ -21,6 +21,7 @@ from scenario_instance.client.data_classes._core import (
     DomainModelCore,
     DomainModelWrite,
     DomainRelationWrite,
+    GraphQLList,
     ResourcesWriteResult,
     T_DomainModel,
     T_DomainModelWrite,
@@ -32,6 +33,8 @@ from scenario_instance.client.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
+from scenario_instance.client import data_classes
+
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
@@ -751,3 +754,40 @@ def _create_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+class GraphQLQueryResponse:
+    def __init__(self, data_model_id: dm.DataModelId):
+        self._output = GraphQLList([])
+        self._data_class_by_type = _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE[data_model_id]
+
+    def parse(self, response: dict[str, Any]) -> GraphQLList:
+        if "error" in response:
+            raise ValueError(response["error"])
+        self._parse_item(response)
+        return self._output
+
+    def _parse_item(self, data: dict[str, Any]) -> None:
+        if "__typename" in data:
+            try:
+                item = self._data_class_by_type[data["__typename"]].model_validate(data)
+            except KeyError:
+                warnings.warn(f"Could not find class for type {data['__typename']}", stacklevel=2)
+            except ValueError as e:
+                warnings.warn(f"Validation error: {e}", stacklevel=2)
+            else:
+                self._output.append(item)
+        else:
+            for item in data.values():
+                if isinstance(item, dict):
+                    self._parse_item(item)
+                elif isinstance(item, list):
+                    for item in item:
+                        self._parse_item(item)
+
+
+_GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
+    dm.DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1"): {
+        "ScenarioInstance": data_classes.ScenarioInstanceGraphQL,
+    },
+}

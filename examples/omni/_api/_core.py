@@ -807,5 +807,5 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
         "PrimitiveRequiredListed": data_classes.PrimitiveRequiredListedGraphQL,
         "PrimitiveWithDefaults": data_classes.PrimitiveWithDefaultsGraphQL,
         "SubInterface": data_classes.SubInterfaceGraphQL,
-    }
+    },
 }

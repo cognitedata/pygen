@@ -7,6 +7,7 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -213,26 +214,30 @@ from ._sub_interface import (
 )
 
 ConnectionItemA.model_rebuild()
+ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
 ConnectionItemAApply.model_rebuild()
 ConnectionItemB.model_rebuild()
+ConnectionItemBGraphQL.model_rebuild()
 ConnectionItemBWrite.model_rebuild()
 ConnectionItemBApply.model_rebuild()
 ConnectionItemC.model_rebuild()
+ConnectionItemCGraphQL.model_rebuild()
 ConnectionItemCWrite.model_rebuild()
 ConnectionItemCApply.model_rebuild()
 ConnectionItemD.model_rebuild()
+ConnectionItemDGraphQL.model_rebuild()
 ConnectionItemDWrite.model_rebuild()
 ConnectionItemDApply.model_rebuild()
 ConnectionItemE.model_rebuild()
+ConnectionItemEGraphQL.model_rebuild()
 ConnectionItemEWrite.model_rebuild()
 ConnectionItemEApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
+DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
 DependentOnNonWritableApply.model_rebuild()
 
-
-_GRAPHQL_DATA_CLASS_BY_VIEW_ID = {_cls.view_id: _cls for _cls in GraphQLCore.__subclasses__()}
 
 __all__ = [
     "DataRecord",
@@ -243,6 +248,8 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "CDFExternalReferences",
     "CDFExternalReferencesGraphQL",

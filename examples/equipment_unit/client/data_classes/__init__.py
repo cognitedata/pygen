@@ -7,6 +7,7 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -26,6 +27,7 @@ from ._start_end_time import (
     StartEndTimeApply,
     StartEndTimeApplyList,
     StartEndTimeFields,
+    StartEndTimeGraphQL,
     StartEndTimeList,
     StartEndTimeWrite,
     StartEndTimeWriteList,
@@ -54,14 +56,14 @@ from ._work_order import (
 )
 
 StartEndTime.model_rebuild()
+StartEndTimeGraphQL.model_rebuild()
 StartEndTimeWrite.model_rebuild()
 StartEndTimeApply.model_rebuild()
 UnitProcedure.model_rebuild()
+UnitProcedureGraphQL.model_rebuild()
 UnitProcedureWrite.model_rebuild()
 UnitProcedureApply.model_rebuild()
 
-
-_GRAPHQL_DATA_CLASS_BY_VIEW_ID = {_cls.view_id: _cls for _cls in GraphQLCore.__subclasses__()}
 
 __all__ = [
     "DataRecord",
@@ -72,6 +74,8 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "EquipmentModule",
     "EquipmentModuleGraphQL",
@@ -83,6 +87,7 @@ __all__ = [
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
+    "StartEndTimeGraphQL",
     "StartEndTimeWrite",
     "StartEndTimeApply",
     "StartEndTimeList",
