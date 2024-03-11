@@ -21,6 +21,8 @@ from windmill.data_classes._core import (
     DomainModelCore,
     DomainModelWrite,
     DomainRelationWrite,
+    GraphQLCore,
+    GraphQLList,
     ResourcesWriteResult,
     T_DomainModel,
     T_DomainModelWrite,
@@ -751,3 +753,13 @@ def _create_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+class GraphQLQuery:
+    def __init__(self, result: dict[str, Any]):
+        self._result = result
+
+    def parse(self) -> GraphQLList:
+        if "error" in self._result:
+            raise ValueError(self._result["error"])
+        raise NotImplementedError()

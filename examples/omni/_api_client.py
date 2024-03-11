@@ -28,7 +28,7 @@ from ._api.primitive_required_listed import PrimitiveRequiredListedAPI
 from ._api.primitive_with_defaults import PrimitiveWithDefaultsAPI
 from ._api.sub_interface import SubInterfaceAPI
 from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLCore
 from . import data_classes
 
 
@@ -203,6 +203,10 @@ class OmniClient:
             return self._client.data_modeling.instances.delete(
                 nodes=[(space, id) for id in external_id],
             )
+
+    def query(self, query: str) -> list[GraphQLCore]:
+        result = self._client.data_modeling.graphql.query(("pygen-models", "Omni", "1"), query)
+        return [GraphQLCore(**item) for item in result]
 
     @classmethod
     def azure_project(

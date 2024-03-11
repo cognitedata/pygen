@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
@@ -19,8 +19,8 @@ from ._api.power_inverter import PowerInverterAPI
 from ._api.rotor import RotorAPI
 from ._api.sensor_position import SensorPositionAPI
 from ._api.windmill import WindmillAPI
-from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._api._core import SequenceNotStr, GraphQLQuery
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
 
@@ -179,6 +179,10 @@ class WindmillClient:
             return self._client.data_modeling.instances.delete(
                 nodes=[(space, id) for id in external_id],
             )
+
+    def query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        result = self._client.data_modeling.graphql.query(("power-models", "Windmill", "1"), query)
+        return GraphQLQuery(result).parse()
 
     @classmethod
     def azure_project(
