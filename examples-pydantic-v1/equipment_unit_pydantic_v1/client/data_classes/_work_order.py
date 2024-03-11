@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -39,6 +41,55 @@ _WORKORDER_PROPERTIES_BY_FIELD = {
     "performed_by": "performedBy",
     "type_": "type",
 }
+
+
+class WorkOrderGraphQL(GraphQLCore):
+    """This represents the reading version of work order, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the work order.
+        data_record: The data record of the work order node.
+        description: The description field.
+        performed_by: The performed by field.
+        type_: The type field.
+    """
+
+    view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+    description: Optional[str] = None
+    performed_by: Optional[str] = Field(None, alias="performedBy")
+    type_: Optional[str] = Field(None, alias="type")
+
+    def as_read(self) -> WorkOrder:
+        """Convert this GraphQL format of work order to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return WorkOrder(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            description=self.description,
+            performed_by=self.performed_by,
+            type_=self.type_,
+        )
+
+    def as_write(self) -> WorkOrderWrite:
+        """Convert this GraphQL format of work order to the writing format."""
+        return WorkOrderWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            description=self.description,
+            performed_by=self.performed_by,
+            type_=self.type_,
+        )
 
 
 class WorkOrder(DomainModel):

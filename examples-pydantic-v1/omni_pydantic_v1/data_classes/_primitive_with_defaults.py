@@ -8,6 +8,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -43,6 +45,63 @@ _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
     "default_object": "defaultObject",
     "default_string": "defaultString",
 }
+
+
+class PrimitiveWithDefaultsGraphQL(GraphQLCore):
+    """This represents the reading version of primitive with default, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive with default.
+        data_record: The data record of the primitive with default node.
+        auto_increment_int_32: The auto increment int 32 field.
+        default_boolean: The default boolean field.
+        default_float_32: The default float 32 field.
+        default_object: The default object field.
+        default_string: The default string field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
+    default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
+    default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
+    default_object: Optional[dict] = Field(None, alias="defaultObject")
+    default_string: Optional[str] = Field(None, alias="defaultString")
+
+    def as_read(self) -> PrimitiveWithDefaults:
+        """Convert this GraphQL format of primitive with default to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return PrimitiveWithDefaults(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            auto_increment_int_32=self.auto_increment_int_32,
+            default_boolean=self.default_boolean,
+            default_float_32=self.default_float_32,
+            default_object=self.default_object,
+            default_string=self.default_string,
+        )
+
+    def as_write(self) -> PrimitiveWithDefaultsWrite:
+        """Convert this GraphQL format of primitive with default to the writing format."""
+        return PrimitiveWithDefaultsWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            auto_increment_int_32=self.auto_increment_int_32,
+            default_boolean=self.default_boolean,
+            default_float_32=self.default_float_32,
+            default_object=self.default_object,
+            default_string=self.default_string,
+        )
 
 
 class PrimitiveWithDefaults(DomainModel):

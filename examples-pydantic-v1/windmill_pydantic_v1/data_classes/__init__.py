@@ -6,6 +6,8 @@ from ._core import (
     DomainModelWrite,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -14,6 +16,7 @@ from ._blade import (
     BladeApply,
     BladeApplyList,
     BladeFields,
+    BladeGraphQL,
     BladeList,
     BladeTextFields,
     BladeWrite,
@@ -24,6 +27,7 @@ from ._gearbox import (
     GearboxApply,
     GearboxApplyList,
     GearboxFields,
+    GearboxGraphQL,
     GearboxList,
     GearboxWrite,
     GearboxWriteList,
@@ -33,6 +37,7 @@ from ._generator import (
     GeneratorApply,
     GeneratorApplyList,
     GeneratorFields,
+    GeneratorGraphQL,
     GeneratorList,
     GeneratorWrite,
     GeneratorWriteList,
@@ -42,6 +47,7 @@ from ._high_speed_shaft import (
     HighSpeedShaftApply,
     HighSpeedShaftApplyList,
     HighSpeedShaftFields,
+    HighSpeedShaftGraphQL,
     HighSpeedShaftList,
     HighSpeedShaftWrite,
     HighSpeedShaftWriteList,
@@ -51,6 +57,7 @@ from ._main_shaft import (
     MainShaftApply,
     MainShaftApplyList,
     MainShaftFields,
+    MainShaftGraphQL,
     MainShaftList,
     MainShaftWrite,
     MainShaftWriteList,
@@ -60,6 +67,7 @@ from ._metmast import (
     MetmastApply,
     MetmastApplyList,
     MetmastFields,
+    MetmastGraphQL,
     MetmastList,
     MetmastWrite,
     MetmastWriteList,
@@ -69,6 +77,7 @@ from ._nacelle import (
     NacelleApply,
     NacelleApplyList,
     NacelleFields,
+    NacelleGraphQL,
     NacelleList,
     NacelleWrite,
     NacelleWriteList,
@@ -78,16 +87,18 @@ from ._power_inverter import (
     PowerInverterApply,
     PowerInverterApplyList,
     PowerInverterFields,
+    PowerInverterGraphQL,
     PowerInverterList,
     PowerInverterWrite,
     PowerInverterWriteList,
 )
-from ._rotor import Rotor, RotorApply, RotorApplyList, RotorFields, RotorList, RotorWrite, RotorWriteList
+from ._rotor import Rotor, RotorApply, RotorApplyList, RotorFields, RotorGraphQL, RotorList, RotorWrite, RotorWriteList
 from ._sensor_position import (
     SensorPosition,
     SensorPositionApply,
     SensorPositionApplyList,
     SensorPositionFields,
+    SensorPositionGraphQL,
     SensorPositionList,
     SensorPositionWrite,
     SensorPositionWriteList,
@@ -97,6 +108,7 @@ from ._windmill import (
     WindmillApply,
     WindmillApplyList,
     WindmillFields,
+    WindmillGraphQL,
     WindmillList,
     WindmillTextFields,
     WindmillWrite,
@@ -106,6 +118,9 @@ from ._windmill import (
 
 Blade.update_forward_refs(
     SensorPosition=SensorPosition,
+)
+BladeGraphQL.update_forward_refs(
+    SensorPositionGraphQL=SensorPositionGraphQL,
 )
 BladeWrite.update_forward_refs(
     SensorPositionWrite=SensorPositionWrite,
@@ -120,6 +135,13 @@ Nacelle.update_forward_refs(
     HighSpeedShaft=HighSpeedShaft,
     MainShaft=MainShaft,
     PowerInverter=PowerInverter,
+)
+NacelleGraphQL.update_forward_refs(
+    GearboxGraphQL=GearboxGraphQL,
+    GeneratorGraphQL=GeneratorGraphQL,
+    HighSpeedShaftGraphQL=HighSpeedShaftGraphQL,
+    MainShaftGraphQL=MainShaftGraphQL,
+    PowerInverterGraphQL=PowerInverterGraphQL,
 )
 NacelleWrite.update_forward_refs(
     GearboxWrite=GearboxWrite,
@@ -142,6 +164,12 @@ Windmill.update_forward_refs(
     Nacelle=Nacelle,
     Rotor=Rotor,
 )
+WindmillGraphQL.update_forward_refs(
+    BladeGraphQL=BladeGraphQL,
+    MetmastGraphQL=MetmastGraphQL,
+    NacelleGraphQL=NacelleGraphQL,
+    RotorGraphQL=RotorGraphQL,
+)
 WindmillWrite.update_forward_refs(
     BladeWrite=BladeWrite,
     MetmastWrite=MetmastWrite,
@@ -155,6 +183,7 @@ WindmillApply.update_forward_refs(
     RotorWrite=RotorWrite,
 )
 
+
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
@@ -164,8 +193,11 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "Blade",
+    "BladeGraphQL",
     "BladeWrite",
     "BladeApply",
     "BladeList",
@@ -174,6 +206,7 @@ __all__ = [
     "BladeFields",
     "BladeTextFields",
     "Gearbox",
+    "GearboxGraphQL",
     "GearboxWrite",
     "GearboxApply",
     "GearboxList",
@@ -181,6 +214,7 @@ __all__ = [
     "GearboxApplyList",
     "GearboxFields",
     "Generator",
+    "GeneratorGraphQL",
     "GeneratorWrite",
     "GeneratorApply",
     "GeneratorList",
@@ -188,6 +222,7 @@ __all__ = [
     "GeneratorApplyList",
     "GeneratorFields",
     "HighSpeedShaft",
+    "HighSpeedShaftGraphQL",
     "HighSpeedShaftWrite",
     "HighSpeedShaftApply",
     "HighSpeedShaftList",
@@ -195,6 +230,7 @@ __all__ = [
     "HighSpeedShaftApplyList",
     "HighSpeedShaftFields",
     "MainShaft",
+    "MainShaftGraphQL",
     "MainShaftWrite",
     "MainShaftApply",
     "MainShaftList",
@@ -202,6 +238,7 @@ __all__ = [
     "MainShaftApplyList",
     "MainShaftFields",
     "Metmast",
+    "MetmastGraphQL",
     "MetmastWrite",
     "MetmastApply",
     "MetmastList",
@@ -209,6 +246,7 @@ __all__ = [
     "MetmastApplyList",
     "MetmastFields",
     "Nacelle",
+    "NacelleGraphQL",
     "NacelleWrite",
     "NacelleApply",
     "NacelleList",
@@ -216,6 +254,7 @@ __all__ = [
     "NacelleApplyList",
     "NacelleFields",
     "PowerInverter",
+    "PowerInverterGraphQL",
     "PowerInverterWrite",
     "PowerInverterApply",
     "PowerInverterList",
@@ -223,6 +262,7 @@ __all__ = [
     "PowerInverterApplyList",
     "PowerInverterFields",
     "Rotor",
+    "RotorGraphQL",
     "RotorWrite",
     "RotorApply",
     "RotorList",
@@ -230,6 +270,7 @@ __all__ = [
     "RotorApplyList",
     "RotorFields",
     "SensorPosition",
+    "SensorPositionGraphQL",
     "SensorPositionWrite",
     "SensorPositionApply",
     "SensorPositionList",
@@ -237,6 +278,7 @@ __all__ = [
     "SensorPositionApplyList",
     "SensorPositionFields",
     "Windmill",
+    "WindmillGraphQL",
     "WindmillWrite",
     "WindmillApply",
     "WindmillList",

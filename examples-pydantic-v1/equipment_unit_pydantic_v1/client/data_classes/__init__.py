@@ -6,6 +6,8 @@ from ._core import (
     DomainModelWrite,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -14,6 +16,7 @@ from ._equipment_module import (
     EquipmentModuleApply,
     EquipmentModuleApplyList,
     EquipmentModuleFields,
+    EquipmentModuleGraphQL,
     EquipmentModuleList,
     EquipmentModuleTextFields,
     EquipmentModuleWrite,
@@ -24,6 +27,7 @@ from ._start_end_time import (
     StartEndTimeApply,
     StartEndTimeApplyList,
     StartEndTimeFields,
+    StartEndTimeGraphQL,
     StartEndTimeList,
     StartEndTimeWrite,
     StartEndTimeWriteList,
@@ -33,6 +37,7 @@ from ._unit_procedure import (
     UnitProcedureApply,
     UnitProcedureApplyList,
     UnitProcedureFields,
+    UnitProcedureGraphQL,
     UnitProcedureList,
     UnitProcedureTextFields,
     UnitProcedureWrite,
@@ -43,6 +48,7 @@ from ._work_order import (
     WorkOrderApply,
     WorkOrderApplyList,
     WorkOrderFields,
+    WorkOrderGraphQL,
     WorkOrderList,
     WorkOrderTextFields,
     WorkOrderWrite,
@@ -53,6 +59,10 @@ from ._work_order import (
 StartEndTime.update_forward_refs(
     EquipmentModule=EquipmentModule,
     WorkOrder=WorkOrder,
+)
+StartEndTimeGraphQL.update_forward_refs(
+    EquipmentModuleGraphQL=EquipmentModuleGraphQL,
+    WorkOrderGraphQL=WorkOrderGraphQL,
 )
 StartEndTimeWrite.update_forward_refs(
     EquipmentModuleWrite=EquipmentModuleWrite,
@@ -66,12 +76,16 @@ StartEndTimeApply.update_forward_refs(
 UnitProcedure.update_forward_refs(
     StartEndTime=StartEndTime,
 )
+UnitProcedureGraphQL.update_forward_refs(
+    StartEndTimeGraphQL=StartEndTimeGraphQL,
+)
 UnitProcedureWrite.update_forward_refs(
     StartEndTimeWrite=StartEndTimeWrite,
 )
 UnitProcedureApply.update_forward_refs(
     StartEndTimeWrite=StartEndTimeWrite,
 )
+
 
 __all__ = [
     "DataRecord",
@@ -82,8 +96,11 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "EquipmentModule",
+    "EquipmentModuleGraphQL",
     "EquipmentModuleWrite",
     "EquipmentModuleApply",
     "EquipmentModuleList",
@@ -92,6 +109,7 @@ __all__ = [
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
+    "StartEndTimeGraphQL",
     "StartEndTimeWrite",
     "StartEndTimeApply",
     "StartEndTimeList",
@@ -99,6 +117,7 @@ __all__ = [
     "StartEndTimeApplyList",
     "StartEndTimeFields",
     "UnitProcedure",
+    "UnitProcedureGraphQL",
     "UnitProcedureWrite",
     "UnitProcedureApply",
     "UnitProcedureList",
@@ -107,6 +126,7 @@ __all__ = [
     "UnitProcedureFields",
     "UnitProcedureTextFields",
     "WorkOrder",
+    "WorkOrderGraphQL",
     "WorkOrderWrite",
     "WorkOrderApply",
     "WorkOrderList",

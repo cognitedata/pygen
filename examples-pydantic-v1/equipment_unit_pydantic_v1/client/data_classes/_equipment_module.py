@@ -9,6 +9,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -16,6 +17,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -41,6 +43,59 @@ _EQUIPMENTMODULE_PROPERTIES_BY_FIELD = {
     "sensor_value": "sensor_value",
     "type_": "type",
 }
+
+
+class EquipmentModuleGraphQL(GraphQLCore):
+    """This represents the reading version of equipment module, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the equipment module.
+        data_record: The data record of the equipment module node.
+        description: The description field.
+        name: The name field.
+        sensor_value: The sensor value field.
+        type_: The type field.
+    """
+
+    view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+    description: Optional[str] = None
+    name: Optional[str] = None
+    sensor_value: Union[TimeSeries, str, None] = None
+    type_: Optional[str] = Field(None, alias="type")
+
+    def as_read(self) -> EquipmentModule:
+        """Convert this GraphQL format of equipment module to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return EquipmentModule(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            description=self.description,
+            name=self.name,
+            sensor_value=self.sensor_value,
+            type_=self.type_,
+        )
+
+    def as_write(self) -> EquipmentModuleWrite:
+        """Convert this GraphQL format of equipment module to the writing format."""
+        return EquipmentModuleWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            description=self.description,
+            name=self.name,
+            sensor_value=self.sensor_value,
+            type_=self.type_,
+        )
 
 
 class EquipmentModule(DomainModel):

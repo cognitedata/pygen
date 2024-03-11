@@ -5,9 +5,11 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,12 +17,13 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_a import ConnectionItemA, ConnectionItemAWrite
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBWrite
+    from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [
@@ -31,6 +34,71 @@ __all__ = [
     "ConnectionItemCWriteList",
     "ConnectionItemCApplyList",
 ]
+
+
+class ConnectionItemCGraphQL(GraphQLCore):
+    """This represents the reading version of connection item c, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the connection item c.
+        data_record: The data record of the connection item c node.
+        connection_item_a: The connection item a field.
+        connection_item_b: The connection item b field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
+
+    @validator("connection_item_a", "connection_item_b", pre=True)
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
+
+    def as_read(self) -> ConnectionItemC:
+        """Convert this GraphQL format of connection item c to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return ConnectionItemC(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            connection_item_a=[
+                connection_item_a.as_read() if isinstance(connection_item_a, GraphQLCore) else connection_item_a
+                for connection_item_a in self.connection_item_a or []
+            ],
+            connection_item_b=[
+                connection_item_b.as_read() if isinstance(connection_item_b, GraphQLCore) else connection_item_b
+                for connection_item_b in self.connection_item_b or []
+            ],
+        )
+
+    def as_write(self) -> ConnectionItemCWrite:
+        """Convert this GraphQL format of connection item c to the writing format."""
+        return ConnectionItemCWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            connection_item_a=[
+                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                for connection_item_a in self.connection_item_a or []
+            ],
+            connection_item_b=[
+                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                for connection_item_b in self.connection_item_b or []
+            ],
+        )
 
 
 class ConnectionItemC(DomainModel):
