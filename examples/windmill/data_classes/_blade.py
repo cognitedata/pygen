@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -64,6 +65,14 @@ class BladeGraphQL(GraphQLCore):
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
     sensor_positions: Optional[list[SensorPositionGraphQL]] = Field(default=None, repr=False)
+
+    @field_validator("sensor_positions", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> Blade:
         """Convert this GraphQL format of blade to the reading format."""

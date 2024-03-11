@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
+from pydantic import field_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -91,6 +92,14 @@ class NacelleGraphQL(GraphQLCore):
     power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
+
+    @field_validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> Nacelle:
         """Convert this GraphQL format of nacelle to the reading format."""

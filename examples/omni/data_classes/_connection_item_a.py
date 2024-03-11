@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -67,6 +68,14 @@ class ConnectionItemAGraphQL(GraphQLCore):
     other_direct: Optional[ConnectionItemCGraphQL] = Field(None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
     self_direct: Optional[ConnectionItemAGraphQL] = Field(None, repr=False, alias="selfDirect")
+
+    @field_validator("other_direct", "outwards", "self_direct", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> ConnectionItemA:
         """Convert this GraphQL format of connection item a to the reading format."""

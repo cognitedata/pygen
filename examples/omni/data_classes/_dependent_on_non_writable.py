@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -63,6 +64,14 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
     to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
         default=None, repr=False, alias="toNonWritable"
     )
+
+    @field_validator("to_non_writable", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> DependentOnNonWritable:
         """Convert this GraphQL format of dependent on non writable to the reading format."""

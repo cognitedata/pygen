@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
-from pydantic import field_validator, validator
+from pydantic import field_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
