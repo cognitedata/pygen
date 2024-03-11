@@ -18,7 +18,7 @@ def multi_api_generator(scenario_instance_model: dm.DataModel[dm.View]) -> Multi
     return MultiAPIGenerator(
         SCENARIO_INSTANCE_SDK.top_level_package,
         SCENARIO_INSTANCE_SDK.client_name,
-        scenario_instance_model.views,
+        [scenario_instance_model],
         scenario_instance_model.space,
     )
 

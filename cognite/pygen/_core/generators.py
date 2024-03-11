@@ -68,7 +68,7 @@ class SDKGenerator:
         self._multi_api_generator = MultiAPIGenerator(
             top_level_package,
             client_name,
-            [view for model in data_model for view in model.views],
+            list(self._data_model),
             self.default_instance_space,
             pydantic_version,
             logger,
@@ -152,7 +152,7 @@ class MultiAPIGenerator:
         self,
         top_level_package: str,
         client_name: str,
-        views: Sequence[dm.View],
+        data_models: list[dm.DataModel[dm.View]],
         default_instance_space: str,
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
@@ -164,6 +164,7 @@ class MultiAPIGenerator:
         self.default_instance_space = default_instance_space
         self._pydantic_version = pydantic_version
         self._logger = logger or print
+        views = list(itertools.chain.from_iterable(model.views for model in data_models))
         self.api_by_view_id = self.create_api_by_view_id(
             list(views),
             default_instance_space,
@@ -198,6 +199,12 @@ class MultiAPIGenerator:
 
         validate_api_classes_unique_names([api.api_class for api in self.unique_apis])
         validate_data_classes_unique_name([api.data_class for api in self.unique_apis])
+
+        # Data Models require view external IDs to be unique within the data model.
+        self._data_class_by_data_model_by_type = {
+            model.as_id(): {view.external_id: data_class_by_view_id[view.as_id()] for view in model.views}
+            for model in data_models
+        }
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
@@ -285,7 +292,14 @@ class MultiAPIGenerator:
 
     def generate_api_core_file(self) -> str:
         api_core = self.env.get_template("api_core.py.jinja")
-        return api_core.render(top_level_package=self.top_level_package) + "\n"
+
+        return (
+            api_core.render(
+                top_level_package=self.top_level_package,
+                data_class_by_data_model_by_type=self._data_class_by_data_model_by_type,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_file(self) -> str:
         data_class_core = self.env.get_template("data_classes_core.py.jinja")

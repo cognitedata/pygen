@@ -33,7 +33,7 @@ from {{ top_level_package }}.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
-from {{ top_level_package } import data_classes
+from {{ top_level_package }} import data_classes
 
 
 DEFAULT_LIMIT_READ = 25
@@ -786,5 +786,8 @@ class GraphQLQueryResponse:
                         self._parse_item(item)
 
 
-_GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
-}
+_GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {% raw %}{{% endraw %}{% for data_model_id, data_class_by_type in data_class_by_data_model_by_type.items() %}
+    dm.DataModelId("{{ data_model_id.space }}", "{{ data_model_id.external_id }}", "{{ data_model_id.version }}"): {% raw %}{{% endraw %}{% for type_, data_class in data_class_by_type.items() %}
+        "{{ type_ }}": data_classes.{{ data_class.graphql_name }},{% endfor %}
+    {% raw %}}{% endraw %}{% endfor %}
+{% raw %}}{% endraw %}
