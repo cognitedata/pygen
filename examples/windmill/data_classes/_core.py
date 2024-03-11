@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from collections import UserList
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
@@ -81,7 +81,7 @@ class DataRecordGraphQL(Core):
     created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
 
 
-class GraphQLCore(Core):
+class GraphQLCore(Core, ABC):
     view_id: ClassVar[dm.ViewId]
     space: Optional[str] = None
     external_id: Optional[str] = Field(None, alias="externalId")

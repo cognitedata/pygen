@@ -21,7 +21,6 @@ from windmill.data_classes._core import (
     DomainModelCore,
     DomainModelWrite,
     DomainRelationWrite,
-    GraphQLCore,
     GraphQLList,
     ResourcesWriteResult,
     T_DomainModel,
@@ -35,6 +34,7 @@ from windmill.data_classes._core import (
     DomainRelation,
 )
 from windmill import data_classes
+
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
@@ -789,5 +789,15 @@ class GraphQLQueryResponse:
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
     dm.DataModelId("power-models", "Windmill", "1"): {
         "Blade": data_classes.BladeGraphQL,
+        "Gearbox": data_classes.GearboxGraphQL,
+        "Generator": data_classes.GeneratorGraphQL,
+        "HighSpeedShaft": data_classes.HighSpeedShaftGraphQL,
+        "MainShaft": data_classes.MainShaftGraphQL,
+        "Metmast": data_classes.MetmastGraphQL,
+        "Nacelle": data_classes.NacelleGraphQL,
+        "PowerInverter": data_classes.PowerInverterGraphQL,
+        "Rotor": data_classes.RotorGraphQL,
+        "SensorPosition": data_classes.SensorPositionGraphQL,
+        "Windmill": data_classes.WindmillGraphQL,
     }
 }

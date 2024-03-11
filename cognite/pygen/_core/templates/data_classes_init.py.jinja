@@ -7,6 +7,7 @@ from ._core import (
     DomainModelList,
     DomainRelationWrite,
     GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -40,6 +41,8 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.graphql_name }}",{% if class_.is_writable or class_.is_interface %}
