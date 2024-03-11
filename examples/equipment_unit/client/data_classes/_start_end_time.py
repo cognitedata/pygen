@@ -15,6 +15,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    GraphQLCore,
     ResourcesWrite,
 )
 from ._unit_procedure import UnitProcedureWrite
@@ -37,6 +38,55 @@ _STARTENDTIME_PROPERTIES_BY_FIELD = {
     "end_time": "end_time",
     "start_time": "start_time",
 }
+
+
+class StartEndTimeGraphQL(GraphQLCore):
+    """This represents the reading version of start end time, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the start end time.
+        data_record: The data record of the start end time node.
+        end_node: The end node of this edge.
+        end_time: The end time field.
+        start_time: The start time field.
+    """
+
+    view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    end_node: Optional[EquipmentModuleGraphQL, WorkOrderGraphQL] = None
+    end_time: Optional[datetime.datetime] = None
+    start_time: Optional[datetime.datetime] = None
+
+    def as_read(self) -> StartEndTime:
+        """Convert this GraphQL format of start end time to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return StartEndTime(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
+            end_time=self.end_time,
+            start_time=self.start_time,
+        )
+
+    def as_write(self) -> StartEndTimeWrite:
+        """Convert this GraphQL format of start end time to the writing format."""
+        return StartEndTimeWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
+            end_time=self.end_time,
+            start_time=self.start_time,
+        )
 
 
 class StartEndTime(DomainRelation):
