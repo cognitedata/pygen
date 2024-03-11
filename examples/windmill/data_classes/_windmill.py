@@ -21,10 +21,10 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._blade import Blade, BladeWrite
-    from ._metmast import Metmast, MetmastWrite
-    from ._nacelle import Nacelle, NacelleWrite
-    from ._rotor import Rotor, RotorWrite
+    from ._blade import Blade, BladeGraphQL, BladeWrite
+    from ._metmast import Metmast, MetmastGraphQL, MetmastWrite
+    from ._nacelle import Nacelle, NacelleGraphQL, NacelleWrite
+    from ._rotor import Rotor, RotorGraphQL, RotorWrite
 
 
 __all__ = [

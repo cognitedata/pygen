@@ -21,7 +21,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._sensor_position import SensorPosition, SensorPositionWrite
+    from ._sensor_position import SensorPosition, SensorPositionGraphQL, SensorPositionWrite
 
 
 __all__ = [

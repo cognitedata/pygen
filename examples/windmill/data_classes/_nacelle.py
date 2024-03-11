@@ -23,11 +23,11 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._gearbox import Gearbox, GearboxWrite
-    from ._generator import Generator, GeneratorWrite
-    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftWrite
-    from ._main_shaft import MainShaft, MainShaftWrite
-    from ._power_inverter import PowerInverter, PowerInverterWrite
+    from ._gearbox import Gearbox, GearboxGraphQL, GearboxWrite
+    from ._generator import Generator, GeneratorGraphQL, GeneratorWrite
+    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftGraphQL, HighSpeedShaftWrite
+    from ._main_shaft import MainShaft, MainShaftGraphQL, MainShaftWrite
+    from ._power_inverter import PowerInverter, PowerInverterGraphQL, PowerInverterWrite
 
 
 __all__ = [

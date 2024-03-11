@@ -21,7 +21,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_e import ConnectionItemE, ConnectionItemEWrite
+    from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
 
 
 __all__ = [

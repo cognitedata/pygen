@@ -21,7 +21,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._start_end_time import StartEndTime, StartEndTimeWrite
+    from ._start_end_time import StartEndTime, StartEndTimeGraphQL, StartEndTimeWrite
 
 
 __all__ = [

@@ -21,7 +21,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._implementation_1_non_writeable import Implementation1NonWriteable
+    from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableGraphQL
 
 
 __all__ = [
