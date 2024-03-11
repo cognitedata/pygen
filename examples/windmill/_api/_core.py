@@ -34,7 +34,7 @@ from windmill.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
-from windmill.data_classes import _GRAPHQL_DATA_CLASS_BY_VIEW_ID
+from windmill import data_classes
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
@@ -757,8 +757,9 @@ def _create_edge_filter(
 
 
 class GraphQLQueryResponse:
-    def __init__(self):
+    def __init__(self, data_model_id: dm.DataModelId):
         self._output = GraphQLList([])
+        self._data_class_by_type = _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE[data_model_id]
 
     def parse(self, response: dict[str, Any]) -> GraphQLList:
         if "error" in response:
@@ -769,7 +770,7 @@ class GraphQLQueryResponse:
     def _parse_item(self, data: dict[str, Any]) -> None:
         if "__typename" in data:
             try:
-                item = _GRAPHQL_DATA_CLASS_BY_VIEW_ID[data["__typename"]].model_validate(data)
+                item = self._data_class_by_type[data["__typename"]].model_validate(data)
             except KeyError:
                 warnings.warn(f"Could not find class for type {data['__typename']}", stacklevel=2)
             except ValueError as e:
@@ -783,3 +784,10 @@ class GraphQLQueryResponse:
                 elif isinstance(item, list):
                     for item in item:
                         self._parse_item(item)
+
+
+_GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
+    dm.DataModelId("power-models", "Windmill", "1"): {
+        "Blade": data_classes.BladeGraphQL,
+    }
+}

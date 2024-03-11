@@ -127,8 +127,6 @@ WindmillWrite.model_rebuild()
 WindmillApply.model_rebuild()
 
 
-_GRAPHQL_DATA_CLASS_BY_VIEW_ID = {_cls.view_id: _cls for _cls in GraphQLCore.__subclasses__()}
-
 __all__ = [
     "DataRecord",
     "DataRecordWrite",

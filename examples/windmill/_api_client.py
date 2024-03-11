@@ -181,8 +181,9 @@ class WindmillClient:
             )
 
     def query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
-        result = self._client.data_modeling.graphql.query(("power-models", "Windmill", "1"), query, variables)
-        return GraphQLQueryResponse(result).parse()
+        data_model_id = dm.DataModelId("power-models", "Windmill", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
     @classmethod
     def azure_project(

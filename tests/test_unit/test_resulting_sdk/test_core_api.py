@@ -181,5 +181,5 @@ def parse_graphql_query():
 class TestGraphQLQuery:
     @pytest.mark.parametrize("result, expected", parse_graphql_query())
     def test_parse_query(self, result: dict[str, Any], expected: wdc.GraphQLList) -> None:
-        actual = GraphQLQueryResponse(result).parse()
+        actual = GraphQLQueryResponse(dm.DataModelId("power-models", "Windmill", "1")).parse(result)
         assert actual == expected
