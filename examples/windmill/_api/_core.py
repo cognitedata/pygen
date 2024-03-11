@@ -756,14 +756,14 @@ def _create_edge_filter(
     return dm.filters.And(*filters)
 
 
-class GraphQLQuery:
+class GraphQLQueryResponse:
     def __init__(self):
         self._output = GraphQLList([])
 
-    def parse(self, result: dict[str, Any]) -> GraphQLList:
-        if "error" in result:
-            raise ValueError(result["error"])
-        self._parse_item(result)
+    def parse(self, response: dict[str, Any]) -> GraphQLList:
+        if "error" in response:
+            raise ValueError(response["error"])
+        self._parse_item(response)
         return self._output
 
     def _parse_item(self, data: dict[str, Any]) -> None:

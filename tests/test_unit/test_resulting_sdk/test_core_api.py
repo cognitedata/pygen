@@ -13,7 +13,7 @@ if IS_PYDANTIC_V2:
         UnitProcedureList,
     )
     from windmill import data_classes as wdc
-    from windmill._api._core import GraphQLQuery
+    from windmill._api._core import GraphQLQueryResponse
 else:
     from equipment_unit_pydantic_v1.client._api._core import QueryBuilder, QueryStep
     from equipment_unit_pydantic_v1.client.data_classes import (
@@ -21,7 +21,7 @@ else:
         UnitProcedure,
         UnitProcedureList,
     )
-    from windmill._api._core import GraphQLQuery
+    from windmill._api._core import GraphQLQueryResponse
     from windmill_pydantic_v1 import data_classes as wdc
 
 
@@ -181,5 +181,5 @@ def parse_graphql_query():
 class TestGraphQLQuery:
     @pytest.mark.parametrize("result, expected", parse_graphql_query())
     def test_parse_query(self, result: dict[str, Any], expected: wdc.GraphQLList) -> None:
-        actual = GraphQLQuery(result).parse()
+        actual = GraphQLQueryResponse(result).parse()
         assert actual == expected

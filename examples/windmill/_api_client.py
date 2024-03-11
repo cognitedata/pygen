@@ -19,7 +19,7 @@ from ._api.power_inverter import PowerInverterAPI
 from ._api.rotor import RotorAPI
 from ._api.sensor_position import SensorPositionAPI
 from ._api.windmill import WindmillAPI
-from ._api._core import SequenceNotStr, GraphQLQuery
+from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
@@ -182,7 +182,7 @@ class WindmillClient:
 
     def query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         result = self._client.data_modeling.graphql.query(("power-models", "Windmill", "1"), query, variables)
-        return GraphQLQuery(result).parse()
+        return GraphQLQueryResponse(result).parse()
 
     @classmethod
     def azure_project(
