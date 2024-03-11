@@ -19,8 +19,8 @@ from ._core import (
     ResourcesWrite,
 )
 from ._unit_procedure import UnitProcedureWrite
-from ._equipment_module import EquipmentModule, EquipmentModuleWrite
-from ._work_order import WorkOrder, WorkOrderWrite
+from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
+from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
 
 __all__ = [
     "StartEndTime",
