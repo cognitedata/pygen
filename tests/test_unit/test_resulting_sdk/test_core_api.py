@@ -256,9 +256,47 @@ def parse_graphql_query():
         id="listWindmill",
     )
 
+    result = {
+        "listWindmill": {
+            "items": [
+                {
+                    "__typename": "Windmill",
+                    "name": "hornsea_1_mill_3",
+                    "capacity": 7,
+                    "nacelle": {"externalId": "nacellewrite:1"},
+                }
+            ]
+        }
+    }
+    yield pytest.param(
+        result,
+        wdc.GraphQLList(
+            [
+                wdc.WindmillGraphQL(
+                    name="hornsea_1_mill_3",
+                    capacity=7,
+                    nacelle=wdc.NacelleGraphQL(external_id="nacellewrite:1"),
+                )
+            ]
+        ),
+        id="listWindmill",
+    )
+
 
 class TestGraphQLQuery:
     @pytest.mark.parametrize("result, expected", parse_graphql_query())
     def test_parse_query(self, result: dict[str, Any], expected: wdc.GraphQLList) -> None:
         actual = GraphQLQueryResponse(dm.DataModelId("power-models", "Windmill", "1")).parse(result)
         assert actual == expected
+
+    def test_parse_query_with_error(self) -> None:
+        result = {"errors": [{"message": "Error message"}]}
+        with pytest.raises(RuntimeError) as exc_info:
+            GraphQLQueryResponse(dm.DataModelId("power-models", "Windmill", "1")).parse(result)
+        assert exc_info.match("Error message")
+
+    def test_parse_query_without_typename(self) -> None:
+        result = {"listWindmill": {"items": [{"name": "hornsea_1_mill_3", "capacity": 7}]}}
+        with pytest.raises(RuntimeError) as exc_info:
+            GraphQLQueryResponse(dm.DataModelId("power-models", "Windmill", "1")).parse(result)
+        assert exc_info.match("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")

@@ -762,28 +762,25 @@ class GraphQLQueryResponse:
         self._data_class_by_type = _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE[data_model_id]
 
     def parse(self, response: dict[str, Any]) -> GraphQLList:
-        if "error" in response:
-            raise ValueError(response["error"])
-        self._parse_item(response)
+        if "errors" in response:
+            raise RuntimeError(response["errors"])
+        _, data = list(response.items())[0]
+        self._parse_item(data)
         return self._output
 
     def _parse_item(self, data: dict[str, Any]) -> None:
-        if "__typename" in data:
+        if "items" in data:
+            for item in data["items"]:
+                self._parse_item(item)
+        elif "__typename" in data:
             try:
                 item = self._data_class_by_type[data["__typename"]].model_validate(data)
             except KeyError:
-                warnings.warn(f"Could not find class for type {data['__typename']}", stacklevel=2)
-            except ValueError as e:
-                warnings.warn(f"Validation error: {e}", stacklevel=2)
+                raise ValueError(f"Could not find class for type {data['__typename']}")
             else:
                 self._output.append(item)
         else:
-            for item in data.values():
-                if isinstance(item, dict):
-                    self._parse_item(item)
-                elif isinstance(item, list):
-                    for item in item:
-                        self._parse_item(item)
+            raise RuntimeError("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")
 
 
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {% raw %}{{% endraw %}{% for data_model_id, data_class_by_type in data_class_by_data_model_by_type.items() %}
