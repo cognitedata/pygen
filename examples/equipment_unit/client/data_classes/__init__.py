@@ -27,7 +27,6 @@ from ._start_end_time import (
     StartEndTimeApply,
     StartEndTimeApplyList,
     StartEndTimeFields,
-    StartEndTimeGraphQL,
     StartEndTimeList,
     StartEndTimeWrite,
     StartEndTimeWriteList,
@@ -56,7 +55,6 @@ from ._work_order import (
 )
 
 StartEndTime.model_rebuild()
-StartEndTimeGraphQL.model_rebuild()
 StartEndTimeWrite.model_rebuild()
 StartEndTimeApply.model_rebuild()
 UnitProcedure.model_rebuild()
@@ -87,7 +85,6 @@ __all__ = [
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
     "StartEndTime",
-    "StartEndTimeGraphQL",
     "StartEndTimeWrite",
     "StartEndTimeApply",
     "StartEndTimeList",
