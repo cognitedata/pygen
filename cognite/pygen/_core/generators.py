@@ -303,12 +303,13 @@ class MultiAPIGenerator:
     def generate_data_classes_init_file(self) -> str:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
-        dependencies_by_names: dict[tuple[str, str, bool], list[DataClass]] = defaultdict(list)
+        dependencies_by_names: dict[tuple[str, str, str, bool], list[DataClass]] = defaultdict(list)
         for api in self.unique_apis:
             for dep in api.data_class.dependencies:
                 dependencies_by_names[
                     (
                         api.data_class.read_name,
+                        api.data_class.graphql_name,
                         api.data_class.write_name,
                         api.data_class.is_writable or api.data_class.is_interface,
                     )
