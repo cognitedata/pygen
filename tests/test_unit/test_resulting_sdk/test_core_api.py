@@ -177,6 +177,85 @@ def parse_graphql_query():
 
     yield pytest.param(result, wdc.GraphQLList([wdc.BladeGraphQL(name="A")]), id="listBlade")
 
+    result = {
+        "listWindmill": {
+            "items": [
+                {
+                    "__typename": "Windmill",
+                    "name": "hornsea_1_mill_3",
+                    "capacity": 7,
+                    "blades": {
+                        "items": [
+                            {
+                                "__typename": "Blade",
+                                "name": "A",
+                                "is_damaged": False,
+                                "sensor_positions": {
+                                    "items": [
+                                        {
+                                            "__typename": "SensorPosition",
+                                            "position": 19.6,
+                                            "flapwise_bend_mom_offset": None,
+                                        }
+                                    ]
+                                },
+                            },
+                            {
+                                "__typename": "Blade",
+                                "name": "B",
+                                "is_damaged": False,
+                                "sensor_positions": {
+                                    "items": [
+                                        {
+                                            "__typename": "SensorPosition",
+                                            "position": 1.5,
+                                            "flapwise_bend_mom_offset": None,
+                                        }
+                                    ]
+                                },
+                            },
+                        ]
+                    },
+                }
+            ]
+        }
+    }
+
+    yield pytest.param(
+        result,
+        wdc.GraphQLList(
+            [
+                wdc.WindmillGraphQL(
+                    name="hornsea_1_mill_3",
+                    capacity=7,
+                    blades=[
+                        wdc.BladeGraphQL(
+                            name="A",
+                            is_damaged=False,
+                            sensor_positions=[
+                                wdc.SensorPositionGraphQL(
+                                    position=19.6,
+                                    flapwise_bend_mom_offset=None,
+                                )
+                            ],
+                        ),
+                        wdc.BladeGraphQL(
+                            name="B",
+                            is_damaged=False,
+                            sensor_positions=[
+                                wdc.SensorPositionGraphQL(
+                                    position=1.5,
+                                    flapwise_bend_mom_offset=None,
+                                )
+                            ],
+                        ),
+                    ],
+                )
+            ]
+        ),
+        id="listWindmill",
+    )
+
 
 class TestGraphQLQuery:
     @pytest.mark.parametrize("result, expected", parse_graphql_query())
