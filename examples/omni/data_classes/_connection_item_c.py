@@ -75,11 +75,11 @@ class ConnectionItemCGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             connection_item_a=[
-                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                connection_item_a.as_read() if isinstance(connection_item_a, GraphQLCore) else connection_item_a
                 for connection_item_a in self.connection_item_a or []
             ],
             connection_item_b=[
-                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                connection_item_b.as_read() if isinstance(connection_item_b, GraphQLCore) else connection_item_b
                 for connection_item_b in self.connection_item_b or []
             ],
         )

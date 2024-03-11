@@ -94,7 +94,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
                 self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
             outwards=[
-                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
+                outward.as_read() if isinstance(outward, GraphQLCore) else outward for outward in self.outwards or []
             ],
             self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )

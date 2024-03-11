@@ -98,10 +98,10 @@ class WindmillGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            blades=[blade.as_read() if isinstance(blade, GraphQLCore) else blade for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[
-                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+                metmast.as_read() if isinstance(metmast, GraphQLCore) else metmast for metmast in self.metmast or []
             ],
             nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,

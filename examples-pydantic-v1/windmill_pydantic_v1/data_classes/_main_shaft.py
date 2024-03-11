@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -41,6 +43,63 @@ _MAINSHAFT_PROPERTIES_BY_FIELD = {
     "calculated_yaw_moment": "calculated_yaw_moment",
     "torque": "torque",
 }
+
+
+class MainShaftGraphQL(GraphQLCore):
+    """This represents the reading version of main shaft, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the main shaft.
+        data_record: The data record of the main shaft node.
+        bending_x: The bending x field.
+        bending_y: The bending y field.
+        calculated_tilt_moment: The calculated tilt moment field.
+        calculated_yaw_moment: The calculated yaw moment field.
+        torque: The torque field.
+    """
+
+    view_id = dm.ViewId("power-models", "MainShaft", "1")
+    bending_x: Union[TimeSeries, str, None] = None
+    bending_y: Union[TimeSeries, str, None] = None
+    calculated_tilt_moment: Union[TimeSeries, str, None] = None
+    calculated_yaw_moment: Union[TimeSeries, str, None] = None
+    torque: Union[TimeSeries, str, None] = None
+
+    def as_read(self) -> MainShaft:
+        """Convert this GraphQL format of main shaft to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return MainShaft(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            bending_x=self.bending_x,
+            bending_y=self.bending_y,
+            calculated_tilt_moment=self.calculated_tilt_moment,
+            calculated_yaw_moment=self.calculated_yaw_moment,
+            torque=self.torque,
+        )
+
+    def as_write(self) -> MainShaftWrite:
+        """Convert this GraphQL format of main shaft to the writing format."""
+        return MainShaftWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            bending_x=self.bending_x,
+            bending_y=self.bending_y,
+            calculated_tilt_moment=self.calculated_tilt_moment,
+            calculated_yaw_moment=self.calculated_yaw_moment,
+            torque=self.torque,
+        )
 
 
 class MainShaft(DomainModel):

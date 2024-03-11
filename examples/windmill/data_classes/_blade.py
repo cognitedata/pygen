@@ -89,7 +89,7 @@ class BladeGraphQL(GraphQLCore):
             is_damaged=self.is_damaged,
             name=self.name,
             sensor_positions=[
-                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
+                sensor_position.as_read() if isinstance(sensor_position, GraphQLCore) else sensor_position
                 for sensor_position in self.sensor_positions or []
             ],
         )

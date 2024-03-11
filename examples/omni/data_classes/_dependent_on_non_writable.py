@@ -87,7 +87,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             ),
             a_value=self.a_value,
             to_non_writable=[
-                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                to_non_writable.as_read() if isinstance(to_non_writable, GraphQLCore) else to_non_writable
                 for to_non_writable in self.to_non_writable or []
             ],
         )

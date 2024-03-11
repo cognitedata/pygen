@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +16,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -39,6 +41,55 @@ _GEARBOX_PROPERTIES_BY_FIELD = {
     "displacement_y": "displacement_y",
     "displacement_z": "displacement_z",
 }
+
+
+class GearboxGraphQL(GraphQLCore):
+    """This represents the reading version of gearbox, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the gearbox.
+        data_record: The data record of the gearbox node.
+        displacement_x: The displacement x field.
+        displacement_y: The displacement y field.
+        displacement_z: The displacement z field.
+    """
+
+    view_id = dm.ViewId("power-models", "Gearbox", "1")
+    displacement_x: Union[TimeSeries, str, None] = None
+    displacement_y: Union[TimeSeries, str, None] = None
+    displacement_z: Union[TimeSeries, str, None] = None
+
+    def as_read(self) -> Gearbox:
+        """Convert this GraphQL format of gearbox to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Gearbox(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            displacement_x=self.displacement_x,
+            displacement_y=self.displacement_y,
+            displacement_z=self.displacement_z,
+        )
+
+    def as_write(self) -> GearboxWrite:
+        """Convert this GraphQL format of gearbox to the writing format."""
+        return GearboxWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            displacement_x=self.displacement_x,
+            displacement_y=self.displacement_y,
+            displacement_z=self.displacement_z,
+        )
 
 
 class Gearbox(DomainModel):
