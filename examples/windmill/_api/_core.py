@@ -34,6 +34,7 @@ from windmill.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
+from windmill.data_classes import _GRAPHQL_DATA_CLASS_BY_VIEW_ID
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
@@ -756,10 +757,29 @@ def _create_edge_filter(
 
 
 class GraphQLQuery:
-    def __init__(self, result: dict[str, Any]):
-        self._result = result
+    def __init__(self):
+        self._output = GraphQLList([])
 
-    def parse(self) -> GraphQLList:
-        if "error" in self._result:
-            raise ValueError(self._result["error"])
-        raise NotImplementedError()
+    def parse(self, result: dict[str, Any]) -> GraphQLList:
+        if "error" in result:
+            raise ValueError(result["error"])
+        self._parse_item(result)
+        return self._output
+
+    def _parse_item(self, data: dict[str, Any]) -> None:
+        if "__typename" in data:
+            try:
+                item = _GRAPHQL_DATA_CLASS_BY_VIEW_ID[data["__typename"]].model_validate(data)
+            except KeyError:
+                warnings.warn(f"Could not find class for type {data['__typename']}", stacklevel=2)
+            except ValueError as e:
+                warnings.warn(f"Validation error: {e}", stacklevel=2)
+            else:
+                self._output.append(item)
+        else:
+            for item in data.values():
+                if isinstance(item, dict):
+                    self._parse_item(item)
+                elif isinstance(item, list):
+                    for item in item:
+                        self._parse_item(item)
