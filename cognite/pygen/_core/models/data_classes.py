@@ -212,7 +212,7 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_classes = [self.read_name]
+        import_classes = [self.read_name, self.graphql_name]
         if self.is_writable:
             import_classes.append(self.write_name)
             import_classes.append(f"{self.read_name}Apply")

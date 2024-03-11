@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-import datetime
-
-import pytest
-from cognite.client import CogniteClient
-
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
@@ -29,4 +24,3 @@ def test_graphql_query(wind_client: WindmillClient) -> None:
     assert len(result) == 1
     assert isinstance(result[0], wdc.BladeGraphQL)
     assert result[0].name
-
