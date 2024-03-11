@@ -52,14 +52,14 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
     view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
-    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}{% if data_class.has_field_of_type(ft.EdgeField) %}
     @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for dependency_class in data_class.dependencies %})"{{ dependency_class.variable }}",{% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
         if "items" in value:
             return value["items"]
-        return value
+        return value{% endif %}
 
     def as_read(self) -> {{ data_class.read_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
