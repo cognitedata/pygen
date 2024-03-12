@@ -297,6 +297,7 @@ class MultiAPIGenerator:
             api_core.render(
                 top_level_package=self.top_level_package,
                 data_class_by_data_model_by_type=self._data_class_by_data_model_by_type,
+                is_pydantic_v2=self.pydantic_version == "v2",
             )
             + "\n"
         )
