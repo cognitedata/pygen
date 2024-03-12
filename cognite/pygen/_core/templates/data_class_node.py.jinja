@@ -6,8 +6,8 @@ import warnings
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
-{{ data_class.import_pydantic_field }}{% endif %}{% if data_class.has_field_of_type(ft.EdgeField) %}
-from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}{% endif %}
+{{ data_class.import_pydantic_field }}{% endif %}
+from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -55,7 +55,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
-    @% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
     def parse_data_record(cls, values: Any) -> Any:
         if not isinstance(values, dict):
             return values
