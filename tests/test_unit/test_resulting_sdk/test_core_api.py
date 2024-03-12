@@ -253,7 +253,7 @@ def parse_graphql_query():
                 )
             ]
         ),
-        id="listWindmill",
+        id="listWindmill with nested blades and sensor_positions",
     )
 
     result = {
@@ -279,7 +279,32 @@ def parse_graphql_query():
                 )
             ]
         ),
-        id="listWindmill",
+        id="listWindmill with direct relation",
+    )
+    result = {
+        "listWindmill": {
+            "items": [
+                {
+                    "__typename": "Windmill",
+                    "name": "hornsea_1_mill_3",
+                    "capacity": 7,
+                    "createdTime": "2023-12-25T07:47:50.040Z",
+                }
+            ]
+        }
+    }
+    yield pytest.param(
+        result,
+        wdc.GraphQLList(
+            [
+                wdc.WindmillGraphQL(
+                    name="hornsea_1_mill_3",
+                    capacity=7,
+                    dataRecord=wdc.DataRecordGraphQL(created_time="2023-12-25T07:47:50.040Z"),
+                )
+            ]
+        ),
+        id="listWindmill with createdTime",
     )
 
 
