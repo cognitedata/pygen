@@ -11,7 +11,7 @@ else:
 
 
 def test_graphql_query(wind_client: WindmillClient) -> None:
-    result = wind_client.query(
+    result = wind_client.graphql_query(
         """{
   listBlade(first: 1) {
     items {
