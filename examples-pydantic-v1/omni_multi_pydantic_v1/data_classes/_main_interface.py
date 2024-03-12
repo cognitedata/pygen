@@ -5,10 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -56,6 +58,17 @@ class MainInterfaceGraphQL(GraphQLCore):
 
     view_id = dm.ViewId("pygen-models", "MainInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
 
     def as_read(self) -> MainInterface:
         """Convert this GraphQL format of main interface to the reading format."""

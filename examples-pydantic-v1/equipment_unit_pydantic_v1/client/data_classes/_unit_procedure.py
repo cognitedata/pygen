@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
-from pydantic import validator
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -67,6 +68,17 @@ class UnitProcedureGraphQL(GraphQLCore):
     type_: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
 
     @validator("work_orders", "work_units", pre=True)
     def parse_graphql(cls, value: Any) -> Any:

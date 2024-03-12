@@ -5,10 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -62,6 +64,17 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
     files: Optional[list[str]] = None
     sequences: Optional[list[str]] = None
     timeseries: Union[list[TimeSeries], list[str], None] = None
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
 
     def as_read(self) -> CDFExternalReferencesListed:
         """Convert this GraphQL format of cdf external references listed to the reading format."""

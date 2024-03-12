@@ -6,11 +6,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
 from pydantic import Field
-from pydantic import validator
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -91,6 +92,17 @@ class NacelleGraphQL(GraphQLCore):
     power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
 
     @validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", pre=True)
     def parse_graphql(cls, value: Any) -> Any:
