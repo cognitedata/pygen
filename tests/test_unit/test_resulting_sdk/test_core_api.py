@@ -21,8 +21,8 @@ else:
         UnitProcedure,
         UnitProcedureList,
     )
-    from windmill._api._core import GraphQLQueryResponse
     from windmill_pydantic_v1 import data_classes as wdc
+    from windmill_pydantic_v1._api._core import GraphQLQueryResponse
 
 
 class TestQueryBuilderT:
