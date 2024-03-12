@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -53,6 +54,17 @@ class ConnectionItemCGraphQL(GraphQLCore):
     view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
     connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
 
     @field_validator("connection_item_a", "connection_item_b", mode="before")
     def parse_graphql(cls, value: Any) -> Any:

@@ -1,5 +1,6 @@
 from ._core import (
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -26,6 +27,7 @@ from ._scenario_instance import (
 
 __all__ = [
     "DataRecord",
+    "DataRecordGraphQL",
     "DataRecordWrite",
     "ResourcesWrite",
     "DomainModel",

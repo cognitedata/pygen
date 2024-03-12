@@ -1,5 +1,6 @@
 from ._core import (
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -67,6 +68,7 @@ UnitProcedureApply.model_rebuild()
 
 __all__ = [
     "DataRecord",
+    "DataRecordGraphQL",
     "DataRecordWrite",
     "ResourcesWrite",
     "DomainModel",
