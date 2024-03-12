@@ -13,6 +13,20 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.12] - 12-03-24
+### Added
+* Support for `GraphQL` queries in the generated SDK. This is available through the `query` method in the generated
+  SDK. For example, if you have a data model `Windmill` you can do `windmill_client.graphql_query(...)`.
+* Support for view property type connection with `connectionType=single_edge_connection`.
+* Added parameter `allow_version_increase` to `client.upsert(...)` call to allow set `existing_version` to None
+  in all nodes when writing to CDF.
+
+### Fixed
+* Creation of the SDK no longer fails if there is a `connectionType=single_reverse_direct_relation`
+  or `connectionType=multi_reverse_direct_relation` in any view property the data model.
+* The creation of the SDK no longer fails with `NotImplementedError` if a direct relation
+  is missing a source.
+
 ## [0.99.11] - 23-02-24
 ### Added
 * Allowed `externalId` as alias for `external_id` in the generated data classes.
