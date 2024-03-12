@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
@@ -13,6 +13,8 @@ from ._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
 from ._api.connection_item_a import ConnectionItemAAPI
 from ._api.connection_item_b import ConnectionItemBAPI
 from ._api.connection_item_c import ConnectionItemCAPI
+from ._api.connection_item_d import ConnectionItemDAPI
+from ._api.connection_item_e import ConnectionItemEAPI
 from ._api.dependent_on_non_writable import DependentOnNonWritableAPI
 from ._api.empty import EmptyAPI
 from ._api.implementation_1 import Implementation1API
@@ -25,8 +27,8 @@ from ._api.primitive_required import PrimitiveRequiredAPI
 from ._api.primitive_required_listed import PrimitiveRequiredListedAPI
 from ._api.primitive_with_defaults import PrimitiveWithDefaultsAPI
 from ._api.sub_interface import SubInterfaceAPI
-from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._api._core import SequenceNotStr, GraphQLQueryResponse
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
 
@@ -35,8 +37,8 @@ class OmniClient:
     OmniClient
 
     Generated with:
-        pygen = 0.99.11
-        cognite-sdk = 7.17.1
+        pygen = 0.99.12
+        cognite-sdk = 7.27.2
         pydantic = 1.10.7
 
     Data Model:
@@ -53,7 +55,7 @@ class OmniClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.11"
+        client.config.client_name = "CognitePygen:0.99.12"
 
         view_by_read_class = {
             data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
@@ -61,6 +63,8 @@ class OmniClient:
             data_classes.ConnectionItemA: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
             data_classes.ConnectionItemB: dm.ViewId("pygen-models", "ConnectionItemB", "1"),
             data_classes.ConnectionItemC: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
+            data_classes.ConnectionItemD: dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+            data_classes.ConnectionItemE: dm.ViewId("pygen-models", "ConnectionItemE", "1"),
             data_classes.DependentOnNonWritable: dm.ViewId("pygen-models", "DependentOnNonWritable", "1"),
             data_classes.Empty: dm.ViewId("pygen-models", "Empty", "1"),
             data_classes.Implementation1: dm.ViewId("pygen-models", "Implementation1", "1"),
@@ -82,6 +86,8 @@ class OmniClient:
         self.connection_item_a = ConnectionItemAAPI(client, view_by_read_class)
         self.connection_item_b = ConnectionItemBAPI(client, view_by_read_class)
         self.connection_item_c = ConnectionItemCAPI(client, view_by_read_class)
+        self.connection_item_d = ConnectionItemDAPI(client, view_by_read_class)
+        self.connection_item_e = ConnectionItemEAPI(client, view_by_read_class)
         self.dependent_on_non_writable = DependentOnNonWritableAPI(client, view_by_read_class)
         self.empty = EmptyAPI(client, view_by_read_class)
         self.implementation_1 = Implementation1API(client, view_by_read_class)
@@ -100,6 +106,7 @@ class OmniClient:
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
@@ -109,17 +116,27 @@ class OmniClient:
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
+            allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
+                If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
+                the version to increase.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none)
+            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
             for item in items:
-                instances.extend(item._to_instances_write(cache, self._view_by_read_class, write_none))
+                instances.extend(
+                    item._to_instances_write(
+                        cache,
+                        self._view_by_read_class,
+                        write_none,
+                        allow_version_increase,
+                    )
+                )
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -187,6 +204,17 @@ class OmniClient:
                 nodes=[(space, id) for id in external_id],
             )
 
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the Omni data model.
+
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("pygen-models", "Omni", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
+
     @classmethod
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
@@ -217,6 +245,8 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_d<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_e<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.dependent_on_non_writable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.empty<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_1<br />

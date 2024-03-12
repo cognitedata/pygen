@@ -7,9 +7,9 @@ from typing import Literal, Optional, Union
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelWrite, DomainRelation, DomainRelationWrite, DomainRelationList, ResourcesWrite{% for class_ in unique_start_classes %}
+from ._core import DEFAULT_INSTANCE_SPACE, DataRecordWrite, DomainModel, DomainModelCore, DomainModelWrite, DomainRelation, DomainRelationWrite, DomainRelationList, GraphQLCore, ResourcesWrite{% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
-from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
+from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 
@@ -20,6 +20,47 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
+
+class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+    """This represents the reading version of {{ data_class.doc_name }}, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.
+        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+    """
+    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+
+    def as_read(self) -> {{ data_class.read_name }}:
+        """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return {{ data_class.read_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),{% for field in data_class %}
+            {{ field.name }}={{ field.as_read() }},{% endfor %}
+        )
+
+{% if data_class.is_writable or data_class.is_interface %}
+    def as_write(self) -> {{ data_class.write_name }}:
+        """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
+        return {{ data_class.write_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
+            {{ field.name }}={{ field.as_write() }},{% endfor %}
+        )
+{% endif %}
 
 class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
@@ -75,6 +116,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -116,7 +158,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
                 type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

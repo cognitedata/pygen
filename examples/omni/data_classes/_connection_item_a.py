@@ -5,9 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,13 +18,14 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_a import ConnectionItemA, ConnectionItemAWrite
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBWrite
-    from ._connection_item_c import ConnectionItemC, ConnectionItemCWrite
+    from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+    from ._connection_item_c import ConnectionItemC, ConnectionItemCGraphQL, ConnectionItemCWrite
 
 
 __all__ = [
@@ -44,6 +48,86 @@ _CONNECTIONITEMA_PROPERTIES_BY_FIELD = {
 }
 
 
+class ConnectionItemAGraphQL(GraphQLCore):
+    """This represents the reading version of connection item a, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the connection item a.
+        data_record: The data record of the connection item a node.
+        name: The name field.
+        other_direct: The other direct field.
+        outwards: The outward field.
+        self_direct: The self direct field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    name: Optional[str] = None
+    other_direct: Optional[ConnectionItemCGraphQL] = Field(None, repr=False, alias="otherDirect")
+    outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
+    self_direct: Optional[ConnectionItemAGraphQL] = Field(None, repr=False, alias="selfDirect")
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    @field_validator("other_direct", "outwards", "self_direct", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
+
+    def as_read(self) -> ConnectionItemA:
+        """Convert this GraphQL format of connection item a to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return ConnectionItemA(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            name=self.name,
+            other_direct=(
+                self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
+            ),
+            outwards=[
+                outward.as_read() if isinstance(outward, GraphQLCore) else outward for outward in self.outwards or []
+            ],
+            self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
+        )
+
+    def as_write(self) -> ConnectionItemAWrite:
+        """Convert this GraphQL format of connection item a to the writing format."""
+        return ConnectionItemAWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            name=self.name,
+            other_direct=(
+                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
+            ),
+            outwards=[
+                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
+            ],
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
+        )
+
+
 class ConnectionItemA(DomainModel):
     """This represents the reading version of connection item a.
 
@@ -63,7 +147,7 @@ class ConnectionItemA(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
@@ -111,7 +195,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemBWrite], list[str], None] = Field(default=None, repr=False)
+    outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
 
     def _to_instances_write(
@@ -119,6 +203,7 @@ class ConnectionItemAWrite(DomainModelWrite):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
@@ -149,7 +234,7 @@ class ConnectionItemAWrite(DomainModelWrite):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
@@ -164,7 +249,13 @@ class ConnectionItemAWrite(DomainModelWrite):
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for outward in self.outwards or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=outward, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=outward,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

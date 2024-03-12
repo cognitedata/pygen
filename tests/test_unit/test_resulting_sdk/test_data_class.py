@@ -15,10 +15,12 @@ from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
 from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
+    from omni import data_classes as dc
     from pydantic import TypeAdapter
     from windmill.data_classes import DomainModelWrite as WindmillDomainModelWrite
     from windmill.data_classes import ResourcesWrite, WindmillWrite
 else:
+    from omni_pydantic_v1 import data_classes as dc
     from pydantic import parse_obj_as
     from windmill_pydantic_v1.data_classes import (
         DomainModelWrite as WindmillDomainModelWrite,
@@ -81,6 +83,26 @@ class TestToFromInstances:
         assert len(resources.nodes) == 1
 
         assert node_write.dump() == resources.nodes[0].dump()
+
+
+class TestToInstancesWrite:
+    def test_single_edge_to_instances_write(self):
+        # Arrange
+        connection = dc.ConnectionItemDWrite(
+            external_id="test_single_edge_to_instances_write",
+            name="connectionD",
+            outwards_single=dc.ConnectionItemEWrite(
+                name="connectionE",
+                external_id="test_single_edge_to_instances_write:connectionE",
+            ),
+        )
+
+        # Act
+        resources = connection.to_instances_write()
+
+        # Assert
+        assert len(resources.nodes) == 2
+        assert len(resources.edges) == 1
 
 
 @pytest.mark.parametrize(

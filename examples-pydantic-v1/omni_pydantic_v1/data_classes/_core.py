@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from collections import UserList
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
@@ -49,9 +49,9 @@ class ResourcesWrite:
 
 @dataclass
 class ResourcesWriteResult:
-    nodes: dm.NodeApplyResultList
-    edges: dm.EdgeApplyResultList
-    time_series: TimeSeriesList
+    nodes: dm.NodeApplyResultList = field(default_factory=lambda: dm.NodeApplyResultList([]))
+    edges: dm.EdgeApplyResultList = field(default_factory=lambda: dm.EdgeApplyResultList([]))
+    time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
@@ -66,6 +66,66 @@ class Core(BaseModel):
     def _repr_html_(self) -> str:
         """Returns HTML representation of DomainModel."""
         return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
+
+
+class DataRecordGraphQL(Core):
+    last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
+    created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
+
+
+class GraphQLCore(Core, ABC):
+    view_id: ClassVar[dm.ViewId]
+    space: Optional[str] = None
+    external_id: Optional[str] = Field(None, alias="externalId")
+    data_record: Optional[DataRecordGraphQL] = Field(None, alias="dataRecord")
+
+
+class GraphQLList(UserList):
+    def __init__(self, nodes: Collection[GraphQLCore] = None):
+        super().__init__(nodes or [])
+
+    # The dunder implementations are to get proper type hints
+    def __iter__(self) -> Iterator[GraphQLCore]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> GraphQLCore: ...
+
+    @overload
+    def __getitem__(self, item: slice) -> GraphQLCore: ...
+
+    def __getitem__(self, item: int | slice) -> GraphQLCore | GraphQLList:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
+
+    def dump(self) -> list[dict[str, Any]]:
+        return [node.model_dump() for node in self.data]
+
+    def to_pandas(self) -> pd.DataFrame:
+        """
+        Convert the list of nodes to a pandas.DataFrame.
+
+        Returns:
+            A pandas.DataFrame with the nodes as rows.
+        """
+        df = pd.DataFrame(self.dump())
+        if df.empty:
+            df = pd.DataFrame(columns=GraphQLCore.model_fields)
+        # Reorder columns to have the most relevant first
+        id_columns = ["space", "external_id"]
+        end_columns = ["data_record"]
+        fixed_columns = set(id_columns + end_columns)
+        columns = (
+            id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
+        )
+        return df[columns]
+
+    def _repr_html_(self) -> str:
+        return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
 class DomainModelCore(Core):
@@ -200,9 +260,12 @@ class DomainModelWrite(DomainModelCore):
         allow_population_by_field_name = True
 
     def to_instances_write(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+        self,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
+        write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), view_by_read_class, write_none)
+        return self._to_instances_write(set(), view_by_read_class, write_none, allow_version_increase)
 
     def to_instances_apply(
         self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
@@ -220,6 +283,7 @@ class DomainModelWrite(DomainModelCore):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
 
@@ -336,12 +400,15 @@ class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
         return DataRecordWriteList([node.data_record for node in self])
 
     def to_instances_write(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
+        self,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
+        write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_write(cache, view_by_read_class, write_none)
+            result = node._to_instances_write(cache, view_by_read_class, write_none, allow_version_increase)
             domains.extend(result)
         return domains
 
@@ -425,24 +492,30 @@ class DomainRelationWrite(BaseModel):
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
 
     @classmethod
     def create_edge(
-        cls, start_node: DomainModelWrite | str, end_node: DomainModelWrite | str, edge_type: dm.DirectRelationReference
+        cls,
+        start_node: DomainModelWrite | str | dm.NodeId,
+        end_node: DomainModelWrite | str | dm.NodeId,
+        edge_type: dm.DirectRelationReference,
     ) -> dm.EdgeApply:
-        if isinstance(start_node, DomainModelWrite):
+        if isinstance(start_node, (DomainModelWrite, dm.NodeId)):
             space = start_node.space
-        elif isinstance(start_node, DomainModelWrite):
-            space = start_node.space
+        elif isinstance(end_node, (DomainModelWrite, dm.NodeId)):
+            space = end_node.space
         else:
-            raise TypeError(f"Either pass in a start or end node of type {DomainRelationWrite.__name__}")
+            space = DEFAULT_INSTANCE_SPACE
 
         if isinstance(end_node, str):
             end_ref = dm.DirectRelationReference(space, end_node)
         elif isinstance(end_node, DomainModelWrite):
             end_ref = end_node.as_direct_reference()
+        elif isinstance(end_node, dm.NodeId):
+            end_ref = dm.DirectRelationReference(end_node.space, end_node.external_id)
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(end_node)}")
 
@@ -450,6 +523,8 @@ class DomainRelationWrite(BaseModel):
             start_ref = dm.DirectRelationReference(space, start_node)
         elif isinstance(start_node, DomainModelWrite):
             start_ref = start_node.as_direct_reference()
+        elif isinstance(start_node, dm.NodeId):
+            start_ref = dm.DirectRelationReference(start_node.space, start_node.external_id)
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(start_node)}")
 
@@ -465,11 +540,12 @@ class DomainRelationWrite(BaseModel):
     def from_edge_to_resources(
         cls,
         cache: set[tuple[str, str]],
-        start_node: DomainModelWrite | str,
-        end_node: DomainModelWrite | str,
+        start_node: DomainModelWrite | str | dm.NodeId,
+        end_node: DomainModelWrite | str | dm.NodeId,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         edge = DomainRelationWrite.create_edge(start_node, end_node, edge_type)
@@ -479,10 +555,20 @@ class DomainRelationWrite(BaseModel):
         cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
-            other_resources = end_node._to_instances_write(cache, view_by_read_class, write_none)
+            other_resources = end_node._to_instances_write(
+                cache,
+                view_by_read_class,
+                write_none,
+                allow_version_increase,
+            )
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelWrite):
-            other_resources = start_node._to_instances_write(cache, view_by_read_class, write_none)
+            other_resources = start_node._to_instances_write(
+                cache,
+                view_by_read_class,
+                write_none,
+                allow_version_increase,
+            )
             resources.extend(other_resources)
 
         return resources

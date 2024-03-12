@@ -1,11 +1,14 @@
 from ._core import (
     DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
+    GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
 )
@@ -14,6 +17,7 @@ from ._scenario_instance import (
     ScenarioInstanceApply,
     ScenarioInstanceApplyList,
     ScenarioInstanceFields,
+    ScenarioInstanceGraphQL,
     ScenarioInstanceList,
     ScenarioInstanceTextFields,
     ScenarioInstanceWrite,
@@ -23,6 +27,7 @@ from ._scenario_instance import (
 
 __all__ = [
     "DataRecord",
+    "DataRecordGraphQL",
     "DataRecordWrite",
     "ResourcesWrite",
     "DomainModel",
@@ -30,8 +35,11 @@ __all__ = [
     "DomainModelWrite",
     "DomainModelList",
     "DomainRelationWrite",
+    "GraphQLCore",
+    "GraphQLList",
     "ResourcesWriteResult",
     "ScenarioInstance",
+    "ScenarioInstanceGraphQL",
     "ScenarioInstanceWrite",
     "ScenarioInstanceApply",
     "ScenarioInstanceList",

@@ -1,12 +1,13 @@
 space: pygen-models
 externalId: Omni
-description: ''
 name: Omni
+description: ''
 version: '1'
 views:
 - space: pygen-models
   externalId: CDFExternalReferences
   name: CDFExternalReferences
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -59,6 +60,7 @@ views:
 - space: pygen-models
   externalId: CDFExternalReferencesListed
   name: CDFExternalReferencesListed
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -119,6 +121,7 @@ views:
       value:
         space: pygen-models
         externalId: ConnectionItemA
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -198,6 +201,7 @@ views:
       value:
         space: pygen-models
         externalId: ConnectionItemB
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -259,6 +263,7 @@ views:
       value:
         space: pygen-models
         externalId: ConnectionItemC
+  implements: []
   version: '1'
   writable: false
   usedFor: all
@@ -295,6 +300,179 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 - space: pygen-models
+  externalId: ConnectionItemD
+  name: ConnectionItemD
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: ConnectionItemD
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    directMulti:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: direct1
+      type:
+        type: direct
+        source:
+          space: pygen-models
+          externalId: ConnectionItemE
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: selfDirect
+      description: null
+    directSingle:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: direct2
+      type:
+        type: direct
+        source:
+          space: pygen-models
+          externalId: ConnectionItemE
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: otherDirect
+      description: null
+    name:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    outwardsSingle:
+      type:
+        space: pygen-models
+        externalId: bidirectionalSingle
+      source:
+        space: pygen-models
+        externalId: ConnectionItemE
+        version: '1'
+        type: view
+      name: outwards
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: single_edge_connection
+  lastUpdatedTime: 1709987539845
+  createdTime: 1709987539845
+- space: pygen-models
+  externalId: ConnectionItemE
+  name: ConnectionItemE
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: ConnectionItemE
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    directNoSource:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: direct1
+      type:
+        type: direct
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: directNoSource
+      description: null
+    directReverseMulti:
+      source:
+        space: pygen-models
+        externalId: ConnectionItemD
+        version: '1'
+        type: view
+      through:
+        source:
+          space: pygen-models
+          externalId: ConnectionItemD
+          version: '1'
+          type: view
+        identifier: directMulti
+      name: null
+      description: null
+      connectionType: multi_reverse_direct_relation
+    directReverseSingle:
+      source:
+        space: pygen-models
+        externalId: ConnectionItemD
+        version: '1'
+        type: view
+      through:
+        source:
+          space: pygen-models
+          externalId: ConnectionItemD
+          version: '1'
+          type: view
+        identifier: directSingle
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+    inwardsSingle:
+      type:
+        space: pygen-models
+        externalId: bidirectionalSingle
+      source:
+        space: pygen-models
+        externalId: ConnectionItemD
+        version: '1'
+        type: view
+      name: inwards
+      description: null
+      edgeSource: null
+      direction: inwards
+      connectionType: single_edge_connection
+    name:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+  lastUpdatedTime: 1709996763597
+  createdTime: 1709996763597
+- space: pygen-models
   externalId: DependentOnNonWritable
   name: DependentOnNonWritable
   filter:
@@ -305,6 +483,7 @@ views:
       value:
         space: pygen-models
         externalId: DependentOnNonWritable
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -352,6 +531,7 @@ views:
       value:
         space: pygen-models
         externalId: Empty
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -697,6 +877,7 @@ views:
 - space: pygen-models
   externalId: MainInterface
   name: MainInterface
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -722,6 +903,7 @@ views:
 - space: pygen-models
   externalId: PrimitiveNullable
   name: PrimitiveNullable
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -859,6 +1041,7 @@ views:
 - space: pygen-models
   externalId: PrimitiveNullableListed
   name: PrimitiveNullableListed
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -996,6 +1179,7 @@ views:
 - space: pygen-models
   externalId: PrimitiveRequired
   name: PrimitiveRequired
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -1133,6 +1317,7 @@ views:
 - space: pygen-models
   externalId: PrimitiveRequiredListed
   name: PrimitiveRequiredListed
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -1270,6 +1455,7 @@ views:
 - space: pygen-models
   externalId: PrimitiveWithDefaults
   name: PrimitiveWithDefaults
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -1405,5 +1591,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1704274898601
-createdTime: 1704274898601
+lastUpdatedTime: 1709996765462
+createdTime: 1709996765462

@@ -7,9 +7,12 @@ import warnings
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
+from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -17,13 +20,14 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_field_of_type(ft.EdgeField) %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
 {% endif %}
 
 __all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
@@ -36,6 +40,65 @@ __all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_clas
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
+class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+    """This represents the reading version of {{ data_class.doc_name }}, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.
+        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+    """
+    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+
+    @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+{% if data_class.has_field_of_type(ft.EdgeField) %}
+    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.EdgeField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value{% endif %}
+
+    def as_read(self) -> {{ data_class.read_name }}:
+        """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return {{ data_class.read_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),{% for field in data_class %}
+            {{ field.name }}={{ field.as_read() }},{% endfor %}
+        )
+
+{% if data_class.is_writable or data_class.is_interface %}
+    def as_write(self) -> {{ data_class.write_name }}:
+        """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
+        return {{ data_class.write_name }}(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
+            {{ field.name }}={{ field.as_write() }},{% endfor %}
+        )
+{% endif %}
 
 class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
@@ -91,6 +154,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
@@ -102,7 +166,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=self.data_record.existing_version,{% if data_class.node_type %}
+            existing_version=None if allow_version_increase else self.data_record.existing_version,{% if data_class.node_type %}
             type=self.node_type,{% endif %}
             sources=None,
         )
@@ -114,7 +178,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         )){% endif %}
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         properties: dict[str, Any] = {}
-        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
+        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne, ft.EdgeOneToOneAny)) %}
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:{% if field.is_edge %}
             properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
@@ -144,7 +208,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
@@ -170,10 +234,22 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node={{field.variable}},
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             ){% else %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node={{field.variable}},
+                end_node=self,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
@@ -183,6 +259,31 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
             resources.time_series.append(self.{{ field.name }})
+{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeTypedOneToOne) %}{% if field.edge_direction == 'outwards' %}
+        if self.{{field.name}} is not None:
+            other_resources = DomainRelationWrite.from_edge_to_resources(
+                cache,
+                start_node=self,
+                end_node=self.{{ field.name }},
+                edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
+            )
+            resources.extend(other_resources)
+    {% else %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            other_resources = DomainRelationWrite.from_edge_to_resources(
+                cache,
+                start_node={{field.variable}},
+                end_node=self,
+                edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
+            )
+            resources.extend(other_resources)
+    {% endif %}
 {% endfor %}
         return resources
 

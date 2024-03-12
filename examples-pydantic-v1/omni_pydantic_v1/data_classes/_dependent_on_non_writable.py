@@ -5,9 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,11 +18,12 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._implementation_1_non_writeable import Implementation1NonWriteable
+    from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableGraphQL
 
 
 __all__ = [
@@ -42,6 +46,78 @@ _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD = {
 }
 
 
+class DependentOnNonWritableGraphQL(GraphQLCore):
+    """This represents the reading version of dependent on non writable, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the dependent on non writable.
+        data_record: The data record of the dependent on non writable node.
+        a_value: The a value field.
+        to_non_writable: The to non writable field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    a_value: Optional[str] = Field(None, alias="aValue")
+    to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
+        default=None, repr=False, alias="toNonWritable"
+    )
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    @validator("to_non_writable", pre=True)
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
+
+    def as_read(self) -> DependentOnNonWritable:
+        """Convert this GraphQL format of dependent on non writable to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return DependentOnNonWritable(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            a_value=self.a_value,
+            to_non_writable=[
+                to_non_writable.as_read() if isinstance(to_non_writable, GraphQLCore) else to_non_writable
+                for to_non_writable in self.to_non_writable or []
+            ],
+        )
+
+    def as_write(self) -> DependentOnNonWritableWrite:
+        """Convert this GraphQL format of dependent on non writable to the writing format."""
+        return DependentOnNonWritableWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            a_value=self.a_value,
+            to_non_writable=[
+                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                for to_non_writable in self.to_non_writable or []
+            ],
+        )
+
+
 class DependentOnNonWritable(DomainModel):
     """This represents the reading version of dependent on non writable.
 
@@ -60,7 +136,7 @@ class DependentOnNonWritable(DomainModel):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[Implementation1NonWriteable], list[str], None] = Field(
+    to_non_writable: Union[list[Implementation1NonWriteable], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="toNonWritable"
     )
 
@@ -112,6 +188,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
@@ -130,7 +207,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
@@ -150,6 +227,8 @@ class DependentOnNonWritableWrite(DomainModelWrite):
                 end_node=to_non_writable,
                 edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

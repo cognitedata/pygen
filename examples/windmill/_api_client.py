@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
@@ -19,8 +19,8 @@ from ._api.power_inverter import PowerInverterAPI
 from ._api.rotor import RotorAPI
 from ._api.sensor_position import SensorPositionAPI
 from ._api.windmill import WindmillAPI
-from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._api._core import SequenceNotStr, GraphQLQueryResponse
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
 
@@ -29,9 +29,9 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.99.11
-        cognite-sdk = 7.17.1
-        pydantic = 2.6.0
+        pygen = 0.99.12
+        cognite-sdk = 7.27.2
+        pydantic = 2.6.3
 
     Data Model:
         space: power-models
@@ -47,7 +47,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.11"
+        client.config.client_name = "CognitePygen:0.99.12"
 
         view_by_read_class = {
             data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
@@ -82,6 +82,7 @@ class WindmillClient:
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
         replace: bool = False,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
@@ -91,17 +92,27 @@ class WindmillClient:
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
+            allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
+                If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
+                the version to increase.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none)
+            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
             for item in items:
-                instances.extend(item._to_instances_write(cache, self._view_by_read_class, write_none))
+                instances.extend(
+                    item._to_instances_write(
+                        cache,
+                        self._view_by_read_class,
+                        write_none,
+                        allow_version_increase,
+                    )
+                )
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -168,6 +179,17 @@ class WindmillClient:
             return self._client.data_modeling.instances.delete(
                 nodes=[(space, id) for id in external_id],
             )
+
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the Windmill data model.
+
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("power-models", "Windmill", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
     @classmethod
     def azure_project(

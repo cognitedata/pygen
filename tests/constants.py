@@ -140,7 +140,7 @@ class ExampleSDK:
         if not isoformat_dates:
             return nodes
         for node in nodes:
-            for source in node.sources:
+            for source in node.sources or []:
                 for name in list(source.properties):
                     if isinstance(source.properties[name], date):
                         source.properties[name] = source.properties[name].isoformat()
@@ -304,6 +304,8 @@ class OmniFiles:
     implementation_1_non_writeable_data = data_classes / "_implementation_1_non_writeable.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
     connection_item_c_data = data_classes / "_connection_item_c.py"
+    connection_item_d_data = data_classes / "_connection_item_d.py"
+    connection_item_e_data = data_classes / "_connection_item_e.py"
 
     cdf_external_api = api / "cdf_external_references.py"
     cdf_external_list_api = api / "cdf_external_references_listed.py"

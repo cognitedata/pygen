@@ -5,9 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,14 +18,15 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
 if TYPE_CHECKING:
-    from ._blade import Blade, BladeWrite
-    from ._metmast import Metmast, MetmastWrite
-    from ._nacelle import Nacelle, NacelleWrite
-    from ._rotor import Rotor, RotorWrite
+    from ._blade import Blade, BladeGraphQL, BladeWrite
+    from ._metmast import Metmast, MetmastGraphQL, MetmastWrite
+    from ._nacelle import Nacelle, NacelleGraphQL, NacelleWrite
+    from ._rotor import Rotor, RotorGraphQL, RotorWrite
 
 
 __all__ = [
@@ -47,6 +51,94 @@ _WINDMILL_PROPERTIES_BY_FIELD = {
 }
 
 
+class WindmillGraphQL(GraphQLCore):
+    """This represents the reading version of windmill, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the windmill.
+        data_record: The data record of the windmill node.
+        blades: The blade field.
+        capacity: The capacity field.
+        metmast: The metmast field.
+        nacelle: The nacelle field.
+        name: The name field.
+        rotor: The rotor field.
+        windfarm: The windfarm field.
+    """
+
+    view_id = dm.ViewId("power-models", "Windmill", "1")
+    blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
+    capacity: Optional[float] = None
+    metmast: Optional[list[MetmastGraphQL]] = Field(default=None, repr=False)
+    nacelle: Optional[NacelleGraphQL] = Field(None, repr=False)
+    name: Optional[str] = None
+    rotor: Optional[RotorGraphQL] = Field(None, repr=False)
+    windfarm: Optional[str] = None
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    @field_validator("blades", "metmast", "nacelle", "rotor", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
+
+    def as_read(self) -> Windmill:
+        """Convert this GraphQL format of windmill to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Windmill(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            blades=[blade.as_read() if isinstance(blade, GraphQLCore) else blade for blade in self.blades or []],
+            capacity=self.capacity,
+            metmast=[
+                metmast.as_read() if isinstance(metmast, GraphQLCore) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
+            name=self.name,
+            rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
+            windfarm=self.windfarm,
+        )
+
+    def as_write(self) -> WindmillWrite:
+        """Convert this GraphQL format of windmill to the writing format."""
+        return WindmillWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            capacity=self.capacity,
+            metmast=[
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            name=self.name,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
+            windfarm=self.windfarm,
+        )
+
+
 class Windmill(DomainModel):
     """This represents the reading version of windmill.
 
@@ -67,9 +159,9 @@ class Windmill(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[Blade], list[str], None] = Field(default=None, repr=False)
+    blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[Metmast], list[str], None] = Field(default=None, repr=False)
+    metmast: Union[list[Metmast], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
@@ -122,9 +214,9 @@ class WindmillWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[BladeWrite], list[str], None] = Field(default=None, repr=False)
+    blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[MetmastWrite], list[str], None] = Field(default=None, repr=False)
+    metmast: Union[list[MetmastWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
     rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(None, repr=False)
@@ -135,6 +227,7 @@ class WindmillWrite(DomainModelWrite):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
@@ -169,7 +262,7 @@ class WindmillWrite(DomainModelWrite):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
@@ -184,14 +277,26 @@ class WindmillWrite(DomainModelWrite):
         edge_type = dm.DirectRelationReference("power-models", "Windmill.blades")
         for blade in self.blades or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=blade, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=blade,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.metmast")
         for metmast in self.metmast or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache, start_node=self, end_node=metmast, edge_type=edge_type, view_by_read_class=view_by_read_class
+                cache,
+                start_node=self,
+                end_node=metmast,
+                edge_type=edge_type,
+                view_by_read_class=view_by_read_class,
+                write_none=write_none,
+                allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 

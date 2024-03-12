@@ -40,6 +40,6 @@ def omni_multi_api_generator(omni_data_model: dm.DataModel[dm.View]) -> MultiAPI
     return MultiAPIGenerator(
         OMNI_SDK.top_level_package,
         OMNI_SDK.client_name,
-        omni_data_model.views,
+        [omni_data_model],
         OMNI_SDK.instance_space,
     )

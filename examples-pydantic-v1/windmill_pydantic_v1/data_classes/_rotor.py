@@ -5,9 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -38,6 +42,62 @@ _ROTOR_PROPERTIES_BY_FIELD = {
     "rotor_speed_controller": "rotor_speed_controller",
     "rpm_low_speed_shaft": "rpm_low_speed_shaft",
 }
+
+
+class RotorGraphQL(GraphQLCore):
+    """This represents the reading version of rotor, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the rotor.
+        data_record: The data record of the rotor node.
+        rotor_speed_controller: The rotor speed controller field.
+        rpm_low_speed_shaft: The rpm low speed shaft field.
+    """
+
+    view_id = dm.ViewId("power-models", "Rotor", "1")
+    rotor_speed_controller: Union[TimeSeries, str, None] = None
+    rpm_low_speed_shaft: Union[TimeSeries, str, None] = None
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    def as_read(self) -> Rotor:
+        """Convert this GraphQL format of rotor to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Rotor(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            rotor_speed_controller=self.rotor_speed_controller,
+            rpm_low_speed_shaft=self.rpm_low_speed_shaft,
+        )
+
+    def as_write(self) -> RotorWrite:
+        """Convert this GraphQL format of rotor to the writing format."""
+        return RotorWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            rotor_speed_controller=self.rotor_speed_controller,
+            rpm_low_speed_shaft=self.rpm_low_speed_shaft,
+        )
 
 
 class Rotor(DomainModel):
@@ -101,6 +161,7 @@ class RotorWrite(DomainModelWrite):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
@@ -126,7 +187,7 @@ class RotorWrite(DomainModelWrite):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

@@ -5,9 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 from ._main_interface import MainInterface, MainInterfaceWrite
@@ -39,6 +43,61 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
     "main_value": "mainValue",
     "sub_value": "subValue",
 }
+
+
+class SubInterfaceGraphQL(GraphQLCore):
+    """This represents the reading version of sub interface, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the sub interface.
+        data_record: The data record of the sub interface node.
+        main_value: The main value field.
+        sub_value: The sub value field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    sub_value: Optional[str] = Field(None, alias="subValue")
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    def as_read(self) -> SubInterface:
+        """Convert this GraphQL format of sub interface to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return SubInterface(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
+
+    def as_write(self) -> SubInterfaceWrite:
+        """Convert this GraphQL format of sub interface to the writing format."""
+        return SubInterfaceWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+        )
 
 
 class SubInterface(MainInterface):
@@ -98,6 +157,7 @@ class SubInterfaceWrite(MainInterfaceWrite):
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
+        allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
@@ -117,7 +177,7 @@ class SubInterfaceWrite(MainInterfaceWrite):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.data_record.existing_version,
+                existing_version=None if allow_version_increase else self.data_record.existing_version,
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(

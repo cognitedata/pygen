@@ -38,6 +38,7 @@ class DataClass:
 
     read_name: str
     write_name: str
+    graphql_name: str
     read_list_name: str
     write_list_name: str
     doc_name: str
@@ -104,6 +105,7 @@ class DataClass:
         args = dict(
             read_name=class_name,
             write_name=f"{class_name}Write",
+            graphql_name=f"{class_name}GraphQL",
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}WriteList",
             doc_name=doc_name,
@@ -154,6 +156,9 @@ class DataClass:
                 self.view_id,
                 pydantic_field=pydantic_field,
             )
+            if field_ is None:
+                # Reverse direct relations are skipped
+                continue
             self.fields.append(field_)
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
@@ -207,7 +212,7 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_classes = [self.read_name]
+        import_classes = [self.read_name, self.graphql_name]
         if self.is_writable:
             import_classes.append(self.write_name)
             import_classes.append(f"{self.read_name}Apply")
