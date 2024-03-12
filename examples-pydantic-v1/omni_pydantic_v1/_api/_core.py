@@ -774,7 +774,7 @@ class GraphQLQueryResponse:
                 self._parse_item(item)
         elif "__typename" in data:
             try:
-                item = self._data_class_by_type[data["__typename"]].model_validate(data)
+                item = self._data_class_by_type[data["__typename"]].parse_obj(data)
             except KeyError:
                 raise ValueError(f"Could not find class for type {data['__typename']}")
             else:

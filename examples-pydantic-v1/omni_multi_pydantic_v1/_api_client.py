@@ -13,8 +13,8 @@ from ._api.implementation_1_s_pygen_models_other import Implementation1sPygenMod
 from ._api.implementation_1_v_2 import Implementation1v2API
 from ._api.main_interface import MainInterfaceAPI
 from ._api.sub_interface import SubInterfaceAPI
-from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._api._core import SequenceNotStr, GraphQLQueryResponse
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
 
@@ -36,10 +36,22 @@ class OmniMultiAAPIs:
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
         self._view_by_read_class = view_by_read_class
+        self._client = client
 
         self.implementation_1_s_pygen_models = Implementation1sPygenModelsAPI(client, view_by_read_class)
         self.main_interface = MainInterfaceAPI(client, view_by_read_class)
         self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
+
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the OmniMultiA data model.
+
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
 
 class OmniMultiBAPIs:
@@ -60,10 +72,22 @@ class OmniMultiBAPIs:
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
         self._view_by_read_class = view_by_read_class
+        self._client = client
 
         self.implementation_1_v_2 = Implementation1v2API(client, view_by_read_class)
         self.main_interface = MainInterfaceAPI(client, view_by_read_class)
         self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
+
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the OmniMultiB data model.
+
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiB", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
 
 class OmniMultiCAPIs:
@@ -82,8 +106,20 @@ class OmniMultiCAPIs:
             data_classes.Implementation1sPygenModelsOther: dm.ViewId("pygen-models-other", "Implementation1", "1"),
         }
         self._view_by_read_class = view_by_read_class
+        self._client = client
 
         self.implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherAPI(client, view_by_read_class)
+
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the OmniMultiC data model.
+
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiC", "1")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
 
 class OmniMultiClient:

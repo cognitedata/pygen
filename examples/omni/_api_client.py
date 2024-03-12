@@ -204,7 +204,7 @@ class OmniClient:
                 nodes=[(space, id) for id in external_id],
             )
 
-    def query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the Omni data model.
 
         Args:
