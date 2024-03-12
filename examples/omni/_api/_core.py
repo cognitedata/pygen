@@ -21,6 +21,7 @@ from omni.data_classes._core import (
     DomainModelCore,
     DomainModelWrite,
     DomainRelationWrite,
+    GraphQLList,
     ResourcesWriteResult,
     T_DomainModel,
     T_DomainModelWrite,
@@ -32,6 +33,8 @@ from omni.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
+from omni import data_classes
+
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
@@ -751,3 +754,55 @@ def _create_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+class GraphQLQueryResponse:
+    def __init__(self, data_model_id: dm.DataModelId):
+        self._output = GraphQLList([])
+        self._data_class_by_type = _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE[data_model_id]
+
+    def parse(self, response: dict[str, Any]) -> GraphQLList:
+        if "errors" in response:
+            raise RuntimeError(response["errors"])
+        _, data = list(response.items())[0]
+        self._parse_item(data)
+        return self._output
+
+    def _parse_item(self, data: dict[str, Any]) -> None:
+        if "items" in data:
+            for item in data["items"]:
+                self._parse_item(item)
+        elif "__typename" in data:
+            try:
+                item = self._data_class_by_type[data["__typename"]].model_validate(data)
+            except KeyError:
+                raise ValueError(f"Could not find class for type {data['__typename']}")
+            else:
+                self._output.append(item)
+        else:
+            raise RuntimeError("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")
+
+
+_GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
+    dm.DataModelId("pygen-models", "Omni", "1"): {
+        "CDFExternalReferences": data_classes.CDFExternalReferencesGraphQL,
+        "CDFExternalReferencesListed": data_classes.CDFExternalReferencesListedGraphQL,
+        "ConnectionItemA": data_classes.ConnectionItemAGraphQL,
+        "ConnectionItemB": data_classes.ConnectionItemBGraphQL,
+        "ConnectionItemC": data_classes.ConnectionItemCGraphQL,
+        "ConnectionItemD": data_classes.ConnectionItemDGraphQL,
+        "ConnectionItemE": data_classes.ConnectionItemEGraphQL,
+        "DependentOnNonWritable": data_classes.DependentOnNonWritableGraphQL,
+        "Empty": data_classes.EmptyGraphQL,
+        "Implementation1": data_classes.Implementation1GraphQL,
+        "Implementation1NonWriteable": data_classes.Implementation1NonWriteableGraphQL,
+        "Implementation2": data_classes.Implementation2GraphQL,
+        "MainInterface": data_classes.MainInterfaceGraphQL,
+        "PrimitiveNullable": data_classes.PrimitiveNullableGraphQL,
+        "PrimitiveNullableListed": data_classes.PrimitiveNullableListedGraphQL,
+        "PrimitiveRequired": data_classes.PrimitiveRequiredGraphQL,
+        "PrimitiveRequiredListed": data_classes.PrimitiveRequiredListedGraphQL,
+        "PrimitiveWithDefaults": data_classes.PrimitiveWithDefaultsGraphQL,
+        "SubInterface": data_classes.SubInterfaceGraphQL,
+    },
+}

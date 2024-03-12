@@ -5,9 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
@@ -40,6 +44,66 @@ _POWERINVERTER_PROPERTIES_BY_FIELD = {
     "apparent_power_total": "apparent_power_total",
     "reactive_power_total": "reactive_power_total",
 }
+
+
+class PowerInverterGraphQL(GraphQLCore):
+    """This represents the reading version of power inverter, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the power inverter.
+        data_record: The data record of the power inverter node.
+        active_power_total: The active power total field.
+        apparent_power_total: The apparent power total field.
+        reactive_power_total: The reactive power total field.
+    """
+
+    view_id = dm.ViewId("power-models", "PowerInverter", "1")
+    active_power_total: Union[TimeSeries, str, None] = None
+    apparent_power_total: Union[TimeSeries, str, None] = None
+    reactive_power_total: Union[TimeSeries, str, None] = None
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    def as_read(self) -> PowerInverter:
+        """Convert this GraphQL format of power inverter to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return PowerInverter(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            active_power_total=self.active_power_total,
+            apparent_power_total=self.apparent_power_total,
+            reactive_power_total=self.reactive_power_total,
+        )
+
+    def as_write(self) -> PowerInverterWrite:
+        """Convert this GraphQL format of power inverter to the writing format."""
+        return PowerInverterWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            active_power_total=self.active_power_total,
+            apparent_power_total=self.apparent_power_total,
+            reactive_power_total=self.reactive_power_total,
+        )
 
 
 class PowerInverter(DomainModel):

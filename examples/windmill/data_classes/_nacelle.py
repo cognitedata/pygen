@@ -6,9 +6,12 @@ from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -16,16 +19,17 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
     TimeSeries,
 )
 
 if TYPE_CHECKING:
-    from ._gearbox import Gearbox, GearboxWrite
-    from ._generator import Generator, GeneratorWrite
-    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftWrite
-    from ._main_shaft import MainShaft, MainShaftWrite
-    from ._power_inverter import PowerInverter, PowerInverterWrite
+    from ._gearbox import Gearbox, GearboxGraphQL, GearboxWrite
+    from ._generator import Generator, GeneratorGraphQL, GeneratorWrite
+    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftGraphQL, HighSpeedShaftWrite
+    from ._main_shaft import MainShaft, MainShaftGraphQL, MainShaftWrite
+    from ._power_inverter import PowerInverter, PowerInverterGraphQL, PowerInverterWrite
 
 
 __all__ = [
@@ -54,6 +58,114 @@ _NACELLE_PROPERTIES_BY_FIELD = {
     "yaw_direction": "yaw_direction",
     "yaw_error": "yaw_error",
 }
+
+
+class NacelleGraphQL(GraphQLCore):
+    """This represents the reading version of nacelle, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the nacelle.
+        data_record: The data record of the nacelle node.
+        acc_from_back_side_x: The acc from back side x field.
+        acc_from_back_side_y: The acc from back side y field.
+        acc_from_back_side_z: The acc from back side z field.
+        gearbox: The gearbox field.
+        generator: The generator field.
+        high_speed_shaft: The high speed shaft field.
+        main_shaft: The main shaft field.
+        power_inverter: The power inverter field.
+        yaw_direction: The yaw direction field.
+        yaw_error: The yaw error field.
+    """
+
+    view_id = dm.ViewId("power-models", "Nacelle", "1")
+    acc_from_back_side_x: Union[TimeSeries, str, None] = None
+    acc_from_back_side_y: Union[TimeSeries, str, None] = None
+    acc_from_back_side_z: Union[TimeSeries, str, None] = None
+    gearbox: Optional[GearboxGraphQL] = Field(None, repr=False)
+    generator: Optional[GeneratorGraphQL] = Field(None, repr=False)
+    high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(None, repr=False)
+    main_shaft: Optional[MainShaftGraphQL] = Field(None, repr=False)
+    power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
+    yaw_direction: Union[TimeSeries, str, None] = None
+    yaw_error: Union[TimeSeries, str, None] = None
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    @field_validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
+
+    def as_read(self) -> Nacelle:
+        """Convert this GraphQL format of nacelle to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Nacelle(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            acc_from_back_side_x=self.acc_from_back_side_x,
+            acc_from_back_side_y=self.acc_from_back_side_y,
+            acc_from_back_side_z=self.acc_from_back_side_z,
+            gearbox=self.gearbox.as_read() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
+            generator=self.generator.as_read() if isinstance(self.generator, GraphQLCore) else self.generator,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_read()
+                if isinstance(self.high_speed_shaft, GraphQLCore)
+                else self.high_speed_shaft
+            ),
+            main_shaft=self.main_shaft.as_read() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
+            power_inverter=(
+                self.power_inverter.as_read() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
+            ),
+            yaw_direction=self.yaw_direction,
+            yaw_error=self.yaw_error,
+        )
+
+    def as_write(self) -> NacelleWrite:
+        """Convert this GraphQL format of nacelle to the writing format."""
+        return NacelleWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            acc_from_back_side_x=self.acc_from_back_side_x,
+            acc_from_back_side_y=self.acc_from_back_side_y,
+            acc_from_back_side_z=self.acc_from_back_side_z,
+            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
+            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_write()
+                if isinstance(self.high_speed_shaft, DomainModel)
+                else self.high_speed_shaft
+            ),
+            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
+            power_inverter=(
+                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
+            ),
+            yaw_direction=self.yaw_direction,
+            yaw_error=self.yaw_error,
+        )
 
 
 class Nacelle(DomainModel):

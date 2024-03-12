@@ -6,9 +6,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import validator, root_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -16,6 +19,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 
@@ -46,6 +50,90 @@ _EMPTY_PROPERTIES_BY_FIELD = {
     "text": "text",
     "timestamp": "timestamp",
 }
+
+
+class EmptyGraphQL(GraphQLCore):
+    """This represents the reading version of empty, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the empty.
+        data_record: The data record of the empty node.
+        boolean: The boolean field.
+        date: The date field.
+        float_32: The float 32 field.
+        float_64: The float 64 field.
+        int_32: The int 32 field.
+        int_64: The int 64 field.
+        json_: The json field.
+        text: The text field.
+        timestamp: The timestamp field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "Empty", "1")
+    boolean: Optional[bool] = None
+    date: Optional[datetime.date] = None
+    float_32: Optional[float] = Field(None, alias="float32")
+    float_64: Optional[float] = Field(None, alias="float64")
+    int_32: Optional[int] = Field(None, alias="int32")
+    int_64: Optional[int] = Field(None, alias="int64")
+    json_: Optional[dict] = Field(None, alias="json")
+    text: Optional[str] = None
+    timestamp: Optional[datetime.datetime] = None
+
+    @root_validator(pre=True)
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    def as_read(self) -> Empty:
+        """Convert this GraphQL format of empty to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Empty(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            boolean=self.boolean,
+            date=self.date,
+            float_32=self.float_32,
+            float_64=self.float_64,
+            int_32=self.int_32,
+            int_64=self.int_64,
+            json_=self.json_,
+            text=self.text,
+            timestamp=self.timestamp,
+        )
+
+    def as_write(self) -> EmptyWrite:
+        """Convert this GraphQL format of empty to the writing format."""
+        return EmptyWrite(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            boolean=self.boolean,
+            date=self.date,
+            float_32=self.float_32,
+            float_64=self.float_64,
+            int_32=self.int_32,
+            int_64=self.int_64,
+            json_=self.json_,
+            text=self.text,
+            timestamp=self.timestamp,
+        )
 
 
 class Empty(DomainModel):

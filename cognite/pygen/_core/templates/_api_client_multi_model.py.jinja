@@ -9,8 +9,8 @@ from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 {% for api in api_classes %}{% if not api.data_class.is_edge_class %}
 from ._api.{{ api.api_class.file_name }} import {{ api.api_class.name }}{% endif %}{% endfor %}
-from ._api._core import SequenceNotStr
-from .data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._api._core import SequenceNotStr, GraphQLQueryResponse
+from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
 
 {% for api in multi_apis %}
@@ -30,8 +30,20 @@ class {{ api.name }}:
             data_classes.{{ api_by_view_id[view_id].data_class.read_name }}: dm.ViewId("{{ view_id.space }}", "{{ view_id.external_id }}", "{{ view_id.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
         self._view_by_read_class = view_by_read_class
+        self._client = client
         {% for sub in api.sub_apis_by_view_id.values() %}{% if not sub.is_edge_class %}
         self.{{ sub.parent_attribute }} = {{ sub.name }}(client, view_by_read_class){% endif %}{% endfor %}
+
+    def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
+        """Execute a GraphQl query against the {{ api.model.external_id }} data model.
+
+            Args:
+                query (str): The GraphQL query to issue.
+                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        """
+        data_model_id = dm.DataModelId("{{ api.model.space }}", "{{ api.model.external_id }}", "{{ api.model.version }}")
+        result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
+        return GraphQLQueryResponse(data_model_id).parse(result)
 
 {% endfor %}
 class {{ client_name }}:

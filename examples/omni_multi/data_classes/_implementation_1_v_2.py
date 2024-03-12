@@ -5,9 +5,12 @@ from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
+from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
+    DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -15,6 +18,7 @@ from ._core import (
     DomainModelWriteList,
     DomainModelList,
     DomainRelationWrite,
+    GraphQLCore,
     ResourcesWrite,
 )
 from ._sub_interface import SubInterface, SubInterfaceWrite
@@ -40,6 +44,64 @@ _IMPLEMENTATION1V2_PROPERTIES_BY_FIELD = {
     "sub_value": "subValue",
     "value_2": "value2",
 }
+
+
+class Implementation1v2GraphQL(GraphQLCore):
+    """This represents the reading version of implementation 1 v 2, used
+    when data is retrieved from CDF using GraphQL.
+
+    It is used when retrieving data from CDF using GraphQL.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 1 v 2.
+        data_record: The data record of the implementation 1 v 2 node.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        value_2: The value 2 field.
+    """
+
+    view_id = dm.ViewId("pygen-models", "Implementation1", "2")
+    value_2: Optional[str] = Field(None, alias="value2")
+
+    @model_validator(mode="before")
+    def parse_data_record(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            return values
+        if "lastUpdatedTime" in values or "createdTime" in values:
+            values["dataRecord"] = DataRecordGraphQL(
+                created_time=values.pop("createdTime", None),
+                last_updated_time=values.pop("lastUpdatedTime", None),
+            )
+        return values
+
+    def as_read(self) -> Implementation1v2:
+        """Convert this GraphQL format of implementation 1 v 2 to the reading format."""
+        if self.data_record is None:
+            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
+        return Implementation1v2(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecord(
+                version=0,
+                last_updated_time=self.data_record.last_updated_time,
+                created_time=self.data_record.created_time,
+            ),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            value_2=self.value_2,
+        )
+
+    def as_write(self) -> Implementation1v2Write:
+        """Convert this GraphQL format of implementation 1 v 2 to the writing format."""
+        return Implementation1v2Write(
+            space=self.space,
+            external_id=self.external_id,
+            data_record=DataRecordWrite(existing_version=0),
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            value_2=self.value_2,
+        )
 
 
 class Implementation1v2(SubInterface):

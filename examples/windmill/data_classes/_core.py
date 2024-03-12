@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from collections import UserList
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
@@ -74,6 +74,66 @@ class Core(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
     def _repr_html_(self) -> str:
         """Returns HTML representation of DomainModel."""
         return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
+
+
+class DataRecordGraphQL(Core):
+    last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
+    created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
+
+
+class GraphQLCore(Core, ABC):
+    view_id: ClassVar[dm.ViewId]
+    space: Optional[str] = None
+    external_id: Optional[str] = Field(None, alias="externalId")
+    data_record: Optional[DataRecordGraphQL] = Field(None, alias="dataRecord")
+
+
+class GraphQLList(UserList):
+    def __init__(self, nodes: Collection[GraphQLCore] = None):
+        super().__init__(nodes or [])
+
+    # The dunder implementations are to get proper type hints
+    def __iter__(self) -> Iterator[GraphQLCore]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> GraphQLCore: ...
+
+    @overload
+    def __getitem__(self, item: slice) -> GraphQLCore: ...
+
+    def __getitem__(self, item: int | slice) -> GraphQLCore | GraphQLList:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
+
+    def dump(self) -> list[dict[str, Any]]:
+        return [node.model_dump() for node in self.data]
+
+    def to_pandas(self) -> pd.DataFrame:
+        """
+        Convert the list of nodes to a pandas.DataFrame.
+
+        Returns:
+            A pandas.DataFrame with the nodes as rows.
+        """
+        df = pd.DataFrame(self.dump())
+        if df.empty:
+            df = pd.DataFrame(columns=GraphQLCore.model_fields)
+        # Reorder columns to have the most relevant first
+        id_columns = ["space", "external_id"]
+        end_columns = ["data_record"]
+        fixed_columns = set(id_columns + end_columns)
+        columns = (
+            id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
+        )
+        return df[columns]
+
+    def _repr_html_(self) -> str:
+        return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
 class DomainModelCore(Core):
