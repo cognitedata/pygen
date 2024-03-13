@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.13] - 13-03-24
+### Changed
+* Ignore extra arguments for Write classes instead of raising `ValidationError`. This is to allow for
+  future changes in the data model.
+
 ## [0.99.12] - 12-03-24
 ### Added
 * Support for `GraphQL` queries in the generated SDK. This is available through the `query` method in the generated
