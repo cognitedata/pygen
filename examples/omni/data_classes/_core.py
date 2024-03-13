@@ -259,7 +259,7 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
     _INSTANCE = DataRecordWrite
 
 
-class DomainModelWrite(DomainModelCore, extra=Extra.allow, populate_by_name=True):
+class DomainModelWrite(DomainModelCore, extra=Extra.ignore, populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
