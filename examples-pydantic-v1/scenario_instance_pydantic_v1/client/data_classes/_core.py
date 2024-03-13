@@ -256,7 +256,7 @@ class DomainModelWrite(DomainModelCore):
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
     class Config:
-        extra = Extra.forbid
+        extra = Extra.ignore
         allow_population_by_field_name = True
 
     def to_instances_write(
