@@ -60,6 +60,7 @@ class SubInterfaceGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     @root_validator(pre=True)

@@ -62,6 +62,8 @@ class Implementation1v2GraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "Implementation1", "2")
+    main_value: Optional[str] = Field(None, alias="mainValue")
+    sub_value: Optional[str] = Field(None, alias="subValue")
     value_2: Optional[str] = Field(None, alias="value2")
 
     @model_validator(mode="before")
