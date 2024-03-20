@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.14] - 20-03-24
+### Fixed
+* The new `GraphQL` classes introduced in `0.99.12` fails for views which implements another view. This is now fixed.
+
 ## [0.99.13] - 13-03-24
 ### Changed
 * Ignore extra arguments for Write classes instead of raising `ValidationError`. This is to allow for

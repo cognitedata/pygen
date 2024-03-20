@@ -60,6 +60,8 @@ class Implementation2GraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "Implementation2", "1")
+    main_value: Optional[str] = Field(None, alias="mainValue")
+    sub_value: Optional[str] = Field(None, alias="subValue")
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:

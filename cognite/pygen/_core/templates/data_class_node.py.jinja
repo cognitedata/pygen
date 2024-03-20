@@ -52,7 +52,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
+    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
     @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})

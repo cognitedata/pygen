@@ -58,6 +58,8 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    main_value: Optional[str] = Field(None, alias="mainValue")
+    sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
 
     @model_validator(mode="before")
