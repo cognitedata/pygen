@@ -144,7 +144,6 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         from .connection_item_b_query import ConnectionItemBQueryAPI
 
         from_ = self._builder[-1].name
-
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "unidirectional"),
             external_id_prefix=external_id_prefix_edge,

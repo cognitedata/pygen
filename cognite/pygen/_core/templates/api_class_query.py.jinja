@@ -92,10 +92,18 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select(),{% endif %}
                 max_retrieve_limit=limit,
             )
+        )
+
+        view_id = self._view_by_read_class[{{ edge_api.end_class.read_name }}]
+        has_data = dm.filters.HasData(views=[view_id])
+        node_filer = {{ edge_api.end_class.filter_name }}(
+            view_id,{% for parm in edge_api.end_filter_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         ){% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
-        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_read_class, None, limit)
+        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_read_class, node_filer, limit)
     {% endfor %}
     def query(
         self,{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
