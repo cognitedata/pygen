@@ -15,7 +15,9 @@ Changes are grouped as follows
 
 ## [0.99.15] - 23-03-24
 ### Added
-* In the python query method, you can now filter on the end node of an edge relation.
+* In the python query method, you can now filter on the end node of an edge connection. For example,
+  `windmill_client.windmill(limit=2).blade(is_damaged=True).query()`. The `is_damaged=True` is a filter on the
+  end node of the edge connection `blade`.
 
 ### Fixed
 * In the Python Query method, if you included direct relations, e.g.,
