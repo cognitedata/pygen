@@ -28,6 +28,26 @@ def test_query_with_direct_relation(omni_client: OmniClient) -> None:
     assert len(incorrect_self) == 0, f"Self direct relation should be set, got {incorrect_self}"
 
 
+def test_query_limit_with_direct_relations(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a(limit=2).query(retrieve_self_direct=True, retrieve_other_direct=True)
+
+    assert len(items) == 2
+
+
+def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
+    items = (
+        omni_client.connection_item_c(limit=-1).connection_item_a(external_id_prefix="ConnectionItemA:Joseph").query()
+    )
+
+    assert len(items) > 0
+    has_retrieved_a = False
+    for item in items:
+        for a_item in item.connection_item_a or []:
+            assert a_item.external_id.startswith("ConnectionItemA:Joseph")
+            has_retrieved_a = True
+    assert has_retrieved_a, "No ConnectionItemA items were retrieved"
+
+
 def test_query_circular(omni_client: OmniClient) -> None:
     b_items = omni_client.connection_item_b(limit=5).inwards(limit=-1).outwards(limit=-1).query()
 

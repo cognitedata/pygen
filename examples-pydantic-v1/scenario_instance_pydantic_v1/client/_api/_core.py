@@ -482,6 +482,7 @@ class QueryStep:
     max_retrieve_limit: int
     select: dm.query.Select
     result_cls: type[DomainModelCore] | None = None
+    is_single_direct_relation: bool = False
 
     # Query Variables
     cursor: str | None = None
@@ -498,6 +499,17 @@ class QueryStep:
     @property
     def is_unlimited(self) -> bool:
         return self.max_retrieve_limit in {None, -1, math.inf}
+
+    @property
+    def is_finished(self) -> bool:
+        return (
+            (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
+            or self.cursor is None
+            or self.last_batch_count == 0
+            # Single direct relations are dependent on the parent node,
+            # so we assume that the parent node is the limiting factor.
+            or self.is_single_direct_relation
+        )
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
@@ -569,12 +581,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     @property
     def is_finished(self):
-        return all(
-            (not expression.is_unlimited and expression.total_retrieved >= expression.max_retrieve_limit)
-            or expression.cursor is None
-            or expression.last_batch_count == 0
-            for expression in self
-        )
+        return all(expression.is_finished for expression in self)
 
     def unpack(self) -> T_DomainModelList:
         nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)

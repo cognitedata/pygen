@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -12,6 +12,9 @@ from cognite.pygen.utils.text import create_name
 from .data_classes import DataClass, EdgeDataClass
 from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges, EdgeOneToManyNodes, EdgeTypedOneToOne
 from .filter_method import FilterMethod, FilterParameter
+
+if TYPE_CHECKING:
+    from cognite.pygen._core.generators import APIGenerator
 
 
 @dataclass(frozen=True)
@@ -69,13 +72,19 @@ class EdgeAPIClass(APIClass):
     filter_method: FilterMethod
     doc_name: str
     query: QueryAPIClass
+    end_view_id: dm.ViewId
+    end_filter_method: FilterMethod
 
     @property
     def has_edge_class(self) -> bool:
         return self.edge_class is not None
 
     def filter_parameters(
-        self, include_nodes: bool = True, case: Literal["signature", "docs", "filter_call"] = "signature"
+        self,
+        include_nodes: bool = True,
+        include_end_node: bool = False,
+        suffix_edge: bool = False,
+        case: Literal["signature", "docs", "filter_call"] = "signature",
     ) -> Iterator[FilterParameter]:
         if include_nodes:
             nodes = {
@@ -111,7 +120,13 @@ class EdgeAPIClass(APIClass):
                 yield from [nodes["to"], nodes["to_space"], nodes["from"], nodes["from_space"]]
             else:
                 yield from nodes.values()
-        yield from self.filter_method.parameters
+
+        if include_end_node:
+            yield from self.end_filter_method.parameters
+        if suffix_edge:
+            yield from [param.copy(name=f"{param.name}_edge") for param in self.filter_method.parameters]
+        else:
+            yield from self.filter_method.parameters
 
     @classmethod
     def from_fields(
@@ -120,6 +135,7 @@ class EdgeAPIClass(APIClass):
         data_class: DataClass,
         base_name: str,
         query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
+        api_generator_by_view_id: dict[dm.ViewId, APIGenerator],
         pygen_config: pygen_config.PygenConfig,
     ) -> EdgeAPIClass:
         api_class = pygen_config.naming.api_class
@@ -161,6 +177,8 @@ class EdgeAPIClass(APIClass):
             doc_name=create_name(field.name, api_class.doc_name),
             query=query_class_by_view_id[end_class.view_id],
             direction=field.edge_direction,
+            end_view_id=end_class.view_id,
+            end_filter_method=api_generator_by_view_id[end_class.view_id].list_method,
         )
 
 

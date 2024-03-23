@@ -195,7 +195,7 @@ class MultiAPIGenerator:
 
         # All data classes have been updated, before we can create edge APIs.
         for api in self.unique_apis:
-            api.create_edge_apis(query_class_by_view_id)
+            api.create_edge_apis(query_class_by_view_id, self.api_by_view_id)
 
         validate_api_classes_unique_names([api.api_class for api in self.unique_apis])
         validate_data_classes_unique_name([api.data_class for api in self.unique_apis])
@@ -406,13 +406,18 @@ class APIGenerator:
             ]
         return self._timeseries_apis
 
-    def create_edge_apis(self, query_api_by_view_id: dict[dm.ViewId, QueryAPIClass]) -> None:
+    def create_edge_apis(
+        self,
+        query_api_by_view_id: dict[dm.ViewId, QueryAPIClass],
+        api_generator_by_view_id: dict[dm.ViewId, APIGenerator],
+    ) -> None:
         self._edge_apis = [
             EdgeAPIClass.from_fields(
                 field,  # type: ignore[arg-type]
                 self.data_class,
                 self.base_name,
                 query_api_by_view_id,
+                api_generator_by_view_id,
                 self._config,
             )
             for field in itertools.chain(

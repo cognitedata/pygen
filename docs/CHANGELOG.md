@@ -13,6 +13,17 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.15] - 23-03-24
+### Added
+* In the python query method, you can now filter on the end node of an edge connection. For example,
+  `windmill_client.windmill(limit=2).blade(is_damaged=True).query()`. The `is_damaged=True` is a filter on the
+  end node of the edge connection `blade`.
+
+### Fixed
+* In the Python Query method, if you included direct relations, e.g.,
+  `windmill_client.windmill(limit=2).query(retrieve_rotor=True)`, the `limit` was not respected and instead returned all nodes.
+  This is now fixed.
+
 ## [0.99.14] - 20-03-24
 ### Fixed
 * The new `GraphQL` classes introduced in `0.99.12` fails for views which implements another view. This is now fixed.
