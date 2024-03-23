@@ -16,8 +16,8 @@ from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_Dom
 from {{ top_level_package }}.data_classes.{{ class_.file_name }} import (
     {{ class_.filter_name }},
 ){% endfor %}{% if edge_apis %}
-if TYPE_CHECKING:{% for edge_api in edge_apis %}
-    from .{{ edge_api.query.file_name}} import {{ edge_api.query.name }}{% endfor %}
+if TYPE_CHECKING:{% for edge_api in edge_apis %}{% if edge_api.end_view_id != api_class.view_id %}
+    from .{{ edge_api.query.file_name}} import {{ edge_api.query.name }}{% endif %}{% endfor %}
 {% endif %}
 
 

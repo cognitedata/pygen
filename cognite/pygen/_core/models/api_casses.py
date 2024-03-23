@@ -69,6 +69,7 @@ class EdgeAPIClass(APIClass):
     filter_method: FilterMethod
     doc_name: str
     query: QueryAPIClass
+    end_view_id: dm.ViewId
 
     @property
     def has_edge_class(self) -> bool:
@@ -161,6 +162,7 @@ class EdgeAPIClass(APIClass):
             doc_name=create_name(field.name, api_class.doc_name),
             query=query_class_by_view_id[end_class.view_id],
             direction=field.edge_direction,
+            end_view_id=end_class.view_id,
         )
 
 
