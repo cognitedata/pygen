@@ -139,8 +139,8 @@ class ScenarioInstanceClient:
 
             Delete item by id:
 
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
+                >>> from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
+                >>> client = ScenarioInstanceClient()
                 >>> client.delete("my_node_external_id")
         """
         if isinstance(external_id, str):

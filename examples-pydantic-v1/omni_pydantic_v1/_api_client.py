@@ -193,7 +193,7 @@ class OmniClient:
 
             Delete item by id:
 
-                >>> from omni import OmniClient
+                >>> from omni_pydantic_v1 import OmniClient
                 >>> client = OmniClient()
                 >>> client.delete("my_node_external_id")
         """
