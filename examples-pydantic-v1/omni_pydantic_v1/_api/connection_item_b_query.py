@@ -13,7 +13,6 @@ from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_Dom
 
 if TYPE_CHECKING:
     from .connection_item_a_query import ConnectionItemAQueryAPI
-    from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
