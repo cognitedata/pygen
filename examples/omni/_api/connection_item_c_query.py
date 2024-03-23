@@ -56,9 +56,9 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        filter: dm.Filter | None = None,
         external_id_prefix_edge: str | None = None,
         space_edge: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemAQueryAPI[T_DomainModelList]:
         """Query along the connection item a edges of the connection item c.
@@ -66,13 +66,13 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         Args:
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            other_direct: The other_direct to filter on.
-            self_direct: The self_direct to filter on.
+            other_direct: The other direct to filter on.
+            self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            filter: The filter to apply.
             external_id_prefix_edge: The prefix of the external ID to filter on.
             space_edge: The space to filter on.
+            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of connection item a edges to return. Defaults to 3. Set to -1, float("inf") or None
                 to return all items.
 
@@ -120,9 +120,9 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        filter: dm.Filter | None = None,
         external_id_prefix_edge: str | None = None,
         space_edge: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemBQueryAPI[T_DomainModelList]:
         """Query along the connection item b edges of the connection item c.
@@ -132,9 +132,9 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             external_id_prefix_edge: The prefix of the external ID to filter on.
             space_edge: The space to filter on.
+            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of connection item b edges to return. Defaults to 3. Set to -1, float("inf") or None
                 to return all items.
 
