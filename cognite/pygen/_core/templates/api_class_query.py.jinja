@@ -10,7 +10,11 @@ from {{ top_level_package }}.data_classes import (
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
     {{ class_.read_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
     {{ field.data_class.read_name }},{% endfor %}
-)
+){% for edge_api in edge_apis %}
+from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
+    {{ edge_api.end_class.read_name }},
+    {{ edge_api.end_class.filter_name }},
+){% endfor %}
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not query_api.is_only_one_to_many_edges  %}, _create_edge_filter{% endif %}
 {% for class_ in unique_edge_data_classes %}
 from {{ top_level_package }}.data_classes.{{ class_.file_name }} import (
