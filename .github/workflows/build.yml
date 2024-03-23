@@ -85,10 +85,6 @@ jobs:
       - name: Test CLI
         run: pygen --help
 
-      - uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-
       - name: Build package
         run: poetry build
 
@@ -113,3 +109,35 @@ jobs:
 
       - name: Test CLI
         run: pygen --help
+
+
+  coverage:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip poetry
+          poetry config virtualenvs.create false
+          poetry install -E all
+
+      - name: Test
+        env:
+          CDF_CLUSTER: ${{ vars.CDF_CLUSTER }}
+          CDF_PROJECT: ${{ vars.CDF_PROJECT }}
+          IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
+          IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
+          IDP_TENANT_ID: ${{ secrets.IDP_TENANT_ID }}
+        run: pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/
+
+      - name: Push coverage report to PR
+        uses: orgoro/coverage@v3.1
+        with:
+            coverageFile: coverage.xml
+            token: ${{ secrets.GITHUB_TOKEN }}
+            thresholdAll: 0.6
