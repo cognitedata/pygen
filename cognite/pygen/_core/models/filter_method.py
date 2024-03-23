@@ -29,6 +29,15 @@ class FilterParameter:
         if is_reserved_word(self.name, "parameter"):
             self.name = f"{self.name}_"
 
+    def copy(self, name: str) -> FilterParameter:
+        return FilterParameter(
+            name=name,
+            type_=self.type_,
+            description=self.description,
+            default=self.default,
+            is_nullable=self.is_nullable,
+        )
+
     @property
     def annotation(self) -> str:
         if self.is_nullable:
