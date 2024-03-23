@@ -250,8 +250,8 @@ class OmniMultiClient:
 
             Delete item by id:
 
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
+                >>> from omni_multi import OmniMultiClient
+                >>> client = OmniMultiClient()
                 >>> client.delete("my_node_external_id")
         """
         if isinstance(external_id, str):

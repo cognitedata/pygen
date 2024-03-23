@@ -146,8 +146,8 @@ class EquipmentUnitClient:
 
             Delete item by id:
 
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
+                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
                 >>> client.delete("my_node_external_id")
         """
         if isinstance(external_id, str):

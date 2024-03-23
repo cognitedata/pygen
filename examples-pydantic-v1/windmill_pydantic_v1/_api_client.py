@@ -169,8 +169,8 @@ class WindmillClient:
 
             Delete item by id:
 
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> client = WindmillClient()
                 >>> client.delete("my_node_external_id")
         """
         if isinstance(external_id, str):
