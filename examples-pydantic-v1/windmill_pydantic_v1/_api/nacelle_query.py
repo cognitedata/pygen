@@ -89,6 +89,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=Gearbox,
+                is_single_direct_relation=True,
             ),
         )
 
@@ -106,6 +107,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=Generator,
+                is_single_direct_relation=True,
             ),
         )
 
@@ -123,6 +125,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=HighSpeedShaft,
+                is_single_direct_relation=True,
             ),
         )
 
@@ -140,6 +143,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=MainShaft,
+                is_single_direct_relation=True,
             ),
         )
 
@@ -157,5 +161,6 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=PowerInverter,
+                is_single_direct_relation=True,
             ),
         )

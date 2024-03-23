@@ -125,6 +125,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=ConnectionItemC,
+                is_single_direct_relation=True,
             ),
         )
 
@@ -142,5 +143,6 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=ConnectionItemA,
+                is_single_direct_relation=True,
             ),
         )
