@@ -9,6 +9,9 @@ from omni.data_classes import (
     DomainModelCore,
     ConnectionItemC,
 )
+from omni.data_classes._connection_item_a import (
+    _create_connection_item_a_filter,
+)
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 if TYPE_CHECKING:
@@ -42,16 +45,30 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
 
     def connection_item_a(
         self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        other_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        external_id_prefix_edge: str | None = None,
+        space_edge: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemAQueryAPI[T_DomainModelList]:
         """Query along the connection item a edges of the connection item c.
 
         Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            other_direct: The other_direct to filter on.
+            self_direct: The self_direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item a edges to return. Defaults to 25. Set to -1, float("inf") or None
+            filter: The filter to apply.
+            external_id_prefix_edge: The prefix of the external ID to filter on.
+            space_edge: The space to filter on.
+            limit: Maximum number of connection item a edges to return. Defaults to 3. Set to -1, float("inf") or None
                 to return all items.
 
         Returns:
@@ -60,11 +77,10 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         from .connection_item_a_query import ConnectionItemAQueryAPI
 
         from_ = self._builder[-1].name
-
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "unidirectional"),
-            external_id_prefix=external_id_prefix,
-            space=space,
+            external_id_prefix=external_id_prefix_edge,
+            space=space_edge,
         )
         self._builder.append(
             QueryStep(
@@ -78,7 +94,20 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return ConnectionItemAQueryAPI(self._client, self._builder, self._view_by_read_class, None, limit)
+
+        view_id = self._view_by_read_class[ConnectionItemC]
+        has_data = dm.filters.HasData(views=[view_id])
+        node_filer = _create_connection_item_a_filter(
+            view_id,
+            name,
+            name_prefix,
+            other_direct,
+            self_direct,
+            external_id_prefix,
+            space,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
+        )
+        return ConnectionItemAQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
 
     def connection_item_b(
         self,
