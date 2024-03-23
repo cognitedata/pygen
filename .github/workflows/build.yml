@@ -113,6 +113,7 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - uses: actions/setup-python@v5
@@ -126,7 +127,13 @@ jobs:
           poetry install -E all
 
       - name: Test
-        run: pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/test_unit
+        env:
+          CDF_CLUSTER: ${{ vars.CDF_CLUSTER }}
+          CDF_PROJECT: ${{ vars.CDF_PROJECT }}
+          IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
+          IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
+          IDP_TENANT_ID: ${{ secrets.IDP_TENANT_ID }}
+        run: pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/
 
       - name: Push coverage report to PR
         uses: orgoro/coverage@v3.1

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import getpass
+import os
 from pathlib import Path
 
 import pytest
@@ -21,7 +22,17 @@ else:
 
 @pytest.fixture(scope="session")
 def client_config() -> dict[str, str]:
-    return toml.load(Path(__file__).parent / "config.toml")["cognite"]
+    config_file = Path(__file__).parent / "config.toml"
+    if config_file.exists():
+        return toml.load(config_file)["cognite"]
+    else:
+        return {
+            "tenant_id": os.environ["IDP_TENANT_ID"],
+            "client_id": os.environ["IDP_CLIENT_ID"],
+            "client_secret": os.environ["IDP_CLIENT_SECRET"],
+            "cdf_cluster": os.environ["CDF_CLUSTER"],
+            "project": os.environ["CDF_PROJECT"],
+        }
 
 
 def create_cognite_client_config(
