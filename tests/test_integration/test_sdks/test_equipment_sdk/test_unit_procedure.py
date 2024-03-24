@@ -5,7 +5,7 @@ from cognite.client.data_classes import TimeSeries
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from equipment_unit.client.data_classes import (
+    from equipment_unit.data_classes import (
         EquipmentModule,
         EquipmentModuleWrite,
         StartEndTime,
@@ -15,10 +15,10 @@ if IS_PYDANTIC_V2:
         UnitProcedureWrite,
     )
 
-    from examples.equipment_unit.client import EquipmentUnitClient
+    from examples.equipment_unit import EquipmentUnitClient
 else:
-    from equipment_unit_pydantic_v1.client import EquipmentUnitClient
-    from equipment_unit_pydantic_v1.client.data_classes import (
+    from equipment_unit_pydantic_v1 import EquipmentUnitClient
+    from equipment_unit_pydantic_v1.data_classes import (
         EquipmentModule,
         EquipmentModuleWrite,
         StartEndTime,

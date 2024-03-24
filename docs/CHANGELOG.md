@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.15] - 23-03-24
+## [0.99.16] - 23-03-24
+### Fixed
+* When setting `external_id` in a generated edge data class, it was ignored and used the
+  `external_id_hook_factory` instead. This is now fixed.
+
+## [0.99.15] - 23-03-23
 ### Added
 * In the python query method, you can now filter on the end node of an edge connection. For example,
   `windmill_client.windmill(limit=2).blade(is_damaged=True).query()`. The `is_damaged=True` is a filter on the
