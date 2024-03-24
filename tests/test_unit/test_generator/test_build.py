@@ -1,9 +1,16 @@
+import os
 from pathlib import Path
+
+import pytest
 
 from cognite.pygen._build import build_wheel
 from tests.constants import OMNI_SDK
 
 
+@pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS") == "true",
+    reason="The build package use a subprocess to run the command, which is not supported in GitHub Actions.",
+)
 def test_build_wheel() -> None:
     data_model = OMNI_SDK.load_data_model()
     local_dir = Path(__file__).parent / "dist"
