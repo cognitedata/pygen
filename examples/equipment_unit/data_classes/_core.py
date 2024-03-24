@@ -489,10 +489,6 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
 
-    @property
-    def data_records(self) -> DataRecordWriteList:
-        return DataRecordWriteList([node.data_record for node in self])
-
     @abstractmethod
     def _to_instances_write(
         self,
