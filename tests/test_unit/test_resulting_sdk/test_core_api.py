@@ -6,8 +6,8 @@ from cognite.client import data_modeling as dm
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from equipment_unit.client._api._core import QueryBuilder, QueryStep
-    from equipment_unit.client.data_classes import (
+    from equipment_unit._api._core import QueryBuilder, QueryStep
+    from equipment_unit.data_classes import (
         StartEndTime,
         UnitProcedure,
         UnitProcedureList,
@@ -15,8 +15,8 @@ if IS_PYDANTIC_V2:
     from windmill import data_classes as wdc
     from windmill._api._core import GraphQLQueryResponse
 else:
-    from equipment_unit_pydantic_v1.client._api._core import QueryBuilder, QueryStep
-    from equipment_unit_pydantic_v1.client.data_classes import (
+    from equipment_unit_pydantic_v1._api._core import QueryBuilder, QueryStep
+    from equipment_unit_pydantic_v1.data_classes import (
         StartEndTime,
         UnitProcedure,
         UnitProcedureList,
