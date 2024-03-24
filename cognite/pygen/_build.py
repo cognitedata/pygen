@@ -6,7 +6,7 @@ import shutil
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Optional
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -30,11 +30,11 @@ from ._generator import (
 def build_wheel(
     model_id: DataModel | Sequence[DataModel],
     client: Optional[CogniteClient] = None,
+    *,
     top_level_package: Optional[str] = None,
     client_name: Optional[str] = None,
     default_instance_space: str | None = None,
     output_dir: Path = Path("dist"),
-    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
 ) -> None:
@@ -55,8 +55,6 @@ def build_wheel(
         default_instance_space: The default instance space to use for the generated SDK. Defaults to the
             instance space of the first data model given.
         output_dir: The location to output the generated SDK wheel. Defaults to "dist".
-        pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
-            the environment to detect the installed version of pydantic.
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
     """
@@ -92,7 +90,6 @@ def build_wheel(
         default_instance_space=default_instance_space,
         output_dir=build_dir,
         overwrite=True,
-        pydantic_version=pydantic_version,
         format_code=format_code,
         config=config,
     )
