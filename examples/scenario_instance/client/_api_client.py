@@ -20,7 +20,7 @@ class ScenarioInstanceClient:
 
     Generated with:
         pygen = 0.99.16
-        cognite-sdk = 7.30.1
+        cognite-sdk = 7.31.0
         pydantic = 2.6.4
 
     Data Model:
