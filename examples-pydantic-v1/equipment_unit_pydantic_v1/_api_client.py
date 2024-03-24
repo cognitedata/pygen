@@ -146,7 +146,7 @@ class EquipmentUnitClient:
 
             Delete item by id:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> client.delete("my_node_external_id")
         """

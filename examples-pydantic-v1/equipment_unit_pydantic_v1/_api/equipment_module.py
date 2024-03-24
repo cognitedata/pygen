@@ -8,8 +8,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from equipment_unit_pydantic_v1.client.data_classes import (
+from equipment_unit_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -20,7 +20,7 @@ from equipment_unit_pydantic_v1.client.data_classes import (
     EquipmentModuleWriteList,
     EquipmentModuleTextFields,
 )
-from equipment_unit_pydantic_v1.client.data_classes._equipment_module import (
+from equipment_unit_pydantic_v1.data_classes._equipment_module import (
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
     _create_equipment_module_filter,
 )
@@ -119,8 +119,8 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
             Create a new equipment_module:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
-                >>> from equipment_unit_pydantic_v1.client.data_classes import EquipmentModuleWrite
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1.data_classes import EquipmentModuleWrite
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module = EquipmentModuleWrite(external_id="my_equipment_module", ...)
                 >>> result = client.equipment_module.apply(equipment_module)
@@ -154,7 +154,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
             Delete equipment_module by id:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> client.equipment_module.delete("my_equipment_module")
         """
@@ -193,7 +193,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
             Retrieve equipment_module by id:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module = client.equipment_module.retrieve("my_equipment_module")
 
@@ -238,7 +238,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
            Search for 'my_equipment_module' in all text properties:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_modules = client.equipment_module.search('my_equipment_module')
 
@@ -356,7 +356,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
             Count equipment modules in space `my_space`:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> result = client.equipment_module.aggregate("count", space="my_space")
 
@@ -482,7 +482,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
             List equipment modules and limit to 5:
 
-                >>> from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+                >>> from equipment_unit_pydantic_v1 import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_modules = client.equipment_module.list(limit=5)
 

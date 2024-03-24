@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DataRecord,
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
@@ -172,7 +173,7 @@ class StartEndTimeWrite(DomainRelationWrite):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
-        self.external_id = external_id = DomainRelationWrite.external_id_factory(start_node, end_node, edge_type)
+        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
         write_view = (view_by_read_class or {}).get(
             StartEndTime, dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
