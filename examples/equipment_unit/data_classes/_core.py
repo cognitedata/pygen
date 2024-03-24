@@ -466,7 +466,9 @@ T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
 def default_edge_external_id_factory(
-    start_node: DomainModelWrite | str, end_node: DomainModelWrite | str, edge_type: dm.DirectRelationReference
+    start_node: DomainModelWrite | str | dm.NodeId,
+    end_node: DomainModelWrite | str | dm.NodeId,
+    edge_type: dm.DirectRelationReference,
 ) -> str:
     start = start_node if isinstance(start_node, str) else start_node.external_id
     end = end_node if isinstance(end_node, str) else end_node.external_id
@@ -475,7 +477,14 @@ def default_edge_external_id_factory(
 
 class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[
-        Callable[[Union[DomainModelWrite, str], Union[DomainModelWrite, str], dm.DirectRelationReference], str]
+        Callable[
+            [
+                Union[DomainModelWrite, str, dm.NodeId],
+                Union[DomainModelWrite, str, dm.NodeId],
+                dm.DirectRelationReference,
+            ],
+            str,
+        ]
     ] = default_edge_external_id_factory
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
