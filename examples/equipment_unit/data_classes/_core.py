@@ -582,6 +582,10 @@ class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
 
         return resources
 
+    @classmethod
+    def reset_external_id_factory(cls) -> None:
+        cls.external_id_factory = default_edge_external_id_factory
+
 
 T_DomainRelationWrite = TypeVar("T_DomainRelationWrite", bound=DomainRelationWrite)
 
