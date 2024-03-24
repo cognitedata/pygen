@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+* Support for generating a wheel file for the generated SDK. This is currently only
+  available in code through `cognite.pygen.build_wheel` function.
+
 ## [0.99.16] - 23-03-24
 ### Fixed
 * When setting `external_id` in a generated edge data class, it was ignored and used the

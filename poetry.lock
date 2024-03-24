@@ -271,6 +271,30 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.3)"]
 
 [[package]]
+name = "build"
+version = "1.1.1"
+description = "A simple, correct Python build frontend"
+optional = true
+python-versions = ">= 3.7"
+files = [
+    {file = "build-1.1.1-py3-none-any.whl", hash = "sha256:8ed0851ee76e6e38adce47e4bee3b51c771d86c64cf578d0c2245567ee200e73"},
+    {file = "build-1.1.1.tar.gz", hash = "sha256:8eea65bb45b1aac2e734ba2cc8dad3a6d97d97901a395bd0ed3e7b46953d2a31"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "os_name == \"nt\""}
+importlib-metadata = {version = ">=4.6", markers = "python_full_version < \"3.10.2\""}
+packaging = ">=19.0"
+pyproject_hooks = "*"
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+
+[package.extras]
+docs = ["furo (>=2023.08.17)", "sphinx (>=7.0,<8.0)", "sphinx-argparse-cli (>=1.5)", "sphinx-autodoc-typehints (>=1.10)", "sphinx-issues (>=3.0.0)"]
+test = ["filelock (>=3)", "pytest (>=6.2.4)", "pytest-cov (>=2.12)", "pytest-mock (>=2)", "pytest-rerunfailures (>=9.1)", "pytest-xdist (>=1.34)", "setuptools (>=42.0.0)", "setuptools (>=56.0.0)", "setuptools (>=56.0.0)", "setuptools (>=67.8.0)", "wheel (>=0.36.0)"]
+typing = ["importlib-metadata (>=5.1)", "mypy (>=1.5.0,<1.6.0)", "tomli", "typing-extensions (>=3.7.4.3)"]
+virtualenv = ["virtualenv (>=20.0.35)"]
+
+[[package]]
 name = "certifi"
 version = "2024.2.2"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -3173,6 +3197,20 @@ files = [
 diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
+name = "pyproject-hooks"
+version = "1.0.0"
+description = "Wrappers to call pyproject.toml-based build backend hooks."
+optional = true
+python-versions = ">=3.7"
+files = [
+    {file = "pyproject_hooks-1.0.0-py3-none-any.whl", hash = "sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8"},
+    {file = "pyproject_hooks-1.0.0.tar.gz", hash = "sha256:f271b298b97f5955d53fb12b72c1fb1948c22c1a6b70b315c54cedaca0264ef5"},
+]
+
+[package.dependencies]
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+
+[[package]]
 name = "pytest"
 version = "8.1.1"
 description = "pytest: simple powerful testing with Python"
@@ -4367,12 +4405,12 @@ docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.link
 testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
 [extras]
-all = ["black", "packaging", "toml", "typer"]
-cli = ["packaging", "toml", "typer"]
+all = ["black", "build", "packaging", "toml", "typer"]
+cli = ["build", "packaging", "toml", "typer"]
 docs = ["mkdocs", "mkdocs-git-authors-plugin", "mkdocs-git-revision-date-localized-plugin", "mkdocs-gitbook", "mkdocs-glightbox", "mkdocs-jupyter", "mkdocs-material", "mkdocs-material-extensions", "mkdocstrings", "pymdown-extensions"]
 format = ["black"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "5b2ba544534031ce52b090e3bf36304d910c37f4c9ee18328c05033863d91aff"
+content-hash = "86213916d189b26c1d401b22b52cd8552d9d0cff08ab20184de8310d4a9049f0"
