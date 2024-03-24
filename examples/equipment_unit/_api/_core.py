@@ -16,7 +16,7 @@ from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import (
+from equipment_unit.data_classes._core import (
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
@@ -33,7 +33,7 @@ from equipment_unit.client.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
-from equipment_unit.client import data_classes
+from equipment_unit import data_classes
 
 
 DEFAULT_LIMIT_READ = 25

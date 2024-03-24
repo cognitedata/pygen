@@ -22,8 +22,8 @@ class EquipmentUnitClient:
 
     Generated with:
         pygen = 0.99.15
-        cognite-sdk = 7.27.2
-        pydantic = 2.6.3
+        cognite-sdk = 7.30.1
+        pydantic = 2.6.4
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -146,7 +146,7 @@ class EquipmentUnitClient:
 
             Delete item by id:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> client.delete("my_node_external_id")
         """

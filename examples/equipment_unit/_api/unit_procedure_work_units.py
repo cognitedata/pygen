@@ -4,13 +4,13 @@ import datetime
 
 from cognite.client import data_modeling as dm
 
-from equipment_unit.client.data_classes import (
+from equipment_unit.data_classes import (
     StartEndTimeList,
 )
-from equipment_unit.client.data_classes._start_end_time import _create_start_end_time_filter
+from equipment_unit.data_classes._start_end_time import _create_start_end_time_filter
 
 from ._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
-from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
@@ -51,7 +51,7 @@ class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
 
             List 5 work unit edges connected to "my_unit_procedure":
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> unit_procedure = client.unit_procedure.work_units_edge.list("my_unit_procedure", limit=5)
 

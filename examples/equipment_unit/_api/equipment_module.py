@@ -8,21 +8,21 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from equipment_unit.client.data_classes import (
+from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes import (
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    WorkOrder,
-    WorkOrderWrite,
-    WorkOrderFields,
-    WorkOrderList,
-    WorkOrderWriteList,
-    WorkOrderTextFields,
+    EquipmentModule,
+    EquipmentModuleWrite,
+    EquipmentModuleFields,
+    EquipmentModuleList,
+    EquipmentModuleWriteList,
+    EquipmentModuleTextFields,
 )
-from equipment_unit.client.data_classes._work_order import (
-    _WORKORDER_PROPERTIES_BY_FIELD,
-    _create_work_order_filter,
+from equipment_unit.data_classes._equipment_module import (
+    _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
+    _create_equipment_module_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
@@ -33,79 +33,81 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .work_order_query import WorkOrderQueryAPI
+from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
+from .equipment_module_query import EquipmentModuleQueryAPI
 
 
-class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
+class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[WorkOrder]
+        view_id = view_by_read_class[EquipmentModule]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=WorkOrder,
-            class_list=WorkOrderList,
-            class_write_list=WorkOrderWriteList,
+            class_type=EquipmentModule,
+            class_list=EquipmentModuleList,
+            class_write_list=EquipmentModuleWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
+        self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
 
     def __call__(
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> WorkOrderQueryAPI[WorkOrderList]:
-        """Query starting at work orders.
+    ) -> EquipmentModuleQueryAPI[EquipmentModuleList]:
+        """Query starting at equipment modules.
 
         Args:
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            performed_by: The performed by to filter on.
-            performed_by_prefix: The prefix of the performed by to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for work orders.
+            A query API for equipment modules.
 
         """
         has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_work_order_filter(
+        filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
             description_prefix,
-            performed_by,
-            performed_by_prefix,
+            name,
+            name_prefix,
             type_,
             type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(WorkOrderList)
-        return WorkOrderQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        builder = QueryBuilder(EquipmentModuleList)
+        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,
-        work_order: WorkOrderWrite | Sequence[WorkOrderWrite],
+        equipment_module: EquipmentModuleWrite | Sequence[EquipmentModuleWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) work orders.
+        """Add or update (upsert) equipment modules.
 
         Args:
-            work_order: Work order or sequence of work orders to upsert.
+            equipment_module: Equipment module or sequence of equipment modules to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
@@ -115,51 +117,51 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
 
         Examples:
 
-            Create a new work_order:
+            Create a new equipment_module:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import WorkOrderWrite
+                >>> from equipment_unit import EquipmentUnitClient
+                >>> from equipment_unit.data_classes import EquipmentModuleWrite
                 >>> client = EquipmentUnitClient()
-                >>> work_order = WorkOrderWrite(external_id="my_work_order", ...)
-                >>> result = client.work_order.apply(work_order)
+                >>> equipment_module = EquipmentModuleWrite(external_id="my_equipment_module", ...)
+                >>> result = client.equipment_module.apply(equipment_module)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
             "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.work_order.apply(my_items)` please use `my_client.upsert(my_items)`."
+            "`my_client.equipment_module.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
             " class encourages users to create items in small batches, which is inefficient."
             "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
-        return self._apply(work_order, replace, write_none)
+        return self._apply(equipment_module, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
-        """Delete one or more work order.
+        """Delete one or more equipment module.
 
         Args:
-            external_id: External id of the work order to delete.
-            space: The space where all the work order are located.
+            external_id: External id of the equipment module to delete.
+            space: The space where all the equipment module are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
 
         Examples:
 
-            Delete work_order by id:
+            Delete equipment_module by id:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> client.work_order.delete("my_work_order")
+                >>> client.equipment_module.delete("my_equipment_module")
         """
         warnings.warn(
             "The .delete method is deprecated and will be removed in v1.0. "
             "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.work_order.delete(my_ids)` please use `my_client.delete(my_ids)`."
+            "`my_client.equipment_module.delete(my_ids)` please use `my_client.delete(my_ids)`."
             "The motivation is that all delete methods are the same, and having one delete method per API "
             " class encourages users to delete items in small batches, which is inefficient.",
             UserWarning,
@@ -168,30 +170,32 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> WorkOrder | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> EquipmentModule | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> WorkOrderList: ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> EquipmentModuleList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> WorkOrder | WorkOrderList | None:
-        """Retrieve one or more work orders by id(s).
+    ) -> EquipmentModule | EquipmentModuleList | None:
+        """Retrieve one or more equipment modules by id(s).
 
         Args:
-            external_id: External id or list of external ids of the work orders.
-            space: The space where all the work orders are located.
+            external_id: External id or list of external ids of the equipment modules.
+            space: The space where all the equipment modules are located.
 
         Returns:
-            The requested work orders.
+            The requested equipment modules.
 
         Examples:
 
-            Retrieve work_order by id:
+            Retrieve equipment_module by id:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> work_order = client.work_order.retrieve("my_work_order")
+                >>> equipment_module = client.equipment_module.retrieve("my_equipment_module")
 
         """
         return self._retrieve(external_id, space)
@@ -199,59 +203,59 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
     def search(
         self,
         query: str,
-        properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> WorkOrderList:
-        """Search work orders
+    ) -> EquipmentModuleList:
+        """Search equipment modules
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            performed_by: The performed by to filter on.
-            performed_by_prefix: The prefix of the performed by to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            Search results work orders matching the query.
+            Search results equipment modules matching the query.
 
         Examples:
 
-           Search for 'my_work_order' in all text properties:
+           Search for 'my_equipment_module' in all text properties:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> work_orders = client.work_order.search('my_work_order')
+                >>> equipment_modules = client.equipment_module.search('my_equipment_module')
 
         """
-        filter_ = _create_work_order_filter(
+        filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
             description_prefix,
-            performed_by,
-            performed_by_prefix,
+            name,
+            name_prefix,
             type_,
             type_prefix,
             external_id_prefix,
             space,
             filter,
         )
-        return self._search(self._view_id, query, _WORKORDER_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _EQUIPMENTMODULE_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     @overload
     def aggregate(
@@ -262,14 +266,14 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -287,14 +291,14 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
-        group_by: WorkOrderFields | Sequence[WorkOrderFields] = None,
+        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] = None,
         query: str | None = None,
-        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -311,14 +315,14 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
-        group_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
         query: str | None = None,
-        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -326,7 +330,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        """Aggregate data across work orders
+        """Aggregate data across equipment modules
 
         Args:
             aggregate: The aggregation to perform.
@@ -336,13 +340,13 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             search_property: The text field to search in.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            performed_by: The performed by to filter on.
-            performed_by_prefix: The prefix of the performed by to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
@@ -350,20 +354,20 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
 
         Examples:
 
-            Count work orders in space `my_space`:
+            Count equipment modules in space `my_space`:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> result = client.work_order.aggregate("count", space="my_space")
+                >>> result = client.equipment_module.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_work_order_filter(
+        filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
             description_prefix,
-            performed_by,
-            performed_by_prefix,
+            name,
+            name_prefix,
             type_,
             type_prefix,
             external_id_prefix,
@@ -373,7 +377,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _WORKORDER_PROPERTIES_BY_FIELD,
+            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -384,14 +388,14 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
 
     def histogram(
         self,
-        property: WorkOrderFields,
+        property: EquipmentModuleFields,
         interval: float,
         query: str | None = None,
-        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -399,7 +403,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for work orders
+        """Produces histograms for equipment modules
 
         Args:
             property: The property to use as the value in the histogram.
@@ -408,25 +412,25 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             search_property: The text field to search in.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            performed_by: The performed by to filter on.
-            performed_by_prefix: The prefix of the performed by to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_work_order_filter(
+        filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
             description_prefix,
-            performed_by,
-            performed_by_prefix,
+            name,
+            name_prefix,
             type_,
             type_prefix,
             external_id_prefix,
@@ -437,7 +441,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             self._view_id,
             property,
             interval,
-            _WORKORDER_PROPERTIES_BY_FIELD,
+            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -448,47 +452,47 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        performed_by: str | list[str] | None = None,
-        performed_by_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> WorkOrderList:
-        """List/filter work orders
+    ) -> EquipmentModuleList:
+        """List/filter equipment modules
 
         Args:
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            performed_by: The performed by to filter on.
-            performed_by_prefix: The prefix of the performed by to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of requested work orders
+            List of requested equipment modules
 
         Examples:
 
-            List work orders and limit to 5:
+            List equipment modules and limit to 5:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> work_orders = client.work_order.list(limit=5)
+                >>> equipment_modules = client.equipment_module.list(limit=5)
 
         """
-        filter_ = _create_work_order_filter(
+        filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
             description_prefix,
-            performed_by,
-            performed_by_prefix,
+            name,
+            name_prefix,
             type_,
             type_prefix,
             external_id_prefix,

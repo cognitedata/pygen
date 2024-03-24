@@ -8,21 +8,24 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
-from equipment_unit.client.data_classes import (
+from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes import (
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    EquipmentModule,
-    EquipmentModuleWrite,
-    EquipmentModuleFields,
-    EquipmentModuleList,
-    EquipmentModuleWriteList,
-    EquipmentModuleTextFields,
+    UnitProcedure,
+    UnitProcedureWrite,
+    UnitProcedureFields,
+    UnitProcedureList,
+    UnitProcedureWriteList,
+    UnitProcedureTextFields,
+    StartEndTime,
+    StartEndTimeWrite,
+    StartEndTimeList,
 )
-from equipment_unit.client.data_classes._equipment_module import (
-    _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
-    _create_equipment_module_filter,
+from equipment_unit.data_classes._unit_procedure import (
+    _UNITPROCEDURE_PROPERTIES_BY_FIELD,
+    _create_unit_procedure_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
@@ -33,28 +36,32 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
-from .equipment_module_query import EquipmentModuleQueryAPI
+from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
+from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
+from .unit_procedure_query import UnitProcedureQueryAPI
 
 
-class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
+class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[EquipmentModule]
+        view_id = view_by_read_class[UnitProcedure]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=EquipmentModule,
-            class_list=EquipmentModuleList,
-            class_write_list=EquipmentModuleWriteList,
+            class_type=UnitProcedure,
+            class_list=UnitProcedureList,
+            class_write_list=UnitProcedureWriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
-        self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
+        self.work_orders_edge = UnitProcedureWorkOrdersAPI(
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
+        )
+        self.work_units_edge = UnitProcedureWorkUnitsAPI(
+            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
+        )
 
     def __call__(
         self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -63,30 +70,26 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> EquipmentModuleQueryAPI[EquipmentModuleList]:
-        """Query starting at equipment modules.
+    ) -> UnitProcedureQueryAPI[UnitProcedureList]:
+        """Query starting at unit procedures.
 
         Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for equipment modules.
+            A query API for unit procedures.
 
         """
         has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_equipment_module_filter(
+        filter_ = _create_unit_procedure_filter(
             self._view_id,
-            description,
-            description_prefix,
             name,
             name_prefix,
             type_,
@@ -95,19 +98,23 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(EquipmentModuleList)
-        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        builder = QueryBuilder(UnitProcedureList)
+        return UnitProcedureQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,
-        equipment_module: EquipmentModuleWrite | Sequence[EquipmentModuleWrite],
+        unit_procedure: UnitProcedureWrite | Sequence[UnitProcedureWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) equipment modules.
+        """Add or update (upsert) unit procedures.
+
+        Note: This method iterates through all nodes and timeseries linked to unit_procedure and creates them including the edges
+        between the nodes. For example, if any of `work_orders` or `work_units` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
-            equipment_module: Equipment module or sequence of equipment modules to upsert.
+            unit_procedure: Unit procedure or sequence of unit procedures to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
@@ -117,51 +124,51 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
         Examples:
 
-            Create a new equipment_module:
+            Create a new unit_procedure:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
-                >>> from equipment_unit.client.data_classes import EquipmentModuleWrite
+                >>> from equipment_unit import EquipmentUnitClient
+                >>> from equipment_unit.data_classes import UnitProcedureWrite
                 >>> client = EquipmentUnitClient()
-                >>> equipment_module = EquipmentModuleWrite(external_id="my_equipment_module", ...)
-                >>> result = client.equipment_module.apply(equipment_module)
+                >>> unit_procedure = UnitProcedureWrite(external_id="my_unit_procedure", ...)
+                >>> result = client.unit_procedure.apply(unit_procedure)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
             "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.equipment_module.apply(my_items)` please use `my_client.upsert(my_items)`."
+            "`my_client.unit_procedure.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
             " class encourages users to create items in small batches, which is inefficient."
             "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
-        return self._apply(equipment_module, replace, write_none)
+        return self._apply(unit_procedure, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
-        """Delete one or more equipment module.
+        """Delete one or more unit procedure.
 
         Args:
-            external_id: External id of the equipment module to delete.
-            space: The space where all the equipment module are located.
+            external_id: External id of the unit procedure to delete.
+            space: The space where all the unit procedure are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
 
         Examples:
 
-            Delete equipment_module by id:
+            Delete unit_procedure by id:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> client.equipment_module.delete("my_equipment_module")
+                >>> client.unit_procedure.delete("my_unit_procedure")
         """
         warnings.warn(
             "The .delete method is deprecated and will be removed in v1.0. "
             "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.equipment_module.delete(my_ids)` please use `my_client.delete(my_ids)`."
+            "`my_client.unit_procedure.delete(my_ids)` please use `my_client.delete(my_ids)`."
             "The motivation is that all delete methods are the same, and having one delete method per API "
             " class encourages users to delete items in small batches, which is inefficient.",
             UserWarning,
@@ -170,42 +177,58 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> EquipmentModule | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None: ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> EquipmentModuleList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> EquipmentModule | EquipmentModuleList | None:
-        """Retrieve one or more equipment modules by id(s).
+    ) -> UnitProcedure | UnitProcedureList | None:
+        """Retrieve one or more unit procedures by id(s).
 
         Args:
-            external_id: External id or list of external ids of the equipment modules.
-            space: The space where all the equipment modules are located.
+            external_id: External id or list of external ids of the unit procedures.
+            space: The space where all the unit procedures are located.
 
         Returns:
-            The requested equipment modules.
+            The requested unit procedures.
 
         Examples:
 
-            Retrieve equipment_module by id:
+            Retrieve unit_procedure by id:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> equipment_module = client.equipment_module.retrieve("my_equipment_module")
+                >>> unit_procedure = client.unit_procedure.retrieve("my_unit_procedure")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.work_orders_edge,
+                    "work_orders",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                    "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
+                ),
+                (
+                    self.work_units_edge,
+                    "work_units",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                    "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
+                ),
+            ],
+        )
 
     def search(
         self,
         query: str,
-        properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
+        properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -214,39 +237,35 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> EquipmentModuleList:
-        """Search equipment modules
+    ) -> UnitProcedureList:
+        """Search unit procedures
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            Search results equipment modules matching the query.
+            Search results unit procedures matching the query.
 
         Examples:
 
-           Search for 'my_equipment_module' in all text properties:
+           Search for 'my_unit_procedure' in all text properties:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> equipment_modules = client.equipment_module.search('my_equipment_module')
+                >>> unit_procedures = client.unit_procedure.search('my_unit_procedure')
 
         """
-        filter_ = _create_equipment_module_filter(
+        filter_ = _create_unit_procedure_filter(
             self._view_id,
-            description,
-            description_prefix,
             name,
             name_prefix,
             type_,
@@ -255,7 +274,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             space,
             filter,
         )
-        return self._search(self._view_id, query, _EQUIPMENTMODULE_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _UNITPROCEDURE_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     @overload
     def aggregate(
@@ -266,12 +285,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
+        search_properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -291,12 +308,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
-        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] = None,
+        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
+        group_by: UnitProcedureFields | Sequence[UnitProcedureFields] = None,
         query: str | None = None,
-        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
+        search_properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -315,12 +330,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
-        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
+        group_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
+        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -330,7 +343,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        """Aggregate data across equipment modules
+        """Aggregate data across unit procedures
 
         Args:
             aggregate: The aggregation to perform.
@@ -338,15 +351,13 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
@@ -354,18 +365,16 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
         Examples:
 
-            Count equipment modules in space `my_space`:
+            Count unit procedures in space `my_space`:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> result = client.equipment_module.aggregate("count", space="my_space")
+                >>> result = client.unit_procedure.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_equipment_module_filter(
+        filter_ = _create_unit_procedure_filter(
             self._view_id,
-            description,
-            description_prefix,
             name,
             name_prefix,
             type_,
@@ -377,7 +386,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         return self._aggregate(
             self._view_id,
             aggregate,
-            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
+            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -388,12 +397,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
     def histogram(
         self,
-        property: EquipmentModuleFields,
+        property: UnitProcedureFields,
         interval: float,
         query: str | None = None,
-        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
+        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -403,32 +410,28 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for equipment modules
+        """Produces histograms for unit procedures
 
         Args:
             property: The property to use as the value in the histogram.
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_equipment_module_filter(
+        filter_ = _create_unit_procedure_filter(
             self._view_id,
-            description,
-            description_prefix,
             name,
             name_prefix,
             type_,
@@ -441,7 +444,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             self._view_id,
             property,
             interval,
-            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
+            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -450,8 +453,6 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
     def list(
         self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -460,37 +461,35 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> EquipmentModuleList:
-        """List/filter equipment modules
+        retrieve_edges: bool = True,
+    ) -> UnitProcedureList:
+        """List/filter unit procedures
 
         Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `work_orders` or `work_units` external ids for the unit procedures. Defaults to True.
 
         Returns:
-            List of requested equipment modules
+            List of requested unit procedures
 
         Examples:
 
-            List equipment modules and limit to 5:
+            List unit procedures and limit to 5:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
-                >>> equipment_modules = client.equipment_module.list(limit=5)
+                >>> unit_procedures = client.unit_procedure.list(limit=5)
 
         """
-        filter_ = _create_equipment_module_filter(
+        filter_ = _create_unit_procedure_filter(
             self._view_id,
-            description,
-            description_prefix,
             name,
             name_prefix,
             type_,
@@ -499,4 +498,25 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             space,
             filter,
         )
-        return self._list(limit=limit, filter=filter_)
+
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.work_orders_edge,
+                    "work_orders",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                    "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
+                ),
+                (
+                    self.work_units_edge,
+                    "work_units",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                    "outwards",
+                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
+                ),
+            ],
+        )

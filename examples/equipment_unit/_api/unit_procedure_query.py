@@ -5,22 +5,22 @@ from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from equipment_unit.client.data_classes import (
+from equipment_unit.data_classes import (
     DomainModelCore,
     UnitProcedure,
     StartEndTime,
 )
-from equipment_unit.client.data_classes._work_order import (
+from equipment_unit.data_classes._work_order import (
     WorkOrder,
     _create_work_order_filter,
 )
-from equipment_unit.client.data_classes._equipment_module import (
+from equipment_unit.data_classes._equipment_module import (
     EquipmentModule,
     _create_equipment_module_filter,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
-from equipment_unit.client.data_classes._start_end_time import (
+from equipment_unit.data_classes._start_end_time import (
     _create_start_end_time_filter,
 )
 

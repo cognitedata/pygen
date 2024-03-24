@@ -9,7 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from equipment_unit.client.data_classes._equipment_module import _create_equipment_module_filter
+from equipment_unit.data_classes._equipment_module import _create_equipment_module_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["description", "name", "sensor_value", "type"]
@@ -67,7 +67,7 @@ class EquipmentModuleSensorValueQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_sensor_value' from 2 weeks ago up until now::
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module_datapoints = client.equipment_module.sensor_value(external_id="my_sensor_value").retrieve(start="2w-ago")
         """
@@ -126,7 +126,7 @@ class EquipmentModuleSensorValueQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_sensor_value' from 2 weeks ago up until now::
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module_datapoints = client.equipment_module.sensor_value(external_id="my_sensor_value").retrieve_array(start="2w-ago")
         """
@@ -194,7 +194,7 @@ class EquipmentModuleSensorValueQuery:
             In this example,
             we are using the time-ago format to get raw data for the 'my_sensor_value' from 2 weeks ago up until now::
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module_datapoints = client.equipment_module.sensor_value(external_id="my_sensor_value").retrieve_dataframe(start="2w-ago")
         """
@@ -271,7 +271,7 @@ class EquipmentModuleSensorValueQuery:
             In this example,
             get weekly aggregates for the 'my_sensor_value' for the first month of 2023 in Oslo time:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> from datetime import datetime, timezone
                 >>> client = EquipmentUnitClient()
                 >>> equipment_module_datapoints = client.equipment_module.sensor_value(
@@ -392,7 +392,7 @@ class EquipmentModuleSensorValueAPI:
 
             Retrieve all data for 5 equipment_module.sensor_value timeseries:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_modules = client.equipment_module.sensor_value(limit=5).retrieve()
 
@@ -451,7 +451,7 @@ class EquipmentModuleSensorValueAPI:
 
             List equipment_module.sensor_value and limit to 5:
 
-                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit import EquipmentUnitClient
                 >>> client = EquipmentUnitClient()
                 >>> equipment_modules = client.equipment_module.sensor_value.list(limit=5)
 

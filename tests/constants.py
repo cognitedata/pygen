@@ -239,7 +239,7 @@ APM_APP_DATA_SINK = ExampleSDK(
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
-    _top_level_package="equipment_unit.client",
+    _top_level_package="equipment_unit",
     client_name="EquipmentUnitClient",
     generate_sdk=True,
 )

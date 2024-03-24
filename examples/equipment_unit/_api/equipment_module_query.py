@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from equipment_unit.client.data_classes import (
+from equipment_unit.data_classes import (
     DomainModelCore,
-    WorkOrder,
+    EquipmentModule,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
-class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
+class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -25,13 +25,13 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("work_order"),
+                name=self._builder.next_name("equipment_module"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[WorkOrder], ["*"])]),
-                result_cls=WorkOrder,
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[EquipmentModule], ["*"])]),
+                result_cls=EquipmentModule,
                 max_retrieve_limit=limit,
             )
         )
