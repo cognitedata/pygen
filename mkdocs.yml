@@ -3,12 +3,15 @@ docs_dir: docs
 use_directory_urls: false
 theme:
     name: material
+    logo: logo/logo.svg
+    favicon: logo/logo.svg
     features:
       - content.code.copy
       - content.tooltips
 
 nav:
     - Home: index.md
+    - What is Pygen?: what_is_pygen.md
     - Quickstart:
         - Where to Start: quickstart/where_to_start.md
         - Exploration CDF Notebook: quickstart/cdf_notebook.ipynb
