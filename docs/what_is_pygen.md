@@ -1,7 +1,7 @@
 ## What is `Pygen`?
 
-You have created your data model and want to start writing Python code to interact with it. Then, you have multiple
-options
+You have created your data model and have it ready in Cognite Data Fusion (CDF). Now you want to start writing Python
+code to interact with it. Then, you have multiple options
 
 1. You can use `GraphQL`, and call the endpoint `https://{cluster}.cognitedata.com/api/v1/projects/{project}/userapis/spaces/{space}/datamodels/{externalId}/versions/{version}/graphql`.
    * This gives you a flexible way to query your data model, but
@@ -22,7 +22,7 @@ data model. This way, you can interact with your data model using Python objects
 3. Client-side validation of data when creating or updating objects.
 4. Enable you to work in the language of your data model.
 
-## What does actually `Pygen` do?
+## What does `Pygen` actually do?
 
 The input to `Pygen` are the views of the data model (views are represented as types in GraphQL), the output for each
 view is data classes and an API class tailored to the view. This is illustrated in the following diagram
@@ -82,7 +82,7 @@ For example, the `WindTurbine` API class will have the following methods:
 
  * `.retrieve(...)` - Retrieves one or more wind turbines from CDF. The method takes a list of external ids
     and returns a `WindTurbineList` object.
- _* `.list(...)` - This method returns all wind turbines from CDF matching the filter criteria passed in
+ * `.list(...)` - This method returns all wind turbines from CDF matching the filter criteria passed in
    through the method arguments.
  * `.search(...)` - This method searches for wind turbines in CDF matching the search criteria passed in
    through the method arguments.
@@ -91,7 +91,7 @@ For example, the `WindTurbine` API class will have the following methods:
  * `.histogram(...)` - This is a special aggregation method that returns a histogram of the wind turbines in CDF
    matching the aggregation criteria passed in through the method arguments.
  * `(...)` - Doing a call directly on the API class will enable you to write a Python query for retrieving wind turbines
-   with nested objects from CDF._
+   with nested objects from CDF.
 
 For each of these methods, `pygen` generates filter parameters that correspond to the field types in the view. For example,
 a field of type `string` will have `Equals`, `In`, and `Prefix` filter parameters in `list()`, `search()`,
@@ -125,10 +125,12 @@ three methods which are shared.
 
 * `.upsert(...)` This method can take any of the write data classes generated for the views as input,
   or a list of write data classes. This has multiple benefits over using the `DMS` endpoint directly:
-  * It supports nested objects. These will be unpacked into nodes and edges before being sent to CDF.
-  * It automatically creates edges based on the relationships between the objects.
-  * It will automatically create `TimeSeries` objects for timeseries fields.
+     - It supports nested objects. These will be unpacked into nodes and edges before being sent to CDF.
+     - It automatically creates edges based on the relationships between the objects.
+     - It will automatically create `TimeSeries` objects for timeseries fields.
+
 * `.delete(...)` This method can is a thin wrapper around the `DMS` endpoint for deleting objects.
+
 * `.graphql_query(...)` This method takes a `GraphQL` query as input and returns the response from CDF.
   In difference from using the regular `GraphQL` endpoint, this method will automatically parse the response
   to the corresponding data classes for the views in the query.
