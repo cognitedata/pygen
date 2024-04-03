@@ -4,15 +4,15 @@ You have created your data model and have it ready in Cognite Data Fusion (CDF).
 code to interact with it. Then, you have multiple options
 
 1. You can use `GraphQL`, and call the endpoint `https://{cluster}.cognitedata.com/api/v1/projects/{project}/userapis/spaces/{space}/datamodels/{externalId}/versions/{version}/graphql`.
-   * This gives you a flexible way to query your data model, but
-     - writing the queries can be cumbersome.
-     - the response is a dictionary that you need to parse.
-     - you need to know the data model structure.
+   This gives you a flexible way to query your data model, but
+    - writing the queries can be cumbersome.
+    - the response is a dictionary that you need to parse.
+    - you need to know the data model structure.
 2. You can use the Data Modeling Storage, `DMS` endpoint `https://{cluster}.cognitedata.com/api/v1/projects/{project}/models/instances/`.
-   * This lacks the context of your data model
-     - you are using a set of generic endpoints designed to work with any data model.
-     - the response is a dictionary that you need to parse.
-     - you need to know the data model structure.
+   This lacks the context of your data model
+    - you are using a set of generic endpoints designed to work with any data model.
+    - the response is a dictionary that you need to parse.
+    - you need to know the data model structure.
 
 `Pygen` is offering a third option. It generates Python code that wraps the `DMS` endpoint with your
 data model. This way, you can interact with your data model using Python objects, which gives you the following benefits:
@@ -118,13 +118,14 @@ property:
    datapoints for the timeseries.
 
 
-## API CLient
+## API Client
 
 `Pygen` generates a shared API client that contains all the API classes for each view. In addition, it has
 three methods which are shared.
 
 * `.upsert(...)` This method can take any of the write data classes generated for the views as input,
   or a list of write data classes. This has multiple benefits over using the `DMS` endpoint directly:
+
      - It supports nested objects. These will be unpacked into nodes and edges before being sent to CDF.
      - It automatically creates edges based on the relationships between the objects.
      - It will automatically create `TimeSeries` objects for timeseries fields.
