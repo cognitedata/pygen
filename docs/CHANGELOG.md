@@ -13,10 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.17] - 03-04-24
 ### Added
 * Support for generating a wheel file for the generated SDK. This is currently only
   available in code through `cognite.pygen.build_wheel` function.
+
+### Fixed
+* If the data model contained a view with name `Field`, `pygen` would raise a `NameError`. This is now fixed.
 
 ## [0.99.16] - 23-03-24
 ### Fixed
