@@ -9,7 +9,7 @@ from functools import total_ordering
 from typing import Literal, cast, overload
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.views import EdgeConnection, ViewProperty
+from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -136,17 +136,6 @@ class DataClass:
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ) -> None:
-        dependencies = [
-            data_class_by_view_id[prop.edge_source or prop.source]
-            for prop in properties.values()
-            if isinstance(prop, EdgeConnection)
-        ]
-        pydantic_field: Literal["Field", "pydantic.Field"] = "Field"
-        if self.pydantic_field == "pydantic.Field" or any(
-            dependency.pydantic_field == "pydantic.Field" for dependency in dependencies
-        ):
-            pydantic_field = "pydantic.Field"
-
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
                 prop_name,
@@ -154,12 +143,18 @@ class DataClass:
                 data_class_by_view_id,
                 config,
                 self.view_id,
-                pydantic_field=pydantic_field,
+                # This is the default value for pydantic_field, it will be updated later
+                pydantic_field=self.pydantic_field,
             )
             if field_ is None:
                 # Reverse direct relations are skipped
                 continue
             self.fields.append(field_)
+
+        if any(dependency.pydantic_field == "pydantic.Field" for dependency in self.dependencies):
+            for field_ in self.fields:
+                # All fields are frozen, so we need to set the attribute directly
+                object.__setattr__(field_, "pydantic_field", "pydantic.Field")
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
         self.is_interface = is_interface
