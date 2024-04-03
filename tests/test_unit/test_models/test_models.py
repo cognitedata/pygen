@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from itertools import chain
 from unittest.mock import MagicMock
 
@@ -263,8 +262,10 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
     data_class = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
     data_class.update_fields(
         view.properties,
-        defaultdict(lambda: MagicMock(spec=NodeDataClass)),
-        [MagicMock(spec=NodeDataClass)],
+        {
+            view.as_id(): data_class,
+        },
+        [view],
         pygen_config,
     )
 
@@ -679,27 +680,6 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
             "defaultValue": None,
             "name": "dayAheadPrice",
             "description": None,
-        },
-        "plants": {
-            "type": {"space": "power-ops", "externalId": "PriceArea.plants"},
-            "source": {"space": "power-ops", "externalId": "Plant", "version": "836dcb3f5da1df", "type": "view"},
-            "name": "plants",
-            "description": None,
-            "edgeSource": None,
-            "direction": "outwards",
-        },
-        "watercourses": {
-            "type": {"space": "power-ops", "externalId": "PriceArea.watercourses"},
-            "source": {
-                "space": "power-ops",
-                "externalId": "Watercourse",
-                "version": "96f5170f35ef70",
-                "type": "view",
-            },
-            "name": "watercourses",
-            "description": None,
-            "edgeSource": None,
-            "direction": "outwards",
         },
     },
     "lastUpdatedTime": 1692020117686,
