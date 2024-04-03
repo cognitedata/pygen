@@ -19,7 +19,8 @@ Changes are grouped as follows
   available in code through `cognite.pygen.build_wheel` function.
 
 ### Fixed
-* If the data model contained a view with name `Field`, `pygen` would raise a `NameError`. This is now fixed.
+* If the data model contained a view with name `Field`, the generated SDK would raise a
+  `NameError: name 'Field' is not defined` when importing the client. This is now fixed.
 
 ## [0.99.16] - 23-03-24
 ### Fixed
