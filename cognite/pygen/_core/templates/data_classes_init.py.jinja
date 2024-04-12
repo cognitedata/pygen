@@ -11,6 +11,7 @@ from ._core import (
     GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
+    PageInfo,
 )
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
@@ -46,7 +47,8 @@ __all__ = [
     "DomainRelationWrite",
     "GraphQLCore",
     "GraphQLList",
-    "ResourcesWriteResult",{% for class_ in classes %}
+    "ResourcesWriteResult",
+    "PageInfo",{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.graphql_name }}",{% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_name }}",
