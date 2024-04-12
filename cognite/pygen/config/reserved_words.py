@@ -39,6 +39,7 @@ FIELD_NAMES = (
         "from_instance",
         "config",
         "create_external_id_if_factory",
+        "dump",
     }
 )
 PARAMETER_NAMES = {
