@@ -104,7 +104,9 @@ class NacelleGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator(
+        "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error", pre=True
+    )
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

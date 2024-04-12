@@ -78,14 +78,6 @@ class BladeGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
-
     @validator("sensor_positions", pre=True)
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):

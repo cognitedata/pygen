@@ -97,14 +97,6 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
-
     def as_read(self) -> PrimitiveNullableListed:
         """Convert this GraphQL format of primitive nullable listed to the reading format."""
         if self.data_record is None:

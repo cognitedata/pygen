@@ -76,14 +76,6 @@ class Implementation1sPygenModelsOtherGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
-
     def as_read(self) -> Implementation1sPygenModelsOther:
         """Convert this GraphQL format of implementation 1 s pygen models other to the reading format."""
         if self.data_record is None:

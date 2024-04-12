@@ -79,7 +79,7 @@ class MetmastGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator("temperature", "tilt_angle", "wind_speed", pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

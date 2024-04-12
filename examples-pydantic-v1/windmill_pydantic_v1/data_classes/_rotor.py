@@ -73,7 +73,7 @@ class RotorGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator("rotor_speed_controller", "rpm_low_speed_shaft", pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

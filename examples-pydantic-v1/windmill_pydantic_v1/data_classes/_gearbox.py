@@ -76,7 +76,7 @@ class GearboxGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator("displacement_x", "displacement_y", "displacement_z", pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

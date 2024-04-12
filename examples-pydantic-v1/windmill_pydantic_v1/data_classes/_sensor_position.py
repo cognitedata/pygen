@@ -113,7 +113,17 @@ class SensorPositionGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator(
+        "edgewise_bend_mom_crosstalk_corrected",
+        "edgewise_bend_mom_offset",
+        "edgewise_bend_mom_offset_crosstalk_corrected",
+        "edgewisewise_bend_mom",
+        "flapwise_bend_mom",
+        "flapwise_bend_mom_crosstalk_corrected",
+        "flapwise_bend_mom_offset",
+        "flapwise_bend_mom_offset_crosstalk_corrected",
+        pre=True,
+    )
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

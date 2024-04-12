@@ -76,7 +76,7 @@ class PowerInverterGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator("active_power_total", "apparent_power_total", "reactive_power_total", pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]

@@ -97,14 +97,6 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
-
     def as_read(self) -> PrimitiveRequiredListed:
         """Convert this GraphQL format of primitive required listed to the reading format."""
         if self.data_record is None:

@@ -82,7 +82,7 @@ class MainShaftGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("timeseries", pre=True)
+    @validator("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque", pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
