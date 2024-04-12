@@ -91,6 +91,7 @@ class Core(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True, popul
         """
         return self.{% if is_pydantic_v2 %}model_dump{% else %}dict{% endif %}(by_alias=by_alias)
 
+
 class DataRecordGraphQL(Core):
     last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
     created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
