@@ -392,7 +392,19 @@ class CDFExternalField(PrimitiveFieldCore):
         return self.as_write_type_hint()
 
     def as_graphql_type_hint(self) -> str:
-        return self.as_write_type_hint()
+        type_ = self.type_as_string
+        if type_ != "str":
+            type_ = f"{type_}, dict"
+        else:
+            # GraphQL returns dict for CDF External Fields
+            type_ = "dict"
+
+        # CDF External Fields are always nullable
+        if self.need_alias:
+            out_type = f'Union[{type_}, None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            out_type = f"Union[{type_}, None] = None"
+        return out_type
 
     def as_write_type_hint(self) -> str:
         type_ = self.type_as_string
@@ -449,6 +461,27 @@ class CDFExternalListField(ListFieldCore, CDFExternalField):
                 return "Optional[list[str]] = None"
             else:
                 return "list[str]"
+
+    def as_graphql_type_hint(self) -> str:
+        type_ = self.type_as_string
+        if type_ != "str":
+            if self.is_nullable and self.need_alias:
+                return f'Union[list[{type_}], list[dict], None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'Union[list[{type_}], list[dict]] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return f"Union[list[{type_}], list[dict], None] = None"
+            else:
+                return f"Union[list[{type_}], list[dict]]"
+        else:
+            if self.is_nullable and self.need_alias:
+                return f'Optional[list[dict]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'list[dict] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return "Optional[list[dict]] = None"
+            else:
+                return "list[dict]"
 
 
 @dataclass(frozen=True)

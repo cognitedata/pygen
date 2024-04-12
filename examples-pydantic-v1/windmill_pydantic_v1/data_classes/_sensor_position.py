@@ -92,14 +92,14 @@ class SensorPositionGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "SensorPosition", "1")
-    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    edgewise_bend_mom_offset: Union[TimeSeries, str, None] = None
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    edgewisewise_bend_mom: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_offset: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, dict, None] = None
+    edgewise_bend_mom_offset: Union[TimeSeries, dict, None] = None
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, dict, None] = None
+    edgewisewise_bend_mom: Union[TimeSeries, dict, None] = None
+    flapwise_bend_mom: Union[TimeSeries, dict, None] = None
+    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeries, dict, None] = None
+    flapwise_bend_mom_offset: Union[TimeSeries, dict, None] = None
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, dict, None] = None
     position: Optional[float] = None
 
     @root_validator(pre=True)
@@ -112,6 +112,24 @@ class SensorPositionGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator(
+        "edgewise_bend_mom_crosstalk_corrected",
+        "edgewise_bend_mom_offset",
+        "edgewise_bend_mom_offset_crosstalk_corrected",
+        "edgewisewise_bend_mom",
+        "flapwise_bend_mom",
+        "flapwise_bend_mom_crosstalk_corrected",
+        "flapwise_bend_mom_offset",
+        "flapwise_bend_mom_offset_crosstalk_corrected",
+        pre=True,
+    )
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     def as_read(self) -> SensorPosition:
         """Convert this GraphQL format of sensor position to the reading format."""

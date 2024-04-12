@@ -80,7 +80,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeries, dict, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
@@ -94,6 +94,14 @@ class ScenarioInstanceGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator("price_forecast", pre=True)
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     def as_read(self) -> ScenarioInstance:
         """Convert this GraphQL format of scenario instance to the reading format."""

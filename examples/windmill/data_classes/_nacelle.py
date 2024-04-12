@@ -83,16 +83,16 @@ class NacelleGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "Nacelle", "1")
-    acc_from_back_side_x: Union[TimeSeries, str, None] = None
-    acc_from_back_side_y: Union[TimeSeries, str, None] = None
-    acc_from_back_side_z: Union[TimeSeries, str, None] = None
+    acc_from_back_side_x: Union[TimeSeries, dict, None] = None
+    acc_from_back_side_y: Union[TimeSeries, dict, None] = None
+    acc_from_back_side_z: Union[TimeSeries, dict, None] = None
     gearbox: Optional[GearboxGraphQL] = Field(None, repr=False)
     generator: Optional[GeneratorGraphQL] = Field(None, repr=False)
     high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(None, repr=False)
     main_shaft: Optional[MainShaftGraphQL] = Field(None, repr=False)
     power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
-    yaw_direction: Union[TimeSeries, str, None] = None
-    yaw_error: Union[TimeSeries, str, None] = None
+    yaw_direction: Union[TimeSeries, dict, None] = None
+    yaw_error: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

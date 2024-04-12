@@ -261,6 +261,12 @@ class DataClass:
     def is_all_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
         return all(self.primitive_fields_of_type(type_))
 
+    def has_timeseries_fields(self) -> bool:
+        return any(isinstance(field_, CDFExternalField) and field_.is_time_series for field_ in self)
+
+    def timeseries_fields(self) -> Iterable[CDFExternalField]:
+        return (field_ for field_ in self if isinstance(field_, CDFExternalField) and field_.is_time_series)
+
     @property
     def _field_type_hints(self) -> Iterable[str]:
         return (hint for field_ in self.fields for hint in (field_.as_read_type_hint(), field_.as_write_type_hint()))

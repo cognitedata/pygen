@@ -62,9 +62,9 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
-    file: Union[str, None] = None
-    sequence: Union[str, None] = None
-    timeseries: Union[TimeSeries, str, None] = None
+    file: Union[dict, None] = None
+    sequence: Union[dict, None] = None
+    timeseries: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

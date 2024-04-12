@@ -61,9 +61,9 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
-    file: Union[str, None] = None
-    sequence: Union[str, None] = None
-    timeseries: Union[TimeSeries, str, None] = None
+    file: Union[dict, None] = None
+    sequence: Union[dict, None] = None
+    timeseries: Union[TimeSeries, dict, None] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -75,6 +75,14 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator("timeseries", pre=True)
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     def as_read(self) -> CDFExternalReferences:
         """Convert this GraphQL format of cdf external reference to the reading format."""

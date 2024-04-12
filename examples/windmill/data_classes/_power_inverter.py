@@ -62,9 +62,9 @@ class PowerInverterGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "PowerInverter", "1")
-    active_power_total: Union[TimeSeries, str, None] = None
-    apparent_power_total: Union[TimeSeries, str, None] = None
-    reactive_power_total: Union[TimeSeries, str, None] = None
+    active_power_total: Union[TimeSeries, dict, None] = None
+    apparent_power_total: Union[TimeSeries, dict, None] = None
+    reactive_power_total: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

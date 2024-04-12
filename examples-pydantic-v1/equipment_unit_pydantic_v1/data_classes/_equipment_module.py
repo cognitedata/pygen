@@ -66,7 +66,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
     view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Union[TimeSeries, str, None] = None
+    sensor_value: Union[TimeSeries, dict, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     @root_validator(pre=True)
@@ -79,6 +79,14 @@ class EquipmentModuleGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator("sensor_value", pre=True)
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     def as_read(self) -> EquipmentModule:
         """Convert this GraphQL format of equipment module to the reading format."""
