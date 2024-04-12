@@ -21,6 +21,9 @@ Changes are grouped as follows
 ### Changed
 - When `pygen` write a SDK to disk, it now will always use `\n` and `utf-8` for newline and encoding, respectively.
   This is to ensure that the generated SDK is consistent across platforms.
+- When writing a SDK to disk, `pygen` will now remove `.py` files that are not part of the generated SDK when
+  `overwrite=True` is set. This is to remove any old files generated from previous versions of the data
+  model.
 
 ## [0.99.18] - 03-04-24
 ### Changed
