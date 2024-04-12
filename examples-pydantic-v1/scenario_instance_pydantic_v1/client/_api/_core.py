@@ -21,6 +21,7 @@ from scenario_instance_pydantic_v1.client.data_classes._core import (
     DomainModelCore,
     DomainModelWrite,
     DomainRelationWrite,
+    PageInfo,
     GraphQLList,
     ResourcesWriteResult,
     T_DomainModel,
@@ -773,6 +774,8 @@ class GraphQLQueryResponse:
             raise RuntimeError(response["errors"])
         _, data = list(response.items())[0]
         self._parse_item(data)
+        if "pageInfo" in data:
+            self._output.page_info = PageInfo.load(data["pageInfo"])
         return self._output
 
     def _parse_item(self, data: dict[str, Any]) -> None:
