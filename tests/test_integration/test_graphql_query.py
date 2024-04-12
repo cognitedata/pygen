@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from cognite.client.data_classes import TimeSeries
+
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
@@ -8,8 +10,8 @@ if IS_PYDANTIC_V2:
     from windmill import WindmillClient
     from windmill import data_classes as wdc
 else:
-    from omni_multi_pydantic_v1 import OmniClient
-    from omni_multi_pydantic_v1 import data_classes as odc
+    from omni_pydantic_v1 import OmniClient
+    from omni_pydantic_v1 import data_classes as odc
     from windmill_pydantic_v1 import WindmillClient
     from windmill_pydantic_v1 import data_classes as wdc
 
@@ -57,3 +59,5 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
 
     assert len(result) > 0
     assert isinstance(result[0], odc.CDFExternalReferencesListedGraphQL)
+    assert len(result[0].timeseries) > 0
+    assert isinstance(result[0].timeseries[0], TimeSeries)
