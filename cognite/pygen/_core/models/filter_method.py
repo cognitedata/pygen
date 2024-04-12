@@ -9,7 +9,6 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
-from typing_extensions import Self
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -143,7 +142,9 @@ class FilterMethod:
     filters: list[FilterCondition]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False) -> Self:
+    def from_fields(
+        cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False
+    ) -> FilterMethod:
         parameters_by_name: dict[str, FilterParameter] = {}
         list_filters: list[FilterCondition] = []
 
