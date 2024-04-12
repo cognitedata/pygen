@@ -67,6 +67,18 @@ class Core(BaseModel):
         """Returns HTML representation of DomainModel."""
         return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
 
+    def dump(self, by_alias: bool = True) -> dict[str, Any]:
+        """Returns the item as a dictionary.
+
+        Args:
+            by_alias: Whether to use the alias names in the dictionary.
+
+        Returns:
+            The item as a dictionary.
+
+        """
+        return self.dict(by_alias=by_alias)
+
 
 class DataRecordGraphQL(Core):
     last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
