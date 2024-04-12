@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.18] - 03-04-24
+### Changed
+* Typing extensions, `typing-extensions` is no longer a direct dependency of `pygen`. This is to avoid
+  conflicts when installing `pygen` in a `Pyodide` environment.
+
 ## [0.99.17] - 03-04-24
 ### Added
 * Support for generating a wheel file for the generated SDK. This is currently only
