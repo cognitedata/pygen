@@ -71,7 +71,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
             return [v for v in value if v is not None] or None
         return value
 {% endif %}{% if not is_pydantic_v2 and data_class.has_timeseries_fields %}
-    @validator("timeseries", pre=True)
+    @validator({% for field in data_class.timeseries_fields %}"{{ field.name }}", {% endfor %}pre=True)
     def parse_timeseries(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
