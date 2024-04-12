@@ -78,10 +78,10 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         return values
 
     @field_validator("files", "sequences", "timeseries", mode="before")
-    def clean_list(cls, values: Any) -> Any:
-        if isinstance(values, list):
-            return [value for value in values if value is not None] or None
-        return values
+    def clean_list(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [v for v in value if v is not None] or None
+        return value
 
     def as_read(self) -> CDFExternalReferencesListed:
         """Convert this GraphQL format of cdf external references listed to the reading format."""

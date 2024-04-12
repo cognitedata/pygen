@@ -64,7 +64,13 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
                 created_time=values.pop("createdTime", None),
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
-        return values
+        return values{% if data_class.has_field_of_type(ft.CDFExternalListField) %}
+    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.CDFExternalListField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    def clean_list(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [v for v in value if v is not None] or None
+        return value
+{% endif %}
 {% if data_class.has_field_of_type(ft.EdgeField) %}
     @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.EdgeField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
     def parse_graphql(cls, value: Any) -> Any:
