@@ -56,4 +56,4 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
     result = omni_client.graphql_query(query)
 
     assert len(result) > 0
-    assert isinstance(result[0], odc.CDFExternalReferencesGraphQL)
+    assert isinstance(result[0], odc.CDFExternalReferencesListedGraphQL)

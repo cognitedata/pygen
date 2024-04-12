@@ -62,9 +62,9 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
-    files: Optional[list[str]] = None
-    sequences: Optional[list[str]] = None
-    timeseries: Union[list[TimeSeries], list[str], None] = None
+    files: Optional[list[dict]] = None
+    sequences: Optional[list[dict]] = None
+    timeseries: Union[list[TimeSeries], list[dict], None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -75,6 +75,12 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
                 created_time=values.pop("createdTime", None),
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
+        return values
+
+    @field_validator("files", "sequences", "timeseries", mode="before")
+    def clean_list(cls, values: Any) -> Any:
+        if isinstance(values, list):
+            return [value for value in values if value is not None] or None
         return values
 
     def as_read(self) -> CDFExternalReferencesListed:
