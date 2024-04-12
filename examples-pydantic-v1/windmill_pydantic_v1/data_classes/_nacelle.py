@@ -82,16 +82,16 @@ class NacelleGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "Nacelle", "1")
-    acc_from_back_side_x: Union[TimeSeries, str, None] = None
-    acc_from_back_side_y: Union[TimeSeries, str, None] = None
-    acc_from_back_side_z: Union[TimeSeries, str, None] = None
+    acc_from_back_side_x: Union[TimeSeries, dict, None] = None
+    acc_from_back_side_y: Union[TimeSeries, dict, None] = None
+    acc_from_back_side_z: Union[TimeSeries, dict, None] = None
     gearbox: Optional[GearboxGraphQL] = Field(None, repr=False)
     generator: Optional[GeneratorGraphQL] = Field(None, repr=False)
     high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(None, repr=False)
     main_shaft: Optional[MainShaftGraphQL] = Field(None, repr=False)
     power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
-    yaw_direction: Union[TimeSeries, str, None] = None
-    yaw_error: Union[TimeSeries, str, None] = None
+    yaw_direction: Union[TimeSeries, dict, None] = None
+    yaw_error: Union[TimeSeries, dict, None] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -103,6 +103,14 @@ class NacelleGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator("timeseries", pre=True)
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     @validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", pre=True)
     def parse_graphql(cls, value: Any) -> Any:

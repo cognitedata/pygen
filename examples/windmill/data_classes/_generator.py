@@ -60,8 +60,8 @@ class GeneratorGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "Generator", "1")
-    generator_speed_controller: Union[TimeSeries, str, None] = None
-    generator_speed_controller_reference: Union[TimeSeries, str, None] = None
+    generator_speed_controller: Union[TimeSeries, dict, None] = None
+    generator_speed_controller_reference: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

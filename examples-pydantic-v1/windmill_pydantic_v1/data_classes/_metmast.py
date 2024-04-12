@@ -64,9 +64,9 @@ class MetmastGraphQL(GraphQLCore):
 
     view_id = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
-    temperature: Union[TimeSeries, str, None] = None
-    tilt_angle: Union[TimeSeries, str, None] = None
-    wind_speed: Union[TimeSeries, str, None] = None
+    temperature: Union[TimeSeries, dict, None] = None
+    tilt_angle: Union[TimeSeries, dict, None] = None
+    wind_speed: Union[TimeSeries, dict, None] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -78,6 +78,14 @@ class MetmastGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @validator("timeseries", pre=True)
+    def parse_timeseries(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
+        elif isinstance(value, dict):
+            return TimeSeries.load(value)
+        return value
 
     def as_read(self) -> Metmast:
         """Convert this GraphQL format of metmast to the reading format."""

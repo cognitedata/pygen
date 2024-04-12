@@ -62,9 +62,9 @@ class HighSpeedShaftGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "HighSpeedShaft", "1")
-    bending_moment_y: Union[TimeSeries, str, None] = None
-    bending_monent_x: Union[TimeSeries, str, None] = None
-    torque: Union[TimeSeries, str, None] = None
+    bending_moment_y: Union[TimeSeries, dict, None] = None
+    bending_monent_x: Union[TimeSeries, dict, None] = None
+    torque: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

@@ -66,11 +66,11 @@ class MainShaftGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("power-models", "MainShaft", "1")
-    bending_x: Union[TimeSeries, str, None] = None
-    bending_y: Union[TimeSeries, str, None] = None
-    calculated_tilt_moment: Union[TimeSeries, str, None] = None
-    calculated_yaw_moment: Union[TimeSeries, str, None] = None
-    torque: Union[TimeSeries, str, None] = None
+    bending_x: Union[TimeSeries, dict, None] = None
+    bending_y: Union[TimeSeries, dict, None] = None
+    calculated_tilt_moment: Union[TimeSeries, dict, None] = None
+    calculated_yaw_moment: Union[TimeSeries, dict, None] = None
+    torque: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

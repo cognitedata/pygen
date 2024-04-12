@@ -38,7 +38,7 @@ class OmniClient:
 
     Generated with:
         pygen = 0.99.18
-        cognite-sdk = 7.34.0
+        cognite-sdk = 7.27.2
         pydantic = 1.10.7
 
     Data Model:

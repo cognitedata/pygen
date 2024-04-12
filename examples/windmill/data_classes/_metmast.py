@@ -65,9 +65,9 @@ class MetmastGraphQL(GraphQLCore):
 
     view_id = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
-    temperature: Union[TimeSeries, str, None] = None
-    tilt_angle: Union[TimeSeries, str, None] = None
-    wind_speed: Union[TimeSeries, str, None] = None
+    temperature: Union[TimeSeries, dict, None] = None
+    tilt_angle: Union[TimeSeries, dict, None] = None
+    wind_speed: Union[TimeSeries, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
