@@ -61,3 +61,24 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
     assert isinstance(result[0], odc.CDFExternalReferencesListedGraphQL)
     assert len(result[0].timeseries) > 0
     assert isinstance(result[0].timeseries[0], TimeSeries)
+
+
+def test_query_paging(omni_client: OmniClient) -> None:
+    result = omni_client.graphql_query(
+        """{
+  listImplementation2{
+    items{
+      __typename
+      externalId
+    }
+    pageInfo{
+      hasNextPage
+      startCursor
+      endCursor
+      hasPreviousPage
+    }
+  }
+}"""
+    )
+    assert result.page_info is not None
+    assert result.page_info.has_next_page is True
