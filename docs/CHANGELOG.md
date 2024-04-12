@@ -17,6 +17,8 @@ Changes are grouped as follows
 ### Fixed
 - When retrieving `.graphql` with a CDF external resource type (`Timeseries`, `File`, or `Sequence`), the generated SDK
   would raise a `ValidationError`. This is now fixed.
+- When generating a SDK for a Data Model with a View without any properties, the generated SDK would raise a
+  `ValueError: APIGenerator has not been initialized` error. This is now fixed.
 
 ### Changed
 - When `pygen` write a SDK to disk, it now will always use `\n` and `utf-8` for newline and encoding, respectively.
