@@ -66,3 +66,21 @@ def test_query_limit(omni_client: OmniClient) -> None:
     items = omni_client.implementation_2(limit=-1).query()
 
     assert len(items) >= 200, "There should be more than 5,000 items of this type in the dataset"
+
+
+def test_query_direct_relation_to_self(omni_client: OmniClient) -> None:
+    # Selecting a specific item to ensure that the self direct relation is set
+    items = (
+        omni_client.connection_item_b(external_id_prefix="ConnectionItemB:John", limit=1)
+        .inwards(external_id_prefix="ConnectionItemA:Erin", limit=1)
+        .query(retrieve_self_direct=True)
+    )
+    # Nodes are connected: John [inwards] -> Erin [selfDirect] -> Joseph
+
+    assert len(items) == 1
+    john = items[0]
+    assert isinstance(john.inwards, list) and len(john.inwards) == 1
+    erin = john.inwards[0]
+    assert isinstance(erin, dc.ConnectionItemA)
+    assert isinstance(erin.self_direct, dc.ConnectionItemA)
+    assert erin.self_direct.external_id == "ConnectionItemA:Joseph"
