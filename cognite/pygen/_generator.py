@@ -126,7 +126,7 @@ def generate_sdk(
         return sdk
     output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir, overwrite, format_code, logger)
+    write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code, top_level_package)
     logger("Done!")
     return None
 
@@ -381,8 +381,9 @@ def write_sdk_to_disk(
     sdk: dict[Path, str],
     output_dir: Path,
     overwrite: bool,
+    logger: Optional[Callable[[str], None]],
     format_code: bool = True,
-    logger: Optional[Callable[[str], None]] = None,
+    top_level_package: str | None = None,
 ) -> None:
     """Write a generated SDK to disk.
 
@@ -393,18 +394,25 @@ def write_sdk_to_disk(
             The output directory to write to.
         overwrite (bool):
             Whether to overwrite existing files.
+        logger (Optional[Callable[[str], None]]):
+            A logger function to log progress.
         format_code (bool):
             Whether to format the generated code using black.
+        top_level_package (str):
+            The name of the top level package for the SDK.
     """
     formatter = CodeFormatter(format_code, print)
 
     if overwrite:
-        existing_files = {path.relative_to(output_dir) for path in output_dir.rglob("*.py")}
+        top_path = output_dir
+        if top_level_package is not None:
+            top_path = top_path / Path(top_level_package.replace(".", "/"))
+        existing_files = {path.relative_to(output_dir) for path in top_path.rglob("*.py")}
         new_files = {path for path in sdk.keys()}
         files_to_remove = existing_files - new_files
         for file in files_to_remove:
             (output_dir / file).unlink()
-            (logger or print)(f"Removed {file} from {output_dir}. It is no longer part of the SDK.")
+            (logger or print)(f"Removed File: {file}. It is no longer part of the SDK.")
 
     for file_path, file_content in sdk.items():
         path = output_dir / file_path
