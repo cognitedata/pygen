@@ -406,4 +406,6 @@ def write_sdk_to_disk(
         path.parent.mkdir(parents=True, exist_ok=True)
         if format_code:
             file_content = formatter.format_code(file_content)
-        path.write_text(file_content)
+        # Encoding and newline are set to ensure consistent file writing across platforms
+        with path.open("w", encoding="utf-8", newline="\n") as f:
+            f.write(file_content)
