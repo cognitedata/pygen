@@ -11,6 +11,7 @@ from ._core import (
     GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
+    PageInfo,
 )
 from ._cdf_external_references import (
     CDFExternalReferences,
@@ -319,6 +320,7 @@ __all__ = [
     "GraphQLCore",
     "GraphQLList",
     "ResourcesWriteResult",
+    "PageInfo",
     "CDFExternalReferences",
     "CDFExternalReferencesGraphQL",
     "CDFExternalReferencesWrite",

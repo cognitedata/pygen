@@ -11,6 +11,7 @@ from ._core import (
     GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
+    PageInfo,
 )
 from ._scenario_instance import (
     ScenarioInstance,
@@ -38,6 +39,7 @@ __all__ = [
     "GraphQLCore",
     "GraphQLList",
     "ResourcesWriteResult",
+    "PageInfo",
     "ScenarioInstance",
     "ScenarioInstanceGraphQL",
     "ScenarioInstanceWrite",

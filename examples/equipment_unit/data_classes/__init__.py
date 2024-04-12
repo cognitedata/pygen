@@ -11,6 +11,7 @@ from ._core import (
     GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
+    PageInfo,
 )
 from ._equipment_module import (
     EquipmentModule,
@@ -79,6 +80,7 @@ __all__ = [
     "GraphQLCore",
     "GraphQLList",
     "ResourcesWriteResult",
+    "PageInfo",
     "EquipmentModule",
     "EquipmentModuleGraphQL",
     "EquipmentModuleWrite",

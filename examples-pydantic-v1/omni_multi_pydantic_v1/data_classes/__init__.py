@@ -11,6 +11,7 @@ from ._core import (
     GraphQLList,
     ResourcesWrite,
     ResourcesWriteResult,
+    PageInfo,
 )
 from ._implementation_1_s_pygen_models import (
     Implementation1sPygenModels,
@@ -82,6 +83,7 @@ __all__ = [
     "GraphQLCore",
     "GraphQLList",
     "ResourcesWriteResult",
+    "PageInfo",
     "Implementation1sPygenModels",
     "Implementation1sPygenModelsGraphQL",
     "Implementation1sPygenModelsWrite",

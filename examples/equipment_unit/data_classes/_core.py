@@ -88,9 +88,21 @@ class GraphQLCore(Core, ABC):
     data_record: Optional[DataRecordGraphQL] = Field(None, alias="dataRecord")
 
 
+class PageInfo(BaseModel):
+    has_next_page: Optional[bool] = Field(None, alias="hasNextPage")
+    has_previous_page: Optional[bool] = Field(None, alias="hasPreviousPage")
+    start_cursor: Optional[str] = Field(None, alias="startCursor")
+    end_cursor: Optional[str] = Field(None, alias="endCursor")
+
+    @classmethod
+    def load(cls, data: dict[str, Any]) -> PageInfo:
+        return cls.model_validate(data)
+
+
 class GraphQLList(UserList):
     def __init__(self, nodes: Collection[GraphQLCore] = None):
         super().__init__(nodes or [])
+        self.page_info: PageInfo | None = None
 
     # The dunder implementations are to get proper type hints
     def __iter__(self) -> Iterator[GraphQLCore]:
