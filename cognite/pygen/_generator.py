@@ -126,7 +126,7 @@ def generate_sdk(
         return sdk
     output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
+    write_sdk_to_disk(sdk, output_dir, overwrite, format_code, logger)
     logger("Done!")
     return None
 
@@ -382,6 +382,7 @@ def write_sdk_to_disk(
     output_dir: Path,
     overwrite: bool,
     format_code: bool = True,
+    logger: Optional[Callable[[str], None]] = None,
 ) -> None:
     """Write a generated SDK to disk.
 
@@ -396,6 +397,14 @@ def write_sdk_to_disk(
             Whether to format the generated code using black.
     """
     formatter = CodeFormatter(format_code, print)
+
+    if overwrite:
+        existing_files = {path.relative_to(output_dir) for path in output_dir.rglob("*.py")}
+        new_files = {path for path in sdk.keys()}
+        files_to_remove = existing_files - new_files
+        for file in files_to_remove:
+            (output_dir / file).unlink()
+            (logger or print)(f"Removed {file} from {output_dir}. It is no longer part of the SDK.")
 
     for file_path, file_content in sdk.items():
         path = output_dir / file_path
