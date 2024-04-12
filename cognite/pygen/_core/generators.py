@@ -382,8 +382,8 @@ class APIGenerator:
         return self.view.as_id()
 
     def _validate_initialized(self) -> None:
-        if not self.data_class.fields:
-            raise ValueError("APIGenerator has not been initialized.")
+        if missing := self.data_class.initialization - {"parents", "fields"}:
+            raise ValueError(f"APIGenerator has not been initialized. Missing {missing}")
 
     @property
     def list_method(self) -> FilterMethod:
