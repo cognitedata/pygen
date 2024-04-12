@@ -52,7 +52,7 @@ class DataClass:
     is_writable: bool
     is_interface: bool
 
-    _initialization: set[Literal["fields", "parents"]]
+    initialization: set[Literal["fields", "parents"]]
 
     def __lt__(self, other: DataClass):
         if isinstance(other, DataClass):
@@ -120,7 +120,7 @@ class DataClass:
             implements=[],
             is_writable=view.writable,
             is_interface=False,
-            _initialization={},
+            initialization=set(),
         )
 
         if used_for == "node":
@@ -158,13 +158,13 @@ class DataClass:
             for field_ in self.fields:
                 # All fields are frozen, so we need to set the attribute directly
                 object.__setattr__(field_, "pydantic_field", "pydantic.Field")
-        self._initialization.add("fields")
+        self.initialization.add("fields")
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
         self.is_interface = is_interface
         self.implements.extend(parents)
         self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
-        self._initialization.add("parents")
+        self.initialization.add("parents")
 
     @property
     def read_base_class(self) -> str:
