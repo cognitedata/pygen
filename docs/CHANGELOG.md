@@ -18,6 +18,10 @@ Changes are grouped as follows
 - When retrieving `.graphql` with a CDF external resource type (`Timeseries`, `File`, or `Sequence`), the generated SDK
   would raise a `ValidationError`. This is now fixed.
 
+### Changed
+- When `pygen` write a SDK to disk, it now will always use `\n` and `utf-8` for newline and encoding, respectively.
+  This is to ensure that the generated SDK is consistent across platforms.
+
 ## [0.99.18] - 03-04-24
 ### Changed
 * Typing extensions, `typing-extensions` is no longer a direct dependency of `pygen`. This is to avoid
