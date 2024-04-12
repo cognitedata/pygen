@@ -35,13 +35,12 @@ from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from cognite.client.exceptions import CogniteNotFoundError
-from typing_extensions import TypeAlias
 
 from cognite.pygen._version import __version__
 from cognite.pygen.utils.cdf import _find_first_node_type
 
-DataType: TypeAlias = typing.Union[int, float, bool, str, dict, None]
-ListAbleDataType: TypeAlias = typing.Union[
+DataType = typing.Union[int, float, bool, str, dict, None]
+ListAbleDataType = typing.Union[
     int,
     float,
     bool,

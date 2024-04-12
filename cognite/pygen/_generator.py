@@ -14,7 +14,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
-from typing_extensions import TypeAlias
 
 from cognite.pygen._core.generators import SDKGenerator
 from cognite.pygen._core.models import DataClass
@@ -24,13 +23,13 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.text import to_pascal, to_snake
 
-DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
+DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
 _ILLEGAL_CHARACTERS_IN_FOLDER_NAME = '/\\?%*:|"<>!'
 
 
 @overload
-def generate_sdk(  # type: ignore[overload-overlap]
+def generate_sdk(  # type: ignore[overload-overlap, misc]
     model_id: DataModel | Sequence[DataModel],
     client: Optional[CogniteClient] = None,
     top_level_package: Optional[str] = None,
@@ -75,7 +74,7 @@ def generate_sdk(
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
-    return_sdk_files: Literal[True, False] = False,
+    return_sdk_files: bool = False,
 ) -> None | dict[Path, str]:
     """
     Generates a Python SDK tailored to the given Data Model(s).
