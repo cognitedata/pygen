@@ -8,10 +8,7 @@ version: 2
 # Set the version of Python and other tools you might need
 python:
   install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
+    - requirements: docs/requirements.txt
 
 build:
   os: ubuntu-22.04
