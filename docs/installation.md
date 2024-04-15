@@ -1,3 +1,4 @@
+## Installation Local
 **Prerequisites**: Installed Python 3.9 or newer, see [python.org](https://www.python.org/downloads/)
 
 1. Create a virtual environment.
@@ -64,3 +65,16 @@
     ```
 
     This installs the core dependencies for `cognite-pygen`, as well as the CLI and code formatting dependencies.
+
+
+## Pyodide Installation
+
+In a `CDF Notebook` you can install `cognite-pygen` by running the following code in a cell:
+
+```python
+%pip install cognite-pygen
+```
+
+## Pyodide Troubleshooting
+
+## Can't find a pure Python 3 wheel: 'cognite-pygen'
