@@ -11,13 +11,16 @@ adding `cognite-pygen` to the installed packages under `settings`.
 
 ```text
 pyodide-http==0.2.1
-cognite-sdk==7.5.0
+cognite-sdk==7.34.0
 pydantic==1.10.7
-cognite-pygen==0.32.4
+cognite-pygen==0.99.19
 ```
 
 Note that we also set `pydantic` to a specific version. This is because `pygen` supports both `pydantic` `v1` and `v2`, but
 when we want to use `pygen` in the CDF streamlit environment, we need to use `pydantic` `v1`.
+
+In case you have issues with the installation, check out the [troubleshooting](../installation.html#pyodide-troubleshooting) in the
+installation guide.
 
 ## Minimal Example
 
