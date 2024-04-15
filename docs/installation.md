@@ -271,7 +271,7 @@ import micropip
 micropip.uninstall('typing_extensions')
 ```
 
-Then install `cognite-pygen`:
+Then, install `cognite-pygen`:
 
 ```python
 %pip install cognite-pygen
