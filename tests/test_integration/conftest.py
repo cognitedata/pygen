@@ -15,9 +15,11 @@ from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from windmill import WindmillClient
+    from scenario_instance.client import ScenarioInstanceClient
 else:
     from omni_pydantic_v1 import OmniClient
     from windmill_pydantic_v1 import WindmillClient
+    from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
 
 
 @pytest.fixture(scope="session")
@@ -79,6 +81,11 @@ def omni_client(cognite_client: CogniteClient) -> OmniClient:
 @pytest.fixture(scope="session")
 def wind_client(cognite_client: CogniteClient) -> WindmillClient:
     return WindmillClient(cognite_client)
+
+
+@pytest.fixture(scope="session")
+def scenario_instance_client(cognite_client: CogniteClient) -> ScenarioInstanceClient:
+    return ScenarioInstanceClient(cognite_client)
 
 
 @pytest.fixture(scope="session")
