@@ -10,7 +10,6 @@ from itertools import product
 from typing import TypeVar
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 
 NOT_SUPPORTED = {
     # Todo Add Omnium Connection to have support for direct nullable type.
@@ -44,9 +43,7 @@ def properties_from_views(views: list[dm.View]) -> set[tuple[str, bool, bool]]:
     for view in views:
         for prop in view.properties.values():
             if isinstance(prop, dm.MappedProperty):
-                properties.add(
-                    (prop.type._type, isinstance(prop.type, ListablePropertyType) and prop.type.is_list, prop.nullable)
-                )
+                properties.add((prop.type._type, prop.type.is_list, prop.nullable))
     return properties
 
 
@@ -61,6 +58,5 @@ def existing_mapped_properties() -> set[tuple[str, bool, bool]]:
     types = list(_concrete_subclasses(dm.PropertyType))
 
     return {
-        (t._type, listable and issubclass(t, ListablePropertyType), nullable)
-        for t, listable, nullable in product(types, [True, False], [True, False])
+        (t._type, listable, nullable) for t, listable, nullable in product(types, [True, False], [True, False])
     } - NOT_SUPPORTED

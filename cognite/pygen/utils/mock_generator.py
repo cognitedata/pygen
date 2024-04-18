@@ -31,8 +31,7 @@ from cognite.client.data_classes import (
     TimeSeries,
     TimeSeriesList,
 )
-from cognite.client.data_classes.data_modeling import DataModelIdentifier
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
+from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from cognite.client.exceptions import CogniteNotFoundError
 
@@ -370,7 +369,7 @@ class MockGenerator:
 
             null_values = int(prop.nullable and config_node_count * config_null_values)
             node_count = config_node_count - null_values
-            if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
+            if isinstance(prop.type, PropertyType) and prop.type.is_list:
                 values = [generator(random.randint(0, 5)) for _ in range(node_count)] + [None] * null_values
             else:
                 values = generator(config_node_count - null_values) + [None] * null_values
