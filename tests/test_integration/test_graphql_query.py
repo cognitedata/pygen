@@ -9,11 +9,15 @@ if IS_PYDANTIC_V2:
     from omni import data_classes as odc
     from windmill import WindmillClient
     from windmill import data_classes as wdc
+    from scenario_instance.client import ScenarioInstanceClient
+    from scenario_instance.client import data_classes as sidc
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as odc
     from windmill_pydantic_v1 import WindmillClient
     from windmill_pydantic_v1 import data_classes as wdc
+    from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
+    from scenario_instance_pydantic_v1.client import data_classes as sidc
 
 
 def test_graphql_query(wind_client: WindmillClient) -> None:
@@ -87,3 +91,26 @@ def test_query_paging(omni_client: OmniClient) -> None:
     )
     assert result.page_info is not None
     assert result.page_info.has_next_page is True
+
+
+def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient) -> None:
+    ...
+    result = scenario_instance_client.graphql_query(
+        """{
+  listScenarioInstance(first: 1){
+    items{
+      priceForecast{
+        getDataPoints(granularity: "1d", aggregates: SUM){
+          items{
+            timestamp
+            sum
+          }
+        }
+      }
+    }
+  }
+}
+"""
+    )
+    assert len(result) == 1
+    assert isinstance(result[0], sidc.GraphQLList)
