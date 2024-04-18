@@ -21,8 +21,8 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.99.19
-        cognite-sdk = 7.34.0
+        pygen = 0.99.20
+        cognite-sdk = 7.37.1
         pydantic = 2.7.0
 
     Data Model:
@@ -39,7 +39,7 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.19"
+        client.config.client_name = "CognitePygen:0.99.20"
 
         view_by_read_class = {
             data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
