@@ -15,7 +15,6 @@ from cognite.client.data_classes import (
     TimeSeries,
     TimeSeriesList,
 )
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from cognite.client.data_classes.data_modeling.instances import PropertyValue
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from faker import Faker
@@ -218,7 +217,7 @@ def generate_mock_values(
             output[name] = None
             continue
 
-        if isinstance(mapped.type, ListablePropertyType) and mapped.type.is_list:
+        if mapped.type.is_list:
             output[name] = [create_value(mapped.type, faker) for _ in range(faker.random.randint(0, 5))]
         else:
             output[name] = create_value(mapped.type, faker)

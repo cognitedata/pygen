@@ -8,8 +8,7 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.implementation_1_s_pygen_models import Implementation1sPygenModelsAPI
-from ._api.implementation_1_s_pygen_models_other import Implementation1sPygenModelsOtherAPI
+from ._api.implementation_1_v_1 import Implementation1v1API
 from ._api.implementation_1_v_2 import Implementation1v2API
 from ._api.main_interface import MainInterfaceAPI
 from ._api.sub_interface import SubInterfaceAPI
@@ -31,14 +30,12 @@ class OmniMultiAAPIs:
 
     def __init__(self, client: CogniteClient):
         view_by_read_class = {
-            data_classes.Implementation1sPygenModels: dm.ViewId("pygen-models", "Implementation1", "1"),
             data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
         self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.implementation_1_s_pygen_models = Implementation1sPygenModelsAPI(client, view_by_read_class)
         self.main_interface = MainInterfaceAPI(client, view_by_read_class)
         self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
 
@@ -103,12 +100,12 @@ class OmniMultiCAPIs:
 
     def __init__(self, client: CogniteClient):
         view_by_read_class = {
-            data_classes.Implementation1sPygenModelsOther: dm.ViewId("pygen-models-other", "Implementation1", "1"),
+            data_classes.Implementation1v1: dm.ViewId("pygen-models-other", "Implementation1", "1"),
         }
         self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherAPI(client, view_by_read_class)
+        self.implementation_1_v_1 = Implementation1v1API(client, view_by_read_class)
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiC data model.
@@ -127,8 +124,8 @@ class OmniMultiClient:
     OmniMultiClient
 
     Generated with:
-        pygen = 0.99.19
-        cognite-sdk = 7.34.0
+        pygen = 0.99.20
+        cognite-sdk = 7.37.1
         pydantic = 2.7.0
 
     """
@@ -141,7 +138,7 @@ class OmniMultiClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.19"
+        client.config.client_name = "CognitePygen:0.99.20"
 
         self.omni_multi_a = OmniMultiAAPIs(client)
         self.omni_multi_b = OmniMultiBAPIs(client)

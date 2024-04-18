@@ -70,6 +70,7 @@ def load_field_test_cases():
         "type": {
             "container": None,
             "type": "direct",
+            "list": False,
             "source": {"space": "cogShop", "external_id": "ModelTemplate", "version": "8ae35635bb3f8a"},
         },
         "nullable": True,
@@ -200,6 +201,7 @@ def load_data_classes_test_cases():
                 "type": {
                     "container": None,
                     "type": "direct",
+                    "list": False,
                     "source": {"space": "power-ops", "externalId": "Duration", "version": "7433a3f6ac2be0"},
                 },
                 "nullable": True,
@@ -534,6 +536,7 @@ def create_fields_test_cases():
         "type": {
             "container": None,
             "type": "direct",
+            "list": False,
             "source": {"space": "IntegrationTestsImmutable", "externalId": "Person", "version": "2"},
         },
         "nullable": True,

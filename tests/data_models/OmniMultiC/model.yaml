@@ -1,7 +1,7 @@
 space: pygen-models
 externalId: OmniMultiC
-description: ''
 name: OmniMultiC
+description: ''
 version: '1'
 views:
 - space: pygen-models-other
@@ -15,6 +15,7 @@ views:
       value:
         space: pygen-models
         externalId: Implementation1
+  implements: []
   version: '1'
   writable: true
   usedFor: node

@@ -110,11 +110,7 @@ class Field(ABC):
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
-        elif (
-            isinstance(prop, dm.MappedProperty)
-            and isinstance(prop.type, dm.data_types.ListablePropertyType)
-            and prop.type.is_list
-        ):
+        elif isinstance(prop, dm.MappedProperty) and prop.type.is_list:
             if isinstance(prop.type, dm.CDFExternalIdReference):
                 return CDFExternalListField(
                     name=name,
@@ -386,7 +382,7 @@ class CDFExternalField(PrimitiveFieldCore):
 
     @property
     def is_list(self) -> bool:
-        return isinstance(self.type_, dm.data_types.ListablePropertyType) and self.type_.is_list
+        return self.type_.is_list
 
     def as_read_type_hint(self) -> str:
         return self.as_write_type_hint()

@@ -1,7 +1,7 @@
 space: pygen-models
 externalId: OmniMultiB
-description: ''
 name: OmniMultiB
+description: ''
 version: '1'
 views:
 - space: pygen-models
@@ -75,6 +75,7 @@ views:
 - space: pygen-models
   externalId: MainInterface
   name: MainInterface
+  implements: []
   version: '1'
   writable: true
   usedFor: node

@@ -8,21 +8,21 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from omni_multi_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
-from omni_multi_pydantic_v1.data_classes import (
+from omni_multi.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_multi.data_classes import (
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    Implementation1sPygenModelsOther,
-    Implementation1sPygenModelsOtherWrite,
-    Implementation1sPygenModelsOtherFields,
-    Implementation1sPygenModelsOtherList,
-    Implementation1sPygenModelsOtherWriteList,
-    Implementation1sPygenModelsOtherTextFields,
+    Implementation1v1,
+    Implementation1v1Write,
+    Implementation1v1Fields,
+    Implementation1v1List,
+    Implementation1v1WriteList,
+    Implementation1v1TextFields,
 )
-from omni_multi_pydantic_v1.data_classes._implementation_1_s_pygen_models_other import (
-    _IMPLEMENTATION1SPYGENMODELSOTHER_PROPERTIES_BY_FIELD,
-    _create_implementation_1_s_pygen_models_other_filter,
+from omni_multi.data_classes._implementation_1_v_1 import (
+    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
+    _create_implementation_1_v_1_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
@@ -33,22 +33,18 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .implementation_1_s_pygen_models_other_query import Implementation1sPygenModelsOtherQueryAPI
+from .implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
-class Implementation1sPygenModelsOtherAPI(
-    NodeAPI[
-        Implementation1sPygenModelsOther, Implementation1sPygenModelsOtherWrite, Implementation1sPygenModelsOtherList
-    ]
-):
+class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Implementation1sPygenModelsOther]
+        view_id = view_by_read_class[Implementation1v1]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=Implementation1sPygenModelsOther,
-            class_list=Implementation1sPygenModelsOtherList,
-            class_write_list=Implementation1sPygenModelsOtherWriteList,
+            class_type=Implementation1v1,
+            class_list=Implementation1v1List,
+            class_write_list=Implementation1v1WriteList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -65,8 +61,8 @@ class Implementation1sPygenModelsOtherAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Implementation1sPygenModelsOtherQueryAPI[Implementation1sPygenModelsOtherList]:
-        """Query starting at implementation 1 s pygen models others.
+    ) -> Implementation1v1QueryAPI[Implementation1v1List]:
+        """Query starting at implementation 1 v 1.
 
         Args:
             main_value: The main value to filter on.
@@ -77,15 +73,15 @@ class Implementation1sPygenModelsOtherAPI(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 s pygen models others to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for implementation 1 s pygen models others.
+            A query API for implementation 1 v 1.
 
         """
         has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_implementation_1_s_pygen_models_other_filter(
+        filter_ = _create_implementation_1_v_1_filter(
             self._view_id,
             main_value,
             main_value_prefix,
@@ -97,21 +93,19 @@ class Implementation1sPygenModelsOtherAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(Implementation1sPygenModelsOtherList)
-        return Implementation1sPygenModelsOtherQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        builder = QueryBuilder(Implementation1v1List)
+        return Implementation1v1QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,
-        implementation_1_s_pygen_models_other: (
-            Implementation1sPygenModelsOtherWrite | Sequence[Implementation1sPygenModelsOtherWrite]
-        ),
+        implementation_1_v_1: Implementation1v1Write | Sequence[Implementation1v1Write],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) implementation 1 s pygen models others.
+        """Add or update (upsert) implementation 1 v 1.
 
         Args:
-            implementation_1_s_pygen_models_other: Implementation 1 s pygen models other or sequence of implementation 1 s pygen models others to upsert.
+            implementation_1_v_1: Implementation 1 v 1 or sequence of implementation 1 v 1 to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
@@ -121,51 +115,51 @@ class Implementation1sPygenModelsOtherAPI(
 
         Examples:
 
-            Create a new implementation_1_s_pygen_models_other:
+            Create a new implementation_1_v_1:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
-                >>> from omni_multi_pydantic_v1.data_classes import Implementation1sPygenModelsOtherWrite
+                >>> from omni_multi import OmniMultiClient
+                >>> from omni_multi.data_classes import Implementation1v1Write
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_models_other = Implementation1sPygenModelsOtherWrite(external_id="my_implementation_1_s_pygen_models_other", ...)
-                >>> result = client.implementation_1_s_pygen_models_other.apply(implementation_1_s_pygen_models_other)
+                >>> implementation_1_v_1 = Implementation1v1Write(external_id="my_implementation_1_v_1", ...)
+                >>> result = client.implementation_1_v_1.apply(implementation_1_v_1)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
             "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.implementation_1_s_pygen_models_other.apply(my_items)` please use `my_client.upsert(my_items)`."
+            "`my_client.implementation_1_v_1.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
             " class encourages users to create items in small batches, which is inefficient."
             "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
-        return self._apply(implementation_1_s_pygen_models_other, replace, write_none)
+        return self._apply(implementation_1_v_1, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
-        """Delete one or more implementation 1 s pygen models other.
+        """Delete one or more implementation 1 v 1.
 
         Args:
-            external_id: External id of the implementation 1 s pygen models other to delete.
-            space: The space where all the implementation 1 s pygen models other are located.
+            external_id: External id of the implementation 1 v 1 to delete.
+            space: The space where all the implementation 1 v 1 are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
 
         Examples:
 
-            Delete implementation_1_s_pygen_models_other by id:
+            Delete implementation_1_v_1 by id:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
+                >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> client.implementation_1_s_pygen_models_other.delete("my_implementation_1_s_pygen_models_other")
+                >>> client.implementation_1_v_1.delete("my_implementation_1_v_1")
         """
         warnings.warn(
             "The .delete method is deprecated and will be removed in v1.0. "
             "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.implementation_1_s_pygen_models_other.delete(my_ids)` please use `my_client.delete(my_ids)`."
+            "`my_client.implementation_1_v_1.delete(my_ids)` please use `my_client.delete(my_ids)`."
             "The motivation is that all delete methods are the same, and having one delete method per API "
             " class encourages users to delete items in small batches, which is inefficient.",
             UserWarning,
@@ -174,34 +168,32 @@ class Implementation1sPygenModelsOtherAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(
-        self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1sPygenModelsOther | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1v1 | None: ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1sPygenModelsOtherList: ...
+    ) -> Implementation1v1List: ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1sPygenModelsOther | Implementation1sPygenModelsOtherList | None:
-        """Retrieve one or more implementation 1 s pygen models others by id(s).
+    ) -> Implementation1v1 | Implementation1v1List | None:
+        """Retrieve one or more implementation 1 v 1 by id(s).
 
         Args:
-            external_id: External id or list of external ids of the implementation 1 s pygen models others.
-            space: The space where all the implementation 1 s pygen models others are located.
+            external_id: External id or list of external ids of the implementation 1 v 1.
+            space: The space where all the implementation 1 v 1 are located.
 
         Returns:
-            The requested implementation 1 s pygen models others.
+            The requested implementation 1 v 1.
 
         Examples:
 
-            Retrieve implementation_1_s_pygen_models_other by id:
+            Retrieve implementation_1_v_1 by id:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
+                >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_models_other = client.implementation_1_s_pygen_models_other.retrieve("my_implementation_1_s_pygen_models_other")
+                >>> implementation_1_v_1 = client.implementation_1_v_1.retrieve("my_implementation_1_v_1")
 
         """
         return self._retrieve(external_id, space)
@@ -209,9 +201,7 @@ class Implementation1sPygenModelsOtherAPI(
     def search(
         self,
         query: str,
-        properties: (
-            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
-        ) = None,
+        properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -222,8 +212,8 @@ class Implementation1sPygenModelsOtherAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> Implementation1sPygenModelsOtherList:
-        """Search implementation 1 s pygen models others
+    ) -> Implementation1v1List:
+        """Search implementation 1 v 1
 
         Args:
             query: The search query,
@@ -236,22 +226,22 @@ class Implementation1sPygenModelsOtherAPI(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 s pygen models others to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            Search results implementation 1 s pygen models others matching the query.
+            Search results implementation 1 v 1 matching the query.
 
         Examples:
 
-           Search for 'my_implementation_1_s_pygen_models_other' in all text properties:
+           Search for 'my_implementation_1_v_1' in all text properties:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
+                >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_models_others = client.implementation_1_s_pygen_models_other.search('my_implementation_1_s_pygen_models_other')
+                >>> implementation_1_v_1_list = client.implementation_1_v_1.search('my_implementation_1_v_1')
 
         """
-        filter_ = _create_implementation_1_s_pygen_models_other_filter(
+        filter_ = _create_implementation_1_v_1_filter(
             self._view_id,
             main_value,
             main_value_prefix,
@@ -263,9 +253,7 @@ class Implementation1sPygenModelsOtherAPI(
             space,
             filter,
         )
-        return self._search(
-            self._view_id, query, _IMPLEMENTATION1SPYGENMODELSOTHER_PROPERTIES_BY_FIELD, properties, filter_, limit
-        )
+        return self._search(self._view_id, query, _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     @overload
     def aggregate(
@@ -276,14 +264,10 @@ class Implementation1sPygenModelsOtherAPI(
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: (
-            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
-        ) = None,
+        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: (
-            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
-        ) = None,
+        search_properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -305,14 +289,10 @@ class Implementation1sPygenModelsOtherAPI(
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: (
-            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
-        ) = None,
-        group_by: Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] = None,
+        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        group_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] = None,
         query: str | None = None,
-        search_properties: (
-            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
-        ) = None,
+        search_properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -333,16 +313,10 @@ class Implementation1sPygenModelsOtherAPI(
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        property: (
-            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
-        ) = None,
-        group_by: (
-            Implementation1sPygenModelsOtherFields | Sequence[Implementation1sPygenModelsOtherFields] | None
-        ) = None,
+        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        group_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
         query: str | None = None,
-        search_property: (
-            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
-        ) = None,
+        search_property: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -354,7 +328,7 @@ class Implementation1sPygenModelsOtherAPI(
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        """Aggregate data across implementation 1 s pygen models others
+        """Aggregate data across implementation 1 v 1
 
         Args:
             aggregate: The aggregation to perform.
@@ -370,7 +344,7 @@ class Implementation1sPygenModelsOtherAPI(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 s pygen models others to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
@@ -378,15 +352,15 @@ class Implementation1sPygenModelsOtherAPI(
 
         Examples:
 
-            Count implementation 1 s pygen models others in space `my_space`:
+            Count implementation 1 v 1 in space `my_space`:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
+                >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> result = client.implementation_1_s_pygen_models_other.aggregate("count", space="my_space")
+                >>> result = client.implementation_1_v_1.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_implementation_1_s_pygen_models_other_filter(
+        filter_ = _create_implementation_1_v_1_filter(
             self._view_id,
             main_value,
             main_value_prefix,
@@ -401,7 +375,7 @@ class Implementation1sPygenModelsOtherAPI(
         return self._aggregate(
             self._view_id,
             aggregate,
-            _IMPLEMENTATION1SPYGENMODELSOTHER_PROPERTIES_BY_FIELD,
+            _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -412,12 +386,10 @@ class Implementation1sPygenModelsOtherAPI(
 
     def histogram(
         self,
-        property: Implementation1sPygenModelsOtherFields,
+        property: Implementation1v1Fields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            Implementation1sPygenModelsOtherTextFields | Sequence[Implementation1sPygenModelsOtherTextFields] | None
-        ) = None,
+        search_property: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -429,7 +401,7 @@ class Implementation1sPygenModelsOtherAPI(
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for implementation 1 s pygen models others
+        """Produces histograms for implementation 1 v 1
 
         Args:
             property: The property to use as the value in the histogram.
@@ -444,14 +416,14 @@ class Implementation1sPygenModelsOtherAPI(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 s pygen models others to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_implementation_1_s_pygen_models_other_filter(
+        filter_ = _create_implementation_1_v_1_filter(
             self._view_id,
             main_value,
             main_value_prefix,
@@ -467,7 +439,7 @@ class Implementation1sPygenModelsOtherAPI(
             self._view_id,
             property,
             interval,
-            _IMPLEMENTATION1SPYGENMODELSOTHER_PROPERTIES_BY_FIELD,
+            _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -486,8 +458,8 @@ class Implementation1sPygenModelsOtherAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> Implementation1sPygenModelsOtherList:
-        """List/filter implementation 1 s pygen models others
+    ) -> Implementation1v1List:
+        """List/filter implementation 1 v 1
 
         Args:
             main_value: The main value to filter on.
@@ -498,22 +470,22 @@ class Implementation1sPygenModelsOtherAPI(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 s pygen models others to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of requested implementation 1 s pygen models others
+            List of requested implementation 1 v 1
 
         Examples:
 
-            List implementation 1 s pygen models others and limit to 5:
+            List implementation 1 v 1 and limit to 5:
 
-                >>> from omni_multi_pydantic_v1 import OmniMultiClient
+                >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_s_pygen_models_others = client.implementation_1_s_pygen_models_other.list(limit=5)
+                >>> implementation_1_v_1_list = client.implementation_1_v_1.list(limit=5)
 
         """
-        filter_ = _create_implementation_1_s_pygen_models_other_filter(
+        filter_ = _create_implementation_1_v_1_filter(
             self._view_id,
             main_value,
             main_value_prefix,

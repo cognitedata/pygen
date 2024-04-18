@@ -1,12 +1,13 @@
 space: IntegrationTestsImmutable
 externalId: ScenarioInstance
-description: ''
 name: ScenarioInstance
+description: ''
 version: '1'
 views:
 - space: IntegrationTestsImmutable
   externalId: ScenarioInstance
   name: ScenarioInstance
+  implements: []
   version: ee2b79fd98b5bb
   writable: true
   usedFor: node
