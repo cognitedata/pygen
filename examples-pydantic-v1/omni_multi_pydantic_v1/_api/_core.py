@@ -795,7 +795,6 @@ class GraphQLQueryResponse:
 
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
     dm.DataModelId("pygen-models", "OmniMultiA", "1"): {
-        "Implementation1": data_classes.Implementation1sPygenModelsGraphQL,
         "MainInterface": data_classes.MainInterfaceGraphQL,
         "SubInterface": data_classes.SubInterfaceGraphQL,
     },
@@ -805,6 +804,6 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
         "SubInterface": data_classes.SubInterfaceGraphQL,
     },
     dm.DataModelId("pygen-models", "OmniMultiC", "1"): {
-        "Implementation1": data_classes.Implementation1sPygenModelsOtherGraphQL,
+        "Implementation1": data_classes.Implementation1v1GraphQL,
     },
 }
