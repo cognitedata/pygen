@@ -24,37 +24,37 @@ from ._core import (
 
 
 __all__ = [
-    "Implementation1sPygenModelsOther",
-    "Implementation1sPygenModelsOtherWrite",
-    "Implementation1sPygenModelsOtherApply",
-    "Implementation1sPygenModelsOtherList",
-    "Implementation1sPygenModelsOtherWriteList",
-    "Implementation1sPygenModelsOtherApplyList",
-    "Implementation1sPygenModelsOtherFields",
-    "Implementation1sPygenModelsOtherTextFields",
+    "Implementation1v1",
+    "Implementation1v1Write",
+    "Implementation1v1Apply",
+    "Implementation1v1List",
+    "Implementation1v1WriteList",
+    "Implementation1v1ApplyList",
+    "Implementation1v1Fields",
+    "Implementation1v1TextFields",
 ]
 
 
-Implementation1sPygenModelsOtherTextFields = Literal["main_value", "value_1", "value_2"]
-Implementation1sPygenModelsOtherFields = Literal["main_value", "value_1", "value_2"]
+Implementation1v1TextFields = Literal["main_value", "value_1", "value_2"]
+Implementation1v1Fields = Literal["main_value", "value_1", "value_2"]
 
-_IMPLEMENTATION1SPYGENMODELSOTHER_PROPERTIES_BY_FIELD = {
+_IMPLEMENTATION1V1_PROPERTIES_BY_FIELD = {
     "main_value": "mainValue",
     "value_1": "value1",
     "value_2": "value2",
 }
 
 
-class Implementation1sPygenModelsOtherGraphQL(GraphQLCore):
-    """This represents the reading version of implementation 1 s pygen models other, used
+class Implementation1v1GraphQL(GraphQLCore):
+    """This represents the reading version of implementation 1 v 1, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 s pygen models other.
-        data_record: The data record of the implementation 1 s pygen models other node.
+        external_id: The external id of the implementation 1 v 1.
+        data_record: The data record of the implementation 1 v 1 node.
         main_value: The main value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
@@ -76,11 +76,11 @@ class Implementation1sPygenModelsOtherGraphQL(GraphQLCore):
             )
         return values
 
-    def as_read(self) -> Implementation1sPygenModelsOther:
-        """Convert this GraphQL format of implementation 1 s pygen models other to the reading format."""
+    def as_read(self) -> Implementation1v1:
+        """Convert this GraphQL format of implementation 1 v 1 to the reading format."""
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Implementation1sPygenModelsOther(
+        return Implementation1v1(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
@@ -93,9 +93,9 @@ class Implementation1sPygenModelsOtherGraphQL(GraphQLCore):
             value_2=self.value_2,
         )
 
-    def as_write(self) -> Implementation1sPygenModelsOtherWrite:
-        """Convert this GraphQL format of implementation 1 s pygen models other to the writing format."""
-        return Implementation1sPygenModelsOtherWrite(
+    def as_write(self) -> Implementation1v1Write:
+        """Convert this GraphQL format of implementation 1 v 1 to the writing format."""
+        return Implementation1v1Write(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
@@ -105,15 +105,15 @@ class Implementation1sPygenModelsOtherGraphQL(GraphQLCore):
         )
 
 
-class Implementation1sPygenModelsOther(DomainModel):
-    """This represents the reading version of implementation 1 s pygen models other.
+class Implementation1v1(DomainModel):
+    """This represents the reading version of implementation 1 v 1.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 s pygen models other.
-        data_record: The data record of the implementation 1 s pygen models other node.
+        external_id: The external id of the implementation 1 v 1.
+        data_record: The data record of the implementation 1 v 1 node.
         main_value: The main value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
@@ -125,9 +125,9 @@ class Implementation1sPygenModelsOther(DomainModel):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def as_write(self) -> Implementation1sPygenModelsOtherWrite:
-        """Convert this read version of implementation 1 s pygen models other to the writing version."""
-        return Implementation1sPygenModelsOtherWrite(
+    def as_write(self) -> Implementation1v1Write:
+        """Convert this read version of implementation 1 v 1 to the writing version."""
+        return Implementation1v1Write(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -136,8 +136,8 @@ class Implementation1sPygenModelsOther(DomainModel):
             value_2=self.value_2,
         )
 
-    def as_apply(self) -> Implementation1sPygenModelsOtherWrite:
-        """Convert this read version of implementation 1 s pygen models other to the writing version."""
+    def as_apply(self) -> Implementation1v1Write:
+        """Convert this read version of implementation 1 v 1 to the writing version."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -146,15 +146,15 @@ class Implementation1sPygenModelsOther(DomainModel):
         return self.as_write()
 
 
-class Implementation1sPygenModelsOtherWrite(DomainModelWrite):
-    """This represents the writing version of implementation 1 s pygen models other.
+class Implementation1v1Write(DomainModelWrite):
+    """This represents the writing version of implementation 1 v 1.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 s pygen models other.
-        data_record: The data record of the implementation 1 s pygen models other node.
+        external_id: The external id of the implementation 1 v 1.
+        data_record: The data record of the implementation 1 v 1 node.
         main_value: The main value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
@@ -178,7 +178,7 @@ class Implementation1sPygenModelsOtherWrite(DomainModelWrite):
             return resources
 
         write_view = (view_by_read_class or {}).get(
-            Implementation1sPygenModelsOther, dm.ViewId("pygen-models-other", "Implementation1", "1")
+            Implementation1v1, dm.ViewId("pygen-models-other", "Implementation1", "1")
         )
 
         properties: dict[str, Any] = {}
@@ -211,28 +211,28 @@ class Implementation1sPygenModelsOtherWrite(DomainModelWrite):
         return resources
 
 
-class Implementation1sPygenModelsOtherApply(Implementation1sPygenModelsOtherWrite):
-    def __new__(cls, *args, **kwargs) -> Implementation1sPygenModelsOtherApply:
+class Implementation1v1Apply(Implementation1v1Write):
+    def __new__(cls, *args, **kwargs) -> Implementation1v1Apply:
         warnings.warn(
-            "Implementation1sPygenModelsOtherApply is deprecated and will be removed in v1.0. Use Implementation1sPygenModelsOtherWrite instead."
+            "Implementation1v1Apply is deprecated and will be removed in v1.0. Use Implementation1v1Write instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Implementation1sPygenModelsOther.",
+            "Implementation1v1.",
             UserWarning,
             stacklevel=2,
         )
         return super().__new__(cls)
 
 
-class Implementation1sPygenModelsOtherList(DomainModelList[Implementation1sPygenModelsOther]):
-    """List of implementation 1 s pygen models others in the read version."""
+class Implementation1v1List(DomainModelList[Implementation1v1]):
+    """List of implementation 1 v 1 in the read version."""
 
-    _INSTANCE = Implementation1sPygenModelsOther
+    _INSTANCE = Implementation1v1
 
-    def as_write(self) -> Implementation1sPygenModelsOtherWriteList:
-        """Convert these read versions of implementation 1 s pygen models other to the writing versions."""
-        return Implementation1sPygenModelsOtherWriteList([node.as_write() for node in self.data])
+    def as_write(self) -> Implementation1v1WriteList:
+        """Convert these read versions of implementation 1 v 1 to the writing versions."""
+        return Implementation1v1WriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> Implementation1sPygenModelsOtherWriteList:
+    def as_apply(self) -> Implementation1v1WriteList:
         """Convert these read versions of primitive nullable to the writing versions."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
@@ -242,16 +242,16 @@ class Implementation1sPygenModelsOtherList(DomainModelList[Implementation1sPygen
         return self.as_write()
 
 
-class Implementation1sPygenModelsOtherWriteList(DomainModelWriteList[Implementation1sPygenModelsOtherWrite]):
-    """List of implementation 1 s pygen models others in the writing version."""
+class Implementation1v1WriteList(DomainModelWriteList[Implementation1v1Write]):
+    """List of implementation 1 v 1 in the writing version."""
 
-    _INSTANCE = Implementation1sPygenModelsOtherWrite
-
-
-class Implementation1sPygenModelsOtherApplyList(Implementation1sPygenModelsOtherWriteList): ...
+    _INSTANCE = Implementation1v1Write
 
 
-def _create_implementation_1_s_pygen_models_other_filter(
+class Implementation1v1ApplyList(Implementation1v1WriteList): ...
+
+
+def _create_implementation_1_v_1_filter(
     view_id: dm.ViewId,
     main_value: str | list[str] | None = None,
     main_value_prefix: str | None = None,
