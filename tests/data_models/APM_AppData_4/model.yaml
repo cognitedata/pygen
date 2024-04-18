@@ -1,12 +1,13 @@
 space: APM_AppData_4
 externalId: APM_AppData_4
-description: ''
 name: APM_AppData_4
+description: ''
 version: '7'
 views:
 - space: APM_AppData_4
   externalId: APM_Checklist
   name: APM_Checklist
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -208,6 +209,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_ChecklistItem
   name: APM_ChecklistItem
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -439,6 +441,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_Measurement
   name: APM_Measurement
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -637,6 +640,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_Observation
   name: APM_Observation
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -750,6 +754,7 @@ views:
         externalId: APM_Observation
       containerPropertyIdentifier: position
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -852,6 +857,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_Schedule
   name: APM_Schedule
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -1022,6 +1028,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_Template
   name: APM_Template
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -1150,6 +1157,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_TemplateItem
   name: APM_TemplateItem
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -1264,6 +1272,7 @@ views:
 - space: APM_AppData_4
   externalId: APM_User
   name: APM_User
+  implements: []
   version: '7'
   writable: true
   usedFor: node
@@ -1332,6 +1341,7 @@ views:
 - space: APM_AppData_4
   externalId: Vec3f
   name: Vec3f
+  implements: []
   version: '7'
   writable: true
   usedFor: node

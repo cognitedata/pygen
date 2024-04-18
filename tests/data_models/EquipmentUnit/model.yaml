@@ -1,12 +1,13 @@
 space: IntegrationTestsImmutable
 externalId: EquipmentUnit
-description: ''
 name: EquipmentUnit
+description: ''
 version: '2'
 views:
 - space: IntegrationTestsImmutable
   externalId: EquipmentModule
   name: EquipmentModule
+  implements: []
   version: b1cd4bf14a7a33
   writable: true
   usedFor: node
@@ -76,6 +77,7 @@ views:
 - space: IntegrationTestsImmutable
   externalId: StartEndTime
   name: StartEndTime
+  implements: []
   version: d416e0ed98186b
   writable: true
   usedFor: edge
@@ -114,6 +116,7 @@ views:
 - space: IntegrationTestsImmutable
   externalId: UnitProcedure
   name: UnitProcedure
+  implements: []
   version: a6e2fea1e1c664
   writable: true
   usedFor: node
@@ -190,6 +193,7 @@ views:
 - space: IntegrationTestsImmutable
   externalId: WorkOrder
   name: WorkOrder
+  implements: []
   version: c5543fb2b1bc81
   writable: true
   usedFor: node

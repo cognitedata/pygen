@@ -1,7 +1,7 @@
 space: tutorial_apm_simple
 externalId: ApmSimple
-description: Bug from Lars
 name: ApmSimple
+description: Bug from Lars
 version: '6'
 views:
 - space: tutorial_apm_simple
@@ -182,6 +182,7 @@ views:
         externalId: Asset
       containerPropertyIdentifier: parent
       type:
+        list: false
         type: direct
         source:
           space: tutorial_apm_simple
@@ -282,6 +283,7 @@ views:
   createdTime: 1694865892001
 - space: cdf_3d_schema
   externalId: Cdf3dConnectionProperties
+  implements: []
   version: '1'
   writable: true
   usedFor: edge
@@ -315,10 +317,11 @@ views:
       defaultValue: null
       name: null
       description: null
-  lastUpdatedTime: 1704190918843
+  lastUpdatedTime: 1712744636257
   createdTime: 1690467703871
 - space: cdf_3d_schema
   externalId: Cdf3dEntity
+  implements: []
   version: '1'
   writable: false
   usedFor: all
@@ -342,10 +345,11 @@ views:
         type: view
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1704190918843
+  lastUpdatedTime: 1712744636257
   createdTime: 1690467703871
 - space: cdf_3d_schema
   externalId: Cdf3dModel
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -384,12 +388,13 @@ views:
       defaultValue: null
       name: null
       description: null
-  lastUpdatedTime: 1704190918843
+  lastUpdatedTime: 1712744636257
   createdTime: 1690467703871
 - space: tutorial_apm_simple
   externalId: WorkItem
-  description: '@name Work item'
   name: Work item
+  description: '@name Work item'
+  implements: []
   version: 18ac48abbe96aa
   writable: true
   usedFor: node
@@ -533,6 +538,7 @@ views:
         externalId: WorkItem
       containerPropertyIdentifier: workOrder
       type:
+        list: false
         type: direct
         source:
           space: tutorial_apm_simple
@@ -547,8 +553,9 @@ views:
   createdTime: 1694865892001
 - space: tutorial_apm_simple
   externalId: WorkOrder
-  description: '@name Work order'
   name: Work order
+  description: '@name Work order'
+  implements: []
   version: 6f36e59c3c4896
   writable: true
   usedFor: node

@@ -1,11 +1,12 @@
 space: IntegrationTestsImmutable
 externalId: ApmAppData
-description: APM data models within the cognite applications space
 name: ApmAppData
+description: APM data models within the cognite applications space
 version: v3
 views:
 - space: IntegrationTestsImmutable
   externalId: Asset
+  implements: []
   version: v1
   writable: true
   usedFor: node
@@ -47,6 +48,7 @@ views:
         externalId: Asset
       containerPropertyIdentifier: parent
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -60,6 +62,7 @@ views:
         externalId: Asset
       containerPropertyIdentifier: root
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -116,6 +119,7 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: CDF_User
+  implements: []
   version: v1
   writable: true
   usedFor: node
@@ -157,6 +161,7 @@ views:
         externalId: CDF_User
       containerPropertyIdentifier: preferences
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -168,6 +173,7 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: CDF_UserPreferences
+  implements: []
   version: v1
   writable: true
   usedFor: node
@@ -206,10 +212,11 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: Checklist
+  name: Checklist
   description: The Checklist view provides functionality for executing maintenance
     and inspection work. It maintains a list of checklist items (tasks) associated
     with specific maintenance and inspection activities.
-  name: Checklist
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -250,6 +257,7 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -321,6 +329,7 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: rootLocation
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -423,6 +432,7 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -449,10 +459,11 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: ChecklistItem
+  name: Checklist item
   description: The checklist item view is used for managing individual maintenance
     and inspection tasks within a checklist. It allows users to track the execution
     order, status, notes, associated assets, and related observations for each task.
-  name: Checklist item
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -464,6 +475,7 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: asset
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -477,6 +489,7 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -693,6 +706,7 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -719,11 +733,12 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: MeasurementReading
+  name: Measurement reading
   description: The Measurement reading view facilitates the collection of field data
     by making readings. It supports various measurement types (e.g., numerical, label)
     and includes information about execution order, associated time series, value
     ranges, and the timestamp of the last reading.
-  name: Measurement reading
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -735,6 +750,7 @@ views:
         externalId: MeasurementReading
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -892,6 +908,7 @@ views:
         externalId: MeasurementReading
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -918,11 +935,12 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: Observation
+  name: Observation
   description: The Observation view captures anomaly reports created by field operators.
     It records information about the status, associated assets, related files, root
     locations, troubleshooting details, priority, and the type of observation (e.g.,
     Malfunction report, Maintenance request).
-  name: Observation
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -934,6 +952,7 @@ views:
         externalId: Observation
       containerPropertyIdentifier: asset
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -947,6 +966,7 @@ views:
         externalId: Observation
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1033,6 +1053,7 @@ views:
         externalId: Observation
       containerPropertyIdentifier: rootLocation
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1137,6 +1158,7 @@ views:
         externalId: Observation
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1163,12 +1185,13 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: Schedule
+  name: Schedule
   description: The Schedule view provides a flexible scheduling framework that can
     be applied across different models, such as Templates, Robotics Missions, and
     Template Tasks. It aligns with the ICS calendar format and offers features like
     status tracking, time zone configuration, exception dates, frequency settings,
     and end date.
-  name: Schedule
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -1196,6 +1219,7 @@ views:
         externalId: Schedule
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1345,6 +1369,7 @@ views:
         externalId: Schedule
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1371,11 +1396,12 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: Template
+  name: Template
   description: The Template view is used for creating standardized maintenance and
     inspection tasks. It defines the status of the template (e.g., draft, ready) and
     includes a list of template items (tasks) that can be reused for various maintenance
     and inspection activities.
-  name: Template
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -1402,6 +1428,7 @@ views:
         externalId: Template
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1459,6 +1486,7 @@ views:
         externalId: Template
       containerPropertyIdentifier: rootLocation
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1516,6 +1544,7 @@ views:
         externalId: Template
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1542,10 +1571,11 @@ views:
   createdTime: 1699196213142
 - space: IntegrationTestsImmutable
   externalId: TemplateItem
+  name: Template item
   description: The template item view is designed for creating individual maintenance
     and inspection tasks within a template. It specifies the execution order, associated
     assets, measurements, schedules, and other relevant details for each task.
-  name: Template item
+  implements: []
   version: v3
   writable: true
   usedFor: node
@@ -1557,6 +1587,7 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: asset
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1570,6 +1601,7 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: createdBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false
@@ -1684,6 +1716,7 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: updatedBy
       type:
+        list: false
         type: direct
       nullable: true
       autoIncrement: false

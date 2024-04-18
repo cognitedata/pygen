@@ -1,15 +1,5 @@
 - space: omni-instances
   instanceType: node
-  externalId: CDFExternalReferences:Anthony
-  version: 1
-  lastUpdatedTime: 1709996766375
-  createdTime: 1709996766375
-  properties:
-    pygen-models:
-      CDFExternalReferences/1:
-        file: file_patricia
-- space: omni-instances
-  instanceType: node
   externalId: CDFExternalReferences:Jeffrey
   version: 2
   lastUpdatedTime: 1703845439090
@@ -19,16 +9,6 @@
       CDFExternalReferences/1:
         sequence: sequence_james
         timeseries: timeseries_amy
-- space: omni-instances
-  instanceType: node
-  externalId: CDFExternalReferences:Jill
-  version: 1
-  lastUpdatedTime: 1709996766375
-  createdTime: 1709996766375
-  properties:
-    pygen-models:
-      CDFExternalReferences/1:
-        file: file_angel
 - space: omni-instances
   instanceType: node
   externalId: CDFExternalReferences:Matthew
@@ -80,15 +60,6 @@
         timeseries:
         - timeseries_francisco
         - timeseries_michael
-- space: omni-instances
-  instanceType: node
-  externalId: CDFExternalReferencesListed:Jesse
-  version: 1
-  lastUpdatedTime: 1709996766375
-  createdTime: 1709996766375
-  properties:
-    pygen-models:
-      CDFExternalReferencesListed/1: {}
 - space: omni-instances
   instanceType: node
   externalId: CDFExternalReferencesListed:Linda

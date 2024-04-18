@@ -1,12 +1,13 @@
 space: power-models
 externalId: Windmill
-description: ''
 name: Windmill
+description: ''
 version: '1'
 views:
 - space: power-models
   externalId: Blade
   name: Blade
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -60,6 +61,7 @@ views:
 - space: power-models
   externalId: Gearbox
   name: Gearbox
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -112,6 +114,7 @@ views:
 - space: power-models
   externalId: Generator
   name: Generator
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -150,6 +153,7 @@ views:
 - space: power-models
   externalId: HighSpeedShaft
   name: HighSpeedShaft
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -202,6 +206,7 @@ views:
 - space: power-models
   externalId: MainShaft
   name: MainShaft
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -282,6 +287,7 @@ views:
 - space: power-models
   externalId: Metmast
   name: Metmast
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -348,6 +354,7 @@ views:
 - space: power-models
   externalId: Nacelle
   name: Nacelle
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -401,6 +408,7 @@ views:
         externalId: Nacelle
       containerPropertyIdentifier: gearbox
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -417,6 +425,7 @@ views:
         externalId: Nacelle
       containerPropertyIdentifier: generator
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -433,6 +442,7 @@ views:
         externalId: Nacelle
       containerPropertyIdentifier: high_speed_shaft
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -449,6 +459,7 @@ views:
         externalId: Nacelle
       containerPropertyIdentifier: main_shaft
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -465,6 +476,7 @@ views:
         externalId: Nacelle
       containerPropertyIdentifier: power_inverter
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -508,6 +520,7 @@ views:
 - space: power-models
   externalId: PowerInverter
   name: PowerInverter
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -560,6 +573,7 @@ views:
 - space: power-models
   externalId: Rotor
   name: Rotor
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -598,6 +612,7 @@ views:
 - space: power-models
   externalId: SensorPosition
   name: SensorPosition
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -734,6 +749,7 @@ views:
 - space: power-models
   externalId: Windmill
   name: Windmill
+  implements: []
   version: '1'
   writable: true
   usedFor: node
@@ -787,6 +803,7 @@ views:
         externalId: Windmill
       containerPropertyIdentifier: nacelle
       type:
+        list: false
         type: direct
         source:
           space: power-models
@@ -818,6 +835,7 @@ views:
         externalId: Windmill
       containerPropertyIdentifier: rotor
       type:
+        list: false
         type: direct
         source:
           space: power-models
