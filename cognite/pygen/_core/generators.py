@@ -432,6 +432,10 @@ class APIGenerator:
             raise ValueError("Please call create_edge_apis before accessing edge_apis.")
         return self._edge_apis
 
+    @property
+    def has_edge_api_dependencies(self) -> bool:
+        return any(True for api in self.edge_apis if api.end_view_id != self.api_class.view_id)
+
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         unique_start_classes = []
         unique_end_classes = []
@@ -522,6 +526,7 @@ class APIGenerator:
                 list_method=self.list_method,
                 query_api=self.query_api,
                 edge_apis=self.edge_apis,
+                has_edge_api_dependencies=self.has_edge_api_dependencies,
                 unique_edge_data_classes=unique_edge_data_classes,
                 # ft = field types
                 ft=fields,

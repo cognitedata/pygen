@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.21] - 02-05-24
+### Fixed
+- When calling the function `generate_sdk` or `generate_sdk_notebook` with a data model containing a view used for
+  edge properties, there was an edge case that caused
+  `IndentationError: expected an indented block after 'if' statement on line 22`. This is now fixed.
+
 ## [0.99.20] - 18-04-24
 ### Fixed
 - Upgrading to `cognite-sdk>=7.37` caused the generated SDK to fail with:
