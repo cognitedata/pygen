@@ -14,14 +14,14 @@ properties:
   name:
     container:
       space: pygen-models
-      externalId: ConnectionBase
+      externalId: ConnectionDirectList
       type: container
     containerPropertyIdentifier: name
     name: name
   directList:
     container:
       space: pygen-models
-      externalId: ConnectionBase
+      externalId: ConnectionDirectList
       type: container
     source:
       space: pygen-models

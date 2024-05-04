@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: ConnectionBase
-name: ConnectionBase
+externalId: ConnectionDirectList
+name: ConnectionDirectList
 usedFor: node
 properties:
   name:
@@ -11,17 +11,17 @@ properties:
     nullable: true
     autoIncrement: false
     name: name
-  direct1:
+  directList:
+    type:
+      type: direct
+      list: true
+    nullable: true
+    autoIncrement: false
+    name: directList
+  directNoList:
     type:
       type: direct
       list: false
     nullable: true
     autoIncrement: false
-    name: direct1
-  direct2:
-    type:
-      type: direct
-      list: false
-    nullable: true
-    autoIncrement: false
-    name: direct2
+    name: directNoList
