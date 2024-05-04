@@ -86,6 +86,17 @@ from ._connection_item_e import (
     ConnectionItemEWrite,
     ConnectionItemEWriteList,
 )
+from ._connection_item_f import (
+    ConnectionItemF,
+    ConnectionItemFApply,
+    ConnectionItemFApplyList,
+    ConnectionItemFFields,
+    ConnectionItemFGraphQL,
+    ConnectionItemFList,
+    ConnectionItemFTextFields,
+    ConnectionItemFWrite,
+    ConnectionItemFWriteList,
+)
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
     DependentOnNonWritableApply,
@@ -297,6 +308,19 @@ ConnectionItemEApply.update_forward_refs(
     ConnectionItemDWrite=ConnectionItemDWrite,
 )
 
+ConnectionItemF.update_forward_refs(
+    ConnectionItemD=ConnectionItemD,
+)
+ConnectionItemFGraphQL.update_forward_refs(
+    ConnectionItemDGraphQL=ConnectionItemDGraphQL,
+)
+ConnectionItemFWrite.update_forward_refs(
+    ConnectionItemDWrite=ConnectionItemDWrite,
+)
+ConnectionItemFApply.update_forward_refs(
+    ConnectionItemDWrite=ConnectionItemDWrite,
+)
+
 DependentOnNonWritable.update_forward_refs(
     Implementation1NonWriteable=Implementation1NonWriteable,
 )
@@ -380,6 +404,15 @@ __all__ = [
     "ConnectionItemEApplyList",
     "ConnectionItemEFields",
     "ConnectionItemETextFields",
+    "ConnectionItemF",
+    "ConnectionItemFGraphQL",
+    "ConnectionItemFWrite",
+    "ConnectionItemFApply",
+    "ConnectionItemFList",
+    "ConnectionItemFWriteList",
+    "ConnectionItemFApplyList",
+    "ConnectionItemFFields",
+    "ConnectionItemFTextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableGraphQL",
     "DependentOnNonWritableWrite",

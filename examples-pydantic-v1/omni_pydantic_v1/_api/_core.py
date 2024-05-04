@@ -802,6 +802,7 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE = {
         "ConnectionItemC": data_classes.ConnectionItemCGraphQL,
         "ConnectionItemD": data_classes.ConnectionItemDGraphQL,
         "ConnectionItemE": data_classes.ConnectionItemEGraphQL,
+        "ConnectionItemF": data_classes.ConnectionItemFGraphQL,
         "DependentOnNonWritable": data_classes.DependentOnNonWritableGraphQL,
         "Empty": data_classes.EmptyGraphQL,
         "Implementation1": data_classes.Implementation1GraphQL,
