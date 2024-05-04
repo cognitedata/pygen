@@ -86,6 +86,17 @@ from ._connection_item_e import (
     ConnectionItemEWrite,
     ConnectionItemEWriteList,
 )
+from ._connection_item_f import (
+    ConnectionItemF,
+    ConnectionItemFApply,
+    ConnectionItemFApplyList,
+    ConnectionItemFFields,
+    ConnectionItemFGraphQL,
+    ConnectionItemFList,
+    ConnectionItemFTextFields,
+    ConnectionItemFWrite,
+    ConnectionItemFWriteList,
+)
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
     DependentOnNonWritableApply,
@@ -235,6 +246,10 @@ ConnectionItemE.model_rebuild()
 ConnectionItemEGraphQL.model_rebuild()
 ConnectionItemEWrite.model_rebuild()
 ConnectionItemEApply.model_rebuild()
+ConnectionItemF.model_rebuild()
+ConnectionItemFGraphQL.model_rebuild()
+ConnectionItemFWrite.model_rebuild()
+ConnectionItemFApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
@@ -314,6 +329,15 @@ __all__ = [
     "ConnectionItemEApplyList",
     "ConnectionItemEFields",
     "ConnectionItemETextFields",
+    "ConnectionItemF",
+    "ConnectionItemFGraphQL",
+    "ConnectionItemFWrite",
+    "ConnectionItemFApply",
+    "ConnectionItemFList",
+    "ConnectionItemFWriteList",
+    "ConnectionItemFApplyList",
+    "ConnectionItemFFields",
+    "ConnectionItemFTextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableGraphQL",
     "DependentOnNonWritableWrite",
