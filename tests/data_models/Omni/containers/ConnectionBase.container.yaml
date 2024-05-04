@@ -14,12 +14,21 @@ properties:
   direct1:
     type:
       type: direct
+      list: false
     nullable: true
     autoIncrement: false
     name: direct1
   direct2:
     type:
       type: direct
+      list: false
     nullable: true
     autoIncrement: false
     name: direct2
+  directList:
+    type:
+      type: direct
+      list: true
+    nullable: true
+    autoIncrement: false
+    name: directList

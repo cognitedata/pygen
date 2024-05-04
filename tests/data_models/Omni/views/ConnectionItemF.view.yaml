@@ -1,0 +1,32 @@
+space: pygen-models
+externalId: ConnectionItemF
+name: ConnectionItemF
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: pygen-models
+      externalId: ConnectionItemF
+properties:
+  name:
+    container:
+      space: pygen-models
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  directList:
+    container:
+      space: pygen-models
+      externalId: ConnectionBase
+      type: container
+    source:
+      space: pygen-models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+    containerPropertyIdentifier: directList
+    name: directList
