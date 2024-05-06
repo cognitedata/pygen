@@ -88,26 +88,26 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return CDFExternalReferencesListed(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            files=self.files,
-            sequences=self.sequences,
+            files=[item["externalId"] for item in self.files or [] if "externalId" in item] or None,
+            sequences=[item["externalId"] for item in self.sequences or [] if "externalId" in item] or None,
             timeseries=self.timeseries,
         )
 
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this GraphQL format of cdf external references listed to the writing format."""
         return CDFExternalReferencesListedWrite(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            files=self.files,
-            sequences=self.sequences,
+            files=[item["externalId"] for item in self.files or [] if "externalId" in item] or None,
+            sequences=[item["externalId"] for item in self.sequences or [] if "externalId" in item] or None,
             timeseries=self.timeseries,
         )
 

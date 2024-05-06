@@ -65,6 +65,7 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
     item: odc.CDFExternalReferencesListedGraphQL
     for item in result:
         item.as_read()
+        item.as_write()
 
 
 def test_query_paging(omni_client: OmniClient) -> None:
