@@ -37,6 +37,8 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
   listCDFExternalReferencesListed{
     items{
        __typename
+      createdTime
+      lastUpdatedTime
       timeseries {
         externalId
         name
@@ -49,7 +51,6 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
       sequences{
         externalId
         name
-
       }
     }
   }
@@ -61,6 +62,9 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
     assert isinstance(result[0], odc.CDFExternalReferencesListedGraphQL)
     assert len(result[0].timeseries) > 0
     assert isinstance(result[0].timeseries[0], TimeSeries)
+    item: odc.CDFExternalReferencesListedGraphQL
+    for item in result:
+        item.as_read()
 
 
 def test_query_paging(omni_client: OmniClient) -> None:
