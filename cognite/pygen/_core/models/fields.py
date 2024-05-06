@@ -213,6 +213,10 @@ class Field(ABC):
         """Used in the .as_write() method for the read version of the data class."""
         raise NotImplementedError
 
+    def as_write_graphql(self) -> str:
+        """Used in the .as_write() method for the graphQL version of the data class."""
+        return self.as_write()
+
     @abstractmethod
     def as_read(self) -> str:
         """Used in the .as_read() method for the graphQL version of the data class."""
@@ -413,6 +417,20 @@ class CDFExternalField(PrimitiveFieldCore):
         else:
             out_type = f"Union[{type_}, None] = None"
         return out_type
+
+    def as_write_graphql(self) -> str:
+        if self.is_time_series:
+            # TimeSeries Supports converting from dict.
+            return self.as_write()
+
+        if self.is_list:
+            return f'[item["externalId"] for item in self.{self.name} or [] if "externalId" in item] or None'
+        else:
+            return f'self.{self.name}["externalId"] if self.{self.name} and "externalId" in self.{self.name} else None'
+
+    def as_read(self) -> str:
+        # Read is only used in graphql
+        return self.as_write_graphql()
 
 
 @dataclass(frozen=True)

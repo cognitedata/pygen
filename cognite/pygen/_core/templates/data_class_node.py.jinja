@@ -92,7 +92,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return {{ data_class.read_name }}(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -106,10 +106,10 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
         return {{ data_class.write_name }}(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
-            {{ field.name }}={{ field.as_write() }},{% endfor %}
+            {{ field.name }}={{ field.as_write_graphql() }},{% endfor %}
         )
 {% endif %}
 

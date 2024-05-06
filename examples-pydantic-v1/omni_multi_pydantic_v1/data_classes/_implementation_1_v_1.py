@@ -81,7 +81,7 @@ class Implementation1v1GraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Implementation1v1(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -96,7 +96,7 @@ class Implementation1v1GraphQL(GraphQLCore):
     def as_write(self) -> Implementation1v1Write:
         """Convert this GraphQL format of implementation 1 v 1 to the writing format."""
         return Implementation1v1Write(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             main_value=self.main_value,

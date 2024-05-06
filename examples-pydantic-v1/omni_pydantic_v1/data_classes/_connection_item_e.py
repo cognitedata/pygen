@@ -90,7 +90,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return ConnectionItemE(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -107,7 +107,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this GraphQL format of connection item e to the writing format."""
         return ConnectionItemEWrite(
-            space=self.space,
+            space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             direct_no_source=self.direct_no_source,
