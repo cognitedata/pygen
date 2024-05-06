@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.22] - 06-05-24
+### Fixed
+- When calling `.as_read()` (or `.as_write()) on a `GraphQL` object in the generated SDK, with a file
+  or sequence, the generated SDK would raise a `pydantic_core._pydantic_core.ValidationError`. This is now fixed.
+
 ## [0.99.21] - 02-05-24
 ### Fixed
 - When calling the function `generate_sdk` or `generate_sdk_notebook` with a data model containing a view used for
