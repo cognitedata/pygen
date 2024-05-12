@@ -1,3 +1,9 @@
+"""This subpackage contains the classes that represent the internal representation of the API and data classes.
+for the generated SDK.
+
+They are made from the input views to pygen.
+"""
+
 from . import fields
 from .api_classes import APIClass, MultiAPIClass
 from .data_classes import DataClass, EdgeDataClass, NodeDataClass

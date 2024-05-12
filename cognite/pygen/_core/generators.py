@@ -1,4 +1,9 @@
-"""This module contains the SDK generator classes."""
+"""This module contains the SDK generator classes.
+
+These are responsible for:
+1. Generating the internal representation from the input views.
+2. Use the internal representation with the Jinja templates to generate the SDK.
+"""
 
 from __future__ import annotations
 

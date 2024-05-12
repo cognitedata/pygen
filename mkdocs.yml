@@ -52,6 +52,7 @@ nav:
         - Home: developer_docs/index.md
         - Core:
             - Generators: developer_docs/core/generators.md
+            - Templates: developer_docs/core/templates.md
             - Models:
                 - APIClasses: developer_docs/core/models/api_classes.md
                 - DataClasses: developer_docs/core/models/data_classes.md
