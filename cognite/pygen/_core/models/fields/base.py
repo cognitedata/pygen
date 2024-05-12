@@ -245,26 +245,3 @@ class Field(ABC):
 
 
 T_Field = TypeVar("T_Field", bound=Field)
-
-
-def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
-    if isinstance(type_, (dm.Int32, dm.Int64)):
-        out_type = "int"
-    elif isinstance(type_, dm.Boolean):
-        out_type = "bool"
-    elif isinstance(type_, (dm.Float32, dm.Float64)):
-        out_type = "float"
-    elif isinstance(type_, dm.Date):
-        out_type = "datetime.date"
-    elif isinstance(type_, dm.Timestamp):
-        out_type = "datetime.datetime"
-    elif isinstance(type_, dm.Json):
-        out_type = "dict"
-    elif isinstance(type_, dm.TimeSeriesReference):
-        out_type = "TimeSeries"
-    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
-        out_type = "str"
-    else:
-        raise ValueError(f"Unknown type {type_}")
-
-    return out_type
