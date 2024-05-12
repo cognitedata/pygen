@@ -48,6 +48,8 @@ nav:
             - Text: api/utils_text.md
             - ExternalID Factories: api/utils_external_id_factory.md
     - Changelog: CHANGELOG.md
+    - Developer Docs:
+        - Home: developer_docs/index.md
 
 markdown_extensions:
   - pymdownx.superfences
