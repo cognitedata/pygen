@@ -1,3 +1,5 @@
+"""This module contains functions for validating the uniqueness of names in the generated classes."""
+
 from collections import defaultdict
 from typing import Any, cast
 
@@ -26,10 +28,12 @@ def validate_data_classes_unique_name(data_classes: list[DataClass]) -> None:
 
 
 def validate_api_classes_unique_names(api_classes: list[APIClass]) -> None:
+    """Checks that fields that are used in shared namespaces the API classes have unique names."""
     _validate(api_classes, _APICLASS_UNIQUE_PROPERTIES, "view_id", APIClass.__name__)
 
 
 def validate_multi_api_classes_unique_names(multi_api_classes: list[MultiAPIClass]) -> None:
+    """Checks that fields that are used in shared namespaces the MultiAPI classes have unique names."""
     _validate(multi_api_classes, _MULTIAPICLASS_UNIQUE_PROPERTIES, "model_id", MultiAPIClass.__name__)
 
 

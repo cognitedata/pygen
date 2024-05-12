@@ -1,0 +1,136 @@
+"""This module contains the primitive fields"""
+
+from __future__ import annotations
+
+from abc import ABC
+from dataclasses import dataclass
+
+from cognite.client.data_classes import data_modeling as dm
+
+from .base import Field, _to_python_type
+
+
+@dataclass(frozen=True)
+class PrimitiveFieldCore(Field, ABC):
+    """This is a base class for all primitive fields
+
+    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on.
+    """
+
+    type_: dm.PropertyType
+    is_nullable: bool
+
+    @property
+    def is_time_field(self) -> bool:
+        return isinstance(self.type_, (dm.Timestamp, dm.Date))
+
+    @property
+    def is_timestamp(self) -> bool:
+        return isinstance(self.type_, dm.Timestamp)
+
+    @property
+    def is_text_field(self) -> bool:
+        return isinstance(self.type_, dm.Text)
+
+    @property
+    def type_as_string(self) -> str:
+        return _to_python_type(self.type_)
+
+    def as_write(self) -> str:
+        return f"self.{self.name}"
+
+    def as_read(self) -> str:
+        return f"self.{self.name}"
+
+
+@dataclass(frozen=True)
+class ListFieldCore(PrimitiveFieldCore):
+    """
+    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
+    list[datetime.datetime], list[datetime.date].
+    """
+
+    variable: str
+
+    def as_read_type_hint(self) -> str:
+        if self.need_alias:
+            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[list[{self.type_as_string}]] = None"
+
+    def as_graphql_type_hint(self) -> str:
+        return self.as_read_type_hint()
+
+    def as_write_type_hint(self) -> str:
+        type_ = self.type_as_string
+        if self.is_nullable and self.need_alias:
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            return f"Optional[list[{type_}]] = None"
+        else:  # not self.is_nullable and not self.need_alias
+            return f"list[{type_}]"
+
+
+@dataclass(frozen=True)
+class PrimitiveField(PrimitiveFieldCore):
+    """
+    This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
+    """
+
+    default: str | int | dict | None = None
+
+    @property
+    def default_code(self) -> str:
+        if self.default is None:
+            return "None"
+        elif isinstance(self.default, str):
+            return f'"{self.default}"'
+        elif isinstance(self.default, dict):
+            return f"{self.default}"
+        else:
+            return f"{self.default}"
+
+    def as_read_type_hint(self) -> str:
+        if self.need_alias and self.is_nullable:
+            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'{self.type_as_string} = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            return f"Optional[{self.type_as_string}] = None"
+        else:
+            return f"{self.type_as_string}"
+
+    def as_graphql_type_hint(self) -> str:
+        if self.need_alias:
+            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[{self.type_as_string}] = None"
+
+    def as_write_type_hint(self) -> str:
+        out_type = self.type_as_string
+        if self.is_nullable and self.need_alias:
+            out_type = (
+                f"Optional[{self.type_as_string}] = "
+                f'{self.pydantic_field}({self.default_code}, alias="{self.prop_name}")'
+            )
+        elif self.need_alias:
+            out_type = f'{self.type_as_string} = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            out_type = f"Optional[{self.type_as_string}] = None"
+        elif self.default is not None or self.is_nullable:
+            out_type = f"{self.type_as_string} = {self.default_code}"
+        return out_type
+
+
+@dataclass(frozen=True)
+class PrimitiveListField(ListFieldCore):
+    """
+    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
+    list[datetime.datetime], list[datetime.date].
+    """
+
+    @property
+    def is_list(self) -> bool:
+        return True
