@@ -55,7 +55,11 @@ nav:
             - Models:
                 - APIClasses: developer_docs/core/models/api_classes.md
                 - DataClasses: developer_docs/core/models/data_classes.md
-                - Fields: developer_docs/core/models/fields.md
+                - Fields:
+                    - developer_docs/core/models/fields/base.md
+                    - developer_docs/core/models/fields/primitive.md
+                    - developer_docs/core/models/fields/cdf_reference.md
+                    - developer_docs/core/models/fields/connection.md
                 - FilterMethods: developer_docs/core/models/filter_methods.md
             - Validation: developer_docs/core/validation.md
 
