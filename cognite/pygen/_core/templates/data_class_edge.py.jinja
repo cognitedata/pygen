@@ -283,7 +283,7 @@ def {{ data_class.filter_name }}(
                     for ext_id in end_node
                 ],
             )
-        ){% for filter in list_method.filters %}
+        ){% for filter in list_method.implementations %}
     if {{ filter.condition }}:
         filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
     if filter:
