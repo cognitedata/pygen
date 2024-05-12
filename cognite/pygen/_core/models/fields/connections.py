@@ -48,7 +48,7 @@ class EdgeField(Field, ABC):
                     pydantic_field=base.pydantic_field,
                 )
             else:
-                EdgeOneToManyNodes(
+                return EdgeOneToManyNodes(
                     name=base.name,
                     doc_name=base.doc_name,
                     prop_name=base.prop_name,
