@@ -1,3 +1,5 @@
+"""This module contains the SDK generator classes."""
+
 from __future__ import annotations
 
 import itertools
