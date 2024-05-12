@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
 
+from .base import Field
 from .primitive import ListFieldCore, PrimitiveFieldCore
 
 
@@ -67,6 +68,32 @@ class CDFExternalField(PrimitiveFieldCore):
     def as_read(self) -> str:
         # Read is only used in graphql
         return self.as_write_graphql()
+
+    @classmethod
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> CDFExternalField | None:
+        if not isinstance(prop.type, dm.CDFExternalIdReference):
+            return None
+        if prop.type.is_list:
+            return CDFExternalListField(
+                name=base.name,
+                prop_name=base.prop_name,
+                doc_name=base.doc_name,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                description=prop.description,
+                pydantic_field=base.pydantic_field,
+                variable=variable,
+            )
+        else:
+            return CDFExternalField(
+                name=base.name,
+                prop_name=base.prop_name,
+                doc_name=base.doc_name,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                description=prop.description,
+                pydantic_field=base.pydantic_field,
+            )
 
 
 @dataclass(frozen=True)

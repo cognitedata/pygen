@@ -14,7 +14,8 @@ from .base import Field
 class PrimitiveFieldCore(Field, ABC):
     """This is a base class for all primitive fields
 
-    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on.
+    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on, including
+    any list of these types.
     """
 
     type_: dm.PropertyType
@@ -41,6 +42,31 @@ class PrimitiveFieldCore(Field, ABC):
 
     def as_read(self) -> str:
         return f"self.{self.name}"
+
+    @classmethod
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> PrimitiveFieldCore | None:
+        if prop.type.is_list:
+            return PrimitiveListField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                description=base.description,
+                pydantic_field=base.pydantic_field,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                variable=variable,
+            )
+        else:
+            return PrimitiveField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                description=base.description,
+                pydantic_field=base.pydantic_field,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                default=prop.default_value,
+            )
 
 
 @dataclass(frozen=True)

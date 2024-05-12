@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import warnings
 from abc import ABC
 from dataclasses import dataclass
 from functools import total_ordering
 from typing import TYPE_CHECKING, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling import MultiEdgeConnection
+from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, SingleEdgeConnection
 
 from .base import Field
 
@@ -22,6 +25,88 @@ class EdgeField(Field, ABC):
     @property
     def is_edge(self) -> bool:
         return True
+
+    @classmethod
+    def load(
+        cls,
+        base: Field,
+        prop: dm.ConnectionDefinition | dm.MappedProperty,
+        variable: str,
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+    ) -> EdgeField | None:
+        if isinstance(prop, MultiEdgeConnection):
+            if prop.edge_source:
+                return EdgeOneToManyEdges(
+                    name=base.name,
+                    doc_name=base.doc_name,
+                    prop_name=base.prop_name,
+                    variable=variable,
+                    data_class=data_class_by_view_id[prop.edge_source],
+                    edge_type=prop.type,
+                    edge_direction=prop.direction,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                )
+            else:
+                EdgeOneToManyNodes(
+                    name=base.name,
+                    doc_name=base.doc_name,
+                    prop_name=base.prop_name,
+                    variable=variable,
+                    data_class=data_class_by_view_id[prop.source],
+                    edge_type=prop.type,
+                    edge_direction=prop.direction,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+            if prop.source:
+                target_data_class = data_class_by_view_id[prop.source]
+                return EdgeOneToOne(
+                    name=base.name,
+                    prop_name=base.prop_name,
+                    description=prop.description,
+                    data_class=target_data_class,
+                    pydantic_field=base.pydantic_field,
+                    doc_name=base.doc_name,
+                )
+            else:
+                return EdgeOneToOneAny(
+                    name=base.name,
+                    prop_name=base.prop_name,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                    doc_name=base.doc_name,
+                )
+        elif isinstance(prop, SingleEdgeConnection) and prop.edge_source:
+            warnings.warn(
+                f"SingleEdgeConnection with edge properties is not yet supported, skipping {base.prop_name}.",
+                UserWarning,
+                stacklevel=2,
+            )
+        elif isinstance(prop, SingleEdgeConnection):
+            target_data_class = data_class_by_view_id[prop.source]
+            return EdgeTypedOneToOne(
+                name=base.name,
+                variable=variable,
+                edge_type=prop.type,
+                edge_direction=prop.direction,
+                prop_name=base.prop_name,
+                description=prop.description,
+                data_class=target_data_class,
+                pydantic_field=base.pydantic_field,
+                doc_name=base.doc_name,
+            )
+        elif isinstance(prop, ReverseDirectRelation):
+            # ReverseDirectRelation are skipped as they are not used in the generated SDK.
+            return None
+        else:
+            warnings.warn(
+                f"Property type={type(prop)} is not yet supported, skipping {base.prop_name}.",
+                UserWarning,
+                stacklevel=2,
+            )
+        return None
 
 
 @dataclass(frozen=True)
