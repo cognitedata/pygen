@@ -346,7 +346,7 @@ def {{ data_class.filter_name }}(
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []{% for filter in list_method.filters %}
+    filters = []{% for filter in list_method.implementations %}
     if {{ filter.condition }}:
         filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
     if filter:

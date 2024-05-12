@@ -1,3 +1,4 @@
+from . import fields
 from .api_classes import APIClass, MultiAPIClass
 from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import (
@@ -15,6 +16,7 @@ from .fields import (
 from .filter_methods import FilterImplementation, FilterImplementationOnetoOneEdge, FilterMethod, FilterParameter
 
 __all__ = [
+    "fields",
     "DataClass",
     "APIClass",
     "MultiAPIClass",
