@@ -1,6 +1,4 @@
-"""
-
-"""
+"""This module contains the class representing the filter used in the generated classes."""
 
 from __future__ import annotations
 
@@ -18,6 +16,16 @@ from .fields import EdgeOneToOne, Field, PrimitiveField
 
 @dataclass
 class FilterParameter:
+    """This class represents a single parameter in a filter method.
+
+    Args:
+        name: The name of the parameter.
+        type_: The type of the parameter.
+        description: The description of the parameter.
+        default: The default value of the parameter.
+        is_nullable: Whether the parameter is nullable.
+    """
+
     name: str
     type_: str
     description: str
@@ -54,7 +62,18 @@ class FilterParameter:
 
 
 @dataclass
-class FilterCondition:
+class FilterImplementation:
+    """This class represent a filter implementation.
+
+    It is used in the methods that require filtering to create the DMS filter.
+
+    Args:
+        filter: The DMS filter to use.
+        prop_name: The name of the property in the View to filter on.
+        keyword_arguments: The keyword arguments of the filter.
+        is_edge_class: Whether the class is an edge class.
+    """
+
     filter: type[dm.Filter]
     prop_name: str
     keyword_arguments: dict[str, FilterParameter]
@@ -102,7 +121,7 @@ class FilterCondition:
 
 
 @dataclass
-class FilterConditionOnetoOneEdge(FilterCondition):
+class FilterImplementationOnetoOneEdge(FilterImplementation):
     instance_type: type
 
     @property
@@ -138,15 +157,23 @@ class FilterConditionOnetoOneEdge(FilterCondition):
 
 @dataclass
 class FilterMethod:
+    """This classe represents a filter that can be used in any method that requires filtering.
+
+    Args:
+        parameters: The parameters of the filter.
+        implementations: The conditions of the filter.
+
+    """
+
     parameters: list[FilterParameter]
-    filters: list[FilterCondition]
+    implementations: list[FilterImplementation]
 
     @classmethod
     def from_fields(
         cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False
     ) -> FilterMethod:
         parameters_by_name: dict[str, FilterParameter] = {}
-        list_filters: list[FilterCondition] = []
+        list_filters: list[FilterImplementation] = []
 
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD, _SPACE_FIELD)):
             # Only primitive and edge one-to-one fields supported for now
@@ -165,7 +192,7 @@ class FilterMethod:
                             parameter = parameters_by_name[field_.name]
                             parameter.type_ = f"{field_.type_as_string} | {parameter.type_}"
                         list_filters.append(
-                            FilterCondition(
+                            FilterImplementation(
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
@@ -185,7 +212,7 @@ class FilterMethod:
                             parameter = parameters_by_name[field_.name]
                             parameter.type_ = f"{parameter.type_} | list[{field_.type_as_string}]"
                         list_filters.append(
-                            FilterCondition(
+                            FilterImplementation(
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(values=parameter),
@@ -200,7 +227,7 @@ class FilterMethod:
                         )
                         parameters_by_name[parameter.name] = parameter
                         list_filters.append(
-                            FilterCondition(
+                            FilterImplementation(
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
@@ -221,7 +248,7 @@ class FilterMethod:
                         parameters_by_name[min_parameter.name] = min_parameter
                         parameters_by_name[max_parameter.name] = max_parameter
                         list_filters.append(
-                            FilterCondition(
+                            FilterImplementation(
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
@@ -247,7 +274,7 @@ class FilterMethod:
                             parameter.type_ = f"str | tuple[str, str] | {parameter.type_}"
                         list_filters.extend(
                             [
-                                FilterConditionOnetoOneEdge(
+                                FilterImplementationOnetoOneEdge(
                                     filter=selected_filter,
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(value=parameter),
@@ -271,7 +298,7 @@ class FilterMethod:
                             parameter.type_ = f"{parameter.type_} | list[str] | list[tuple[str, str]]"
                         list_filters.extend(
                             [
-                                FilterConditionOnetoOneEdge(
+                                FilterImplementationOnetoOneEdge(
                                     filter=selected_filter,
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(values=parameter),
@@ -285,7 +312,7 @@ class FilterMethod:
                         # This is a filter not supported.
                         continue
 
-        return cls(parameters=list(parameters_by_name.values()), filters=list_filters)
+        return cls(parameters=list(parameters_by_name.values()), implementations=list_filters)
 
 
 # These fields are used when creating the list method.

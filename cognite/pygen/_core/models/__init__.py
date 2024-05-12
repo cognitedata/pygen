@@ -12,7 +12,7 @@ from .fields import (
     PrimitiveFieldCore,
     PrimitiveListField,
 )
-from .filter_methods import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
+from .filter_methods import FilterImplementation, FilterImplementationOnetoOneEdge, FilterMethod, FilterParameter
 
 __all__ = [
     "DataClass",
@@ -31,7 +31,7 @@ __all__ = [
     "PrimitiveListField",
     "FilterMethod",
     "FilterParameter",
-    "FilterCondition",
-    "FilterConditionOnetoOneEdge",
+    "FilterImplementation",
+    "FilterImplementationOnetoOneEdge",
     "EdgeOneToMany",
 ]

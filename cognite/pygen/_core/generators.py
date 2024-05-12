@@ -393,6 +393,13 @@ class APIGenerator:
         default_instance_space: The default instance space to use for the generated SDK.
         config: The configuration for the SDK generation
         base_name: The base name of the view. If None, the base name will be inferred from the view.
+
+    Attributes:
+        view: The view to generate the API and Data Classes for.
+        data_class: The data class for the view.
+        api_class: The API class for the view.
+        query_api: The query API class for the view.
+
     """
 
     def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, base_name: str | None = None):

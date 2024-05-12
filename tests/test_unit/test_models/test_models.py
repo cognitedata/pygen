@@ -13,7 +13,7 @@ from cognite.pygen._core.models import (
     EdgeOneToManyNodes,
     EdgeOneToOne,
     Field,
-    FilterCondition,
+    FilterImplementation,
     FilterParameter,
     NodeDataClass,
     PrimitiveField,
@@ -280,7 +280,7 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
     "filter_condition, expected_args",
     [
         (
-            FilterCondition(
+            FilterImplementation(
                 dm.filters.Range,
                 prop_name="end_time",
                 keyword_arguments={
@@ -295,7 +295,7 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
         )
     ],
 )
-def test_filter_condition(filter_condition: FilterCondition, expected_args: str) -> None:
+def test_filter_condition(filter_condition: FilterImplementation, expected_args: str) -> None:
     # Act
     actual = filter_condition.arguments
 

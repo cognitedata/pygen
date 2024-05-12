@@ -4,8 +4,8 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._core.models import (
-    FilterCondition,
-    FilterConditionOnetoOneEdge,
+    FilterImplementation,
+    FilterImplementationOnetoOneEdge,
     FilterMethod,
     FilterParameter,
 )
@@ -42,28 +42,32 @@ def test_create_list_method_primitive_nullable(
     ]
     expected = FilterMethod(
         parameters=parameters,
-        filters=[
-            FilterCondition(dm.filters.Equals, "boolean", dict(value=parameters[0]), is_edge_class=False),
-            FilterCondition(dm.filters.Range, "date", dict(gte=parameters[1], lte=parameters[2]), is_edge_class=False),
-            FilterCondition(
+        implementations=[
+            FilterImplementation(dm.filters.Equals, "boolean", dict(value=parameters[0]), is_edge_class=False),
+            FilterImplementation(
+                dm.filters.Range, "date", dict(gte=parameters[1], lte=parameters[2]), is_edge_class=False
+            ),
+            FilterImplementation(
                 dm.filters.Range, "float32", dict(gte=parameters[3], lte=parameters[4]), is_edge_class=False
             ),
-            FilterCondition(
+            FilterImplementation(
                 dm.filters.Range, "float64", dict(gte=parameters[5], lte=parameters[6]), is_edge_class=False
             ),
-            FilterCondition(dm.filters.Range, "int32", dict(gte=parameters[7], lte=parameters[8]), is_edge_class=False),
-            FilterCondition(
+            FilterImplementation(
+                dm.filters.Range, "int32", dict(gte=parameters[7], lte=parameters[8]), is_edge_class=False
+            ),
+            FilterImplementation(
                 dm.filters.Range, "int64", dict(gte=parameters[9], lte=parameters[10]), is_edge_class=False
             ),
-            FilterCondition(dm.filters.Equals, "text", dict(value=parameters[11]), is_edge_class=False),
-            FilterCondition(dm.filters.In, "text", dict(values=parameters[11]), is_edge_class=False),
-            FilterCondition(dm.filters.Prefix, "text", dict(value=parameters[12]), is_edge_class=False),
-            FilterCondition(
+            FilterImplementation(dm.filters.Equals, "text", dict(value=parameters[11]), is_edge_class=False),
+            FilterImplementation(dm.filters.In, "text", dict(values=parameters[11]), is_edge_class=False),
+            FilterImplementation(dm.filters.Prefix, "text", dict(value=parameters[12]), is_edge_class=False),
+            FilterImplementation(
                 dm.filters.Range, "timestamp", dict(gte=parameters[13], lte=parameters[14]), is_edge_class=False
             ),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[15]), is_edge_class=False),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[16]), is_edge_class=False),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[16]), is_edge_class=False),
+            FilterImplementation(dm.filters.Prefix, "externalId", dict(value=parameters[15]), is_edge_class=False),
+            FilterImplementation(dm.filters.Equals, "space", dict(value=parameters[16]), is_edge_class=False),
+            FilterImplementation(dm.filters.In, "space", dict(values=parameters[16]), is_edge_class=False),
         ],
     )
 
@@ -72,7 +76,7 @@ def test_create_list_method_primitive_nullable(
 
     # Assert
     assert actual.parameters == expected.parameters
-    for act, exp in zip(actual.filters, expected.filters):
+    for act, exp in zip(actual.implementations, expected.implementations):
         assert act.filter == exp.filter
         assert act.prop_name == exp.prop_name
         assert act.keyword_arguments == exp.keyword_arguments
@@ -103,37 +107,37 @@ def test_create_list_method_connection_item_a(
     ]
     expected = FilterMethod(
         parameters=parameters,
-        filters=[
-            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[0]), is_edge_class=False),
-            FilterCondition(dm.filters.In, "name", dict(values=parameters[0]), is_edge_class=False),
-            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[1]), is_edge_class=False),
-            FilterConditionOnetoOneEdge(
+        implementations=[
+            FilterImplementation(dm.filters.Equals, "name", dict(value=parameters[0]), is_edge_class=False),
+            FilterImplementation(dm.filters.In, "name", dict(values=parameters[0]), is_edge_class=False),
+            FilterImplementation(dm.filters.Prefix, "name", dict(value=parameters[1]), is_edge_class=False),
+            FilterImplementationOnetoOneEdge(
                 dm.filters.Equals, "otherDirect", dict(value=parameters[2]), is_edge_class=False, instance_type=str
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.Equals, "otherDirect", dict(value=parameters[2]), is_edge_class=False, instance_type=tuple
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.In, "otherDirect", dict(values=parameters[2]), is_edge_class=False, instance_type=str
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.In, "otherDirect", dict(values=parameters[2]), is_edge_class=False, instance_type=tuple
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.Equals, "selfDirect", dict(value=parameters[3]), is_edge_class=False, instance_type=str
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.Equals, "selfDirect", dict(value=parameters[3]), is_edge_class=False, instance_type=tuple
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.In, "selfDirect", dict(values=parameters[3]), is_edge_class=False, instance_type=str
             ),
-            FilterConditionOnetoOneEdge(
+            FilterImplementationOnetoOneEdge(
                 dm.filters.In, "selfDirect", dict(values=parameters[3]), is_edge_class=False, instance_type=tuple
             ),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[5]), is_edge_class=False),
+            FilterImplementation(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
+            FilterImplementation(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
+            FilterImplementation(dm.filters.In, "space", dict(values=parameters[5]), is_edge_class=False),
         ],
     )
 
@@ -142,7 +146,7 @@ def test_create_list_method_connection_item_a(
 
     # Assert
     assert actual.parameters == expected.parameters
-    for act, exp in zip(actual.filters, expected.filters):
+    for act, exp in zip(actual.implementations, expected.implementations):
         assert act.filter == exp.filter
         assert act.prop_name == exp.prop_name
         assert act.keyword_arguments == exp.keyword_arguments

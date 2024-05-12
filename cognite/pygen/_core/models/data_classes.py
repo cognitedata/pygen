@@ -32,9 +32,7 @@ from .fields import (
 @total_ordering
 @dataclass
 class DataClass:
-    """
-    This represents a data class. It is created from a view.
-    """
+    """This represents a data class. It is created from a view."""
 
     read_name: str
     write_name: str
@@ -344,11 +342,15 @@ class DataClass:
 
 @dataclass
 class NodeDataClass(DataClass):
+    """This represent data class used for views marked as used_for='node'."""
+
     node_type: dm.DirectRelationReference | None
 
 
 @dataclass
 class EdgeDataClass(DataClass):
+    """This represent data class used for views marked as used_for='edge'."""
+
     @property
     def is_edge_class(self) -> bool:
         return True
