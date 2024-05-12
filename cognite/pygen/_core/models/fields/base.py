@@ -1,3 +1,5 @@
+"""This module contains the base class for all fields."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -16,7 +18,7 @@ from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.text import create_name, to_words
 
 if TYPE_CHECKING:
-    from . import DataClass
+    from cognite.pygen._core.models.data_classes import DataClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)

@@ -1,3 +1,5 @@
+"""This module contains the fields that are references to CDF External Fields."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

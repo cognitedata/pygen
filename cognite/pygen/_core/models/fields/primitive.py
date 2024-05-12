@@ -1,3 +1,5 @@
+"""This module contains the primitive fields"""
+
 from __future__ import annotations
 
 from abc import ABC

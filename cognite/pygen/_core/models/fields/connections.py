@@ -1,3 +1,5 @@
+"""This module contains the fields that contain a connection to another data class."""
+
 from __future__ import annotations
 
 from abc import ABC
@@ -10,7 +12,7 @@ from cognite.client.data_classes import data_modeling as dm
 from .base import Field
 
 if TYPE_CHECKING:
-    from . import DataClass, EdgeDataClass, NodeDataClass
+    from cognite.pygen._core.models.data_classes import DataClass, EdgeDataClass, NodeDataClass
 
 
 @dataclass(frozen=True)
