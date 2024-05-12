@@ -98,6 +98,10 @@ class ListFieldCore(PrimitiveFieldCore):
         else:  # not self.is_nullable and not self.need_alias
             return f"list[{type_}]"
 
+    @property
+    def is_list(self) -> bool:
+        return True
+
 
 @dataclass(frozen=True)
 class PrimitiveField(PrimitiveFieldCore):
@@ -157,9 +161,7 @@ class PrimitiveListField(ListFieldCore):
     list[datetime.datetime], list[datetime.date].
     """
 
-    @property
-    def is_list(self) -> bool:
-        return True
+    ...
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
