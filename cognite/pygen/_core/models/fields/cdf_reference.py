@@ -11,6 +11,11 @@ from .primitive import ListFieldCore, PrimitiveFieldCore
 
 @dataclass(frozen=True)
 class CDFExternalField(PrimitiveFieldCore):
+    """This represents a field that is a reference to a CDF External Field.
+
+    For example, a field that is a reference to a TimeSeries, Sequence, or File.
+    """
+
     @property
     def is_time_series(self) -> bool:
         return isinstance(self.type_, dm.TimeSeriesReference)
@@ -67,7 +72,7 @@ class CDFExternalField(PrimitiveFieldCore):
 @dataclass(frozen=True)
 class CDFExternalListField(ListFieldCore, CDFExternalField):
     """
-    This represents a list of CDF types such as list[TimeSeries], list[Sequence].
+    This represents a list of CDF types such as list[TimeSeries], list[Sequence], or list[File].
     """
 
     def as_read_type_hint(self) -> str:

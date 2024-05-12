@@ -12,6 +12,11 @@ from .base import Field, _to_python_type
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
+    """This is a base class for all primitive fields
+
+    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on.
+    """
+
     type_: dm.PropertyType
     is_nullable: bool
 

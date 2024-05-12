@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class EdgeField(Field, ABC):
-    """This represents a field linking to another data class(es)."""
+    """This represents a field connecting to another data class(es)."""
 
     @property
     def is_edge(self) -> bool:
@@ -26,7 +26,7 @@ class EdgeField(Field, ABC):
 
 @dataclass(frozen=True)
 class EdgeToOneDataClass(EdgeField, ABC):
-    """This represents a field linking to a single data class."""
+    """This represents a field connecting to a single data class."""
 
     data_class: DataClass
 
