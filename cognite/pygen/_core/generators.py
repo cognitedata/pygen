@@ -28,7 +28,7 @@ from .validation import validate_api_classes_unique_names, validate_data_classes
 
 class SDKGenerator:
     """
-    SDK generator for data model(s).
+    SDK generator for one or more data models.
 
     Args:
         top_level_package: The name of the top level package for the SDK. Example "movie.client"
@@ -125,6 +125,20 @@ class SDKGenerator:
 
 
 def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
+    """Given a list of views, return a dictionary of unique parents for each view.
+
+    Note that this is necessary due to the following situation (-> denotes implements):
+     A -> B and C
+     B -> C
+    Then, A implements B and C, while B also implements C. This means that the unique parents for A
+    is [B and C] and for B is [C].
+
+    Args:
+        views:
+
+    Returns:
+
+    """
     existing_views = {view.as_id() for view in views}
     parents_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = {
         view.as_id(): {parent for parent in view.implements or [] if parent in existing_views} for view in views
@@ -150,6 +164,8 @@ def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, li
 
 
 class MultiAPIGenerator:
+    """This class is responsible for generating the API and Data Classes for multiple views."""
+
     def __init__(
         self,
         top_level_package: str,
@@ -210,6 +226,7 @@ class MultiAPIGenerator:
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
+        """Iterate over the unique APIs."""
         seen = set()
         for api in self.api_by_view_id.values():
             if api.view.as_id() not in seen:
@@ -228,6 +245,7 @@ class MultiAPIGenerator:
         base_name_functions: list[Callable[[dm.View], str]],
         selected_function: int = 0,
     ) -> dict[dm.ViewId, APIGenerator]:
+        """Create the API by view ID for the given views."""
         try:
             base_name_fun = base_name_functions[selected_function]
         except IndexError as e:
@@ -256,6 +274,7 @@ class MultiAPIGenerator:
 
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
+        """The version of Pydantic to use."""
         if self._pydantic_version == "infer":
             return get_pydantic_version()
         elif self._pydantic_version in ["v1", "v2"]:
@@ -264,6 +283,14 @@ class MultiAPIGenerator:
             raise ValueError(f"Unknown pydantic version {self._pydantic_version}")
 
     def generate_apis(self, client_dir: Path) -> dict[Path, str]:
+        """Generate the APIs for the SDK.
+
+        Args:
+            client_dir: The directory to generate the SDK in.
+
+        Returns:
+            A dictionary of file paths and file contents for the generated SDK.
+        """
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
 
@@ -293,6 +320,7 @@ class MultiAPIGenerator:
         return sdk
 
     def generate_api_core_file(self) -> str:
+        """Generate the core API file for the SDK."""
         api_core = self.env.get_template("api_core.py.jinja")
 
         return (
@@ -305,6 +333,7 @@ class MultiAPIGenerator:
         )
 
     def generate_data_class_core_file(self) -> str:
+        """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core.py.jinja")
         return (
             data_class_core.render(
@@ -314,10 +343,20 @@ class MultiAPIGenerator:
         )
 
     def generate_client_init_file(self) -> str:
+        """Generate the __init__.py file for the client.
+
+        Returns:
+            The generated __init__.py file as a string.
+        """
         client_init = self.env.get_template("_client_init.py.jinja")
         return client_init.render(client_name=self.client_name, top_level_package=self.top_level_package) + "\n"
 
     def generate_data_classes_init_file(self) -> str:
+        """Generate the __init__.py file for the data classes.
+
+        Returns:
+            The generated __init__.py file as a string.
+        """
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         dependencies_by_names: dict[tuple[str, str, str, bool], list[DataClass]] = defaultdict(list)
@@ -346,6 +385,16 @@ class MultiAPIGenerator:
 
 @total_ordering
 class APIGenerator:
+    """This class is responsible for generating the API and Data Classes for a
+    single view.
+
+    Args:
+        view: The view to generate the API and Data Classes for.
+        default_instance_space: The default instance space to use for the generated SDK.
+        config: The configuration for the SDK generation
+        base_name: The base name of the view. If None, the base name will be inferred from the view.
+    """
+
     def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, base_name: str | None = None):
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
@@ -381,6 +430,7 @@ class APIGenerator:
 
     @property
     def view_id(self) -> dm.ViewId:
+        """The view ID of the view."""
         return self.view.as_id()
 
     def _validate_initialized(self) -> None:
@@ -389,6 +439,7 @@ class APIGenerator:
 
     @property
     def list_method(self) -> FilterMethod:
+        """The list method for the view."""
         if self._list_method is None:
             self._validate_initialized()
             self._list_method = FilterMethod.from_fields(
@@ -398,6 +449,7 @@ class APIGenerator:
 
     @property
     def timeseries_apis(self) -> list[TimeSeriesAPIClass]:
+        """The timeseries APIs for the view."""
         if self._timeseries_apis is None:
             self._validate_initialized()
             self._timeseries_apis = [
@@ -413,6 +465,7 @@ class APIGenerator:
         query_api_by_view_id: dict[dm.ViewId, QueryAPIClass],
         api_generator_by_view_id: dict[dm.ViewId, APIGenerator],
     ) -> None:
+        """Create the edge APIs for the view."""
         self._edge_apis = [
             EdgeAPIClass.from_fields(
                 field,  # type: ignore[arg-type]
@@ -430,15 +483,25 @@ class APIGenerator:
 
     @property
     def edge_apis(self) -> list[EdgeAPIClass]:
+        """The edge APIs for the view."""
         if self._edge_apis is None:
             raise ValueError("Please call create_edge_apis before accessing edge_apis.")
         return self._edge_apis
 
     @property
     def has_edge_api_dependencies(self) -> bool:
+        """Whether the view has edge API dependencies."""
         return any(True for api in self.edge_apis if api.end_view_id != self.api_class.view_id)
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
+        """Generate the data class file for the view.
+
+        Args:
+            is_pydantic_v2: Whether to generate the data class file for Pydantic v2 or v1.
+
+        Returns:
+            The generated data class file as a string.
+        """
         unique_start_classes = []
         unique_end_classes = []
         grouped_edge_classes = []
@@ -492,6 +555,15 @@ class APIGenerator:
         )
 
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
+        """Generate the API file for the view.
+
+        Args:
+            top_level_package: The top level package for the SDK.
+            client_name: The name of the client class.
+
+        Returns:
+            The generated API file as a string.
+        """
         type_api = self._env.get_template("api_class_node.py.jinja")
 
         unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
@@ -515,6 +587,17 @@ class APIGenerator:
         )
 
     def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
+        """Generate the API query file for the view.
+
+        This is the basis for the Python query functionality for the view.
+
+        Args:
+            top_level_package: The top level package for the SDK.
+            client_name: The name of the client class.
+
+        Returns:
+            The generated API query file as a string.
+        """
         query_api = self._env.get_template("api_class_query.py.jinja")
 
         unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
@@ -539,6 +622,17 @@ class APIGenerator:
         )
 
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+        """Generate the edge API files for the view.
+
+
+        Args:
+            top_level_package: The top level package for the SDK.
+            client_name: The name of the client class.
+
+        Returns:
+            Iterator of tuples of file names and file contents for the edge APIs.
+        """
+
         edge_class = self._env.get_template("api_class_edge.py.jinja")
         for edge_api in self.edge_apis:
             yield edge_api.file_name, (
@@ -555,6 +649,15 @@ class APIGenerator:
             )
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+        """Generate the timeseries API files for the view.
+
+        Args:
+            top_level_package: The top level package for the SDK.
+            client_name: The name of the client class.
+
+        Returns:
+            Iterator of tuples of file names and file contents for the timeseries APIs.
+        """
         timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
         for timeseries in self.timeseries_apis:
             yield timeseries.file_name, (
