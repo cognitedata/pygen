@@ -11,7 +11,7 @@ from cognite.pygen.utils.text import create_name
 
 from .data_classes import DataClass, EdgeDataClass
 from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges, EdgeOneToManyNodes, EdgeTypedOneToOne
-from .filter_method import FilterMethod, FilterParameter
+from .filter_methods import FilterMethod, FilterParameter
 
 if TYPE_CHECKING:
     from cognite.pygen._core.generators import APIGenerator

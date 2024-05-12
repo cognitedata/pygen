@@ -1,4 +1,4 @@
-from .api_casses import APIClass, MultiAPIClass
+from .api_classes import APIClass, MultiAPIClass
 from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import (
     CDFExternalField,
@@ -12,7 +12,7 @@ from .fields import (
     PrimitiveFieldCore,
     PrimitiveListField,
 )
-from .filter_method import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
+from .filter_methods import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
 
 __all__ = [
     "DataClass",

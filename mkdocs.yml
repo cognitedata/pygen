@@ -53,7 +53,7 @@ nav:
         - Core:
             - Generators: developer_docs/core/generators.md
             - Models:
-                - APIClasses: developer_docs/core/models/api_classes.md.md
+                - APIClasses: developer_docs/core/models/api_classes.md
                 - DataClasses: developer_docs/core/models/data_classes.md
                 - Fields: developer_docs/core/models/fields.md
                 - FilterMethods: developer_docs/core/models/filter_methods.md

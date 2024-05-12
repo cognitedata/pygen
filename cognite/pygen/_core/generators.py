@@ -20,7 +20,7 @@ from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
-from .models.api_casses import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
+from .models.api_classes import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
 
 
