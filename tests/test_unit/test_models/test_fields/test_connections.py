@@ -82,3 +82,53 @@ class TestConnections:
 
         # Assert
         assert actual == expected
+
+    @pytest.mark.parametrize(
+        "view_ext_id, property_id, expected",
+        [
+            pytest.param(
+                "ConnectionItemA",
+                "outwards",
+                "Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                id="Outwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "otherDirect",
+                'Union[str, dm.NodeId, None] = Field(None, alias="otherDirect")',
+                id="Direct is_list=False, not writable",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "selfDirect",
+                'Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")',
+                id="Direct to self is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemB",
+                "inwards",
+                "Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                id="Inwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directNoSource",
+                'Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")',
+            ),
+        ],
+    )
+    def test_as_write_type_hint(
+        self,
+        view_ext_id: str,
+        property_id: str,
+        expected: str,
+        omni_field_factory: Callable[[str, str], Field],
+    ) -> None:
+        # Arrange
+        field_ = omni_field_factory(view_ext_id, property_id)
+
+        # Act
+        actual = field_.as_write_type_hint()
+
+        # Assert
+        assert actual == expected
