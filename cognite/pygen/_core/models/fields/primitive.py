@@ -40,7 +40,7 @@ class PrimitiveFieldCore(Field, ABC):
     def as_write(self) -> str:
         return f"self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}"
 
     @classmethod

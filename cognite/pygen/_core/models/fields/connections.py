@@ -148,7 +148,7 @@ class EdgeOneToOne(EdgeToOneDataClass):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -197,7 +197,7 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -226,7 +226,7 @@ class EdgeOneToOneAny(EdgeField):
     def as_write(self) -> str:
         return f"self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}"
 
 
@@ -303,7 +303,7 @@ class EdgeOneToEndNode(EdgeField):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -337,7 +337,7 @@ class EdgeOneToManyNodes(EdgeOneToMany):
             f"for {self.variable} in self.{self.name} or []]"
         )
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return (
             f"[{self.variable}.as_read() if isinstance({self.variable}, GraphQLCore) else {self.variable} "
             f"for {self.variable} in self.{self.name} or []]"
@@ -384,7 +384,7 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     def as_write(self) -> str:
         return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []]"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []]"
 
     def as_read_type_hint(self) -> str:

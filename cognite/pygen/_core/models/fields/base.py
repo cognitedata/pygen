@@ -105,7 +105,7 @@ class Field:
         """Used in the .as_write() method for the graphQL version of the data class."""
         return self.as_write()
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         """Used in the .as_read() method for the graphQL version of the data class."""
         raise NotImplementedError
 

@@ -65,7 +65,7 @@ class CDFExternalField(PrimitiveFieldCore):
         else:
             return f'self.{self.name}["externalId"] if self.{self.name} and "externalId" in self.{self.name} else None'
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         # Read is only used in graphql
         return self.as_write_graphql()
 
