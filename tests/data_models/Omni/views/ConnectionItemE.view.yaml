@@ -65,3 +65,20 @@ properties:
       type: container
     containerPropertyIdentifier: direct1
     name: directNoSource
+  inwardsSingleProperty:
+    type:
+      space: pygen-models
+      externalId: multiProperty
+    edgeSource:
+        space: pygen-models
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+    source:
+      space: pygen-models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+    direction: inwards
+    name: inwards
+    connectionType: single_edge_connection
