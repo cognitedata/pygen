@@ -406,7 +406,7 @@ class EdgeOneToManyEdges(EdgeOneToMany):
 
 
 @dataclass(frozen=True)
-class BaseConnection(Field, ABC):
+class BaseConnectionField(Field, ABC):
     reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
     edge_type: dm.DirectRelationReference | None
     direction: Literal["outwards", "inwards"] | None
@@ -429,7 +429,7 @@ class BaseConnection(Field, ABC):
         data_class_by_view_id: dict[dm.ViewId, DataClass],
     ) -> Field | None:
         if isinstance(prop, MultiEdgeConnection):
-            return OneToManyConnection(
+            return OneToManyConnectionField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -451,9 +451,9 @@ class BaseConnection(Field, ABC):
 
 
 @dataclass(frozen=True)
-class OneToManyConnection(BaseConnection):
+class OneToManyConnectionField(BaseConnectionField):
     variable: str
 
 
 @dataclass(frozen=True)
-class OneToOneConnection(BaseConnection): ...
+class OneToOneConnectionField(BaseConnectionField): ...
