@@ -6,7 +6,7 @@ import warnings
 from abc import ABC
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling import MultiEdgeConnection
@@ -33,7 +33,7 @@ class EdgeField(Field, ABC):
         prop: dm.ConnectionDefinition | dm.MappedProperty,
         variable: str,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
-    ) -> EdgeField | None:
+    ) -> Field | None:
         if isinstance(prop, MultiEdgeConnection):
             if prop.edge_source:
                 return EdgeOneToManyEdges(
@@ -397,3 +397,57 @@ class EdgeOneToManyEdges(EdgeOneToMany):
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
         else:
             return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
+
+
+@dataclass(frozen=True)
+class BaseConnection(Field, ABC):
+    reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
+    edge_type: dm.DirectRelationReference | None
+    direction: Literal["outwards", "inwards"] | None
+    end_classes: list[DataClass] | None
+
+    @property
+    def is_relation(self) -> bool:
+        return self.edge_type is None
+
+    @property
+    def is_edge(self) -> bool:
+        return True
+
+    @classmethod
+    def load(
+        cls,
+        base: Field,
+        prop: dm.ConnectionDefinition | dm.MappedProperty,
+        variable: str,
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+    ) -> Field | None:
+        if isinstance(prop, MultiEdgeConnection):
+            return OneToManyConnection(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                pydantic_field=base.pydantic_field,
+                variable=variable,
+                edge_type=prop.type,
+                direction=prop.direction,
+                description=prop.description,
+                end_classes=[data_class_by_view_id[prop.source]],
+            )
+        return None
+
+    @property
+    def _type_hint_right_side(self) -> str:
+        if self.need_alias:
+            return f'{self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
+        else:
+            return f"{self.pydantic_field}(default=None, repr=False)"
+
+
+@dataclass(frozen=True)
+class OneToManyConnection(BaseConnection):
+    variable: str
+
+
+@dataclass(frozen=True)
+class OneToOneConnection(BaseConnection): ...
