@@ -1,0 +1,65 @@
+- space: omni-instances
+  instanceType: node
+  externalId: CDFExternalReferences:Angela
+  sources:
+  - properties:
+      file: file_evan
+      sequence: sequence_sierra
+      timeseries: timeseries_mike
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: omni-instances
+  instanceType: node
+  externalId: CDFExternalReferences:Russell
+  sources:
+  - properties:
+      file: file_david
+      sequence: sequence_ann
+      timeseries: timeseries_edward
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: omni-instances
+  instanceType: node
+  externalId: CDFExternalReferences:Bobby
+  sources:
+  - properties:
+      file: file_tina
+      sequence: sequence_scott
+      timeseries: timeseries_barry
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: omni-instances
+  instanceType: node
+  externalId: CDFExternalReferences:Michael
+  sources:
+  - properties:
+      file: null
+      sequence: null
+      timeseries: timeseries_hannah
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: omni-instances
+  instanceType: node
+  externalId: CDFExternalReferences:Sarah
+  sources:
+  - properties:
+      file: file_matthew
+      sequence: sequence_janice
+      timeseries: null
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view

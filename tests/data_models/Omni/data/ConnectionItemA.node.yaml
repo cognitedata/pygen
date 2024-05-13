@@ -1,0 +1,91 @@
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemA:Melissa
+  sources:
+  - properties:
+      name: null
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Diana
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemA:Charles
+  sources:
+  - properties:
+      name: Pressure let kind degree list top somebody college.
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Heather
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemA:Crystal
+  sources:
+  - properties:
+      name: Exist professional people behavior.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Karen
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Crystal
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemA:Heather
+  sources:
+  - properties:
+      name: Fight decision size.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Diana
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Charles
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemA:Troy
+  sources:
+  - properties:
+      name: Pull different current agency each.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Karen
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA

@@ -1,0 +1,30 @@
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Diana
+  type:
+    space: pygen-models
+    externalId: ConnectionItemC
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Adam
+  type:
+    space: pygen-models
+    externalId: ConnectionItemC
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Karen
+  type:
+    space: pygen-models
+    externalId: ConnectionItemC
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Kayla
+  type:
+    space: pygen-models
+    externalId: ConnectionItemC
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Ronald
+  type:
+    space: pygen-models
+    externalId: ConnectionItemC

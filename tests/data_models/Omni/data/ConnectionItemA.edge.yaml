@@ -1,0 +1,48 @@
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Melissa:ConnectionItemB:Adrienne
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Melissa
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Adrienne
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Crystal:ConnectionItemB:Adrienne
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Crystal
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Adrienne
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Heather:ConnectionItemB:Chris
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Heather
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Chris
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Troy:ConnectionItemB:Adrienne
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Troy
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Adrienne

@@ -1,0 +1,70 @@
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemB:Dana
+  sources:
+  - properties:
+      name: Lead soon property write.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemB:Katie
+  sources:
+  - properties:
+      name: Sound receive let newspaper.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemB:Adrienne
+  sources:
+  - properties:
+      name: Season listen else easy.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemB:Courtney
+  sources:
+  - properties:
+      name: Fish sense kind spring throughout interview trade knowledge.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemB:Chris
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB

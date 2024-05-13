@@ -1,0 +1,108 @@
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Brandon:Implementation1NonWriteable:Theodore
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Brandon
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Theodore
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Brian:Implementation1NonWriteable:Wendy
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Brian
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Wendy
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Brian:Implementation1NonWriteable:Tanya
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Brian
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Tanya
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Brian:Implementation1NonWriteable:April
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Brian
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:April
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Sherry:Implementation1NonWriteable:Tanya
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Sherry
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Tanya
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Sherry:Implementation1NonWriteable:Wendy
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Sherry
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Wendy
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Justin:Implementation1NonWriteable:Theodore
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Justin
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Theodore
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Justin:Implementation1NonWriteable:April
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Justin
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:April
+- space: omni-instances
+  instanceType: edge
+  externalId: DependentOnNonWritable:Justin:Implementation1NonWriteable:Tanya
+  type:
+    space: pygen-models
+    externalId: toNonWritable
+  startNode:
+    space: omni-instances
+    externalId: DependentOnNonWritable:Justin
+  endNode:
+    space: omni-instances
+    externalId: Implementation1NonWriteable:Tanya
