@@ -19,6 +19,7 @@ from cognite.client.data_classes.data_modeling.instances import PropertyValue
 from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from faker import Faker
 
+from cognite.pygen.utils.mock_generator import MockGenerator, ViewMockConfig
 from tests.constants import OMNI_SDK
 
 MODEL_DIR = Path(__file__).resolve().parent
@@ -29,17 +30,96 @@ DATA_DIR = MODEL_DIR / "data"
 
 def main():
     Faker.seed(42)
+    Faker()
+    data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
+
+    # The empty view is used for testing and should not have mock data, neither should interfaces
+    views = [v for v in data_model.views if v.external_id != "Empty"]
+    g = Generators(seed=42)
+    config = ViewMockConfig(
+        node_id_generator=g.id_generator,
+        property_types={
+            dm.Text: g.text,
+            dm.Int64: g.int64,
+            dm.Int32: g.int32,
+            dm.Float64: g.float64,
+            dm.Float32: g.float32,
+            dm.Boolean: g.boolean,
+            dm.Json: g.json,
+            dm.Timestamp: g.timestamp,
+            dm.Date: g.date,
+            dm.FileReference: g.file,
+            dm.SequenceReference: g.sequence,
+            dm.TimeSeriesReference: g.timeseries,
+        },
+    )
+    data = MockGenerator(
+        views, OMNI_SDK.instance_space, default_config=config, seed=42, skip_interfaces=True
+    ).generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
+
+    print(data)
+
+
+class Generators:
+    def __init__(self, seed):
+        Faker.seed(42)
+        self.faker = Faker()
+
+    def id_generator(self, view_id: dm.ViewId, node_count) -> list[str]:
+        return [f"{view_id.external_id}:{self.faker.unique.first_name()}" for _ in range(node_count)]
+
+    def text(self, count: int) -> list[str]:
+        return [self.faker.sentence() for _ in range(count)]
+
+    def int64(self, count: int) -> list[int]:
+        info = np.iinfo(np.int64)
+        return [self.faker.random.randint(int(info.min) + 1, int(info.max) - 1) for _ in range(count)]
+
+    def int32(self, count: int) -> list[int]:
+        info = np.iinfo(np.int32)
+        return [self.faker.random.randint(int(info.min) + 1, int(info.max) - 1) for _ in range(count)]
+
+    def float64(self, count: int) -> list[float]:
+        info = np.finfo(np.float64)
+        return [
+            round(self.faker.random.uniform(float(info.min) / 2, float(info.max) / 2), info.precision)
+            for _ in range(count)
+        ]
+
+    def float32(self, count: int) -> list[float]:
+        return [round(float(np.float32(self.faker.random.uniform(-1000, 1000))), 2) for _ in range(count)]
+
+    def boolean(self, count: int) -> list[bool]:
+        return [self.faker.pybool() for _ in range(count)]
+
+    def json(self, count: int) -> list[dict]:
+        return [
+            {self.text(1)[0]: self.text(1)[0] for _ in range(self.faker.random.randint(0, 5))} for _ in range(count)
+        ]
+
+    def timestamp(self, count: int) -> list[str]:
+        return [self.faker.date_time_this_year() for _ in range(count)]
+
+    def date(self, count: int) -> list[str]:
+        return [self.faker.date_this_year() for _ in range(count)]
+
+    def file(self, count: int) -> list[str]:
+        return [f"file_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
+
+    def sequence(self, count: int) -> list[str]:
+        return [f"sequence_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
+
+    def timeseries(self, count: int) -> list[str]:
+        return [f"timeseries_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
+
+
+def old_main():
+    Faker.seed(42)
     faker = Faker()
     data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
     interfaces = {parent for view in data_model.views for parent in view.implements or []}
-    views = [
-        view
-        for view in data_model.views
-        # The empty view is used for testing and should not have mock data, neither should interfaces
-        if view.external_id != "Empty" and view.as_id() not in interfaces
-    ]
+    views = [view for view in data_model.views if view.external_id != "Empty" and view.as_id() not in interfaces]
     # Not writeable views need to be included as they might be used in connections (edges)
-    {view.as_id() for view in data_model.views if not view.writable}
 
     for component in connected_views(views):
         mock_data = generate_mock_data(component, node_count=5, edge_count=3, faker=faker)
