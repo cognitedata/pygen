@@ -32,18 +32,29 @@ def omni_field_factory(
     return factory
 
 
-class TestConnectionsReadTypeHint:
-    def test_multiedge_outwards(
+class TestConnections:
+    @pytest.mark.parametrize(
+        "view_ext_id, property_id, expected",
+        [
+            (
+                "ConnectionItemA",
+                "outwards",
+                "Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+            )
+        ],
+    )
+    def test_as_read_type_hint(
         self,
+        view_ext_id: str,
+        property_id: str,
+        expected: str,
         omni_field_factory: Callable[[str, str], Field],
     ) -> None:
         # Arrange
-        field_ = omni_field_factory("ConnectionItemA", "outwards")
+        field_ = omni_field_factory(view_ext_id, property_id)
 
         # Act
         actual = field_.as_read_type_hint()
 
         # Assert
-        assert (
-            actual == "Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)"
-        )
+        assert actual == expected
