@@ -131,16 +131,19 @@ class EdgeOneToOne(EdgeToOneDataClass):
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
             left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+            repr_field = True
         else:
             left_side = "Union[str, dm.NodeId, None] ="
-        return self._type_hint(left_side)
+            repr_field = False
+        return self._type_hint(left_side, repr_field)
 
-    def _type_hint(self, left_side: str) -> str:
+    def _type_hint(self, left_side: str, repr_field: bool = True) -> str:
         # Edge fields are always nullable
+        repr_ = ", repr=False" if repr_field else ""
         if self.need_alias:
-            return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
+            return f'{left_side} {self.pydantic_field}(None{repr_}, alias="{self.prop_name}")'
         else:
-            return f"{left_side} {self.pydantic_field}(None, repr=False)"
+            return f"{left_side} {self.pydantic_field}(None{repr_})"
 
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
@@ -351,16 +354,19 @@ class EdgeOneToManyNodes(EdgeOneToMany):
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
             left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None]"
+            repr_field = True
         else:
             left_side = "Union[list[str], None]"
-        return self._type_hint(left_side)
+            repr_field = False
+        return self._type_hint(left_side, repr_field)
 
-    def _type_hint(self, left_side: str) -> str:
+    def _type_hint(self, left_side: str, repr_field: bool = True) -> str:
         # Edge fields are always nullable
+        repr_ = ", repr=False" if repr_field else ""
         if self.need_alias:
-            return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
+            return f'{left_side} = {self.pydantic_field}(default=None{repr_}, alias="{self.prop_name}")'
         else:
-            return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
+            return f"{left_side} = {self.pydantic_field}(default=None{repr_})"
 
 
 @dataclass(frozen=True)
