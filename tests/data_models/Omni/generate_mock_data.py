@@ -63,7 +63,7 @@ def main():
 
 class Generators:
     def __init__(self, seed):
-        Faker.seed(42)
+        Faker.seed(seed)
         self.faker = Faker()
 
     def id_generator(self, view_id: dm.ViewId, node_count) -> list[str]:
