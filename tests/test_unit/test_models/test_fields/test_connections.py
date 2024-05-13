@@ -42,6 +42,29 @@ class TestConnections:
                 "Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
                 id="Outwards MultiEdge",
             ),
+            pytest.param(
+                "ConnectionItemA",
+                "otherDirect",
+                'Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")',
+                id="Direct is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "selfDirect",
+                'Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")',
+                id="Direct is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemB",
+                "inwards",
+                "Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                id="Inwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directNoSource",
+                'Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")',
+            ),
         ],
     )
     def test_as_read_type_hint(
