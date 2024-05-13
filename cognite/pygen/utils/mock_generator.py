@@ -52,6 +52,8 @@ ListAbleDataType = typing.Union[
     list[dict],
     None,
 ]
+ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
+_ResourceTypes = set(typing.get_args(ResourceType))
 
 
 class MockGenerator:
@@ -501,17 +503,20 @@ class ViewMockData:
             nodes.append(dm.NodeApply.load(dumped))
         return nodes
 
-    def dump_yaml(self, folder: Path | str) -> None:
+    def dump_yaml(self, folder: Path | str, exclude: set[ResourceType] | None = None) -> None:
         """
         Dumps the mock data to the given folder in yaml format.
 
         Args:
             folder: The folder to dump the mock data to.
+            exclude: The resources to exclude from the dump.
         """
         folder_path = Path(folder)
         if not folder_path.exists():
             folder_path.mkdir(parents=True, exist_ok=True)
         for resource_name in ["node", "edge", "timeseries", "sequence", "file"]:
+            if exclude and resource_name in exclude:
+                continue
             values = getattr(self, resource_name)
             if values:
                 dump_file = folder_path / f"{self.view_id.external_id}.{resource_name}.yaml"
@@ -648,14 +653,30 @@ class MockData(UserList[ViewMockData]):
                 unique_resources.append(resource)
         return unique_resources  # type: ignore[return-value]
 
-    def dump_yaml(self, folder: Path | str) -> None:
+    def dump_yaml(
+        self, folder: Path | str, exclude: set[ResourceType | tuple[str, ResourceType] | str] | None = None
+    ) -> None:
         """Dumps the mock data to a folder in yaml format.
 
         Args:
             folder (Path | str): The folder to dump the mock data to.
+            exclude: The resources to exclude from the dump. Can either be a ResourceType,
+                a view_external_id or a tuple of view_external_id and ResourceType.
         """
         for view_mock_data in self:
-            view_mock_data.dump_yaml(folder)
+            exclude_view: set[str] | None
+            if exclude:
+                external_id = view_mock_data.view_id.external_id
+                if external_id in exclude:
+                    continue
+                exclude_view = {
+                    item if item in _ResourceTypes else item[1]  # type: ignore[misc]
+                    for item in exclude
+                    if (isinstance(item, tuple) and item[0] == external_id) or item in _ResourceTypes
+                }
+            else:
+                exclude_view = None
+            view_mock_data.dump_yaml(folder, exclude_view)  # type: ignore[arg-type]
 
     def deploy(
         self,
