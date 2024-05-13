@@ -52,7 +52,7 @@ class TestConnections:
                 "ConnectionItemA",
                 "selfDirect",
                 'Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")',
-                id="Direct is_list=False",
+                id="Direct to self is_list=False",
             ),
             pytest.param(
                 "ConnectionItemB",
