@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import warnings
 from abc import ABC
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling import MultiEdgeConnection
+from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, SingleEdgeConnection
 
 from .base import Field
 
@@ -22,6 +25,88 @@ class EdgeField(Field, ABC):
     @property
     def is_edge(self) -> bool:
         return True
+
+    @classmethod
+    def load(
+        cls,
+        base: Field,
+        prop: dm.ConnectionDefinition | dm.MappedProperty,
+        variable: str,
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+    ) -> Field | None:
+        if isinstance(prop, MultiEdgeConnection):
+            if prop.edge_source:
+                return EdgeOneToManyEdges(
+                    name=base.name,
+                    doc_name=base.doc_name,
+                    prop_name=base.prop_name,
+                    variable=variable,
+                    data_class=data_class_by_view_id[prop.edge_source],
+                    edge_type=prop.type,
+                    edge_direction=prop.direction,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                )
+            else:
+                return EdgeOneToManyNodes(
+                    name=base.name,
+                    doc_name=base.doc_name,
+                    prop_name=base.prop_name,
+                    variable=variable,
+                    data_class=data_class_by_view_id[prop.source],
+                    edge_type=prop.type,
+                    edge_direction=prop.direction,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+            if prop.source:
+                target_data_class = data_class_by_view_id[prop.source]
+                return EdgeOneToOne(
+                    name=base.name,
+                    prop_name=base.prop_name,
+                    description=prop.description,
+                    data_class=target_data_class,
+                    pydantic_field=base.pydantic_field,
+                    doc_name=base.doc_name,
+                )
+            else:
+                return EdgeOneToOneAny(
+                    name=base.name,
+                    prop_name=base.prop_name,
+                    description=prop.description,
+                    pydantic_field=base.pydantic_field,
+                    doc_name=base.doc_name,
+                )
+        elif isinstance(prop, SingleEdgeConnection) and prop.edge_source:
+            warnings.warn(
+                f"SingleEdgeConnection with edge properties is not yet supported, skipping {base.prop_name}.",
+                UserWarning,
+                stacklevel=2,
+            )
+        elif isinstance(prop, SingleEdgeConnection):
+            target_data_class = data_class_by_view_id[prop.source]
+            return EdgeTypedOneToOne(
+                name=base.name,
+                variable=variable,
+                edge_type=prop.type,
+                edge_direction=prop.direction,
+                prop_name=base.prop_name,
+                description=prop.description,
+                data_class=target_data_class,
+                pydantic_field=base.pydantic_field,
+                doc_name=base.doc_name,
+            )
+        elif isinstance(prop, ReverseDirectRelation):
+            # ReverseDirectRelation are skipped as they are not used in the generated SDK.
+            return None
+        else:
+            warnings.warn(
+                f"Property type={type(prop)} is not yet supported, skipping {base.prop_name}.",
+                UserWarning,
+                stacklevel=2,
+            )
+        return None
 
 
 @dataclass(frozen=True)
@@ -46,21 +131,24 @@ class EdgeOneToOne(EdgeToOneDataClass):
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
             left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+            repr_field = True
         else:
             left_side = "Union[str, dm.NodeId, None] ="
-        return self._type_hint(left_side)
+            repr_field = False
+        return self._type_hint(left_side, repr_field)
 
-    def _type_hint(self, left_side: str) -> str:
+    def _type_hint(self, left_side: str, repr_field: bool = True) -> str:
         # Edge fields are always nullable
+        repr_ = ", repr=False" if repr_field else ""
         if self.need_alias:
-            return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
+            return f'{left_side} {self.pydantic_field}(None{repr_}, alias="{self.prop_name}")'
         else:
-            return f"{left_side} {self.pydantic_field}(None, repr=False)"
+            return f"{left_side} {self.pydantic_field}(None{repr_})"
 
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -109,7 +197,7 @@ class EdgeTypedOneToOne(EdgeToOneDataClass):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -138,7 +226,7 @@ class EdgeOneToOneAny(EdgeField):
     def as_write(self) -> str:
         return f"self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}"
 
 
@@ -215,7 +303,7 @@ class EdgeOneToEndNode(EdgeField):
     def as_write(self) -> str:
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
@@ -249,7 +337,7 @@ class EdgeOneToManyNodes(EdgeOneToMany):
             f"for {self.variable} in self.{self.name} or []]"
         )
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return (
             f"[{self.variable}.as_read() if isinstance({self.variable}, GraphQLCore) else {self.variable} "
             f"for {self.variable} in self.{self.name} or []]"
@@ -266,16 +354,19 @@ class EdgeOneToManyNodes(EdgeOneToMany):
     def as_write_type_hint(self) -> str:
         if self.data_class.is_writable or self.data_class.is_interface:
             left_side = f"Union[list[{self.data_class.write_name}], list[str], list[dm.NodeId], None]"
+            repr_field = True
         else:
             left_side = "Union[list[str], None]"
-        return self._type_hint(left_side)
+            repr_field = False
+        return self._type_hint(left_side, repr_field)
 
-    def _type_hint(self, left_side: str) -> str:
+    def _type_hint(self, left_side: str, repr_field: bool = True) -> str:
         # Edge fields are always nullable
+        repr_ = ", repr=False" if repr_field else ""
         if self.need_alias:
-            return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
+            return f'{left_side} = {self.pydantic_field}(default=None{repr_}, alias="{self.prop_name}")'
         else:
-            return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
+            return f"{left_side} = {self.pydantic_field}(default=None{repr_})"
 
 
 @dataclass(frozen=True)
@@ -293,7 +384,7 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     def as_write(self) -> str:
         return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []]"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []]"
 
     def as_read_type_hint(self) -> str:
@@ -312,3 +403,57 @@ class EdgeOneToManyEdges(EdgeOneToMany):
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
         else:
             return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
+
+
+@dataclass(frozen=True)
+class BaseConnectionField(Field, ABC):
+    reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
+    edge_type: dm.DirectRelationReference | None
+    direction: Literal["outwards", "inwards"] | None
+    end_classes: list[DataClass] | None
+
+    @property
+    def is_relation(self) -> bool:
+        return self.edge_type is None
+
+    @property
+    def is_edge(self) -> bool:
+        return True
+
+    @classmethod
+    def load(
+        cls,
+        base: Field,
+        prop: dm.ConnectionDefinition | dm.MappedProperty,
+        variable: str,
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+    ) -> Field | None:
+        if isinstance(prop, MultiEdgeConnection):
+            return OneToManyConnectionField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                pydantic_field=base.pydantic_field,
+                variable=variable,
+                edge_type=prop.type,
+                direction=prop.direction,
+                description=prop.description,
+                end_classes=[data_class_by_view_id[prop.source]],
+            )
+        return None
+
+    @property
+    def _type_hint_right_side(self) -> str:
+        if self.need_alias:
+            return f'{self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
+        else:
+            return f"{self.pydantic_field}(default=None, repr=False)"
+
+
+@dataclass(frozen=True)
+class OneToManyConnectionField(BaseConnectionField):
+    variable: str
+
+
+@dataclass(frozen=True)
+class OneToOneConnectionField(BaseConnectionField): ...

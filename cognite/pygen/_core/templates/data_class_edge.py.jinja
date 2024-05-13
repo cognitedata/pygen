@@ -60,7 +60,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),{% for field in data_class %}
-            {{ field.name }}={{ field.as_read() }},{% endfor %}
+            {{ field.name }}={{ field.as_read_graphql() }},{% endfor %}
         )
 
 {% if data_class.is_writable or data_class.is_interface %}

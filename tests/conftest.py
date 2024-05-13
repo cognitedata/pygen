@@ -17,6 +17,11 @@ def omni_data_model() -> dm.DataModel[dm.View]:
 
 
 @pytest.fixture(scope="session")
+def omni_views(omni_data_model: dm.DataModel[dm.View]) -> dict[str, dm.View]:
+    return {view.external_id: view for view in omni_data_model.views}
+
+
+@pytest.fixture(scope="session")
 def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[str, OmniClasses]:
     output = {}
     available_data_classes = vars(omni_classes)

@@ -7,14 +7,15 @@ from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
 
-from .base import Field, _to_python_type
+from .base import Field
 
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
     """This is a base class for all primitive fields
 
-    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on.
+    For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on, including
+    any list of these types.
     """
 
     type_: dm.PropertyType
@@ -39,8 +40,33 @@ class PrimitiveFieldCore(Field, ABC):
     def as_write(self) -> str:
         return f"self.{self.name}"
 
-    def as_read(self) -> str:
+    def as_read_graphql(self) -> str:
         return f"self.{self.name}"
+
+    @classmethod
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> PrimitiveFieldCore | None:
+        if prop.type.is_list:
+            return PrimitiveListField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                description=base.description,
+                pydantic_field=base.pydantic_field,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                variable=variable,
+            )
+        else:
+            return PrimitiveField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                description=base.description,
+                pydantic_field=base.pydantic_field,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                default=prop.default_value,
+            )
 
 
 @dataclass(frozen=True)
@@ -71,6 +97,10 @@ class ListFieldCore(PrimitiveFieldCore):
             return f"Optional[list[{type_}]] = None"
         else:  # not self.is_nullable and not self.need_alias
             return f"list[{type_}]"
+
+    @property
+    def is_list(self) -> bool:
+        return True
 
 
 @dataclass(frozen=True)
@@ -131,6 +161,27 @@ class PrimitiveListField(ListFieldCore):
     list[datetime.datetime], list[datetime.date].
     """
 
-    @property
-    def is_list(self) -> bool:
-        return True
+    ...
+
+
+def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
+    if isinstance(type_, (dm.Int32, dm.Int64)):
+        out_type = "int"
+    elif isinstance(type_, dm.Boolean):
+        out_type = "bool"
+    elif isinstance(type_, (dm.Float32, dm.Float64)):
+        out_type = "float"
+    elif isinstance(type_, dm.Date):
+        out_type = "datetime.date"
+    elif isinstance(type_, dm.Timestamp):
+        out_type = "datetime.datetime"
+    elif isinstance(type_, dm.Json):
+        out_type = "dict"
+    elif isinstance(type_, dm.TimeSeriesReference):
+        out_type = "TimeSeries"
+    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
+        out_type = "str"
+    else:
+        raise ValueError(f"Unknown type {type_}")
+
+    return out_type
