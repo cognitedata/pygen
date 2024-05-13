@@ -182,3 +182,161 @@ class TestConnections:
 
         # Assert
         assert actual == expected
+
+    @pytest.mark.parametrize(
+        "view_ext_id, property_id, expected",
+        [
+            pytest.param(
+                "ConnectionItemA",
+                "outwards",
+                "[outward.as_write() if isinstance(outward, DomainModel) else outward "
+                "for outward in self.outwards or []]",
+                id="Outwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "otherDirect",
+                "self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct",
+                id="Direct is_list=False, not writable",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "selfDirect",
+                "self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct",
+                id="Direct to self is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemB",
+                "inwards",
+                "[inward.as_write() if isinstance(inward, DomainModel) else inward "
+                "for inward in self.inwards or []]",
+                id="Inwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directNoSource",
+                "self.direct_no_source",
+                id="Direct is_list=False, no source",
+            ),
+        ],
+    )
+    def test_as_write(
+        self,
+        view_ext_id: str,
+        property_id: str,
+        expected: str,
+        omni_field_factory: Callable[[str, str], Field],
+    ) -> None:
+        # Arrange
+        field_ = omni_field_factory(view_ext_id, property_id)
+
+        # Act
+        actual = field_.as_write()
+
+        # Assert
+        assert actual == expected
+
+    @pytest.mark.parametrize(
+        "view_ext_id, property_id, expected",
+        [
+            pytest.param(
+                "ConnectionItemA",
+                "outwards",
+                "[outward.as_write() if isinstance(outward, DomainModel) else outward "
+                "for outward in self.outwards or []]",
+                id="Outwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "otherDirect",
+                "self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct",
+                id="Direct is_list=False, not writable",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "selfDirect",
+                "self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct",
+                id="Direct to self is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemB",
+                "inwards",
+                "[inward.as_write() if isinstance(inward, DomainModel) else inward "
+                "for inward in self.inwards or []]",
+                id="Inwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directNoSource",
+                "self.direct_no_source",
+                id="Direct is_list=False, no source",
+            ),
+        ],
+    )
+    def test_as_write_graphql(
+        self,
+        view_ext_id: str,
+        property_id: str,
+        expected: str,
+        omni_field_factory: Callable[[str, str], Field],
+    ) -> None:
+        # Arrange
+        field_ = omni_field_factory(view_ext_id, property_id)
+
+        # Act
+        actual = field_.as_write_graphql()
+
+        # Assert
+        assert actual == expected
+
+    @pytest.mark.parametrize(
+        "view_ext_id, property_id, expected",
+        [
+            pytest.param(
+                "ConnectionItemA",
+                "outwards",
+                "[outward.as_read() if isinstance(outward, GraphQLCore) else outward "
+                "for outward in self.outwards or []]",
+                id="Outwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "otherDirect",
+                "self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct",
+                id="Direct is_list=False, not writable",
+            ),
+            pytest.param(
+                "ConnectionItemA",
+                "selfDirect",
+                "self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct",
+                id="Direct to self is_list=False",
+            ),
+            pytest.param(
+                "ConnectionItemB",
+                "inwards",
+                "[inward.as_read() if isinstance(inward, GraphQLCore) else inward " "for inward in self.inwards or []]",
+                id="Inwards MultiEdge",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directNoSource",
+                "self.direct_no_source",
+                id="Direct is_list=False, no source",
+            ),
+        ],
+    )
+    def test_as_read_graphql(
+        self,
+        view_ext_id: str,
+        property_id: str,
+        expected: str,
+        omni_field_factory: Callable[[str, str], Field],
+    ) -> None:
+        # Arrange
+        field_ = omni_field_factory(view_ext_id, property_id)
+
+        # Act
+        actual = field_.as_read_graphql()
+
+        # Assert
+        assert actual == expected
