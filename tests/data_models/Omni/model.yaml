@@ -111,6 +111,60 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 - space: pygen-models
+  externalId: ConnectionEdgeA
+  name: ConnectionEdgeA
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: edge
+  isGlobal: false
+  properties:
+    endTime:
+      container:
+        space: pygen-models
+        externalId: ConnectionEdge
+      containerPropertyIdentifier: endTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: endTime
+      description: null
+    name:
+      container:
+        space: pygen-models
+        externalId: ConnectionEdge
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    startTime:
+      container:
+        space: pygen-models
+        externalId: ConnectionEdge
+      containerPropertyIdentifier: startTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: startTime
+      description: null
+  lastUpdatedTime: 1715622303578
+  createdTime: 1715622303578
+- space: pygen-models
   externalId: ConnectionItemA
   name: ConnectionItemA
   filter:
@@ -460,6 +514,24 @@ views:
       edgeSource: null
       direction: inwards
       connectionType: single_edge_connection
+    inwardsSingleProperty:
+      type:
+        space: pygen-models
+        externalId: multiProperty
+      source:
+        space: pygen-models
+        externalId: ConnectionItemF
+        version: '1'
+        type: view
+      name: inwards
+      description: null
+      edgeSource:
+        space: pygen-models
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+      direction: inwards
+      connectionType: single_edge_connection
     name:
       container:
         space: pygen-models
@@ -475,8 +547,8 @@ views:
       defaultValue: null
       name: name
       description: null
-  lastUpdatedTime: 1709996763597
-  createdTime: 1709996763597
+  lastUpdatedTime: 1715622303578
+  createdTime: 1715622303578
 - space: pygen-models
   externalId: ConnectionItemF
   name: ConnectionItemF
@@ -500,7 +572,7 @@ views:
         externalId: ConnectionDirectList
       containerPropertyIdentifier: directList
       type:
-        list: false
+        list: true
         type: direct
         source:
           space: pygen-models
@@ -526,8 +598,96 @@ views:
       defaultValue: null
       name: name
       description: null
-  lastUpdatedTime: 1714806450171
-  createdTime: 1714806450171
+    outwardsMulti:
+      type:
+        space: pygen-models
+        externalId: multiProperty
+      source:
+        space: pygen-models
+        externalId: ConnectionItemG
+        version: '1'
+        type: view
+      name: outwards
+      description: null
+      edgeSource:
+        space: pygen-models
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+      direction: outwards
+      connectionType: multi_edge_connection
+    outwardsSingle:
+      type:
+        space: pygen-models
+        externalId: singleProperty
+      source:
+        space: pygen-models
+        externalId: ConnectionItemE
+        version: '1'
+        type: view
+      name: outwards
+      description: null
+      edgeSource:
+        space: pygen-models
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+      direction: outwards
+      connectionType: single_edge_connection
+  lastUpdatedTime: 1715622303578
+  createdTime: 1715622303578
+- space: pygen-models
+  externalId: ConnectionItemG
+  name: ConnectionItemG
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: ConnectionItemG
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    inwardsMultiProperty:
+      type:
+        space: pygen-models
+        externalId: multiProperty
+      source:
+        space: pygen-models
+        externalId: ConnectionItemF
+        version: '1'
+        type: view
+      name: inwardsMultiProperty
+      description: null
+      edgeSource:
+        space: pygen-models
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+      direction: inwards
+      connectionType: multi_edge_connection
+    name:
+      container:
+        space: pygen-models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+  lastUpdatedTime: 1715622303578
+  createdTime: 1715622303578
 - space: pygen-models
   externalId: DependentOnNonWritable
   name: DependentOnNonWritable
@@ -1647,5 +1807,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1714806451347
-createdTime: 1714806451347
+lastUpdatedTime: 1715622305271
+createdTime: 1715622305271
