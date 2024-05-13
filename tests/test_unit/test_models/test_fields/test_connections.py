@@ -36,11 +36,12 @@ class TestConnections:
     @pytest.mark.parametrize(
         "view_ext_id, property_id, expected",
         [
-            (
+            pytest.param(
                 "ConnectionItemA",
                 "outwards",
                 "Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
-            )
+                id="Outwards MultiEdge",
+            ),
         ],
     )
     def test_as_read_type_hint(
