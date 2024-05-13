@@ -57,7 +57,8 @@ def main():
         views, OMNI_SDK.instance_space, default_config=config, seed=42, skip_interfaces=True
     ).generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
 
-    print(data)
+    data.dump_yaml(DATA_DIR)
+    print(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)}")
 
 
 class Generators:

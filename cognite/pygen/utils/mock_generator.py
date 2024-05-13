@@ -514,7 +514,9 @@ class ViewMockData:
         for resource_name in ["node", "edge", "timeseries", "sequence", "file"]:
             values = getattr(self, resource_name)
             if values:
-                (folder_path / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
+                dump_file = folder_path / f"{self.view_id.external_id}.{resource_name}.yaml"
+                with dump_file.open("w", encoding="utf-8", newline="\n") as f:
+                    f.write(values.dump_yaml())
 
     def deploy(self, client: CogniteClient, verbose: bool = False) -> None:
         """Deploys the mock data to CDF."""
