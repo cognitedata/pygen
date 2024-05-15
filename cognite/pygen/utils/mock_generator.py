@@ -185,7 +185,7 @@ class MockGenerator:
         self, views: list[dm.View], default_node_count: int, default_nullable_fraction: float
     ) -> dict[dm.ViewId, ViewMockData]:
         output: dict[dm.ViewId, ViewMockData] = {}
-        for view in views:
+        for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
             mapped_properties = {
