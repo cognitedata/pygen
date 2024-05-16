@@ -29,6 +29,9 @@ def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[str, OmniC
         read_name = to_pascal(view.external_id)
         write_name = read_name + "Write"
         api_name = to_snake(view.external_id)
+        if read_name not in available_data_classes:
+
+            continue
         read_class = available_data_classes[read_name]
         write_class = available_data_classes.get(write_name)
         output[view.external_id] = OmniClasses(read_class, write_class, api_name, view)
