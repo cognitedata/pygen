@@ -1,6 +1,6 @@
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Patricia:ConnectionItemA:Melissa
+  externalId: ConnectionItemC:Patricia:ConnectionItemB:Shannon
   type:
     space: pygen-models
     externalId: unidirectional
@@ -9,46 +9,22 @@
     externalId: ConnectionItemC:Patricia
   endNode:
     space: omni-instances
-    externalId: ConnectionItemA:Melissa
+    externalId: ConnectionItemB:Shannon
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Patricia:ConnectionItemA:Troy
+  externalId: ConnectionItemC:Christopher:ConnectionItemA:Heather
   type:
     space: pygen-models
     externalId: unidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemC:Patricia
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Troy
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Patricia:ConnectionItemA:Heather
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Patricia
+    externalId: ConnectionItemC:Christopher
   endNode:
     space: omni-instances
     externalId: ConnectionItemA:Heather
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Patricia:ConnectionItemB:Karen
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Patricia
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemB:Karen
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemA:Troy
+  externalId: ConnectionItemC:Christopher:ConnectionItemA:Crystal
   type:
     space: pygen-models
     externalId: unidirectional
@@ -57,67 +33,7 @@
     externalId: ConnectionItemC:Christopher
   endNode:
     space: omni-instances
-    externalId: ConnectionItemA:Troy
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemA:Melissa
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Christopher
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Melissa
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemA:Charles
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Christopher
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Charles
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemB:Jimmy
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Christopher
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemB:Jimmy
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemB:Todd
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Christopher
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemB:Todd
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Christopher:ConnectionItemB:Mary
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Christopher
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemB:Mary
+    externalId: ConnectionItemA:Crystal
 - space: omni-instances
   instanceType: edge
   externalId: ConnectionItemC:Jason:ConnectionItemA:Troy
@@ -132,7 +48,7 @@
     externalId: ConnectionItemA:Troy
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Jason:ConnectionItemA:Melissa
+  externalId: ConnectionItemC:Jason:ConnectionItemB:Karen
   type:
     space: pygen-models
     externalId: unidirectional
@@ -141,43 +57,55 @@
     externalId: ConnectionItemC:Jason
   endNode:
     space: omni-instances
-    externalId: ConnectionItemA:Melissa
+    externalId: ConnectionItemB:Karen
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Steven:ConnectionItemA:Crystal
+  externalId: ConnectionItemC:Jason:ConnectionItemB:Todd
   type:
     space: pygen-models
     externalId: unidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemC:Steven
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Crystal
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Steven:ConnectionItemA:Melissa
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Steven
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Melissa
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Steven:ConnectionItemB:Todd
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Steven
+    externalId: ConnectionItemC:Jason
   endNode:
     space: omni-instances
     externalId: ConnectionItemB:Todd
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemC:Steven:ConnectionItemA:Heather
+  type:
+    space: pygen-models
+    externalId: unidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemC:Steven
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Heather
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemC:Steven:ConnectionItemA:Charles
+  type:
+    space: pygen-models
+    externalId: unidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemC:Steven
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Charles
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemC:Steven:ConnectionItemA:Troy
+  type:
+    space: pygen-models
+    externalId: unidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemC:Steven
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Troy
 - space: omni-instances
   instanceType: edge
   externalId: ConnectionItemC:Steven:ConnectionItemB:Karen
@@ -192,7 +120,7 @@
     externalId: ConnectionItemB:Karen
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Bryan:ConnectionItemA:Melissa
+  externalId: ConnectionItemC:Bryan:ConnectionItemA:Troy
   type:
     space: pygen-models
     externalId: unidirectional
@@ -201,19 +129,7 @@
     externalId: ConnectionItemC:Bryan
   endNode:
     space: omni-instances
-    externalId: ConnectionItemA:Melissa
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemC:Bryan:ConnectionItemA:Crystal
-  type:
-    space: pygen-models
-    externalId: unidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemC:Bryan
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Crystal
+    externalId: ConnectionItemA:Troy
 - space: omni-instances
   instanceType: edge
   externalId: ConnectionItemC:Bryan:ConnectionItemA:Heather
@@ -228,7 +144,7 @@
     externalId: ConnectionItemA:Heather
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemC:Bryan:ConnectionItemB:Jimmy
+  externalId: ConnectionItemC:Bryan:ConnectionItemB:Mary
   type:
     space: pygen-models
     externalId: unidirectional
@@ -237,4 +153,28 @@
     externalId: ConnectionItemC:Bryan
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Jimmy
+    externalId: ConnectionItemB:Mary
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemC:Bryan:ConnectionItemB:Karen
+  type:
+    space: pygen-models
+    externalId: unidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemC:Bryan
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Karen
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemC:Bryan:ConnectionItemB:Shannon
+  type:
+    space: pygen-models
+    externalId: unidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemC:Bryan
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Shannon
