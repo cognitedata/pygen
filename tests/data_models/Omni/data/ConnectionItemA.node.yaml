@@ -6,7 +6,7 @@
       name: null
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Diana
+        externalId: ConnectionItemC:Patricia
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -20,7 +20,7 @@
   externalId: ConnectionItemA:Charles
   sources:
   - properties:
-      name: Pressure let kind degree list top somebody college.
+      name: Memory soldier where save probably.
       selfDirect:
         space: omni-instances
         externalId: ConnectionItemA:Heather
@@ -37,10 +37,10 @@
   externalId: ConnectionItemA:Crystal
   sources:
   - properties:
-      name: Exist professional people behavior.
+      name: Middle plan friend stand seem.
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Karen
+        externalId: ConnectionItemC:Jason
       selfDirect:
         space: omni-instances
         externalId: ConnectionItemA:Crystal
@@ -57,10 +57,10 @@
   externalId: ConnectionItemA:Heather
   sources:
   - properties:
-      name: Fight decision size.
+      name: Street fight decision size parent focus kid.
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Diana
+        externalId: ConnectionItemC:Patricia
       selfDirect:
         space: omni-instances
         externalId: ConnectionItemA:Charles
@@ -77,10 +77,10 @@
   externalId: ConnectionItemA:Troy
   sources:
   - properties:
-      name: Pull different current agency each.
+      name: Different current agency each little.
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Karen
+        externalId: ConnectionItemC:Jason
     source:
       space: pygen-models
       externalId: ConnectionItemA

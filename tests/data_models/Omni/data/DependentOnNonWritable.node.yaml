@@ -42,7 +42,7 @@
     externalId: DependentOnNonWritable
 - space: omni-instances
   instanceType: node
-  externalId: DependentOnNonWritable:Curtis
+  externalId: DependentOnNonWritable:Dana
   sources:
   - properties:
       aValue: Most international second former reflect even edge.
@@ -56,7 +56,7 @@
     externalId: DependentOnNonWritable
 - space: omni-instances
   instanceType: node
-  externalId: DependentOnNonWritable:Justin
+  externalId: DependentOnNonWritable:Curtis
   sources:
   - properties:
       aValue: Return firm sea week.
