@@ -32,7 +32,7 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
-from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
+from cognite.client.data_classes.data_modeling.views import EdgeConnection, MultiEdgeConnection
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
@@ -276,33 +276,17 @@ class MockGenerator:
                         sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
 
                         max_edge_count = min(config.max_edge_per_type or default_max_edge_count, len(sources))
-                        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
-
-                        for end_node in end_nodes:
-                            start_node = node.as_id()
-                            if connection.direction == "inwards":
-                                start_node, end_node = end_node, start_node
-
-                            edge = dm.EdgeApply(
-                                space=self._instance_space,
-                                external_id=f"{start_node.external_id}:{end_node.external_id}",
-                                type=connection.type,
-                                start_node=(start_node.space, start_node.external_id),
-                                end_node=(end_node.space, end_node.external_id),
+                        edges = self._create_edges(connection, node.as_id(), sources, max_edge_count)
+                        outputs[view_id].edge.extend(edges)
+                    elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+                        if not connection.source:
+                            warnings.warn(
+                                f"View {view_id}: DirectRelation {name} is missing source, "
+                                "do not know the target view the direct relation points to",
+                                stacklevel=2,
                             )
-                            outputs[view_id].edge.append(edge)
-                    elif (
-                        isinstance(connection, dm.MappedProperty)
-                        and isinstance(connection.type, dm.DirectRelation)
-                        and connection.source
-                    ):
-                        if connection.source in leaf_children_by_parent:
-                            sources = []
-                            for child in leaf_children_by_parent[connection.source]:
-                                sources.extend(outputs[child].node.as_ids())
-                        else:
-                            sources = outputs[connection.source].node.as_ids()
-
+                            continue
+                        sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
                         if (
                             not connection.nullable
                             or random.random() < (1 - (config.null_values or default_nullable_fraction))
@@ -329,18 +313,11 @@ class MockGenerator:
                                     )
                                 )
                     else:
-                        if isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
-                            warnings.warn(
-                                f"View {view_id}: DirectRelation {name} is missing source, "
-                                "do not know the target view the direct relation points to",
-                                stacklevel=2,
-                            )
-                        else:
-                            warnings.warn(
-                                f"View {view_id}: Connection {type(connection)} used by {name} "
-                                f"is not supported by the {type(self).__name__}.",
-                                stacklevel=2,
-                            )
+                        warnings.warn(
+                            f"View {view_id}: Connection {type(connection)} used by {name} "
+                            f"is not supported by the {type(self).__name__}.",
+                            stacklevel=2,
+                        )
 
     def _generate_mock_values(
         self,
@@ -456,6 +433,27 @@ class MockGenerator:
         else:
             sources = outputs[connection].node.as_ids()
         return sources
+
+    def _create_edges(
+        self, connection: EdgeConnection, node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
+    ) -> list[dm.EdgeApply]:
+        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
+
+        edges: list[dm.EdgeApply] = []
+        for end_node in end_nodes:
+            start_node = node
+            if connection.direction == "inwards":
+                start_node, end_node = end_node, start_node
+
+            edge = dm.EdgeApply(
+                space=self._instance_space,
+                external_id=f"{start_node.external_id}:{end_node.external_id}",
+                type=connection.type,
+                start_node=(start_node.space, start_node.external_id),
+                end_node=(end_node.space, end_node.external_id),
+            )
+            edges.append(edge)
+        return edges
 
     @staticmethod
     def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
