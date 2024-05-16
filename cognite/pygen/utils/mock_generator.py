@@ -32,7 +32,7 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
-from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection, ReverseDirectRelation
+from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
@@ -178,7 +178,7 @@ class MockGenerator:
 
     def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
         outputs = self._generate_mock_nodes(views, node_count, null_values)
-        self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
+        self._generate_mock_relations(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
 
     def _generate_mock_nodes(
@@ -236,7 +236,7 @@ class MockGenerator:
             )
         return output
 
-    def _generate_mock_connections(
+    def _generate_mock_relations(
         self,
         views: list[dm.View],
         outputs: dict[dm.ViewId, ViewMockData],
@@ -273,20 +273,36 @@ class MockGenerator:
                         continue
 
                     if isinstance(connection, MultiEdgeConnection):
-                        sources = self._get_sources(connection.source, leaf_children_by_parent, outputs)
-                        edges = self._generate_mock_edges(
-                            connection, node.as_id(), sources, config.max_edge_per_type or default_max_edge_count
-                        )
-                        outputs[view_id].edge.extend(edges)
-                    elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
-                        if connection.source is None:
-                            warnings.warn(
-                                f"View {view_id}: DirectRelation {name} is missing source, "
-                                "do not know the target view the direct relation points to",
-                                stacklevel=2,
+                        sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
+
+                        max_edge_count = min(config.max_edge_per_type or default_max_edge_count, len(sources))
+                        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
+
+                        for end_node in end_nodes:
+                            start_node = node.as_id()
+                            if connection.direction == "inwards":
+                                start_node, end_node = end_node, start_node
+
+                            edge = dm.EdgeApply(
+                                space=self._instance_space,
+                                external_id=f"{start_node.external_id}:{end_node.external_id}",
+                                type=connection.type,
+                                start_node=(start_node.space, start_node.external_id),
+                                end_node=(end_node.space, end_node.external_id),
                             )
-                            continue
-                        sources = self._get_sources(connection.source, leaf_children_by_parent, outputs)
+                            outputs[view_id].edge.append(edge)
+                    elif (
+                        isinstance(connection, dm.MappedProperty)
+                        and isinstance(connection.type, dm.DirectRelation)
+                        and connection.source
+                    ):
+                        if connection.source in leaf_children_by_parent:
+                            sources = []
+                            for child in leaf_children_by_parent[connection.source]:
+                                sources.extend(outputs[child].node.as_ids())
+                        else:
+                            sources = outputs[connection.source].node.as_ids()
+
                         if (
                             not connection.nullable
                             or random.random() < (1 - (config.null_values or default_nullable_fraction))
@@ -312,15 +328,19 @@ class MockGenerator:
                                         },
                                     )
                                 )
-                    elif isinstance(connection, ReverseDirectRelation):
-                        # ReverseDirectRelations are created in the opposite direction.
-                        continue
                     else:
-                        warnings.warn(
-                            f"View {view_id}: Connection {type(connection)} used by {name} "
-                            f"is not supported by the {type(self).__name__}.",
-                            stacklevel=2,
-                        )
+                        if isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+                            warnings.warn(
+                                f"View {view_id}: DirectRelation {name} is missing source, "
+                                "do not know the target view the direct relation points to",
+                                stacklevel=2,
+                            )
+                        else:
+                            warnings.warn(
+                                f"View {view_id}: Connection {type(connection)} used by {name} "
+                                f"is not supported by the {type(self).__name__}.",
+                                stacklevel=2,
+                            )
 
     def _generate_mock_values(
         self,
@@ -424,41 +444,21 @@ class MockGenerator:
         return output, external
 
     @staticmethod
-    def _get_sources(
-        connection_source: dm.ViewId,
-        leaf_children_by_parent: dict[dm.ViewId, set[dm.ViewId]],
+    def get_sources(
+        connection: dm.ViewId,
         outputs: dict[dm.ViewId, ViewMockData],
+        leaf_children_by_parent: dict[dm.ViewId, list[dm.ViewId]],
     ) -> list[dm.NodeId]:
-        if connection_source in leaf_children_by_parent:
+        if connection in leaf_children_by_parent:
             sources: list[dm.NodeId] = []
-            for child in leaf_children_by_parent[connection_source]:
+            for child in leaf_children_by_parent[connection]:
                 sources.extend(outputs[child].node.as_ids())
         else:
-            sources = outputs[connection_source].node.as_ids()
+            sources = outputs[connection].node.as_ids()
         return sources
 
-    def _generate_mock_edges(self, connection, from_node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int):
-        max_edge_count = min(max_edge_count, len(sources))
-        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
-
-        edges: list[dm.EdgeApply] = []
-        for end_node in end_nodes:
-            start_node = from_node
-            if connection.direction == "inwards":
-                start_node, end_node = end_node, start_node
-
-            edge = dm.EdgeApply(
-                space=self._instance_space,
-                external_id=f"{start_node.external_id}:{end_node.external_id}",
-                type=connection.type,
-                start_node=(start_node.space, start_node.external_id),
-                end_node=(end_node.space, end_node.external_id),
-            )
-            edges.append(edge)
-        return edges
-
     @staticmethod
-    def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, set[dm.ViewId]]:
+    def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
         leaf_children_by_parent: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
         for view in views:
             for parent in view.implements or []:
@@ -475,7 +475,7 @@ class MockGenerator:
                 leaf_children_by_parent[view_id].remove(parent)
                 leaf_children_by_parent[view_id].update(leaf_children_by_parent[parent])
 
-        return leaf_children_by_parent
+        return {k: sorted(v, key=lambda x: x.as_tuple()) for k, v in leaf_children_by_parent.items()}
 
 
 @dataclass
