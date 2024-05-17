@@ -4,9 +4,6 @@
   sources:
   - properties:
       name: Accept goal send table well industry section.
-      directMulti:
-        space: omni-instances
-        externalId: ConnectionItemE:Rebecca
     source:
       space: pygen-models
       externalId: ConnectionItemD
@@ -20,8 +17,11 @@
   externalId: ConnectionItemD:Roy
   sources:
   - properties:
-      name: null
+      name: Right subject try wonder move trade.
       directMulti:
+        space: omni-instances
+        externalId: ConnectionItemE:Beth
+      directSingle:
         space: omni-instances
         externalId: ConnectionItemE:Frank
     source:
@@ -37,10 +37,13 @@
   externalId: ConnectionItemD:Hunter
   sources:
   - properties:
-      name: Right subject try wonder move trade.
+      name: Hope show watch affect thing offer.
       directMulti:
         space: omni-instances
-        externalId: ConnectionItemE:Barbara
+        externalId: ConnectionItemE:Frank
+      directSingle:
+        space: omni-instances
+        externalId: ConnectionItemE:Rebecca
     source:
       space: pygen-models
       externalId: ConnectionItemD
@@ -54,13 +57,13 @@
   externalId: ConnectionItemD:Jorge
   sources:
   - properties:
-      name: Son today major event magazine home protect.
+      name: null
       directMulti:
         space: omni-instances
-        externalId: ConnectionItemE:Rebecca
+        externalId: ConnectionItemE:Larry
       directSingle:
         space: omni-instances
-        externalId: ConnectionItemE:Larry
+        externalId: ConnectionItemE:Beth
     source:
       space: pygen-models
       externalId: ConnectionItemD
@@ -74,10 +77,13 @@
   externalId: ConnectionItemD:Nichole
   sources:
   - properties:
-      name: Hope show watch affect thing offer.
+      name: Son today major event magazine home protect.
       directMulti:
         space: omni-instances
         externalId: ConnectionItemE:Barbara
+      directSingle:
+        space: omni-instances
+        externalId: ConnectionItemE:Rebecca
     source:
       space: pygen-models
       externalId: ConnectionItemD

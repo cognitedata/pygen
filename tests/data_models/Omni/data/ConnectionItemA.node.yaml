@@ -6,7 +6,7 @@
       name: null
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Patricia
+        externalId: ConnectionItemC:Christopher
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -21,9 +21,12 @@
   sources:
   - properties:
       name: Memory soldier where save probably.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Jason
       selfDirect:
         space: omni-instances
-        externalId: ConnectionItemA:Heather
+        externalId: ConnectionItemA:Melissa
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -40,10 +43,10 @@
       name: Middle plan friend stand seem.
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Jason
+        externalId: ConnectionItemC:Bryan
       selfDirect:
         space: omni-instances
-        externalId: ConnectionItemA:Crystal
+        externalId: ConnectionItemA:Troy
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -61,9 +64,6 @@
       otherDirect:
         space: omni-instances
         externalId: ConnectionItemC:Patricia
-      selfDirect:
-        space: omni-instances
-        externalId: ConnectionItemA:Charles
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -80,7 +80,10 @@
       name: Different current agency each little.
       otherDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Jason
+        externalId: ConnectionItemC:Christopher
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Charles
     source:
       space: pygen-models
       externalId: ConnectionItemA

@@ -3,7 +3,7 @@
   externalId: ConnectionItemE:Frank
   sources:
   - properties:
-      name: null
+      name: Current after charge call prove.
     source:
       space: pygen-models
       externalId: ConnectionItemE
@@ -17,7 +17,7 @@
   externalId: ConnectionItemE:Larry
   sources:
   - properties:
-      name: Way let eight hard paper white responsibility.
+      name: null
     source:
       space: pygen-models
       externalId: ConnectionItemE
@@ -31,7 +31,7 @@
   externalId: ConnectionItemE:Beth
   sources:
   - properties:
-      name: Sell story edge bank affect.
+      name: Way let eight hard paper white responsibility.
     source:
       space: pygen-models
       externalId: ConnectionItemE
@@ -45,7 +45,7 @@
   externalId: ConnectionItemE:Barbara
   sources:
   - properties:
-      name: Current after charge call prove.
+      name: Sell story edge bank affect.
     source:
       space: pygen-models
       externalId: ConnectionItemE

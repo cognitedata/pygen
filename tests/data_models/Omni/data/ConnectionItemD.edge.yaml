@@ -1,6 +1,6 @@
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemD:Nichole:ConnectionItemE:Barbara
+  externalId: ConnectionItemD:Nichole:ConnectionItemE:Larry
   type:
     space: pygen-models
     externalId: bidirectionalSingle
@@ -9,4 +9,4 @@
     externalId: ConnectionItemD:Nichole
   endNode:
     space: omni-instances
-    externalId: ConnectionItemE:Barbara
+    externalId: ConnectionItemE:Larry
