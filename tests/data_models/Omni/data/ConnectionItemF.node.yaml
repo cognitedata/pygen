@@ -20,11 +20,11 @@
       name: Black whether player stock religious itself safe.
       directList:
       - space: omni-instances
-        externalId: ConnectionItemD:Roy
-      - space: omni-instances
         externalId: ConnectionItemD:Jorge
       - space: omni-instances
-        externalId: ConnectionItemD:Brittany
+        externalId: ConnectionItemD:Roy
+      - space: omni-instances
+        externalId: ConnectionItemD:Nichole
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -39,13 +39,6 @@
   sources:
   - properties:
       name: null
-      directList:
-      - space: omni-instances
-        externalId: ConnectionItemD:Brittany
-      - space: omni-instances
-        externalId: ConnectionItemD:Nichole
-      - space: omni-instances
-        externalId: ConnectionItemD:Hunter
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -63,6 +56,10 @@
       directList:
       - space: omni-instances
         externalId: ConnectionItemD:Nichole
+      - space: omni-instances
+        externalId: ConnectionItemD:Brittany
+      - space: omni-instances
+        externalId: ConnectionItemD:Jorge
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -79,7 +76,9 @@
       name: However resource away real physical big.
       directList:
       - space: omni-instances
-        externalId: ConnectionItemD:Nichole
+        externalId: ConnectionItemD:Brittany
+      - space: omni-instances
+        externalId: ConnectionItemD:Roy
     source:
       space: pygen-models
       externalId: ConnectionItemF
