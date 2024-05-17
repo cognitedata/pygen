@@ -72,6 +72,12 @@ class TestConnections:
                 'Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")',
                 id="Outwards MultiEdge with properties",
             ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                'Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="inwardsMultiProperty")',
+                id="Inwards MultiEdge with properties",
+            ),
         ],
     )
     def test_as_read_type_hint(
@@ -128,6 +134,12 @@ class TestConnections:
                 "outwardsMulti",
                 'Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")',
                 id="Outwards MultiEdge with properties",
+            ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                'Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="inwardsMultiProperty")',
+                id="Inwards MultiEdge with properties",
             ),
         ],
     )
@@ -186,6 +198,13 @@ class TestConnections:
                 'Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")',
                 id="Outwards MultiEdge with properties",
             ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                "Optional[list[ConnectionEdgeAGraphQL]] = "
+                'Field(default=None, repr=False, alias="inwardsMultiProperty")',
+                id="Inwards MultiEdge with properties",
+            ),
         ],
     )
     def test_as_graphql_type_hint(
@@ -238,6 +257,12 @@ class TestConnections:
                 "directNoSource",
                 "self.direct_no_source",
                 id="Direct is_list=False, no source",
+            ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []]",
+                id="Inwards MultiEdge with properties",
             ),
         ],
     )
@@ -298,6 +323,12 @@ class TestConnections:
                 "[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []]",
                 id="Outwards MultiEdge with properties",
             ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []]",
+                id="Inwards MultiEdge with properties",
+            ),
         ],
     )
     def test_as_write_graphql(
@@ -355,6 +386,12 @@ class TestConnections:
                 "outwardsMulti",
                 "[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []]",
                 id="Outwards MultiEdge with properties",
+            ),
+            pytest.param(
+                "ConnectionItemG",
+                "inwardsMultiProperty",
+                "[inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property or []]",
+                id="Inwards MultiEdge with properties",
             ),
         ],
     )
