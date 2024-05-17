@@ -23,6 +23,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
+    from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
     from ._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
 
 
@@ -58,11 +59,13 @@ class ConnectionItemFGraphQL(GraphQLCore):
         data_record: The data record of the connection item f node.
         direct_list: The direct list field.
         name: The name field.
+        outwards_multi: The outwards multi field.
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
     direct_list: Optional[ConnectionItemDGraphQL] = Field(None, repr=False, alias="directList")
     name: Optional[str] = None
+    outwards_multi: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -75,7 +78,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("direct_list", pre=True)
+    @validator("direct_list", "outwards_multi", pre=True)
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -97,6 +100,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             ),
             direct_list=self.direct_list.as_read() if isinstance(self.direct_list, GraphQLCore) else self.direct_list,
             name=self.name,
+            outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
         )
 
     def as_write(self) -> ConnectionItemFWrite:
@@ -107,6 +111,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             direct_list=self.direct_list.as_write() if isinstance(self.direct_list, DomainModel) else self.direct_list,
             name=self.name,
+            outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
 
 
@@ -121,12 +126,14 @@ class ConnectionItemF(DomainModel):
         data_record: The data record of the connection item f node.
         direct_list: The direct list field.
         name: The name field.
+        outwards_multi: The outwards multi field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
     direct_list: Union[ConnectionItemD, str, dm.NodeId, None] = Field(None, repr=False, alias="directList")
     name: Optional[str] = None
+    outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
 
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this read version of connection item f to the writing version."""
@@ -136,6 +143,7 @@ class ConnectionItemF(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_list=self.direct_list.as_write() if isinstance(self.direct_list, DomainModel) else self.direct_list,
             name=self.name,
+            outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
 
     def as_apply(self) -> ConnectionItemFWrite:
@@ -159,12 +167,14 @@ class ConnectionItemFWrite(DomainModelWrite):
         data_record: The data record of the connection item f node.
         direct_list: The direct list field.
         name: The name field.
+        outwards_multi: The outwards multi field.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
     direct_list: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="directList")
     name: Optional[str] = None
+    outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
 
     def _to_instances_write(
         self,
@@ -205,6 +215,13 @@ class ConnectionItemFWrite(DomainModelWrite):
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+
+        for outwards_multi in self.outwards_multi or []:
+            if isinstance(outwards_multi, DomainRelationWrite):
+                other_resources = outwards_multi._to_instances_write(
+                    cache, self, dm.DirectRelationReference("pygen-models", "multiProperty"), view_by_read_class
+                )
+                resources.extend(other_resources)
 
         if isinstance(self.direct_list, DomainModelWrite):
             other_resources = self.direct_list._to_instances_write(cache, view_by_read_class)
