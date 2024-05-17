@@ -32,7 +32,12 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
-from cognite.client.data_classes.data_modeling.views import EdgeConnection, MultiEdgeConnection, ReverseDirectRelation
+from cognite.client.data_classes.data_modeling.views import (
+    EdgeConnection,
+    MultiEdgeConnection,
+    ReverseDirectRelation,
+    SingleEdgeConnection,
+)
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
@@ -272,10 +277,20 @@ class MockGenerator:
                         )
                         continue
 
-                    if isinstance(connection, MultiEdgeConnection):
+                    if isinstance(connection, EdgeConnection):
                         sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
-
-                        max_edge_count = min(config.max_edge_per_type or default_max_edge_count, len(sources))
+                        if isinstance(connection, SingleEdgeConnection):
+                            max_edge_count = 1
+                        elif isinstance(connection, dm.MultiEdgeConnection):
+                            max_edge_count = config.max_edge_per_type or default_max_edge_count
+                        else:
+                            warnings.warn(
+                                f"View {view_id}: Connection {type(connection)} used by {name} "
+                                f"is not supported by the {type(self).__name__}.",
+                                stacklevel=2,
+                            )
+                            continue
+                        max_edge_count = min(max_edge_count, len(sources))
                         edges = self._create_edges(connection, node.as_id(), sources, max_edge_count)
                         outputs[view_id].edge.extend(edges)
                     elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
