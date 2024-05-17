@@ -262,8 +262,8 @@ class MockGenerator:
                 continue
             view_id = view.as_id()
             config = self._view_configs.get(view_id, self._default_config)
-            for node in outputs[view_id].node:
-                for name, connection in connection_properties.items():
+            for this_node in outputs[view_id].node:
+                for property_name, connection in connection_properties.items():
                     if (
                         isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
                         and connection.source is not None
@@ -271,67 +271,45 @@ class MockGenerator:
                         and connection.source not in leaf_children_by_parent
                     ):
                         warnings.warn(
-                            f"{view_id} property {name!r} points to a view {connection.source} "
+                            f"{view_id} property {property_name!r} points to a view {connection.source} "
                             f"which is not in the data model. Skipping connection generation.",
                             stacklevel=2,
                         )
                         continue
 
                     if isinstance(connection, EdgeConnection):
-                        sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
+                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
                             max_edge_count = 1
-                        elif isinstance(connection, dm.MultiEdgeConnection):
+                        else:  # MultiEdgeConnection
                             max_edge_count = config.max_edge_per_type or default_max_edge_count
-                        else:
-                            warnings.warn(
-                                f"View {view_id}: Connection {type(connection)} used by {name} "
-                                f"is not supported by the {type(self).__name__}.",
-                                stacklevel=2,
-                            )
-                            continue
-                        max_edge_count = min(max_edge_count, len(sources))
-                        edges = self._create_edges(connection, node.as_id(), sources, max_edge_count)
+                        max_edge_count = min(max_edge_count, len(other_nodes))
+                        edges = self._create_edges(connection, this_node.as_id(), other_nodes, max_edge_count)
                         outputs[view_id].edge.extend(edges)
                     elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
                         if not connection.source:
                             warnings.warn(
-                                f"View {view_id}: DirectRelation {name} is missing source, "
+                                f"View {view_id}: DirectRelation {property_name} is missing source, "
                                 "do not know the target view the direct relation points to",
                                 stacklevel=2,
                             )
                             continue
-                        sources = self.get_sources(connection.source, outputs, leaf_children_by_parent)
-                        if (
-                            not connection.nullable
-                            or random.random() < (1 - (config.null_values or default_nullable_fraction))
-                        ) and sources:
-                            other_node = choice(sources)
-                            if node.sources is None:
-                                node.sources = []
-                            for source in node.sources:
-                                if source.source == view_id:
-                                    if not isinstance(source.properties, dict):
-                                        source.properties = dict(source.properties) if source.properties else {}
-                                    source.properties[name] = {
-                                        "space": other_node.space,
-                                        "externalId": other_node.external_id,
-                                    }
-                                    break
-                            else:
-                                node.sources.append(
-                                    dm.NodeOrEdgeData(
-                                        source=view_id,
-                                        properties={
-                                            name: {"space": other_node.space, "externalId": other_node.external_id}
-                                        },
-                                    )
-                                )
+                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+
+                        # If the connection is nullable, we randomly decide if we should create the relation
+                        create_relation = not connection.nullable or random.random() < (
+                            1 - (config.null_values or default_nullable_fraction)
+                        )
+                        if not (create_relation and other_nodes):
+                            continue
+                        other_node = choice(other_nodes)
+                        value = {"space": other_node.space, "externalId": other_node.external_id}
+                        self._set_direct_relation_property(this_node, view_id, property_name, value)
                     elif isinstance(connection, ReverseDirectRelation):
                         continue
                     else:
                         warnings.warn(
-                            f"View {view_id}: Connection {type(connection)} used by {name} "
+                            f"View {view_id}: Connection {type(connection)} used by {property_name} "
                             f"is not supported by the {type(self).__name__}.",
                             stacklevel=2,
                         )
@@ -438,7 +416,7 @@ class MockGenerator:
         return output, external
 
     @staticmethod
-    def get_sources(
+    def get_other_nodes(
         connection: dm.ViewId,
         outputs: dict[dm.ViewId, ViewMockData],
         leaf_children_by_parent: dict[dm.ViewId, list[dm.ViewId]],
@@ -452,13 +430,13 @@ class MockGenerator:
         return sources
 
     def _create_edges(
-        self, connection: EdgeConnection, node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
+        self, connection: EdgeConnection, this_node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
     ) -> list[dm.EdgeApply]:
         end_nodes = random.sample(sources, k=randint(0, max_edge_count))
 
         edges: list[dm.EdgeApply] = []
         for end_node in end_nodes:
-            start_node = node
+            start_node = this_node
             if connection.direction == "inwards":
                 start_node, end_node = end_node, start_node
 
@@ -471,6 +449,28 @@ class MockGenerator:
             )
             edges.append(edge)
         return edges
+
+    @staticmethod
+    def _set_direct_relation_property(
+        this_node: dm.NodeApply, view_id: dm.ViewId, property_name: str, value: dict
+    ) -> None:
+        if this_node.sources is None:
+            this_node.sources = []
+        for source in this_node.sources:
+            if source.source == view_id:
+                if not isinstance(source.properties, dict):
+                    source.properties = dict(source.properties) if source.properties else {}
+                source.properties[property_name] = value
+                break
+        else:
+            # This is the first property residing in this view
+            # for this node
+            this_node.sources.append(
+                dm.NodeOrEdgeData(
+                    source=view_id,
+                    properties={property_name: value},
+                )
+            )
 
     @staticmethod
     def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
