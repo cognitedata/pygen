@@ -6,7 +6,7 @@
       name: Black whether player stock religious itself safe.
       directList:
         space: omni-instances
-        externalId: ConnectionItemD:Roy
+        externalId: ConnectionItemD:Brittany
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -23,7 +23,7 @@
       name: However resource away real physical big.
       directList:
         space: omni-instances
-        externalId: ConnectionItemD:Hunter
+        externalId: ConnectionItemD:Roy
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -40,7 +40,7 @@
       name: Sure outside building worker site.
       directList:
         space: omni-instances
-        externalId: ConnectionItemD:Brittany
+        externalId: ConnectionItemD:Jorge
     source:
       space: pygen-models
       externalId: ConnectionItemF
@@ -72,9 +72,6 @@
   sources:
   - properties:
       name: null
-      directList:
-        space: omni-instances
-        externalId: ConnectionItemD:Brittany
     source:
       space: pygen-models
       externalId: ConnectionItemF

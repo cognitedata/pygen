@@ -3,7 +3,7 @@
   externalId: DependentOnNonWritable:Brandon
   sources:
   - properties:
-      aValue: Course school everybody operation.
+      aValue: Return firm sea week.
     source:
       space: pygen-models
       externalId: DependentOnNonWritable
@@ -17,7 +17,7 @@
   externalId: DependentOnNonWritable:Brian
   sources:
   - properties:
-      aValue: null
+      aValue: Course school everybody operation.
     source:
       space: pygen-models
       externalId: DependentOnNonWritable
@@ -59,7 +59,7 @@
   externalId: DependentOnNonWritable:Curtis
   sources:
   - properties:
-      aValue: Return firm sea week.
+      aValue: null
     source:
       space: pygen-models
       externalId: DependentOnNonWritable

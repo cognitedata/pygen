@@ -1,0 +1,24 @@
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemD:Brittany:ConnectionItemE:Frank
+  type:
+    space: pygen-models
+    externalId: bidirectionalSingle
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemD:Brittany
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemE:Frank
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemD:Brittany:ConnectionItemE:Beth
+  type:
+    space: pygen-models
+    externalId: bidirectionalSingle
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemD:Brittany
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemE:Beth

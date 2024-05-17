@@ -1,15 +1,15 @@
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemF:Tammy:ConnectionItemG:Andre
+  externalId: ConnectionItemF:Lindsey:ConnectionItemG:Shane
   type:
     space: pygen-models
     externalId: multiProperty
   startNode:
     space: omni-instances
-    externalId: ConnectionItemF:Tammy
+    externalId: ConnectionItemF:Lindsey
   endNode:
     space: omni-instances
-    externalId: ConnectionItemG:Andre
+    externalId: ConnectionItemG:Shane
 - space: omni-instances
   instanceType: edge
   externalId: ConnectionItemF:Lindsey:ConnectionItemG:Andre
@@ -19,6 +19,30 @@
   startNode:
     space: omni-instances
     externalId: ConnectionItemF:Lindsey
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemG:Andre
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemF:Jessica:ConnectionItemG:Andre
+  type:
+    space: pygen-models
+    externalId: multiProperty
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemF:Jessica
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemG:Andre
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemF:Tammy:ConnectionItemG:Andre
+  type:
+    space: pygen-models
+    externalId: multiProperty
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemF:Tammy
   endNode:
     space: omni-instances
     externalId: ConnectionItemG:Andre
@@ -48,7 +72,7 @@
     externalId: ConnectionItemG:Kelly
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemF:Mariah:ConnectionItemG:Richard
+  externalId: ConnectionItemF:Mariah:ConnectionItemG:Miguel
   type:
     space: pygen-models
     externalId: multiProperty
@@ -57,16 +81,16 @@
     externalId: ConnectionItemF:Mariah
   endNode:
     space: omni-instances
-    externalId: ConnectionItemG:Richard
+    externalId: ConnectionItemG:Miguel
 - space: omni-instances
   instanceType: edge
-  externalId: ConnectionItemF:Lindsey:ConnectionItemG:Miguel
+  externalId: ConnectionItemF:Tammy:ConnectionItemG:Miguel
   type:
     space: pygen-models
     externalId: multiProperty
   startNode:
     space: omni-instances
-    externalId: ConnectionItemF:Lindsey
+    externalId: ConnectionItemF:Tammy
   endNode:
     space: omni-instances
     externalId: ConnectionItemG:Miguel
@@ -79,18 +103,6 @@
   startNode:
     space: omni-instances
     externalId: ConnectionItemF:Jessica
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemG:Miguel
-- space: omni-instances
-  instanceType: edge
-  externalId: ConnectionItemF:Mariah:ConnectionItemG:Miguel
-  type:
-    space: pygen-models
-    externalId: multiProperty
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemF:Mariah
   endNode:
     space: omni-instances
     externalId: ConnectionItemG:Miguel
