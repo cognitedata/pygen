@@ -302,8 +302,16 @@ class MockGenerator:
                         )
                         if not (create_relation and other_nodes):
                             continue
-                        other_node = choice(other_nodes)
-                        value = {"space": other_node.space, "externalId": other_node.external_id}
+                        if connection.type.is_list:
+                            max_edge_count = config.max_edge_per_type or default_max_edge_count
+                        else:
+                            max_edge_count = 1
+                        other_nodes = random.sample(other_nodes, k=randint(1, max_edge_count))
+                        values = [
+                            {"space": other_node.space, "externalId": other_node.external_id}
+                            for other_node in other_nodes
+                        ]
+                        value: dict | list[dict] = values if connection.type.is_list else values[0]
                         self._set_direct_relation_property(this_node, view_id, property_name, value)
                     elif isinstance(connection, ReverseDirectRelation):
                         continue
@@ -452,7 +460,7 @@ class MockGenerator:
 
     @staticmethod
     def _set_direct_relation_property(
-        this_node: dm.NodeApply, view_id: dm.ViewId, property_name: str, value: dict
+        this_node: dm.NodeApply, view_id: dm.ViewId, property_name: str, value: dict | list[dict]
     ) -> None:
         if this_node.sources is None:
             this_node.sources = []

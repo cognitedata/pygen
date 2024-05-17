@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+- Support for list of direct relations and `SingleEdgeConnection` in the `cognite.pygen.utils.MockGenerator`.
+
 ## [0.99.22] - 06-05-24
 ### Fixed
 - When calling `.as_read()` (or `.as_write()) on a `GraphQL` object in the generated SDK, with a file
