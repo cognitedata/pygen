@@ -1,0 +1,70 @@
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemG:Shane
+  sources:
+  - properties:
+      name: Everything late seek now.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemG
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemG:Andre
+  sources:
+  - properties:
+      name: They red everybody act way.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemG
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemG:Kelly
+  sources:
+  - properties:
+      name: Drop image new drive.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemG
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemG:Richard
+  sources:
+  - properties:
+      name: From management foot maintain great election.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemG
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemG:Miguel
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemG

@@ -1,0 +1,70 @@
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemE:Frank
+  sources:
+  - properties:
+      name: Current after charge call prove.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemE
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemE:Larry
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemE
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemE:Beth
+  sources:
+  - properties:
+      name: Way let eight hard paper white responsibility.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemE
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemE:Barbara
+  sources:
+  - properties:
+      name: Sell story edge bank affect.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemE
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemE:Rebecca
+  sources:
+  - properties:
+      name: Appear weight difference attention whatever American all.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemE

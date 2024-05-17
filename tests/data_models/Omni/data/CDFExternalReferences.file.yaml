@@ -1,12 +1,24 @@
-- externalId: file_angel
-  name: file_angel
+- externalId: file_evan
+  name: file_evan
   source: omni-instances
   mimeType: text/plain
-- externalId: file_patricia
-  name: file_patricia
+  metadata:
+    source: PygenMockGenerator
+- externalId: file_david
+  name: file_david
   source: omni-instances
   mimeType: text/plain
-- externalId: file_lisa
-  name: file_lisa
+  metadata:
+    source: PygenMockGenerator
+- externalId: file_tina
+  name: file_tina
   source: omni-instances
   mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+- externalId: file_matthew
+  name: file_matthew
+  source: omni-instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator

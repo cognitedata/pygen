@@ -1,0 +1,70 @@
+- space: omni-instances
+  instanceType: node
+  externalId: DependentOnNonWritable:Brandon
+  sources:
+  - properties:
+      aValue: Return firm sea week.
+    source:
+      space: pygen-models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: DependentOnNonWritable
+- space: omni-instances
+  instanceType: node
+  externalId: DependentOnNonWritable:Brian
+  sources:
+  - properties:
+      aValue: Most international second former reflect even edge.
+    source:
+      space: pygen-models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: DependentOnNonWritable
+- space: omni-instances
+  instanceType: node
+  externalId: DependentOnNonWritable:Sherry
+  sources:
+  - properties:
+      aValue: Course school everybody operation.
+    source:
+      space: pygen-models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: DependentOnNonWritable
+- space: omni-instances
+  instanceType: node
+  externalId: DependentOnNonWritable:Dana
+  sources:
+  - properties:
+      aValue: Others wonder strategy fast guess few remain.
+    source:
+      space: pygen-models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: DependentOnNonWritable
+- space: omni-instances
+  instanceType: node
+  externalId: DependentOnNonWritable:Curtis
+  sources:
+  - properties:
+      aValue: null
+    source:
+      space: pygen-models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: DependentOnNonWritable

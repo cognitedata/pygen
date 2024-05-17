@@ -181,7 +181,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[str], None] = Field(default=None, repr=False, alias="toNonWritable")
+    to_non_writable: Union[list[str], None] = Field(default=None, alias="toNonWritable")
 
     def _to_instances_write(
         self,

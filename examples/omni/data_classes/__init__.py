@@ -33,6 +33,17 @@ from ._cdf_external_references_listed import (
     CDFExternalReferencesListedWrite,
     CDFExternalReferencesListedWriteList,
 )
+from ._connection_edge_a import (
+    ConnectionEdgeA,
+    ConnectionEdgeAApply,
+    ConnectionEdgeAApplyList,
+    ConnectionEdgeAFields,
+    ConnectionEdgeAGraphQL,
+    ConnectionEdgeAList,
+    ConnectionEdgeATextFields,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAWriteList,
+)
 from ._connection_item_a import (
     ConnectionItemA,
     ConnectionItemAApply,
@@ -96,6 +107,17 @@ from ._connection_item_f import (
     ConnectionItemFTextFields,
     ConnectionItemFWrite,
     ConnectionItemFWriteList,
+)
+from ._connection_item_g import (
+    ConnectionItemG,
+    ConnectionItemGApply,
+    ConnectionItemGApplyList,
+    ConnectionItemGFields,
+    ConnectionItemGGraphQL,
+    ConnectionItemGList,
+    ConnectionItemGTextFields,
+    ConnectionItemGWrite,
+    ConnectionItemGWriteList,
 )
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
@@ -226,6 +248,10 @@ from ._sub_interface import (
     SubInterfaceWriteList,
 )
 
+ConnectionEdgeA.model_rebuild()
+ConnectionEdgeAGraphQL.model_rebuild()
+ConnectionEdgeAWrite.model_rebuild()
+ConnectionEdgeAApply.model_rebuild()
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
@@ -250,6 +276,10 @@ ConnectionItemF.model_rebuild()
 ConnectionItemFGraphQL.model_rebuild()
 ConnectionItemFWrite.model_rebuild()
 ConnectionItemFApply.model_rebuild()
+ConnectionItemG.model_rebuild()
+ConnectionItemGGraphQL.model_rebuild()
+ConnectionItemGWrite.model_rebuild()
+ConnectionItemGApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
@@ -286,6 +316,15 @@ __all__ = [
     "CDFExternalReferencesListedWriteList",
     "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
+    "ConnectionEdgeA",
+    "ConnectionEdgeAGraphQL",
+    "ConnectionEdgeAWrite",
+    "ConnectionEdgeAApply",
+    "ConnectionEdgeAList",
+    "ConnectionEdgeAWriteList",
+    "ConnectionEdgeAApplyList",
+    "ConnectionEdgeAFields",
+    "ConnectionEdgeATextFields",
     "ConnectionItemA",
     "ConnectionItemAGraphQL",
     "ConnectionItemAWrite",
@@ -338,6 +377,15 @@ __all__ = [
     "ConnectionItemFApplyList",
     "ConnectionItemFFields",
     "ConnectionItemFTextFields",
+    "ConnectionItemG",
+    "ConnectionItemGGraphQL",
+    "ConnectionItemGWrite",
+    "ConnectionItemGApply",
+    "ConnectionItemGList",
+    "ConnectionItemGWriteList",
+    "ConnectionItemGApplyList",
+    "ConnectionItemGFields",
+    "ConnectionItemGTextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableGraphQL",
     "DependentOnNonWritableWrite",

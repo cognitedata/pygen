@@ -19,6 +19,9 @@ from omni_pydantic_v1.data_classes import (
     ConnectionItemFList,
     ConnectionItemFWriteList,
     ConnectionItemFTextFields,
+    ConnectionEdgeA,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAList,
 )
 from omni_pydantic_v1.data_classes._connection_item_f import (
     _CONNECTIONITEMF_PROPERTIES_BY_FIELD,
@@ -33,6 +36,7 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
+from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
 from .connection_item_f_query import ConnectionItemFQueryAPI
 
 
@@ -48,6 +52,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
+        self.outwards_multi_edge = ConnectionItemFOutwardsMultiAPI(
+            client, view_by_read_class, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
+        )
 
     def __call__(
         self,
@@ -94,6 +101,10 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         write_none: bool = False,
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item fs.
+
+        Note: This method iterates through all nodes and timeseries linked to connection_item_f and creates them including the edges
+        between the nodes. For example, if any of `outwards_multi` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
             connection_item_f: Connection item f or sequence of connection item fs to upsert.
@@ -187,7 +198,20 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                 >>> connection_item_f = client.connection_item_f.retrieve("my_connection_item_f")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.outwards_multi_edge,
+                    "outwards_multi",
+                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemG", "1"),
+                ),
+            ],
+        )
 
     def search(
         self,
@@ -413,6 +437,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
     ) -> ConnectionItemFList:
         """List/filter connection item fs
 
@@ -424,6 +449,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             space: The space to filter on.
             limit: Maximum number of connection item fs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `outwards_multi` external ids for the connection item fs. Defaults to True.
 
         Returns:
             List of requested connection item fs
@@ -446,4 +472,18 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             space,
             filter,
         )
-        return self._list(limit=limit, filter=filter_)
+
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.outwards_multi_edge,
+                    "outwards_multi",
+                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemG", "1"),
+                ),
+            ],
+        )

@@ -1,84 +1,84 @@
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Sarah
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Melissa:ConnectionItemB:Shannon
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Joseph
+    externalId: ConnectionItemA:Melissa
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Teresa
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Raymond
+    externalId: ConnectionItemB:Shannon
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Melissa:ConnectionItemB:Karen
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Joseph
+    externalId: ConnectionItemA:Melissa
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Teresa
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Samuel
+    externalId: ConnectionItemB:Karen
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Charles:ConnectionItemB:Mary
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Joseph
+    externalId: ConnectionItemA:Charles
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Amber
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Chad
+    externalId: ConnectionItemB:Mary
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Crystal:ConnectionItemB:Karen
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Brenda
+    externalId: ConnectionItemA:Crystal
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Ashley
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Willie
+    externalId: ConnectionItemB:Karen
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Heather:ConnectionItemB:Shannon
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Eric
+    externalId: ConnectionItemA:Heather
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Jennifer
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Jason
+    externalId: ConnectionItemB:Shannon
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Troy:ConnectionItemB:Karen
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Eric
+    externalId: ConnectionItemA:Troy
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Amber
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Lindsey
+    externalId: ConnectionItemB:Karen
+- space: omni-instances
+  instanceType: edge
+  externalId: ConnectionItemA:Troy:ConnectionItemB:Todd
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Erin
+    externalId: ConnectionItemA:Troy
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:John
+    externalId: ConnectionItemB:Todd

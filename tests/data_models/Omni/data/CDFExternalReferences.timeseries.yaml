@@ -1,8 +1,24 @@
-- externalId: timeseries_amy
-  name: timeseries_amy
+- externalId: timeseries_mike
+  name: timeseries_mike
   isString: false
+  metadata:
+    source: PygenMockGenerator
   isStep: false
-- externalId: timeseries_helen
-  name: timeseries_helen
+- externalId: timeseries_edward
+  name: timeseries_edward
   isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+- externalId: timeseries_barry
+  name: timeseries_barry
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+- externalId: timeseries_hannah
+  name: timeseries_hannah
+  isString: false
+  metadata:
+    source: PygenMockGenerator
   isStep: false

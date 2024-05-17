@@ -33,6 +33,17 @@ from ._cdf_external_references_listed import (
     CDFExternalReferencesListedWrite,
     CDFExternalReferencesListedWriteList,
 )
+from ._connection_edge_a import (
+    ConnectionEdgeA,
+    ConnectionEdgeAApply,
+    ConnectionEdgeAApplyList,
+    ConnectionEdgeAFields,
+    ConnectionEdgeAGraphQL,
+    ConnectionEdgeAList,
+    ConnectionEdgeATextFields,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAWriteList,
+)
 from ._connection_item_a import (
     ConnectionItemA,
     ConnectionItemAApply,
@@ -96,6 +107,17 @@ from ._connection_item_f import (
     ConnectionItemFTextFields,
     ConnectionItemFWrite,
     ConnectionItemFWriteList,
+)
+from ._connection_item_g import (
+    ConnectionItemG,
+    ConnectionItemGApply,
+    ConnectionItemGApplyList,
+    ConnectionItemGFields,
+    ConnectionItemGGraphQL,
+    ConnectionItemGList,
+    ConnectionItemGTextFields,
+    ConnectionItemGWrite,
+    ConnectionItemGWriteList,
 )
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
@@ -227,6 +249,23 @@ from ._sub_interface import (
 )
 
 
+ConnectionEdgeA.update_forward_refs(
+    ConnectionItemF=ConnectionItemF,
+    ConnectionItemG=ConnectionItemG,
+)
+ConnectionEdgeAGraphQL.update_forward_refs(
+    ConnectionItemFGraphQL=ConnectionItemFGraphQL,
+    ConnectionItemGGraphQL=ConnectionItemGGraphQL,
+)
+ConnectionEdgeAWrite.update_forward_refs(
+    ConnectionItemFWrite=ConnectionItemFWrite,
+    ConnectionItemGWrite=ConnectionItemGWrite,
+)
+ConnectionEdgeAApply.update_forward_refs(
+    ConnectionItemFWrite=ConnectionItemFWrite,
+    ConnectionItemGWrite=ConnectionItemGWrite,
+)
+
 ConnectionItemA.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,
@@ -309,16 +348,33 @@ ConnectionItemEApply.update_forward_refs(
 )
 
 ConnectionItemF.update_forward_refs(
+    ConnectionEdgeA=ConnectionEdgeA,
     ConnectionItemD=ConnectionItemD,
 )
 ConnectionItemFGraphQL.update_forward_refs(
+    ConnectionEdgeAGraphQL=ConnectionEdgeAGraphQL,
     ConnectionItemDGraphQL=ConnectionItemDGraphQL,
 )
 ConnectionItemFWrite.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
     ConnectionItemDWrite=ConnectionItemDWrite,
 )
 ConnectionItemFApply.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
     ConnectionItemDWrite=ConnectionItemDWrite,
+)
+
+ConnectionItemG.update_forward_refs(
+    ConnectionEdgeA=ConnectionEdgeA,
+)
+ConnectionItemGGraphQL.update_forward_refs(
+    ConnectionEdgeAGraphQL=ConnectionEdgeAGraphQL,
+)
+ConnectionItemGWrite.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
+)
+ConnectionItemGApply.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
 )
 
 DependentOnNonWritable.update_forward_refs(
@@ -361,6 +417,15 @@ __all__ = [
     "CDFExternalReferencesListedWriteList",
     "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
+    "ConnectionEdgeA",
+    "ConnectionEdgeAGraphQL",
+    "ConnectionEdgeAWrite",
+    "ConnectionEdgeAApply",
+    "ConnectionEdgeAList",
+    "ConnectionEdgeAWriteList",
+    "ConnectionEdgeAApplyList",
+    "ConnectionEdgeAFields",
+    "ConnectionEdgeATextFields",
     "ConnectionItemA",
     "ConnectionItemAGraphQL",
     "ConnectionItemAWrite",
@@ -413,6 +478,15 @@ __all__ = [
     "ConnectionItemFApplyList",
     "ConnectionItemFFields",
     "ConnectionItemFTextFields",
+    "ConnectionItemG",
+    "ConnectionItemGGraphQL",
+    "ConnectionItemGWrite",
+    "ConnectionItemGApply",
+    "ConnectionItemGList",
+    "ConnectionItemGWriteList",
+    "ConnectionItemGApplyList",
+    "ConnectionItemGFields",
+    "ConnectionItemGTextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableGraphQL",
     "DependentOnNonWritableWrite",

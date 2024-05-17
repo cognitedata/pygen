@@ -32,7 +32,12 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
-from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
+from cognite.client.data_classes.data_modeling.views import (
+    EdgeConnection,
+    MultiEdgeConnection,
+    ReverseDirectRelation,
+    SingleEdgeConnection,
+)
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
@@ -52,6 +57,8 @@ ListAbleDataType = typing.Union[
     list[dict],
     None,
 ]
+ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
+_ResourceTypes = set(typing.get_args(ResourceType))
 
 
 class MockGenerator:
@@ -176,14 +183,14 @@ class MockGenerator:
 
     def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
         outputs = self._generate_mock_nodes(views, node_count, null_values)
-        self._generate_mock_relations(views, outputs, max_edge_per_type, null_values)
+        self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
 
     def _generate_mock_nodes(
         self, views: list[dm.View], default_node_count: int, default_nullable_fraction: float
     ) -> dict[dm.ViewId, ViewMockData]:
         output: dict[dm.ViewId, ViewMockData] = {}
-        for view in views:
+        for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
             mapped_properties = {
@@ -234,7 +241,7 @@ class MockGenerator:
             )
         return output
 
-    def _generate_mock_relations(
+    def _generate_mock_connections(
         self,
         views: list[dm.View],
         outputs: dict[dm.ViewId, ViewMockData],
@@ -242,7 +249,7 @@ class MockGenerator:
         default_nullable_fraction: float,
     ) -> None:
         leaf_children_by_parent = self._to_leaf_children_by_parent(views)
-        for view in views:
+        for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
             connection_properties = {
@@ -255,8 +262,8 @@ class MockGenerator:
                 continue
             view_id = view.as_id()
             config = self._view_configs.get(view_id, self._default_config)
-            for node in outputs[view_id].node:
-                for name, connection in connection_properties.items():
+            for this_node in outputs[view_id].node:
+                for property_name, connection in connection_properties.items():
                     if (
                         isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
                         and connection.source is not None
@@ -264,86 +271,56 @@ class MockGenerator:
                         and connection.source not in leaf_children_by_parent
                     ):
                         warnings.warn(
-                            f"{view_id} property {name!r} points to a view {connection.source} "
+                            f"{view_id} property {property_name!r} points to a view {connection.source} "
                             f"which is not in the data model. Skipping connection generation.",
                             stacklevel=2,
                         )
                         continue
 
-                    if isinstance(connection, MultiEdgeConnection):
-                        if connection.source in leaf_children_by_parent:
-                            sources: list[dm.NodeId] = []
-                            for child in leaf_children_by_parent[connection.source]:
-                                sources.extend(outputs[child].node.as_ids())
-                        else:
-                            sources = outputs[connection.source].node.as_ids()
-
-                        max_edge_count = min(config.max_edge_per_type or default_max_edge_count, len(sources))
-                        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
-
-                        for end_node in end_nodes:
-                            start_node = node.as_id()
-                            if connection.direction == "inwards":
-                                start_node, end_node = end_node, start_node
-
-                            edge = dm.EdgeApply(
-                                space=self._instance_space,
-                                external_id=f"{start_node.external_id}:{end_node.external_id}",
-                                type=connection.type,
-                                start_node=(start_node.space, start_node.external_id),
-                                end_node=(end_node.space, end_node.external_id),
-                            )
-                            outputs[view_id].edge.append(edge)
-                    elif (
-                        isinstance(connection, dm.MappedProperty)
-                        and isinstance(connection.type, dm.DirectRelation)
-                        and connection.source
-                    ):
-                        if connection.source in leaf_children_by_parent:
-                            sources = []
-                            for child in leaf_children_by_parent[connection.source]:
-                                sources.extend(outputs[child].node.as_ids())
-                        else:
-                            sources = outputs[connection.source].node.as_ids()
-
-                        if (
-                            not connection.nullable
-                            or random.random() < (1 - (config.null_values or default_nullable_fraction))
-                        ) and sources:
-                            other_node = choice(sources)
-                            if node.sources is None:
-                                node.sources = []
-                            for source in node.sources:
-                                if source.source == view_id:
-                                    if not isinstance(source.properties, dict):
-                                        source.properties = dict(source.properties) if source.properties else {}
-                                    source.properties[name] = {
-                                        "space": other_node.space,
-                                        "externalId": other_node.external_id,
-                                    }
-                                    break
-                            else:
-                                node.sources.append(
-                                    dm.NodeOrEdgeData(
-                                        source=view_id,
-                                        properties={
-                                            name: {"space": other_node.space, "externalId": other_node.external_id}
-                                        },
-                                    )
-                                )
-                    else:
-                        if isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+                    if isinstance(connection, EdgeConnection):
+                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+                        if isinstance(connection, SingleEdgeConnection):
+                            max_edge_count = 1
+                        else:  # MultiEdgeConnection
+                            max_edge_count = config.max_edge_per_type or default_max_edge_count
+                        max_edge_count = min(max_edge_count, len(other_nodes))
+                        edges = self._create_edges(connection, this_node.as_id(), other_nodes, max_edge_count)
+                        outputs[view_id].edge.extend(edges)
+                    elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+                        if not connection.source:
                             warnings.warn(
-                                f"View {view_id}: DirectRelation {name} is missing source, "
+                                f"View {view_id}: DirectRelation {property_name} is missing source, "
                                 "do not know the target view the direct relation points to",
                                 stacklevel=2,
                             )
+                            continue
+                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+
+                        # If the connection is nullable, we randomly decide if we should create the relation
+                        create_relation = not connection.nullable or random.random() < (
+                            1 - (config.null_values or default_nullable_fraction)
+                        )
+                        if not (create_relation and other_nodes):
+                            continue
+                        if connection.type.is_list:
+                            max_edge_count = config.max_edge_per_type or default_max_edge_count
                         else:
-                            warnings.warn(
-                                f"View {view_id}: Connection {type(connection)} used by {name} "
-                                f"is not supported by the {type(self).__name__}.",
-                                stacklevel=2,
-                            )
+                            max_edge_count = 1
+                        other_nodes = random.sample(other_nodes, k=randint(1, max_edge_count))
+                        values = [
+                            {"space": other_node.space, "externalId": other_node.external_id}
+                            for other_node in other_nodes
+                        ]
+                        value: dict | list[dict] = values if connection.type.is_list else values[0]
+                        self._set_direct_relation_property(this_node, view_id, property_name, value)
+                    elif isinstance(connection, ReverseDirectRelation):
+                        continue
+                    else:
+                        warnings.warn(
+                            f"View {view_id}: Connection {type(connection)} used by {property_name} "
+                            f"is not supported by the {type(self).__name__}.",
+                            stacklevel=2,
+                        )
 
     def _generate_mock_values(
         self,
@@ -447,7 +424,64 @@ class MockGenerator:
         return output, external
 
     @staticmethod
-    def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, set[dm.ViewId]]:
+    def get_other_nodes(
+        connection: dm.ViewId,
+        outputs: dict[dm.ViewId, ViewMockData],
+        leaf_children_by_parent: dict[dm.ViewId, list[dm.ViewId]],
+    ) -> list[dm.NodeId]:
+        if connection in leaf_children_by_parent:
+            sources: list[dm.NodeId] = []
+            for child in leaf_children_by_parent[connection]:
+                sources.extend(outputs[child].node.as_ids())
+        else:
+            sources = outputs[connection].node.as_ids()
+        return sources
+
+    def _create_edges(
+        self, connection: EdgeConnection, this_node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
+    ) -> list[dm.EdgeApply]:
+        end_nodes = random.sample(sources, k=randint(0, max_edge_count))
+
+        edges: list[dm.EdgeApply] = []
+        for end_node in end_nodes:
+            start_node = this_node
+            if connection.direction == "inwards":
+                start_node, end_node = end_node, start_node
+
+            edge = dm.EdgeApply(
+                space=self._instance_space,
+                external_id=f"{start_node.external_id}:{end_node.external_id}",
+                type=connection.type,
+                start_node=(start_node.space, start_node.external_id),
+                end_node=(end_node.space, end_node.external_id),
+            )
+            edges.append(edge)
+        return edges
+
+    @staticmethod
+    def _set_direct_relation_property(
+        this_node: dm.NodeApply, view_id: dm.ViewId, property_name: str, value: dict | list[dict]
+    ) -> None:
+        if this_node.sources is None:
+            this_node.sources = []
+        for source in this_node.sources:
+            if source.source == view_id:
+                if not isinstance(source.properties, dict):
+                    source.properties = dict(source.properties) if source.properties else {}
+                source.properties[property_name] = value
+                break
+        else:
+            # This is the first property residing in this view
+            # for this node
+            this_node.sources.append(
+                dm.NodeOrEdgeData(
+                    source=view_id,
+                    properties={property_name: value},
+                )
+            )
+
+    @staticmethod
+    def _to_leaf_children_by_parent(views: list[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
         leaf_children_by_parent: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
         for view in views:
             for parent in view.implements or []:
@@ -464,7 +498,7 @@ class MockGenerator:
                 leaf_children_by_parent[view_id].remove(parent)
                 leaf_children_by_parent[view_id].update(leaf_children_by_parent[parent])
 
-        return leaf_children_by_parent
+        return {k: sorted(v, key=lambda x: x.as_tuple()) for k, v in leaf_children_by_parent.items()}
 
 
 @dataclass
@@ -501,20 +535,25 @@ class ViewMockData:
             nodes.append(dm.NodeApply.load(dumped))
         return nodes
 
-    def dump_yaml(self, folder: Path | str) -> None:
+    def dump_yaml(self, folder: Path | str, exclude: set[ResourceType] | None = None) -> None:
         """
         Dumps the mock data to the given folder in yaml format.
 
         Args:
             folder: The folder to dump the mock data to.
+            exclude: The resources to exclude from the dump.
         """
         folder_path = Path(folder)
         if not folder_path.exists():
             folder_path.mkdir(parents=True, exist_ok=True)
         for resource_name in ["node", "edge", "timeseries", "sequence", "file"]:
+            if exclude and resource_name in exclude:
+                continue
             values = getattr(self, resource_name)
             if values:
-                (folder_path / f"{self.view_id.external_id}.{resource_name}.yaml").write_text(values.dump_yaml())
+                dump_file = folder_path / f"{self.view_id.external_id}.{resource_name}.yaml"
+                with dump_file.open("w", encoding="utf-8", newline="\n") as f:
+                    f.write(values.dump_yaml())
 
     def deploy(self, client: CogniteClient, verbose: bool = False) -> None:
         """Deploys the mock data to CDF."""
@@ -646,14 +685,30 @@ class MockData(UserList[ViewMockData]):
                 unique_resources.append(resource)
         return unique_resources  # type: ignore[return-value]
 
-    def dump_yaml(self, folder: Path | str) -> None:
+    def dump_yaml(
+        self, folder: Path | str, exclude: set[ResourceType | tuple[str, ResourceType] | str] | None = None
+    ) -> None:
         """Dumps the mock data to a folder in yaml format.
 
         Args:
             folder (Path | str): The folder to dump the mock data to.
+            exclude: The resources to exclude from the dump. Can either be a ResourceType,
+                a view_external_id or a tuple of view_external_id and ResourceType.
         """
         for view_mock_data in self:
-            view_mock_data.dump_yaml(folder)
+            exclude_view: set[str] | None
+            if exclude:
+                external_id = view_mock_data.view_id.external_id
+                if external_id in exclude:
+                    continue
+                exclude_view = {
+                    item if item in _ResourceTypes else item[1]  # type: ignore[misc]
+                    for item in exclude
+                    if (isinstance(item, tuple) and item[0] == external_id) or item in _ResourceTypes
+                }
+            else:
+                exclude_view = None
+            view_mock_data.dump_yaml(folder, exclude_view)  # type: ignore[arg-type]
 
     def deploy(
         self,

@@ -1,35 +1,30 @@
-- instanceType: node
-  space: omni-instances
-  externalId: ConnectionItemC:Tiffany
-  sources: []
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Patricia
   type:
     space: pygen-models
     externalId: ConnectionItemC
-- instanceType: node
-  space: omni-instances
-  externalId: ConnectionItemC:Amanda
-  sources: []
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Christopher
   type:
     space: pygen-models
     externalId: ConnectionItemC
-- instanceType: node
-  space: omni-instances
-  externalId: ConnectionItemC:Donna
-  sources: []
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Jason
   type:
     space: pygen-models
     externalId: ConnectionItemC
-- instanceType: node
-  space: omni-instances
-  externalId: ConnectionItemC:Stacey
-  sources: []
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Steven
   type:
     space: pygen-models
     externalId: ConnectionItemC
-- instanceType: node
-  space: omni-instances
-  externalId: ConnectionItemC:Frederick
-  sources: []
+- space: omni-instances
+  instanceType: node
+  externalId: ConnectionItemC:Bryan
   type:
     space: pygen-models
     externalId: ConnectionItemC

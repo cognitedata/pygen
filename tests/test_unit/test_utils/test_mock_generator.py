@@ -57,15 +57,16 @@ def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses
 def test_generate_mock_data_multiple_views(
     omni_data_classes: dict[str, OmniClasses], view_external_ids: list[str]
 ) -> None:
-    views = [omni_data_classes[name].view for name in view_external_ids]
+    view_by_id = {omni_data_classes[name].view.as_id(): omni_data_classes[name].view for name in view_external_ids}
 
-    generator = MockGenerator(views, "sandbox", seed=42)
+    generator = MockGenerator(list(view_by_id.values()), "sandbox", seed=42)
 
     data = generator.generate_mock_data()
 
-    assert len(data) == len(views)
-    for view, view_data in zip(views, data):
+    assert len(data) == len(view_by_id)
+    for view_data in data:
         assert len(view_data.node) == 5
+        view = view_by_id[view_data.view_id]
         edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
         if edge_type_count == 0:
             assert len(view_data.edge) == 0
@@ -84,15 +85,16 @@ def test_generate_mock_data_skip_interfaces(omni_data_classes: dict[str, OmniCla
     ]
     interface_count = 2
 
-    views = [omni_data_classes[name].view for name in view_external_ids]
+    view_by_id = {omni_data_classes[name].view.as_id(): omni_data_classes[name].view for name in view_external_ids}
 
-    generator = MockGenerator(views, "sandbox", seed=42, skip_interfaces=True)
+    generator = MockGenerator(list(view_by_id.values()), "sandbox", seed=42, skip_interfaces=True)
 
     data = generator.generate_mock_data()
 
-    assert len(data) == len(views) - interface_count
-    for view, view_data in zip(views[interface_count:], data):
+    assert len(data) == len(view_by_id) - interface_count
+    for view_data in data:
         assert len(view_data.node) == 5
+        view = view_by_id[view_data.view_id]
         edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
         if edge_type_count == 0:
             assert len(view_data.edge) == 0
