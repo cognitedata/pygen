@@ -178,7 +178,7 @@ class MockGenerator:
 
     def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
         outputs = self._generate_mock_nodes(views, node_count, null_values)
-        self._generate_mock_relations(views, outputs, max_edge_per_type, null_values)
+        self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
 
     def _generate_mock_nodes(
@@ -236,7 +236,7 @@ class MockGenerator:
             )
         return output
 
-    def _generate_mock_relations(
+    def _generate_mock_connections(
         self,
         views: list[dm.View],
         outputs: dict[dm.ViewId, ViewMockData],
@@ -244,7 +244,7 @@ class MockGenerator:
         default_nullable_fraction: float,
     ) -> None:
         leaf_children_by_parent = self._to_leaf_children_by_parent(views)
-        for view in views:
+        for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
             connection_properties = {
