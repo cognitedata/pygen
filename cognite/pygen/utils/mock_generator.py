@@ -32,7 +32,7 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier, PropertyType
-from cognite.client.data_classes.data_modeling.views import EdgeConnection, MultiEdgeConnection
+from cognite.client.data_classes.data_modeling.views import EdgeConnection, MultiEdgeConnection, ReverseDirectRelation
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
@@ -312,6 +312,8 @@ class MockGenerator:
                                         },
                                     )
                                 )
+                    elif isinstance(connection, ReverseDirectRelation):
+                        continue
                     else:
                         warnings.warn(
                             f"View {view_id}: Connection {type(connection)} used by {name} "
