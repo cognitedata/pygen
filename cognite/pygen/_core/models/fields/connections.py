@@ -416,6 +416,14 @@ class BaseConnectionField(Field, ABC):
     use_node_reference: bool
 
     @property
+    def data_class(self) -> DataClass:
+        if self.end_classes is None:
+            raise ValueError("Bug in Pygen: Missing end class")
+        elif len(self.end_classes) > 1:
+            raise ValueError("Bug in Pygen: Multiple end classes")
+        return self.end_classes[0]
+
+    @property
     def is_direct_relation(self) -> bool:
         return self.edge_type is None
 
