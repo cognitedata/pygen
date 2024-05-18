@@ -343,8 +343,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "[outward.as_write() if isinstance(outward, DomainModel) else outward "
-                "for outward in self.outwards or []]",
+                "[outward.as_write() for outward in self.outwards or []]",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -422,8 +421,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "[outward.as_read() if isinstance(outward, GraphQLCore) else outward "
-                "for outward in self.outwards or []]",
+                "[outward.as_read() for outward in self.outwards or []]",
                 id="Outwards MultiEdge",
             ),
             pytest.param(

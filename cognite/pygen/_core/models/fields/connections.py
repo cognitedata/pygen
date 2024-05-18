@@ -530,16 +530,16 @@ class BaseConnectionField(Field, ABC):
         return f"{type_hint} = {self.pydantic_field}({field_args})"
 
     def as_write(self) -> str:
-        return self._create_as_method("as_write", "DomainModel")
+        return self._create_as_method("as_write", "DomainModel", self.use_node_reference)
 
     def as_read_graphql(self) -> str:
-        return self._create_as_method("as_read", "GraphQLCore")
+        return self._create_as_method("as_read", "GraphQLCore", False)
 
     def as_write_graphql(self) -> str:
-        return self._create_as_method("as_write", "GraphQLCore")
+        return self._create_as_method("as_write", "GraphQLCore", False)
 
     @abstractmethod
-    def _create_as_method(self, method: str, base_cls: str) -> str:
+    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         raise NotImplementedError()
 
 
@@ -548,8 +548,8 @@ class OneToManyConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = True
     variable: str
 
-    def _create_as_method(self, method: str, base_cls: str) -> str:
-        if self.end_classes and self.use_node_reference:
+    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
+        if self.end_classes and use_node_reference:
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
         elif self.end_classes:
             inner = f"{self.variable}.{method}()"
@@ -562,8 +562,8 @@ class OneToManyConnectionField(BaseConnectionField):
 class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
 
-    def _create_as_method(self, method: str, base_cls: str) -> str:
-        if self.end_classes and self.use_node_reference:
+    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
+        if self.end_classes and use_node_reference:
             return f"self.{self.name}.{method}() if isinstance(self.{self.name}, {base_cls}) else self.{self.name}"
         elif self.end_classes:
             return f"self.{self.name}.{method}()"
