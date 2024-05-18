@@ -210,34 +210,37 @@ class MainShaftWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.bending_x is not None or write_none:
-            if isinstance(self.bending_x, str) or self.bending_x is None:
-                properties["bending_x"] = self.bending_x
-            else:
-                properties["bending_x"] = self.bending_x.external_id
+            properties["bending_x"] = (
+                self.bending_x
+                if isinstance(self.bending_x, str) or self.bending_x is None
+                else self.bending_x.external_id
+            )
 
         if self.bending_y is not None or write_none:
-            if isinstance(self.bending_y, str) or self.bending_y is None:
-                properties["bending_y"] = self.bending_y
-            else:
-                properties["bending_y"] = self.bending_y.external_id
+            properties["bending_y"] = (
+                self.bending_y
+                if isinstance(self.bending_y, str) or self.bending_y is None
+                else self.bending_y.external_id
+            )
 
         if self.calculated_tilt_moment is not None or write_none:
-            if isinstance(self.calculated_tilt_moment, str) or self.calculated_tilt_moment is None:
-                properties["calculated_tilt_moment"] = self.calculated_tilt_moment
-            else:
-                properties["calculated_tilt_moment"] = self.calculated_tilt_moment.external_id
+            properties["calculated_tilt_moment"] = (
+                self.calculated_tilt_moment
+                if isinstance(self.calculated_tilt_moment, str) or self.calculated_tilt_moment is None
+                else self.calculated_tilt_moment.external_id
+            )
 
         if self.calculated_yaw_moment is not None or write_none:
-            if isinstance(self.calculated_yaw_moment, str) or self.calculated_yaw_moment is None:
-                properties["calculated_yaw_moment"] = self.calculated_yaw_moment
-            else:
-                properties["calculated_yaw_moment"] = self.calculated_yaw_moment.external_id
+            properties["calculated_yaw_moment"] = (
+                self.calculated_yaw_moment
+                if isinstance(self.calculated_yaw_moment, str) or self.calculated_yaw_moment is None
+                else self.calculated_yaw_moment.external_id
+            )
 
         if self.torque is not None or write_none:
-            if isinstance(self.torque, str) or self.torque is None:
-                properties["torque"] = self.torque
-            else:
-                properties["torque"] = self.torque.external_id
+            properties["torque"] = (
+                self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

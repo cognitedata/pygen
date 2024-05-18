@@ -261,10 +261,11 @@ class ScenarioInstanceWrite(DomainModelWrite):
             properties["priceArea"] = self.price_area
 
         if self.price_forecast is not None or write_none:
-            if isinstance(self.price_forecast, str) or self.price_forecast is None:
-                properties["priceForecast"] = self.price_forecast
-            else:
-                properties["priceForecast"] = self.price_forecast.external_id
+            properties["priceForecast"] = (
+                self.price_forecast
+                if isinstance(self.price_forecast, str) or self.price_forecast is None
+                else self.price_forecast.external_id
+            )
 
         if self.scenario is not None or write_none:
             properties["scenario"] = self.scenario

@@ -203,22 +203,25 @@ class MetmastWrite(DomainModelWrite):
             properties["position"] = self.position
 
         if self.temperature is not None or write_none:
-            if isinstance(self.temperature, str) or self.temperature is None:
-                properties["temperature"] = self.temperature
-            else:
-                properties["temperature"] = self.temperature.external_id
+            properties["temperature"] = (
+                self.temperature
+                if isinstance(self.temperature, str) or self.temperature is None
+                else self.temperature.external_id
+            )
 
         if self.tilt_angle is not None or write_none:
-            if isinstance(self.tilt_angle, str) or self.tilt_angle is None:
-                properties["tilt_angle"] = self.tilt_angle
-            else:
-                properties["tilt_angle"] = self.tilt_angle.external_id
+            properties["tilt_angle"] = (
+                self.tilt_angle
+                if isinstance(self.tilt_angle, str) or self.tilt_angle is None
+                else self.tilt_angle.external_id
+            )
 
         if self.wind_speed is not None or write_none:
-            if isinstance(self.wind_speed, str) or self.wind_speed is None:
-                properties["wind_speed"] = self.wind_speed
-            else:
-                properties["wind_speed"] = self.wind_speed.external_id
+            properties["wind_speed"] = (
+                self.wind_speed
+                if isinstance(self.wind_speed, str) or self.wind_speed is None
+                else self.wind_speed.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

@@ -194,13 +194,13 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         properties = {}
 
         if self.end_time is not None or write_none:
-            properties["endTime"] = self.end_time.isoformat(timespec="milliseconds")
+            properties["endTime"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
 
         if self.name is not None or write_none:
             properties["name"] = self.name
 
         if self.start_time is not None or write_none:
-            properties["startTime"] = self.start_time.isoformat(timespec="milliseconds")
+            properties["startTime"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
 
         if properties:
             this_edge = dm.EdgeApply(
