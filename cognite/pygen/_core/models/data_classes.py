@@ -337,7 +337,7 @@ class DataClass:
         return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
 
     @property
-    def one_to_one_direct_relations(self) -> Iterable[OneToOneConnectionField]:
+    def one_to_one_direct_relations_with_source(self) -> Iterable[OneToOneConnectionField]:
         """All direct relations."""
         return (
             field_
