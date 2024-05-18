@@ -17,15 +17,6 @@ if TYPE_CHECKING:
     from cognite.pygen._core.models.data_classes import DataClass, NodeDataClass
 
 
-@dataclass(frozen=True)
-class EdgeField(Field, ABC):
-    """This represents a field connecting to another data class(es)."""
-
-    @property
-    def is_connection(self) -> bool:
-        return True
-
-
 @total_ordering
 @dataclass(frozen=True)
 class EdgeClasses:
@@ -51,13 +42,19 @@ class EdgeClasses:
 
 
 @dataclass(frozen=True)
-class EdgeOneToEndNode(EdgeField):
+class EdgeOneToEndNode(Field):
     """This represents a one-to-one edge where the end class can be one of multiple data classes.
     This is used for the end_node field in edge data classes, where the end_node can be one of multiple
     data classes.
+
+    This is a special class that is not instantiated from a property, but is created in the edge data class.
     """
 
     edge_classes: list[EdgeClasses]
+
+    @property
+    def is_connection(self) -> bool:
+        return True
 
     @property
     def end_classes(self) -> list[DataClass]:
