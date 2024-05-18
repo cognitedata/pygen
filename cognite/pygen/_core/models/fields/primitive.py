@@ -123,9 +123,9 @@ class PrimitiveField(BasePrimitiveField):
     def as_value(self) -> str:
         base = f"self.{self.name}"
         if isinstance(self.type_, dm.Date):
-            return f"{base}.isoformat()"
+            return f"{base}.isoformat() if {base} else None"
         elif isinstance(self.type_, dm.Timestamp):
-            return f'{base}.isoformat(timespec="milliseconds")'
+            return f'{base}.isoformat(timespec="milliseconds") if {base} else None'
         else:
             return base
 
@@ -166,9 +166,9 @@ class PrimitiveListField(BasePrimitiveField):
     def as_value(self) -> str:
         base = f"self.{self.name}"
         if isinstance(self.type_, dm.Date):
-            return f"[{base}.isoformat() for {self.variable} in {base}]"
+            return f"[{self.variable}.isoformat() for {self.variable} in {base}]"
         elif isinstance(self.type_, dm.Timestamp):
-            return f'[{base}.isoformat(timespec="milliseconds") for {self.variable} in {base}]'
+            return f'[{self.variable}.isoformat(timespec="milliseconds") for {self.variable} in {base}]'
         else:
             return base
 
