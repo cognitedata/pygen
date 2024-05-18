@@ -152,7 +152,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         ))
 
         properties = {}
-        {% for field in data_class.fields_of_type((ft.BasePrimitiveField, ft.EdgeOneToOne)) %}
+        {% for field in data_class.container_fields %}
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             properties["{{ field.prop_name }}"] = {{ field.as_value() }}
         {% endfor %}
