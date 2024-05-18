@@ -17,11 +17,11 @@ from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
+    BaseConnectionField,
     CDFExternalField,
     EdgeClasses,
     EdgeOneToEndNode,
     EdgeOneToMany,
-    EdgeToOneDataClass,
     Field,
     PrimitiveField,
     PrimitiveFieldCore,
@@ -287,12 +287,10 @@ class DataClass:
     def dependencies(self) -> list[DataClass]:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
-            if isinstance(field_, EdgeToOneDataClass):
-                # This will overwrite any existing data class with the same view id
-                # however, this is not a problem as all data classes are uniquely identified by their view id
-                unique[field_.data_class.view_id] = field_.data_class
-            elif isinstance(field_, EdgeOneToEndNode):
-                for class_ in field_.end_classes:
+            if isinstance(field_, BaseConnectionField):
+                for class_ in field_.end_classes or []:
+                    # This will overwrite any existing data class with the same view id
+                    # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[class_.view_id] = class_
         return sorted(unique.values(), key=lambda x: x.write_name)
 
