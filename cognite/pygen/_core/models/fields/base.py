@@ -109,6 +109,11 @@ class Field:
         """Used in the .as_read() method for the graphQL version of the data class."""
         raise NotImplementedError
 
+    def as_value(self) -> str:
+        """Used in the ._to_instances_write() method to write the value of the field to the node instance.
+        This should only be implemented for container fields, i.e., fields that store their value in a container."""
+        raise NotImplementedError
+
     @property
     def argument_documentation(self) -> str:
         if self.description:

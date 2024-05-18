@@ -71,6 +71,14 @@ class CDFExternalField(BasePrimitiveField):
         # Read is only used in graphql
         return self.as_write_graphql()
 
+    def as_value(self) -> str:
+        if not isinstance(self.type_, dm.TimeSeriesReference):
+            return super().as_value()
+        return (
+            f"{self.name} if isinstance(self.{self.name}, str) or self.{self.name} is None "
+            f"else self.{self.name}.external_id"
+        )
+
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> CDFExternalField | None:
         if not isinstance(prop.type, dm.CDFExternalIdReference):
@@ -161,3 +169,8 @@ class CDFExternalListField(PrimitiveListField, CDFExternalField):
                 return "Optional[list[dict]] = None"
             else:
                 return "list[dict]"
+
+    def as_value(self) -> str:
+        if not isinstance(self.type_, dm.TimeSeriesReference):
+            return super().as_value()
+        return f"[value if isinstance(value, str) else value.external_id for value in self.{self.name} or []] or None"

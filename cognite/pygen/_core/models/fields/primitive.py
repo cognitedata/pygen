@@ -120,6 +120,15 @@ class PrimitiveField(BasePrimitiveField):
             out_type = f"{self.type_as_string} = {self.default_code}"
         return out_type
 
+    def as_value(self) -> str:
+        base = f"self.{self.name}"
+        if isinstance(self.type_, dm.Date):
+            return f"{base}.isoformat()"
+        elif isinstance(self.type_, dm.Timestamp):
+            return f'{base}.isoformat(timespec="milliseconds")'
+        else:
+            return base
+
 
 @dataclass(frozen=True)
 class PrimitiveListField(BasePrimitiveField):
@@ -153,6 +162,15 @@ class PrimitiveListField(BasePrimitiveField):
     @property
     def is_list(self) -> bool:
         return True
+
+    def as_value(self) -> str:
+        base = f"self.{self.name}"
+        if isinstance(self.type_, dm.Date):
+            return f"[{base}.isoformat() for {self.variable} in {base}]"
+        elif isinstance(self.type_, dm.Timestamp):
+            return f'[{base}.isoformat(timespec="milliseconds") for {self.variable} in {base}]'
+        else:
+            return base
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:

@@ -173,7 +173,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
 {% endif %}
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
-            return resources{% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
+            return resources{% if not data_class.has_container_fields %}
         cache.add(self.as_tuple_id())
 
         this_node = dm.NodeApply(
@@ -188,33 +188,11 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
 
         write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        )){% endif %}
-{% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
+        )){% else %}
         properties: dict[str, Any] = {}
-        {% for field in data_class.fields_of_type((ft.BasePrimitiveField, ft.EdgeOneToOne, ft.EdgeOneToOneAny)) %}
-        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:{% if field.is_edge %}
-            properties["{{ field.prop_name }}"] = {
-                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
-                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }
-            {% elif field.is_time_series and not field.is_list %}
-                if isinstance(self.{{ field.name }}, str) or self.{{ field.name }} is None:
-                    properties["{{ field.prop_name }}"] = self.{{ field.name }}
-                else:
-                    properties["{{ field.prop_name }}"] = self.{{ field.name }}.external_id
-            {% elif field.is_time_series and field.is_list %}
-            properties["{{ field.prop_name }}"] = [
-                value if isinstance(value, str) else value.external_id for value in self.{{ field.name }} or []
-            ] or None
-            {% elif field.is_time_field and field.is_list %}
-            properties["{{ field.prop_name }}"] = [
-                {{ field.variable }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) for {{ field.variable }} in self.{{ field.name }}
-            ]
-            {% elif field.is_time_field %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) if self.{{ field.name }} else None
-            {% else %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}
-            {% endif %}
+        {% for field in data_class.container_fields %}
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
+            properties["{{ field.prop_name }}"] = {{ field.as_value() }}
         {% endfor %}
 
         if properties:

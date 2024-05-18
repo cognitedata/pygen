@@ -299,6 +299,24 @@ class DataClass:
         return bool(self.dependencies)
 
     @property
+    def container_fields(self) -> Iterable[Field]:
+        """Container fields are fields that store their value in a container.
+
+        That is all primitive fields (including CDFExternalField) and direct relations.
+        """
+        return (
+            field_
+            for field_ in self
+            if isinstance(field_, BasePrimitiveField)
+            or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
+        )
+
+    @property
+    def has_container_fields(self) -> bool:
+        """Check if the data class has any container fields."""
+        return any(self.container_fields)
+
+    @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))

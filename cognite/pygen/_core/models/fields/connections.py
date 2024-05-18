@@ -568,3 +568,11 @@ class OneToOneConnectionField(BaseConnectionField):
             return f"self.{self.name}.{method}() if isinstance(self.{self.name}, {base_cls}) else self.{self.name}"
         else:
             return f"self.{self.name}"
+
+    def as_value(self) -> str:
+        if not self.is_direct_relation:
+            raise NotImplementedError("as_value is not implemented for edge fields")
+        return f"""{{
+                "space":  self.space if isinstance(self.{ self.name }, str) else self.{ self.name }.space,
+                "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
+            }}"""
