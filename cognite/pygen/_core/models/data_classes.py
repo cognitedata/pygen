@@ -293,6 +293,10 @@ class DataClass:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[class_.view_id] = class_
+            elif isinstance(field_, EdgeOneToEndNode):
+                for class_ in field_.end_classes:
+                    unique[class_.view_id] = class_
+
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
