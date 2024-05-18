@@ -251,7 +251,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
             resources.time_series.append(self.{{ field.name }})
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeTypedOneToOne) %}{% if field.edge_direction == 'outwards' %}
+{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}{% if field.edge_direction == 'outwards' %}
         if self.{{field.name}} is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,

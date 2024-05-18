@@ -188,7 +188,7 @@ class EdgeAPIClass(APIClass):
             filter_method=filter_method,
             doc_name=create_name(field.name, api_class.doc_name),
             query=query_class_by_view_id[end_class.view_id],
-            direction=field.direction,
+            direction=field.edge_direction,
             end_view_id=end_class.view_id,
             end_filter_method=api_generator_by_view_id[end_class.view_id].list_method,
         )

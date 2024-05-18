@@ -16,6 +16,7 @@ from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
+from . import OneToOneConnectionField
 from .fields import (
     BaseConnectionField,
     BasePrimitiveField,
@@ -320,6 +321,11 @@ class DataClass:
     def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges without properties on the edge."""
         return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_no_property_edge)
+
+    @property
+    def one_to_one_edge_without_properties(self) -> Iterable[OneToOneConnectionField]:
+        """All MultiEdges without properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_no_property_edge)
 
     @property
     def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:

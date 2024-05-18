@@ -411,7 +411,7 @@ class BaseConnectionField(Field, ABC):
     _node_reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
     _wrap_list: ClassVar[bool] = False
     edge_type: dm.DirectRelationReference | None
-    direction: Literal["outwards", "inwards"]
+    edge_direction: Literal["outwards", "inwards"]
     end_classes: list[DataClass] | None
     use_node_reference: bool
 
@@ -466,7 +466,7 @@ class BaseConnectionField(Field, ABC):
                 pydantic_field=base.pydantic_field,
                 variable=variable,
                 edge_type=edge_type,
-                direction=direction,
+                edge_direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
                 use_node_reference=use_node_reference,
@@ -478,7 +478,7 @@ class BaseConnectionField(Field, ABC):
                 prop_name=base.prop_name,
                 pydantic_field=base.pydantic_field,
                 edge_type=edge_type,
-                direction=direction,
+                edge_direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
                 use_node_reference=use_node_reference,
