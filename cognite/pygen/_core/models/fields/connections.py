@@ -563,9 +563,7 @@ class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        if self.end_classes and use_node_reference:
+        if self.end_classes:
             return f"self.{self.name}.{method}() if isinstance(self.{self.name}, {base_cls}) else self.{self.name}"
-        elif self.end_classes:
-            return f"self.{self.name}.{method}()"
         else:
             return f"self.{self.name}"
