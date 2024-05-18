@@ -295,6 +295,10 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
+    def has_dependencies(self) -> bool:
+        return bool(self.dependencies)
+
+    @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
