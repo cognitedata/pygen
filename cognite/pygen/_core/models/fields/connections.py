@@ -493,7 +493,13 @@ class BaseConnectionField(Field, ABC):
         return self._create_type_hint([data_class.read_name for data_class in self.end_classes or []])
 
     def as_write_type_hint(self) -> str:
-        return self._create_type_hint([data_class.write_name for data_class in self.end_classes or []])
+        return self._create_type_hint(
+            [
+                data_class.write_name
+                for data_class in self.end_classes or []
+                if data_class.is_writable or data_class.is_interface
+            ]
+        )
 
     def as_graphql_type_hint(self) -> str:
         return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []])
