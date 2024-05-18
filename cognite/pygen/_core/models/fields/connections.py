@@ -412,6 +412,7 @@ class BaseConnectionField(Field, ABC):
     edge_type: dm.DirectRelationReference | None
     direction: Literal["outwards", "inwards"] | None
     end_classes: list[DataClass] | None
+    use_node_reference: bool
 
     @property
     def is_relation(self) -> bool:
@@ -435,7 +436,15 @@ class BaseConnectionField(Field, ABC):
         direction: Literal["outwards", "inwards"] = (
             prop.direction if isinstance(prop, dm.EdgeConnection) else "outwards"
         )
-        end_classes = [data_class_by_view_id[prop.source]] if prop.source in data_class_by_view_id else None
+        use_node_reference = True
+        end_classes: list[DataClass] | None
+        if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
+            end_classes = [data_class_by_view_id[prop.edge_source]]
+            use_node_reference = False
+        elif isinstance(prop, dm.EdgeConnection) or (isinstance(prop, dm.MappedProperty) and prop.source is not None):
+            end_classes = [data_class_by_view_id[prop.source]]  # type: ignore[index]
+        else:
+            end_classes = None
         if cls._is_supported_one_to_many_connection(prop):
             return OneToManyConnectionField(
                 name=base.name,
@@ -447,6 +456,7 @@ class BaseConnectionField(Field, ABC):
                 direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
+                use_node_reference=use_node_reference,
             )
         elif cls._is_supported_one_to_one_connection(prop):
             return OneToOneConnectionField(
@@ -458,6 +468,7 @@ class BaseConnectionField(Field, ABC):
                 direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
+                use_node_reference=use_node_reference,
             )
         else:
             return None
@@ -490,12 +501,15 @@ class BaseConnectionField(Field, ABC):
             field_kwargs["repr"] = "False"
         if self.need_alias:
             field_kwargs["alias"] = f'"{self.prop_name}"'
-
-        types_hint = ", ".join(
-            [f"list[{type_}]" if self._wrap_list else type_ for type_ in types + self._node_reference]
-        )
+        if self.use_node_reference:
+            types.extend(self._node_reference)
+        types_hint = ", ".join([f"list[{type_}]" if self._wrap_list else type_ for type_ in types])
         field_args = ", ".join([f"{key}={value}" for key, value in field_kwargs.items()])
-        return f"Union[{types_hint}, None] = {self.pydantic_field}({field_args})"
+        if len(types) == 1:
+            type_hint = f"Optional[{types_hint}]"
+        else:
+            type_hint = f"Union[{types_hint}, None]"
+        return f"{type_hint} = {self.pydantic_field}({field_args})"
 
 
 @dataclass(frozen=True)
