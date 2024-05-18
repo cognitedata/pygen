@@ -492,6 +492,12 @@ class BaseConnectionField(Field, ABC):
     def as_read_type_hint(self) -> str:
         return self._create_type_hint([data_class.read_name for data_class in self.end_classes or []])
 
+    def as_write_type_hint(self) -> str:
+        return self._create_type_hint([data_class.write_name for data_class in self.end_classes or []])
+
+    def as_graphql_type_hint(self) -> str:
+        return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []])
+
     def _create_type_hint(self, types: list[str]) -> str:
         field_kwargs = {
             #  All connection fields are nullable
