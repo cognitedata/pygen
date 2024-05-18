@@ -78,7 +78,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         elif isinstance(value, dict):
             return TimeSeries.load(value)
         return value
-{% endif %}{% if data_class.has_field_of_type(ft.EdgeField) %}
+{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
     @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
