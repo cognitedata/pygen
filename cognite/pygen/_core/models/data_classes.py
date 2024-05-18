@@ -333,6 +333,11 @@ class DataClass:
         return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
 
     @property
+    def one_to_one_direct_relations(self) -> Iterable[OneToOneConnectionField]:
+        """All direct relations."""
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_direct_relation)
+
+    @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
