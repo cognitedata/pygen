@@ -46,7 +46,7 @@ class BaseContainerField(Field, ABC):
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BaseContainerField | None:
         if prop.type.is_list:
-            return ContainerListField(
+            return PrimitiveListField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,

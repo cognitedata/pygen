@@ -6,7 +6,7 @@ from typing import overload
 import warnings
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.BaseContainerField) %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
@@ -15,7 +15,7 @@ from {{ top_level_package }}.data_classes import (
     DomainModelWrite,
     ResourcesWriteResult,
     {{ data_class.read_name }},{% if data_class.is_writable %}
-    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.BaseContainerField) %}
     {{ data_class.field_names }},{% endif %}
     {{ data_class.read_list_name }},{% if data_class.is_writable %}
     {{ data_class.write_list_name }},{% endif %}{% if data_class.has_primitive_field_of_type(dm.Text) %}
@@ -24,7 +24,7 @@ from {{ top_level_package }}.data_classes import (
     {{ edge_data_class.write_name }},
     {{ edge_data_class.read_list_name }},{% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BaseContainerField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
@@ -230,7 +230,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
-{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+{% if data_class.has_field_of_type(ft.BaseContainerField) %}
     @overload
     def aggregate(
         self,
