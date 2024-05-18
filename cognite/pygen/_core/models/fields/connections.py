@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import warnings
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import total_ordering
 from typing import TYPE_CHECKING, ClassVar, Literal, cast
@@ -529,13 +529,43 @@ class BaseConnectionField(Field, ABC):
             type_hint = f"Union[{types_hint}, None]"
         return f"{type_hint} = {self.pydantic_field}({field_args})"
 
+    def as_write(self) -> str:
+        return self._create_as_method("as_write", "DomainModel")
+
+    def as_read_graphql(self) -> str:
+        return self._create_as_method("as_read", "GraphQLCore")
+
+    def as_write_graphql(self) -> str:
+        return self._create_as_method("as_write", "GraphQLCore")
+
+    @abstractmethod
+    def _create_as_method(self, method: str, base_cls: str) -> str:
+        raise NotImplementedError()
+
 
 @dataclass(frozen=True)
 class OneToManyConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = True
     variable: str
 
+    def _create_as_method(self, method: str, base_cls: str) -> str:
+        if self.end_classes and self.use_node_reference:
+            inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
+        elif self.end_classes:
+            inner = f"{self.variable}.{method}()"
+        else:
+            inner = f"{self.variable}"
+        return f"[{inner} for {self.variable} in self.{self.name} or []]"
+
 
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
+
+    def _create_as_method(self, method: str, base_cls: str) -> str:
+        if self.end_classes and self.use_node_reference:
+            return f"self.{self.name}.{method}() if isinstance(self.{self.name}, {base_cls}) else self.{self.name}"
+        elif self.end_classes:
+            return f"self.{self.name}.{method}()"
+        else:
+            return f"self.{self.name}"

@@ -315,8 +315,8 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) "
-                "else self.inwards_single",
+                "[inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single "
+                "for inwards_single in self.inwards_single or []]",
                 id="Inwards SingleEdge no properties",
             ),
         ],

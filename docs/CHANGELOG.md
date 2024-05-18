@@ -20,6 +20,8 @@ Changes are grouped as follows
 ### Fixed
 - The `MockGenerator` could produce different results for the same input and seed due to the internal creation order.
   This is now fixed by ensuring the creation order is always the same for the same input.
+- Properties of type `SingleEdgeConnection` with direction `inwards` would raise `ValueError` if you called
+  `.as_write()` on the generated read data class. This is now fixed.
 
 ## [0.99.22] - 06-05-24
 ### Fixed
