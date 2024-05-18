@@ -317,6 +317,16 @@ class DataClass:
         return any(self.container_fields)
 
     @property
+    def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
+        """All MultiEdges without properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_no_property_edge)
+
+    @property
+    def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:
+        """All MultiEdges with properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
+
+    @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))

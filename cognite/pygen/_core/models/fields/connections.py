@@ -24,7 +24,7 @@ class EdgeField(Field, ABC):
     """This represents a field connecting to another data class(es)."""
 
     @property
-    def is_edge(self) -> bool:
+    def is_connection(self) -> bool:
         return True
 
     @classmethod
@@ -421,6 +421,18 @@ class BaseConnectionField(Field, ABC):
 
     @property
     def is_edge(self) -> bool:
+        return self.edge_type is not None
+
+    @property
+    def is_no_property_edge(self) -> bool:
+        return self.is_edge and all(isinstance(data_class, NodeDataClass) for data_class in self.end_classes or [])
+
+    @property
+    def is_property_edge(self) -> bool:
+        return self.is_edge and all(isinstance(data_class, EdgeDataClass) for data_class in self.end_classes or [])
+
+    @property
+    def is_connection(self) -> bool:
         return True
 
     @classmethod

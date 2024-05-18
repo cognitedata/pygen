@@ -212,7 +212,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             cache.add(self.as_tuple_id())
         {% endif %}
 
-{% for field in data_class.fields_of_type(ft.EdgeOneToManyEdges) %}
+{% for field in data_class.one_to_many_edges_with_properties %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationWrite):
                 other_resources = {{ field.variable }}._to_instances_write(
@@ -222,7 +222,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                     view_by_read_class
 )
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
+{% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(

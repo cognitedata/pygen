@@ -123,7 +123,7 @@ class Field:
 
     # The properties below are overwritten in the child classes
     @property
-    def is_edge(self) -> bool:
+    def is_connection(self) -> bool:
         return False
 
     @property
