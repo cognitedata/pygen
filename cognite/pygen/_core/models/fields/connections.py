@@ -490,7 +490,9 @@ class BaseConnectionField(Field, ABC):
         return False
 
     def as_read_type_hint(self) -> str:
-        return self._create_type_hint([data_class.read_name for data_class in self.end_classes or []])
+        return self._create_type_hint(
+            [data_class.read_name for data_class in self.end_classes or []], self.use_node_reference
+        )
 
     def as_write_type_hint(self) -> str:
         return self._create_type_hint(
@@ -498,13 +500,14 @@ class BaseConnectionField(Field, ABC):
                 data_class.write_name
                 for data_class in self.end_classes or []
                 if data_class.is_writable or data_class.is_interface
-            ]
+            ],
+            self.use_node_reference,
         )
 
     def as_graphql_type_hint(self) -> str:
-        return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []])
+        return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []], False)
 
-    def _create_type_hint(self, types: list[str]) -> str:
+    def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:
         field_kwargs = {
             #  All connection fields are nullable
             "default": "None",
@@ -513,12 +516,15 @@ class BaseConnectionField(Field, ABC):
             field_kwargs["repr"] = "False"
         if self.need_alias:
             field_kwargs["alias"] = f'"{self.prop_name}"'
-        if self.use_node_reference:
+        if use_node_reference:
             types.extend(self._node_reference)
         types_hint = ", ".join([f"list[{type_}]" if self._wrap_list else type_ for type_ in types])
         field_args = ", ".join([f"{key}={value}" for key, value in field_kwargs.items()])
         if len(types) == 1:
             type_hint = f"Optional[{types_hint}]"
+        elif len(types) == 0:
+            # GraphQL Hint for direct relation with no source
+            type_hint = "Optional[str]"
         else:
             type_hint = f"Union[{types_hint}, None]"
         return f"{type_hint} = {self.pydantic_field}({field_args})"

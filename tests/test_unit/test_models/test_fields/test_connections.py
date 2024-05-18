@@ -200,13 +200,13 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "otherDirect",
-                'Optional[ConnectionItemCGraphQL] = Field(None, repr=False, alias="otherDirect")',
+                'Optional[ConnectionItemCGraphQL] = Field(default=None, repr=False, alias="otherDirect")',
                 id="Single Direct relation, not writable",
             ),
             pytest.param(
                 "ConnectionItemA",
                 "selfDirect",
-                'Optional[ConnectionItemAGraphQL] = Field(None, repr=False, alias="selfDirect")',
+                'Optional[ConnectionItemAGraphQL] = Field(default=None, repr=False, alias="selfDirect")',
                 id="Single Direct to self",
             ),
             pytest.param(
@@ -218,7 +218,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "directNoSource",
-                'Optional[str] = Field(None, alias="directNoSource")',
+                'Optional[str] = Field(default=None, alias="directNoSource")',
                 id="Single Direct, no source",
             ),
             pytest.param(
@@ -237,13 +237,13 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemD",
                 "outwardsSingle",
-                'Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="outwardsSingle")',
+                'Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="outwardsSingle")',
                 id="Outwards SingleEdge no properties",
             ),
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                'Optional[list[ConnectionItemDGraphQL]] = Field(None, repr=False, alias="inwardsSingle")',
+                'Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
         ],
