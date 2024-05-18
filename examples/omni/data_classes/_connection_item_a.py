@@ -66,9 +66,9 @@ class ConnectionItemAGraphQL(GraphQLCore):
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
     name: Optional[str] = None
-    other_direct: Optional[ConnectionItemCGraphQL] = Field(None, repr=False, alias="otherDirect")
+    other_direct: Optional[ConnectionItemCGraphQL] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
-    self_direct: Optional[ConnectionItemAGraphQL] = Field(None, repr=False, alias="selfDirect")
+    self_direct: Optional[ConnectionItemAGraphQL] = Field(default=None, repr=False, alias="selfDirect")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -105,9 +105,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
             other_direct=(
                 self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
-            outwards=[
-                outward.as_read() if isinstance(outward, GraphQLCore) else outward for outward in self.outwards or []
-            ],
+            outwards=[outward.as_read() for outward in self.outwards or []],
             self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
@@ -119,12 +117,10 @@ class ConnectionItemAGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             name=self.name,
             other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
+                self.other_direct.as_write() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
-            outwards=[
-                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
-            ],
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
+            outwards=[outward.as_write() for outward in self.outwards or []],
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
 
@@ -146,9 +142,9 @@ class ConnectionItemA(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
+    other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
+    self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
@@ -194,9 +190,11 @@ class ConnectionItemAWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
+    other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="otherDirect"
+    )
     outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")
+    self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def _to_instances_write(
         self,
