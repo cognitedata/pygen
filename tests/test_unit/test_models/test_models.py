@@ -10,6 +10,7 @@ from yaml import safe_load
 
 from cognite.pygen._core.models import (
     ContainerField,
+    ContainerListField,
     EdgeOneToEndNode,
     Field,
     FilterImplementation,
@@ -17,7 +18,6 @@ from cognite.pygen._core.models import (
     NodeDataClass,
     OneToManyConnectionField,
     OneToOneConnectionField,
-    PrimitiveListField,
 )
 from cognite.pygen._core.models.fields import EdgeClasses
 from cognite.pygen.config import PygenConfig
@@ -49,7 +49,7 @@ def load_field_test_cases():
     mapped = dm.MappedProperty.load(raw_data)
     yield pytest.param(
         mapped,
-        PrimitiveListField(
+        ContainerListField(
             name="run_events",
             prop_name="runEvents",
             pydantic_field="Field",
@@ -519,7 +519,7 @@ def create_fields_test_cases():
         prop,
         {},
         "Command_Config",
-        PrimitiveListField(
+        ContainerListField(
             name="configs",
             prop_name="configs",
             description=None,

@@ -1,4 +1,5 @@
-"""This module contains the primitive fields"""
+"""This module contains the primitive fields. A primitive field is a field that contains pure data, such as a string,
+it is in contrast to a connection field that contains a reference to another object."""
 
 from __future__ import annotations
 
@@ -46,7 +47,7 @@ class BaseContainerField(Field, ABC):
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BaseContainerField | None:
         if prop.type.is_list:
-            return PrimitiveListField(
+            return ContainerListField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -152,16 +153,6 @@ class ContainerField(BaseContainerField):
         elif self.default is not None or self.is_nullable:
             out_type = f"{self.type_as_string} = {self.default_code}"
         return out_type
-
-
-@dataclass(frozen=True)
-class PrimitiveListField(ContainerListField):
-    """
-    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
-    list[datetime.datetime], list[datetime.date].
-    """
-
-    ...
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:

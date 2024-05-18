@@ -12,6 +12,7 @@ from .fields import (
     BaseContainerField,
     CDFExternalField,
     ContainerField,
+    ContainerListField,
     EdgeField,
     EdgeOneToEndNode,
     EdgeOneToMany,
@@ -20,7 +21,6 @@ from .fields import (
     Field,
     OneToManyConnectionField,
     OneToOneConnectionField,
-    PrimitiveListField,
 )
 from .filter_methods import FilterImplementation, FilterImplementationOnetoOneEdge, FilterMethod, FilterParameter
 
@@ -39,7 +39,6 @@ __all__ = [
     "EdgeOneToManyNodes",
     "EdgeOneToOne",
     "EdgeOneToEndNode",
-    "PrimitiveListField",
     "FilterMethod",
     "FilterParameter",
     "FilterImplementation",
@@ -48,4 +47,5 @@ __all__ = [
     "BaseConnectionField",
     "OneToOneConnectionField",
     "OneToManyConnectionField",
+    "ContainerListField",
 ]
