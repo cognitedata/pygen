@@ -346,6 +346,10 @@ class DataClass:
         )
 
     @property
+    def has_one_to_one_direct_relations_with_source(self) -> bool:
+        return any(self.one_to_one_direct_relations_with_source)
+
+    @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
