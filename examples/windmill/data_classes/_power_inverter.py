@@ -183,22 +183,25 @@ class PowerInverterWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.active_power_total is not None or write_none:
-            if isinstance(self.active_power_total, str) or self.active_power_total is None:
-                properties["active_power_total"] = self.active_power_total
-            else:
-                properties["active_power_total"] = self.active_power_total.external_id
+            properties["active_power_total"] = (
+                self.active_power_total
+                if isinstance(self.active_power_total, str) or self.active_power_total is None
+                else self.active_power_total.external_id
+            )
 
         if self.apparent_power_total is not None or write_none:
-            if isinstance(self.apparent_power_total, str) or self.apparent_power_total is None:
-                properties["apparent_power_total"] = self.apparent_power_total
-            else:
-                properties["apparent_power_total"] = self.apparent_power_total.external_id
+            properties["apparent_power_total"] = (
+                self.apparent_power_total
+                if isinstance(self.apparent_power_total, str) or self.apparent_power_total is None
+                else self.apparent_power_total.external_id
+            )
 
         if self.reactive_power_total is not None or write_none:
-            if isinstance(self.reactive_power_total, str) or self.reactive_power_total is None:
-                properties["reactive_power_total"] = self.reactive_power_total
-            else:
-                properties["reactive_power_total"] = self.reactive_power_total.external_id
+            properties["reactive_power_total"] = (
+                self.reactive_power_total
+                if isinstance(self.reactive_power_total, str) or self.reactive_power_total is None
+                else self.reactive_power_total.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

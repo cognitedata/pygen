@@ -183,22 +183,23 @@ class HighSpeedShaftWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.bending_moment_y is not None or write_none:
-            if isinstance(self.bending_moment_y, str) or self.bending_moment_y is None:
-                properties["bending_moment_y"] = self.bending_moment_y
-            else:
-                properties["bending_moment_y"] = self.bending_moment_y.external_id
+            properties["bending_moment_y"] = (
+                self.bending_moment_y
+                if isinstance(self.bending_moment_y, str) or self.bending_moment_y is None
+                else self.bending_moment_y.external_id
+            )
 
         if self.bending_monent_x is not None or write_none:
-            if isinstance(self.bending_monent_x, str) or self.bending_monent_x is None:
-                properties["bending_monent_x"] = self.bending_monent_x
-            else:
-                properties["bending_monent_x"] = self.bending_monent_x.external_id
+            properties["bending_monent_x"] = (
+                self.bending_monent_x
+                if isinstance(self.bending_monent_x, str) or self.bending_monent_x is None
+                else self.bending_monent_x.external_id
+            )
 
         if self.torque is not None or write_none:
-            if isinstance(self.torque, str) or self.torque is None:
-                properties["torque"] = self.torque
-            else:
-                properties["torque"] = self.torque.external_id
+            properties["torque"] = (
+                self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

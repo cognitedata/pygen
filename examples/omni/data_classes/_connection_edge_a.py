@@ -64,9 +64,9 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
 
     view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     end_node: Union[ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
-    end_time: Optional[datetime.datetime] = Field(default=None, alias="endTime")
+    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
-    start_time: Optional[datetime.datetime] = Field(default=None, alias="startTime")
+    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
     def as_read(self) -> ConnectionEdgeA:
         """Convert this GraphQL format of connection edge a to the reading format."""
@@ -116,9 +116,9 @@ class ConnectionEdgeA(DomainRelation):
 
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemF, ConnectionItemG, str, dm.NodeId]
-    end_time: Optional[datetime.datetime] = Field(default=None, alias="endTime")
+    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
-    start_time: Optional[datetime.datetime] = Field(default=None, alias="startTime")
+    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
@@ -159,9 +159,9 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
-    end_time: Optional[datetime.datetime] = Field(default=None, alias="endTime")
+    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
-    start_time: Optional[datetime.datetime] = Field(default=None, alias="startTime")
+    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
     def _to_instances_write(
         self,
