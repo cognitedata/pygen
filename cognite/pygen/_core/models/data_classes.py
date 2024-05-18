@@ -371,7 +371,7 @@ class EdgeDataClass(DataClass):
         for view in views:
             start_class = data_class_by_view_id[view.as_id()]
             for _prop_name, prop in view.properties.items():
-                if isinstance(prop, dm.SingleHopConnectionDefinition) and prop.edge_source == self.view_id:
+                if isinstance(prop, dm.MultiEdgeConnection) and prop.edge_source == self.view_id:
                     edge_classes.append(
                         EdgeClasses(
                             cast(NodeDataClass, start_class),
