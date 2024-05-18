@@ -84,7 +84,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
         between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
@@ -177,7 +177,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
 
-        """{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        """{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         return self._retrieve(
             external_id,
             space,
@@ -371,7 +371,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
@@ -379,7 +379,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
             retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
@@ -399,7 +399,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }},{% endfor %}
             filter,
         )
-        {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         return self._list(
             limit=limit,
             filter=filter_,
