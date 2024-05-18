@@ -7,7 +7,7 @@ from .cdf_reference import CDFExternalField, CDFExternalListField
 from .connections import (
     BaseConnectionField,
     EdgeClasses,
-    EdgeOneToEndNode,
+    EndNodeField,
     OneToManyConnectionField,
     OneToOneConnectionField,
 )
@@ -20,7 +20,7 @@ __all__ = [
     "PrimitiveListField",
     "CDFExternalField",
     "CDFExternalListField",
-    "EdgeOneToEndNode",
+    "EndNodeField",
     "EdgeClasses",
     "T_Field",
     "BaseConnectionField",

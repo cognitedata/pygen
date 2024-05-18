@@ -9,7 +9,7 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 from yaml import safe_load
 
 from cognite.pygen._core.models import (
-    EdgeOneToEndNode,
+    EndNodeField,
     Field,
     FilterImplementation,
     FilterParameter,
@@ -715,7 +715,7 @@ def field_type_hints_test_cases():
     site_apply2.is_writable = True
     site_apply_edge2.end_class = site_apply2
 
-    field = EdgeOneToEndNode(
+    field = EndNodeField(
         name="end_node",
         doc_name="end node",
         prop_name="end_node",

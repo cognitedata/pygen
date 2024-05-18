@@ -21,7 +21,7 @@ from .fields import (
     BasePrimitiveField,
     CDFExternalField,
     EdgeClasses,
-    EdgeOneToEndNode,
+    EndNodeField,
     Field,
     OneToManyConnectionField,
     OneToOneConnectionField,
@@ -293,7 +293,7 @@ class DataClass:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[class_.view_id] = class_
-            elif isinstance(field_, EdgeOneToEndNode):
+            elif isinstance(field_, EndNodeField):
                 for class_ in field_.end_classes:
                     unique[class_.view_id] = class_
 
@@ -409,9 +409,9 @@ class EdgeDataClass(DataClass):
         return True
 
     @property
-    def end_node_field(self) -> EdgeOneToEndNode:
+    def end_node_field(self) -> EndNodeField:
         try:
-            return next(field_ for field_ in self.fields if isinstance(field_, EdgeOneToEndNode))
+            return next(field_ for field_ in self.fields if isinstance(field_, EndNodeField))
         except StopIteration:
             raise ValueError("EdgeDataClass has not been initialized.") from None
 
@@ -436,7 +436,7 @@ class EdgeDataClass(DataClass):
                     )
 
         self.fields.append(
-            EdgeOneToEndNode(
+            EndNodeField(
                 name="end_node",
                 doc_name="end node",
                 prop_name="end_node",

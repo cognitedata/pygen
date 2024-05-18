@@ -42,7 +42,7 @@ class EdgeClasses:
 
 
 @dataclass(frozen=True)
-class EdgeOneToEndNode(Field):
+class EndNodeField(Field):
     """This represents a one-to-one edge where the end class can be one of multiple data classes.
     This is used for the end_node field in edge data classes, where the end_node can be one of multiple
     data classes.
