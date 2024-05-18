@@ -6,7 +6,7 @@ from typing import overload
 import warnings
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
@@ -15,7 +15,7 @@ from {{ top_level_package }}.data_classes import (
     DomainModelWrite,
     ResourcesWriteResult,
     {{ data_class.read_name }},{% if data_class.is_writable %}
-    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.field_names }},{% endif %}
     {{ data_class.read_list_name }},{% if data_class.is_writable %}
     {{ data_class.write_list_name }},{% endif %}{% if data_class.has_primitive_field_of_type(dm.Text) %}
@@ -24,7 +24,7 @@ from {{ top_level_package }}.data_classes import (
     {{ edge_data_class.write_name }},
     {{ edge_data_class.read_list_name }},{% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
@@ -39,7 +39,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         view_id = view_by_read_class[{{ data_class.read_name }}]
         super().__init__(
             client=client,
-            sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
+            sources={% if not data_class.has_container_fields %}None{% else %}view_id{% endif %},
             class_type={{ data_class.read_name }},
             class_list={{ data_class.read_list_name }},{% if data_class.is_writable %}
             class_write_list={{ data_class.write_list_name }},{% endif %}
@@ -84,7 +84,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
         between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
@@ -177,7 +177,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
 
-        """{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        """{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         return self._retrieve(
             external_id,
             space,
@@ -230,7 +230,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
-{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
     @overload
     def aggregate(
         self,
@@ -371,7 +371,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
@@ -379,7 +379,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
             retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
@@ -399,7 +399,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }},{% endfor %}
             filter,
         )
-        {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
+        {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         return self._list(
             limit=limit,
             filter=filter_,

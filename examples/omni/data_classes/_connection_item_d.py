@@ -63,10 +63,10 @@ class ConnectionItemDGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
-    direct_multi: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="directMulti")
-    direct_single: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="directSingle")
+    direct_multi: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directMulti")
+    direct_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
-    outwards_single: Optional[ConnectionItemEGraphQL] = Field(None, repr=False, alias="outwardsSingle")
+    outwards_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="outwardsSingle")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -120,15 +120,15 @@ class ConnectionItemDGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else self.direct_multi
+                self.direct_multi.as_write() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
             ),
             direct_single=(
-                self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
+                self.direct_single.as_write() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
             name=self.name,
             outwards_single=(
                 self.outwards_single.as_write()
-                if isinstance(self.outwards_single, DomainModel)
+                if isinstance(self.outwards_single, GraphQLCore)
                 else self.outwards_single
             ),
         )
@@ -151,10 +151,12 @@ class ConnectionItemD(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
-    direct_multi: Union[ConnectionItemE, str, dm.NodeId, None] = Field(None, repr=False, alias="directMulti")
-    direct_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(None, repr=False, alias="directSingle")
+    direct_multi: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directMulti")
+    direct_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
-    outwards_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(None, repr=False, alias="outwardsSingle")
+    outwards_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="outwardsSingle"
+    )
 
     def as_write(self) -> ConnectionItemDWrite:
         """Convert this read version of connection item d to the writing version."""
@@ -203,10 +205,16 @@ class ConnectionItemDWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
-    direct_multi: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="directMulti")
-    direct_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="directSingle")
+    direct_multi: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="directMulti"
+    )
+    direct_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="directSingle"
+    )
     name: Optional[str] = None
-    outwards_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="outwardsSingle")
+    outwards_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="outwardsSingle"
+    )
 
     def _to_instances_write(
         self,

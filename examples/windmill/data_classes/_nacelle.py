@@ -86,11 +86,11 @@ class NacelleGraphQL(GraphQLCore):
     acc_from_back_side_x: Union[TimeSeries, dict, None] = None
     acc_from_back_side_y: Union[TimeSeries, dict, None] = None
     acc_from_back_side_z: Union[TimeSeries, dict, None] = None
-    gearbox: Optional[GearboxGraphQL] = Field(None, repr=False)
-    generator: Optional[GeneratorGraphQL] = Field(None, repr=False)
-    high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(None, repr=False)
-    main_shaft: Optional[MainShaftGraphQL] = Field(None, repr=False)
-    power_inverter: Optional[PowerInverterGraphQL] = Field(None, repr=False)
+    gearbox: Optional[GearboxGraphQL] = Field(default=None, repr=False)
+    generator: Optional[GeneratorGraphQL] = Field(default=None, repr=False)
+    high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(default=None, repr=False)
+    main_shaft: Optional[MainShaftGraphQL] = Field(default=None, repr=False)
+    power_inverter: Optional[PowerInverterGraphQL] = Field(default=None, repr=False)
     yaw_direction: Union[TimeSeries, dict, None] = None
     yaw_error: Union[TimeSeries, dict, None] = None
 
@@ -152,16 +152,16 @@ class NacelleGraphQL(GraphQLCore):
             acc_from_back_side_x=self.acc_from_back_side_x,
             acc_from_back_side_y=self.acc_from_back_side_y,
             acc_from_back_side_z=self.acc_from_back_side_z,
-            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
-            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
+            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
+            generator=self.generator.as_write() if isinstance(self.generator, GraphQLCore) else self.generator,
             high_speed_shaft=(
                 self.high_speed_shaft.as_write()
-                if isinstance(self.high_speed_shaft, DomainModel)
+                if isinstance(self.high_speed_shaft, GraphQLCore)
                 else self.high_speed_shaft
             ),
-            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
+            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
             power_inverter=(
-                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
+                self.power_inverter.as_write() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
             ),
             yaw_direction=self.yaw_direction,
             yaw_error=self.yaw_error,
@@ -194,11 +194,11 @@ class Nacelle(DomainModel):
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
     acc_from_back_side_y: Union[TimeSeries, str, None] = None
     acc_from_back_side_z: Union[TimeSeries, str, None] = None
-    gearbox: Union[Gearbox, str, dm.NodeId, None] = Field(None, repr=False)
-    generator: Union[Generator, str, dm.NodeId, None] = Field(None, repr=False)
-    high_speed_shaft: Union[HighSpeedShaft, str, dm.NodeId, None] = Field(None, repr=False)
-    main_shaft: Union[MainShaft, str, dm.NodeId, None] = Field(None, repr=False)
-    power_inverter: Union[PowerInverter, str, dm.NodeId, None] = Field(None, repr=False)
+    gearbox: Union[Gearbox, str, dm.NodeId, None] = Field(default=None, repr=False)
+    generator: Union[Generator, str, dm.NodeId, None] = Field(default=None, repr=False)
+    high_speed_shaft: Union[HighSpeedShaft, str, dm.NodeId, None] = Field(default=None, repr=False)
+    main_shaft: Union[MainShaft, str, dm.NodeId, None] = Field(default=None, repr=False)
+    power_inverter: Union[PowerInverter, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
@@ -262,11 +262,11 @@ class NacelleWrite(DomainModelWrite):
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
     acc_from_back_side_y: Union[TimeSeries, str, None] = None
     acc_from_back_side_z: Union[TimeSeries, str, None] = None
-    gearbox: Union[GearboxWrite, str, dm.NodeId, None] = Field(None, repr=False)
-    generator: Union[GeneratorWrite, str, dm.NodeId, None] = Field(None, repr=False)
-    high_speed_shaft: Union[HighSpeedShaftWrite, str, dm.NodeId, None] = Field(None, repr=False)
-    main_shaft: Union[MainShaftWrite, str, dm.NodeId, None] = Field(None, repr=False)
-    power_inverter: Union[PowerInverterWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    gearbox: Union[GearboxWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
+    generator: Union[GeneratorWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
+    high_speed_shaft: Union[HighSpeedShaftWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
+    main_shaft: Union[MainShaftWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
+    power_inverter: Union[PowerInverterWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
@@ -286,22 +286,25 @@ class NacelleWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.acc_from_back_side_x is not None or write_none:
-            if isinstance(self.acc_from_back_side_x, str) or self.acc_from_back_side_x is None:
-                properties["acc_from_back_side_x"] = self.acc_from_back_side_x
-            else:
-                properties["acc_from_back_side_x"] = self.acc_from_back_side_x.external_id
+            properties["acc_from_back_side_x"] = (
+                self.acc_from_back_side_x
+                if isinstance(self.acc_from_back_side_x, str) or self.acc_from_back_side_x is None
+                else self.acc_from_back_side_x.external_id
+            )
 
         if self.acc_from_back_side_y is not None or write_none:
-            if isinstance(self.acc_from_back_side_y, str) or self.acc_from_back_side_y is None:
-                properties["acc_from_back_side_y"] = self.acc_from_back_side_y
-            else:
-                properties["acc_from_back_side_y"] = self.acc_from_back_side_y.external_id
+            properties["acc_from_back_side_y"] = (
+                self.acc_from_back_side_y
+                if isinstance(self.acc_from_back_side_y, str) or self.acc_from_back_side_y is None
+                else self.acc_from_back_side_y.external_id
+            )
 
         if self.acc_from_back_side_z is not None or write_none:
-            if isinstance(self.acc_from_back_side_z, str) or self.acc_from_back_side_z is None:
-                properties["acc_from_back_side_z"] = self.acc_from_back_side_z
-            else:
-                properties["acc_from_back_side_z"] = self.acc_from_back_side_z.external_id
+            properties["acc_from_back_side_z"] = (
+                self.acc_from_back_side_z
+                if isinstance(self.acc_from_back_side_z, str) or self.acc_from_back_side_z is None
+                else self.acc_from_back_side_z.external_id
+            )
 
         if self.gearbox is not None:
             properties["gearbox"] = {
@@ -340,16 +343,18 @@ class NacelleWrite(DomainModelWrite):
             }
 
         if self.yaw_direction is not None or write_none:
-            if isinstance(self.yaw_direction, str) or self.yaw_direction is None:
-                properties["yaw_direction"] = self.yaw_direction
-            else:
-                properties["yaw_direction"] = self.yaw_direction.external_id
+            properties["yaw_direction"] = (
+                self.yaw_direction
+                if isinstance(self.yaw_direction, str) or self.yaw_direction is None
+                else self.yaw_direction.external_id
+            )
 
         if self.yaw_error is not None or write_none:
-            if isinstance(self.yaw_error, str) or self.yaw_error is None:
-                properties["yaw_error"] = self.yaw_error
-            else:
-                properties["yaw_error"] = self.yaw_error.external_id
+            properties["yaw_error"] = (
+                self.yaw_error
+                if isinstance(self.yaw_error, str) or self.yaw_error is None
+                else self.yaw_error.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

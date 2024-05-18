@@ -63,7 +63,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
-    direct_list: Optional[ConnectionItemDGraphQL] = Field(None, repr=False, alias="directList")
+    direct_list: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")
 
@@ -109,7 +109,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_list=self.direct_list.as_write() if isinstance(self.direct_list, DomainModel) else self.direct_list,
+            direct_list=self.direct_list.as_write() if isinstance(self.direct_list, GraphQLCore) else self.direct_list,
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
@@ -131,7 +131,7 @@ class ConnectionItemF(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[ConnectionItemD, str, dm.NodeId, None] = Field(None, repr=False, alias="directList")
+    direct_list: Union[ConnectionItemD, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
 
@@ -172,7 +172,7 @@ class ConnectionItemFWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(None, repr=False, alias="directList")
+    direct_list: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
 

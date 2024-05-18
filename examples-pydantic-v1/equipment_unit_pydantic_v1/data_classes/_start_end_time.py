@@ -182,10 +182,10 @@ class StartEndTimeWrite(DomainRelationWrite):
         properties = {}
 
         if self.end_time is not None or write_none:
-            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
+            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
 
         if self.start_time is not None or write_none:
-            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
+            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
 
         if properties:
             this_edge = dm.EdgeApply(

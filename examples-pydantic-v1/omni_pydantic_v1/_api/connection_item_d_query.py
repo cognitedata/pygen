@@ -47,6 +47,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
 
     def outwards_single(
         self,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -61,6 +62,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outwards single edges of the connection item d.
 
         Args:
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -101,6 +103,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_connection_item_e_filter(
             view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,

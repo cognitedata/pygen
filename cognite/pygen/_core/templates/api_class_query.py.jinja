@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
-    {{ class_.read_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+    {{ class_.read_name }},{% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
     {{ field.data_class.read_name }},{% endfor %}
 ){% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
@@ -53,7 +53,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         self,{% for parm in edge_api.filter_parameters(False, include_end_node=True, suffix_edge=True) %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         filter: dm.Filter | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+        limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_direct_relations_with_source %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> {{ edge_api.query.name }}[T_DomainModelList]:
         """Query along the {{ edge_api.doc_name }} edges of the {{ data_class.doc_name}}.
@@ -62,7 +62,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+                to return all items.{% for field in data_class.one_to_one_direct_relations_with_source %}
             retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
 
         Returns:
@@ -100,29 +100,29 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
             view_id,{% for parm in edge_api.end_filter_method.parameters %}
             {{ parm.name }},{% endfor %}
             (filter and dm.filters.And(filter, has_data)) or has_data,
-        ){% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+        ){% for field in data_class.one_to_one_direct_relations_with_source %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
         return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_read_class, node_filer, limit)
     {% endfor %}
     def query(
-        self,{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+        self,{% for field in data_class.one_to_one_direct_relations_with_source %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> T_DomainModelList:
         """Execute query and return the result.
-{% if data_class.has_field_of_type(ft.EdgeOneToOne) %}
-        Args:{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+{% if data_class.has_one_to_one_direct_relations_with_source %}
+        Args:{% for field in data_class.one_to_one_direct_relations_with_source %}
             retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
 {% endif %}
         Returns:
             The list of the source nodes of the query.
 
-        """{% if data_class.has_field_of_type(ft.EdgeOneToOne) %}
-        from_ = self._builder[-1].name{% endif %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+        """{% if data_class.has_one_to_one_direct_relations_with_source %}
+        from_ = self._builder[-1].name{% endif %}{% for field in data_class.one_to_one_direct_relations_with_source %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
         return self._query()
-{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+{% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
         view_id = self._view_by_read_class[{{ field.data_class.read_name }}]
         self._builder.append(

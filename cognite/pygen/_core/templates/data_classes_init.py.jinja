@@ -55,7 +55,7 @@ __all__ = [
     "{{ class_.read_name }}Apply",{% endif %}
     "{{ class_.read_list_name }}",{% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_list_name }}",
-    "{{ class_.read_name }}ApplyList",{% endif %}{% if class_.has_field_of_type(ft.PrimitiveFieldCore) %}
+    "{{ class_.read_name }}ApplyList",{% endif %}{% if class_.has_field_of_type(ft.BasePrimitiveField) %}
     "{{ class_.field_names }}",{% endif %}{% if class_.has_primitive_field_of_type(dm.Text) %}
     "{{ class_.text_field_names }}", {% endif %}{% endfor %}
 ]

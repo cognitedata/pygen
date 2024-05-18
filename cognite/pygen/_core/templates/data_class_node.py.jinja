@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Any, Literal, Optional, Union{% else %}from typing import Any, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, Literal, Optional, Union{% else %}from typing import Any, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -25,18 +25,18 @@ from ._core import (
     TimeSeries,{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
-{% if data_class.has_field_of_type(ft.EdgeField) %}
+{% if data_class.has_dependencies %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
-{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
 {{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
 
-{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.PrimitiveFieldCore) %}
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
@@ -78,8 +78,8 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         elif isinstance(value, dict):
             return TimeSeries.load(value)
         return value
-{% endif %}{% if data_class.has_field_of_type(ft.EdgeField) %}
-    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.EdgeField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -173,7 +173,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
 {% endif %}
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
-            return resources{% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
+            return resources{% if not data_class.has_container_fields %}
         cache.add(self.as_tuple_id())
 
         this_node = dm.NodeApply(
@@ -189,32 +189,11 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
         )){% endif %}
-{% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
+{% if data_class.has_container_fields %}
         properties: dict[str, Any] = {}
-        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne, ft.EdgeOneToOneAny)) %}
-        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:{% if field.is_edge %}
-            properties["{{ field.prop_name }}"] = {
-                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
-                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }
-            {% elif field.is_time_series and not field.is_list %}
-                if isinstance(self.{{ field.name }}, str) or self.{{ field.name }} is None:
-                    properties["{{ field.prop_name }}"] = self.{{ field.name }}
-                else:
-                    properties["{{ field.prop_name }}"] = self.{{ field.name }}.external_id
-            {% elif field.is_time_series and field.is_list %}
-            properties["{{ field.prop_name }}"] = [
-                value if isinstance(value, str) else value.external_id for value in self.{{ field.name }} or []
-            ] or None
-            {% elif field.is_time_field and field.is_list %}
-            properties["{{ field.prop_name }}"] = [
-                {{ field.variable }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) for {{ field.variable }} in self.{{ field.name }}
-            ]
-            {% elif field.is_time_field %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) if self.{{ field.name }} else None
-            {% else %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}
-            {% endif %}
+        {% for field in data_class.container_fields %}
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
+            properties["{{ field.prop_name }}"] = {{ field.as_value() }}
         {% endfor %}
 
         if properties:
@@ -233,7 +212,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             cache.add(self.as_tuple_id())
         {% endif %}
 
-{% for field in data_class.fields_of_type(ft.EdgeOneToManyEdges) %}
+{% for field in data_class.one_to_many_edges_with_properties %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationWrite):
                 other_resources = {{ field.variable }}._to_instances_write(
@@ -243,7 +222,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                     view_by_read_class
 )
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
+{% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
@@ -265,14 +244,14 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 allow_version_increase=allow_version_increase,
             ){% endif %}
             resources.extend(other_resources)
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+{% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
         if isinstance(self.{{ field.name }}, DomainModelWrite):
             other_resources = self.{{ field.name }}._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
             resources.time_series.append(self.{{ field.name }})
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeTypedOneToOne) %}{% if field.edge_direction == 'outwards' %}
+{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}{% if field.edge_direction == 'outwards' %}
         if self.{{field.name}} is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,

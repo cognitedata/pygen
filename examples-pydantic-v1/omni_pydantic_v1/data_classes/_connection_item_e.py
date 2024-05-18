@@ -62,8 +62,8 @@ class ConnectionItemEGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
-    direct_no_source: Optional[str] = Field(None, alias="directNoSource")
-    inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(None, repr=False, alias="inwardsSingle")
+    direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
+    inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None
 
     @root_validator(pre=True)
@@ -98,9 +98,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_read() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
-            ),
+            inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
@@ -111,9 +109,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
-            ),
+            inwards_single=[inwards_single.as_write() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
@@ -134,9 +130,9 @@ class ConnectionItemE(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
-    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
-        None, repr=False, alias="inwardsSingle"
+        default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
 
@@ -147,9 +143,10 @@ class ConnectionItemE(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
-            ),
+            inwards_single=[
+                inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single
+                for inwards_single in self.inwards_single or []
+            ],
             name=self.name,
         )
 
@@ -179,9 +176,9 @@ class ConnectionItemEWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
-    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
-        None, repr=False, alias="inwardsSingle"
+        default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
 
@@ -229,12 +226,13 @@ class ConnectionItemEWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        edge_type = dm.DirectRelationReference("pygen-models", "bidirectionalSingle")
         for inwards_single in self.inwards_single or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=inwards_single,
                 end_node=self,
-                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
@@ -286,6 +284,7 @@ class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
 
 def _create_connection_item_e_filter(
     view_id: dm.ViewId,
+    direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -293,6 +292,34 @@ def _create_connection_item_e_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if direct_no_source and isinstance(direct_no_source, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directNoSource"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_no_source},
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directNoSource"),
+                value={"space": direct_no_source[0], "externalId": direct_no_source[1]},
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directNoSource"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_no_source],
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directNoSource"),
+                values=[{"space": item[0], "externalId": item[1]} for item in direct_no_source],
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

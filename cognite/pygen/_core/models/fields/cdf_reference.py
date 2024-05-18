@@ -1,4 +1,6 @@
-"""This module contains the fields that are references to CDF External Fields."""
+"""This module contains the fields that are references to CDF External Fields. These fields are referencing
+either TimeSeries, Sequence, or File objects. In other words, these fields are references to objects that are
+outside of the data model."""
 
 from __future__ import annotations
 
@@ -7,11 +9,11 @@ from dataclasses import dataclass
 from cognite.client.data_classes import data_modeling as dm
 
 from .base import Field
-from .primitive import ListFieldCore, PrimitiveFieldCore
+from .primitive import BasePrimitiveField, PrimitiveListField
 
 
 @dataclass(frozen=True)
-class CDFExternalField(PrimitiveFieldCore):
+class CDFExternalField(BasePrimitiveField):
     """This represents a field that is a reference to a CDF External Field.
 
     For example, a field that is a reference to a TimeSeries, Sequence, or File.
@@ -69,6 +71,14 @@ class CDFExternalField(PrimitiveFieldCore):
         # Read is only used in graphql
         return self.as_write_graphql()
 
+    def as_value(self) -> str:
+        if not isinstance(self.type_, dm.TimeSeriesReference):
+            return f"self.{self.name}"
+        return (
+            f"self.{self.name} if isinstance(self.{self.name}, str) or self.{self.name} is None "
+            f"else self.{self.name}.external_id"
+        )
+
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> CDFExternalField | None:
         if not isinstance(prop.type, dm.CDFExternalIdReference):
@@ -97,7 +107,7 @@ class CDFExternalField(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class CDFExternalListField(ListFieldCore, CDFExternalField):
+class CDFExternalListField(PrimitiveListField, CDFExternalField):
     """
     This represents a list of CDF types such as list[TimeSeries], list[Sequence], or list[File].
     """
@@ -159,3 +169,8 @@ class CDFExternalListField(ListFieldCore, CDFExternalField):
                 return "Optional[list[dict]] = None"
             else:
                 return "list[dict]"
+
+    def as_value(self) -> str:
+        if not isinstance(self.type_, dm.TimeSeriesReference):
+            return f"self.{self.name}"
+        return f"[value if isinstance(value, str) else value.external_id for value in self.{self.name} or []] or None"

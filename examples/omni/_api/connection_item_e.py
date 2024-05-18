@@ -53,6 +53,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def __call__(
         self,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -63,6 +64,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """Query starting at connection item es.
 
         Args:
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -77,6 +79,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
@@ -93,6 +96,10 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         write_none: bool = False,
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item es.
+
+        Note: This method iterates through all nodes and timeseries linked to connection_item_e and creates them including the edges
+        between the nodes. For example, if any of `inwards_single` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
             connection_item_e: Connection item e or sequence of connection item es to upsert.
@@ -186,12 +193,26 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 >>> connection_item_e = client.connection_item_e.retrieve("my_connection_item_e")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.inwards_single_edge,
+                    "inwards_single",
+                    dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                    "inwards",
+                    dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+                ),
+            ],
+        )
 
     def search(
         self,
         query: str,
         properties: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -204,6 +225,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -225,6 +247,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
@@ -246,6 +269,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         group_by: None = None,
         query: str | None = None,
         search_properties: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -267,6 +291,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         group_by: ConnectionItemEFields | Sequence[ConnectionItemEFields] = None,
         query: str | None = None,
         search_properties: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -287,6 +312,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         group_by: ConnectionItemEFields | Sequence[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -302,6 +328,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -324,6 +351,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
@@ -348,6 +376,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         interval: float,
         query: str | None = None,
         search_property: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -362,6 +391,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -375,6 +405,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
@@ -394,22 +425,26 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def list(
         self,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
     ) -> ConnectionItemEList:
         """List/filter connection item es
 
         Args:
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of connection item es to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `inwards_single` external ids for the connection item es. Defaults to True.
 
         Returns:
             List of requested connection item es
@@ -425,10 +460,25 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
             space,
             filter,
         )
-        return self._list(limit=limit, filter=filter_)
+
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.inwards_single_edge,
+                    "inwards_single",
+                    dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                    "inwards",
+                    dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+                ),
+            ],
+        )

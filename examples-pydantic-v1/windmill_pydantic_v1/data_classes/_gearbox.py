@@ -190,22 +190,25 @@ class GearboxWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.displacement_x is not None or write_none:
-            if isinstance(self.displacement_x, str) or self.displacement_x is None:
-                properties["displacement_x"] = self.displacement_x
-            else:
-                properties["displacement_x"] = self.displacement_x.external_id
+            properties["displacement_x"] = (
+                self.displacement_x
+                if isinstance(self.displacement_x, str) or self.displacement_x is None
+                else self.displacement_x.external_id
+            )
 
         if self.displacement_y is not None or write_none:
-            if isinstance(self.displacement_y, str) or self.displacement_y is None:
-                properties["displacement_y"] = self.displacement_y
-            else:
-                properties["displacement_y"] = self.displacement_y.external_id
+            properties["displacement_y"] = (
+                self.displacement_y
+                if isinstance(self.displacement_y, str) or self.displacement_y is None
+                else self.displacement_y.external_id
+            )
 
         if self.displacement_z is not None or write_none:
-            if isinstance(self.displacement_z, str) or self.displacement_z is None:
-                properties["displacement_z"] = self.displacement_z
-            else:
-                properties["displacement_z"] = self.displacement_z.external_id
+            properties["displacement_z"] = (
+                self.displacement_z
+                if isinstance(self.displacement_z, str) or self.displacement_z is None
+                else self.displacement_z.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

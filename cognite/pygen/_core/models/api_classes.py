@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -12,7 +12,7 @@ from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
 from .data_classes import DataClass, EdgeDataClass
-from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges, EdgeOneToManyNodes, EdgeTypedOneToOne
+from .fields import BaseConnectionField, CDFExternalField
 from .filter_methods import FilterMethod, FilterParameter
 
 if TYPE_CHECKING:
@@ -142,25 +142,28 @@ class EdgeAPIClass(APIClass):
     @classmethod
     def from_fields(
         cls,
-        field: EdgeOneToMany | EdgeTypedOneToOne,
+        field: BaseConnectionField,
         data_class: DataClass,
         base_name: str,
         query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
         api_generator_by_view_id: dict[dm.ViewId, APIGenerator],
         pygen_config: pygen_config.PygenConfig,
     ) -> EdgeAPIClass:
+        if field.is_direct_relation:
+            raise ValueError("Bug in Pygen: Expected only Edge Connection Fields")
         api_class = pygen_config.naming.api_class
         base_name = f"{base_name}_{field.name}"
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
         parent_attribute = create_name(field.name, api_class.client_attribute)
 
-        edge_class: DataClass | None
+        # This is always true for Edge Connection Fields
+        field_end_class = cast(DataClass, field.end_classes[0])  # type: ignore[index]
+
+        edge_class: EdgeDataClass | None = None
         end_class: DataClass
-        if isinstance(field, EdgeOneToManyEdges):
-            edge_class = field.data_class
-            if not isinstance(edge_class, EdgeDataClass):
-                raise ValueError("Expected EdgeOneToManyEdges")
+        if isinstance(field_end_class, EdgeDataClass):
+            edge_class = field_end_class
             try:
                 end_class = next(
                     c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type
@@ -168,12 +171,9 @@ class EdgeAPIClass(APIClass):
             except StopIteration:
                 raise ValueError("Could not find end class") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
-        elif isinstance(field, (EdgeOneToManyNodes, EdgeTypedOneToOne)):
-            edge_class = None
-            end_class = field.data_class
+        else:  #  NodeDataClass
+            end_class = field_end_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
-        else:
-            raise ValueError(f"Expected EdgeOneToMany: {type(field)}")
 
         return cls(
             parent_attribute=f"{parent_attribute}_edge",
@@ -181,7 +181,8 @@ class EdgeAPIClass(APIClass):
             file_name=file_name,
             edge_class=edge_class,
             field_name=field.name,
-            type=field.edge_type,
+            # This is always true for Edge Connection Fields
+            type=field.edge_type,  # type: ignore[arg-type]
             start_class=data_class,
             end_class=end_class,
             filter_method=filter_method,

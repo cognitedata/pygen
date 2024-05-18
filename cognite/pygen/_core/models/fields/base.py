@@ -57,8 +57,8 @@ class Field:
         pydantic_field: Literal["Field", "pydantic.Field"],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
-        from .connections import EdgeField
-        from .primitive import PrimitiveFieldCore
+        from .connections import BaseConnectionField
+        from .primitive import BasePrimitiveField
 
         field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
@@ -77,11 +77,11 @@ class Field:
         if isinstance(prop, dm.ConnectionDefinition) or (
             isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         ):
-            return EdgeField.load(base, prop, variable, data_class_by_view_id)
+            return BaseConnectionField.load(base, prop, variable, data_class_by_view_id)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
         elif isinstance(prop, dm.MappedProperty):
-            return PrimitiveFieldCore.load(base, prop, variable)
+            return BasePrimitiveField.load(base, prop, variable)
         else:
             warnings.warn(
                 f"Unsupported property type: {type(prop)}. Skipping field {prop_name}", UserWarning, stacklevel=2
@@ -109,6 +109,11 @@ class Field:
         """Used in the .as_read() method for the graphQL version of the data class."""
         raise NotImplementedError
 
+    def as_value(self) -> str:
+        """Used in the ._to_instances_write() method to write the value of the field to the node instance.
+        This should only be implemented for container fields, i.e., fields that store their value in a container."""
+        raise NotImplementedError
+
     @property
     def argument_documentation(self) -> str:
         if self.description:
@@ -118,7 +123,7 @@ class Field:
 
     # The properties below are overwritten in the child classes
     @property
-    def is_edge(self) -> bool:
+    def is_connection(self) -> bool:
         return False
 
     @property

@@ -98,12 +98,9 @@ class ConnectionItemBGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            inwards=[inward.as_read() if isinstance(inward, GraphQLCore) else inward for inward in self.inwards or []],
+            inwards=[inward.as_read() for inward in self.inwards or []],
             name=self.name,
-            self_edge=[
-                self_edge.as_read() if isinstance(self_edge, GraphQLCore) else self_edge
-                for self_edge in self.self_edge or []
-            ],
+            self_edge=[self_edge.as_read() for self_edge in self.self_edge or []],
         )
 
     def as_write(self) -> ConnectionItemBWrite:
@@ -112,12 +109,9 @@ class ConnectionItemBGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
+            inwards=[inward.as_write() for inward in self.inwards or []],
             name=self.name,
-            self_edge=[
-                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
-                for self_edge in self.self_edge or []
-            ],
+            self_edge=[self_edge.as_write() for self_edge in self.self_edge or []],
         )
 
 

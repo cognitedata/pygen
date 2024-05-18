@@ -5,37 +5,25 @@ from __future__ import annotations
 from .base import Field, T_Field
 from .cdf_reference import CDFExternalField, CDFExternalListField
 from .connections import (
+    BaseConnectionField,
     EdgeClasses,
-    EdgeField,
-    EdgeOneToEndNode,
-    EdgeOneToMany,
-    EdgeOneToManyEdges,
-    EdgeOneToManyNodes,
-    EdgeOneToOne,
-    EdgeOneToOneAny,
-    EdgeToOneDataClass,
-    EdgeTypedOneToOne,
+    EndNodeField,
+    OneToManyConnectionField,
+    OneToOneConnectionField,
 )
-from .primitive import ListFieldCore, PrimitiveField, PrimitiveFieldCore, PrimitiveListField
+from .primitive import BasePrimitiveField, PrimitiveField, PrimitiveListField
 
 __all__ = [
     "Field",
-    "PrimitiveFieldCore",
+    "BasePrimitiveField",
     "PrimitiveField",
     "PrimitiveListField",
-    "ListFieldCore",
     "CDFExternalField",
     "CDFExternalListField",
-    "EdgeField",
-    "EdgeOneToManyEdges",
-    "EdgeOneToManyNodes",
-    "EdgeToOneDataClass",
-    "EdgeOneToOne",
-    "EdgeOneToMany",
-    "EdgeOneToEndNode",
-    "EdgeTypedOneToOne",
+    "EndNodeField",
     "EdgeClasses",
     "T_Field",
-    "EdgeTypedOneToOne",
-    "EdgeOneToOneAny",
+    "BaseConnectionField",
+    "OneToOneConnectionField",
+    "OneToManyConnectionField",
 ]

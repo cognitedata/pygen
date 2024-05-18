@@ -17,14 +17,15 @@ from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
+    BaseConnectionField,
+    BasePrimitiveField,
     CDFExternalField,
     EdgeClasses,
-    EdgeOneToEndNode,
-    EdgeOneToMany,
-    EdgeToOneDataClass,
+    EndNodeField,
     Field,
+    OneToManyConnectionField,
+    OneToOneConnectionField,
     PrimitiveField,
-    PrimitiveFieldCore,
     T_Field,
 )
 
@@ -161,7 +162,7 @@ class DataClass:
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
         self.is_interface = is_interface
         self.implements.extend(parents)
-        self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
+        self.is_writable = self.is_writable or self.is_all_fields_of_type(OneToManyConnectionField)
         self.initialization.add("parents")
 
     @property
@@ -218,7 +219,7 @@ class DataClass:
         if self.is_writable:
             import_classes.append(self.write_list_name)
             import_classes.append(f"{self.read_name}ApplyList")
-        if self.has_field_of_type(PrimitiveFieldCore):
+        if self.has_field_of_type(BasePrimitiveField):
             import_classes.append(self.field_names)
         if self.has_primitive_field_of_type(dm.Text):
             import_classes.append(self.text_field_names)
@@ -251,10 +252,10 @@ class DataClass:
 
     def primitive_fields_of_type(
         self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]
-    ) -> Iterable[PrimitiveFieldCore]:
+    ) -> Iterable[BasePrimitiveField]:
         return (
             field_
-            for field_ in self.fields_of_type(PrimitiveFieldCore)  # type: ignore[type-abstract]
+            for field_ in self.fields_of_type(BasePrimitiveField)  # type: ignore[type-abstract]
             if isinstance(field_.type_, type_)
         )
 
@@ -287,14 +288,66 @@ class DataClass:
     def dependencies(self) -> list[DataClass]:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
-            if isinstance(field_, EdgeToOneDataClass):
-                # This will overwrite any existing data class with the same view id
-                # however, this is not a problem as all data classes are uniquely identified by their view id
-                unique[field_.data_class.view_id] = field_.data_class
-            elif isinstance(field_, EdgeOneToEndNode):
+            if isinstance(field_, BaseConnectionField):
+                for class_ in field_.end_classes or []:
+                    # This will overwrite any existing data class with the same view id
+                    # however, this is not a problem as all data classes are uniquely identified by their view id
+                    unique[class_.view_id] = class_
+            elif isinstance(field_, EndNodeField):
                 for class_ in field_.end_classes:
                     unique[class_.view_id] = class_
+
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def has_dependencies(self) -> bool:
+        return bool(self.dependencies)
+
+    @property
+    def container_fields(self) -> Iterable[Field]:
+        """Container fields are fields that store their value in a container.
+
+        That is all primitive fields (including CDFExternalField) and direct relations.
+        """
+        return (
+            field_
+            for field_ in self
+            if isinstance(field_, BasePrimitiveField)
+            or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
+        )
+
+    @property
+    def has_container_fields(self) -> bool:
+        """Check if the data class has any container fields."""
+        return any(self.container_fields)
+
+    @property
+    def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
+        """All MultiEdges without properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_no_property_edge)
+
+    @property
+    def one_to_one_edge_without_properties(self) -> Iterable[OneToOneConnectionField]:
+        """All MultiEdges without properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_no_property_edge)
+
+    @property
+    def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:
+        """All MultiEdges with properties on the edge."""
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
+
+    @property
+    def one_to_one_direct_relations_with_source(self) -> Iterable[OneToOneConnectionField]:
+        """All direct relations."""
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToOneConnectionField)
+            if field_.is_direct_relation and field_.end_classes
+        )
+
+    @property
+    def has_one_to_one_direct_relations_with_source(self) -> bool:
+        return any(self.one_to_one_direct_relations_with_source)
 
     @property
     def primitive_fields_literal(self) -> str:
@@ -310,7 +363,7 @@ class DataClass:
 
     @property
     def fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
+        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
 
     @property
     def filter_name(self) -> str:
@@ -322,7 +375,7 @@ class DataClass:
 
     @property
     def one_to_many_edges_docs(self) -> str:
-        edges = list(self.fields_of_type(EdgeOneToMany))  # type: ignore[type-abstract]
+        edges = list(self.fields_of_type(OneToManyConnectionField))
         if len(edges) == 1:
             return f"`{edges[0].name}`"
         else:
@@ -356,9 +409,9 @@ class EdgeDataClass(DataClass):
         return True
 
     @property
-    def end_node_field(self) -> EdgeOneToEndNode:
+    def end_node_field(self) -> EndNodeField:
         try:
-            return next(field_ for field_ in self.fields if isinstance(field_, EdgeOneToEndNode))
+            return next(field_ for field_ in self.fields if isinstance(field_, EndNodeField))
         except StopIteration:
             raise ValueError("EdgeDataClass has not been initialized.") from None
 
@@ -373,7 +426,7 @@ class EdgeDataClass(DataClass):
         for view in views:
             start_class = data_class_by_view_id[view.as_id()]
             for _prop_name, prop in view.properties.items():
-                if isinstance(prop, dm.SingleHopConnectionDefinition) and prop.edge_source == self.view_id:
+                if isinstance(prop, dm.MultiEdgeConnection) and prop.edge_source == self.view_id:
                     edge_classes.append(
                         EdgeClasses(
                             cast(NodeDataClass, start_class),
@@ -383,7 +436,7 @@ class EdgeDataClass(DataClass):
                     )
 
         self.fields.append(
-            EdgeOneToEndNode(
+            EndNodeField(
                 name="end_node",
                 doc_name="end node",
                 prop_name="end_node",

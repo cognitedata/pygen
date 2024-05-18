@@ -180,21 +180,19 @@ class GeneratorWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.generator_speed_controller is not None or write_none:
-            if isinstance(self.generator_speed_controller, str) or self.generator_speed_controller is None:
-                properties["generator_speed_controller"] = self.generator_speed_controller
-            else:
-                properties["generator_speed_controller"] = self.generator_speed_controller.external_id
+            properties["generator_speed_controller"] = (
+                self.generator_speed_controller
+                if isinstance(self.generator_speed_controller, str) or self.generator_speed_controller is None
+                else self.generator_speed_controller.external_id
+            )
 
         if self.generator_speed_controller_reference is not None or write_none:
-            if (
-                isinstance(self.generator_speed_controller_reference, str)
+            properties["generator_speed_controller_reference"] = (
+                self.generator_speed_controller_reference
+                if isinstance(self.generator_speed_controller_reference, str)
                 or self.generator_speed_controller_reference is None
-            ):
-                properties["generator_speed_controller_reference"] = self.generator_speed_controller_reference
-            else:
-                properties["generator_speed_controller_reference"] = (
-                    self.generator_speed_controller_reference.external_id
-                )
+                else self.generator_speed_controller_reference.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(

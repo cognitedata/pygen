@@ -98,10 +98,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             a_value=self.a_value,
-            to_non_writable=[
-                to_non_writable.as_read() if isinstance(to_non_writable, GraphQLCore) else to_non_writable
-                for to_non_writable in self.to_non_writable or []
-            ],
+            to_non_writable=[to_non_writable.as_read() for to_non_writable in self.to_non_writable or []],
         )
 
     def as_write(self) -> DependentOnNonWritableWrite:
@@ -111,10 +108,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             a_value=self.a_value,
-            to_non_writable=[
-                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
-                for to_non_writable in self.to_non_writable or []
-            ],
+            to_non_writable=[to_non_writable.as_write() for to_non_writable in self.to_non_writable or []],
         )
 
 
@@ -181,7 +175,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[str], None] = Field(default=None, alias="toNonWritable")
+    to_non_writable: Union[list[str], list[dm.NodeId], None] = Field(default=None, alias="toNonWritable")
 
     def _to_instances_write(
         self,

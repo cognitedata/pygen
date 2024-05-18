@@ -74,9 +74,9 @@ class WindmillGraphQL(GraphQLCore):
     blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Optional[list[MetmastGraphQL]] = Field(default=None, repr=False)
-    nacelle: Optional[NacelleGraphQL] = Field(None, repr=False)
+    nacelle: Optional[NacelleGraphQL] = Field(default=None, repr=False)
     name: Optional[str] = None
-    rotor: Optional[RotorGraphQL] = Field(None, repr=False)
+    rotor: Optional[RotorGraphQL] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
 
     @root_validator(pre=True)
@@ -110,11 +110,9 @@ class WindmillGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            blades=[blade.as_read() if isinstance(blade, GraphQLCore) else blade for blade in self.blades or []],
+            blades=[blade.as_read() for blade in self.blades or []],
             capacity=self.capacity,
-            metmast=[
-                metmast.as_read() if isinstance(metmast, GraphQLCore) else metmast for metmast in self.metmast or []
-            ],
+            metmast=[metmast.as_read() for metmast in self.metmast or []],
             nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
             rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
@@ -127,14 +125,12 @@ class WindmillGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            blades=[blade.as_write() for blade in self.blades or []],
             capacity=self.capacity,
-            metmast=[
-                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
-            ],
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            metmast=[metmast.as_write() for metmast in self.metmast or []],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, GraphQLCore) else self.rotor,
             windfarm=self.windfarm,
         )
 
@@ -162,9 +158,9 @@ class Windmill(DomainModel):
     blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Union[list[Metmast], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(None, repr=False)
+    nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
-    rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
+    rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
 
     def as_write(self) -> WindmillWrite:
@@ -217,9 +213,9 @@ class WindmillWrite(DomainModelWrite):
     blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Union[list[MetmastWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
-    nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
-    rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(None, repr=False)
+    rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
 
     def _to_instances_write(

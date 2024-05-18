@@ -50,7 +50,7 @@ class TestGenerateSDK:
             assert client_name in module
 
 
-DATA_MODEL_WITH_VIEW_NAMED_FIELD = data_model = dm.DataModel(
+DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
     space="field_space",
     external_id="FieldModel",
     version="1",

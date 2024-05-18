@@ -23,12 +23,12 @@ from ._core import (
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
-{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
 {{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
-{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.PrimitiveFieldCore) %}
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
@@ -152,15 +152,9 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         ))
 
         properties = {}
-        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
-        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:{% if field.is_edge %}
-            properties["{{ field.prop_name }}"] = {
-                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
-                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }
-            {% else %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}
-            {% endif %}
+        {% for field in data_class.container_fields %}
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
+            properties["{{ field.prop_name }}"] = {{ field.as_value() }}
         {% endfor %}
 
         if properties:

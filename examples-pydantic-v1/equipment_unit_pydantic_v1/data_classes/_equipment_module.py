@@ -209,10 +209,11 @@ class EquipmentModuleWrite(DomainModelWrite):
             properties["name"] = self.name
 
         if self.sensor_value is not None or write_none:
-            if isinstance(self.sensor_value, str) or self.sensor_value is None:
-                properties["sensor_value"] = self.sensor_value
-            else:
-                properties["sensor_value"] = self.sensor_value.external_id
+            properties["sensor_value"] = (
+                self.sensor_value
+                if isinstance(self.sensor_value, str) or self.sensor_value is None
+                else self.sensor_value.external_id
+            )
 
         if self.type_ is not None or write_none:
             properties["type"] = self.type_

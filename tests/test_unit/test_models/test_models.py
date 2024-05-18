@@ -9,13 +9,13 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 from yaml import safe_load
 
 from cognite.pygen._core.models import (
-    EdgeOneToEndNode,
-    EdgeOneToManyNodes,
-    EdgeOneToOne,
+    EndNodeField,
     Field,
     FilterImplementation,
     FilterParameter,
     NodeDataClass,
+    OneToManyConnectionField,
+    OneToOneConnectionField,
     PrimitiveField,
     PrimitiveListField,
 )
@@ -87,17 +87,20 @@ def load_field_test_cases():
 
     yield pytest.param(
         mapped,
-        EdgeOneToOne(
+        OneToOneConnectionField(
             name="model_template",
             prop_name="modelTemplate",
             pydantic_field="Field",
             doc_name="model template",
             description=None,
-            data_class=data_class,
+            end_classes=[data_class],
+            use_node_reference=True,
+            edge_type=None,
+            edge_direction="outwards",
         ),
         {dm.ViewId("cogShop", "ModelTemplate", "8ae35635bb3f8a"): data_class},
-        'Union[ModelTemplate, str, dm.NodeId, None] = Field(None, repr=False, alias="modelTemplate")',
-        'Union[ModelTemplateApply, str, dm.NodeId, None] = Field(None, repr=False, alias="modelTemplate")',
+        'Union[ModelTemplate, str, dm.NodeId, None] = Field(default=None, repr=False, alias="modelTemplate")',
+        'Union[ModelTemplateApply, str, dm.NodeId, None] = Field(default=None, repr=False, alias="modelTemplate")',
         id="EdgeField that require alias.",
     )
     raw_data = """
@@ -483,16 +486,17 @@ def create_fields_test_cases():
         prop,
         data_class_by_view_id,
         "Person",
-        EdgeOneToManyNodes(
+        OneToManyConnectionField(
             name="roles",
             prop_name="roles",
             doc_name="role",
             description=None,
-            data_class=data_class,
+            end_classes=[data_class],
             variable="role",
             pydantic_field="Field",
             edge_type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
             edge_direction="outwards",
+            use_node_reference=True,
         ),
         "Union[list[Role], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
         "Union[list[RoleApply], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
@@ -572,16 +576,19 @@ def create_fields_test_cases():
         prop,
         data_class_by_view_id,
         "Person",
-        EdgeOneToOne(
+        OneToOneConnectionField(
             name="person",
             prop_name="person",
             doc_name="person",
-            data_class=data_class,
+            end_classes=[data_class],
             pydantic_field="Field",
             description=None,
+            use_node_reference=True,
+            edge_type=None,
+            edge_direction="outwards",
         ),
-        "Union[Person, str, dm.NodeId, None] = Field(None, repr=False)",
-        "Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)",
+        "Union[Person, str, dm.NodeId, None] = Field(default=None, repr=False)",
+        "Union[PersonApply, str, dm.NodeId, None] = Field(default=None, repr=False)",
         id="Edge to another view",
     )
 
@@ -708,7 +715,7 @@ def field_type_hints_test_cases():
     site_apply2.is_writable = True
     site_apply_edge2.end_class = site_apply2
 
-    field = EdgeOneToEndNode(
+    field = EndNodeField(
         name="end_node",
         doc_name="end node",
         prop_name="end_node",

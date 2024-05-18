@@ -1,4 +1,5 @@
-"""This module contains the primitive fields"""
+"""This module contains the primitive fields. A primitive field is a field that contains pure data, such as a string,
+it is in contrast to a connection field that contains a reference to another object."""
 
 from __future__ import annotations
 
@@ -11,7 +12,7 @@ from .base import Field
 
 
 @dataclass(frozen=True)
-class PrimitiveFieldCore(Field, ABC):
+class BasePrimitiveField(Field, ABC):
     """This is a base class for all primitive fields
 
     For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on, including
@@ -44,7 +45,7 @@ class PrimitiveFieldCore(Field, ABC):
         return f"self.{self.name}"
 
     @classmethod
-    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> PrimitiveFieldCore | None:
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BasePrimitiveField | None:
         if prop.type.is_list:
             return PrimitiveListField(
                 name=base.name,
@@ -70,41 +71,7 @@ class PrimitiveFieldCore(Field, ABC):
 
 
 @dataclass(frozen=True)
-class ListFieldCore(PrimitiveFieldCore):
-    """
-    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
-    list[datetime.datetime], list[datetime.date].
-    """
-
-    variable: str
-
-    def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return f"Optional[list[{self.type_as_string}]] = None"
-
-    def as_graphql_type_hint(self) -> str:
-        return self.as_read_type_hint()
-
-    def as_write_type_hint(self) -> str:
-        type_ = self.type_as_string
-        if self.is_nullable and self.need_alias:
-            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        elif self.need_alias:
-            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
-        elif self.is_nullable:
-            return f"Optional[list[{type_}]] = None"
-        else:  # not self.is_nullable and not self.need_alias
-            return f"list[{type_}]"
-
-    @property
-    def is_list(self) -> bool:
-        return True
-
-
-@dataclass(frozen=True)
-class PrimitiveField(PrimitiveFieldCore):
+class PrimitiveField(BasePrimitiveField):
     """
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """
@@ -153,15 +120,57 @@ class PrimitiveField(PrimitiveFieldCore):
             out_type = f"{self.type_as_string} = {self.default_code}"
         return out_type
 
+    def as_value(self) -> str:
+        base = f"self.{self.name}"
+        if isinstance(self.type_, dm.Date):
+            return f"{base}.isoformat() if {base} else None"
+        elif isinstance(self.type_, dm.Timestamp):
+            return f'{base}.isoformat(timespec="milliseconds") if {base} else None'
+        else:
+            return base
+
 
 @dataclass(frozen=True)
-class PrimitiveListField(ListFieldCore):
+class PrimitiveListField(BasePrimitiveField):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
     """
 
-    ...
+    variable: str
+
+    def as_read_type_hint(self) -> str:
+        if self.need_alias:
+            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[list[{self.type_as_string}]] = None"
+
+    def as_graphql_type_hint(self) -> str:
+        return self.as_read_type_hint()
+
+    def as_write_type_hint(self) -> str:
+        type_ = self.type_as_string
+        if self.is_nullable and self.need_alias:
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            return f"Optional[list[{type_}]] = None"
+        else:  # not self.is_nullable and not self.need_alias
+            return f"list[{type_}]"
+
+    @property
+    def is_list(self) -> bool:
+        return True
+
+    def as_value(self) -> str:
+        base = f"self.{self.name}"
+        if isinstance(self.type_, dm.Date):
+            return f"[{self.variable}.isoformat() for {self.variable} in {base}]"
+        elif isinstance(self.type_, dm.Timestamp):
+            return f'[{self.variable}.isoformat(timespec="milliseconds") for {self.variable} in {base}]'
+        else:
+            return base
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
