@@ -16,7 +16,6 @@ from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
-from . import OneToOneConnectionField
 from .fields import (
     BaseConnectionField,
     BasePrimitiveField,
@@ -25,6 +24,7 @@ from .fields import (
     EdgeOneToEndNode,
     Field,
     OneToManyConnectionField,
+    OneToOneConnectionField,
     PrimitiveField,
     T_Field,
 )

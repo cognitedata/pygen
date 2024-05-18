@@ -425,10 +425,14 @@ class BaseConnectionField(Field, ABC):
 
     @property
     def is_no_property_edge(self) -> bool:
+        from cognite.pygen._core.models.data_classes import NodeDataClass
+
         return self.is_edge and all(isinstance(data_class, NodeDataClass) for data_class in self.end_classes or [])
 
     @property
     def is_property_edge(self) -> bool:
+        from cognite.pygen._core.models.data_classes import EdgeDataClass
+
         return self.is_edge and all(isinstance(data_class, EdgeDataClass) for data_class in self.end_classes or [])
 
     @property
