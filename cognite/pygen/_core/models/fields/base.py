@@ -57,7 +57,7 @@ class Field:
         pydantic_field: Literal["Field", "pydantic.Field"],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
-        from .connections import EdgeField
+        from .connections import BaseConnectionField
         from .primitive import PrimitiveFieldCore
 
         field_naming = config.naming.field
@@ -77,7 +77,7 @@ class Field:
         if isinstance(prop, dm.ConnectionDefinition) or (
             isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         ):
-            return EdgeField.load(base, prop, variable, data_class_by_view_id)
+            return BaseConnectionField.load(base, prop, variable, data_class_by_view_id)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
         elif isinstance(prop, dm.MappedProperty):
