@@ -258,7 +258,7 @@ class FilterMethod:
                     else:
                         # This is a filter not supported by the list method.
                         continue
-            elif isinstance(field_, OneToOneConnectionField) and field_.is_relation:
+            elif isinstance(field_, OneToOneConnectionField) and field_.is_direct_relation:
                 for selected_filter in config.get(dm.DirectRelation(), field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:

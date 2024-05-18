@@ -410,12 +410,12 @@ class BaseConnectionField(Field, ABC):
     _node_reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
     _wrap_list: ClassVar[bool] = False
     edge_type: dm.DirectRelationReference | None
-    direction: Literal["outwards", "inwards"] | None
+    direction: Literal["outwards", "inwards"]
     end_classes: list[DataClass] | None
     use_node_reference: bool
 
     @property
-    def is_relation(self) -> bool:
+    def is_direct_relation(self) -> bool:
         return self.edge_type is None
 
     @property

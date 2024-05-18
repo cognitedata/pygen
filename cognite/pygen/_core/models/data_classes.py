@@ -21,8 +21,8 @@ from .fields import (
     CDFExternalField,
     EdgeClasses,
     EdgeOneToEndNode,
-    EdgeOneToMany,
     Field,
+    OneToManyConnectionField,
     PrimitiveField,
     PrimitiveFieldCore,
     T_Field,
@@ -161,7 +161,7 @@ class DataClass:
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
         self.is_interface = is_interface
         self.implements.extend(parents)
-        self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
+        self.is_writable = self.is_writable or self.is_all_fields_of_type(OneToManyConnectionField)
         self.initialization.add("parents")
 
     @property
@@ -320,7 +320,7 @@ class DataClass:
 
     @property
     def one_to_many_edges_docs(self) -> str:
-        edges = list(self.fields_of_type(EdgeOneToMany))  # type: ignore[type-abstract]
+        edges = list(self.fields_of_type(OneToManyConnectionField))
         if len(edges) == 1:
             return f"`{edges[0].name}`"
         else:

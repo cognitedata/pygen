@@ -487,10 +487,8 @@ class APIGenerator:
                 api_generator_by_view_id,
                 self._config,
             )
-            for field in itertools.chain(
-                self.data_class.fields_of_type(fields.EdgeOneToMany),  # type: ignore[type-abstract]
-                self.data_class.fields_of_type(fields.EdgeTypedOneToOne),
-            )
+            for field in self.data_class.fields_of_type(fields.BaseConnectionField)  # type: ignore[type-abstract]
+            if not field.is_direct_relation
         ]
 
     @property
