@@ -75,7 +75,7 @@ class CDFExternalField(BasePrimitiveField):
         if not isinstance(self.type_, dm.TimeSeriesReference):
             return f"self.{self.name}"
         return (
-            f"{self.name} if isinstance(self.{self.name}, str) or self.{self.name} is None "
+            f"self.{self.name} if isinstance(self.{self.name}, str) or self.{self.name} is None "
             f"else self.{self.name}.external_id"
         )
 
