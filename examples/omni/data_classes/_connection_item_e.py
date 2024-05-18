@@ -226,12 +226,13 @@ class ConnectionItemEWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        edge_type = dm.DirectRelationReference("pygen-models", "bidirectionalSingle")
         for inwards_single in self.inwards_single or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=inwards_single,
                 end_node=self,
-                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                edge_type=edge_type,
                 view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
@@ -283,6 +284,7 @@ class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
 
 def _create_connection_item_e_filter(
     view_id: dm.ViewId,
+    direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -290,6 +292,34 @@ def _create_connection_item_e_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if direct_no_source and isinstance(direct_no_source, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directNoSource"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_no_source},
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directNoSource"),
+                value={"space": direct_no_source[0], "externalId": direct_no_source[1]},
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directNoSource"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_no_source],
+            )
+        )
+    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directNoSource"),
+                values=[{"space": item[0], "externalId": item[1]} for item in direct_no_source],
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
