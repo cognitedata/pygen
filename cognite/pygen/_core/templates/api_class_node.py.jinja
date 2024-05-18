@@ -39,7 +39,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         view_id = view_by_read_class[{{ data_class.read_name }}]
         super().__init__(
             client=client,
-            sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
+            sources={% if not data_class.has_container_fields %}None{% else %}view_id{% endif %},
             class_type={{ data_class.read_name }},
             class_list={{ data_class.read_list_name }},{% if data_class.is_writable %}
             class_write_list={{ data_class.write_list_name }},{% endif %}
