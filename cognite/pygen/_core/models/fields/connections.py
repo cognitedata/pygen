@@ -407,7 +407,8 @@ class EdgeOneToManyEdges(EdgeOneToMany):
 
 @dataclass(frozen=True)
 class BaseConnectionField(Field, ABC):
-    reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
+    _node_reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
+    _wrap_list: ClassVar[bool] = False
     edge_type: dm.DirectRelationReference | None
     direction: Literal["outwards", "inwards"] | None
     end_classes: list[DataClass] | None
@@ -428,32 +429,81 @@ class BaseConnectionField(Field, ABC):
         variable: str,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
     ) -> Field | None:
-        if isinstance(prop, MultiEdgeConnection):
+        if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty)):
+            return None
+        edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
+        direction: Literal["outwards", "inwards"] = (
+            prop.direction if isinstance(prop, dm.EdgeConnection) else "outwards"
+        )
+        end_classes = [data_class_by_view_id[prop.source]] if prop.source in data_class_by_view_id else None
+        if cls._is_supported_one_to_many_connection(prop):
             return OneToManyConnectionField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
                 pydantic_field=base.pydantic_field,
                 variable=variable,
-                edge_type=prop.type,
-                direction=prop.direction,
+                edge_type=edge_type,
+                direction=direction,
                 description=prop.description,
-                end_classes=[data_class_by_view_id[prop.source]],
+                end_classes=end_classes,
             )
-        return None
-
-    @property
-    def _type_hint_right_side(self) -> str:
-        if self.need_alias:
-            return f'{self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
+        elif cls._is_supported_one_to_one_connection(prop):
+            return OneToOneConnectionField(
+                name=base.name,
+                doc_name=base.doc_name,
+                prop_name=base.prop_name,
+                pydantic_field=base.pydantic_field,
+                edge_type=edge_type,
+                direction=direction,
+                description=prop.description,
+                end_classes=end_classes,
+            )
         else:
-            return f"{self.pydantic_field}(default=None, repr=False)"
+            return None
+
+    @classmethod
+    def _is_supported_one_to_many_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
+        if isinstance(prop, dm.MultiEdgeConnection):
+            return True
+        elif isinstance(prop, SingleEdgeConnection) and prop.direction == "inwards":
+            return True
+        return False
+
+    @classmethod
+    def _is_supported_one_to_one_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
+        if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+            return True
+        elif isinstance(prop, SingleEdgeConnection) and prop.direction == "outwards":
+            return True
+        return False
+
+    def as_read_type_hint(self) -> str:
+        return self._create_type_hint([data_class.read_name for data_class in self.end_classes or []])
+
+    def _create_type_hint(self, types: list[str]) -> str:
+        field_kwargs = {
+            #  All connection fields are nullable
+            "default": "None",
+        }
+        if types:
+            field_kwargs["repr"] = "False"
+        if self.need_alias:
+            field_kwargs["alias"] = f'"{self.prop_name}"'
+
+        types_hint = ", ".join(
+            [f"list[{type_}]" if self._wrap_list else type_ for type_ in types + self._node_reference]
+        )
+        field_args = ", ".join([f"{key}={value}" for key, value in field_kwargs.items()])
+        return f"Union[{types_hint}, None] = {self.pydantic_field}({field_args})"
 
 
 @dataclass(frozen=True)
 class OneToManyConnectionField(BaseConnectionField):
+    _wrap_list: ClassVar[bool] = True
     variable: str
 
 
 @dataclass(frozen=True)
-class OneToOneConnectionField(BaseConnectionField): ...
+class OneToOneConnectionField(BaseConnectionField):
+    _wrap_list: ClassVar[bool] = False
