@@ -9,10 +9,8 @@ from .api_classes import APIClass, MultiAPIClass
 from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import (
     BaseConnectionField,
-    BaseContainerField,
+    BasePrimitiveField,
     CDFExternalField,
-    ContainerField,
-    ContainerListField,
     EdgeField,
     EdgeOneToEndNode,
     EdgeOneToMany,
@@ -21,6 +19,8 @@ from .fields import (
     Field,
     OneToManyConnectionField,
     OneToOneConnectionField,
+    PrimitiveField,
+    PrimitiveListField,
 )
 from .filter_methods import FilterImplementation, FilterImplementationOnetoOneEdge, FilterMethod, FilterParameter
 
@@ -32,8 +32,8 @@ __all__ = [
     "NodeDataClass",
     "EdgeDataClass",
     "Field",
-    "BaseContainerField",
-    "ContainerField",
+    "BasePrimitiveField",
+    "PrimitiveField",
     "CDFExternalField",
     "EdgeField",
     "EdgeOneToManyNodes",
@@ -47,5 +47,5 @@ __all__ = [
     "BaseConnectionField",
     "OneToOneConnectionField",
     "OneToManyConnectionField",
-    "ContainerListField",
+    "PrimitiveListField",
 ]

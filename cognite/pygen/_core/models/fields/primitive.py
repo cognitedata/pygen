@@ -12,7 +12,7 @@ from .base import Field
 
 
 @dataclass(frozen=True)
-class BaseContainerField(Field, ABC):
+class BasePrimitiveField(Field, ABC):
     """This is a base class for all primitive fields
 
     For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on, including
@@ -45,9 +45,9 @@ class BaseContainerField(Field, ABC):
         return f"self.{self.name}"
 
     @classmethod
-    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BaseContainerField | None:
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BasePrimitiveField | None:
         if prop.type.is_list:
-            return ContainerListField(
+            return PrimitiveListField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -58,7 +58,7 @@ class BaseContainerField(Field, ABC):
                 variable=variable,
             )
         else:
-            return ContainerField(
+            return PrimitiveField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -71,7 +71,7 @@ class BaseContainerField(Field, ABC):
 
 
 @dataclass(frozen=True)
-class ContainerListField(BaseContainerField):
+class PrimitiveListField(BasePrimitiveField):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
@@ -105,7 +105,7 @@ class ContainerListField(BaseContainerField):
 
 
 @dataclass(frozen=True)
-class ContainerField(BaseContainerField):
+class PrimitiveField(BasePrimitiveField):
     """
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """

@@ -1,4 +1,5 @@
-"""This module contains the fields that contain a connection to another data class."""
+"""This module contains the fields that contain a connection to another data class. These fields are references to
+another object in the data model."""
 
 from __future__ import annotations
 

@@ -19,13 +19,13 @@ from .connections import (
     OneToManyConnectionField,
     OneToOneConnectionField,
 )
-from .container import BaseContainerField, ContainerField, ContainerListField
+from .primitive import BasePrimitiveField, PrimitiveField, PrimitiveListField
 
 __all__ = [
     "Field",
-    "BaseContainerField",
-    "ContainerField",
-    "ContainerListField",
+    "BasePrimitiveField",
+    "PrimitiveField",
+    "PrimitiveListField",
     "CDFExternalField",
     "CDFExternalListField",
     "EdgeField",

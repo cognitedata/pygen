@@ -1,4 +1,6 @@
-"""This module contains the fields that are references to CDF External Fields."""
+"""This module contains the fields that are references to CDF External Fields. These fields are referencing
+either TimeSeries, Sequence, or File objects. In other words, these fields are references to objects that are
+outside of the data model."""
 
 from __future__ import annotations
 
@@ -7,11 +9,11 @@ from dataclasses import dataclass
 from cognite.client.data_classes import data_modeling as dm
 
 from .base import Field
-from .container import BaseContainerField, ContainerListField
+from .primitive import BasePrimitiveField, PrimitiveListField
 
 
 @dataclass(frozen=True)
-class CDFExternalField(BaseContainerField):
+class CDFExternalField(BasePrimitiveField):
     """This represents a field that is a reference to a CDF External Field.
 
     For example, a field that is a reference to a TimeSeries, Sequence, or File.
@@ -97,7 +99,7 @@ class CDFExternalField(BaseContainerField):
 
 
 @dataclass(frozen=True)
-class CDFExternalListField(ContainerListField, CDFExternalField):
+class CDFExternalListField(PrimitiveListField, CDFExternalField):
     """
     This represents a list of CDF types such as list[TimeSeries], list[Sequence], or list[File].
     """

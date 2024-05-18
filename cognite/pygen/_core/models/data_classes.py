@@ -18,13 +18,13 @@ from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
     BaseConnectionField,
-    BaseContainerField,
+    BasePrimitiveField,
     CDFExternalField,
-    ContainerField,
     EdgeClasses,
     EdgeOneToEndNode,
     Field,
     OneToManyConnectionField,
+    PrimitiveField,
     T_Field,
 )
 
@@ -218,7 +218,7 @@ class DataClass:
         if self.is_writable:
             import_classes.append(self.write_list_name)
             import_classes.append(f"{self.read_name}ApplyList")
-        if self.has_field_of_type(BaseContainerField):
+        if self.has_field_of_type(BasePrimitiveField):
             import_classes.append(self.field_names)
         if self.has_primitive_field_of_type(dm.Text):
             import_classes.append(self.text_field_names)
@@ -251,10 +251,10 @@ class DataClass:
 
     def primitive_fields_of_type(
         self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]
-    ) -> Iterable[BaseContainerField]:
+    ) -> Iterable[BasePrimitiveField]:
         return (
             field_
-            for field_ in self.fields_of_type(BaseContainerField)  # type: ignore[type-abstract]
+            for field_ in self.fields_of_type(BasePrimitiveField)  # type: ignore[type-abstract]
             if isinstance(field_.type_, type_)
         )
 
@@ -301,7 +301,7 @@ class DataClass:
     @property
     def primitive_fields_literal(self) -> str:
         return ", ".join(
-            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (ContainerField, CDFExternalField))
+            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
         )
 
     @property
@@ -312,7 +312,7 @@ class DataClass:
 
     @property
     def fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BaseContainerField))
+        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
 
     @property
     def filter_name(self) -> str:
