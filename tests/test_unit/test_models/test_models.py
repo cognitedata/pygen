@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 from yaml import safe_load
 
 from cognite.pygen._core.models import (
+    ContainerField,
     EdgeOneToEndNode,
     Field,
     FilterImplementation,
@@ -16,7 +17,6 @@ from cognite.pygen._core.models import (
     NodeDataClass,
     OneToManyConnectionField,
     OneToOneConnectionField,
-    PrimitiveField,
     PrimitiveListField,
 )
 from cognite.pygen._core.models.fields import EdgeClasses
@@ -122,7 +122,7 @@ def load_field_test_cases():
     mapped = dm.MappedProperty.load(safe_load(raw_data))
     yield pytest.param(
         mapped,
-        PrimitiveField(
+        ContainerField(
             name="name",
             prop_name="name",
             pydantic_field="Field",
@@ -438,7 +438,7 @@ def create_fields_test_cases():
         prop,
         {},
         "Person",
-        PrimitiveField(
+        ContainerField(
             name="name",
             prop_name="name",
             doc_name="name",
@@ -610,7 +610,7 @@ def create_fields_test_cases():
         prop,
         {},
         "Person",
-        PrimitiveField(
+        ContainerField(
             name="won_oscar",
             prop_name="wonOscar",
             doc_name="won oscar",

@@ -7,11 +7,11 @@ from dataclasses import dataclass
 from cognite.client.data_classes import data_modeling as dm
 
 from .base import Field
-from .primitive import ListFieldCore, PrimitiveFieldCore
+from .container import BaseContainerField, ContainerListField
 
 
 @dataclass(frozen=True)
-class CDFExternalField(PrimitiveFieldCore):
+class CDFExternalField(BaseContainerField):
     """This represents a field that is a reference to a CDF External Field.
 
     For example, a field that is a reference to a TimeSeries, Sequence, or File.
@@ -97,7 +97,7 @@ class CDFExternalField(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class CDFExternalListField(ListFieldCore, CDFExternalField):
+class CDFExternalListField(ContainerListField, CDFExternalField):
     """
     This represents a list of CDF types such as list[TimeSeries], list[Sequence], or list[File].
     """

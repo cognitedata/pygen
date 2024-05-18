@@ -58,7 +58,7 @@ class Field:
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
         from .connections import BaseConnectionField
-        from .primitive import PrimitiveFieldCore
+        from .container import BaseContainerField
 
         field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
@@ -81,7 +81,7 @@ class Field:
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
         elif isinstance(prop, dm.MappedProperty):
-            return PrimitiveFieldCore.load(base, prop, variable)
+            return BaseContainerField.load(base, prop, variable)
         else:
             warnings.warn(
                 f"Unsupported property type: {type(prop)}. Skipping field {prop_name}", UserWarning, stacklevel=2

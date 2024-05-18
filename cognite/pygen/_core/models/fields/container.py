@@ -11,7 +11,7 @@ from .base import Field
 
 
 @dataclass(frozen=True)
-class PrimitiveFieldCore(Field, ABC):
+class BaseContainerField(Field, ABC):
     """This is a base class for all primitive fields
 
     For example, a field that is a bool, str, int, float, datetime.datetime, datetime.date, and so on, including
@@ -44,9 +44,9 @@ class PrimitiveFieldCore(Field, ABC):
         return f"self.{self.name}"
 
     @classmethod
-    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> PrimitiveFieldCore | None:
+    def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BaseContainerField | None:
         if prop.type.is_list:
-            return PrimitiveListField(
+            return ContainerListField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -57,7 +57,7 @@ class PrimitiveFieldCore(Field, ABC):
                 variable=variable,
             )
         else:
-            return PrimitiveField(
+            return ContainerField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
@@ -70,7 +70,7 @@ class PrimitiveFieldCore(Field, ABC):
 
 
 @dataclass(frozen=True)
-class ListFieldCore(PrimitiveFieldCore):
+class ContainerListField(BaseContainerField):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
@@ -104,7 +104,7 @@ class ListFieldCore(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class PrimitiveField(PrimitiveFieldCore):
+class ContainerField(BaseContainerField):
     """
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """
@@ -155,7 +155,7 @@ class PrimitiveField(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class PrimitiveListField(ListFieldCore):
+class PrimitiveListField(ContainerListField):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].

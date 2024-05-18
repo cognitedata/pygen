@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 
-from .fields import Field, OneToOneConnectionField, PrimitiveField
+from .fields import ContainerField, Field, OneToOneConnectionField
 
 
 @dataclass
@@ -177,7 +177,7 @@ class FilterMethod:
 
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD, _SPACE_FIELD)):
             # Only primitive and edge one-to-one fields supported for now
-            if isinstance(field_, PrimitiveField):
+            if isinstance(field_, ContainerField):
                 for selected_filter in config.get(field_.type_, field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
@@ -316,7 +316,7 @@ class FilterMethod:
 
 
 # These fields are used when creating the list method.
-_EXTERNAL_ID_FIELD = PrimitiveField(
+_EXTERNAL_ID_FIELD = ContainerField(
     name="external_id",
     prop_name="externalId",
     type_=dm.Text(),
@@ -326,7 +326,7 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
     description=None,
     pydantic_field="Field",
 )
-_SPACE_FIELD = PrimitiveField(
+_SPACE_FIELD = ContainerField(
     name="space",
     prop_name="space",
     type_=dm.Text(),
