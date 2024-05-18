@@ -62,8 +62,8 @@ class ConnectionItemEGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
-    direct_no_source: Optional[str] = Field(None, alias="directNoSource")
-    inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(None, repr=False, alias="inwardsSingle")
+    direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
+    inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None
 
     @model_validator(mode="before")
@@ -98,9 +98,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_read() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
-            ),
+            inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
@@ -111,9 +109,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
-            ),
+            inwards_single=[inwards_single.as_write() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
@@ -134,9 +130,9 @@ class ConnectionItemE(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
-    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
-        None, repr=False, alias="inwardsSingle"
+        default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
 
@@ -147,9 +143,7 @@ class ConnectionItemE(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
-            ),
+            inwards_single=[inwards_single.as_write() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
@@ -179,9 +173,9 @@ class ConnectionItemEWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
-    direct_no_source: Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")
+    direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
-        None, repr=False, alias="inwardsSingle"
+        default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
 
