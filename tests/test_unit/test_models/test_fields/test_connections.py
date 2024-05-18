@@ -45,13 +45,13 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "otherDirect",
-                'Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")',
+                'Union[ConnectionItemC, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")',
                 id="Single direct relation",
             ),
             pytest.param(
                 "ConnectionItemA",
                 "selfDirect",
-                'Union[ConnectionItemA, str, dm.NodeId, None] = Field(None, repr=False, alias="selfDirect")',
+                'Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")',
                 id="Single direct relation to self",
             ),
             pytest.param(
@@ -63,7 +63,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "directNoSource",
-                'Union[str, dm.NodeId, None] = Field(None, alias="directNoSource")',
+                'Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")',
                 id="Single direct relation with no source",
             ),
             pytest.param(
@@ -81,14 +81,15 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemD",
                 "outwardsSingle",
-                'Union[ConnectionItemE, str, dm.NodeId, None] = Field(None, repr=False, alias="outwardsSingle")',
+                "Union[ConnectionItemE, str, dm.NodeId, None] = "
+                'Field(default=None, repr=False, alias="outwardsSingle")',
                 id="Outwards SingleEdge no properties",
             ),
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
                 "Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = "
-                'Field(None, repr=False, alias="inwardsSingle")',
+                'Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
         ],
