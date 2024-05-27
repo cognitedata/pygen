@@ -20,8 +20,8 @@ class ScenarioInstanceClient:
 
     Generated with:
         pygen = 0.99.23
-        cognite-sdk = 7.37.1
-        pydantic = 2.7.0
+        cognite-sdk = 7.43.5
+        pydantic = 2.7.1
 
     Data Model:
         space: IntegrationTestsImmutable
