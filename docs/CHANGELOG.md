@@ -13,9 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.24] - 27-05-24
 ### Added
 - Support for list of direct relations and `SingleEdgeConnection` in the `cognite.pygen.utils.MockGenerator`.
+- Support for recursive delete in the generated SDK for nodes and edges in the `.delete` method.
 
 ### Fixed
 - The `MockGenerator` could produce different results for the same input and seed due to the internal creation order.
