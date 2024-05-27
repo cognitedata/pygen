@@ -25,6 +25,7 @@ Changes are grouped as follows
   `.as_write()` on the generated read data class. This is now fixed.
 - Multiple bugs for different types of connections in the `.as_read()` and `.as_write()` methods of the generated
   GraphQL data classes. This is now fixed.
+- Set minimum version of `cognite-sdk` to `7.43.4` as this contains a bugfix for data modeling limits.
 
 ## [0.99.22] - 06-05-24
 ### Fixed
