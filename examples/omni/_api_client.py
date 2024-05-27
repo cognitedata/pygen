@@ -185,12 +185,18 @@ class OmniClient:
         return self.upsert(items, replace, write_none)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: (
+            str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
+        ),
+        space: str = DEFAULT_INSTANCE_SPACE,
     ) -> dm.InstancesDeleteResult:
         """Delete one or more items.
 
+        If you pass in an item, it will be deleted recursively, i.e., all connected nodes and edges will be deleted as well.
+
         Args:
-            external_id: External id of the item(s) to delete.
+            external_id: The external id or items(s) to delete.
             space: The space where all the item(s) are located.
 
         Returns:
