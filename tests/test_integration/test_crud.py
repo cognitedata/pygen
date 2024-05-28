@@ -109,11 +109,11 @@ class TestCRUDOperations:
             external_id="tmp_create_retrieve_delete_direct_listable",
             name="tmp_create_retrieve_delete_direct_listable",
             direct_list=[
-                odc.ConnectionItemEWrite(
+                odc.ConnectionItemDWrite(
                     external_id="tmp_create_retrieve_delete_direct_listable_e",
                     name="tmp_create_retrieve_delete_direct_listable_e",
                 ),
-                odc.ConnectionItemEWrite(
+                odc.ConnectionItemDWrite(
                     external_id="tmp_create_retrieve_delete_direct_listable_e2",
                     name="tmp_create_retrieve_delete_direct_listable_e2",
                 ),
@@ -125,7 +125,7 @@ class TestCRUDOperations:
             assert len(created.nodes) == 3
             assert len(created.edges) == 0
 
-            retrieved = omni_client.connection_item_d.retrieve(item.external_id)
+            retrieved = omni_client.connection_item_f.retrieve(item.external_id)
             assert set(retrieved.direct_multi or []) == {
                 "tmp_create_retrieve_delete_direct_listable_e",
                 "tmp_create_retrieve_delete_direct_listable_e2",
