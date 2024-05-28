@@ -15,6 +15,10 @@ Changes are grouped as follows
 
 ## [0.99.24] - 27-05-24
 ### Added
+- Support for generating SDKs for views with list of direct relations properties.
+
+## [0.99.23] - 27-05-24
+### Added
 - Support for list of direct relations and `SingleEdgeConnection` in the `cognite.pygen.utils.MockGenerator`.
 - Support for recursive delete in the generated SDK for nodes and edges in the `.delete` method.
 

@@ -29,8 +29,8 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.99.23
-        cognite-sdk = 7.37.1
+        pygen = 0.99.24
+        cognite-sdk = 7.43.5
         pydantic = 1.10.7
 
     Data Model:
@@ -47,7 +47,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.23"
+        client.config.client_name = "CognitePygen:0.99.24"
 
         view_by_read_class = {
             data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
