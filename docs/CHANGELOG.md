@@ -13,9 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.24] - 27-05-24
 ### Added
 - Support for list of direct relations and `SingleEdgeConnection` in the `cognite.pygen.utils.MockGenerator`.
+- Support for recursive delete in the generated SDK for nodes and edges in the `.delete` method.
 
 ### Fixed
 - The `MockGenerator` could produce different results for the same input and seed due to the internal creation order.
@@ -24,6 +25,7 @@ Changes are grouped as follows
   `.as_write()` on the generated read data class. This is now fixed.
 - Multiple bugs for different types of connections in the `.as_read()` and `.as_write()` methods of the generated
   GraphQL data classes. This is now fixed.
+- Set minimum version of `cognite-sdk` to `7.43.4` as this contains a bugfix for data modeling limits.
 
 ## [0.99.22] - 06-05-24
 ### Fixed

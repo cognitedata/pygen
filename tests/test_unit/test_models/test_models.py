@@ -65,13 +65,13 @@ def load_field_test_cases():
         id="PrimitiveListField that require alias.",
     )
     raw_data = {
-        "container": {"space": "cogShop", "external_id": "Scenario"},
+        "container": {"space": "cogShop", "externalId": "Scenario"},
         "containerPropertyIdentifier": "modelTemplate",
         "type": {
             "container": None,
             "type": "direct",
             "list": False,
-            "source": {"space": "cogShop", "external_id": "ModelTemplate", "version": "8ae35635bb3f8a"},
+            "source": {"space": "cogShop", "externalId": "ModelTemplate", "version": "8ae35635bb3f8a"},
         },
         "nullable": True,
         "autoIncrement": False,

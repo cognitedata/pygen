@@ -21,9 +21,9 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.99.22
-        cognite-sdk = 7.37.1
-        pydantic = 2.7.0
+        pygen = 0.99.23
+        cognite-sdk = 7.43.5
+        pydantic = 2.7.1
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -39,7 +39,7 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.22"
+        client.config.client_name = "CognitePygen:0.99.23"
 
         view_by_read_class = {
             data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
@@ -76,6 +76,26 @@ class EquipmentUnitClient:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
+        instances = self._create_instances(items, write_none, allow_version_increase)
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
+
+    def _create_instances(
+        self,
+        items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
+        write_none: bool,
+        allow_version_increase: bool,
+    ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
             instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
         else:
@@ -90,18 +110,7 @@ class EquipmentUnitClient:
                         allow_version_increase,
                     )
                 )
-        result = self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
-        time_series = []
-        if instances.time_series:
-            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
-
-        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return instances
 
     def apply(
         self,
@@ -131,12 +140,19 @@ class EquipmentUnitClient:
         return self.upsert(items, replace, write_none)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: (
+            str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
+        ),
+        space: str = DEFAULT_INSTANCE_SPACE,
     ) -> dm.InstancesDeleteResult:
         """Delete one or more items.
 
+        If you pass in an item, it will be deleted recursively, i.e., all connected nodes and edges
+        will be deleted as well.
+
         Args:
-            external_id: External id of the item(s) to delete.
+            external_id: The external id or items(s) to delete.
             space: The space where all the item(s) are located.
 
         Returns:
@@ -152,9 +168,21 @@ class EquipmentUnitClient:
         """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
+        elif all(isinstance(item, str) for item in external_id):
             return self._client.data_modeling.instances.delete(
                 nodes=[(space, id) for id in external_id],
+            )
+        elif isinstance(external_id, data_classes.DomainModelWrite) or all(
+            isinstance(item, data_classes.DomainModelWrite) for item in external_id
+        ):
+            resources = self._create_instances(external_id, False, False)
+            return self._client.data_modeling.instances.delete(
+                nodes=resources.nodes.as_ids(),
+                edges=resources.edges.as_ids(),
+            )
+        else:
+            raise ValueError(
+                "Expected str, list of str, or DomainModelWrite, list of DomainModelWrite," f"got {type(external_id)}"
             )
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
