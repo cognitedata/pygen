@@ -63,7 +63,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
-    direct_list: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="directList")
+    direct_list: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")
 
@@ -98,7 +98,11 @@ class ConnectionItemFGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_list=self.direct_list.as_read() if isinstance(self.direct_list, GraphQLCore) else self.direct_list,
+            direct_list=[
+                direct_list.as_read() if isinstance(direct_list, GraphQLCore) else direct_list
+                for direct_list in self.direct_list or []
+            ]
+            or None,
             name=self.name,
             outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
         )
@@ -109,7 +113,11 @@ class ConnectionItemFGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_list=self.direct_list.as_write() if isinstance(self.direct_list, GraphQLCore) else self.direct_list,
+            direct_list=[
+                direct_list.as_write() if isinstance(direct_list, GraphQLCore) else direct_list
+                for direct_list in self.direct_list or []
+            ]
+            or None,
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
@@ -131,7 +139,9 @@ class ConnectionItemF(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[ConnectionItemD, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directList")
+    direct_list: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+        default=None, repr=False, alias="directList"
+    )
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
 
@@ -141,7 +151,11 @@ class ConnectionItemF(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list=self.direct_list.as_write() if isinstance(self.direct_list, DomainModel) else self.direct_list,
+            direct_list=[
+                direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
+                for direct_list in self.direct_list or []
+            ]
+            or None,
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
@@ -172,7 +186,9 @@ class ConnectionItemFWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directList")
+    direct_list: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
+        default=None, repr=False, alias="directList"
+    )
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
 
@@ -192,10 +208,13 @@ class ConnectionItemFWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.direct_list is not None:
-            properties["directList"] = {
-                "space": self.space if isinstance(self.direct_list, str) else self.direct_list.space,
-                "externalId": self.direct_list if isinstance(self.direct_list, str) else self.direct_list.external_id,
-            }
+            properties["directList"] = [
+                {
+                    "space": self.space if isinstance(direct_list, str) else direct_list.space,
+                    "externalId": direct_list if isinstance(direct_list, str) else direct_list.external_id,
+                }
+                for direct_list in self.direct_list or []
+            ]
 
         if self.name is not None or write_none:
             properties["name"] = self.name
@@ -222,10 +241,10 @@ class ConnectionItemFWrite(DomainModelWrite):
                     cache, self, dm.DirectRelationReference("pygen-models", "multiProperty"), view_by_read_class
                 )
                 resources.extend(other_resources)
-
-        if isinstance(self.direct_list, DomainModelWrite):
-            other_resources = self.direct_list._to_instances_write(cache, view_by_read_class)
-            resources.extend(other_resources)
+        for direct_list in self.direct_list or []:
+            if isinstance(direct_list, DomainModelWrite):
+                other_resources = direct_list._to_instances_write(cache, view_by_read_class)
+                resources.extend(other_resources)
 
         return resources
 
