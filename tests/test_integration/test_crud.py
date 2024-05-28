@@ -14,11 +14,13 @@ from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
     from omni import OmniClient
+    from omni import data_classes as odc
     from omni._api._core import SequenceNotStr
     from omni.data_classes import DomainModelWrite, ResourcesWriteResult
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1._api._core import SequenceNotStr
+    from omni_pydantic_v1.data_classes import odc
 
 
 def omni_independent_view_ids() -> list[ParameterSet]:
@@ -99,3 +101,39 @@ class TestCRUDOperations:
         retrieved = api.list(limit=5)
 
         assert 5 >= len(retrieved) >= 3
+
+    def test_create_retrieve_delete_direct_listable(
+        self, omni_client: OmniClient, cognite_client: CogniteClient
+    ) -> None:
+        item = odc.ConnectionItemFWrite(
+            external_id="tmp_create_retrieve_delete_direct_listable",
+            name="tmp_create_retrieve_delete_direct_listable",
+            direct_list=[
+                odc.ConnectionItemEWrite(
+                    external_id="tmp_create_retrieve_delete_direct_listable_e",
+                    name="tmp_create_retrieve_delete_direct_listable_e",
+                ),
+                odc.ConnectionItemEWrite(
+                    external_id="tmp_create_retrieve_delete_direct_listable_e2",
+                    name="tmp_create_retrieve_delete_direct_listable_e2",
+                ),
+            ],
+        )
+
+        try:
+            created = omni_client.upsert(item)
+            assert len(created.nodes) == 3
+            assert len(created.edges) == 0
+
+            retrieved = omni_client.connection_item_d.retrieve(item.external_id)
+            assert set(retrieved.direct_multi or []) == {
+                "tmp_create_retrieve_delete_direct_listable_e",
+                "tmp_create_retrieve_delete_direct_listable_e2",
+            }
+
+            deleted = omni_client.delete(item)
+            assert len(deleted.nodes) == 3
+            assert len(deleted.edges) == 0
+        finally:
+            resources = item.to_instances_write()
+            cognite_client.data_modeling.instances.delete(nodes=resources.nodes.as_ids())
