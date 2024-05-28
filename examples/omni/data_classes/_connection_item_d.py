@@ -63,7 +63,7 @@ class ConnectionItemDGraphQL(GraphQLCore):
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
-    direct_multi: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directMulti")
+    direct_multi: Optional[list[ConnectionItemEGraphQL]] = Field(default=None, repr=False, alias="directMulti")
     direct_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
     outwards_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="outwardsSingle")
@@ -99,9 +99,11 @@ class ConnectionItemDGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_multi=(
-                self.direct_multi.as_read() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
-            ),
+            direct_multi=[
+                (direct_multi.as_write() if isinstance(direct_multi, GraphQLCore) else direct_multi)
+                for direct_multi in self.direct_multi or []
+            ]
+            or None,
             direct_single=(
                 self.direct_single.as_read() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -119,9 +121,11 @@ class ConnectionItemDGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
-            ),
+            direct_multi=[
+                (direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else direct_multi)
+                for direct_multi in self.direct_multi or []
+            ]
+            or None,
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -151,7 +155,9 @@ class ConnectionItemD(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
-    direct_multi: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directMulti")
+    direct_multi: Union[list[ConnectionItemE], list[str], list[dm.NodeId], None] = Field(
+        default=None, repr=False, alias="directMulti"
+    )
     direct_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
     outwards_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(
@@ -164,9 +170,11 @@ class ConnectionItemD(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else self.direct_multi
-            ),
+            direct_multi=[
+                (direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else direct_multi)
+                for direct_multi in self.direct_multi or []
+            ]
+            or None,
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
             ),
@@ -205,7 +213,7 @@ class ConnectionItemDWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
-    direct_multi: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
+    direct_multi: Union[list[ConnectionItemEWrite], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="directMulti"
     )
     direct_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
@@ -232,12 +240,13 @@ class ConnectionItemDWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.direct_multi is not None:
-            properties["directMulti"] = {
-                "space": self.space if isinstance(self.direct_multi, str) else self.direct_multi.space,
-                "externalId": (
-                    self.direct_multi if isinstance(self.direct_multi, str) else self.direct_multi.external_id
-                ),
-            }
+            properties["directMulti"] = [
+                {
+                    "space": self.space if isinstance(direct_multi, str) else direct_multi.space,
+                    "externalId": (direct_multi if isinstance(direct_multi, str) else direct_multi.external_id),
+                }
+                for direct_multi in self.direct_multi
+            ]
 
         if self.direct_single is not None:
             properties["directSingle"] = {
