@@ -346,6 +346,15 @@ class DataClass:
         )
 
     @property
+    def one_to_many_direct_relations_with_source(self) -> Iterable[OneToManyConnectionField]:
+        """All direct relations."""
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToManyConnectionField)
+            if field_.is_direct_relation and field_.end_classes
+        )
+
+    @property
     def has_one_to_one_direct_relations_with_source(self) -> bool:
         return any(self.one_to_one_direct_relations_with_source)
 

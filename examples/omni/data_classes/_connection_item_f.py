@@ -98,11 +98,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_list=[
-                direct_list.as_read() if isinstance(direct_list, GraphQLCore) else direct_list
-                for direct_list in self.direct_list or []
-            ]
-            or None,
+            direct_list=[direct_list.as_read() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
         )
@@ -113,11 +109,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_list=[
-                direct_list.as_write() if isinstance(direct_list, GraphQLCore) else direct_list
-                for direct_list in self.direct_list or []
-            ]
-            or None,
+            direct_list=[direct_list.as_write() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
@@ -154,8 +146,7 @@ class ConnectionItemF(DomainModel):
             direct_list=[
                 direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
                 for direct_list in self.direct_list or []
-            ]
-            or None,
+            ],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
         )
@@ -241,6 +232,7 @@ class ConnectionItemFWrite(DomainModelWrite):
                     cache, self, dm.DirectRelationReference("pygen-models", "multiProperty"), view_by_read_class
                 )
                 resources.extend(other_resources)
+
         for direct_list in self.direct_list or []:
             if isinstance(direct_list, DomainModelWrite):
                 other_resources = direct_list._to_instances_write(cache, view_by_read_class)

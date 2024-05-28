@@ -198,6 +198,8 @@ class BaseConnectionField(Field, ABC):
             return True
         elif isinstance(prop, SingleEdgeConnection) and prop.direction == "inwards" and not prop.edge_source:
             return True
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.type.is_list:
+            return True
         return False
 
     @classmethod
@@ -275,6 +277,17 @@ class OneToManyConnectionField(BaseConnectionField):
         else:
             inner = f"{self.variable}"
         return f"[{inner} for {self.variable} in self.{self.name} or []]"
+
+    def as_value(self) -> str:
+        if not self.is_direct_relation:
+            raise NotImplementedError("as_value is not implemented for edge fields")
+        return f"""[
+                {{
+                "space": self.space if isinstance({ self.variable }, str) else { self.variable }.space,
+                "externalId": { self.variable } if isinstance({self.variable}, str) else {self.variable}.external_id,
+                }}
+                for { self.variable } in self.{ self.name } or []
+            ]"""
 
 
 @dataclass(frozen=True)
