@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 
-from .fields import Field, OneToOneConnectionField, PrimitiveField
+from .fields import Field, OneToManyConnectionField, OneToOneConnectionField, PrimitiveField
 
 
 @dataclass
@@ -258,7 +258,7 @@ class FilterMethod:
                     else:
                         # This is a filter not supported by the list method.
                         continue
-            elif isinstance(field_, OneToOneConnectionField) and field_.is_direct_relation:
+            elif isinstance(field_, (OneToOneConnectionField, OneToManyConnectionField)) and field_.is_direct_relation:
                 for selected_filter in config.get(dm.DirectRelation(), field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:

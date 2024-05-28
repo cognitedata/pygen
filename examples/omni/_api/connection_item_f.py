@@ -103,7 +103,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         """Add or update (upsert) connection item fs.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_f and creates them including the edges
-        between the nodes. For example, if any of `outwards_multi` are set, then these
+        between the nodes. For example, if any of `direct_list` or `outwards_multi` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -449,7 +449,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             space: The space to filter on.
             limit: Maximum number of connection item fs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `outwards_multi` external ids for the connection item fs. Defaults to True.
+            retrieve_edges: Whether to retrieve `direct_list` or `outwards_multi` external ids for the connection item fs. Defaults to True.
 
         Returns:
             List of requested connection item fs

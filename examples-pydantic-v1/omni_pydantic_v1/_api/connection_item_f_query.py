@@ -9,7 +9,6 @@ from omni_pydantic_v1.data_classes import (
     DomainModelCore,
     ConnectionItemF,
     ConnectionEdgeA,
-    ConnectionItemD,
 )
 from omni_pydantic_v1.data_classes._connection_item_g import (
     ConnectionItemG,
@@ -65,7 +64,6 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
-        retrieve_direct_list: bool = False,
     ) -> ConnectionItemGQueryAPI[T_DomainModelList]:
         """Query along the outwards multi edges of the connection item f.
 
@@ -85,7 +83,6 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of outwards multi edges to return. Defaults to 3. Set to -1, float("inf") or None
                 to return all items.
-            retrieve_direct_list: Whether to retrieve the direct list for each connection item f or not.
 
         Returns:
             ConnectionItemGQueryAPI: The query API for the connection item g.
@@ -132,42 +129,15 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        if retrieve_direct_list:
-            self._query_append_direct_list(from_)
         return ConnectionItemGQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
 
     def query(
         self,
-        retrieve_direct_list: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
-
-        Args:
-            retrieve_direct_list: Whether to retrieve the direct list for each connection item f or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
-        if retrieve_direct_list:
-            self._query_append_direct_list(from_)
         return self._query()
-
-    def _query_append_direct_list(self, from_: str) -> None:
-        view_id = self._view_by_read_class[ConnectionItemD]
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("direct_list"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=dm.filters.HasData(views=[view_id]),
-                    from_=from_,
-                    through=self._view_by_read_class[ConnectionItemF].as_property_ref("directList"),
-                    direction="outwards",
-                ),
-                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
-                max_retrieve_limit=-1,
-                result_cls=ConnectionItemD,
-                is_single_direct_relation=True,
-            ),
-        )

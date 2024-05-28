@@ -248,6 +248,11 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         if isinstance(self.{{ field.name }}, DomainModelWrite):
             other_resources = self.{{ field.name }}._to_instances_write(cache, view_by_read_class)
             resources.extend(other_resources)
+{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            if isinstance({{ field.variable }}, DomainModelWrite):
+                other_resources = {{ field.variable }}._to_instances_write(cache, view_by_read_class)
+                resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
             resources.time_series.append(self.{{ field.name }})
