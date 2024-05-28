@@ -126,7 +126,7 @@ class TestCRUDOperations:
             assert len(created.edges) == 0
 
             retrieved = omni_client.connection_item_f.retrieve(item.external_id)
-            assert set(retrieved.direct_multi or []) == {
+            assert set(retrieved.direct_list or []) == {
                 "tmp_create_retrieve_delete_direct_listable_e",
                 "tmp_create_retrieve_delete_direct_listable_e2",
             }

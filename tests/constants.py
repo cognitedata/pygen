@@ -306,6 +306,7 @@ class OmniFiles:
     connection_item_c_data = data_classes / "_connection_item_c.py"
     connection_item_d_data = data_classes / "_connection_item_d.py"
     connection_item_e_data = data_classes / "_connection_item_e.py"
+    connection_item_f_data = data_classes / "_connection_item_f.py"
 
     cdf_external_api = api / "cdf_external_references.py"
     cdf_external_list_api = api / "cdf_external_references_listed.py"
