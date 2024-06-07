@@ -13,6 +13,29 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.25] - 07-06-24
+### Added
+- `create_external_id_factory` in `external_id_factories` which takes in a configuration to produce external_id's of the
+  format `prefix:suffix`
+- `ExternalIdFactory` class as a template for custom functions to define for `DataModelWrite.external_id_factory`
+- Helper functions for unique external_id generation
+  - `domain_name` returns a clean string from the domain class name
+  - `uuid` returns a uuid
+  - `sha256` returns a sha256 has of the data
+  - `incremental_id` returns an incremental integer based on domain class
+- `incremental_id_factory` an instance of the `ExternalIdFactory` that implements the `incremental_id` helper
+
+### Changed
+- More flexible external_id_factory functions
+  - `sha256_factory` is now an instance of the `ExternalIdFactory` class
+  - `uuid_factory` is now an instance of the `ExternalIdFactory` class
+
+### Removed
+- The following functions in `external_id_factories` have been removed and replaced
+  - `create_incremental_factory` is replaced by `create_external_id_factory(suffix_ext_id_factory=incremental_id_factory)`
+  - `create_sha256_factory` is replaced by `create_external_id_factory(suffix_ext_id_factory=sha256_factory)`
+  - `create_uuid_factory` is replaced by `create_external_id_factory()`
+
 ## [0.99.24] - 27-05-24
 ### Added
 - Support for generating SDKs for views with list of direct relations properties.
@@ -33,7 +56,7 @@ Changes are grouped as follows
 
 ## [0.99.22] - 06-05-24
 ### Fixed
-- When calling `.as_read()` (or `.as_write()) on a `GraphQL` object in the generated SDK, with a file
+- When calling `.as_read()` or `.as_write()` on a `GraphQL` object in the generated SDK, with a file
   or sequence, the generated SDK would raise a `pydantic_core._pydantic_core.ValidationError`. This is now fixed.
 
 ## [0.99.21] - 02-05-24
