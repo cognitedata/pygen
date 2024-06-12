@@ -221,7 +221,7 @@ class ExternalIdFactory:
         separator: str = ":",
         prefix_ext_id_factory: Optional[Callable[[type, dict], str]] = None,
         suffix_ext_id_factory: Optional[Callable[[type, dict], str]] = None,
-    ):
+    ) -> Callable[[type, dict], str]:
         """
         This creates an external id factory with a prefix:suffix format that can be set on the DomainModelWrite
         class provided a custom configuration.
