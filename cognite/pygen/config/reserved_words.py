@@ -24,7 +24,7 @@ FIELD_NAMES = (
     }
     | {f for f in dir(BaseModel)}
     | {
-        # Pydantic from DomainModel and DomainModelApply
+        # Pydantic from DomainModel and DomainModelWrite
         "as_id",
         "data_record",
         "as_tuple_id",
@@ -51,7 +51,7 @@ PARAMETER_NAMES = {
     "property",
 }
 
-DATA_CLASS_NAMES = {"DomainModel", "DomainModelApply", "DomainModelList", "DomainModelApplyList"}
+DATA_CLASS_NAMES = {"DomainModel", "DomainModelWrite", "DomainModelList", "DomainModelWriteList"}
 FILE_NAMES = {
     "__init__",
     "_core",
