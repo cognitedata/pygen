@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.99.24"
+version = "0.99.25"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -73,6 +73,7 @@ build = {version=">=1.1", optional=true}
 cli = ["packaging", "typer", "toml", "build"]
 format = ["black"]
 all = ["packaging", "typer", "toml", "black", "build"]
+docs = ["mkdocs", "mkdocs-material",  "mkdocs-jupyter", "mkdocs-glightbox", "mkdocstrings-python"]
 
 [tool.poetry.dev-dependencies]
 twine = "*"
@@ -85,7 +86,13 @@ toml = "*"
 pandas = "*"
 pyyaml = "*"
 mypy = "^1.5"
+mkdocs =  {version="^1.6.0", optional=true}
+mkdocs-material = {version="^9.5.26", optional=true}
+mkdocs-jupyter = {version="^0.24.7", optional=true}
+mkdocs-glightbox = {version="^0.4.0", optional=true}
+mkdocstrings-python = {version="^1.10.3", optional=true}
 pandas-stubs = "^2"
+typer = "^0.12"
 types-PyYAML = "^6"
 types-toml = "^0.10"
 IPython = "*"

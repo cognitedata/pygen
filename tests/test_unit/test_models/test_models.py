@@ -338,7 +338,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
     [
         ("DomainModel", "DomainModel_"),
         ("DomainModelList", "DomainModelList_"),
-        ("DomainModelApply", "DomainModelApply_"),
+        ("DomainModelWrite", "DomainModelWrite_"),
     ],
 )
 def test_data_class_from_view_expected_warning(name: str, expected_name: str, pygen_config: PygenConfig) -> None:

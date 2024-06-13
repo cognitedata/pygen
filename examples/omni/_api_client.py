@@ -39,9 +39,9 @@ class OmniClient:
     OmniClient
 
     Generated with:
-        pygen = 0.99.24
-        cognite-sdk = 7.43.5
-        pydantic = 2.7.1
+        pygen = 0.99.25
+        cognite-sdk = 7.49.1
+        pydantic = 2.7.3
 
     Data Model:
         space: pygen-models
@@ -57,7 +57,7 @@ class OmniClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.24"
+        client.config.client_name = "CognitePygen:0.99.25"
 
         view_by_read_class = {
             data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),

@@ -5,11 +5,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen.utils.external_id_factories import (
-    create_incremental_factory,
-    create_sha256_factory,
-    create_uuid_factory,
-    sha256_factory,
-    uuid_factory,
+    ExternalIdFactory,
 )
 from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
 from tests.omni_constants import OmniClasses
@@ -110,11 +106,23 @@ class TestToInstancesWrite:
     [
         # There are none unique sensor positions in the windmill data
         # so hashing it will lead to fewer nodes
-        (sha256_factory, 135, 105),
-        (create_incremental_factory(), 145, 105),
-        (uuid_factory, 145, 105),
-        (create_sha256_factory(True), 135, 105),
-        (create_uuid_factory(True), 145, 105),
+        (
+            ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.sha256_factory()),
+            135,
+            105,
+        ),
+        (
+            ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.incremental_factory()),
+            145,
+            105,
+        ),
+        (
+            ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.uuid_factory()),
+            145,
+            105,
+        ),
+        (ExternalIdFactory.sha256_factory().short, 135, 105),
+        (ExternalIdFactory.uuid_factory().short, 145, 105),
     ],
 )
 def test_load_windmills_from_json(

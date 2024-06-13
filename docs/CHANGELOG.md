@@ -13,6 +13,26 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.25] - 13-06-24
+### Added
+- `ExternalIdFactory` class as a template for custom functions to define for `DataModelWrite.external_id_factory`
+  - class methods for out of the box external id generators `create_external_id_factory`, `domain_name_factory`,
+    `uuid_factory`, `sha256_factory`, `incremental_factory`
+- Helper functions for unique external_id generation
+  - `shorten_string` returns a shortened string
+  - `domain_name` returns a clean string from the domain class name
+  - `uuid` returns a uuid
+  - `sha256` returns a sha256 has of the data
+  - `incremental_id` returns an incremental integer based on domain class
+
+### Deprecated
+- The following functions in `external_id_factories` have been deprecated and will be removed in v1
+  - `create_uuid_factory`
+  - `uuid_factory`
+  - `create_sha256_factory`
+  - `sha256_factory`
+  - `create_incremental_factory`
+
 ## [0.99.24] - 27-05-24
 ### Added
 - Support for generating SDKs for views with list of direct relations properties.
@@ -33,7 +53,7 @@ Changes are grouped as follows
 
 ## [0.99.22] - 06-05-24
 ### Fixed
-- When calling `.as_read()` (or `.as_write()) on a `GraphQL` object in the generated SDK, with a file
+- When calling `.as_read()` or `.as_write()` on a `GraphQL` object in the generated SDK, with a file
   or sequence, the generated SDK would raise a `pydantic_core._pydantic_core.ValidationError`. This is now fixed.
 
 ## [0.99.21] - 02-05-24
