@@ -94,8 +94,8 @@ def test_list_above_5000_items(omni_client: OmniClient) -> None:
 
 def test_list_and_sort(omni_client: OmniClient) -> None:
     # Act
-    sorted_items = omni_client.primitive_required.list(limit=5, sort_by="int_32", direction="descending")
+    sorted_items = omni_client.primitive_required.list(limit=10, sort_by="int_32", direction="descending")
 
     # Assert
-    assert len(sorted_items) > 0
+    assert len(sorted_items) > 1
     assert list(sorted_items) == sorted(sorted_items, key=lambda item: item.int_32, reverse=True)
