@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.26] - 24-06-24
+### Added
+- Support for `sort` in generated `.list` method.
+
 ## [0.99.25] - 13-06-24
 ### Added
 - `ExternalIdFactory` class as a template for custom functions to define for `DataModelWrite.external_id_factory`
