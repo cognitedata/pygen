@@ -463,7 +463,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+            properties_by_field=_CONNECTIONITEMG_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             retrieve_edges=retrieve_edges,

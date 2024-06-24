@@ -407,7 +407,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+            properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
             retrieve_edges=retrieve_edges,
@@ -424,7 +424,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% else %}return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+            properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
         ){% endif %}

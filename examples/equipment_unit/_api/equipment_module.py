@@ -506,7 +506,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+            properties_by_field=_EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
         )

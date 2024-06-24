@@ -504,7 +504,7 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+            properties_by_field=_IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
         )
