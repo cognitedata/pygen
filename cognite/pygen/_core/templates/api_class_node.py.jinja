@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 from collections.abc import Sequence
-from typing import overload
+from typing import overload, Literal
 import warnings
 
 from cognite.client import CogniteClient
@@ -371,7 +371,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+        filter: dm.Filter | None = None,
+        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
@@ -379,7 +381,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
             retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
@@ -403,6 +407,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._list(
             limit=limit,
             filter=filter_,
+            properties_by_field={{ data_class.properties_dict_name }},
+            sort_by=sort_by,
+            direction=direction,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
@@ -414,4 +421,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ),{% endfor %}
                                                ]
         )
-        {% else %}return self._list(limit=limit, filter=filter_){% endif %}
+        {% else %}return self._list(
+            limit=limit,
+            filter=filter_,
+            properties_by_field={{ data_class.properties_dict_name }},
+            sort_by=sort_by,
+            direction=direction,
+        ){% endif %}

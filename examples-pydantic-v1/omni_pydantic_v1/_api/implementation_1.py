@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import overload
+from typing import overload, Literal
 import warnings
 
 from cognite.client import CogniteClient
@@ -488,6 +488,8 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        sort_by: Implementation1Fields | Sequence[Implementation1Fields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
     ) -> Implementation1List:
         """List/filter implementation 1
 
@@ -504,6 +506,8 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space: The space to filter on.
             limit: Maximum number of implementation 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
 
         Returns:
             List of requested implementation 1
@@ -531,4 +535,10 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space,
             filter,
         )
-        return self._list(limit=limit, filter=filter_)
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            properties_by_field=_IMPLEMENTATION1_PROPERTIES_BY_FIELD,
+            sort_by=sort_by,
+            direction=direction,
+        )

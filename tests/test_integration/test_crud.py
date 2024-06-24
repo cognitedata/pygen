@@ -19,8 +19,8 @@ if IS_PYDANTIC_V2:
     from omni.data_classes import DomainModelWrite, ResourcesWriteResult
 else:
     from omni_pydantic_v1 import OmniClient
+    from omni_pydantic_v1 import data_classes as odc
     from omni_pydantic_v1._api._core import SequenceNotStr
-    from omni_pydantic_v1.data_classes import odc
 
 
 def omni_independent_view_ids() -> list[ParameterSet]:
