@@ -13,8 +13,7 @@ from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, Typ
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Instance
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import Instance, InstanceSort, InstanceAggregationResultList
 
 from omni_multi.data_classes._core import (
     DomainModel,
@@ -310,13 +309,28 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         self,
         limit: int,
         filter: dm.Filter,
+        properties_by_field: dict[str, str],
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
         ) = None,
+        sort_by: str | list[str] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
     ) -> T_DomainModelList:
+        sort: InstanceSort | list[InstanceSort] | None = None
+        if isinstance(sort_by, str):
+            sort = InstanceSort(self._sources.as_property_ref(properties_by_field.get(sort_by, sort_by)), direction)
+        elif isinstance(sort_by, list):
+            sort = [
+                InstanceSort(self._sources.as_property_ref(properties_by_field.get(sort_by_, sort_by_)), direction)
+                for sort_by_ in sort_by
+            ]
         nodes = self._client.data_modeling.instances.list(
-            instance_type="node", sources=self._sources, limit=limit, filter=filter
+            instance_type="node",
+            sources=self._sources,
+            limit=limit,
+            filter=filter,
+            sort=sort,
         )
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:
