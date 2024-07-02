@@ -9,12 +9,12 @@ your data model. Thus making it easy to get data in a format that is close to wo
 is an alternative to `graphql` that is more pythonic.
 
 ## (Beginner) Exploration
-If you are just curious about `pygen` and all you have is a CDF project, and you don't eve have a data model or data
+If you are just curious about `pygen` and all you have is a CDF project, and you don't even have a data model or data
 a great place to start is in the CDF notebook with a demo model packaged into `pygen`,
 see [Generating SDK using Demo Data Model](cdf_notebook.html#generating-sdk-using-demo-data-model). The advantage of using
 a CDF notebook is that you do not have to know how to install and setup `Python`.
 
-Do you have your own data model you want to explore using the CDF notebook, then see (Explore in Notebook)[cdf_notebook.html]
+Do you have your own data model you want to explore using the CDF notebook, then see [Explore in Notebook](cdf_notebook.html)
 
 If you know how to install and setup `Python` and you have a CDF project, and prefer to work in your own environment,
 then you can start with the [Local Notebook](notebook.html) guide.
