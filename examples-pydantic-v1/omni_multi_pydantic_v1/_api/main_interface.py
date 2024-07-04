@@ -6,7 +6,7 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_multi_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi_pydantic_v1.data_classes import (
@@ -194,6 +194,9 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        sort_by: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> MainInterfaceList:
         """Search main interfaces
 
@@ -206,6 +209,11 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             space: The space to filter on.
             limit: Maximum number of main interfaces to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             Search results main interfaces matching the query.
@@ -227,7 +235,17 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             space,
             filter,
         )
-        return self._search(self._view_id, query, _MAININTERFACE_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(
+            view_id=self._view_id,
+            query=query,
+            properties_by_field=_MAININTERFACE_PROPERTIES_BY_FIELD,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,
+            direction=direction,
+            sort=sort,
+        )
 
     @overload
     def aggregate(
@@ -398,6 +416,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         filter: dm.Filter | None = None,
         sort_by: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> MainInterfaceList:
         """List/filter main interfaces
 
@@ -410,6 +429,9 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             List of requested main interfaces
@@ -437,4 +459,5 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             properties_by_field=_MAININTERFACE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
+            sort=sort,
         )
