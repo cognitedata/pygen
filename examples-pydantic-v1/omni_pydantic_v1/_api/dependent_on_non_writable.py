@@ -6,7 +6,7 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
@@ -217,6 +217,9 @@ class DependentOnNonWritableAPI(
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        sort_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> DependentOnNonWritableList:
         """Search dependent on non writables
 
@@ -229,6 +232,11 @@ class DependentOnNonWritableAPI(
             space: The space to filter on.
             limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             Search results dependent on non writables matching the query.
@@ -251,7 +259,15 @@ class DependentOnNonWritableAPI(
             filter,
         )
         return self._search(
-            self._view_id, query, _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD, properties, filter_, limit
+            view_id=self._view_id,
+            query=query,
+            properties_by_field=_DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,
+            direction=direction,
+            sort=sort,
         )
 
     @overload
@@ -423,6 +439,7 @@ class DependentOnNonWritableAPI(
         filter: dm.Filter | None = None,
         sort_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_edges: bool = True,
     ) -> DependentOnNonWritableList:
         """List/filter dependent on non writables
@@ -436,6 +453,9 @@ class DependentOnNonWritableAPI(
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
             retrieve_edges: Whether to retrieve `to_non_writable` external ids for the dependent on non writables. Defaults to True.
 
         Returns:
@@ -465,6 +485,7 @@ class DependentOnNonWritableAPI(
             properties_by_field=_DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
+            sort=sort,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_view_id_penta=[
                 (

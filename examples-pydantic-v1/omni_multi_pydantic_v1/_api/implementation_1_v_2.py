@@ -6,7 +6,7 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_multi_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_multi_pydantic_v1.data_classes import (
@@ -212,6 +212,9 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        sort_by: Implementation1v2Fields | Sequence[Implementation1v2Fields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation1v2List:
         """Search implementation 1 v 2
 
@@ -228,6 +231,11 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
             space: The space to filter on.
             limit: Maximum number of implementation 1 v 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             Search results implementation 1 v 2 matching the query.
@@ -253,7 +261,17 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
             space,
             filter,
         )
-        return self._search(self._view_id, query, _IMPLEMENTATION1V2_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(
+            view_id=self._view_id,
+            query=query,
+            properties_by_field=_IMPLEMENTATION1V2_PROPERTIES_BY_FIELD,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,
+            direction=direction,
+            sort=sort,
+        )
 
     @overload
     def aggregate(
@@ -460,6 +478,7 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
         filter: dm.Filter | None = None,
         sort_by: Implementation1v2Fields | Sequence[Implementation1v2Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation1v2List:
         """List/filter implementation 1 v 2
 
@@ -476,6 +495,9 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             List of requested implementation 1 v 2
@@ -507,4 +529,5 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
             properties_by_field=_IMPLEMENTATION1V2_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
+            sort=sort,
         )

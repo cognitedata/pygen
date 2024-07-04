@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+- Support for advanced sort in generated `.list` method.
+- Support for sort and advanced sort in generated `.search` method.
+
 ## [0.99.26] - 24-06-24
 ### Added
 - Support for `sort` in generated `.list` method.
