@@ -202,6 +202,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
+        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> {{ data_class.read_list_name }}:
         """Search {{ data_class.doc_list_name }}
 
@@ -211,6 +214,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
 
         Returns:
             Search results {{ data_class.doc_list_name}} matching the query.
@@ -229,7 +237,17 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }},{% endfor %}
             filter,
         )
-        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
+        return self._search(
+            view_id=self._view_id,
+            query=query,
+            properties_by_field={{ data_class.properties_dict_name }},
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,
+            direction=direction,
+            sort=sort,
+        ){% endif %}
 {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
     @overload
     def aggregate(
@@ -373,7 +391,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
@@ -383,7 +402,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
             retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
@@ -427,4 +449,5 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
+            sort=sort,
         ){% endif %}
