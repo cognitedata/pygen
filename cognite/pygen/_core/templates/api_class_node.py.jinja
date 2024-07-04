@@ -432,6 +432,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
+            sort=sort,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}
                 (
