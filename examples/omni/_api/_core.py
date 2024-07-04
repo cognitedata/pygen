@@ -161,15 +161,24 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
+        sort_by: str | list[str] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
         if isinstance(properties, str):
             properties = [properties]
 
         if properties:
             properties = [properties_by_field.get(prop, prop) for prop in properties]
-
+        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.search(
-            view=view_id, query=query, instance_type="node", properties=properties, filter=filter_, limit=limit
+            view=view_id,
+            query=query,
+            instance_type="node",
+            properties=properties,
+            filter=filter_,
+            limit=limit,
+            sort=sort_input,
         )
         return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
@@ -319,6 +328,27 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
+        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
+        nodes = self._client.data_modeling.instances.list(
+            instance_type="node",
+            sources=self._sources,
+            limit=limit,
+            filter=filter,
+            sort=sort_input,
+        )
+        node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
+        if retrieve_edges and node_list:
+            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_view_id_penta)
+
+        return node_list
+
+    def _get_sort(
+        self,
+        properties_by_field: dict[str, str],
+        sort_by: str | list[str] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+    ) -> InstanceSort | list[InstanceSort] | None:
         sort_input: InstanceSort | list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
             sort_input = InstanceSort(
@@ -340,19 +370,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
                     sort_.property = self._sources.as_property_ref(
                         properties_by_field.get(sort_.property, sort_.property)
                     )
-
-        nodes = self._client.data_modeling.instances.list(
-            instance_type="node",
-            sources=self._sources,
-            limit=limit,
-            filter=filter,
-            sort=sort_input,
-        )
-        node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
-        if retrieve_edges and node_list:
-            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_view_id_penta)
-
-        return node_list
+        return sort_input
 
     def _retrieve_and_set_edge_types(
         self,
