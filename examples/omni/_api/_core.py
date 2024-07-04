@@ -13,6 +13,7 @@ from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, Typ
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes.data_modeling.core import DataModelingSort
 from cognite.client.data_classes.data_modeling.instances import Instance, InstanceSort, InstanceAggregationResultList
 
 from omni.data_classes._core import (
@@ -316,21 +317,36 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         ) = None,
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
-        sort: InstanceSort | list[InstanceSort] | None = None
-        if isinstance(sort_by, str):
-            sort = InstanceSort(self._sources.as_property_ref(properties_by_field.get(sort_by, sort_by)), direction)
-        elif isinstance(sort_by, list):
-            sort = [
+        sort_input: InstanceSort | list[InstanceSort] | None = None
+        if sort is None and isinstance(sort_by, str):
+            sort_input = InstanceSort(
+                self._sources.as_property_ref(properties_by_field.get(sort_by, sort_by)), direction
+            )
+        elif sort is None and isinstance(sort_by, list):
+            sort_input = [
                 InstanceSort(self._sources.as_property_ref(properties_by_field.get(sort_by_, sort_by_)), direction)
                 for sort_by_ in sort_by
             ]
+        elif sort is not None:
+            sort_input = sort if isinstance(sort, list) else [sort]
+            for sort_ in sort_input:
+                if isinstance(sort_.property, Sequence) and len(sort_.property) == 1:
+                    sort_.property = self._sources.as_property_ref(
+                        properties_by_field.get(sort_.property[0], sort_.property[0])
+                    )
+                elif isinstance(sort_.property, str):
+                    sort_.property = self._sources.as_property_ref(
+                        properties_by_field.get(sort_.property, sort_.property)
+                    )
+
         nodes = self._client.data_modeling.instances.list(
             instance_type="node",
             sources=self._sources,
             limit=limit,
             filter=filter,
-            sort=sort,
+            sort=sort_input,
         )
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:

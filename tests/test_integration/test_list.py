@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import sys
+
+from cognite.client.data_classes.data_modeling import InstanceSort
+
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
@@ -99,3 +103,20 @@ def test_list_and_sort(omni_client: OmniClient) -> None:
     # Assert
     assert len(sorted_items) > 1
     assert list(sorted_items) == sorted(sorted_items, key=lambda item: item.int_32, reverse=True)
+
+
+def test_list_advanced_sort(omni_client: OmniClient) -> None:
+    sort = [
+        InstanceSort(property=["int_32"], direction="ascending", nulls_first=False),
+        InstanceSort(property=["float_32"], direction="descending", nulls_first=True),
+    ]
+
+    def key(item: dc.PrimitiveNullable) -> tuple[int, float]:
+        first = item.int_32 if item.int_32 is not None else sys.maxsize
+        second = -item.float_32 if item.float_32 is not None else -sys.maxsize
+        return first, second
+
+    sorted_items = omni_client.primitive_nullable.list(limit=10, sort=sort)
+
+    assert len(sorted_items) > 1
+    assert list(sorted_items) == sorted(sorted_items, key=key)
