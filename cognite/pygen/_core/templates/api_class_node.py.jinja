@@ -7,7 +7,7 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort{% endif %}
 
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 from {{ top_level_package }}.data_classes import (

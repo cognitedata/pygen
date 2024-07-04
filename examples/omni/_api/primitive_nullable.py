@@ -7,7 +7,6 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.core import DataModelingSort
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
