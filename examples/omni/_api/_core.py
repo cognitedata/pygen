@@ -13,7 +13,6 @@ from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, Typ
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.core import DataModelingSort
 from cognite.client.data_classes.data_modeling.instances import Instance, InstanceSort, InstanceAggregationResultList
 
 from omni.data_classes._core import (
