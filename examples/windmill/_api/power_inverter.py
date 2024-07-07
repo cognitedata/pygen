@@ -48,9 +48,9 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             class_list=PowerInverterList,
             class_write_list=PowerInverterWriteList,
         )
-        self.active_power_total = PowerInverterActivePowerTotalAPI(client, view_id)
-        self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, view_id)
-        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, view_id)
+        self.active_power_total = PowerInverterActivePowerTotalAPI(client, self._view_id)
+        self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, self._view_id)
+        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, self._view_id)
 
     def __call__(
         self,

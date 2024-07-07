@@ -47,7 +47,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             class_list=EquipmentModuleList,
             class_write_list=EquipmentModuleWriteList,
         )
-        self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
+        self.sensor_value = EquipmentModuleSensorValueAPI(client, self._view_id)
 
     def __call__(
         self,

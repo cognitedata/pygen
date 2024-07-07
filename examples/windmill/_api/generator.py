@@ -47,8 +47,8 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             class_list=GeneratorList,
             class_write_list=GeneratorWriteList,
         )
-        self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, view_id)
-        self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, view_id)
+        self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, self._view_id)
+        self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, self._view_id)
 
     def __call__(
         self,

@@ -50,11 +50,11 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             class_list=NacelleList,
             class_write_list=NacelleWriteList,
         )
-        self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, view_id)
-        self.acc_from_back_side_y = NacelleAccFromBackSideYAPI(client, view_id)
-        self.acc_from_back_side_z = NacelleAccFromBackSideZAPI(client, view_id)
-        self.yaw_direction = NacelleYawDirectionAPI(client, view_id)
-        self.yaw_error = NacelleYawErrorAPI(client, view_id)
+        self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, self._view_id)
+        self.acc_from_back_side_y = NacelleAccFromBackSideYAPI(client, self._view_id)
+        self.acc_from_back_side_z = NacelleAccFromBackSideZAPI(client, self._view_id)
+        self.yaw_direction = NacelleYawDirectionAPI(client, self._view_id)
+        self.yaw_error = NacelleYawErrorAPI(client, self._view_id)
 
     def __call__(
         self,

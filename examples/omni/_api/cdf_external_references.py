@@ -46,7 +46,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             class_list=CDFExternalReferencesList,
             class_write_list=CDFExternalReferencesWriteList,
         )
-        self.timeseries = CDFExternalReferencesTimeseriesAPI(client, view_id)
+        self.timeseries = CDFExternalReferencesTimeseriesAPI(client, self._view_id)
 
     def __call__(
         self,

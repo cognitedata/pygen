@@ -48,9 +48,9 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             class_list=HighSpeedShaftList,
             class_write_list=HighSpeedShaftWriteList,
         )
-        self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, view_id)
-        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, view_id)
-        self.torque = HighSpeedShaftTorqueAPI(client, view_id)
+        self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, self._view_id)
+        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, self._view_id)
+        self.torque = HighSpeedShaftTorqueAPI(client, self._view_id)
 
     def __call__(
         self,

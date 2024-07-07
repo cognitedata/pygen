@@ -50,11 +50,11 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             class_list=MainShaftList,
             class_write_list=MainShaftWriteList,
         )
-        self.bending_x = MainShaftBendingXAPI(client, view_id)
-        self.bending_y = MainShaftBendingYAPI(client, view_id)
-        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, view_id)
-        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, view_id)
-        self.torque = MainShaftTorqueAPI(client, view_id)
+        self.bending_x = MainShaftBendingXAPI(client, self._view_id)
+        self.bending_y = MainShaftBendingYAPI(client, self._view_id)
+        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, self._view_id)
+        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, self._view_id)
+        self.torque = MainShaftTorqueAPI(client, self._view_id)
 
     def __call__(
         self,

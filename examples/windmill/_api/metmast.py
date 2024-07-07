@@ -48,9 +48,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             class_list=MetmastList,
             class_write_list=MetmastWriteList,
         )
-        self.temperature = MetmastTemperatureAPI(client, view_id)
-        self.tilt_angle = MetmastTiltAngleAPI(client, view_id)
-        self.wind_speed = MetmastWindSpeedAPI(client, view_id)
+        self.temperature = MetmastTemperatureAPI(client, self._view_id)
+        self.tilt_angle = MetmastTiltAngleAPI(client, self._view_id)
+        self.wind_speed = MetmastWindSpeedAPI(client, self._view_id)
 
     def __call__(
         self,

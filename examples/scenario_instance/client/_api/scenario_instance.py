@@ -48,7 +48,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
             class_list=ScenarioInstanceList,
             class_write_list=ScenarioInstanceWriteList,
         )
-        self.price_forecast = ScenarioInstancePriceForecastAPI(client, view_id)
+        self.price_forecast = ScenarioInstancePriceForecastAPI(client, self._view_id)
 
     def __call__(
         self,

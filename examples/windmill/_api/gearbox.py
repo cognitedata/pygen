@@ -48,9 +48,9 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
             class_list=GearboxList,
             class_write_list=GearboxWriteList,
         )
-        self.displacement_x = GearboxDisplacementXAPI(client, view_id)
-        self.displacement_y = GearboxDisplacementYAPI(client, view_id)
-        self.displacement_z = GearboxDisplacementZAPI(client, view_id)
+        self.displacement_x = GearboxDisplacementXAPI(client, self._view_id)
+        self.displacement_y = GearboxDisplacementYAPI(client, self._view_id)
+        self.displacement_z = GearboxDisplacementZAPI(client, self._view_id)
 
     def __call__(
         self,

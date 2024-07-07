@@ -57,17 +57,21 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             class_list=SensorPositionList,
             class_write_list=SensorPositionWriteList,
         )
-        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, view_id)
-        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, view_id
+        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(
+            client, self._view_id
         )
-        self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, view_id)
-        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, view_id)
-        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, view_id)
+        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, self._view_id)
+        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
+            client, self._view_id
+        )
+        self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, self._view_id)
+        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, self._view_id)
+        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(
+            client, self._view_id
+        )
+        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, self._view_id)
         self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, view_id
+            client, self._view_id
         )
 
     def __call__(

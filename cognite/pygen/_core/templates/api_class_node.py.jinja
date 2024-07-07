@@ -47,7 +47,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self.{{ edge_api.parent_attribute }} = {{ edge_api.name }}(
             client{% if edge_api.has_edge_class %}, {{ edge_api.edge_class.read_name }}, {{ edge_api.edge_class.write_name }}, {{ edge_api.edge_class.read_list_name }}{% endif %}
         ){% endfor %}{% for timeseries_api in timeseries_apis %}
-        self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, view_id){% endfor %}
+        self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, self._view_id){% endfor %}
 
     def __call__(
             self,{% for parm in list_method.parameters %}

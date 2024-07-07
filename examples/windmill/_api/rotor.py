@@ -47,8 +47,8 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             class_list=RotorList,
             class_write_list=RotorWriteList,
         )
-        self.rotor_speed_controller = RotorRotorSpeedControllerAPI(client, view_id)
-        self.rpm_low_speed_shaft = RotorRpmLowSpeedShaftAPI(client, view_id)
+        self.rotor_speed_controller = RotorRotorSpeedControllerAPI(client, self._view_id)
+        self.rpm_low_speed_shaft = RotorRpmLowSpeedShaftAPI(client, self._view_id)
 
     def __call__(
         self,
