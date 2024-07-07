@@ -453,6 +453,7 @@ def create_fields_test_cases():
         id="String property",
     )
     prop = {
+        "connectionType": "multi_edge_connection",
         "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "version": "2", "type": "view"},
         "name": "roles",
