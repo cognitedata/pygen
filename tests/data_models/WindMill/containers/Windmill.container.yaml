@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: name
   windfarm:
     type:
@@ -18,6 +19,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: windfarm
   capacity:
     type:
@@ -25,16 +27,19 @@ properties:
       type: float64
     nullable: true
     autoIncrement: false
+    immutable: false
     name: capacity
   rotor:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: rotor
   nacelle:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: nacelle

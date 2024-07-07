@@ -9,6 +9,7 @@ properties:
       type: float64
     nullable: true
     autoIncrement: false
+    immutable: false
     name: position
   wind_speed:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: wind_speed
   tilt_angle:
     type:
@@ -23,6 +25,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: tilt_angle
   temperature:
     type:
@@ -30,4 +33,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: temperature

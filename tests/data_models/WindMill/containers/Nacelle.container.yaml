@@ -8,30 +8,35 @@ properties:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: gearbox
   generator:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: generator
   high_speed_shaft:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: high_speed_shaft
   main_shaft:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: main_shaft
   power_inverter:
     type:
       type: direct
     nullable: true
     autoIncrement: false
+    immutable: false
     name: power_inverter
   acc_from_back_side_x:
     type:
@@ -39,6 +44,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: acc_from_back_side_x
   acc_from_back_side_y:
     type:
@@ -46,6 +52,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: acc_from_back_side_y
   acc_from_back_side_z:
     type:
@@ -53,6 +60,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: acc_from_back_side_z
   yaw_direction:
     type:
@@ -60,6 +68,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: yaw_direction
   yaw_error:
     type:
@@ -67,4 +76,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: yaw_error

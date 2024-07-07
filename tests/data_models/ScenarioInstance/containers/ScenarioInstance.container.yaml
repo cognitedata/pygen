@@ -9,6 +9,7 @@ properties:
       type: timestamp
     nullable: true
     autoIncrement: false
+    immutable: false
     name: start
   instance:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timestamp
     nullable: true
     autoIncrement: false
+    immutable: false
     name: instance
   scenario:
     type:
@@ -24,6 +26,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: scenario
   priceArea:
     type:
@@ -32,6 +35,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: priceArea
   market:
     type:
@@ -40,6 +44,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: market
   priceForecast:
     type:
@@ -47,6 +52,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: priceForecast
   country:
     type:
@@ -55,6 +61,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: country
   aggregation:
     type:
@@ -63,4 +70,5 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: aggregation

@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: rotor_speed_controller
   rpm_low_speed_shaft:
     type:
@@ -16,4 +17,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: rpm_low_speed_shaft

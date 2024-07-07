@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: torque
   calculated_tilt_moment:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: calculated_tilt_moment
   calculated_yaw_moment:
     type:
@@ -23,6 +25,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: calculated_yaw_moment
   bending_x:
     type:
@@ -30,6 +33,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: bending_x
   bending_y:
     type:
@@ -37,4 +41,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: bending_y
