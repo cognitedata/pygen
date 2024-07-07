@@ -1764,6 +1764,7 @@ views:
         type: int32
       nullable: false
       autoIncrement: true
+      immutable: false
       source: null
       defaultValue: null
       name: autoIncrementInt32
