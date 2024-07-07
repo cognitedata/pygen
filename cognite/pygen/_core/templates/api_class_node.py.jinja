@@ -73,7 +73,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder({{ data_class.read_list_name }})
-        return {{ query_api.name }}(self._client, builder, self._view_by_read_class, filter_, limit)
+        return {{ query_api.name }}(self._client, builder, filter_, limit)
 
 {% if data_class.is_writable %}
     def apply(
