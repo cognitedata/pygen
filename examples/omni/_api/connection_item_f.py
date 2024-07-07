@@ -41,19 +41,17 @@ from .connection_item_f_query import ConnectionItemFQueryAPI
 
 
 class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemF]
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=ConnectionItemF,
             class_list=ConnectionItemFList,
             class_write_list=ConnectionItemFWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.outwards_multi_edge = ConnectionItemFOutwardsMultiAPI(
-            client, view_by_read_class, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
+            client, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
         )
 
     def __call__(

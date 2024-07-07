@@ -38,17 +38,15 @@ from .generator_query import GeneratorQueryAPI
 
 
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Generator]
+    _view_id = dm.ViewId("power-models", "Generator", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=Generator,
             class_list=GeneratorList,
             class_write_list=GeneratorWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, view_id)
         self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, view_id)
 

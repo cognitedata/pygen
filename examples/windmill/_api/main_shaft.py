@@ -41,17 +41,15 @@ from .main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[MainShaft]
+    _view_id = dm.ViewId("power-models", "MainShaft", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=MainShaft,
             class_list=MainShaftList,
             class_write_list=MainShaftWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.bending_x = MainShaftBendingXAPI(client, view_id)
         self.bending_y = MainShaftBendingYAPI(client, view_id)
         self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, view_id)

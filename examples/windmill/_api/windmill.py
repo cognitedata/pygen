@@ -39,17 +39,15 @@ from .windmill_query import WindmillQueryAPI
 
 
 class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Windmill]
+    _view_id = dm.ViewId("power-models", "Windmill", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=Windmill,
             class_list=WindmillList,
             class_write_list=WindmillWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.blades_edge = WindmillBladesAPI(client)
         self.metmast_edge = WindmillMetmastAPI(client)
 

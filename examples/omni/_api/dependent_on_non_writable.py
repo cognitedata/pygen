@@ -40,17 +40,15 @@ from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 class DependentOnNonWritableAPI(
     NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[DependentOnNonWritable]
+    _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=DependentOnNonWritable,
             class_list=DependentOnNonWritableList,
             class_write_list=DependentOnNonWritableWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
 
     def __call__(

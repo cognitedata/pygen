@@ -39,17 +39,15 @@ from .power_inverter_query import PowerInverterQueryAPI
 
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PowerInverter]
+    _view_id = dm.ViewId("power-models", "PowerInverter", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=PowerInverter,
             class_list=PowerInverterList,
             class_write_list=PowerInverterWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.active_power_total = PowerInverterActivePowerTotalAPI(client, view_id)
         self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, view_id)
         self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, view_id)

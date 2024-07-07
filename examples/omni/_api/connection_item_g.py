@@ -41,19 +41,17 @@ from .connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemG]
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=ConnectionItemG,
             class_list=ConnectionItemGList,
             class_write_list=ConnectionItemGWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.inwards_multi_property_edge = ConnectionItemGInwardsMultiPropertyAPI(
-            client, view_by_read_class, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
+            client, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
         )
 
     def __call__(

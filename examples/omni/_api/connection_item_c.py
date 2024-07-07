@@ -35,17 +35,15 @@ from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
 class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemC]
+    _view_id = None
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=None,
             class_type=ConnectionItemC,
             class_list=ConnectionItemCList,
             class_write_list=ConnectionItemCWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.connection_item_a_edge = ConnectionItemCConnectionItemAAPI(client)
         self.connection_item_b_edge = ConnectionItemCConnectionItemBAPI(client)
 

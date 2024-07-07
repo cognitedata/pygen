@@ -37,17 +37,15 @@ from .work_order_query import WorkOrderQueryAPI
 
 
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[WorkOrder]
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=WorkOrder,
             class_list=WorkOrderList,
             class_write_list=WorkOrderWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
 
     def __call__(
         self,

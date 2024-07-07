@@ -39,17 +39,15 @@ from .gearbox_query import GearboxQueryAPI
 
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Gearbox]
+    _view_id = dm.ViewId("power-models", "Gearbox", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=Gearbox,
             class_list=GearboxList,
             class_write_list=GearboxWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.displacement_x = GearboxDisplacementXAPI(client, view_id)
         self.displacement_y = GearboxDisplacementYAPI(client, view_id)
         self.displacement_z = GearboxDisplacementZAPI(client, view_id)

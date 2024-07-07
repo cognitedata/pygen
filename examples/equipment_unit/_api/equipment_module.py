@@ -38,17 +38,15 @@ from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[EquipmentModule]
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=EquipmentModule,
             class_list=EquipmentModuleList,
             class_write_list=EquipmentModuleWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
 
     def __call__(

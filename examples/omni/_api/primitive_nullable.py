@@ -38,17 +38,15 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
 class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PrimitiveNullable]
+    _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=PrimitiveNullable,
             class_list=PrimitiveNullableList,
             class_write_list=PrimitiveNullableWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
 
     def __call__(
         self,

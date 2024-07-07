@@ -37,17 +37,15 @@ from .implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
 class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Implementation1v1]
+    _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=Implementation1v1,
             class_list=Implementation1v1List,
             class_write_list=Implementation1v1WriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
 
     def __call__(
         self,

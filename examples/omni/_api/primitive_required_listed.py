@@ -40,17 +40,15 @@ from .primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
 class PrimitiveRequiredListedAPI(
     NodeAPI[PrimitiveRequiredListed, PrimitiveRequiredListedWrite, PrimitiveRequiredListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PrimitiveRequiredListed]
+    _view_id = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=PrimitiveRequiredListed,
             class_list=PrimitiveRequiredListedList,
             class_write_list=PrimitiveRequiredListedWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
 
     def __call__(
         self,

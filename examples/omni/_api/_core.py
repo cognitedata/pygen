@@ -80,7 +80,7 @@ class SequenceNotStr(Protocol[_T_co]):
 
 
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
-    _view_id: ClassVar[dm.ViewId]
+    _view_id: ClassVar[dm.ViewId | None]
 
     def __init__(
         self,

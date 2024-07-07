@@ -39,17 +39,15 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 class CDFExternalReferencesListedAPI(
     NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedWrite, CDFExternalReferencesListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[CDFExternalReferencesListed]
+    _view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=CDFExternalReferencesListed,
             class_list=CDFExternalReferencesListedList,
             class_write_list=CDFExternalReferencesListedWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.timeseries = CDFExternalReferencesListedTimeseriesAPI(client, view_id)
 
     def __call__(

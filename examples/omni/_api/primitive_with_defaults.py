@@ -37,17 +37,15 @@ from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
 class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PrimitiveWithDefaults]
+    _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=PrimitiveWithDefaults,
             class_list=PrimitiveWithDefaultsList,
             class_write_list=PrimitiveWithDefaultsWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
 
     def __call__(
         self,

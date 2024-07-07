@@ -42,23 +42,17 @@ from .unit_procedure_query import UnitProcedureQueryAPI
 
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[UnitProcedure]
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=UnitProcedure,
             class_list=UnitProcedureList,
             class_write_list=UnitProcedureWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
-        self.work_orders_edge = UnitProcedureWorkOrdersAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
-        )
-        self.work_units_edge = UnitProcedureWorkUnitsAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
-        )
+        self.work_orders_edge = UnitProcedureWorkOrdersAPI(client, StartEndTime, StartEndTimeWrite, StartEndTimeList)
+        self.work_units_edge = UnitProcedureWorkUnitsAPI(client, StartEndTime, StartEndTimeWrite, StartEndTimeList)
 
     def __call__(
         self,

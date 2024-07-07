@@ -38,17 +38,15 @@ from .connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, ConnectionItemEList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemE]
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=ConnectionItemE,
             class_list=ConnectionItemEList,
             class_write_list=ConnectionItemEWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.inwards_single_edge = ConnectionItemEInwardsSingleAPI(client)
 
     def __call__(

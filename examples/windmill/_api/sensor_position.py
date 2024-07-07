@@ -48,17 +48,15 @@ from .sensor_position_query import SensorPositionQueryAPI
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[SensorPosition]
+    _view_id = dm.ViewId("power-models", "SensorPosition", "1")
+
+    def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=view_id,
             class_type=SensorPosition,
             class_list=SensorPositionList,
             class_write_list=SensorPositionWriteList,
-            view_by_read_class=view_by_read_class,
         )
-        self._view_id = view_id
         self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
         self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, view_id)
         self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
