@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, Literal, Optional, Union{% else %}from typing import Any, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union{% else %}from typing import Any, ClassVar, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -157,7 +157,9 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         external_id: The external id of the {{ data_class.doc_name }}.
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-    """{% if not data_class.implements %}
+    """
+    _view_id: ClassVar[{% if not data_class.has_container_fields %}None{% else %}dm.ViewId{% endif %}] = {% if not data_class.has_container_fields %}None{% else %}dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% endif %}
+{% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
@@ -165,7 +167,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
@@ -184,11 +185,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             sources=None,
         )
         resources.nodes.append(this_node)
-        {% else %}
-
-        write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
-            "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        )){% endif %}
+        {% endif %}
 {% if data_class.has_container_fields %}
         properties: dict[str, Any] = {}
         {% for field in data_class.container_fields %}
@@ -204,7 +201,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                 )],
             )
