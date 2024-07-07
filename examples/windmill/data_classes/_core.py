@@ -30,7 +30,7 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel, BeforeValidator, Extra, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
 
 TimeSeries = Annotated[
@@ -283,7 +283,7 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
     _INSTANCE = DataRecordWrite
 
 
-class DomainModelWrite(DomainModelCore, extra=Extra.ignore, populate_by_name=True):
+class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
@@ -499,7 +499,7 @@ def default_edge_external_id_factory(
     return f"{start}:{end}"
 
 
-class DomainRelationWrite(BaseModel, extra=Extra.forbid, populate_by_name=True):
+class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
     external_id_factory: ClassVar[
         Callable[
             [
