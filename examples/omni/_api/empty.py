@@ -40,14 +40,12 @@ from .empty_query import EmptyQueryAPI
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
     _view_id = dm.ViewId("pygen-models", "Empty", "1")
     _properties_by_field = _EMPTY_PROPERTIES_BY_FIELD
+    _class_type = Empty
+    _class_list = EmptyList
+    _class_write_list = EmptyWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=Empty,
-            class_list=EmptyList,
-            class_write_list=EmptyWriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

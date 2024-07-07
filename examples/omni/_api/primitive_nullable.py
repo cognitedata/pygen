@@ -40,14 +40,12 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList]):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
     _properties_by_field = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
+    _class_type = PrimitiveNullable
+    _class_list = PrimitiveNullableList
+    _class_write_list = PrimitiveNullableWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=PrimitiveNullable,
-            class_list=PrimitiveNullableList,
-            class_write_list=PrimitiveNullableWriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

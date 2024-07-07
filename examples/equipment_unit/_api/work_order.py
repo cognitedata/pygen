@@ -39,14 +39,12 @@ from .work_order_query import WorkOrderQueryAPI
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
     _properties_by_field = _WORKORDER_PROPERTIES_BY_FIELD
+    _class_type = WorkOrder
+    _class_list = WorkOrderList
+    _class_write_list = WorkOrderWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=WorkOrder,
-            class_list=WorkOrderList,
-            class_write_list=WorkOrderWriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

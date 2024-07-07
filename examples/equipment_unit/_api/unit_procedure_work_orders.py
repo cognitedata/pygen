@@ -15,6 +15,9 @@ from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class UnitProcedureWorkOrdersAPI(EdgePropertyAPI):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    _class_type: StartEndTime
+    _class_write_type: StartEndTimeWrite
+    _class_list: StartEndTimeList
 
     def list(
         self,

@@ -37,14 +37,13 @@ from .connection_item_c_query import ConnectionItemCQueryAPI
 class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     _properties_by_field = {}
+    _class_type = ConnectionItemC
+    _class_list = ConnectionItemCList
+    _class_write_list = ConnectionItemCWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=ConnectionItemC,
-            class_list=ConnectionItemCList,
-            class_write_list=ConnectionItemCWriteList,
-        )
+        super().__init__(client=client)
+
         self.connection_item_a_edge = ConnectionItemCConnectionItemAAPI(client)
         self.connection_item_b_edge = ConnectionItemCConnectionItemBAPI(client)
 

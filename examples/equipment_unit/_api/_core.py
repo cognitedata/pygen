@@ -82,16 +82,11 @@ class SequenceNotStr(Protocol[_T_co]):
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     _view_id: ClassVar[dm.ViewId]
     _properties_by_field: ClassVar[dict[str, str]]
+    _class_type: ClassVar[type[T_DomainModel]]
+    _class_list: ClassVar[type[T_DomainModelList]]
 
-    def __init__(
-        self,
-        client: CogniteClient,
-        class_type: type[T_DomainModel],
-        class_list: type[T_DomainModelList],
-    ):
+    def __init__(self, client: CogniteClient):
         self._client = client
-        self._class_type = class_type
-        self._class_list = class_list
 
     def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
@@ -442,15 +437,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 class NodeAPI(
     Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList], ABC
 ):
-    def __init__(
-        self,
-        client: CogniteClient,
-        class_type: type[T_DomainModel],
-        class_list: type[T_DomainModelList],
-        class_write_list: type[T_DomainModelWriteList],
-    ):
-        super().__init__(client, class_type, class_list)
-        self._class_write_list = class_write_list
+    _class_write_list: ClassVar[type[T_DomainModelWriteList]]
 
     def _apply(
         self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False
@@ -487,18 +474,9 @@ class EdgeAPI(ABC):
 
 class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, T_DomainRelationList], ABC):
     _view_id: ClassVar[dm.ViewId]
-
-    def __init__(
-        self,
-        client: CogniteClient,
-        class_type: type[T_DomainRelation],
-        class_write_type: type[T_DomainRelationWrite],
-        class_list: type[T_DomainRelationList],
-    ):
-        super().__init__(client)
-        self._class_type = class_type
-        self._class_write_type = class_write_type
-        self._class_list = class_list
+    _class_type: type[T_DomainRelation]
+    _class_write_type: type[T_DomainRelationWrite]
+    _class_list: type[T_DomainRelationList]
 
     def _list(
         self,

@@ -50,14 +50,13 @@ from .sensor_position_query import SensorPositionQueryAPI
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
     _view_id = dm.ViewId("power-models", "SensorPosition", "1")
     _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
+    _class_type = SensorPosition
+    _class_list = SensorPositionList
+    _class_write_list = SensorPositionWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=SensorPosition,
-            class_list=SensorPositionList,
-            class_write_list=SensorPositionWriteList,
-        )
+        super().__init__(client=client)
+
         self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(
             client, self._view_id
         )

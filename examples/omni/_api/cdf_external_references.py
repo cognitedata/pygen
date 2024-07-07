@@ -39,14 +39,13 @@ from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList]):
     _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
     _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
+    _class_type = CDFExternalReferences
+    _class_list = CDFExternalReferencesList
+    _class_write_list = CDFExternalReferencesWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=CDFExternalReferences,
-            class_list=CDFExternalReferencesList,
-            class_write_list=CDFExternalReferencesWriteList,
-        )
+        super().__init__(client=client)
+
         self.timeseries = CDFExternalReferencesTimeseriesAPI(client, self._view_id)
 
     def __call__(

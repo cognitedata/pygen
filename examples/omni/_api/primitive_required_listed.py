@@ -42,14 +42,12 @@ class PrimitiveRequiredListedAPI(
 ):
     _view_id = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
     _properties_by_field = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
+    _class_type = PrimitiveRequiredListed
+    _class_list = PrimitiveRequiredListedList
+    _class_write_list = PrimitiveRequiredListedWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=PrimitiveRequiredListed,
-            class_list=PrimitiveRequiredListedList,
-            class_write_list=PrimitiveRequiredListedWriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

@@ -40,14 +40,13 @@ from .generator_query import GeneratorQueryAPI
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
     _view_id = dm.ViewId("power-models", "Generator", "1")
     _properties_by_field = _GENERATOR_PROPERTIES_BY_FIELD
+    _class_type = Generator
+    _class_list = GeneratorList
+    _class_write_list = GeneratorWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=Generator,
-            class_list=GeneratorList,
-            class_write_list=GeneratorWriteList,
-        )
+        super().__init__(client=client)
+
         self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, self._view_id)
         self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, self._view_id)
 

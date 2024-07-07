@@ -40,14 +40,13 @@ from .blade_query import BladeQueryAPI
 class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
     _view_id = dm.ViewId("power-models", "Blade", "1")
     _properties_by_field = _BLADE_PROPERTIES_BY_FIELD
+    _class_type = Blade
+    _class_list = BladeList
+    _class_write_list = BladeWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=Blade,
-            class_list=BladeList,
-            class_write_list=BladeWriteList,
-        )
+        super().__init__(client=client)
+
         self.sensor_positions_edge = BladeSensorPositionsAPI(client)
 
     def __call__(

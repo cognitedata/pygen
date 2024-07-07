@@ -40,14 +40,13 @@ from .equipment_module_query import EquipmentModuleQueryAPI
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     _properties_by_field = _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+    _class_type = EquipmentModule
+    _class_list = EquipmentModuleList
+    _class_write_list = EquipmentModuleWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=EquipmentModule,
-            class_list=EquipmentModuleList,
-            class_write_list=EquipmentModuleWriteList,
-        )
+        super().__init__(client=client)
+
         self.sensor_value = EquipmentModuleSensorValueAPI(client, self._view_id)
 
     def __call__(

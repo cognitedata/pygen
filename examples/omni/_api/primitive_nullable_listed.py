@@ -42,14 +42,12 @@ class PrimitiveNullableListedAPI(
 ):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
     _properties_by_field = _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD
+    _class_type = PrimitiveNullableListed
+    _class_list = PrimitiveNullableListedList
+    _class_write_list = PrimitiveNullableListedWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=PrimitiveNullableListed,
-            class_list=PrimitiveNullableListedList,
-            class_write_list=PrimitiveNullableListedWriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

@@ -39,14 +39,12 @@ from .implementation_1_v_1_query import Implementation1v1QueryAPI
 class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List]):
     _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
     _properties_by_field = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
+    _class_type = Implementation1v1
+    _class_list = Implementation1v1List
+    _class_write_list = Implementation1v1Write
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=Implementation1v1,
-            class_list=Implementation1v1List,
-            class_write_list=Implementation1v1WriteList,
-        )
+        super().__init__(client=client)
 
     def __call__(
         self,

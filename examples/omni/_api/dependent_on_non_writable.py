@@ -42,14 +42,13 @@ class DependentOnNonWritableAPI(
 ):
     _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
     _properties_by_field = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
+    _class_type = DependentOnNonWritable
+    _class_list = DependentOnNonWritableList
+    _class_write_list = DependentOnNonWritableWrite
 
     def __init__(self, client: CogniteClient):
-        super().__init__(
-            client=client,
-            class_type=DependentOnNonWritable,
-            class_list=DependentOnNonWritableList,
-            class_write_list=DependentOnNonWritableWriteList,
-        )
+        super().__init__(client=client)
+
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
 
     def __call__(
