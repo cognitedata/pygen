@@ -24,6 +24,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: description
@@ -39,6 +40,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -53,6 +55,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: sensor_value
@@ -68,6 +71,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: type
@@ -93,6 +97,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: end_time
@@ -107,6 +112,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: start_time
@@ -133,6 +139,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -148,6 +155,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: type
@@ -210,6 +218,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: description
@@ -225,6 +234,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: performedBy
@@ -240,6 +250,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: type

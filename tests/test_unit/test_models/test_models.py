@@ -105,6 +105,7 @@ def load_field_test_cases():
     )
     raw_data = """
     autoIncrement: false
+    immutable: false
     container:
       externalId: Market
       space: market
@@ -548,6 +549,7 @@ def create_fields_test_cases():
         },
         "nullable": True,
         "autoIncrement": False,
+        "immutable": False,
         "defaultValue": None,
         "name": "person",
         "description": None,
@@ -605,6 +607,7 @@ def create_fields_test_cases():
         "defaultValue": None,
         "name": "wonOscar",
         "description": None,
+        "immutable": False,
     }
     prop = ViewProperty.load(prop)
 

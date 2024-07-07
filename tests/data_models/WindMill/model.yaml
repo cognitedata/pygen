@@ -23,6 +23,7 @@ views:
         type: boolean
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: is_damaged
@@ -38,6 +39,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -77,6 +79,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: displacement_x
@@ -91,6 +94,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: displacement_y
@@ -105,6 +109,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: displacement_z
@@ -130,6 +135,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: generator_speed_controller
@@ -144,6 +150,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: generator_speed_controller_reference
@@ -169,6 +176,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: bending_moment_y
@@ -183,6 +191,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: bending_monent_x
@@ -197,6 +206,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: torque
@@ -222,6 +232,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: bending_x
@@ -236,6 +247,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: bending_y
@@ -250,6 +262,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: calculated_tilt_moment
@@ -264,6 +277,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: calculated_yaw_moment
@@ -278,6 +292,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: torque
@@ -303,6 +318,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: position
@@ -317,6 +333,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: temperature
@@ -331,6 +348,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: tilt_angle
@@ -345,6 +363,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: wind_speed
@@ -370,6 +389,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: acc_from_back_side_x
@@ -384,6 +404,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: acc_from_back_side_y
@@ -398,6 +419,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: acc_from_back_side_z
@@ -416,6 +438,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: gearbox
       description: null
@@ -433,6 +456,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: generator
       description: null
@@ -450,6 +474,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: high_speed_shaft
       description: null
@@ -467,6 +492,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: main_shaft
       description: null
@@ -484,6 +510,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: power_inverter
       description: null
@@ -497,6 +524,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: yaw_direction
@@ -511,6 +539,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: yaw_error
@@ -536,6 +565,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: active_power_total
@@ -550,6 +580,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: apparent_power_total
@@ -564,6 +595,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: reactive_power_total
@@ -589,6 +621,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: rotor_speed_controller
@@ -603,6 +636,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: rpm_low_speed_shaft
@@ -628,6 +662,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: edgewise_bend_mom_crosstalk_corrected
@@ -642,6 +677,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: edgewise_bend_mom_offset
@@ -656,6 +692,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: edgewise_bend_mom_offset_crosstalk_corrected
@@ -670,6 +707,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: edgewisewise_bend_mom
@@ -684,6 +722,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: flapwise_bend_mom
@@ -698,6 +737,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: flapwise_bend_mom_crosstalk_corrected
@@ -712,6 +752,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: flapwise_bend_mom_offset
@@ -726,6 +767,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: flapwise_bend_mom_offset_crosstalk_corrected
@@ -740,6 +782,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: position
@@ -779,6 +822,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: capacity
@@ -811,6 +855,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: nacelle
       description: null
@@ -825,6 +870,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -843,6 +889,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: rotor
       description: null
@@ -857,6 +904,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: windfarm

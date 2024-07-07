@@ -24,6 +24,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -64,6 +65,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -79,6 +81,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: SubValue
