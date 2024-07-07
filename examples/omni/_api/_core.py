@@ -9,7 +9,7 @@ from itertools import groupby
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast, Union, ClassVar
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast, ClassVar
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
