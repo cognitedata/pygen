@@ -36,12 +36,12 @@ from ._core import (
 from .implementation_2_query import Implementation2QueryAPI
 
 
-class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List]):
+class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List, Implementation2WriteList]):
     _view_id = dm.ViewId("pygen-models", "Implementation2", "1")
     _properties_by_field = _IMPLEMENTATION2_PROPERTIES_BY_FIELD
     _class_type = Implementation2
     _class_list = Implementation2List
-    _class_write_list = Implementation2Write
+    _class_write_list = Implementation2WriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

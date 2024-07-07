@@ -47,12 +47,12 @@ from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
 from .sensor_position_query import SensorPositionQueryAPI
 
 
-class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
+class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):
     _view_id = dm.ViewId("power-models", "SensorPosition", "1")
     _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
     _class_type = SensorPosition
     _class_list = SensorPositionList
-    _class_write_list = SensorPositionWrite
+    _class_write_list = SensorPositionWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

@@ -37,12 +37,12 @@ from .connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
 from .connection_item_d_query import ConnectionItemDQueryAPI
 
 
-class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList]):
+class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
     _properties_by_field = _CONNECTIONITEMD_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemD
     _class_list = ConnectionItemDList
-    _class_write_list = ConnectionItemDWrite
+    _class_write_list = ConnectionItemDWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

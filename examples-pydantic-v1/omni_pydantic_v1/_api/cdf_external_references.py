@@ -36,12 +36,16 @@ from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesA
 from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
-class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList]):
+class CDFExternalReferencesAPI(
+    NodeAPI[
+        CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList, CDFExternalReferencesWriteList
+    ]
+):
     _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
     _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferences
     _class_list = CDFExternalReferencesList
-    _class_write_list = CDFExternalReferencesWrite
+    _class_write_list = CDFExternalReferencesWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

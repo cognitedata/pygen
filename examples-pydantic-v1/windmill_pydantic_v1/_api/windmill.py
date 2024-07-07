@@ -38,12 +38,12 @@ from .windmill_metmast import WindmillMetmastAPI
 from .windmill_query import WindmillQueryAPI
 
 
-class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
+class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteList]):
     _view_id = dm.ViewId("power-models", "Windmill", "1")
     _properties_by_field = _WINDMILL_PROPERTIES_BY_FIELD
     _class_type = Windmill
     _class_list = WindmillList
-    _class_write_list = WindmillWrite
+    _class_write_list = WindmillWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

@@ -40,12 +40,12 @@ from .main_shaft_torque import MainShaftTorqueAPI
 from .main_shaft_query import MainShaftQueryAPI
 
 
-class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
+class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):
     _view_id = dm.ViewId("power-models", "MainShaft", "1")
     _properties_by_field = _MAINSHAFT_PROPERTIES_BY_FIELD
     _class_type = MainShaft
     _class_list = MainShaftList
-    _class_write_list = MainShaftWrite
+    _class_write_list = MainShaftWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

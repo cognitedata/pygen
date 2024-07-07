@@ -41,12 +41,12 @@ from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
 
-class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
+class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList, UnitProcedureWriteList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
     _properties_by_field = _UNITPROCEDURE_PROPERTIES_BY_FIELD
     _class_type = UnitProcedure
     _class_list = UnitProcedureList
-    _class_write_list = UnitProcedureWrite
+    _class_write_list = UnitProcedureWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

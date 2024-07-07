@@ -38,12 +38,12 @@ from .power_inverter_reactive_power_total import PowerInverterReactivePowerTotal
 from .power_inverter_query import PowerInverterQueryAPI
 
 
-class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList]):
+class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList, PowerInverterWriteList]):
     _view_id = dm.ViewId("power-models", "PowerInverter", "1")
     _properties_by_field = _POWERINVERTER_PROPERTIES_BY_FIELD
     _class_type = PowerInverter
     _class_list = PowerInverterList
-    _class_write_list = PowerInverterWrite
+    _class_write_list = PowerInverterWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

@@ -40,12 +40,12 @@ from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
 from .connection_item_f_query import ConnectionItemFQueryAPI
 
 
-class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList]):
+class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList, ConnectionItemFWriteList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
     _properties_by_field = _CONNECTIONITEMF_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemF
     _class_list = ConnectionItemFList
-    _class_write_list = ConnectionItemFWrite
+    _class_write_list = ConnectionItemFWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

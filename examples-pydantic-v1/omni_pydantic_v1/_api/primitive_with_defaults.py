@@ -36,12 +36,16 @@ from ._core import (
 from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
-class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList]):
+class PrimitiveWithDefaultsAPI(
+    NodeAPI[
+        PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList, PrimitiveWithDefaultsWriteList
+    ]
+):
     _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
     _properties_by_field = _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD
     _class_type = PrimitiveWithDefaults
     _class_list = PrimitiveWithDefaultsList
-    _class_write_list = PrimitiveWithDefaultsWrite
+    _class_write_list = PrimitiveWithDefaultsWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

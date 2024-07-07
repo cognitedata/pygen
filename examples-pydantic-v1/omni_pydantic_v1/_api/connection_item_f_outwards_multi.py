@@ -5,7 +5,9 @@ import datetime
 from cognite.client import data_modeling as dm
 
 from omni_pydantic_v1.data_classes import (
+    ConnectionEdgeA,
     ConnectionEdgeAList,
+    ConnectionEdgeAWrite,
 )
 from omni_pydantic_v1.data_classes._connection_edge_a import _create_connection_edge_a_filter
 
@@ -15,9 +17,9 @@ from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
     _view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
-    _class_type: ConnectionEdgeA
-    _class_write_type: ConnectionEdgeAWrite
-    _class_list: ConnectionEdgeAList
+    _class_type = ConnectionEdgeA
+    _class_write_type = ConnectionEdgeAWrite
+    _class_list = ConnectionEdgeAList
 
     def list(
         self,

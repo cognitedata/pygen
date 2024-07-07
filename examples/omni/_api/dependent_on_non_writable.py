@@ -38,13 +38,15 @@ from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(
-    NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList]
+    NodeAPI[
+        DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList
+    ]
 ):
     _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
     _properties_by_field = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
     _class_type = DependentOnNonWritable
     _class_list = DependentOnNonWritableList
-    _class_write_list = DependentOnNonWritableWrite
+    _class_write_list = DependentOnNonWritableWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

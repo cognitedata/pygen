@@ -40,12 +40,12 @@ from .connection_item_g_inwards_multi_property import ConnectionItemGInwardsMult
 from .connection_item_g_query import ConnectionItemGQueryAPI
 
 
-class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList]):
+class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList, ConnectionItemGWriteList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemG", "1")
     _properties_by_field = _CONNECTIONITEMG_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemG
     _class_list = ConnectionItemGList
-    _class_write_list = ConnectionItemGWrite
+    _class_write_list = ConnectionItemGWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

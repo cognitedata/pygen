@@ -34,12 +34,12 @@ from .connection_item_c_connection_item_b import ConnectionItemCConnectionItemBA
 from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
-class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
+class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList, ConnectionItemCWriteList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     _properties_by_field = {}
     _class_type = ConnectionItemC
     _class_list = ConnectionItemCList
-    _class_write_list = ConnectionItemCWrite
+    _class_write_list = ConnectionItemCWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

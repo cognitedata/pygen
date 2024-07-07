@@ -36,12 +36,12 @@ from ._core import (
 from .main_interface_query import MainInterfaceQueryAPI
 
 
-class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList]):
+class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):
     _view_id = dm.ViewId("pygen-models", "MainInterface", "1")
     _properties_by_field = _MAININTERFACE_PROPERTIES_BY_FIELD
     _class_type = MainInterface
     _class_list = MainInterfaceList
-    _class_write_list = MainInterfaceWrite
+    _class_write_list = MainInterfaceWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

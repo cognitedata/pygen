@@ -37,12 +37,12 @@ from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
 from .rotor_query import RotorQueryAPI
 
 
-class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
+class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
     _view_id = dm.ViewId("power-models", "Rotor", "1")
     _properties_by_field = _ROTOR_PROPERTIES_BY_FIELD
     _class_type = Rotor
     _class_list = RotorList
-    _class_write_list = RotorWrite
+    _class_write_list = RotorWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

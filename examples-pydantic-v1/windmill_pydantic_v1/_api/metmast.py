@@ -38,12 +38,12 @@ from .metmast_wind_speed import MetmastWindSpeedAPI
 from .metmast_query import MetmastQueryAPI
 
 
-class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
+class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
     _view_id = dm.ViewId("power-models", "Metmast", "1")
     _properties_by_field = _METMAST_PROPERTIES_BY_FIELD
     _class_type = Metmast
     _class_list = MetmastList
-    _class_write_list = MetmastWrite
+    _class_write_list = MetmastWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

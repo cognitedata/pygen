@@ -82,8 +82,8 @@ class SequenceNotStr(Protocol[_T_co]):
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     _view_id: ClassVar[dm.ViewId]
     _properties_by_field: ClassVar[dict[str, str]]
-    _class_type: type[T_DomainModel]
-    _class_list: type[T_DomainModelList]
+    _class_type: ClassVar[type[T_DomainModel]]
+    _class_list: ClassVar[type[T_DomainModelList]]
 
     def __init__(self, client: CogniteClient):
         self._client = client

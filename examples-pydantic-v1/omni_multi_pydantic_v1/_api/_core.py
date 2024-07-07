@@ -435,9 +435,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
 
 class NodeAPI(
-    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList], ABC
+    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList, T_DomainModelWriteList],
+    NodeReadAPI[T_DomainModel, T_DomainModelList],
+    ABC,
 ):
-    _class_write_list: ClassVar[type[T_DomainModelWriteList]]
+    _class_write_list: type[T_DomainModelWriteList]
 
     def _apply(
         self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False

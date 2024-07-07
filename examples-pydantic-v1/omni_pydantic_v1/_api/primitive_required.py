@@ -37,12 +37,14 @@ from ._core import (
 from .primitive_required_query import PrimitiveRequiredQueryAPI
 
 
-class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList]):
+class PrimitiveRequiredAPI(
+    NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList, PrimitiveRequiredWriteList]
+):
     _view_id = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
     _properties_by_field = _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequired
     _class_list = PrimitiveRequiredList
-    _class_write_list = PrimitiveRequiredWrite
+    _class_write_list = PrimitiveRequiredWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

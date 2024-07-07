@@ -38,12 +38,12 @@ from .high_speed_shaft_torque import HighSpeedShaftTorqueAPI
 from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
-class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList]):
+class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList, HighSpeedShaftWriteList]):
     _view_id = dm.ViewId("power-models", "HighSpeedShaft", "1")
     _properties_by_field = _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD
     _class_type = HighSpeedShaft
     _class_list = HighSpeedShaftList
-    _class_write_list = HighSpeedShaftWrite
+    _class_write_list = HighSpeedShaftWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

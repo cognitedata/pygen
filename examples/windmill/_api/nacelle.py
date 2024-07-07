@@ -40,12 +40,12 @@ from .nacelle_yaw_error import NacelleYawErrorAPI
 from .nacelle_query import NacelleQueryAPI
 
 
-class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
+class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
     _view_id = dm.ViewId("power-models", "Nacelle", "1")
     _properties_by_field = _NACELLE_PROPERTIES_BY_FIELD
     _class_type = Nacelle
     _class_list = NacelleList
-    _class_write_list = NacelleWrite
+    _class_write_list = NacelleWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

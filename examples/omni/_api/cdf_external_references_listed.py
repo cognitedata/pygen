@@ -37,13 +37,18 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 
 
 class CDFExternalReferencesListedAPI(
-    NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedWrite, CDFExternalReferencesListedList]
+    NodeAPI[
+        CDFExternalReferencesListed,
+        CDFExternalReferencesListedWrite,
+        CDFExternalReferencesListedList,
+        CDFExternalReferencesListedWriteList,
+    ]
 ):
     _view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
     _properties_by_field = _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferencesListed
     _class_list = CDFExternalReferencesListedList
-    _class_write_list = CDFExternalReferencesListedWrite
+    _class_write_list = CDFExternalReferencesListedWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)

@@ -38,12 +38,14 @@ from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
 from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 
-class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList]):
+class ScenarioInstanceAPI(
+    NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList, ScenarioInstanceWriteList]
+):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
     _properties_by_field = _SCENARIOINSTANCE_PROPERTIES_BY_FIELD
     _class_type = ScenarioInstance
     _class_list = ScenarioInstanceList
-    _class_write_list = ScenarioInstanceWrite
+    _class_write_list = ScenarioInstanceWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
