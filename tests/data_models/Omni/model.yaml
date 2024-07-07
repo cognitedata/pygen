@@ -23,6 +23,7 @@ views:
         type: file
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: file
@@ -37,6 +38,7 @@ views:
         type: sequence
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: sequence
@@ -51,6 +53,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timeseries
@@ -76,6 +79,7 @@ views:
         type: file
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: files
@@ -90,6 +94,7 @@ views:
         type: sequence
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: sequences
@@ -104,6 +109,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timeseries
@@ -129,6 +135,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: endTime
@@ -144,6 +151,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -158,6 +166,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: startTime
@@ -192,6 +201,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -210,6 +220,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: otherDirect
       description: null
@@ -241,6 +252,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: selfDirect
       description: null
@@ -288,6 +300,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -386,6 +399,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: selfDirect
       description: null
@@ -403,6 +417,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: otherDirect
       description: null
@@ -417,6 +432,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -464,6 +480,7 @@ views:
         type: direct
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: directNoSource
@@ -543,6 +560,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -580,6 +598,7 @@ views:
           version: '1'
       nullable: true
       autoIncrement: false
+      immutable: false
       defaultValue: null
       name: directList
       description: null
@@ -594,6 +613,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -682,6 +702,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: name
@@ -716,6 +737,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: aValue
@@ -763,6 +785,7 @@ views:
         type: boolean
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -777,6 +800,7 @@ views:
         type: date
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: date
@@ -791,6 +815,7 @@ views:
         type: float32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float32
@@ -805,6 +830,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float64
@@ -819,6 +845,7 @@ views:
         type: int32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int32
@@ -833,6 +860,7 @@ views:
         type: int64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int64
@@ -847,6 +875,7 @@ views:
         type: json
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: json
@@ -862,6 +891,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -876,6 +906,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timestamp
@@ -918,6 +949,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -933,6 +965,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: SubValue
@@ -948,6 +981,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: Value1
@@ -963,6 +997,7 @@ views:
         type: text
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: Value2
@@ -1001,6 +1036,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -1016,6 +1052,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: SubValue
@@ -1031,6 +1068,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: Value1
@@ -1069,6 +1107,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -1084,6 +1123,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: SubValue
@@ -1110,6 +1150,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -1135,6 +1176,7 @@ views:
         type: boolean
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1149,6 +1191,7 @@ views:
         type: date
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: date
@@ -1163,6 +1206,7 @@ views:
         type: float32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float32
@@ -1177,6 +1221,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float64
@@ -1191,6 +1236,7 @@ views:
         type: int32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int32
@@ -1205,6 +1251,7 @@ views:
         type: int64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int64
@@ -1219,6 +1266,7 @@ views:
         type: json
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: json
@@ -1234,6 +1282,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1248,6 +1297,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timestamp
@@ -1273,6 +1323,7 @@ views:
         type: boolean
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1287,6 +1338,7 @@ views:
         type: date
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: date
@@ -1301,6 +1353,7 @@ views:
         type: float32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float32
@@ -1315,6 +1368,7 @@ views:
         type: float64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float64
@@ -1329,6 +1383,7 @@ views:
         type: int32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int32
@@ -1343,6 +1398,7 @@ views:
         type: int64
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int64
@@ -1357,6 +1413,7 @@ views:
         type: json
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: json
@@ -1372,6 +1429,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1386,6 +1444,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timestamp
@@ -1411,6 +1470,7 @@ views:
         type: boolean
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1425,6 +1485,7 @@ views:
         type: date
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: date
@@ -1439,6 +1500,7 @@ views:
         type: float32
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float32
@@ -1453,6 +1515,7 @@ views:
         type: float64
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float64
@@ -1467,6 +1530,7 @@ views:
         type: int32
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int32
@@ -1481,6 +1545,7 @@ views:
         type: int64
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int64
@@ -1495,6 +1560,7 @@ views:
         type: json
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: json
@@ -1510,6 +1576,7 @@ views:
         type: text
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1524,6 +1591,7 @@ views:
         type: timestamp
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timestamp
@@ -1549,6 +1617,7 @@ views:
         type: boolean
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1563,6 +1632,7 @@ views:
         type: date
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: date
@@ -1577,6 +1647,7 @@ views:
         type: float32
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float32
@@ -1591,6 +1662,7 @@ views:
         type: float64
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: float64
@@ -1605,6 +1677,7 @@ views:
         type: int32
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int32
@@ -1619,6 +1692,7 @@ views:
         type: int64
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: int64
@@ -1633,6 +1707,7 @@ views:
         type: json
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: json
@@ -1648,6 +1723,7 @@ views:
         type: text
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: text
@@ -1662,6 +1738,7 @@ views:
         type: timestamp
       nullable: false
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: timestamp
@@ -1687,6 +1764,7 @@ views:
         type: int32
       nullable: false
       autoIncrement: true
+      immutable: false
       source: null
       defaultValue: null
       name: autoIncrementInt32
@@ -1701,6 +1779,7 @@ views:
         type: boolean
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: true
       name: defaultBoolean
@@ -1715,6 +1794,7 @@ views:
         type: float32
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: 0.42
       name: defaultFloat32
@@ -1729,6 +1809,7 @@ views:
         type: json
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue:
         foo: bar
@@ -1745,6 +1826,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: my default text
       name: defaultString
@@ -1785,6 +1867,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: MainValue
@@ -1800,6 +1883,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: SubValue

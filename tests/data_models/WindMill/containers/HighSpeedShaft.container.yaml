@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: torque
   bending_monent_x:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: bending_monent_x
   bending_moment_y:
     type:
@@ -23,4 +25,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: bending_moment_y

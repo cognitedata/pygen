@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: name
   description:
     type:
@@ -18,6 +19,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: description
   sensor_value:
     type:
@@ -25,6 +27,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: sensor_value
   type:
     type:
@@ -33,4 +36,5 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: type

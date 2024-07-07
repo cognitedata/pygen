@@ -33,16 +33,16 @@ def test_filter_on_boolean(omni_client: OmniClient) -> None:
     items = omni_client.primitive_required.list(boolean=False, limit=-1)
 
     assert len(items) > 0
-    assert not (is_true := [item for item in items if item.boolean]), f"Found items with boolean=True: {is_true}"
+    is_true = [item for item in items if item.boolean]
+    assert not is_true, f"Found items with boolean=True: {is_true}"
 
 
 def test_filter_on_minimum_0(omni_client: OmniClient) -> None:
     items = omni_client.primitive_required.list(min_int_32=0, min_float_32=0.0, limit=-1)
 
     assert len(items) > 0
-    assert not (
-        is_not_0 := [item for item in items if item.int_32 < 0 or item.float_32 < 0.0]
-    ), f"Found items that are below 0: {is_not_0}"
+    is_not_0 = [item for item in items if item.int_32 < 0 or item.float_32 < 0.0]
+    assert not is_not_0, f"Found items that are below 0: {is_not_0}"
 
 
 def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
@@ -76,9 +76,8 @@ def test_filter_range(omni_client: OmniClient) -> None:
 
     # Assert
     assert len(filtered_items) > 0
-    assert not (
-        is_below := [item for item in filtered_items if item.int_32 < items[2].int_32]
-    ), f"Fount items below: {is_below}"
+    is_below = [item for item in filtered_items if item.int_32 < items[2].int_32]
+    assert not is_below, f"Fount items below: {is_below}"
 
 
 def test_list_above_5000_items(omni_client: OmniClient) -> None:

@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: type
   description:
     type:
@@ -18,6 +19,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: description
   performedBy:
     type:
@@ -26,4 +28,5 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: performedBy

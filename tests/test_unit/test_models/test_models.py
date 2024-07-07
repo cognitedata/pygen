@@ -41,6 +41,7 @@ def load_field_test_cases():
         "type": {"list": True, "collation": "ucs_basic", "type": "text"},
         "nullable": True,
         "autoIncrement": False,
+        "immutable": False,
         "source": None,
         "defaultValue": None,
         "name": "runEvents",
@@ -75,6 +76,7 @@ def load_field_test_cases():
         },
         "nullable": True,
         "autoIncrement": False,
+        "immutable": False,
         "default_value": None,
         "name": "modelTemplate",
         "description": None,
@@ -105,6 +107,7 @@ def load_field_test_cases():
     )
     raw_data = """
     autoIncrement: false
+    immutable: false
     container:
       externalId: Market
       space: market
@@ -182,6 +185,7 @@ def load_data_classes_test_cases():
                 "type": {"list": False, "type": "timestamp"},
                 "nullable": True,
                 "autoIncrement": False,
+                "immutable": False,
                 "source": None,
                 "defaultValue": None,
                 "name": "timeIntervalStart",
@@ -193,6 +197,7 @@ def load_data_classes_test_cases():
                 "type": {"list": False, "type": "timestamp"},
                 "nullable": True,
                 "autoIncrement": False,
+                "immutable": False,
                 "source": None,
                 "defaultValue": None,
                 "name": "timeIntervalEnd",
@@ -209,6 +214,7 @@ def load_data_classes_test_cases():
                 },
                 "nullable": True,
                 "autoIncrement": False,
+                "immutable": False,
                 "defaultValue": None,
                 "name": "resolution",
                 "description": None,
@@ -324,7 +330,15 @@ def test_filter_condition(filter_condition: FilterImplementation, expected_args:
 )
 def test_field_from_property_expect_warning(name: str, expected_name, pygen_config: PygenConfig) -> None:
     # Arrange
-    prop = dm.MappedProperty(dm.ContainerId("dummy", "dummy"), name, dm.Text(), True, True, name=name)
+    prop = dm.MappedProperty(
+        container=dm.ContainerId("dummy", "dummy"),
+        container_property_identifier=name,
+        type=dm.Text(),
+        nullable=True,
+        immutable=False,
+        auto_increment=False,
+        name=name,
+    )
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
@@ -431,6 +445,7 @@ def create_fields_test_cases():
         "defaultValue": None,
         "name": "name",
         "description": None,
+        "immutable": False,
     }
     prop = ViewProperty.load(prop)
     #
@@ -510,6 +525,7 @@ def create_fields_test_cases():
         "type": {"list": True, "collation": "ucs_basic", "type": "text"},
         "nullable": False,
         "autoIncrement": False,
+        "immutable": False,
         "source": None,
         "defaultValue": None,
         "name": "configs",
@@ -547,6 +563,7 @@ def create_fields_test_cases():
         },
         "nullable": True,
         "autoIncrement": False,
+        "immutable": False,
         "defaultValue": None,
         "name": "person",
         "description": None,
@@ -604,6 +621,7 @@ def create_fields_test_cases():
         "defaultValue": None,
         "name": "wonOscar",
         "description": None,
+        "immutable": False,
     }
     prop = ViewProperty.load(prop)
 
@@ -669,6 +687,7 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
             "type": {"list": False, "collation": "ucs_basic", "type": "text"},
             "nullable": True,
             "autoIncrement": False,
+            "immutable": False,
             "source": None,
             "defaultValue": None,
             "name": "name",
@@ -680,6 +699,7 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
             "type": {"list": False, "collation": "ucs_basic", "type": "text"},
             "nullable": True,
             "autoIncrement": False,
+            "immutable": False,
             "source": None,
             "defaultValue": None,
             "name": "description",
@@ -691,6 +711,7 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
             "type": {"list": False, "type": "timeseries"},
             "nullable": True,
             "autoIncrement": False,
+            "immutable": False,
             "source": None,
             "defaultValue": None,
             "name": "dayAheadPrice",

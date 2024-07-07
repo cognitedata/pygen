@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: generator_speed_controller
   generator_speed_controller_reference:
     type:
@@ -16,4 +17,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: generator_speed_controller_reference
