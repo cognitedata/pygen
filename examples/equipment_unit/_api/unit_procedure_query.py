@@ -100,7 +100,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         from .work_order_query import WorkOrderQueryAPI
 
         from_ = self._builder[-1].name
-        edge_view = self._view_by_read_class[StartEndTime]
+        edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
             edge_view,
