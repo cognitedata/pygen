@@ -237,7 +237,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
             properties=properties,
             filter_=filter_,
@@ -326,7 +325,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,{% if data_class.has_primitive_field_of_type(dm.Text) %}
@@ -369,7 +367,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
