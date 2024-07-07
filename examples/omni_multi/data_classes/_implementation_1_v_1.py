@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -32,6 +31,7 @@ __all__ = [
     "Implementation1v1ApplyList",
     "Implementation1v1Fields",
     "Implementation1v1TextFields",
+    "Implementation1v1GraphQL",
 ]
 
 
@@ -60,7 +60,7 @@ class Implementation1v1GraphQL(GraphQLCore):
         value_2: The value 2 field.
     """
 
-    view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: Optional[str] = Field(None, alias="value2")

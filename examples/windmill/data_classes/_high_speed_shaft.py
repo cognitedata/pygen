@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "HighSpeedShaftApplyList",
     "HighSpeedShaftFields",
     "HighSpeedShaftTextFields",
+    "HighSpeedShaftGraphQL",
 ]
 
 
@@ -61,7 +61,7 @@ class HighSpeedShaftGraphQL(GraphQLCore):
         torque: The torque field.
     """
 
-    view_id = dm.ViewId("power-models", "HighSpeedShaft", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
     bending_moment_y: Union[TimeSeries, dict, None] = None
     bending_monent_x: Union[TimeSeries, dict, None] = None
     torque: Union[TimeSeries, dict, None] = None

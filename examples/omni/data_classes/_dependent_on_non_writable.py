@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "DependentOnNonWritableApplyList",
     "DependentOnNonWritableFields",
     "DependentOnNonWritableTextFields",
+    "DependentOnNonWritableGraphQL",
 ]
 
 
@@ -60,7 +60,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
         to_non_writable: The to non writable field.
     """
 
-    view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
         default=None, repr=False, alias="toNonWritable"

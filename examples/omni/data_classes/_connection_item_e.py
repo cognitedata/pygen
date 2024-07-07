@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "ConnectionItemEApplyList",
     "ConnectionItemEFields",
     "ConnectionItemETextFields",
+    "ConnectionItemEGraphQL",
 ]
 
 
@@ -61,7 +61,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         name: The name field.
     """
 
-    view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
     direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
     inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None

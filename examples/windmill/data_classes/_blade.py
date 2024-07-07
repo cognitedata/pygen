@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "BladeApplyList",
     "BladeFields",
     "BladeTextFields",
+    "BladeGraphQL",
 ]
 
 
@@ -62,7 +62,7 @@ class BladeGraphQL(GraphQLCore):
         sensor_positions: The sensor position field.
     """
 
-    view_id = dm.ViewId("power-models", "Blade", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
     sensor_positions: Optional[list[SensorPositionGraphQL]] = Field(default=None, repr=False)

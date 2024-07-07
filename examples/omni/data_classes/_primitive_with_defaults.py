@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -32,6 +31,7 @@ __all__ = [
     "PrimitiveWithDefaultsApplyList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
+    "PrimitiveWithDefaultsGraphQL",
 ]
 
 
@@ -66,7 +66,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         default_string: The default string field.
     """
 
-    view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
     auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")

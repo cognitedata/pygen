@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "UnitProcedureApplyList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
+    "UnitProcedureGraphQL",
 ]
 
 
@@ -63,7 +63,7 @@ class UnitProcedureGraphQL(GraphQLCore):
         work_units: The work unit field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)

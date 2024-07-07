@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -41,6 +40,7 @@ __all__ = [
     "NacelleApplyList",
     "NacelleFields",
     "NacelleTextFields",
+    "NacelleGraphQL",
 ]
 
 
@@ -82,7 +82,7 @@ class NacelleGraphQL(GraphQLCore):
         yaw_error: The yaw error field.
     """
 
-    view_id = dm.ViewId("power-models", "Nacelle", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
     acc_from_back_side_x: Union[TimeSeries, dict, None] = None
     acc_from_back_side_y: Union[TimeSeries, dict, None] = None
     acc_from_back_side_z: Union[TimeSeries, dict, None] = None

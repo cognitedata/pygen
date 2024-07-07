@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "MetmastApplyList",
     "MetmastFields",
     "MetmastTextFields",
+    "MetmastGraphQL",
 ]
 
 
@@ -63,7 +63,7 @@ class MetmastGraphQL(GraphQLCore):
         wind_speed: The wind speed field.
     """
 
-    view_id = dm.ViewId("power-models", "Metmast", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
     temperature: Union[TimeSeries, dict, None] = None
     tilt_angle: Union[TimeSeries, dict, None] = None

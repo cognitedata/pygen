@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "RotorApplyList",
     "RotorFields",
     "RotorTextFields",
+    "RotorGraphQL",
 ]
 
 
@@ -59,7 +59,7 @@ class RotorGraphQL(GraphQLCore):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
-    view_id = dm.ViewId("power-models", "Rotor", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
     rotor_speed_controller: Union[TimeSeries, dict, None] = None
     rpm_low_speed_shaft: Union[TimeSeries, dict, None] = None
 

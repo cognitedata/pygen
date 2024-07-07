@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -34,6 +33,7 @@ __all__ = [
     "EquipmentModuleApplyList",
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
+    "EquipmentModuleGraphQL",
 ]
 
 
@@ -64,7 +64,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
         type_: The type field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, dict, None] = None

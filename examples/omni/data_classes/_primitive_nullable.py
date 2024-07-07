@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "PrimitiveNullableApplyList",
     "PrimitiveNullableFields",
     "PrimitiveNullableTextFields",
+    "PrimitiveNullableGraphQL",
 ]
 
 
@@ -75,7 +75,7 @@ class PrimitiveNullableGraphQL(GraphQLCore):
         timestamp: The timestamp field.
     """
 
-    view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")

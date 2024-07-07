@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "MainShaftApplyList",
     "MainShaftFields",
     "MainShaftTextFields",
+    "MainShaftGraphQL",
 ]
 
 
@@ -65,7 +65,7 @@ class MainShaftGraphQL(GraphQLCore):
         torque: The torque field.
     """
 
-    view_id = dm.ViewId("power-models", "MainShaft", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
     bending_x: Union[TimeSeries, dict, None] = None
     bending_y: Union[TimeSeries, dict, None] = None
     calculated_tilt_moment: Union[TimeSeries, dict, None] = None

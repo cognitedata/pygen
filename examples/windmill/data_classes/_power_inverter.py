@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "PowerInverterApplyList",
     "PowerInverterFields",
     "PowerInverterTextFields",
+    "PowerInverterGraphQL",
 ]
 
 
@@ -61,7 +61,7 @@ class PowerInverterGraphQL(GraphQLCore):
         reactive_power_total: The reactive power total field.
     """
 
-    view_id = dm.ViewId("power-models", "PowerInverter", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
     active_power_total: Union[TimeSeries, dict, None] = None
     apparent_power_total: Union[TimeSeries, dict, None] = None
     reactive_power_total: Union[TimeSeries, dict, None] = None

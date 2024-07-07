@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "PrimitiveRequiredListedApplyList",
     "PrimitiveRequiredListedFields",
     "PrimitiveRequiredListedTextFields",
+    "PrimitiveRequiredListedGraphQL",
 ]
 
 
@@ -75,7 +75,7 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
         timestamp: The timestamp field.
     """
 
-    view_id = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
     boolean: Optional[list[bool]] = None
     date: Optional[list[datetime.date]] = None
     float_32: Optional[list[float]] = Field(None, alias="float32")

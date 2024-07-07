@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "GeneratorApplyList",
     "GeneratorFields",
     "GeneratorTextFields",
+    "GeneratorGraphQL",
 ]
 
 
@@ -59,7 +59,7 @@ class GeneratorGraphQL(GraphQLCore):
         generator_speed_controller_reference: The generator speed controller reference field.
     """
 
-    view_id = dm.ViewId("power-models", "Generator", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
     generator_speed_controller: Union[TimeSeries, dict, None] = None
     generator_speed_controller_reference: Union[TimeSeries, dict, None] = None
 

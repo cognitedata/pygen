@@ -15,7 +15,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "ScenarioInstanceApplyList",
     "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
+    "ScenarioInstanceGraphQL",
 ]
 
 
@@ -75,7 +75,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
         start: The start field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None

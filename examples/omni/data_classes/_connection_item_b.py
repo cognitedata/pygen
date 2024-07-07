@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -24,7 +23,6 @@ from ._core import (
 
 if TYPE_CHECKING:
     from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [
@@ -36,6 +34,7 @@ __all__ = [
     "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
+    "ConnectionItemBGraphQL",
 ]
 
 
@@ -62,7 +61,7 @@ class ConnectionItemBGraphQL(GraphQLCore):
         self_edge: The self edge field.
     """
 
-    view_id = dm.ViewId("pygen-models", "ConnectionItemB", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemB", "1")
     inwards: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False)
     name: Optional[str] = None
     self_edge: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="selfEdge")

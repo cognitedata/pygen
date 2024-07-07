@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "GearboxApplyList",
     "GearboxFields",
     "GearboxTextFields",
+    "GearboxGraphQL",
 ]
 
 
@@ -61,7 +61,7 @@ class GearboxGraphQL(GraphQLCore):
         displacement_z: The displacement z field.
     """
 
-    view_id = dm.ViewId("power-models", "Gearbox", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
     displacement_x: Union[TimeSeries, dict, None] = None
     displacement_y: Union[TimeSeries, dict, None] = None
     displacement_z: Union[TimeSeries, dict, None] = None

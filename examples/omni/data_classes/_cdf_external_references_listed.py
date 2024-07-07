@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
     "CDFExternalReferencesListedTextFields",
+    "CDFExternalReferencesListedGraphQL",
 ]
 
 
@@ -61,7 +61,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         timeseries: The timesery field.
     """
 
-    view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
     files: Optional[list[dict]] = None
     sequences: Optional[list[dict]] = None
     timeseries: Union[list[TimeSeries], list[dict], None] = None

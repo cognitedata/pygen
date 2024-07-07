@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -38,6 +37,7 @@ __all__ = [
     "WindmillApplyList",
     "WindmillFields",
     "WindmillTextFields",
+    "WindmillGraphQL",
 ]
 
 
@@ -70,7 +70,7 @@ class WindmillGraphQL(GraphQLCore):
         windfarm: The windfarm field.
     """
 
-    view_id = dm.ViewId("power-models", "Windmill", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
     blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Optional[list[MetmastGraphQL]] = Field(default=None, repr=False)

@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -32,6 +31,7 @@ __all__ = [
     "MainInterfaceApplyList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
+    "MainInterfaceGraphQL",
 ]
 
 
@@ -56,7 +56,7 @@ class MainInterfaceGraphQL(GraphQLCore):
         main_value: The main value field.
     """
 
-    view_id = dm.ViewId("pygen-models", "MainInterface", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     @model_validator(mode="before")

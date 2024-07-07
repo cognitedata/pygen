@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -32,6 +31,7 @@ __all__ = [
     "WorkOrderApplyList",
     "WorkOrderFields",
     "WorkOrderTextFields",
+    "WorkOrderGraphQL",
 ]
 
 
@@ -60,7 +60,7 @@ class WorkOrderGraphQL(GraphQLCore):
         type_: The type field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
     type_: Optional[str] = Field(None, alias="type")
