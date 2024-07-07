@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -32,6 +31,7 @@ __all__ = [
     "PrimitiveWithDefaultsApplyList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
+    "PrimitiveWithDefaultsGraphQL",
 ]
 
 
@@ -66,7 +66,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         default_string: The default string field.
     """
 
-    view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
     auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
@@ -133,6 +133,8 @@ class PrimitiveWithDefaults(DomainModel):
         default_string: The default string field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
@@ -180,6 +182,8 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_string: The default string field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
@@ -191,17 +195,12 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(
-            PrimitiveWithDefaults, dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
-        )
 
         properties: dict[str, Any] = {}
 
@@ -228,7 +227,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],

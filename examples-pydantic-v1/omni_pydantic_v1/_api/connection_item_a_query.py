@@ -22,15 +22,16 @@ if TYPE_CHECKING:
 
 
 class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -39,7 +40,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[ConnectionItemA], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemA,
                 max_retrieve_limit=limit,
             )
@@ -97,7 +98,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[ConnectionItemB]
+        view_id = ConnectionItemBQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_connection_item_b_filter(
             view_id,
@@ -111,7 +112,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_other_direct(from_)
         if retrieve_self_direct:
             self._query_append_self_direct(from_)
-        return ConnectionItemBQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,
@@ -136,14 +137,14 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_other_direct(self, from_: str) -> None:
-        view_id = self._view_by_read_class[ConnectionItemC]
+        view_id = ConnectionItemC._view_id
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("other_direct"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_read_class[ConnectionItemA].as_property_ref("otherDirect"),
+                    through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -154,14 +155,14 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_self_direct(self, from_: str) -> None:
-        view_id = self._view_by_read_class[ConnectionItemA]
+        view_id = ConnectionItemA._view_id
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("self_direct"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_read_class[ConnectionItemA].as_property_ref("selfDirect"),
+                    through=self._view_id.as_property_ref("selfDirect"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

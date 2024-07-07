@@ -40,17 +40,15 @@ from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 class DependentOnNonWritableAPI(
     NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[DependentOnNonWritable]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=DependentOnNonWritable,
-            class_list=DependentOnNonWritableList,
-            class_write_list=DependentOnNonWritableWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    _properties_by_field = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
+    _class_type = DependentOnNonWritable
+    _class_list = DependentOnNonWritableList
+    _class_write_list = DependentOnNonWritableWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
 
     def __call__(
@@ -86,7 +84,7 @@ class DependentOnNonWritableAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(DependentOnNonWritableList)
-        return DependentOnNonWritableQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return DependentOnNonWritableQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -259,9 +257,7 @@ class DependentOnNonWritableAPI(
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -368,9 +364,7 @@ class DependentOnNonWritableAPI(
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -419,10 +413,8 @@ class DependentOnNonWritableAPI(
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -482,7 +474,6 @@ class DependentOnNonWritableAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

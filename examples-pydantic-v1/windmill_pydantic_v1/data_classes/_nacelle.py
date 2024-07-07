@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -40,6 +39,7 @@ __all__ = [
     "NacelleApplyList",
     "NacelleFields",
     "NacelleTextFields",
+    "NacelleGraphQL",
 ]
 
 
@@ -81,7 +81,7 @@ class NacelleGraphQL(GraphQLCore):
         yaw_error: The yaw error field.
     """
 
-    view_id = dm.ViewId("power-models", "Nacelle", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
     acc_from_back_side_x: Union[TimeSeries, dict, None] = None
     acc_from_back_side_y: Union[TimeSeries, dict, None] = None
     acc_from_back_side_z: Union[TimeSeries, dict, None] = None
@@ -198,6 +198,8 @@ class Nacelle(DomainModel):
         yaw_error: The yaw error field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
@@ -266,6 +268,8 @@ class NacelleWrite(DomainModelWrite):
         yaw_error: The yaw error field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
@@ -282,15 +286,12 @@ class NacelleWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(Nacelle, dm.ViewId("power-models", "Nacelle", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -373,7 +374,7 @@ class NacelleWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -382,23 +383,23 @@ class NacelleWrite(DomainModelWrite):
             cache.add(self.as_tuple_id())
 
         if isinstance(self.gearbox, DomainModelWrite):
-            other_resources = self.gearbox._to_instances_write(cache, view_by_read_class)
+            other_resources = self.gearbox._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.generator, DomainModelWrite):
-            other_resources = self.generator._to_instances_write(cache, view_by_read_class)
+            other_resources = self.generator._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.high_speed_shaft, DomainModelWrite):
-            other_resources = self.high_speed_shaft._to_instances_write(cache, view_by_read_class)
+            other_resources = self.high_speed_shaft._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.main_shaft, DomainModelWrite):
-            other_resources = self.main_shaft._to_instances_write(cache, view_by_read_class)
+            other_resources = self.main_shaft._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.power_inverter, DomainModelWrite):
-            other_resources = self.power_inverter._to_instances_write(cache, view_by_read_class)
+            other_resources = self.power_inverter._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.acc_from_back_side_x, TimeSeries):

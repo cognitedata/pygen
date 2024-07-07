@@ -39,18 +39,16 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 class CDFExternalReferencesListedAPI(
     NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedWrite, CDFExternalReferencesListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[CDFExternalReferencesListed]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=CDFExternalReferencesListed,
-            class_list=CDFExternalReferencesListedList,
-            class_write_list=CDFExternalReferencesListedWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.timeseries = CDFExternalReferencesListedTimeseriesAPI(client, view_id)
+    _view_id = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    _properties_by_field = _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD
+    _class_type = CDFExternalReferencesListed
+    _class_list = CDFExternalReferencesListedList
+    _class_write_list = CDFExternalReferencesListedWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.timeseries = CDFExternalReferencesListedTimeseriesAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -79,7 +77,7 @@ class CDFExternalReferencesListedAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(CDFExternalReferencesListedList)
-        return CDFExternalReferencesListedQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return CDFExternalReferencesListedQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -263,9 +261,7 @@ class CDFExternalReferencesListedAPI(
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -304,10 +300,8 @@ class CDFExternalReferencesListedAPI(
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -358,7 +352,6 @@ class CDFExternalReferencesListedAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

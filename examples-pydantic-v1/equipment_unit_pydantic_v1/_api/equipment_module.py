@@ -38,18 +38,16 @@ from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[EquipmentModule]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=EquipmentModule,
-            class_list=EquipmentModuleList,
-            class_write_list=EquipmentModuleWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+    _properties_by_field = _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+    _class_type = EquipmentModule
+    _class_list = EquipmentModuleList
+    _class_write_list = EquipmentModuleWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.sensor_value = EquipmentModuleSensorValueAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -96,7 +94,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EquipmentModuleList)
-        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return EquipmentModuleQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -264,9 +262,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -393,9 +389,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -456,10 +450,8 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -528,7 +520,6 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

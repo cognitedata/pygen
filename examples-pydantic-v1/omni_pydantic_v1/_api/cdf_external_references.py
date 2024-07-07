@@ -37,18 +37,16 @@ from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
 class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[CDFExternalReferences]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=CDFExternalReferences,
-            class_list=CDFExternalReferencesList,
-            class_write_list=CDFExternalReferencesWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.timeseries = CDFExternalReferencesTimeseriesAPI(client, view_id)
+    _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
+    _class_type = CDFExternalReferences
+    _class_list = CDFExternalReferencesList
+    _class_write_list = CDFExternalReferencesWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.timeseries = CDFExternalReferencesTimeseriesAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -77,7 +75,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(CDFExternalReferencesList)
-        return CDFExternalReferencesQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return CDFExternalReferencesQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -261,9 +259,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -302,10 +298,8 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -356,7 +350,6 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

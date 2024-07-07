@@ -42,23 +42,17 @@ from .unit_procedure_query import UnitProcedureQueryAPI
 
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[UnitProcedure]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=UnitProcedure,
-            class_list=UnitProcedureList,
-            class_write_list=UnitProcedureWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.work_orders_edge = UnitProcedureWorkOrdersAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
-        )
-        self.work_units_edge = UnitProcedureWorkUnitsAPI(
-            client, view_by_read_class, StartEndTime, StartEndTimeWrite, StartEndTimeList
-        )
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+    _properties_by_field = _UNITPROCEDURE_PROPERTIES_BY_FIELD
+    _class_type = UnitProcedure
+    _class_list = UnitProcedureList
+    _class_write_list = UnitProcedureWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.work_orders_edge = UnitProcedureWorkOrdersAPI(client)
+        self.work_units_edge = UnitProcedureWorkUnitsAPI(client)
 
     def __call__(
         self,
@@ -99,7 +93,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(UnitProcedureList)
-        return UnitProcedureQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return UnitProcedureQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -283,9 +277,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_UNITPROCEDURE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -402,9 +394,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -459,10 +449,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -528,7 +516,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_UNITPROCEDURE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

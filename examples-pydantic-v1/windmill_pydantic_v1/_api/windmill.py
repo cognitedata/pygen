@@ -39,17 +39,15 @@ from .windmill_query import WindmillQueryAPI
 
 
 class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Windmill]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Windmill,
-            class_list=WindmillList,
-            class_write_list=WindmillWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("power-models", "Windmill", "1")
+    _properties_by_field = _WINDMILL_PROPERTIES_BY_FIELD
+    _class_type = Windmill
+    _class_list = WindmillList
+    _class_write_list = WindmillWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
         self.blades_edge = WindmillBladesAPI(client)
         self.metmast_edge = WindmillMetmastAPI(client)
 
@@ -104,7 +102,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(WindmillList)
-        return WindmillQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return WindmillQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -300,9 +298,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_WINDMILL_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -439,9 +435,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _WINDMILL_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -508,10 +502,8 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _WINDMILL_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -589,7 +581,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_WINDMILL_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

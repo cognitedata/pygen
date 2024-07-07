@@ -39,17 +39,15 @@ from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemB]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=ConnectionItemB,
-            class_list=ConnectionItemBList,
-            class_write_list=ConnectionItemBWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemB", "1")
+    _properties_by_field = _CONNECTIONITEMB_PROPERTIES_BY_FIELD
+    _class_type = ConnectionItemB
+    _class_list = ConnectionItemBList
+    _class_write_list = ConnectionItemBWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
         self.inwards_edge = ConnectionItemBInwardsAPI(client)
         self.self_edge_edge = ConnectionItemBSelfEdgeAPI(client)
 
@@ -86,7 +84,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemBList)
-        return ConnectionItemBQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return ConnectionItemBQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -266,9 +264,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_CONNECTIONITEMB_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -375,9 +371,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -426,10 +420,8 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -489,7 +481,6 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CONNECTIONITEMB_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

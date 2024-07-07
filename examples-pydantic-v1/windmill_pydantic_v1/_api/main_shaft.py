@@ -41,22 +41,20 @@ from .main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[MainShaft]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=MainShaft,
-            class_list=MainShaftList,
-            class_write_list=MainShaftWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.bending_x = MainShaftBendingXAPI(client, view_id)
-        self.bending_y = MainShaftBendingYAPI(client, view_id)
-        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, view_id)
-        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, view_id)
-        self.torque = MainShaftTorqueAPI(client, view_id)
+    _view_id = dm.ViewId("power-models", "MainShaft", "1")
+    _properties_by_field = _MAINSHAFT_PROPERTIES_BY_FIELD
+    _class_type = MainShaft
+    _class_list = MainShaftList
+    _class_write_list = MainShaftWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.bending_x = MainShaftBendingXAPI(client, self._view_id)
+        self.bending_y = MainShaftBendingYAPI(client, self._view_id)
+        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, self._view_id)
+        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, self._view_id)
+        self.torque = MainShaftTorqueAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -85,7 +83,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(MainShaftList)
-        return MainShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return MainShaftQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -267,9 +265,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _MAINSHAFT_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -308,10 +304,8 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _MAINSHAFT_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -362,7 +356,6 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_MAINSHAFT_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

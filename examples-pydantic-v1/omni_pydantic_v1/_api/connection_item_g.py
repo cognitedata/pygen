@@ -41,20 +41,16 @@ from .connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemG]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=ConnectionItemG,
-            class_list=ConnectionItemGList,
-            class_write_list=ConnectionItemGWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.inwards_multi_property_edge = ConnectionItemGInwardsMultiPropertyAPI(
-            client, view_by_read_class, ConnectionEdgeA, ConnectionEdgeAWrite, ConnectionEdgeAList
-        )
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    _properties_by_field = _CONNECTIONITEMG_PROPERTIES_BY_FIELD
+    _class_type = ConnectionItemG
+    _class_list = ConnectionItemGList
+    _class_write_list = ConnectionItemGWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.inwards_multi_property_edge = ConnectionItemGInwardsMultiPropertyAPI(client)
 
     def __call__(
         self,
@@ -89,7 +85,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemGList)
-        return ConnectionItemGQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return ConnectionItemGQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -262,9 +258,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_CONNECTIONITEMG_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -371,9 +365,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -422,10 +414,8 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -485,7 +475,6 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CONNECTIONITEMG_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

@@ -37,17 +37,14 @@ from .work_order_query import WorkOrderQueryAPI
 
 
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[WorkOrder]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=WorkOrder,
-            class_list=WorkOrderList,
-            class_write_list=WorkOrderWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+    _properties_by_field = _WORKORDER_PROPERTIES_BY_FIELD
+    _class_type = WorkOrder
+    _class_list = WorkOrderList
+    _class_write_list = WorkOrderWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -94,7 +91,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(WorkOrderList)
-        return WorkOrderQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return WorkOrderQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -260,9 +257,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_WORKORDER_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -389,9 +384,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _WORKORDER_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -452,10 +445,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _WORKORDER_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -524,7 +515,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_WORKORDER_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

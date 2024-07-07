@@ -25,15 +25,16 @@ if TYPE_CHECKING:
 
 
 class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -42,7 +43,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[ConnectionItemC], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemC,
                 max_retrieve_limit=limit,
             )
@@ -100,7 +101,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[ConnectionItemA]
+        view_id = ConnectionItemAQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_connection_item_a_filter(
             view_id,
@@ -112,7 +113,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemAQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return ConnectionItemAQueryAPI(self._client, self._builder, node_filer, limit)
 
     def connection_item_b(
         self,
@@ -162,7 +163,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[ConnectionItemB]
+        view_id = ConnectionItemBQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_connection_item_b_filter(
             view_id,
@@ -172,7 +173,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemBQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,

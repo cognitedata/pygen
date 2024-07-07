@@ -39,20 +39,18 @@ from .power_inverter_query import PowerInverterQueryAPI
 
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PowerInverter]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=PowerInverter,
-            class_list=PowerInverterList,
-            class_write_list=PowerInverterWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.active_power_total = PowerInverterActivePowerTotalAPI(client, view_id)
-        self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, view_id)
-        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, view_id)
+    _view_id = dm.ViewId("power-models", "PowerInverter", "1")
+    _properties_by_field = _POWERINVERTER_PROPERTIES_BY_FIELD
+    _class_type = PowerInverter
+    _class_list = PowerInverterList
+    _class_write_list = PowerInverterWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.active_power_total = PowerInverterActivePowerTotalAPI(client, self._view_id)
+        self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, self._view_id)
+        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -81,7 +79,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PowerInverterList)
-        return PowerInverterQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return PowerInverterQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -263,9 +261,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _POWERINVERTER_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -304,10 +300,8 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _POWERINVERTER_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -358,7 +352,6 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_POWERINVERTER_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

@@ -37,17 +37,14 @@ from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
 class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PrimitiveWithDefaults]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=PrimitiveWithDefaults,
-            class_list=PrimitiveWithDefaultsList,
-            class_write_list=PrimitiveWithDefaultsWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    _properties_by_field = _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD
+    _class_type = PrimitiveWithDefaults
+    _class_list = PrimitiveWithDefaultsList
+    _class_write_list = PrimitiveWithDefaultsWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -97,7 +94,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveWithDefaultsList)
-        return PrimitiveWithDefaultsQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return PrimitiveWithDefaultsQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -268,9 +265,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -402,9 +397,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -468,10 +461,8 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -543,7 +534,6 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

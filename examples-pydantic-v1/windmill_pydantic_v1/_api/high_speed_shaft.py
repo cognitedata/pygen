@@ -39,20 +39,18 @@ from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[HighSpeedShaft]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=HighSpeedShaft,
-            class_list=HighSpeedShaftList,
-            class_write_list=HighSpeedShaftWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, view_id)
-        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, view_id)
-        self.torque = HighSpeedShaftTorqueAPI(client, view_id)
+    _view_id = dm.ViewId("power-models", "HighSpeedShaft", "1")
+    _properties_by_field = _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD
+    _class_type = HighSpeedShaft
+    _class_list = HighSpeedShaftList
+    _class_write_list = HighSpeedShaftWrite
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, self._view_id)
+        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, self._view_id)
+        self.torque = HighSpeedShaftTorqueAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -81,7 +79,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(HighSpeedShaftList)
-        return HighSpeedShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return HighSpeedShaftQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -263,9 +261,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -304,10 +300,8 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -358,7 +352,6 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,
