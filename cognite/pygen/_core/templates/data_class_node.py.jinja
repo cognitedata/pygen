@@ -15,7 +15,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -26,11 +25,21 @@ from ._core import (
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
-if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = [
+    "{{ data_class.read_name }}",
+    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_name }}",
+    "{{ data_class.read_name }}Apply",{% endif %}
+    "{{ data_class.read_list_name }}",
+    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_list_name }}",
+    "{{ data_class.read_name }}ApplyList",{% endif %}
+    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}"{{ data_class.field_names }}",{% endif %}
+    {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}"{{ data_class.text_field_names }}",{% endif %}
+    "{{ data_class.graphql_name }}",
+]
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
@@ -52,7 +61,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
     @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})

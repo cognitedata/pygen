@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -23,7 +22,6 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
     from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
     from ._connection_item_c import ConnectionItemC, ConnectionItemCGraphQL, ConnectionItemCWrite
 
@@ -37,6 +35,7 @@ __all__ = [
     "ConnectionItemAApplyList",
     "ConnectionItemAFields",
     "ConnectionItemATextFields",
+    "ConnectionItemAGraphQL",
 ]
 
 
@@ -64,7 +63,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
         self_direct: The self direct field.
     """
 
-    view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
     name: Optional[str] = None
     other_direct: Optional[ConnectionItemCGraphQL] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
