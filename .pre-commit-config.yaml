@@ -5,7 +5,7 @@ repos:
       -   id: ruff
           args:
             - --exit-non-zero-on-fix
-    rev: v0.0.289
+    rev: v0.5.0
 
   - repo: https://github.com/psf/black
     rev: 24.1.1

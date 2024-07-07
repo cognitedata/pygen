@@ -536,7 +536,7 @@ class APIGenerator:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
         def create_start_node_set(group: list[EdgeAPIClass]) -> str:
-            return "{%s}" % ", ".join([g.start_class.write_name for g in group])
+            return ", ".join([g.start_class.write_name for g in group])
 
         if is_pydantic_v2 and self.data_class.has_any_field_model_prefix:
             names = ", ".join(field.name for field in self.data_class.fields if field.name.startswith("name"))
