@@ -82,8 +82,8 @@ class SequenceNotStr(Protocol[_T_co]):
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     _view_id: ClassVar[dm.ViewId]
     _properties_by_field: ClassVar[dict[str, str]]
-    _class_type: ClassVar[type[T_DomainModel]]
-    _class_list: ClassVar[type[T_DomainModelList]]
+    _class_type: type[T_DomainModel]
+    _class_list: type[T_DomainModelList]
 
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -435,9 +435,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
 
 class NodeAPI(
-    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList], ABC
+    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList, T_DomainModelWriteList],
+    NodeReadAPI[T_DomainModel, T_DomainModelList],
+    ABC,
 ):
-    _class_write_list: ClassVar[type[T_DomainModelWriteList]]
+    _class_write_list: type[T_DomainModelWriteList]
 
     def _apply(
         self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False

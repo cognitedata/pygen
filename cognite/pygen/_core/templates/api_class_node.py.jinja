@@ -34,12 +34,12 @@ from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
 
 
-class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}]):
+class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
     _properties_by_field = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif %}
     _class_type = {{ data_class.read_name }}
     _class_list = {{ data_class.read_list_name }}{% if data_class.is_writable %}
-    _class_write_list = {{ data_class.write_name }}{% endif %}
+    _class_write_list = {{ data_class.write_list_name }}{% endif %}
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
