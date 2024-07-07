@@ -36,6 +36,7 @@ from .{{ query_api.file_name }} import {{ query_api.name }}
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}]):
     _view_id = {% if not data_class.has_container_fields %}None{% else %}dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% endif %}
+    _properties_by_field = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}dict(){% endif %}
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -238,7 +239,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field={{ data_class.properties_dict_name }},
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -328,7 +328,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._aggregate(
             self._view_id,
             aggregate,
-            {{ data_class.properties_dict_name }},
             property,
             group_by,{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
@@ -372,8 +371,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._histogram(
             self._view_id,
             property,
-            interval,
-            {{ data_class.properties_dict_name }},{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            interval,{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
             None,
@@ -427,7 +425,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
             sort=sort,
@@ -445,7 +442,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% else %}return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field={{ data_class.properties_dict_name }},
             sort_by=sort_by,
             direction=direction,
             sort=sort,

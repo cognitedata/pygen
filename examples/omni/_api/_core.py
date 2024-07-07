@@ -81,6 +81,7 @@ class SequenceNotStr(Protocol[_T_co]):
 
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     _view_id: ClassVar[dm.ViewId | None]
+    _properties_by_field: ClassVar[dict[str, str]]
 
     def __init__(
         self,
@@ -155,7 +156,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         self,
         view_id: dm.ViewId,
         query: str,
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -167,8 +167,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             properties = [properties]
 
         if properties:
-            properties = [properties_by_field.get(prop, prop) for prop in properties]
-        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
+            properties = [self._properties_by_field.get(prop, prop) for prop in properties]
+        sort_input = self._get_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.search(
             view=view_id,
             query=query,
@@ -190,7 +190,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -209,7 +208,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] = None,
         group_by: str | Sequence[str] | None = None,
         query: str | None = None,
@@ -227,7 +225,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: str | Sequence[str] | None = None,
         query: str | None = None,
@@ -239,19 +236,19 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             group_by = [group_by]
 
         if group_by:
-            group_by = [properties_by_field.get(prop, prop) for prop in group_by]
+            group_by = [self._properties_by_field.get(prop, prop) for prop in group_by]
 
         if isinstance(search_properties, str):
             search_properties = [search_properties]
 
         if search_properties:
-            search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
+            search_properties = [self._properties_by_field.get(prop, prop) for prop in search_properties]
 
         if isinstance(properties, str):
             properties = [properties]
 
         if properties:
-            properties = [properties_by_field.get(prop, prop) for prop in properties]
+            properties = [self._properties_by_field.get(prop, prop) for prop in properties]
 
         if isinstance(aggregate, (str, dm.aggregations.MetricAggregation)):
             aggregate = [aggregate]
@@ -290,18 +287,17 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         view_id: dm.ViewId,
         property: str,
         interval: float,
-        properties_by_field: dict[str, str],
         query: str | None = None,
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        property = properties_by_field.get(property, property)
+        property = self._properties_by_field.get(property, property)
 
         if isinstance(search_properties, str):
             search_properties = [search_properties]
         if search_properties:
-            search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
+            search_properties = [self._properties_by_field.get(prop, prop) for prop in search_properties]
 
         return self._client.data_modeling.instances.histogram(
             view=view_id,
@@ -317,7 +313,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         self,
         limit: int,
         filter: dm.Filter,
-        properties_by_field: dict[str, str],
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
@@ -326,7 +321,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
-        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
+        sort_input = self._get_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.list(
             instance_type="node",
             sources=self._view_id,
@@ -342,7 +337,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def _get_sort(
         self,
-        properties_by_field: dict[str, str],
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
@@ -350,11 +344,13 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         sort_input: InstanceSort | list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
             sort_input = InstanceSort(
-                self._view_id.as_property_ref(properties_by_field.get(sort_by, sort_by)), direction
+                self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction
             )
         elif sort is None and isinstance(sort_by, list):
             sort_input = [
-                InstanceSort(self._view_id.as_property_ref(properties_by_field.get(sort_by_, sort_by_)), direction)
+                InstanceSort(
+                    self._view_id.as_property_ref(self._properties_by_field.get(sort_by_, sort_by_)), direction
+                )
                 for sort_by_ in sort_by
             ]
         elif sort is not None:
@@ -362,11 +358,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             for sort_ in sort_input:
                 if isinstance(sort_.property, Sequence) and len(sort_.property) == 1:
                     sort_.property = self._view_id.as_property_ref(
-                        properties_by_field.get(sort_.property[0], sort_.property[0])
+                        self._properties_by_field.get(sort_.property[0], sort_.property[0])
                     )
                 elif isinstance(sort_.property, str):
                     sort_.property = self._view_id.as_property_ref(
-                        properties_by_field.get(sort_.property, sort_.property)
+                        self._properties_by_field.get(sort_.property, sort_.property)
                     )
         return sort_input
 
