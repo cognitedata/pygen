@@ -91,7 +91,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         from .connection_item_g_query import ConnectionItemGQueryAPI
 
         from_ = self._builder[-1].name
-        edge_view = self._view_by_read_class[ConnectionEdgeA]
+        edge_view = ConnectionEdgeA._view_id
         edge_filter = _create_connection_edge_a_filter(
             dm.DirectRelationReference("pygen-models", "multiProperty"),
             edge_view,
