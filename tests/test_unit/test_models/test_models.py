@@ -220,6 +220,7 @@ def load_data_classes_test_cases():
                 "description": None,
                 "edgeSource": None,
                 "direction": "outwards",
+                "connectionType": "multi_edge_connection",
             },
         },
         "lastUpdatedTime": 1695295084756,
@@ -453,6 +454,7 @@ def create_fields_test_cases():
         id="String property",
     )
     prop = {
+        "connectionType": "multi_edge_connection",
         "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "version": "2", "type": "view"},
         "name": "roles",

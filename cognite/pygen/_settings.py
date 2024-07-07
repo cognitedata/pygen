@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Union
 
 try:
-    from pydantic import BaseModel, Field, FieldValidationInfo, field_validator  # type: ignore[attr-defined]
+    from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
     is_pydantic_v2 = True
 except ImportError:
@@ -46,16 +46,16 @@ class PygenSettings(BaseModel):
     skip_formatting: Argument = Argument(default=False, help="Whether to skip formatting the generated SDK with black.")
     data_models: list[tuple[str, str, str]] = Field(
         default_factory=list,
-        help="Data models to generate SDK for.",
-    )  # type: ignore[call-arg]
+        json_schema_extra={"help": "Data models to generate SDK for."},
+    )
 
     if is_pydantic_v2:
 
         @field_validator("*", mode="before")
-        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # type: ignore[valid-type]
-            if info.field_name == "data_models":  # type: ignore[attr-defined]
+        def parse_string(cls, value, info: ValidationInfo) -> Argument:  # type: ignore[valid-type]
+            if info.field_name == "data_models":  # type: ignore[index]
                 return value
-            field = cls.model_fields[info.field_name]  # type: ignore[attr-defined]
+            field = cls.model_fields[info.field_name]  # type: ignore[index]
             return _parse_string(value, field)
 
     else:

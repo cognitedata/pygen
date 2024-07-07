@@ -30,7 +30,7 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% endif %}, Extra, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}{% if is_pydantic_v2 %}
+from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% else %}, Extra{% endif %}, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}{% if is_pydantic_v2 %}
 from pydantic.functional_serializers import PlainSerializer
 
 TimeSeries = Annotated[
@@ -287,7 +287,7 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
     _INSTANCE = DataRecordWrite
 
 
-class DomainModelWrite(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.ignore, populate_by_name=True{% endif %}):
+class DomainModelWrite(DomainModelCore{% if is_pydantic_v2 %}, extra="ignore", populate_by_name=True{% endif %}):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite){% if not is_pydantic_v2 %}
 
@@ -512,7 +512,7 @@ def default_edge_external_id_factory(
     return f"{start}:{end}"
 
 
-class DomainRelationWrite(BaseModel{% if is_pydantic_v2 %}, extra=Extra.forbid, populate_by_name=True{% endif %}):
+class DomainRelationWrite(BaseModel{% if is_pydantic_v2 %}, extra="forbid", populate_by_name=True{% endif %}):
     external_id_factory: ClassVar[
         Callable[
             [

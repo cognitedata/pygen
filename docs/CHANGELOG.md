@@ -18,6 +18,9 @@ Changes are grouped as follows
 - Support for advanced sort in generated `.list` method.
 - Support for sort and advanced sort in generated `.search` method.
 
+### Improved
+- Pygen now longer generates code that is deprecated in `pydantic` or `cognite-sdk`.
+
 ## [0.99.26] - 24-06-24
 ### Added
 - Support for `sort` in generated `.list` method.
