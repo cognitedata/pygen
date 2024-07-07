@@ -479,8 +479,6 @@ class NodeAPI(
 
 
 class EdgeAPI(ABC):
-    _view_id: ClassVar[dm.ViewId | None] = None
-
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -493,6 +491,8 @@ class EdgeAPI(ABC):
 
 
 class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, T_DomainRelationList], ABC):
+    _view_id: ClassVar[dm.ViewId]
+
     def __init__(
         self,
         client: CogniteClient,

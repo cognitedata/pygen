@@ -14,6 +14,8 @@ from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+
     def list(
         self,
         from_unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,

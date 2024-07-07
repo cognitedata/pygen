@@ -14,6 +14,8 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
+    _view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
+
     def list(
         self,
         from_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
