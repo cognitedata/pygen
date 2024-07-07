@@ -13,7 +13,9 @@ from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePrope
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
-class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
+class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):{% if edge_api.has_edge_class %}
+    _view_id = dm.ViewId("{{ edge_api.edge_class.view_id.space }}", "{{ edge_api.edge_class.view_id.external_id }}", "{{ edge_api.edge_class.view_id.version }}"){% endif %}{% endif %}
+
     def list(
             self,{% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}
