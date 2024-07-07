@@ -287,6 +287,9 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
 
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
+
     def to_instances_write(
         self,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
