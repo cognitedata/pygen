@@ -158,6 +158,8 @@ class PrimitiveNullable(DomainModel):
         timestamp: The timestamp field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[bool] = None

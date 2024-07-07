@@ -105,6 +105,8 @@ class Implementation1NonWriteable(SubInterface):
         value_1: The value 1 field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
 

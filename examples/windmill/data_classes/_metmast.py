@@ -126,6 +126,8 @@ class Metmast(DomainModel):
         wind_speed: The wind speed field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     position: Optional[float] = None

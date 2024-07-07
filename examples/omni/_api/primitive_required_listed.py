@@ -77,7 +77,7 @@ class PrimitiveRequiredListedAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveRequiredListedList)
-        return PrimitiveRequiredListedQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return PrimitiveRequiredListedQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,

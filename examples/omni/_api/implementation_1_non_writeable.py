@@ -89,7 +89,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1NonWriteableList)
-        return Implementation1NonWriteableQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return Implementation1NonWriteableQueryAPI(self._client, builder, filter_, limit)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

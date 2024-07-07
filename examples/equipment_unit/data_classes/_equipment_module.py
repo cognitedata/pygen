@@ -127,6 +127,8 @@ class EquipmentModule(DomainModel):
         type_: The type field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None

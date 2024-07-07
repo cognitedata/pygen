@@ -120,6 +120,8 @@ class HighSpeedShaft(DomainModel):
         torque: The torque field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     bending_moment_y: Union[TimeSeries, str, None] = None

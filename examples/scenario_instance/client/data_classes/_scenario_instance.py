@@ -154,6 +154,8 @@ class ScenarioInstance(DomainModel):
         start: The start field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     aggregation: Optional[str] = None

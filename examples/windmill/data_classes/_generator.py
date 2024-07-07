@@ -114,6 +114,8 @@ class Generator(DomainModel):
         generator_speed_controller_reference: The generator speed controller reference field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     generator_speed_controller: Union[TimeSeries, str, None] = None

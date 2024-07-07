@@ -114,6 +114,8 @@ class SubInterface(MainInterface):
         sub_value: The sub value field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
+
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 

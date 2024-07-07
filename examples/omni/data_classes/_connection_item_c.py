@@ -114,6 +114,8 @@ class ConnectionItemC(DomainModel):
         connection_item_b: The connection item b field.
     """
 
+    _view_id: ClassVar[None] = None
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
     connection_item_a: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(

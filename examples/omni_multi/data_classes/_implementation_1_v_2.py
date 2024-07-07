@@ -120,6 +120,8 @@ class Implementation1v2(SubInterface):
         value_2: The value 2 field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "2")
+
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_2: str = Field(alias="value2")
 

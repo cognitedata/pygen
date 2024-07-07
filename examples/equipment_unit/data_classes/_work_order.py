@@ -119,6 +119,8 @@ class WorkOrder(DomainModel):
         type_: The type field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None

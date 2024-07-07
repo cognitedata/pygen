@@ -120,6 +120,8 @@ class PowerInverter(DomainModel):
         reactive_power_total: The reactive power total field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     active_power_total: Union[TimeSeries, str, None] = None

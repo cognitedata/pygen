@@ -102,7 +102,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(WindmillList)
-        return WindmillQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return WindmillQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,

@@ -85,7 +85,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(BladeList)
-        return BladeQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return BladeQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,

@@ -711,9 +711,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         return self._result_cls(nodes_by_type[self[0].name].values())
 
 
-class QueryAPI(Generic[T_DomainModelList], ABC):
-    _view_id: ClassVar[dm.ViewId]
-
+class QueryAPI(Generic[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,

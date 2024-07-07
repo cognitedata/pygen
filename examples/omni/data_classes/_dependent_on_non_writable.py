@@ -125,6 +125,8 @@ class DependentOnNonWritable(DomainModel):
         to_non_writable: The to non writable field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
         "pygen-models", "DependentOnNonWritable"

@@ -95,7 +95,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveWithDefaultsList)
-        return PrimitiveWithDefaultsQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return PrimitiveWithDefaultsQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,

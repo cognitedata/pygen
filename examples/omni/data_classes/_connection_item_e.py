@@ -128,6 +128,8 @@ class ConnectionItemE(DomainModel):
         name: The name field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")

@@ -120,6 +120,8 @@ class Gearbox(DomainModel):
         displacement_z: The displacement z field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     displacement_x: Union[TimeSeries, str, None] = None

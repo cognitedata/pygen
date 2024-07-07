@@ -129,6 +129,8 @@ class ConnectionItemF(DomainModel):
         outwards_multi: The outwards multi field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
     direct_list: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(

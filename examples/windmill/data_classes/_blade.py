@@ -129,6 +129,8 @@ class Blade(DomainModel):
         sensor_positions: The sensor position field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None

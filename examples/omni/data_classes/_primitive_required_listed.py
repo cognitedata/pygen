@@ -158,6 +158,8 @@ class PrimitiveRequiredListed(DomainModel):
         timestamp: The timestamp field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[list[bool]] = None

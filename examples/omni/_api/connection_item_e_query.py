@@ -20,6 +20,8 @@ if TYPE_CHECKING:
 
 
 class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+
     def __init__(
         self,
         client: CogniteClient,
@@ -36,7 +38,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[ConnectionItemE], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemE,
                 max_retrieve_limit=limit,
             )
@@ -94,7 +96,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[ConnectionItemD]
+        view_id = ConnectionItemDQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_connection_item_d_filter(
             view_id,
@@ -106,7 +108,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemDQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return ConnectionItemDQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,

@@ -153,6 +153,8 @@ class Windmill(DomainModel):
         windfarm: The windfarm field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)

@@ -92,7 +92,7 @@ class Implementation1v2API(NodeAPI[Implementation1v2, Implementation1v2Write, Im
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1v2List)
-        return Implementation1v2QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return Implementation1v2QueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,

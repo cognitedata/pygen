@@ -104,6 +104,7 @@ class StartEndTime(DomainRelation):
         start_time: The start time field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None

@@ -189,6 +189,8 @@ class Nacelle(DomainModel):
         yaw_error: The yaw error field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     acc_from_back_side_x: Union[TimeSeries, str, None] = None

@@ -119,6 +119,8 @@ class Implementation1v1(DomainModel):
         value_2: The value 2 field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     main_value: Optional[str] = Field(None, alias="mainValue")

@@ -175,6 +175,8 @@ class SensorPosition(DomainModel):
         position: The position field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "SensorPosition", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None

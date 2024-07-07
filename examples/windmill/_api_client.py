@@ -106,7 +106,7 @@ class WindmillClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -114,7 +114,6 @@ class WindmillClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

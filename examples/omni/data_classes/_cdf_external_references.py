@@ -120,6 +120,8 @@ class CDFExternalReferences(DomainModel):
         timeseries: The timesery field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     file: Union[str, None] = None

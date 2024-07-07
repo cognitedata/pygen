@@ -134,6 +134,8 @@ class UnitProcedure(DomainModel):
         work_units: The work unit field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None

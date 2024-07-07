@@ -149,6 +149,8 @@ class ConnectionItemD(DomainModel):
         outwards_single: The outwards single field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
     direct_multi: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directMulti")

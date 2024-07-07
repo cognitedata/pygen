@@ -114,6 +114,8 @@ class Rotor(DomainModel):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     rotor_speed_controller: Union[TimeSeries, str, None] = None

@@ -156,6 +156,8 @@ class Empty(DomainModel):
         timestamp: The timestamp field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Empty", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None

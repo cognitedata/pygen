@@ -114,6 +114,8 @@ class Implementation2(SubInterface):
         sub_value: The sub value field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation2", "1")
+
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
 
     def as_write(self) -> Implementation2Write:

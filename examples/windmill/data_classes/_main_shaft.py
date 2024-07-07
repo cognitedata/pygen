@@ -132,6 +132,8 @@ class MainShaft(DomainModel):
         torque: The torque field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     bending_x: Union[TimeSeries, str, None] = None
