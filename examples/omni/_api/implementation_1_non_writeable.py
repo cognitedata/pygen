@@ -36,6 +36,7 @@ from .implementation_1_non_writeable_query import Implementation1NonWriteableQue
 
 class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):
     _view_id = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    _properties_by_field = _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -221,7 +222,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -356,7 +356,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._aggregate(
             self._view_id,
             aggregate,
-            _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -422,7 +421,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             self._view_id,
             property,
             interval,
-            _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -491,7 +489,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

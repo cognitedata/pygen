@@ -38,6 +38,7 @@ from .sub_interface_query import SubInterfaceQueryAPI
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]):
     _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -248,7 +249,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_SUBINTERFACE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -367,7 +367,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
         return self._aggregate(
             self._view_id,
             aggregate,
-            _SUBINTERFACE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -425,7 +424,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
             self._view_id,
             property,
             interval,
-            _SUBINTERFACE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -488,7 +486,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_SUBINTERFACE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

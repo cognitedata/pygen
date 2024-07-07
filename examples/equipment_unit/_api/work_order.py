@@ -38,6 +38,7 @@ from .work_order_query import WorkOrderQueryAPI
 
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
+    _properties_by_field = _WORKORDER_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -260,7 +261,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_WORKORDER_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -389,7 +389,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _WORKORDER_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -453,7 +452,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
             self._view_id,
             property,
             interval,
-            _WORKORDER_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -522,7 +520,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_WORKORDER_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

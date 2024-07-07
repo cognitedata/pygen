@@ -42,6 +42,7 @@ from .nacelle_query import NacelleQueryAPI
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
     _view_id = dm.ViewId("power-models", "Nacelle", "1")
+    _properties_by_field = _NACELLE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -307,7 +308,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _NACELLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -364,7 +364,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             self._view_id,
             property,
             interval,
-            _NACELLE_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -430,7 +429,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_NACELLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

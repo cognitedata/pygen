@@ -38,6 +38,7 @@ from .implementation_2_query import Implementation2QueryAPI
 
 class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List]):
     _view_id = dm.ViewId("pygen-models", "Implementation2", "1")
+    _properties_by_field = _IMPLEMENTATION2_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -250,7 +251,6 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_IMPLEMENTATION2_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -369,7 +369,6 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         return self._aggregate(
             self._view_id,
             aggregate,
-            _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -427,7 +426,6 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             self._view_id,
             property,
             interval,
-            _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -490,7 +488,6 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_IMPLEMENTATION2_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

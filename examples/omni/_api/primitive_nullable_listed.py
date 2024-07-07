@@ -41,6 +41,7 @@ class PrimitiveNullableListedAPI(
     NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedWrite, PrimitiveNullableListedList]
 ):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
+    _properties_by_field = _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -229,7 +230,6 @@ class PrimitiveNullableListedAPI(
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -332,7 +332,6 @@ class PrimitiveNullableListedAPI(
         return self._aggregate(
             self._view_id,
             aggregate,
-            _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -378,7 +377,6 @@ class PrimitiveNullableListedAPI(
             self._view_id,
             property,
             interval,
-            _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -429,7 +427,6 @@ class PrimitiveNullableListedAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

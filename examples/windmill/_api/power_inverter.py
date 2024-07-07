@@ -40,6 +40,7 @@ from .power_inverter_query import PowerInverterQueryAPI
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList]):
     _view_id = dm.ViewId("power-models", "PowerInverter", "1")
+    _properties_by_field = _POWERINVERTER_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -263,7 +264,6 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         return self._aggregate(
             self._view_id,
             aggregate,
-            _POWERINVERTER_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -305,7 +305,6 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             self._view_id,
             property,
             interval,
-            _POWERINVERTER_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -356,7 +355,6 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_POWERINVERTER_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

@@ -39,6 +39,7 @@ from .generator_query import GeneratorQueryAPI
 
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
     _view_id = dm.ViewId("power-models", "Generator", "1")
+    _properties_by_field = _GENERATOR_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -261,7 +262,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _GENERATOR_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -303,7 +303,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             self._view_id,
             property,
             interval,
-            _GENERATOR_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -354,7 +353,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_GENERATOR_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

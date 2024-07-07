@@ -39,6 +39,7 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList]):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+    _properties_by_field = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -317,7 +318,6 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -491,7 +491,6 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         return self._aggregate(
             self._view_id,
             aggregate,
-            _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -582,7 +581,6 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
             self._view_id,
             property,
             interval,
-            _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -678,7 +676,6 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

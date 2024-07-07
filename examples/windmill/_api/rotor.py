@@ -39,6 +39,7 @@ from .rotor_query import RotorQueryAPI
 
 class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
     _view_id = dm.ViewId("power-models", "Rotor", "1")
+    _properties_by_field = _ROTOR_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -261,7 +262,6 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _ROTOR_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -303,7 +303,6 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             self._view_id,
             property,
             interval,
-            _ROTOR_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -354,7 +353,6 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_ROTOR_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

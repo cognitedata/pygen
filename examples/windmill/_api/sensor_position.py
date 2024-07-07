@@ -49,6 +49,7 @@ from .sensor_position_query import SensorPositionQueryAPI
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
     _view_id = dm.ViewId("power-models", "SensorPosition", "1")
+    _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -301,7 +302,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         return self._aggregate(
             self._view_id,
             aggregate,
-            _SENSORPOSITION_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -349,7 +349,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             self._view_id,
             property,
             interval,
-            _SENSORPOSITION_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -406,7 +405,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_SENSORPOSITION_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

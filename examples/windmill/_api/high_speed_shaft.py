@@ -40,6 +40,7 @@ from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList]):
     _view_id = dm.ViewId("power-models", "HighSpeedShaft", "1")
+    _properties_by_field = _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -263,7 +264,6 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
         return self._aggregate(
             self._view_id,
             aggregate,
-            _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -305,7 +305,6 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             self._view_id,
             property,
             interval,
-            _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -356,7 +355,6 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

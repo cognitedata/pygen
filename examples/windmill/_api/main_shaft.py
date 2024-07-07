@@ -42,6 +42,7 @@ from .main_shaft_query import MainShaftQueryAPI
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
     _view_id = dm.ViewId("power-models", "MainShaft", "1")
+    _properties_by_field = _MAINSHAFT_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -267,7 +268,6 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _MAINSHAFT_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -309,7 +309,6 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
             self._view_id,
             property,
             interval,
-            _MAINSHAFT_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -360,7 +359,6 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_MAINSHAFT_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

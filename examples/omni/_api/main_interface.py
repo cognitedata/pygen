@@ -38,6 +38,7 @@ from .main_interface_query import MainInterfaceQueryAPI
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList]):
     _view_id = dm.ViewId("pygen-models", "MainInterface", "1")
+    _properties_by_field = _MAININTERFACE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -236,7 +237,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_MAININTERFACE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -345,7 +345,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._aggregate(
             self._view_id,
             aggregate,
-            _MAININTERFACE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -397,7 +396,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             self._view_id,
             property,
             interval,
-            _MAININTERFACE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -454,7 +452,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_MAININTERFACE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

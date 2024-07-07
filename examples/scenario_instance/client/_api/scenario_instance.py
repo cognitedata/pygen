@@ -40,6 +40,7 @@ from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+    _properties_by_field = _SCENARIOINSTANCE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -313,7 +314,6 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -482,7 +482,6 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         return self._aggregate(
             self._view_id,
             aggregate,
-            _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -570,7 +569,6 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
             self._view_id,
             property,
             interval,
-            _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -663,7 +661,6 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

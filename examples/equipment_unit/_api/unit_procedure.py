@@ -43,6 +43,7 @@ from .unit_procedure_query import UnitProcedureQueryAPI
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+    _properties_by_field = _UNITPROCEDURE_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -279,7 +280,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_UNITPROCEDURE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -398,7 +398,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._aggregate(
             self._view_id,
             aggregate,
-            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -456,7 +455,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             property,
             interval,
-            _UNITPROCEDURE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -522,7 +520,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_UNITPROCEDURE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

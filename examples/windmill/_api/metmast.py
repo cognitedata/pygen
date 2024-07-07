@@ -40,6 +40,7 @@ from .metmast_query import MetmastQueryAPI
 
 class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
     _view_id = dm.ViewId("power-models", "Metmast", "1")
+    _properties_by_field = _METMAST_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -279,7 +280,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _METMAST_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -327,7 +327,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             self._view_id,
             property,
             interval,
-            _METMAST_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -384,7 +383,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_METMAST_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

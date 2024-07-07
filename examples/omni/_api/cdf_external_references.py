@@ -38,6 +38,7 @@ from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList]):
     _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -261,7 +262,6 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         return self._aggregate(
             self._view_id,
             aggregate,
-            _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -303,7 +303,6 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             self._view_id,
             property,
             interval,
-            _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -354,7 +353,6 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

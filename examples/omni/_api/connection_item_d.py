@@ -39,6 +39,7 @@ from .connection_item_d_query import ConnectionItemDQueryAPI
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+    _properties_by_field = _CONNECTIONITEMD_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -252,7 +253,6 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_CONNECTIONITEMD_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -371,7 +371,6 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         return self._aggregate(
             self._view_id,
             aggregate,
-            _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -429,7 +428,6 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             self._view_id,
             property,
             interval,
-            _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -492,7 +490,6 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CONNECTIONITEMD_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

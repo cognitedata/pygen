@@ -40,6 +40,7 @@ from .windmill_query import WindmillQueryAPI
 
 class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
     _view_id = dm.ViewId("power-models", "Windmill", "1")
+    _properties_by_field = _WINDMILL_PROPERTIES_BY_FIELD
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -300,7 +301,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
         return self._search(
             view_id=self._view_id,
             query=query,
-            properties_by_field=_WINDMILL_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -439,7 +439,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _WINDMILL_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -509,7 +508,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
             self._view_id,
             property,
             interval,
-            _WINDMILL_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -587,7 +585,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_WINDMILL_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,
