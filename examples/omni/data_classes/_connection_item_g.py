@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -171,6 +171,8 @@ class ConnectionItemGWrite(DomainModelWrite):
         name: The name field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemG")
     inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(
@@ -181,15 +183,12 @@ class ConnectionItemGWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(ConnectionItemG, dm.ViewId("pygen-models", "ConnectionItemG", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -204,7 +203,7 @@ class ConnectionItemGWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -215,7 +214,9 @@ class ConnectionItemGWrite(DomainModelWrite):
         for inwards_multi_property in self.inwards_multi_property or []:
             if isinstance(inwards_multi_property, DomainRelationWrite):
                 other_resources = inwards_multi_property._to_instances_write(
-                    cache, self, dm.DirectRelationReference("pygen-models", "multiProperty"), view_by_read_class
+                    cache,
+                    self,
+                    dm.DirectRelationReference("pygen-models", "multiProperty"),
                 )
                 resources.extend(other_resources)
 

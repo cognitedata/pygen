@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -152,6 +152,8 @@ class GeneratorWrite(DomainModelWrite):
         generator_speed_controller_reference: The generator speed controller reference field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     generator_speed_controller: Union[TimeSeries, str, None] = None
@@ -160,15 +162,12 @@ class GeneratorWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(Generator, dm.ViewId("power-models", "Generator", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -195,7 +194,7 @@ class GeneratorWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],

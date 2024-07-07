@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Literal, Optional, Union
+from typing import ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 
@@ -56,7 +56,7 @@ class StartEndTimeGraphQL(GraphQLCore):
         start_time: The start time field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     end_node: Union[EquipmentModuleGraphQL, WorkOrderGraphQL, None] = None
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
@@ -144,6 +144,7 @@ class StartEndTimeWrite(DomainRelationWrite):
         start_time: The start time field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
@@ -154,7 +155,6 @@ class StartEndTimeWrite(DomainRelationWrite):
         cache: set[tuple[str, str]],
         start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -175,10 +175,6 @@ class StartEndTimeWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        write_view = (view_by_read_class or {}).get(
-            StartEndTime, dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
-        )
-
         properties = {}
 
         if self.end_time is not None or write_none:
@@ -197,7 +193,7 @@ class StartEndTimeWrite(DomainRelationWrite):
                 existing_version=None if allow_version_increase else self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -206,7 +202,7 @@ class StartEndTimeWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
+            other_resources = self.end_node._to_instances_write(cache)
             resources.extend(other_resources)
 
         return resources

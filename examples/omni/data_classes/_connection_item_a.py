@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -187,6 +187,8 @@ class ConnectionItemAWrite(DomainModelWrite):
         self_direct: The self direct field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
@@ -199,15 +201,12 @@ class ConnectionItemAWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(ConnectionItemA, dm.ViewId("pygen-models", "ConnectionItemA", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -236,7 +235,7 @@ class ConnectionItemAWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -251,18 +250,17 @@ class ConnectionItemAWrite(DomainModelWrite):
                 start_node=self,
                 end_node=outward,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
         if isinstance(self.other_direct, DomainModelWrite):
-            other_resources = self.other_direct._to_instances_write(cache, view_by_read_class)
+            other_resources = self.other_direct._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.self_direct, DomainModelWrite):
-            other_resources = self.self_direct._to_instances_write(cache, view_by_read_class)
+            other_resources = self.self_direct._to_instances_write(cache)
             resources.extend(other_resources)
 
         return resources

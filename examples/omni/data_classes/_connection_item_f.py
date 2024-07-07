@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -175,6 +175,8 @@ class ConnectionItemFWrite(DomainModelWrite):
         outwards_multi: The outwards multi field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
     direct_list: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
@@ -186,15 +188,12 @@ class ConnectionItemFWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(ConnectionItemF, dm.ViewId("pygen-models", "ConnectionItemF", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -218,7 +217,7 @@ class ConnectionItemFWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -229,13 +228,15 @@ class ConnectionItemFWrite(DomainModelWrite):
         for outwards_multi in self.outwards_multi or []:
             if isinstance(outwards_multi, DomainRelationWrite):
                 other_resources = outwards_multi._to_instances_write(
-                    cache, self, dm.DirectRelationReference("pygen-models", "multiProperty"), view_by_read_class
+                    cache,
+                    self,
+                    dm.DirectRelationReference("pygen-models", "multiProperty"),
                 )
                 resources.extend(other_resources)
 
         for direct_list in self.direct_list or []:
             if isinstance(direct_list, DomainModelWrite):
-                other_resources = direct_list._to_instances_write(cache, view_by_read_class)
+                other_resources = direct_list._to_instances_write(cache)
                 resources.extend(other_resources)
 
         return resources

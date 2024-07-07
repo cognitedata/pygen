@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -178,6 +178,8 @@ class UnitProcedureWrite(DomainModelWrite):
         work_units: The work unit field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
@@ -188,17 +190,12 @@ class UnitProcedureWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(
-            UnitProcedure, dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
-        )
 
         properties: dict[str, Any] = {}
 
@@ -216,7 +213,7 @@ class UnitProcedureWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -230,7 +227,6 @@ class UnitProcedureWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
-                    view_by_read_class,
                 )
                 resources.extend(other_resources)
 
@@ -240,7 +236,6 @@ class UnitProcedureWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
-                    view_by_read_class,
                 )
                 resources.extend(other_resources)
 

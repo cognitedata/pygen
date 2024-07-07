@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -203,6 +203,8 @@ class ConnectionItemDWrite(DomainModelWrite):
         outwards_single: The outwards single field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemD")
     direct_multi: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
@@ -219,15 +221,12 @@ class ConnectionItemDWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(ConnectionItemD, dm.ViewId("pygen-models", "ConnectionItemD", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -258,7 +257,7 @@ class ConnectionItemDWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -267,11 +266,11 @@ class ConnectionItemDWrite(DomainModelWrite):
             cache.add(self.as_tuple_id())
 
         if isinstance(self.direct_multi, DomainModelWrite):
-            other_resources = self.direct_multi._to_instances_write(cache, view_by_read_class)
+            other_resources = self.direct_multi._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.direct_single, DomainModelWrite):
-            other_resources = self.direct_single._to_instances_write(cache, view_by_read_class)
+            other_resources = self.direct_single._to_instances_write(cache)
             resources.extend(other_resources)
 
         if self.outwards_single is not None:
@@ -280,7 +279,6 @@ class ConnectionItemDWrite(DomainModelWrite):
                 start_node=self,
                 end_node=self.outwards_single,
                 edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
