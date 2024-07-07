@@ -5,7 +5,9 @@ import datetime{% endif %}
 from cognite.client import data_modeling as dm
 {% if edge_api.has_edge_class %}
 from {{ top_level_package }}.data_classes import (
+    {{ edge_api.edge_class.read_name }},
     {{ edge_api.edge_class.read_list_name }},
+    {{ edge_api.edge_class.write_name }},
 )
 from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
 {% endif %}

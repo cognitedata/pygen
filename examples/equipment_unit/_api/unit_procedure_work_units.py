@@ -5,7 +5,9 @@ import datetime
 from cognite.client import data_modeling as dm
 
 from equipment_unit.data_classes import (
+    StartEndTime,
     StartEndTimeList,
+    StartEndTimeWrite,
 )
 from equipment_unit.data_classes._start_end_time import _create_start_end_time_filter
 

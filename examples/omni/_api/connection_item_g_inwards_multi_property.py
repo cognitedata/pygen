@@ -5,7 +5,9 @@ import datetime
 from cognite.client import data_modeling as dm
 
 from omni.data_classes import (
+    ConnectionEdgeA,
     ConnectionEdgeAList,
+    ConnectionEdgeAWrite,
 )
 from omni.data_classes._connection_edge_a import _create_connection_edge_a_filter
 
