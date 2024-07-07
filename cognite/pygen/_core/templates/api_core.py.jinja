@@ -435,7 +435,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
 
 class NodeAPI(
-    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList, T_DomainModelWriteList], NodeReadAPI[T_DomainModel, T_DomainModelList], ABC
+    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList, T_DomainModelWriteList],
+    NodeReadAPI[T_DomainModel, T_DomainModelList],
+    ABC,
 ):
     _class_write_list: type[T_DomainModelWriteList]
 
