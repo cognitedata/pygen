@@ -220,6 +220,7 @@ def load_data_classes_test_cases():
                 "description": None,
                 "edgeSource": None,
                 "direction": "outwards",
+                "connectionType": "multi_edge_connection",
             },
         },
         "lastUpdatedTime": 1695295084756,

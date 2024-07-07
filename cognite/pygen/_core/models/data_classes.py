@@ -101,7 +101,10 @@ class DataClass:
         used_for = view.used_for
         if used_for == "all":
             used_for = "node"
-            warnings.warn("View used_for is set to 'all'. This is not supported. Using 'node' instead.", stacklevel=2)
+            warnings.warn(
+                f"View {view.as_id()} has 'used_for' set to 'all'. This is not supported. Using 'node' instead.",
+                stacklevel=2,
+            )
 
         args = dict(
             read_name=class_name,
