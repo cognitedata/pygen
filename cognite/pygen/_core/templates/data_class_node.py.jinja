@@ -216,7 +216,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                     cache,
                     self,
                     dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                    view_by_read_class
 )
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
@@ -227,7 +226,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node=self,
                 end_node={{field.variable}},
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             ){% else %}
@@ -236,19 +234,18 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node={{field.variable}},
                 end_node=self,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
         if isinstance(self.{{ field.name }}, DomainModelWrite):
-            other_resources = self.{{ field.name }}._to_instances_write(cache, view_by_read_class)
+            other_resources = self.{{ field.name }}._to_instances_write(cache)
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainModelWrite):
-                other_resources = {{ field.variable }}._to_instances_write(cache, view_by_read_class)
+                other_resources = {{ field.variable }}._to_instances_write(cache)
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
@@ -260,7 +257,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node=self,
                 end_node=self.{{ field.name }},
                 edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
@@ -272,7 +268,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node={{field.variable}},
                 end_node=self,
                 edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
