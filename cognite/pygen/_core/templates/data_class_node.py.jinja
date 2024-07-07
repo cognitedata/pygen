@@ -169,7 +169,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    _view_id: ClassVar[{% if not data_class.has_container_fields %}None{% else %}dm.ViewId{% endif %}] = {% if not data_class.has_container_fields %}None{% else %}dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% endif %}
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
 {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}

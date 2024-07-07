@@ -114,7 +114,7 @@ class ConnectionItemC(DomainModel):
         connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[None] = None
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
@@ -164,7 +164,7 @@ class ConnectionItemCWrite(DomainModelWrite):
         connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[None] = None
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
