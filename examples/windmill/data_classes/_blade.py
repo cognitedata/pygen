@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -35,6 +34,7 @@ __all__ = [
     "BladeApplyList",
     "BladeFields",
     "BladeTextFields",
+    "BladeGraphQL",
 ]
 
 
@@ -62,7 +62,7 @@ class BladeGraphQL(GraphQLCore):
         sensor_positions: The sensor position field.
     """
 
-    view_id = dm.ViewId("power-models", "Blade", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
     sensor_positions: Optional[list[SensorPositionGraphQL]] = Field(default=None, repr=False)
@@ -129,6 +129,8 @@ class Blade(DomainModel):
         sensor_positions: The sensor position field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
@@ -173,6 +175,8 @@ class BladeWrite(DomainModelWrite):
         sensor_positions: The sensor position field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
@@ -184,15 +188,12 @@ class BladeWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(Blade, dm.ViewId("power-models", "Blade", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -210,7 +211,7 @@ class BladeWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -225,7 +226,6 @@ class BladeWrite(DomainModelWrite):
                 start_node=self,
                 end_node=sensor_position,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )

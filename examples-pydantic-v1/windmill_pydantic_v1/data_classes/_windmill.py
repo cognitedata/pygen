@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -38,6 +37,7 @@ __all__ = [
     "WindmillApplyList",
     "WindmillFields",
     "WindmillTextFields",
+    "WindmillGraphQL",
 ]
 
 
@@ -70,7 +70,7 @@ class WindmillGraphQL(GraphQLCore):
         windfarm: The windfarm field.
     """
 
-    view_id = dm.ViewId("power-models", "Windmill", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
     blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Optional[list[MetmastGraphQL]] = Field(default=None, repr=False)
@@ -153,6 +153,8 @@ class Windmill(DomainModel):
         windfarm: The windfarm field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
@@ -208,6 +210,8 @@ class WindmillWrite(DomainModelWrite):
         windfarm: The windfarm field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
@@ -221,15 +225,12 @@ class WindmillWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(Windmill, dm.ViewId("power-models", "Windmill", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -262,7 +263,7 @@ class WindmillWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -277,7 +278,6 @@ class WindmillWrite(DomainModelWrite):
                 start_node=self,
                 end_node=blade,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
@@ -290,18 +290,17 @@ class WindmillWrite(DomainModelWrite):
                 start_node=self,
                 end_node=metmast,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
 
         if isinstance(self.nacelle, DomainModelWrite):
-            other_resources = self.nacelle._to_instances_write(cache, view_by_read_class)
+            other_resources = self.nacelle._to_instances_write(cache)
             resources.extend(other_resources)
 
         if isinstance(self.rotor, DomainModelWrite):
-            other_resources = self.rotor._to_instances_write(cache, view_by_read_class)
+            other_resources = self.rotor._to_instances_write(cache)
             resources.extend(other_resources)
 
         return resources

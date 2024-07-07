@@ -41,18 +41,11 @@ class EquipmentUnitClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.99.26"
 
-        view_by_read_class = {
-            data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
-            data_classes.StartEndTime: dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"),
-            data_classes.UnitProcedure: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"),
-            data_classes.WorkOrder: dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.equipment_module = EquipmentModuleAPI(client, view_by_read_class)
-        self.unit_procedure = UnitProcedureAPI(client, view_by_read_class)
-        self.work_order = WorkOrderAPI(client, view_by_read_class)
+        self.equipment_module = EquipmentModuleAPI(client)
+        self.unit_procedure = UnitProcedureAPI(client)
+        self.work_order = WorkOrderAPI(client)
 
     def upsert(
         self,
@@ -97,7 +90,7 @@ class EquipmentUnitClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -105,7 +98,6 @@ class EquipmentUnitClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

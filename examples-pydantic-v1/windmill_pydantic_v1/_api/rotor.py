@@ -37,20 +37,18 @@ from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
 from .rotor_query import RotorQueryAPI
 
 
-class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Rotor]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Rotor,
-            class_list=RotorList,
-            class_write_list=RotorWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.rotor_speed_controller = RotorRotorSpeedControllerAPI(client, view_id)
-        self.rpm_low_speed_shaft = RotorRpmLowSpeedShaftAPI(client, view_id)
+class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
+    _view_id = dm.ViewId("power-models", "Rotor", "1")
+    _properties_by_field = _ROTOR_PROPERTIES_BY_FIELD
+    _class_type = Rotor
+    _class_list = RotorList
+    _class_write_list = RotorWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.rotor_speed_controller = RotorRotorSpeedControllerAPI(client, self._view_id)
+        self.rpm_low_speed_shaft = RotorRpmLowSpeedShaftAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -79,7 +77,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(RotorList)
-        return RotorQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return RotorQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -261,9 +259,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _ROTOR_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -302,10 +298,8 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _ROTOR_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -356,7 +350,6 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_ROTOR_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

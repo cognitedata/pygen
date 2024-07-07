@@ -35,16 +35,13 @@ from .implementation_1_non_writeable_query import Implementation1NonWriteableQue
 
 
 class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Implementation1NonWriteable]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Implementation1NonWriteable,
-            class_list=Implementation1NonWriteableList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    _properties_by_field = _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD
+    _class_type = Implementation1NonWriteable
+    _class_list = Implementation1NonWriteableList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -91,7 +88,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1NonWriteableList)
-        return Implementation1NonWriteableQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return Implementation1NonWriteableQueryAPI(self._client, builder, filter_, limit)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -221,9 +218,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -356,9 +351,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -421,10 +414,8 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -493,7 +484,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

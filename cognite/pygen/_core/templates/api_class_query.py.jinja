@@ -26,15 +26,16 @@ if TYPE_CHECKING:{% for edge_api in edge_apis %}{% if edge_api.end_view_id != ap
 
 
 class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -43,7 +44,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[{{ data_class.read_name }}], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls={{ data_class.read_name }},
                 max_retrieve_limit=limit,
             )
@@ -71,7 +72,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         from .{{ edge_api.query.file_name }} import {{ edge_api.query.name}}
 
         from_ = self._builder[-1].name{% if edge_api.has_edge_class %}
-        edge_view = self._view_by_read_class[{{ edge_api.edge_class.read_name }}]{% endif %}
+        edge_view = {{ edge_api.edge_class.read_name }}._view_id{% endif %}
         edge_filter = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
             {% if edge_api.has_edge_class %}edge_view,{% endif %}{% for parm in edge_api.filter_parameters(False, suffix_edge=True) %}
@@ -94,7 +95,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[{{ edge_api.end_class.read_name }}]
+        view_id = {{ edge_api.query.name}}._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = {{ edge_api.end_class.filter_name }}(
             view_id,{% for parm in edge_api.end_filter_method.parameters %}
@@ -103,7 +104,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         ){% for field in data_class.one_to_one_direct_relations_with_source %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
-        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return {{ edge_api.query.name }}(self._client, self._builder, node_filer, limit)
     {% endfor %}
     def query(
         self,{% for field in data_class.one_to_one_direct_relations_with_source %}
@@ -124,14 +125,14 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         return self._query()
 {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
-        view_id = self._view_by_read_class[{{ field.data_class.read_name }}]
+        view_id = {{ field.data_class.read_name }}._view_id
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("{{ field.name }}"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_read_class[{{ data_class.read_name }}].as_property_ref("{{ field.prop_name }}"),
+                    through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

@@ -36,18 +36,15 @@ from ._core import (
 from .sub_interface_query import SubInterfaceQueryAPI
 
 
-class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[SubInterface]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=SubInterface,
-            class_list=SubInterfaceList,
-            class_write_list=SubInterfaceWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
+    _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
+    _class_type = SubInterface
+    _class_list = SubInterfaceList
+    _class_write_list = SubInterfaceWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -88,7 +85,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(SubInterfaceList)
-        return SubInterfaceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return SubInterfaceQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -248,9 +245,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_SUBINTERFACE_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -367,9 +362,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _SUBINTERFACE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -424,10 +417,8 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _SUBINTERFACE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -490,7 +481,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList]
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_SUBINTERFACE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

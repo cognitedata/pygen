@@ -47,29 +47,31 @@ from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
 from .sensor_position_query import SensorPositionQueryAPI
 
 
-class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[SensorPosition]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=SensorPosition,
-            class_list=SensorPositionList,
-            class_write_list=SensorPositionWriteList,
-            view_by_read_class=view_by_read_class,
+class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):
+    _view_id = dm.ViewId("power-models", "SensorPosition", "1")
+    _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
+    _class_type = SensorPosition
+    _class_list = SensorPositionList
+    _class_write_list = SensorPositionWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(
+            client, self._view_id
         )
-        self._view_id = view_id
-        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, view_id)
+        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, self._view_id)
         self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, view_id
+            client, self._view_id
         )
-        self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, view_id)
-        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, view_id)
-        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, view_id)
+        self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, self._view_id)
+        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, self._view_id)
+        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(
+            client, self._view_id
+        )
+        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, self._view_id)
         self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, view_id
+            client, self._view_id
         )
 
     def __call__(
@@ -105,7 +107,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(SensorPositionList)
-        return SensorPositionQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return SensorPositionQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -297,9 +299,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _SENSORPOSITION_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -344,10 +344,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _SENSORPOSITION_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -404,7 +402,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_SENSORPOSITION_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -15,7 +15,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -34,6 +33,7 @@ __all__ = [
     "ScenarioInstanceApplyList",
     "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
+    "ScenarioInstanceGraphQL",
 ]
 
 
@@ -74,7 +74,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
         start: The start field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None
@@ -161,6 +161,8 @@ class ScenarioInstance(DomainModel):
         start: The start field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     aggregation: Optional[str] = None
@@ -217,6 +219,8 @@ class ScenarioInstanceWrite(DomainModelWrite):
         start: The start field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     aggregation: Optional[str] = None
@@ -231,17 +235,12 @@ class ScenarioInstanceWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(
-            ScenarioInstance, dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
-        )
 
         properties: dict[str, Any] = {}
 
@@ -281,7 +280,7 @@ class ScenarioInstanceWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],

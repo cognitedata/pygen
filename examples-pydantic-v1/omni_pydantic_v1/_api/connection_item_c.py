@@ -34,18 +34,16 @@ from .connection_item_c_connection_item_b import ConnectionItemCConnectionItemBA
 from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
-class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemC]
-        super().__init__(
-            client=client,
-            sources=None,
-            class_type=ConnectionItemC,
-            class_list=ConnectionItemCList,
-            class_write_list=ConnectionItemCWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList, ConnectionItemCWriteList]):
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    _properties_by_field = {}
+    _class_type = ConnectionItemC
+    _class_list = ConnectionItemCList
+    _class_write_list = ConnectionItemCWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
         self.connection_item_a_edge = ConnectionItemCConnectionItemAAPI(client)
         self.connection_item_b_edge = ConnectionItemCConnectionItemBAPI(client)
 
@@ -76,7 +74,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemCList)
-        return ConnectionItemCQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return ConnectionItemCQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -210,9 +208,6 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: ConnectionItemCFields | Sequence[ConnectionItemCFields] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_edges: bool = True,
     ) -> ConnectionItemCList:
         """List/filter connection item cs
@@ -222,11 +217,6 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
             space: The space to filter on.
             limit: Maximum number of connection item cs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.
             retrieve_edges: Whether to retrieve `connection_item_a` or `connection_item_b` external ids for the connection item cs. Defaults to True.
 
         Returns:
@@ -251,10 +241,6 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CONNECTIONITEMC_PROPERTIES_BY_FIELD,
-            sort_by=sort_by,
-            direction=direction,
-            sort=sort,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_view_id_penta=[
                 (

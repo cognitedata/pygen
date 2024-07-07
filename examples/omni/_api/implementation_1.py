@@ -36,18 +36,15 @@ from ._core import (
 from .implementation_1_query import Implementation1QueryAPI
 
 
-class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Implementation1]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Implementation1,
-            class_list=Implementation1List,
-            class_write_list=Implementation1WriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List, Implementation1WriteList]):
+    _view_id = dm.ViewId("pygen-models", "Implementation1", "1")
+    _properties_by_field = _IMPLEMENTATION1_PROPERTIES_BY_FIELD
+    _class_type = Implementation1
+    _class_list = Implementation1List
+    _class_write_list = Implementation1WriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -100,7 +97,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1List)
-        return Implementation1QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return Implementation1QueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -274,9 +271,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_IMPLEMENTATION1_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -413,9 +408,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _IMPLEMENTATION1_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -482,10 +475,8 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _IMPLEMENTATION1_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -560,7 +551,6 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_IMPLEMENTATION1_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

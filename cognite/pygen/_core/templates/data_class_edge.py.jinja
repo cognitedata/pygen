@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-from typing import Literal, Optional, Union
+from typing import ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
@@ -45,7 +45,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
     def as_read(self) -> {{ data_class.read_name }}:
@@ -85,6 +85,7 @@ class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
@@ -118,6 +119,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
     space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
@@ -126,7 +128,6 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         cache: set[tuple[str, str]],
         start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -147,10 +148,6 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
-            "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        ))
-
         properties = {}
         {% for field in data_class.container_fields %}
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
@@ -167,7 +164,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
                 existing_version=None if allow_version_increase else self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -176,7 +173,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
+            other_resources = self.end_node._to_instances_write(cache)
             resources.extend(other_resources)
 
         return resources
