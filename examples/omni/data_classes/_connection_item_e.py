@@ -58,12 +58,16 @@ class ConnectionItemEGraphQL(GraphQLCore):
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
+        direct_reverse_single: The direct reverse single field.
+        direct_reverse_multi: The direct reverse multi field.
         name: The name field.
     """
 
     view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
     direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
     inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
+    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(default=None, alias="directReverseSingle")
+    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, alias="directReverseMulti")
     name: Optional[str] = None
 
     @model_validator(mode="before")
@@ -99,6 +103,10 @@ class ConnectionItemEGraphQL(GraphQLCore):
             ),
             direct_no_source=self.direct_no_source,
             inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
+            direct_reverse_single=self.direct_reverse_single.as_read() if self.direct_reverse_single else None,
+            direct_reverse_multi=[
+                direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi or []
+            ],
             name=self.name,
         )
 
@@ -125,6 +133,8 @@ class ConnectionItemE(DomainModel):
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
+        direct_reverse_single: The direct reverse single field.
+        direct_reverse_multi: The direct reverse multi field.
         name: The name field.
     """
 
@@ -133,6 +143,12 @@ class ConnectionItemE(DomainModel):
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
         default=None, repr=False, alias="inwardsSingle"
+    )
+    direct_reverse_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
+        default=None, alias="directReverseSingle"
+    )
+    direct_reverse_multi: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+        default=None, alias="directReverseMulti"
     )
     name: Optional[str] = None
 
