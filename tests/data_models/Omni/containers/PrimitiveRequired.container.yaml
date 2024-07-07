@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: false
     autoIncrement: false
+    immutable: false
     name: text
   boolean:
     type:
@@ -17,6 +18,7 @@ properties:
       type: boolean
     nullable: false
     autoIncrement: false
+    immutable: false
     name: text
   float32:
     type:
@@ -24,6 +26,7 @@ properties:
       type: float32
     nullable: false
     autoIncrement: false
+    immutable: false
     name: float32
   float64:
     type:
@@ -31,6 +34,7 @@ properties:
       type: float64
     nullable: false
     autoIncrement: false
+    immutable: false
     name: float64
   int32:
     type:
@@ -38,6 +42,7 @@ properties:
       type: int32
     nullable: false
     autoIncrement: false
+    immutable: false
     name: int32
   int64:
     type:
@@ -45,6 +50,7 @@ properties:
       type: int64
     nullable: false
     autoIncrement: false
+    immutable: false
     name: int64
   timestamp:
     type:
@@ -52,6 +58,7 @@ properties:
       type: timestamp
     nullable: false
     autoIncrement: false
+    immutable: false
     name: timestamp
   date:
     type:
@@ -59,6 +66,7 @@ properties:
       type: date
     nullable: false
     autoIncrement: false
+    immutable: false
     name: date
   json:
     type:
@@ -66,4 +74,5 @@ properties:
       type: json
     nullable: false
     autoIncrement: false
+    immutable: false
     name: json

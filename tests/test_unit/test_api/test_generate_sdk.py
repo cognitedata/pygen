@@ -72,6 +72,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
                     type=dm.Text(),
                     nullable=False,
                     auto_increment=False,
+                    immutable=False,
                 )
             },
             description=None,
