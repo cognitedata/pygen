@@ -17,9 +17,9 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
     _view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
-    _class_type: ConnectionEdgeA
-    _class_write_type: ConnectionEdgeAWrite
-    _class_list: ConnectionEdgeAList
+    _class_type = ConnectionEdgeA
+    _class_write_type = ConnectionEdgeAWrite
+    _class_list = ConnectionEdgeAList
 
     def list(
         self,
