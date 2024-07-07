@@ -300,7 +300,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -346,7 +345,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             None,

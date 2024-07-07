@@ -262,7 +262,6 @@ class CDFExternalReferencesListedAPI(
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -302,7 +301,6 @@ class CDFExternalReferencesListedAPI(
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             None,

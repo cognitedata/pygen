@@ -261,7 +261,6 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
             properties=properties,
             filter_=filter_,
@@ -369,7 +368,6 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -419,7 +417,6 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             query,

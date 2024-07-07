@@ -306,7 +306,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -361,7 +360,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             None,

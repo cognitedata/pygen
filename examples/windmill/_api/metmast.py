@@ -278,7 +278,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -324,7 +323,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             None,

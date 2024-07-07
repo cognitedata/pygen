@@ -80,7 +80,7 @@ class SequenceNotStr(Protocol[_T_co]):
 
 
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
-    _view_id: ClassVar[dm.ViewId | None]
+    _view_id: ClassVar[dm.ViewId]
     _properties_by_field: ClassVar[dict[str, str]]
 
     def __init__(
@@ -154,7 +154,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def _search(
         self,
-        view_id: dm.ViewId,
         query: str,
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
@@ -170,7 +169,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             properties = [self._properties_by_field.get(prop, prop) for prop in properties]
         sort_input = self._get_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.search(
-            view=view_id,
+            view=self._view_id,
             query=query,
             instance_type="node",
             properties=properties,
@@ -183,7 +182,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     @overload
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
@@ -201,7 +199,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     @overload
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
@@ -218,7 +215,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
@@ -272,7 +268,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                 raise TypeError(f"Expected str or MetricAggregation, got {type(agg)}")
 
         return self._client.data_modeling.instances.aggregate(
-            view=view_id,
+            view=self._view_id,
             aggregates=aggregates,
             group_by=group_by,
             instance_type="node",
@@ -284,7 +280,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def _histogram(
         self,
-        view_id: dm.ViewId,
         property: str,
         interval: float,
         query: str | None = None,
@@ -300,7 +295,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             search_properties = [self._properties_by_field.get(prop, prop) for prop in search_properties]
 
         return self._client.data_modeling.instances.histogram(
-            view=view_id,
+            view=self._view_id,
             histograms=dm.aggregations.Histogram(property, interval),
             instance_type="node",
             query=query,

@@ -278,7 +278,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
             properties=properties,
             filter_=filter_,
@@ -396,7 +395,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
             property,
             group_by,
@@ -452,7 +450,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
             query,

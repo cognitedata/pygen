@@ -35,7 +35,7 @@ from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
 class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
-    _view_id = None
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     _properties_by_field = {}
 
     def __init__(self, client: CogniteClient):
