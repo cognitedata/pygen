@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 
+import pytest
 from cognite.client.data_classes.data_modeling import InstanceSort
 
 from tests.constants import IS_PYDANTIC_V2
@@ -14,6 +15,29 @@ else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
     from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+
+
+@pytest.fixture(scope="session")
+def setup_reverse_direct_relations(omni_client: OmniClient) -> dc.ConnectionItemEWrite:
+    item_e = dc.ConnectionItemEWrite(
+        external_id="connection_item_e:1",
+        name="ConnectionItemE:1",
+    )
+    to_write = dc.ConnectionItemDWrite(
+        external_id="connection_item_d:1", name="ConnectionItemD:1", direct_single=item_e
+    )
+    to_write2 = dc.ConnectionItemDWrite(
+        external_id="connection_item_d:2",
+        name="ConnectionItemD:2",
+        direct_multi=item_e.as_id(),
+    )
+    to_write3 = dc.ConnectionItemDWrite(
+        external_id="connection_item_d:3",
+        name="ConnectionItemD:3",
+        direct_multi=item_e.as_id(),
+    )
+    _ = omni_client.upsert([to_write, to_write2, to_write3])
+    return item_e
 
 
 def test_list_empty_to_pandas(omni_client: OmniClient) -> None:
@@ -120,3 +144,13 @@ def test_list_advanced_sort(omni_client: OmniClient) -> None:
 
     assert len(sorted_items) > 1
     assert list(sorted_items) == sorted(sorted_items, key=key)
+
+
+@pytest.mark.usefixtures("setup_reverse_direct_relations")
+def test_list_with_reverse_direct_relations(omni_client: OmniClient) -> None:
+    connections = omni_client.connection_item_e.list(limit=1, retrieve_edges=True)
+
+    assert len(connections) > 0
+    first = connections[0]
+    assert first.direct_reverse_single is not None
+    assert first.direct_reverse_multi is not None
