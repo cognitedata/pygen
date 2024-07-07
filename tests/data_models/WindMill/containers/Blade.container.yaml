@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: name
   is_damaged:
     type:
@@ -17,4 +18,5 @@ properties:
       type: boolean
     nullable: true
     autoIncrement: false
+    immutable: false
     name: is_damaged

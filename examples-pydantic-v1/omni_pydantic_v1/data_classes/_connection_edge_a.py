@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Literal, Optional, Union
+from typing import ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -62,7 +62,7 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
         start_time: The start time field.
     """
 
-    view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     end_node: Union[ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
@@ -114,6 +114,7 @@ class ConnectionEdgeA(DomainRelation):
         start_time: The start time field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemF, ConnectionItemG, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
@@ -157,6 +158,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         start_time: The start time field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
@@ -168,7 +170,6 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         cache: set[tuple[str, str]],
         start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -188,8 +189,6 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
             raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        write_view = (view_by_read_class or {}).get(ConnectionEdgeA, dm.ViewId("pygen-models", "ConnectionEdgeA", "1"))
 
         properties = {}
 
@@ -212,7 +211,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
                 existing_version=None if allow_version_increase else self.data_record.existing_version,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
@@ -221,7 +220,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache, view_by_read_class)
+            other_resources = self.end_node._to_instances_write(cache)
             resources.extend(other_resources)
 
         return resources

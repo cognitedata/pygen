@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: timeseries
   file:
     type:
@@ -16,6 +17,7 @@ properties:
       type: file
     nullable: true
     autoIncrement: false
+    immutable: false
     name: file
   sequence:
     type:
@@ -23,4 +25,5 @@ properties:
       type: sequence
     nullable: true
     autoIncrement: false
+    immutable: false
     name: sequence

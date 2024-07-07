@@ -40,8 +40,8 @@ class OmniClient:
 
     Generated with:
         pygen = 0.99.26
-        cognite-sdk = 7.51.1
-        pydantic = 2.7.4
+        cognite-sdk = 7.53.2
+        pydantic = 2.8.2
 
     Data Model:
         space: pygen-models
@@ -59,54 +59,29 @@ class OmniClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.99.26"
 
-        view_by_read_class = {
-            data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
-            data_classes.CDFExternalReferencesListed: dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1"),
-            data_classes.ConnectionEdgeA: dm.ViewId("pygen-models", "ConnectionEdgeA", "1"),
-            data_classes.ConnectionItemA: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
-            data_classes.ConnectionItemB: dm.ViewId("pygen-models", "ConnectionItemB", "1"),
-            data_classes.ConnectionItemC: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
-            data_classes.ConnectionItemD: dm.ViewId("pygen-models", "ConnectionItemD", "1"),
-            data_classes.ConnectionItemE: dm.ViewId("pygen-models", "ConnectionItemE", "1"),
-            data_classes.ConnectionItemF: dm.ViewId("pygen-models", "ConnectionItemF", "1"),
-            data_classes.ConnectionItemG: dm.ViewId("pygen-models", "ConnectionItemG", "1"),
-            data_classes.DependentOnNonWritable: dm.ViewId("pygen-models", "DependentOnNonWritable", "1"),
-            data_classes.Empty: dm.ViewId("pygen-models", "Empty", "1"),
-            data_classes.Implementation1: dm.ViewId("pygen-models", "Implementation1", "1"),
-            data_classes.Implementation1NonWriteable: dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
-            data_classes.Implementation2: dm.ViewId("pygen-models", "Implementation2", "1"),
-            data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
-            data_classes.PrimitiveNullable: dm.ViewId("pygen-models", "PrimitiveNullable", "1"),
-            data_classes.PrimitiveNullableListed: dm.ViewId("pygen-models", "PrimitiveNullableListed", "1"),
-            data_classes.PrimitiveRequired: dm.ViewId("pygen-models", "PrimitiveRequired", "1"),
-            data_classes.PrimitiveRequiredListed: dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1"),
-            data_classes.PrimitiveWithDefaults: dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1"),
-            data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_read_class)
-        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client, view_by_read_class)
-        self.connection_item_a = ConnectionItemAAPI(client, view_by_read_class)
-        self.connection_item_b = ConnectionItemBAPI(client, view_by_read_class)
-        self.connection_item_c = ConnectionItemCAPI(client, view_by_read_class)
-        self.connection_item_d = ConnectionItemDAPI(client, view_by_read_class)
-        self.connection_item_e = ConnectionItemEAPI(client, view_by_read_class)
-        self.connection_item_f = ConnectionItemFAPI(client, view_by_read_class)
-        self.connection_item_g = ConnectionItemGAPI(client, view_by_read_class)
-        self.dependent_on_non_writable = DependentOnNonWritableAPI(client, view_by_read_class)
-        self.empty = EmptyAPI(client, view_by_read_class)
-        self.implementation_1 = Implementation1API(client, view_by_read_class)
-        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_read_class)
-        self.implementation_2 = Implementation2API(client, view_by_read_class)
-        self.main_interface = MainInterfaceAPI(client, view_by_read_class)
-        self.primitive_nullable = PrimitiveNullableAPI(client, view_by_read_class)
-        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client, view_by_read_class)
-        self.primitive_required = PrimitiveRequiredAPI(client, view_by_read_class)
-        self.primitive_required_listed = PrimitiveRequiredListedAPI(client, view_by_read_class)
-        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_read_class)
-        self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
+        self.cdf_external_references = CDFExternalReferencesAPI(client)
+        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client)
+        self.connection_item_a = ConnectionItemAAPI(client)
+        self.connection_item_b = ConnectionItemBAPI(client)
+        self.connection_item_c = ConnectionItemCAPI(client)
+        self.connection_item_d = ConnectionItemDAPI(client)
+        self.connection_item_e = ConnectionItemEAPI(client)
+        self.connection_item_f = ConnectionItemFAPI(client)
+        self.connection_item_g = ConnectionItemGAPI(client)
+        self.dependent_on_non_writable = DependentOnNonWritableAPI(client)
+        self.empty = EmptyAPI(client)
+        self.implementation_1 = Implementation1API(client)
+        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client)
+        self.implementation_2 = Implementation2API(client)
+        self.main_interface = MainInterfaceAPI(client)
+        self.primitive_nullable = PrimitiveNullableAPI(client)
+        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client)
+        self.primitive_required = PrimitiveRequiredAPI(client)
+        self.primitive_required_listed = PrimitiveRequiredListedAPI(client)
+        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client)
+        self.sub_interface = SubInterfaceAPI(client)
 
     def upsert(
         self,
@@ -151,7 +126,7 @@ class OmniClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -159,7 +134,6 @@ class OmniClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

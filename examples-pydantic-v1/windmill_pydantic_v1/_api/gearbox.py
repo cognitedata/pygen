@@ -38,21 +38,19 @@ from .gearbox_displacement_z import GearboxDisplacementZAPI
 from .gearbox_query import GearboxQueryAPI
 
 
-class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Gearbox]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Gearbox,
-            class_list=GearboxList,
-            class_write_list=GearboxWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.displacement_x = GearboxDisplacementXAPI(client, view_id)
-        self.displacement_y = GearboxDisplacementYAPI(client, view_id)
-        self.displacement_z = GearboxDisplacementZAPI(client, view_id)
+class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
+    _view_id = dm.ViewId("power-models", "Gearbox", "1")
+    _properties_by_field = _GEARBOX_PROPERTIES_BY_FIELD
+    _class_type = Gearbox
+    _class_list = GearboxList
+    _class_write_list = GearboxWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.displacement_x = GearboxDisplacementXAPI(client, self._view_id)
+        self.displacement_y = GearboxDisplacementYAPI(client, self._view_id)
+        self.displacement_z = GearboxDisplacementZAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -81,7 +79,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(GearboxList)
-        return GearboxQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return GearboxQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -263,9 +261,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _GEARBOX_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -304,10 +300,8 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _GEARBOX_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -358,7 +352,6 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_GEARBOX_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

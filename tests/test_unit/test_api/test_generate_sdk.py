@@ -72,6 +72,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
                     type=dm.Text(),
                     nullable=False,
                     auto_increment=False,
+                    immutable=False,
                 )
             },
             description=None,
@@ -95,6 +96,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
                     type=dm.Text(),
                     nullable=False,
                     auto_increment=False,
+                    immutable=False,
                 ),
                 "field": dm.MappedProperty(
                     container=dm.ContainerId("field_space", "Field"),
@@ -103,6 +105,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
                     nullable=True,
                     auto_increment=False,
                     source=dm.ViewId("field_space", "Field", "1"),
+                    immutable=False,
                 ),
             },
             description=None,

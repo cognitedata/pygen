@@ -24,6 +24,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: aggregation
@@ -39,6 +40,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: country
@@ -53,6 +55,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: instance
@@ -68,6 +71,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: market
@@ -83,6 +87,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: priceArea
@@ -97,6 +102,7 @@ views:
         type: timeseries
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: priceForecast
@@ -112,6 +118,7 @@ views:
         type: text
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: scenario
@@ -126,6 +133,7 @@ views:
         type: timestamp
       nullable: true
       autoIncrement: false
+      immutable: false
       source: null
       defaultValue: null
       name: start

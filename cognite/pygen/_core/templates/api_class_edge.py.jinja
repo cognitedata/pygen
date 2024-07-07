@@ -5,7 +5,9 @@ import datetime{% endif %}
 from cognite.client import data_modeling as dm
 {% if edge_api.has_edge_class %}
 from {{ top_level_package }}.data_classes import (
+    {{ edge_api.edge_class.read_name }},
     {{ edge_api.edge_class.read_list_name }},
+    {{ edge_api.edge_class.write_name }},
 )
 from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
 {% endif %}
@@ -13,7 +15,12 @@ from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePrope
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
-class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
+class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):{% if edge_api.has_edge_class %}
+    _view_id = dm.ViewId("{{ edge_api.edge_class.view_id.space }}", "{{ edge_api.edge_class.view_id.external_id }}", "{{ edge_api.edge_class.view_id.version }}")
+    _class_type = {{ edge_api.edge_class.read_name }}
+    _class_write_type = {{ edge_api.edge_class.write_name }}
+    _class_list = {{ edge_api.edge_class.read_list_name }}
+{% endif %}
     def list(
             self,{% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}

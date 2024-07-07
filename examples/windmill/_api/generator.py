@@ -37,20 +37,18 @@ from .generator_generator_speed_controller_reference import GeneratorGeneratorSp
 from .generator_query import GeneratorQueryAPI
 
 
-class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Generator]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Generator,
-            class_list=GeneratorList,
-            class_write_list=GeneratorWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, view_id)
-        self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, view_id)
+class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWriteList]):
+    _view_id = dm.ViewId("power-models", "Generator", "1")
+    _properties_by_field = _GENERATOR_PROPERTIES_BY_FIELD
+    _class_type = Generator
+    _class_list = GeneratorList
+    _class_write_list = GeneratorWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.generator_speed_controller = GeneratorGeneratorSpeedControllerAPI(client, self._view_id)
+        self.generator_speed_controller_reference = GeneratorGeneratorSpeedControllerReferenceAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -79,7 +77,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(GeneratorList)
-        return GeneratorQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return GeneratorQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -261,9 +259,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _GENERATOR_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -302,10 +298,8 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _GENERATOR_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -356,7 +350,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_GENERATOR_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

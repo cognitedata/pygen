@@ -35,4 +35,5 @@ def test_import_data_class(example_sdk: ExampleSDK, mock_cognite_client: Cognite
 
     # Assert
     assert "__all__" in module
-    assert not (missing := set(module["__all__"]) - set(module)), f"Missing {missing}"
+    missing = set(module["__all__"]) - set(module)
+    assert not missing, f"Missing {missing}"

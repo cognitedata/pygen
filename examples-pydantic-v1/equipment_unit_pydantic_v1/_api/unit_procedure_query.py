@@ -30,15 +30,16 @@ if TYPE_CHECKING:
 
 
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -47,7 +48,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[UnitProcedure], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=UnitProcedure,
                 max_retrieve_limit=limit,
             )
@@ -99,7 +100,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         from .work_order_query import WorkOrderQueryAPI
 
         from_ = self._builder[-1].name
-        edge_view = self._view_by_read_class[StartEndTime]
+        edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
             edge_view,
@@ -126,7 +127,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[WorkOrder]
+        view_id = WorkOrderQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_work_order_filter(
             view_id,
@@ -140,7 +141,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return WorkOrderQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return WorkOrderQueryAPI(self._client, self._builder, node_filer, limit)
 
     def work_units(
         self,
@@ -188,7 +189,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         from .equipment_module_query import EquipmentModuleQueryAPI
 
         from_ = self._builder[-1].name
-        edge_view = self._view_by_read_class[StartEndTime]
+        edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
             edge_view,
@@ -215,7 +216,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[EquipmentModule]
+        view_id = EquipmentModuleQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_equipment_module_filter(
             view_id,
@@ -229,7 +230,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return EquipmentModuleQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,

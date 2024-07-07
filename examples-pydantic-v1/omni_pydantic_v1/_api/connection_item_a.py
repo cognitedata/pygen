@@ -37,18 +37,16 @@ from .connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from .connection_item_a_query import ConnectionItemAQueryAPI
 
 
-class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[ConnectionItemA]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=ConnectionItemA,
-            class_list=ConnectionItemAList,
-            class_write_list=ConnectionItemAWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):
+    _view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    _properties_by_field = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
+    _class_type = ConnectionItemA
+    _class_list = ConnectionItemAList
+    _class_write_list = ConnectionItemAWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
         self.outwards_edge = ConnectionItemAOutwardsAPI(client)
 
     def __call__(
@@ -90,7 +88,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemAList)
-        return ConnectionItemAQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -269,9 +267,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_CONNECTIONITEMA_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -388,9 +384,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -445,10 +439,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -514,7 +506,6 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_CONNECTIONITEMA_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

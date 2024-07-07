@@ -30,7 +30,7 @@ class WindmillClient:
 
     Generated with:
         pygen = 0.99.26
-        cognite-sdk = 7.51.1
+        cognite-sdk = 7.53.2
         pydantic = 1.10.7
 
     Data Model:
@@ -49,33 +49,19 @@ class WindmillClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.99.26"
 
-        view_by_read_class = {
-            data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
-            data_classes.Gearbox: dm.ViewId("power-models", "Gearbox", "1"),
-            data_classes.Generator: dm.ViewId("power-models", "Generator", "1"),
-            data_classes.HighSpeedShaft: dm.ViewId("power-models", "HighSpeedShaft", "1"),
-            data_classes.MainShaft: dm.ViewId("power-models", "MainShaft", "1"),
-            data_classes.Metmast: dm.ViewId("power-models", "Metmast", "1"),
-            data_classes.Nacelle: dm.ViewId("power-models", "Nacelle", "1"),
-            data_classes.PowerInverter: dm.ViewId("power-models", "PowerInverter", "1"),
-            data_classes.Rotor: dm.ViewId("power-models", "Rotor", "1"),
-            data_classes.SensorPosition: dm.ViewId("power-models", "SensorPosition", "1"),
-            data_classes.Windmill: dm.ViewId("power-models", "Windmill", "1"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.blade = BladeAPI(client, view_by_read_class)
-        self.gearbox = GearboxAPI(client, view_by_read_class)
-        self.generator = GeneratorAPI(client, view_by_read_class)
-        self.high_speed_shaft = HighSpeedShaftAPI(client, view_by_read_class)
-        self.main_shaft = MainShaftAPI(client, view_by_read_class)
-        self.metmast = MetmastAPI(client, view_by_read_class)
-        self.nacelle = NacelleAPI(client, view_by_read_class)
-        self.power_inverter = PowerInverterAPI(client, view_by_read_class)
-        self.rotor = RotorAPI(client, view_by_read_class)
-        self.sensor_position = SensorPositionAPI(client, view_by_read_class)
-        self.windmill = WindmillAPI(client, view_by_read_class)
+        self.blade = BladeAPI(client)
+        self.gearbox = GearboxAPI(client)
+        self.generator = GeneratorAPI(client)
+        self.high_speed_shaft = HighSpeedShaftAPI(client)
+        self.main_shaft = MainShaftAPI(client)
+        self.metmast = MetmastAPI(client)
+        self.nacelle = NacelleAPI(client)
+        self.power_inverter = PowerInverterAPI(client)
+        self.rotor = RotorAPI(client)
+        self.sensor_position = SensorPositionAPI(client)
+        self.windmill = WindmillAPI(client)
 
     def upsert(
         self,
@@ -120,7 +106,7 @@ class WindmillClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -128,7 +114,6 @@ class WindmillClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

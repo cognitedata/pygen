@@ -38,19 +38,21 @@ from .primitive_nullable_listed_query import PrimitiveNullableListedQueryAPI
 
 
 class PrimitiveNullableListedAPI(
-    NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedWrite, PrimitiveNullableListedList]
+    NodeAPI[
+        PrimitiveNullableListed,
+        PrimitiveNullableListedWrite,
+        PrimitiveNullableListedList,
+        PrimitiveNullableListedWriteList,
+    ]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[PrimitiveNullableListed]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=PrimitiveNullableListed,
-            class_list=PrimitiveNullableListedList,
-            class_write_list=PrimitiveNullableListedWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+    _view_id = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
+    _properties_by_field = _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD
+    _class_type = PrimitiveNullableListed
+    _class_list = PrimitiveNullableListedList
+    _class_write_list = PrimitiveNullableListedWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -79,7 +81,7 @@ class PrimitiveNullableListedAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveNullableListedList)
-        return PrimitiveNullableListedQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return PrimitiveNullableListedQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -229,9 +231,7 @@ class PrimitiveNullableListedAPI(
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -332,9 +332,7 @@ class PrimitiveNullableListedAPI(
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -377,10 +375,8 @@ class PrimitiveNullableListedAPI(
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -431,7 +427,6 @@ class PrimitiveNullableListedAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

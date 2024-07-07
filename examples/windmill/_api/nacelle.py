@@ -40,23 +40,21 @@ from .nacelle_yaw_error import NacelleYawErrorAPI
 from .nacelle_query import NacelleQueryAPI
 
 
-class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Nacelle]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Nacelle,
-            class_list=NacelleList,
-            class_write_list=NacelleWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, view_id)
-        self.acc_from_back_side_y = NacelleAccFromBackSideYAPI(client, view_id)
-        self.acc_from_back_side_z = NacelleAccFromBackSideZAPI(client, view_id)
-        self.yaw_direction = NacelleYawDirectionAPI(client, view_id)
-        self.yaw_error = NacelleYawErrorAPI(client, view_id)
+class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
+    _view_id = dm.ViewId("power-models", "Nacelle", "1")
+    _properties_by_field = _NACELLE_PROPERTIES_BY_FIELD
+    _class_type = Nacelle
+    _class_list = NacelleList
+    _class_write_list = NacelleWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, self._view_id)
+        self.acc_from_back_side_y = NacelleAccFromBackSideYAPI(client, self._view_id)
+        self.acc_from_back_side_z = NacelleAccFromBackSideZAPI(client, self._view_id)
+        self.yaw_direction = NacelleYawDirectionAPI(client, self._view_id)
+        self.yaw_error = NacelleYawErrorAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -100,7 +98,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(NacelleList)
-        return NacelleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return NacelleQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -307,9 +305,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _NACELLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -363,10 +359,8 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _NACELLE_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -432,7 +426,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_NACELLE_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

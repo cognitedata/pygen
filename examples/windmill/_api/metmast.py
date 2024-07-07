@@ -38,21 +38,19 @@ from .metmast_wind_speed import MetmastWindSpeedAPI
 from .metmast_query import MetmastQueryAPI
 
 
-class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Metmast]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Metmast,
-            class_list=MetmastList,
-            class_write_list=MetmastWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
-        self.temperature = MetmastTemperatureAPI(client, view_id)
-        self.tilt_angle = MetmastTiltAngleAPI(client, view_id)
-        self.wind_speed = MetmastWindSpeedAPI(client, view_id)
+class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
+    _view_id = dm.ViewId("power-models", "Metmast", "1")
+    _properties_by_field = _METMAST_PROPERTIES_BY_FIELD
+    _class_type = Metmast
+    _class_list = MetmastList
+    _class_write_list = MetmastWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
+
+        self.temperature = MetmastTemperatureAPI(client, self._view_id)
+        self.tilt_angle = MetmastTiltAngleAPI(client, self._view_id)
+        self.wind_speed = MetmastWindSpeedAPI(client, self._view_id)
 
     def __call__(
         self,
@@ -87,7 +85,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(MetmastList)
-        return MetmastQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return MetmastQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -279,9 +277,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _METMAST_PROPERTIES_BY_FIELD,
             property,
             group_by,
             None,
@@ -326,10 +322,8 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _METMAST_PROPERTIES_BY_FIELD,
             None,
             None,
             limit,
@@ -386,7 +380,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_METMAST_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

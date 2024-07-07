@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -13,7 +13,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "RotorApplyList",
     "RotorFields",
     "RotorTextFields",
+    "RotorGraphQL",
 ]
 
 
@@ -59,7 +59,7 @@ class RotorGraphQL(GraphQLCore):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
-    view_id = dm.ViewId("power-models", "Rotor", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
     rotor_speed_controller: Union[TimeSeries, dict, None] = None
     rpm_low_speed_shaft: Union[TimeSeries, dict, None] = None
 
@@ -114,6 +114,8 @@ class Rotor(DomainModel):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     rotor_speed_controller: Union[TimeSeries, str, None] = None
@@ -152,6 +154,8 @@ class RotorWrite(DomainModelWrite):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     rotor_speed_controller: Union[TimeSeries, str, None] = None
@@ -160,15 +164,12 @@ class RotorWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(Rotor, dm.ViewId("power-models", "Rotor", "1"))
 
         properties: dict[str, Any] = {}
 
@@ -194,7 +195,7 @@ class RotorWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],

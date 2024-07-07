@@ -292,27 +292,23 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
 
     def to_instances_write(
         self,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), view_by_read_class, write_none, allow_version_increase)
+        return self._to_instances_write(set(), write_none, allow_version_increase)
 
-    def to_instances_apply(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
-    ) -> ResourcesWrite:
+    def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
         warnings.warn(
             "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
             UserWarning,
             stacklevel=2,
         )
-        return self.to_instances_write(view_by_read_class, write_none)
+        return self.to_instances_write(write_none)
 
     @abstractmethod
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -432,26 +428,23 @@ class DomainModelWriteList(DomainModelList[T_DomainModelWrite]):
 
     def to_instances_write(
         self,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_write(cache, view_by_read_class, write_none, allow_version_increase)
+            result = node._to_instances_write(cache, write_none, allow_version_increase)
             domains.extend(result)
         return domains
 
-    def to_instances_apply(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
-    ) -> ResourcesWrite:
+    def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
         warnings.warn(
             "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
             UserWarning,
             stacklevel=2,
         )
-        return self.to_instances_write(view_by_read_class, write_none)
+        return self.to_instances_write(write_none)
 
 
 T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
@@ -522,7 +515,6 @@ class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
         cache: set[tuple[str, str]],
         start_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -575,7 +567,6 @@ class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
         start_node: DomainModelWrite | str | dm.NodeId,
         end_node: DomainModelWrite | str | dm.NodeId,
         edge_type: dm.DirectRelationReference,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
@@ -589,7 +580,6 @@ class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
         if isinstance(end_node, DomainModelWrite):
             other_resources = end_node._to_instances_write(
                 cache,
-                view_by_read_class,
                 write_none,
                 allow_version_increase,
             )
@@ -597,7 +587,6 @@ class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
         if isinstance(start_node, DomainModelWrite):
             other_resources = start_node._to_instances_write(
                 cache,
-                view_by_read_class,
                 write_none,
                 allow_version_increase,
             )

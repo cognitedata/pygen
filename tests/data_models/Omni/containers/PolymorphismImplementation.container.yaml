@@ -10,6 +10,7 @@ properties:
       type: text
     nullable: true
     autoIncrement: false
+    immutable: false
     name: child1Value
   requiredImplementation1Value:
     type:
@@ -18,4 +19,5 @@ properties:
       type: text
     nullable: false
     autoIncrement: false
+    immutable: false
     name: requiredChild1Value

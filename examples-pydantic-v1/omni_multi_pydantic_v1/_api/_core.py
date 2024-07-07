@@ -3,12 +3,13 @@ from __future__ import annotations
 import math
 import re
 import warnings
+from abc import ABC
 from itertools import groupby
 
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast, Union
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast, ClassVar
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -78,20 +79,14 @@ class SequenceNotStr(Protocol[_T_co]):
     def __reversed__(self) -> Iterator[_T_co]: ...
 
 
-class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
-    def __init__(
-        self,
-        client: CogniteClient,
-        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
-        class_type: type[T_DomainModel],
-        class_list: type[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
-    ):
+class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
+    _view_id: ClassVar[dm.ViewId]
+    _properties_by_field: ClassVar[dict[str, str]]
+    _class_type: ClassVar[type[T_DomainModel]]
+    _class_list: ClassVar[type[T_DomainModelList]]
+
+    def __init__(self, client: CogniteClient):
         self._client = client
-        self._sources = sources
-        self._class_type = class_type
-        self._class_list = class_list
-        self._view_by_read_class = view_by_read_class
 
     def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
@@ -132,14 +127,14 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
     ) -> T_DomainModel | T_DomainModelList | None:
-        is_multiple = True
         if isinstance(external_id, str):
             node_ids = (space, external_id)
             is_multiple = False
         else:
+            is_multiple = True
             node_ids = [(space, ext_id) for ext_id in external_id]
 
-        instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
+        instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
         if retrieve_edges and nodes:
@@ -154,9 +149,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
     def _search(
         self,
-        view_id: dm.ViewId,
         query: str,
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -168,10 +161,10 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
             properties = [properties]
 
         if properties:
-            properties = [properties_by_field.get(prop, prop) for prop in properties]
-        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
+            properties = [self._properties_by_field.get(prop, prop) for prop in properties]
+        sort_input = self._get_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.search(
-            view=view_id,
+            view=self._view_id,
             query=query,
             instance_type="node",
             properties=properties,
@@ -184,14 +177,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
     @overload
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: None = None,
         query: str | None = None,
@@ -203,14 +194,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
     @overload
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] = None,
         group_by: str | Sequence[str] | None = None,
         query: str | None = None,
@@ -221,14 +210,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
     def _aggregate(
         self,
-        view_id: dm.ViewId,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
             | Sequence[Aggregations]
             | Sequence[dm.aggregations.MetricAggregation]
         ),
-        properties_by_field: dict[str, str],
         properties: str | Sequence[str] | None = None,
         group_by: str | Sequence[str] | None = None,
         query: str | None = None,
@@ -240,19 +227,19 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
             group_by = [group_by]
 
         if group_by:
-            group_by = [properties_by_field.get(prop, prop) for prop in group_by]
+            group_by = [self._properties_by_field.get(prop, prop) for prop in group_by]
 
         if isinstance(search_properties, str):
             search_properties = [search_properties]
 
         if search_properties:
-            search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
+            search_properties = [self._properties_by_field.get(prop, prop) for prop in search_properties]
 
         if isinstance(properties, str):
             properties = [properties]
 
         if properties:
-            properties = [properties_by_field.get(prop, prop) for prop in properties]
+            properties = [self._properties_by_field.get(prop, prop) for prop in properties]
 
         if isinstance(aggregate, (str, dm.aggregations.MetricAggregation)):
             aggregate = [aggregate]
@@ -276,7 +263,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
                 raise TypeError(f"Expected str or MetricAggregation, got {type(agg)}")
 
         return self._client.data_modeling.instances.aggregate(
-            view=view_id,
+            view=self._view_id,
             aggregates=aggregates,
             group_by=group_by,
             instance_type="node",
@@ -288,24 +275,22 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
     def _histogram(
         self,
-        view_id: dm.ViewId,
         property: str,
         interval: float,
-        properties_by_field: dict[str, str],
         query: str | None = None,
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        property = properties_by_field.get(property, property)
+        property = self._properties_by_field.get(property, property)
 
         if isinstance(search_properties, str):
             search_properties = [search_properties]
         if search_properties:
-            search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
+            search_properties = [self._properties_by_field.get(prop, prop) for prop in search_properties]
 
         return self._client.data_modeling.instances.histogram(
-            view=view_id,
+            view=self._view_id,
             histograms=dm.aggregations.Histogram(property, interval),
             instance_type="node",
             query=query,
@@ -318,7 +303,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         self,
         limit: int,
         filter: dm.Filter,
-        properties_by_field: dict[str, str],
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None
@@ -327,10 +311,10 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
-        sort_input = self._get_sort(properties_by_field, sort_by, direction, sort)
+        sort_input = self._get_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.list(
             instance_type="node",
-            sources=self._sources,
+            sources=self._view_id,
             limit=limit,
             filter=filter,
             sort=sort_input,
@@ -343,7 +327,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
     def _get_sort(
         self,
-        properties_by_field: dict[str, str],
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
@@ -351,23 +334,25 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
         sort_input: InstanceSort | list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
             sort_input = InstanceSort(
-                self._sources.as_property_ref(properties_by_field.get(sort_by, sort_by)), direction
+                self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction
             )
         elif sort is None and isinstance(sort_by, list):
             sort_input = [
-                InstanceSort(self._sources.as_property_ref(properties_by_field.get(sort_by_, sort_by_)), direction)
+                InstanceSort(
+                    self._view_id.as_property_ref(self._properties_by_field.get(sort_by_, sort_by_)), direction
+                )
                 for sort_by_ in sort_by
             ]
         elif sort is not None:
             sort_input = sort if isinstance(sort, list) else [sort]
             for sort_ in sort_input:
                 if isinstance(sort_.property, Sequence) and len(sort_.property) == 1:
-                    sort_.property = self._sources.as_property_ref(
-                        properties_by_field.get(sort_.property[0], sort_.property[0])
+                    sort_.property = self._view_id.as_property_ref(
+                        self._properties_by_field.get(sort_.property[0], sort_.property[0])
                     )
                 elif isinstance(sort_.property, str):
-                    sort_.property = self._sources.as_property_ref(
-                        properties_by_field.get(sort_.property, sort_.property)
+                    sort_.property = self._view_id.as_property_ref(
+                        self._properties_by_field.get(sort_.property, sort_.property)
                     )
         return sort_input
 
@@ -450,27 +435,19 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
 
 
 class NodeAPI(
-    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList]
+    Generic[T_DomainModel, T_DomainModelWrite, T_DomainModelList, T_DomainModelWriteList],
+    NodeReadAPI[T_DomainModel, T_DomainModelList],
+    ABC,
 ):
-    def __init__(
-        self,
-        client: CogniteClient,
-        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
-        class_type: type[T_DomainModel],
-        class_list: type[T_DomainModelList],
-        class_write_list: type[T_DomainModelWriteList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
-    ):
-        super().__init__(client, sources, class_type, class_list, view_by_read_class)
-        self._class_write_list = class_write_list
+    _class_write_list: type[T_DomainModelWriteList]
 
     def _apply(
         self, item: T_DomainModelWrite | Sequence[T_DomainModelWrite], replace: bool = False, write_none: bool = False
     ) -> ResourcesWriteResult:
         if isinstance(item, DomainModelWrite):
-            instances = item.to_instances_write(self._view_by_read_class, write_none)
+            instances = item.to_instances_write(write_none)
         else:
-            instances = self._class_write_list(item).to_instances_write(self._view_by_read_class, write_none)
+            instances = self._class_write_list(item).to_instances_write(write_none)
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -485,7 +462,7 @@ class NodeAPI(
         return ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
 
-class EdgeAPI:
+class EdgeAPI(ABC):
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -497,21 +474,11 @@ class EdgeAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_)
 
 
-class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, T_DomainRelationList]):
-    def __init__(
-        self,
-        client: CogniteClient,
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
-        class_type: type[T_DomainRelation],
-        class_write_type: type[T_DomainRelationWrite],
-        class_list: type[T_DomainRelationList],
-    ):
-        super().__init__(client)
-        self._view_by_read_class = view_by_read_class
-        self._view_id = view_by_read_class[class_type]
-        self._class_type = class_type
-        self._class_write_type = class_write_type
-        self._class_list = class_list
+class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, T_DomainRelationList], ABC):
+    _view_id: ClassVar[dm.ViewId]
+    _class_type: type[T_DomainRelation]
+    _class_write_type: type[T_DomainRelationWrite]
+    _class_list: type[T_DomainRelationList]
 
     def _list(
         self,
@@ -720,11 +687,9 @@ class QueryAPI(Generic[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         self._client = client
         self._builder = builder
-        self._view_by_read_class = view_by_read_class
 
     def _query(self) -> T_DomainModelList:
         self._builder.reset()

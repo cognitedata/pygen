@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -33,6 +32,7 @@ __all__ = [
     "PrimitiveRequiredApplyList",
     "PrimitiveRequiredFields",
     "PrimitiveRequiredTextFields",
+    "PrimitiveRequiredGraphQL",
 ]
 
 
@@ -75,7 +75,7 @@ class PrimitiveRequiredGraphQL(GraphQLCore):
         timestamp: The timestamp field.
     """
 
-    view_id = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -158,6 +158,8 @@ class PrimitiveRequired(DomainModel):
         timestamp: The timestamp field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: bool
@@ -217,6 +219,8 @@ class PrimitiveRequiredWrite(DomainModelWrite):
         timestamp: The timestamp field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: bool
@@ -232,17 +236,12 @@ class PrimitiveRequiredWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(
-            PrimitiveRequired, dm.ViewId("pygen-models", "PrimitiveRequired", "1")
-        )
 
         properties: dict[str, Any] = {}
 
@@ -281,7 +280,7 @@ class PrimitiveRequiredWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],

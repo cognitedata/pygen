@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, Literal, Optional, Union{% else %}from typing import Any, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union{% else %}from typing import Any, ClassVar, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -15,7 +15,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -26,11 +25,21 @@ from ._core import (
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
-if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = [
+    "{{ data_class.read_name }}",
+    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_name }}",
+    "{{ data_class.read_name }}Apply",{% endif %}
+    "{{ data_class.read_list_name }}",
+    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_list_name }}",
+    "{{ data_class.read_name }}ApplyList",{% endif %}
+    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}"{{ data_class.field_names }}",{% endif %}
+    {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}"{{ data_class.text_field_names }}",{% endif %}
+    "{{ data_class.graphql_name }}",
+]
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
@@ -52,7 +61,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
     @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
@@ -123,7 +132,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         external_id: The external id of the {{ data_class.doc_name }}.
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-    """{% if not data_class.implements %}
+    """
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+    {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
@@ -157,7 +168,9 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         external_id: The external id of the {{ data_class.doc_name }}.
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-    """{% if not data_class.implements %}
+    """
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+{% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
@@ -165,7 +178,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
@@ -184,11 +196,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             sources=None,
         )
         resources.nodes.append(this_node)
-        {% else %}
-
-        write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
-            "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        )){% endif %}
+        {% endif %}
 {% if data_class.has_container_fields %}
         properties: dict[str, Any] = {}
         {% for field in data_class.container_fields %}
@@ -204,7 +212,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                 )],
             )
@@ -219,7 +227,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                     cache,
                     self,
                     dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                    view_by_read_class
 )
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
@@ -230,7 +237,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node=self,
                 end_node={{field.variable}},
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             ){% else %}
@@ -239,19 +245,18 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node={{field.variable}},
                 end_node=self,
                 edge_type=edge_type,
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
         if isinstance(self.{{ field.name }}, DomainModelWrite):
-            other_resources = self.{{ field.name }}._to_instances_write(cache, view_by_read_class)
+            other_resources = self.{{ field.name }}._to_instances_write(cache)
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainModelWrite):
-                other_resources = {{ field.variable }}._to_instances_write(cache, view_by_read_class)
+                other_resources = {{ field.variable }}._to_instances_write(cache)
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
@@ -263,7 +268,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node=self,
                 end_node=self.{{ field.name }},
                 edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
@@ -275,7 +279,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 start_node={{field.variable}},
                 end_node=self,
                 edge_type=dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                view_by_read_class=view_by_read_class,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )

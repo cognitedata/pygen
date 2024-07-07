@@ -9,6 +9,7 @@ properties:
       type: float64
     nullable: true
     autoIncrement: false
+    immutable: false
     name: position
   flapwise_bend_mom:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: flapwise_bend_mom
   flapwise_bend_mom_offset:
     type:
@@ -23,6 +25,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: flapwise_bend_mom_offset
   flapwise_bend_mom_crosstalk_corrected:
     type:
@@ -30,6 +33,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: flapwise_bend_mom_crosstalk_corrected
   flapwise_bend_mom_offset_crosstalk_corrected:
     type:
@@ -37,6 +41,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: flapwise_bend_mom_offset_crosstalk_corrected
   edgewisewise_bend_mom:
     type:
@@ -44,6 +49,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: edgewisewise_bend_mom
   edgewise_bend_mom_offset:
     type:
@@ -51,6 +57,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: edgewise_bend_mom_offset
   edgewise_bend_mom_crosstalk_corrected:
     type:
@@ -58,6 +65,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: edgewise_bend_mom_crosstalk_corrected
   edgewise_bend_mom_offset_crosstalk_corrected:
     type:
@@ -65,4 +73,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: edgewise_bend_mom_offset_crosstalk_corrected

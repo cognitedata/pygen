@@ -5,7 +5,9 @@ import datetime
 from cognite.client import data_modeling as dm
 
 from omni.data_classes import (
+    ConnectionEdgeA,
     ConnectionEdgeAList,
+    ConnectionEdgeAWrite,
 )
 from omni.data_classes._connection_edge_a import _create_connection_edge_a_filter
 
@@ -14,6 +16,11 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
+    _view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
+    _class_type = ConnectionEdgeA
+    _class_write_type = ConnectionEdgeAWrite
+    _class_list = ConnectionEdgeAList
+
     def list(
         self,
         from_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,

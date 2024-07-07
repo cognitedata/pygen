@@ -20,15 +20,16 @@ if TYPE_CHECKING:
 
 
 class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -37,9 +38,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_read_class[DependentOnNonWritable], ["*"])]
-                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=DependentOnNonWritable,
                 max_retrieve_limit=limit,
             )
@@ -101,7 +100,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[Implementation1NonWriteable]
+        view_id = Implementation1NonWriteableQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_implementation_1_non_writeable_filter(
             view_id,
@@ -115,9 +114,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return Implementation1NonWriteableQueryAPI(
-            self._client, self._builder, self._view_by_read_class, node_filer, limit
-        )
+        return Implementation1NonWriteableQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,

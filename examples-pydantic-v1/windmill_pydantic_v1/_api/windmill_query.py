@@ -27,15 +27,16 @@ if TYPE_CHECKING:
 
 
 class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
+    _view_id = dm.ViewId("power-models", "Windmill", "1")
+
     def __init__(
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_read_class)
+        super().__init__(client, builder)
 
         self._builder.append(
             QueryStep(
@@ -44,7 +45,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[Windmill], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=Windmill,
                 max_retrieve_limit=limit,
             )
@@ -104,7 +105,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[Blade]
+        view_id = BladeQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_blade_filter(
             view_id,
@@ -119,7 +120,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_nacelle(from_)
         if retrieve_rotor:
             self._query_append_rotor(from_)
-        return BladeQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return BladeQueryAPI(self._client, self._builder, node_filer, limit)
 
     def metmast(
         self,
@@ -173,7 +174,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = self._view_by_read_class[Metmast]
+        view_id = MetmastQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
         node_filer = _create_metmast_filter(
             view_id,
@@ -187,7 +188,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_nacelle(from_)
         if retrieve_rotor:
             self._query_append_rotor(from_)
-        return MetmastQueryAPI(self._client, self._builder, self._view_by_read_class, node_filer, limit)
+        return MetmastQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,
@@ -212,14 +213,14 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_nacelle(self, from_: str) -> None:
-        view_id = self._view_by_read_class[Nacelle]
+        view_id = Nacelle._view_id
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("nacelle"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_read_class[Windmill].as_property_ref("nacelle"),
+                    through=self._view_id.as_property_ref("nacelle"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -230,14 +231,14 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_rotor(self, from_: str) -> None:
-        view_id = self._view_by_read_class[Rotor]
+        view_id = Rotor._view_id
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("rotor"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_read_class[Windmill].as_property_ref("rotor"),
+                    through=self._view_id.as_property_ref("rotor"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
@@ -29,15 +29,10 @@ class OmniMultiAAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_read_class = {
-            data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
-            data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.main_interface = MainInterfaceAPI(client, view_by_read_class)
-        self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
+        self.main_interface = MainInterfaceAPI(client)
+        self.sub_interface = SubInterfaceAPI(client)
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiA data model.
@@ -63,17 +58,11 @@ class OmniMultiBAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_read_class = {
-            data_classes.Implementation1v2: dm.ViewId("pygen-models", "Implementation1", "2"),
-            data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
-            data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.implementation_1_v_2 = Implementation1v2API(client, view_by_read_class)
-        self.main_interface = MainInterfaceAPI(client, view_by_read_class)
-        self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
+        self.implementation_1_v_2 = Implementation1v2API(client)
+        self.main_interface = MainInterfaceAPI(client)
+        self.sub_interface = SubInterfaceAPI(client)
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiB data model.
@@ -99,13 +88,9 @@ class OmniMultiCAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_read_class = {
-            data_classes.Implementation1v1: dm.ViewId("pygen-models-other", "Implementation1", "1"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.implementation_1_v_1 = Implementation1v1API(client, view_by_read_class)
+        self.implementation_1_v_1 = Implementation1v1API(client)
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiC data model.
@@ -125,8 +110,8 @@ class OmniMultiClient:
 
     Generated with:
         pygen = 0.99.26
-        cognite-sdk = 7.51.1
-        pydantic = 2.7.4
+        cognite-sdk = 7.53.2
+        pydantic = 2.8.2
 
     """
 
@@ -145,15 +130,6 @@ class OmniMultiClient:
         self.omni_multi_c = OmniMultiCAPIs(client)
 
         self._client = client
-        self._view_by_read_class = {
-            k: v
-            for api in [
-                self.omni_multi_a,
-                self.omni_multi_b,
-                self.omni_multi_c,
-            ]
-            for k, v in api._view_by_read_class.items()
-        }
 
     def upsert(
         self,
@@ -198,7 +174,7 @@ class OmniMultiClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -206,7 +182,6 @@ class OmniMultiClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

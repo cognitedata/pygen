@@ -9,6 +9,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: displacement_x
   displacement_y:
     type:
@@ -16,6 +17,7 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: displacement_y
   displacement_z:
     type:
@@ -23,4 +25,5 @@ properties:
       type: timeseries
     nullable: true
     autoIncrement: false
+    immutable: false
     name: displacement_z

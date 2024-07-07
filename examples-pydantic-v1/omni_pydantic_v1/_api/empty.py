@@ -37,18 +37,15 @@ from ._core import (
 from .empty_query import EmptyQueryAPI
 
 
-class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_read_class[Empty]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type=Empty,
-            class_list=EmptyList,
-            class_write_list=EmptyWriteList,
-            view_by_read_class=view_by_read_class,
-        )
-        self._view_id = view_id
+class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
+    _view_id = dm.ViewId("pygen-models", "Empty", "1")
+    _properties_by_field = _EMPTY_PROPERTIES_BY_FIELD
+    _class_type = Empty
+    _class_list = EmptyList
+    _class_write_list = EmptyWriteList
+
+    def __init__(self, client: CogniteClient):
+        super().__init__(client=client)
 
     def __call__(
         self,
@@ -122,7 +119,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EmptyList)
-        return EmptyQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+        return EmptyQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
@@ -315,9 +312,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
             filter,
         )
         return self._search(
-            view_id=self._view_id,
             query=query,
-            properties_by_field=_EMPTY_PROPERTIES_BY_FIELD,
             properties=properties,
             filter_=filter_,
             limit=limit,
@@ -489,9 +484,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
             filter,
         )
         return self._aggregate(
-            self._view_id,
             aggregate,
-            _EMPTY_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -579,10 +572,8 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
             filter,
         )
         return self._histogram(
-            self._view_id,
             property,
             interval,
-            _EMPTY_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -678,7 +669,6 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            properties_by_field=_EMPTY_PROPERTIES_BY_FIELD,
             sort_by=sort_by,
             direction=direction,
             sort=sort,

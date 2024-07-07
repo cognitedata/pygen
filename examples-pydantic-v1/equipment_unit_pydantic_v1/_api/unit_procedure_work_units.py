@@ -5,7 +5,9 @@ import datetime
 from cognite.client import data_modeling as dm
 
 from equipment_unit_pydantic_v1.data_classes import (
+    StartEndTime,
     StartEndTimeList,
+    StartEndTimeWrite,
 )
 from equipment_unit_pydantic_v1.data_classes._start_end_time import _create_start_end_time_filter
 
@@ -14,6 +16,11 @@ from equipment_unit_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
+    _view_id = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    _class_type = StartEndTime
+    _class_write_type = StartEndTimeWrite
+    _class_list = StartEndTimeList
+
     def list(
         self,
         from_unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,

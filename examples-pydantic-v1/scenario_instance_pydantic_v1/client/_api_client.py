@@ -20,7 +20,7 @@ class ScenarioInstanceClient:
 
     Generated with:
         pygen = 0.99.26
-        cognite-sdk = 7.51.1
+        cognite-sdk = 7.53.2
         pydantic = 1.10.7
 
     Data Model:
@@ -39,13 +39,9 @@ class ScenarioInstanceClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.99.26"
 
-        view_by_read_class = {
-            data_classes.ScenarioInstance: dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.scenario_instance = ScenarioInstanceAPI(client, view_by_read_class)
+        self.scenario_instance = ScenarioInstanceAPI(client)
 
     def upsert(
         self,
@@ -90,7 +86,7 @@ class ScenarioInstanceClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(self._view_by_read_class, write_none, allow_version_increase)
+            instances = items.to_instances_write(write_none, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
@@ -98,7 +94,6 @@ class ScenarioInstanceClient:
                 instances.extend(
                     item._to_instances_write(
                         cache,
-                        self._view_by_read_class,
                         write_none,
                         allow_version_increase,
                     )

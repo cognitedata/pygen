@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -14,7 +14,6 @@ from ._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
@@ -34,6 +33,7 @@ __all__ = [
     "EquipmentModuleApplyList",
     "EquipmentModuleFields",
     "EquipmentModuleTextFields",
+    "EquipmentModuleGraphQL",
 ]
 
 
@@ -64,7 +64,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
         type_: The type field.
     """
 
-    view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, dict, None] = None
@@ -127,6 +127,8 @@ class EquipmentModule(DomainModel):
         type_: The type field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
@@ -171,6 +173,8 @@ class EquipmentModuleWrite(DomainModelWrite):
         type_: The type field.
     """
 
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
@@ -181,17 +185,12 @@ class EquipmentModuleWrite(DomainModelWrite):
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
-        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-
-        write_view = (view_by_read_class or {}).get(
-            EquipmentModule, dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
-        )
 
         properties: dict[str, Any] = {}
 
@@ -219,7 +218,7 @@ class EquipmentModuleWrite(DomainModelWrite):
                 type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
-                        source=write_view,
+                        source=self._view_id,
                         properties=properties,
                     )
                 ],
