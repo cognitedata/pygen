@@ -431,6 +431,7 @@ def create_fields_test_cases():
         "defaultValue": None,
         "name": "name",
         "description": None,
+        "immutable": False,
     }
     prop = ViewProperty.load(prop)
     #
