@@ -36,7 +36,7 @@ from .connection_item_c_query import ConnectionItemCQueryAPI
 
 class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, ConnectionItemCList]):
     _view_id = None
-    _properties_by_field = dict()
+    _properties_by_field = {}
 
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -209,9 +209,6 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: ConnectionItemCFields | Sequence[ConnectionItemCFields] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_edges: bool = True,
     ) -> ConnectionItemCList:
         """List/filter connection item cs
@@ -250,9 +247,6 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
-            direction=direction,
-            sort=sort,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_view_id_penta=[
                 (
