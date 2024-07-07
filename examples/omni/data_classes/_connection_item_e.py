@@ -81,7 +81,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
             )
         return values
 
-    @field_validator("direct_no_source", "inwards_single", mode="before")
+    @field_validator(
+        "direct_no_source", "inwards_single", "direct_reverse_single", "direct_reverse_multi", mode="before"
+    )
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
