@@ -39,13 +39,9 @@ class ScenarioInstanceClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.99.26"
 
-        view_by_read_class = {
-            data_classes.ScenarioInstance: dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
-        }
-        self._view_by_read_class = view_by_read_class
         self._client = client
 
-        self.scenario_instance = ScenarioInstanceAPI(client, view_by_read_class)
+        self.scenario_instance = ScenarioInstanceAPI(client)
 
     def upsert(
         self,
