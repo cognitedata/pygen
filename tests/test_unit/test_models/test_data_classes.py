@@ -53,6 +53,7 @@ _DEPENDENCY_NAMED_FIELD = """
           type: text
         nullable: true
         autoIncrement: false
+        immutable: false
         source: null
         defaultValue: null
         name: name
@@ -67,6 +68,7 @@ _DEPENDENCY_NAMED_FIELD = """
           type: float64
         nullable: true
         autoIncrement: false
+        immutable: false
         source: null
         defaultValue: null
         name: value
@@ -92,6 +94,7 @@ _DEPENDENCY_NAMED_FIELD = """
           type: text
         nullable: true
         autoIncrement: false
+        immutable: false
         source: null
         defaultValue: null
         name: name

@@ -330,7 +330,15 @@ def test_filter_condition(filter_condition: FilterImplementation, expected_args:
 )
 def test_field_from_property_expect_warning(name: str, expected_name, pygen_config: PygenConfig) -> None:
     # Arrange
-    prop = dm.MappedProperty(dm.ContainerId("dummy", "dummy"), name, dm.Text(), True, True, name=name)
+    prop = dm.MappedProperty(
+        container=dm.ContainerId("dummy", "dummy"),
+        container_property_identifier=name,
+        type=dm.Text(),
+        nullable=True,
+        immutable=False,
+        auto_increment=False,
+        name=name,
+    )
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
