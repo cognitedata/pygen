@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -74,6 +74,8 @@ class ConnectionItemCGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemC:
         """Convert this GraphQL format of connection item c to the reading format."""
         if self.data_record is None:
@@ -90,6 +92,8 @@ class ConnectionItemCGraphQL(GraphQLCore):
             connection_item_b=[connection_item_b.as_read() for connection_item_b in self.connection_item_b or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemCWrite:
         """Convert this GraphQL format of connection item c to the writing format."""
         return ConnectionItemCWrite(
@@ -118,10 +122,10 @@ class ConnectionItemC(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -168,10 +172,10 @@ class ConnectionItemCWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -268,7 +272,7 @@ def _create_connection_item_c_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -97,6 +97,8 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PrimitiveNullableListed:
         """Convert this GraphQL format of primitive nullable listed to the reading format."""
         if self.data_record is None:
@@ -120,6 +122,8 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveNullableListedWrite:
         """Convert this GraphQL format of primitive nullable listed to the writing format."""
         return PrimitiveNullableListedWrite(
@@ -249,7 +253,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
             properties["boolean"] = self.boolean
 
         if self.date is not None or write_none:
-            properties["date"] = [date.isoformat() for date in self.date]
+            properties["date"] = [date.isoformat() for date in self.date or []]
 
         if self.float_32 is not None or write_none:
             properties["float32"] = self.float_32
@@ -270,7 +274,9 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
             properties["text"] = self.text
 
         if self.timestamp is not None or write_none:
-            properties["timestamp"] = [timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp]
+            properties["timestamp"] = [
+                timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []
+            ]
 
         if properties:
             this_node = dm.NodeApply(
@@ -337,7 +343,7 @@ def _create_primitive_nullable_listed_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

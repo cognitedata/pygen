@@ -59,7 +59,7 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix_edge: str | None = None,
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemAQueryAPI[T_DomainModelList]:
         """Query along the inward edges of the connection item b.
 
@@ -123,7 +123,7 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix_edge: str | None = None,
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemBQueryAPI[T_DomainModelList]:
         """Query along the self edge edges of the connection item b.
 

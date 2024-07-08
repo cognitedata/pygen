@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -96,6 +96,8 @@ class ScenarioInstanceGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ScenarioInstance:
         """Convert this GraphQL format of scenario instance to the reading format."""
         if self.data_record is None:
@@ -118,6 +120,8 @@ class ScenarioInstanceGraphQL(GraphQLCore):
             start=self.start,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ScenarioInstanceWrite:
         """Convert this GraphQL format of scenario instance to the writing format."""
         return ScenarioInstanceWrite(
@@ -347,7 +351,7 @@ def _create_scenario_instance_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(aggregation, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
     if aggregation and isinstance(aggregation, list):

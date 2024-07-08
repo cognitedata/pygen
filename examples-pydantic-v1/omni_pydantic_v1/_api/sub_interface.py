@@ -54,7 +54,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> SubInterfaceQueryAPI[SubInterfaceList]:
         """Query starting at sub interfaces.
@@ -190,16 +190,16 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     def search(
         self,
         query: str,
-        properties: SubInterfaceTextFields | Sequence[SubInterfaceTextFields] | None = None,
+        properties: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
+        sort_by: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> SubInterfaceList:
@@ -249,7 +249,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
@@ -257,46 +257,58 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         query: str | None = None,
-        search_properties: SubInterfaceTextFields | Sequence[SubInterfaceTextFields] | None = None,
+        search_property: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
+        query: str | None = None,
+        search_property: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
-        group_by: SubInterfaceFields | Sequence[SubInterfaceFields] = None,
+        group_by: SubInterfaceFields | SequenceNotStr[SubInterfaceFields],
+        property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         query: str | None = None,
-        search_properties: SubInterfaceTextFields | Sequence[SubInterfaceTextFields] | None = None,
+        search_property: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -305,28 +317,31 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
-        group_by: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
+        group_by: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
+        property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         query: str | None = None,
-        search_property: SubInterfaceTextFields | Sequence[SubInterfaceTextFields] | None = None,
+        search_property: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across sub interfaces
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             main_value: The main value to filter on.
@@ -362,13 +377,13 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            query,
-            search_property,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -376,14 +391,14 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         property: SubInterfaceFields,
         interval: float,
         query: str | None = None,
-        search_property: SubInterfaceTextFields | Sequence[SubInterfaceTextFields] | None = None,
+        search_property: SubInterfaceTextFields | SequenceNotStr[SubInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for sub interfaces
@@ -420,7 +435,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -433,7 +448,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: SubInterfaceFields | Sequence[SubInterfaceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -481,7 +496,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

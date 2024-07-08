@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -86,6 +86,8 @@ class ConnectionItemFGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemF:
         """Convert this GraphQL format of connection item f to the reading format."""
         if self.data_record is None:
@@ -103,6 +105,8 @@ class ConnectionItemFGraphQL(GraphQLCore):
             outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this GraphQL format of connection item f to the writing format."""
         return ConnectionItemFWrite(
@@ -133,7 +137,7 @@ class ConnectionItemF(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+    direct_list: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
     )
     name: Optional[str] = None
@@ -181,7 +185,7 @@ class ConnectionItemFWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
+    direct_list: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
     )
     name: Optional[str] = None
@@ -293,7 +297,7 @@ def _create_connection_item_f_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if direct_list and isinstance(direct_list, str):
         filters.append(
             dm.filters.Equals(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -88,6 +88,8 @@ class UnitProcedureGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> UnitProcedure:
         """Convert this GraphQL format of unit procedure to the reading format."""
         if self.data_record is None:
@@ -106,6 +108,8 @@ class UnitProcedureGraphQL(GraphQLCore):
             work_units=[work_unit.as_read() for work_unit in self.work_units or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> UnitProcedureWrite:
         """Convert this GraphQL format of unit procedure to the writing format."""
         return UnitProcedureWrite(
@@ -294,7 +298,7 @@ def _create_unit_procedure_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

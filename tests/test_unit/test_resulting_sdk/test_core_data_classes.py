@@ -67,12 +67,14 @@ class TestDomainModel:
         assert (
             foo_repr == "Foo(space='FooSpace', external_id='foo', "
             "data_record=DataRecord(version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
-            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None))"
+            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None), "
+            "node_type=None)"
         )
         assert (
             bar_repr == "Bar(space='BarSpace', external_id='bar', "
             "data_record=DataRecord(version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
-            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None))"
+            "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None), "
+            "node_type=None)"
         )
 
 

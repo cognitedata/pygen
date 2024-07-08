@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -80,6 +80,8 @@ class Implementation1GraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Implementation1:
         """Convert this GraphQL format of implementation 1 to the reading format."""
         if self.data_record is None:
@@ -98,6 +100,8 @@ class Implementation1GraphQL(GraphQLCore):
             value_2=self.value_2,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Implementation1Write:
         """Convert this GraphQL format of implementation 1 to the writing format."""
         return Implementation1Write(
@@ -272,7 +276,7 @@ def _create_implementation_1_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(main_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("mainValue"), value=main_value))
     if main_value and isinstance(main_value, list):

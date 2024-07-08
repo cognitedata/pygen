@@ -70,7 +70,7 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> ScenarioInstanceQueryAPI[ScenarioInstanceList]:
         """Query starting at scenario instances.
@@ -228,7 +228,7 @@ class ScenarioInstanceAPI(
     def search(
         self,
         query: str,
-        properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        properties: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -245,9 +245,9 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        sort_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> ScenarioInstanceList:
@@ -317,7 +317,7 @@ class ScenarioInstanceAPI(
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
@@ -325,16 +325,11 @@ class ScenarioInstanceAPI(
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
-        search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -351,23 +346,50 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
+        query: str | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
-        group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] = None,
+        group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields],
+        property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
-        search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -384,7 +406,7 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -393,13 +415,12 @@ class ScenarioInstanceAPI(
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
-        group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
+        property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
-        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -416,15 +437,19 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across scenario instances
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             aggregation: The aggregation to filter on.
@@ -480,13 +505,13 @@ class ScenarioInstanceAPI(
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            query,
-            search_property,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -494,7 +519,7 @@ class ScenarioInstanceAPI(
         property: ScenarioInstanceFields,
         interval: float,
         query: str | None = None,
-        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -511,7 +536,7 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for scenario instances
@@ -568,7 +593,7 @@ class ScenarioInstanceAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -591,7 +616,7 @@ class ScenarioInstanceAPI(
         max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -659,7 +684,7 @@ class ScenarioInstanceAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -98,6 +98,8 @@ class WindmillGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Windmill:
         """Convert this GraphQL format of windmill to the reading format."""
         if self.data_record is None:
@@ -119,6 +121,8 @@ class WindmillGraphQL(GraphQLCore):
             windfarm=self.windfarm,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> WindmillWrite:
         """Convert this GraphQL format of windmill to the writing format."""
         return WindmillWrite(
@@ -157,9 +161,9 @@ class Windmill(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    blades: Optional[list[Union[Blade, str, dm.NodeId]]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[Metmast], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    metmast: Optional[list[Union[Metmast, str, dm.NodeId]]] = Field(default=None, repr=False)
     nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
@@ -214,9 +218,9 @@ class WindmillWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    blades: Optional[list[Union[BladeWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[MetmastWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    metmast: Optional[list[Union[MetmastWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
     rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
@@ -360,7 +364,7 @@ def _create_windmill_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if nacelle and isinstance(nacelle, str):

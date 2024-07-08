@@ -50,7 +50,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def __call__(
             self,{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-            limit: int | None = DEFAULT_QUERY_LIMIT,
+            limit: int = DEFAULT_QUERY_LIMIT,
             filter: dm.Filter | None = None,
     ) -> {{ query_api.name }}[{{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
@@ -194,11 +194,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def search(
         self,
         query: str,
-        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        sort_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> {{ data_class.read_list_name }}:
@@ -238,7 +238,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         ){% endif %}
@@ -246,16 +246,27 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
+        group_by: None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        query: str | None = None,
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
@@ -263,16 +274,15 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
+        aggregate: Aggregations
         | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}],
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -281,22 +291,25 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self,
         aggregate: Aggregations
         | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across {{ data_class.doc_list_name }}
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
-            group_by: The property to group by when doing the aggregation.{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -322,15 +335,15 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,{% if data_class.has_primitive_field_of_type(dm.Text) %}
-            query,
-            search_property,{% else %}
-            None,
-            None,{% endif %}
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]{% else %}
+            query=None,
+            search_properties=None,{% endif %}
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -338,9 +351,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         property: {{ data_class.field_names }},
         interval: float,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for {{ data_class.doc_list_name }}
@@ -367,7 +380,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             property,
             interval,{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
-            search_property,{% else %}
+            search_property,  # type: ignore[arg-type]{% else %}
             None,
             None,{% endif %}
             limit,
@@ -378,7 +391,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def list(
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
         sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -419,7 +432,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._list(
             limit=limit,
             filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,{% endif %}
             retrieve_edges=retrieve_edges,
@@ -436,7 +449,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% else %}return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         ){% endif %}

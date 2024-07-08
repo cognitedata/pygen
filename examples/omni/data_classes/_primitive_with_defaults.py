@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -84,6 +84,8 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PrimitiveWithDefaults:
         """Convert this GraphQL format of primitive with default to the reading format."""
         if self.data_record is None:
@@ -103,6 +105,8 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
             default_string=self.default_string,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this GraphQL format of primitive with default to the writing format."""
         return PrimitiveWithDefaultsWrite(
@@ -291,7 +295,7 @@ def _create_primitive_with_default_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if min_auto_increment_int_32 is not None or max_auto_increment_int_32 is not None:
         filters.append(
             dm.filters.Range(

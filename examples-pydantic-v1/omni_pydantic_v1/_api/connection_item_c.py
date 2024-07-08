@@ -51,7 +51,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> ConnectionItemCQueryAPI[ConnectionItemCList]:
         """Query starting at connection item cs.
@@ -206,7 +206,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCWrite, Connecti
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> ConnectionItemCList:
