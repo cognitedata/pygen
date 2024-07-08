@@ -171,15 +171,15 @@ class ConnectionItemD(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else self.direct_multi
+                self.direct_multi.as_write() if isinstance(self.direct_multi, ConnectionItemE) else self.direct_multi
             ),
             direct_single=(
-                self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
+                self.direct_single.as_write() if isinstance(self.direct_single, ConnectionItemE) else self.direct_single
             ),
             name=self.name,
             outwards_single=(
                 self.outwards_single.as_write()
-                if isinstance(self.outwards_single, DomainModel)
+                if isinstance(self.outwards_single, ConnectionItemE)
                 else self.outwards_single
             ),
         )

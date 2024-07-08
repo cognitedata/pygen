@@ -150,7 +150,7 @@ class ConnectionItemF(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_list=[
-                direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
+                direct_list.as_write() if isinstance(direct_list, ConnectionItemD) else direct_list
                 for direct_list in self.direct_list or []
             ],
             name=self.name,

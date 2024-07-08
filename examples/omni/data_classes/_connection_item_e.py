@@ -150,7 +150,7 @@ class ConnectionItemE(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_no_source=self.direct_no_source,
             inwards_single=[
-                inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single
+                inwards_single.as_write() if isinstance(inwards_single, ConnectionItemD) else inwards_single
                 for inwards_single in self.inwards_single or []
             ],
             name=self.name,
