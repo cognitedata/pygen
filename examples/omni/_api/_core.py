@@ -450,7 +450,7 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         filter_: dm.Filter | None = None,
     ) -> T_DomainRelationList:
         edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
-        return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # ignore; type[misc]
+        return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
 
 
 @dataclass
