@@ -39,7 +39,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                "Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -57,7 +57,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemB",
                 "inwards",
-                "Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                "Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False)",
                 id="Inwards MultiEdge",
             ),
             pytest.param(
@@ -88,7 +88,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = "
+                "Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = "
                 'Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
@@ -116,7 +116,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                "Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False)",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -135,7 +135,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemB",
                 "inwards",
-                "Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+                "Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False)",
                 id="Inwards MultiEdge",
             ),
             pytest.param(
@@ -166,7 +166,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = "
+                "Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = "
                 'Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
@@ -277,7 +277,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "otherDirect",
-                "self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct",
+                "self.other_direct.as_id() if isinstance(self.other_direct, DomainModel) else self.other_direct",
                 id="Direct is_list=False, not writable",
             ),
             pytest.param(

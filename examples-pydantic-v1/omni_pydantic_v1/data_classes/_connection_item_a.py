@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -88,6 +88,8 @@ class ConnectionItemAGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemA:
         """Convert this GraphQL format of connection item a to the reading format."""
         if self.data_record is None:
@@ -108,6 +110,8 @@ class ConnectionItemAGraphQL(GraphQLCore):
             self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this GraphQL format of connection item a to the writing format."""
         return ConnectionItemAWrite(
@@ -144,7 +148,7 @@ class ConnectionItemA(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
@@ -196,7 +200,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="otherDirect"
     )
-    outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    outwards: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def _to_instances_write(
@@ -317,7 +321,7 @@ def _create_connection_item_a_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

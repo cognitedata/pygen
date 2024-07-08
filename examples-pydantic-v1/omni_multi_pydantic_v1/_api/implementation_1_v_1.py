@@ -58,7 +58,7 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> Implementation1v1QueryAPI[Implementation1v1List]:
         """Query starting at implementation 1 v 1.
@@ -200,7 +200,7 @@ class Implementation1v1API(
     def search(
         self,
         query: str,
-        properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
+        properties: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -209,9 +209,9 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        sort_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation1v1List:
@@ -265,7 +265,7 @@ class Implementation1v1API(
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
@@ -273,16 +273,11 @@ class Implementation1v1API(
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         query: str | None = None,
-        search_properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
+        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -291,23 +286,42 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        query: str | None = None,
+        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        value_1: str | list[str] | None = None,
+        value_1_prefix: str | None = None,
+        value_2: str | list[str] | None = None,
+        value_2_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
-        group_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] = None,
+        group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields],
+        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         query: str | None = None,
-        search_properties: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
+        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -316,7 +330,7 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -325,13 +339,12 @@ class Implementation1v1API(
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
-        group_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
+        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -340,15 +353,19 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across implementation 1 v 1
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             main_value: The main value to filter on.
@@ -388,13 +405,13 @@ class Implementation1v1API(
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            query,
-            search_property,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -402,7 +419,7 @@ class Implementation1v1API(
         property: Implementation1v1Fields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | Sequence[Implementation1v1TextFields] | None = None,
+        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
@@ -411,7 +428,7 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for implementation 1 v 1
@@ -452,7 +469,7 @@ class Implementation1v1API(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -467,7 +484,7 @@ class Implementation1v1API(
         value_2_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -519,7 +536,7 @@ class Implementation1v1API(
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

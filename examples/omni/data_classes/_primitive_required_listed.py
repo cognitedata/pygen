@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -97,6 +97,8 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PrimitiveRequiredListed:
         """Convert this GraphQL format of primitive required listed to the reading format."""
         if self.data_record is None:
@@ -120,6 +122,8 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveRequiredListedWrite:
         """Convert this GraphQL format of primitive required listed to the writing format."""
         return PrimitiveRequiredListedWrite(
@@ -162,15 +166,15 @@ class PrimitiveRequiredListed(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    boolean: Optional[list[bool]] = None
-    date: Optional[list[datetime.date]] = None
-    float_32: Optional[list[float]] = Field(None, alias="float32")
-    float_64: Optional[list[float]] = Field(None, alias="float64")
-    int_32: Optional[list[int]] = Field(None, alias="int32")
-    int_64: Optional[list[int]] = Field(None, alias="int64")
-    json_: Optional[list[dict]] = Field(None, alias="json")
-    text: Optional[list[str]] = None
-    timestamp: Optional[list[datetime.datetime]] = None
+    boolean: list[bool]
+    date: list[datetime.date]
+    float_32: list[float] = Field(alias="float32")
+    float_64: list[float] = Field(alias="float64")
+    int_32: list[int] = Field(alias="int32")
+    int_64: list[int] = Field(alias="int64")
+    json_: list[dict] = Field(alias="json")
+    text: list[str]
+    timestamp: list[datetime.datetime]
 
     def as_write(self) -> PrimitiveRequiredListedWrite:
         """Convert this read version of primitive required listed to the writing version."""
@@ -249,7 +253,7 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = [date.isoformat() for date in self.date]
+            properties["date"] = [date.isoformat() for date in self.date or []]
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -270,7 +274,9 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
             properties["text"] = self.text
 
         if self.timestamp is not None:
-            properties["timestamp"] = [timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp]
+            properties["timestamp"] = [
+                timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []
+            ]
 
         if properties:
             this_node = dm.NodeApply(
@@ -337,7 +343,7 @@ def _create_primitive_required_listed_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

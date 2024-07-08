@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -88,6 +88,8 @@ class EquipmentModuleGraphQL(GraphQLCore):
             return TimeSeries.load(value)
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> EquipmentModule:
         """Convert this GraphQL format of equipment module to the reading format."""
         if self.data_record is None:
@@ -106,6 +108,8 @@ class EquipmentModuleGraphQL(GraphQLCore):
             type_=self.type_,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> EquipmentModuleWrite:
         """Convert this GraphQL format of equipment module to the writing format."""
         return EquipmentModuleWrite(
@@ -291,7 +295,7 @@ def _create_equipment_module_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):

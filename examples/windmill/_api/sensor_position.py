@@ -80,7 +80,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> SensorPositionQueryAPI[SensorPositionList]:
         """Query starting at sensor positions.
@@ -212,38 +212,46 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         min_position: float | None = None,
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
+        min_position: float | None = None,
+        max_position: float | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
-        group_by: SensorPositionFields | Sequence[SensorPositionFields] = None,
+        group_by: SensorPositionFields | SequenceNotStr[SensorPositionFields],
+        property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         min_position: float | None = None,
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -252,24 +260,27 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
-        group_by: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
+        group_by: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
+        property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         min_position: float | None = None,
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across sensor positions
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             min_position: The minimum value of the position to filter on.
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -299,13 +310,13 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            None,
-            None,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=None,
+            search_properties=None,
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -316,7 +327,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for sensor positions
@@ -358,7 +369,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         max_position: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -402,7 +413,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

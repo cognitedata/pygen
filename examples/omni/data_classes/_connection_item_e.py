@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -91,6 +91,8 @@ class ConnectionItemEGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemE:
         """Convert this GraphQL format of connection item e to the reading format."""
         if self.data_record is None:
@@ -112,6 +114,8 @@ class ConnectionItemEGraphQL(GraphQLCore):
             name=self.name,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this GraphQL format of connection item e to the writing format."""
         return ConnectionItemEWrite(
@@ -145,7 +149,7 @@ class ConnectionItemE(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
-    inwards_single: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+    inwards_single: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
     direct_reverse_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
@@ -199,7 +203,7 @@ class ConnectionItemEWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
-    inwards_single: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
+    inwards_single: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
@@ -309,7 +313,7 @@ def _create_connection_item_e_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if direct_no_source and isinstance(direct_no_source, str):
         filters.append(
             dm.filters.Equals(

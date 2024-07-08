@@ -75,11 +75,12 @@ class NacelleYawErrorQuery:
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
-            return self._client.time_series.data.retrieve(
+            # Missing overload in SDK
+            return self._client.time_series.data.retrieve(  # type: ignore[return-value]
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -134,11 +135,12 @@ class NacelleYawErrorQuery:
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
-            return self._client.time_series.data.retrieve_arrays(
+            # Missing overload in SDK
+            return self._client.time_series.data.retrieve_arrays(  # type: ignore[return-value]
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -206,7 +208,7 @@ class NacelleYawErrorQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -290,7 +292,7 @@ class NacelleYawErrorQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -345,10 +347,10 @@ class NacelleYawErrorQuery:
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
-            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]
+            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]  # type: ignore[assignment]
         else:
             column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
-            df.columns = [
+            df.columns = [  # type: ignore[assignment]
                 "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
             ]
         return df
@@ -480,7 +482,7 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_error(
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "yaw_error",
 ) -> dict[str, list[str]]:
-    limit = float("inf") if limit is None or limit == -1 else limit
+    limit_input = float("inf") if limit is None or limit == -1 else limit
     properties = ["yaw_error"]
     if extra_properties == "yaw_error":
         ...
@@ -503,8 +505,8 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_error(
     external_ids: dict[str, list[str]] = {}
     total_retrieved = 0
     while True:
-        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit - total_retrieved), 0)
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
+        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit_input - total_retrieved), 0)
+        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=int(query_limit))
         query = dm.query.Query(
             with_={
                 "nodes": selected_nodes,
@@ -524,6 +526,6 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_error(
         total_retrieved += len(batch_external_ids)
         external_ids.update(batch_external_ids)
         cursor = result.cursors["nodes"]
-        if total_retrieved >= limit or cursor is None:
+        if total_retrieved >= limit_input or cursor is None:
             break
     return external_ids

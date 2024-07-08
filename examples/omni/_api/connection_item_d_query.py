@@ -56,7 +56,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix_edge: str | None = None,
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         retrieve_direct_multi: bool = False,
         retrieve_direct_single: bool = False,
     ) -> ConnectionItemEQueryAPI[T_DomainModelList]:

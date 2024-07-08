@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -86,6 +86,8 @@ class BladeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Blade:
         """Convert this GraphQL format of blade to the reading format."""
         if self.data_record is None:
@@ -103,6 +105,8 @@ class BladeGraphQL(GraphQLCore):
             sensor_positions=[sensor_position.as_read() for sensor_position in self.sensor_positions or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> BladeWrite:
         """Convert this GraphQL format of blade to the writing format."""
         return BladeWrite(
@@ -135,7 +139,7 @@ class Blade(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
-    sensor_positions: Union[list[SensorPosition], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    sensor_positions: Optional[list[Union[SensorPosition, str, dm.NodeId]]] = Field(default=None, repr=False)
 
     def as_write(self) -> BladeWrite:
         """Convert this read version of blade to the writing version."""
@@ -181,9 +185,7 @@ class BladeWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
-    sensor_positions: Union[list[SensorPositionWrite], list[str], list[dm.NodeId], None] = Field(
-        default=None, repr=False
-    )
+    sensor_positions: Optional[list[Union[SensorPositionWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
 
     def _to_instances_write(
         self,
@@ -283,7 +285,7 @@ def _create_blade_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(is_damaged, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("is_damaged"), value=is_damaged))
     if isinstance(name, str):

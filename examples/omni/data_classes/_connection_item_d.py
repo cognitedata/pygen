@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -87,6 +87,8 @@ class ConnectionItemDGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemD:
         """Convert this GraphQL format of connection item d to the reading format."""
         if self.data_record is None:
@@ -113,6 +115,8 @@ class ConnectionItemDGraphQL(GraphQLCore):
             ),
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemDWrite:
         """Convert this GraphQL format of connection item d to the writing format."""
         return ConnectionItemDWrite(
@@ -339,7 +343,7 @@ def _create_connection_item_d_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if direct_multi and isinstance(direct_multi, str):
         filters.append(
             dm.filters.Equals(

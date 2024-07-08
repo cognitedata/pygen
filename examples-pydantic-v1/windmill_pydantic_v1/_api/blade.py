@@ -56,7 +56,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> BladeQueryAPI[BladeList]:
         """Query starting at blades.
@@ -207,15 +207,15 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
     def search(
         self,
         query: str,
-        properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        properties: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: BladeFields | Sequence[BladeFields] | None = None,
+        sort_by: BladeFields | SequenceNotStr[BladeFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> BladeList:
@@ -263,7 +263,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
@@ -271,44 +271,55 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: BladeFields | Sequence[BladeFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
-        search_properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: BladeFields | SequenceNotStr[BladeFields] | None = None,
+        query: str | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: BladeFields | Sequence[BladeFields] | None = None,
-        group_by: BladeFields | Sequence[BladeFields] = None,
+        group_by: BladeFields | SequenceNotStr[BladeFields],
+        property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
-        search_properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -317,27 +328,30 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: BladeFields | Sequence[BladeFields] | None = None,
-        group_by: BladeFields | Sequence[BladeFields] | None = None,
+        group_by: BladeFields | SequenceNotStr[BladeFields] | None = None,
+        property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
-        search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across blades
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             is_damaged: The is damaged to filter on.
@@ -371,13 +385,13 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            query,
-            search_property,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -385,13 +399,13 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         property: BladeFields,
         interval: float,
         query: str | None = None,
-        search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for blades
@@ -426,7 +440,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -438,7 +452,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: BladeFields | Sequence[BladeFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -487,7 +501,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
             retrieve_edges=retrieve_edges,

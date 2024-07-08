@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -85,6 +85,8 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> DependentOnNonWritable:
         """Convert this GraphQL format of dependent on non writable to the reading format."""
         if self.data_record is None:
@@ -101,6 +103,8 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             to_non_writable=[to_non_writable.as_read() for to_non_writable in self.to_non_writable or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this GraphQL format of dependent on non writable to the writing format."""
         return DependentOnNonWritableWrite(
@@ -132,7 +136,7 @@ class DependentOnNonWritable(DomainModel):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[Implementation1NonWriteable], list[str], list[dm.NodeId], None] = Field(
+    to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="toNonWritable"
     )
 
@@ -144,7 +148,7 @@ class DependentOnNonWritable(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
             to_non_writable=[
-                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
                 for to_non_writable in self.to_non_writable or []
             ],
         )
@@ -179,7 +183,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         "pygen-models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Union[list[str], list[dm.NodeId], None] = Field(default=None, alias="toNonWritable")
+    to_non_writable: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="toNonWritable")
 
     def _to_instances_write(
         self,
@@ -275,7 +279,7 @@ def _create_dependent_on_non_writable_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(a_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("aValue"), value=a_value))
     if a_value and isinstance(a_value, list):
