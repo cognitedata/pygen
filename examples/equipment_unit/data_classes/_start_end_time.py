@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import ClassVar, Literal, Optional, Union
+from typing import ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 
@@ -61,6 +61,8 @@ class StartEndTimeGraphQL(GraphQLCore):
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> StartEndTime:
         """Convert this GraphQL format of start end time to the reading format."""
         if self.data_record is None:
@@ -78,6 +80,8 @@ class StartEndTimeGraphQL(GraphQLCore):
             start_time=self.start_time,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> StartEndTimeWrite:
         """Convert this GraphQL format of start end time to the writing format."""
         return StartEndTimeWrite(
