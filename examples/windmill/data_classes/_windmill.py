@@ -161,9 +161,9 @@ class Windmill(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[Blade], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    blades: Optional[list[Union[Blade, str, dm.NodeId]]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[Metmast], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    metmast: Optional[list[Union[Metmast, str, dm.NodeId]]] = Field(default=None, repr=False)
     nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
@@ -175,14 +175,12 @@ class Windmill(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            blades=[blade.as_write() if isinstance(blade, Blade) else blade for blade in self.blades or []],
             capacity=self.capacity,
-            metmast=[
-                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
-            ],
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            metmast=[metmast.as_write() if isinstance(metmast, Metmast) else metmast for metmast in self.metmast or []],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, Nacelle) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, Rotor) else self.rotor,
             windfarm=self.windfarm,
         )
 
@@ -218,9 +216,9 @@ class WindmillWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    blades: Union[list[BladeWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    blades: Optional[list[Union[BladeWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
-    metmast: Union[list[MetmastWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    metmast: Optional[list[Union[MetmastWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     nacelle: Union[NacelleWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     name: Optional[str] = None
     rotor: Union[RotorWrite, str, dm.NodeId, None] = Field(default=None, repr=False)

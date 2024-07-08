@@ -136,9 +136,9 @@ class ConnectionItemB(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
+    self_edge: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="selfEdge"
     )
 
@@ -148,10 +148,12 @@ class ConnectionItemB(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
+            inwards=[
+                inward.as_write() if isinstance(inward, ConnectionItemA) else inward for inward in self.inwards or []
+            ],
             name=self.name,
             self_edge=[
-                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
+                self_edge.as_write() if isinstance(self_edge, ConnectionItemB) else self_edge
                 for self_edge in self.self_edge or []
             ],
         )
@@ -184,9 +186,9 @@ class ConnectionItemBWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
+    self_edge: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="selfEdge"
     )
 

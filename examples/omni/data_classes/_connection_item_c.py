@@ -122,10 +122,10 @@ class ConnectionItemC(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -136,11 +136,11 @@ class ConnectionItemC(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             connection_item_a=[
-                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                connection_item_a.as_write() if isinstance(connection_item_a, ConnectionItemA) else connection_item_a
                 for connection_item_a in self.connection_item_a or []
             ],
             connection_item_b=[
-                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                connection_item_b.as_write() if isinstance(connection_item_b, ConnectionItemB) else connection_item_b
                 for connection_item_b in self.connection_item_b or []
             ],
         )
@@ -172,10 +172,10 @@ class ConnectionItemCWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 

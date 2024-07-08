@@ -148,7 +148,7 @@ class ConnectionItemA(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
-    outwards: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def as_write(self) -> ConnectionItemAWrite:
@@ -159,12 +159,15 @@ class ConnectionItemA(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
             other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
+                self.other_direct.as_write() if isinstance(self.other_direct, ConnectionItemC) else self.other_direct
             ),
             outwards=[
-                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
+                outward.as_write() if isinstance(outward, ConnectionItemB) else outward
+                for outward in self.outwards or []
             ],
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
+            self_direct=(
+                self.self_direct.as_write() if isinstance(self.self_direct, ConnectionItemA) else self.self_direct
+            ),
         )
 
     def as_apply(self) -> ConnectionItemAWrite:
@@ -200,7 +203,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="otherDirect"
     )
-    outwards: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    outwards: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
     def _to_instances_write(

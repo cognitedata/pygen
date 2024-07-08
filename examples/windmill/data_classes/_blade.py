@@ -139,7 +139,7 @@ class Blade(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
-    sensor_positions: Union[list[SensorPosition], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    sensor_positions: Optional[list[Union[SensorPosition, str, dm.NodeId]]] = Field(default=None, repr=False)
 
     def as_write(self) -> BladeWrite:
         """Convert this read version of blade to the writing version."""
@@ -150,7 +150,7 @@ class Blade(DomainModel):
             is_damaged=self.is_damaged,
             name=self.name,
             sensor_positions=[
-                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
+                sensor_position.as_write() if isinstance(sensor_position, SensorPosition) else sensor_position
                 for sensor_position in self.sensor_positions or []
             ],
         )
@@ -185,9 +185,7 @@ class BladeWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
-    sensor_positions: Union[list[SensorPositionWrite], list[str], list[dm.NodeId], None] = Field(
-        default=None, repr=False
-    )
+    sensor_positions: Optional[list[Union[SensorPositionWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
 
     def _to_instances_write(
         self,
