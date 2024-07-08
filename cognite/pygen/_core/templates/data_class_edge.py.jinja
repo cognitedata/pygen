@@ -17,6 +17,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite
 ){% for class_ in unique_start_classes %}
@@ -214,7 +215,7 @@ class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name
         return self.as_write()
 
 
-class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_name }}]):
+class {{ data_class.write_list_name }}(DomainRelationWriteList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}

@@ -602,8 +602,19 @@ class DomainRelationList(CoreList[T_DomainRelation]):
         return [edge.as_id() for edge in self.data]
 
     @property
+    def data_records(self) -> DataRecordList:
+        return DataRecordList([connection.data_record for connection in self.data])
+
+
+class DomainRelationWriteList(CoreList[T_DomainModelWrite]):
+    _PARENT_CLASS = DomainModelWrite
+
+    @property
     def data_records(self) -> DataRecordWriteList:
         return DataRecordWriteList([connection.data_record for connection in self.data])
+
+    def as_edge_ids(self) -> list[dm.EdgeId]:
+        return [edge.as_id() for edge in self.data]
 
 
 T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)

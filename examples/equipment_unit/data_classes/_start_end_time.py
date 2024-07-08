@@ -16,6 +16,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
 )
@@ -244,7 +245,7 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
         return self.as_write()
 
 
-class StartEndTimeWriteList(DomainRelationList[StartEndTimeWrite]):
+class StartEndTimeWriteList(DomainRelationWriteList[StartEndTimeWrite]):
     """List of start end times in the writing version."""
 
     _INSTANCE = StartEndTimeWrite

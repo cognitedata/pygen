@@ -17,6 +17,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
 )
@@ -261,7 +262,7 @@ class ConnectionEdgeAList(DomainRelationList[ConnectionEdgeA]):
         return self.as_write()
 
 
-class ConnectionEdgeAWriteList(DomainRelationList[ConnectionEdgeAWrite]):
+class ConnectionEdgeAWriteList(DomainRelationWriteList[ConnectionEdgeAWrite]):
     """List of connection edge as in the writing version."""
 
     _INSTANCE = ConnectionEdgeAWrite
@@ -370,7 +371,7 @@ def _create_connection_edge_a_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE = {
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     ConnectionItemFWrite: {ConnectionItemGWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
 }
