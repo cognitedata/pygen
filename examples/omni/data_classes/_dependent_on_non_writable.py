@@ -275,7 +275,7 @@ def _create_dependent_on_non_writable_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(a_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("aValue"), value=a_value))
     if a_value and isinstance(a_value, list):

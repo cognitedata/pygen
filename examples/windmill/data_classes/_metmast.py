@@ -293,7 +293,7 @@ def _create_metmast_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if min_position is not None or max_position is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("position"), gte=min_position, lte=max_position))
     if external_id_prefix is not None:

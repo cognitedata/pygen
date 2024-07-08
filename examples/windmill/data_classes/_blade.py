@@ -283,7 +283,7 @@ def _create_blade_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(is_damaged, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("is_damaged"), value=is_damaged))
     if isinstance(name, str):

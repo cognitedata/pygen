@@ -293,7 +293,7 @@ def _create_connection_item_f_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if direct_list and isinstance(direct_list, str):
         filters.append(
             dm.filters.Equals(

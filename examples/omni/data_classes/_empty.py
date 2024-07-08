@@ -350,7 +350,7 @@ def _create_empty_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
     if min_date is not None or max_date is not None:

@@ -291,7 +291,7 @@ def _create_connection_item_e_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if direct_no_source and isinstance(direct_no_source, str):
         filters.append(
             dm.filters.Equals(

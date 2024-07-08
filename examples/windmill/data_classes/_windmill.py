@@ -360,7 +360,7 @@ def _create_windmill_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if nacelle and isinstance(nacelle, str):

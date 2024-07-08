@@ -291,7 +291,7 @@ def _create_primitive_with_default_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if min_auto_increment_int_32 is not None or max_auto_increment_int_32 is not None:
         filters.append(
             dm.filters.Range(

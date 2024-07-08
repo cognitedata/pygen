@@ -462,7 +462,7 @@ def _create_nacelle_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if gearbox and isinstance(gearbox, str):
         filters.append(
             dm.filters.Equals(
