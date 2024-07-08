@@ -23,7 +23,7 @@ Changes are grouped as follows
 
 ### Fixed
 - The read data class for a view with required listable properties would generated as optional. This is now fixed.
-- Using `client.upset` with an optional listable `date` or `datetime` property set to `None` would raise 
+- Using `client.upset` with an optional listable `date` or `datetime` property set to `None` would raise
   an `AttributeError`. This is now fixed.
 
 ## [0.99.26] - 24-06-24
