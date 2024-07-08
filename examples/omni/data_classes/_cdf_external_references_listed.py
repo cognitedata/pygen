@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -83,6 +83,8 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             return [v for v in value if v is not None] or None
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> CDFExternalReferencesListed:
         """Convert this GraphQL format of cdf external references listed to the reading format."""
         if self.data_record is None:
@@ -100,6 +102,8 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             timeseries=self.timeseries,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this GraphQL format of cdf external references listed to the writing format."""
         return CDFExternalReferencesListedWrite(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -74,6 +74,8 @@ class RotorGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Rotor:
         """Convert this GraphQL format of rotor to the reading format."""
         if self.data_record is None:
@@ -90,6 +92,8 @@ class RotorGraphQL(GraphQLCore):
             rpm_low_speed_shaft=self.rpm_low_speed_shaft,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this GraphQL format of rotor to the writing format."""
         return RotorWrite(

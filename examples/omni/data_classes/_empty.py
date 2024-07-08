@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -95,6 +95,8 @@ class EmptyGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Empty:
         """Convert this GraphQL format of empty to the reading format."""
         if self.data_record is None:
@@ -118,6 +120,8 @@ class EmptyGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> EmptyWrite:
         """Convert this GraphQL format of empty to the writing format."""
         return EmptyWrite(

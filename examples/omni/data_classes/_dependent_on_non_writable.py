@@ -85,6 +85,8 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> DependentOnNonWritable:
         """Convert this GraphQL format of dependent on non writable to the reading format."""
         if self.data_record is None:
@@ -101,6 +103,8 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             to_non_writable=[to_non_writable.as_read() for to_non_writable in self.to_non_writable or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this GraphQL format of dependent on non writable to the writing format."""
         return DependentOnNonWritableWrite(

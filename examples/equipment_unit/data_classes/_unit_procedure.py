@@ -88,6 +88,8 @@ class UnitProcedureGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> UnitProcedure:
         """Convert this GraphQL format of unit procedure to the reading format."""
         if self.data_record is None:
@@ -106,6 +108,8 @@ class UnitProcedureGraphQL(GraphQLCore):
             work_units=[work_unit.as_read() for work_unit in self.work_units or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> UnitProcedureWrite:
         """Convert this GraphQL format of unit procedure to the writing format."""
         return UnitProcedureWrite(

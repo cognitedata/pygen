@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -74,6 +74,8 @@ class SubInterfaceGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> SubInterface:
         """Convert this GraphQL format of sub interface to the reading format."""
         if self.data_record is None:
@@ -90,6 +92,8 @@ class SubInterfaceGraphQL(GraphQLCore):
             sub_value=self.sub_value,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> SubInterfaceWrite:
         """Convert this GraphQL format of sub interface to the writing format."""
         return SubInterfaceWrite(

@@ -85,6 +85,8 @@ class ConnectionItemBGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemB:
         """Convert this GraphQL format of connection item b to the reading format."""
         if self.data_record is None:
@@ -102,6 +104,8 @@ class ConnectionItemBGraphQL(GraphQLCore):
             self_edge=[self_edge.as_read() for self_edge in self.self_edge or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this GraphQL format of connection item b to the writing format."""
         return ConnectionItemBWrite(

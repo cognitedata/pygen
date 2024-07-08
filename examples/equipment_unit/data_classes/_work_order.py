@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -76,6 +76,8 @@ class WorkOrderGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> WorkOrder:
         """Convert this GraphQL format of work order to the reading format."""
         if self.data_record is None:
@@ -93,6 +95,8 @@ class WorkOrderGraphQL(GraphQLCore):
             type_=self.type_,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> WorkOrderWrite:
         """Convert this GraphQL format of work order to the writing format."""
         return WorkOrderWrite(

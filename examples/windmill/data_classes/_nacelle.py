@@ -113,6 +113,8 @@ class NacelleGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Nacelle:
         """Convert this GraphQL format of nacelle to the reading format."""
         if self.data_record is None:
@@ -143,6 +145,8 @@ class NacelleGraphQL(GraphQLCore):
             yaw_error=self.yaw_error,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this GraphQL format of nacelle to the writing format."""
         return NacelleWrite(

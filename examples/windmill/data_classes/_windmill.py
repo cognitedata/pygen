@@ -98,6 +98,8 @@ class WindmillGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Windmill:
         """Convert this GraphQL format of windmill to the reading format."""
         if self.data_record is None:
@@ -119,6 +121,8 @@ class WindmillGraphQL(GraphQLCore):
             windfarm=self.windfarm,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> WindmillWrite:
         """Convert this GraphQL format of windmill to the writing format."""
         return WindmillWrite(

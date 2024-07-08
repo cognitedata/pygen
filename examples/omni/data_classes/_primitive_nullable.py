@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -97,6 +97,8 @@ class PrimitiveNullableGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PrimitiveNullable:
         """Convert this GraphQL format of primitive nullable to the reading format."""
         if self.data_record is None:
@@ -120,6 +122,8 @@ class PrimitiveNullableGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveNullableWrite:
         """Convert this GraphQL format of primitive nullable to the writing format."""
         return PrimitiveNullableWrite(

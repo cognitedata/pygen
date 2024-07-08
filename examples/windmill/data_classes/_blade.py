@@ -86,6 +86,8 @@ class BladeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> Blade:
         """Convert this GraphQL format of blade to the reading format."""
         if self.data_record is None:
@@ -103,6 +105,8 @@ class BladeGraphQL(GraphQLCore):
             sensor_positions=[sensor_position.as_read() for sensor_position in self.sensor_positions or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> BladeWrite:
         """Convert this GraphQL format of blade to the writing format."""
         return BladeWrite(
