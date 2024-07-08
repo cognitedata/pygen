@@ -56,7 +56,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WorkOrderQueryAPI[WorkOrderList]:
         """Query starting at work orders.
@@ -196,7 +196,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
     def search(
         self,
         query: str,
-        properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        properties: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
@@ -269,16 +269,31 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         query: str | None = None,
-        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_properties: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
+        query: str | None = None,
+        search_properties: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
@@ -294,14 +309,13 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
-        group_by: WorkOrderFields | Sequence[WorkOrderFields] = None,
+        group_by: WorkOrderFields | SequenceNotStr[WorkOrderFields],
+        property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         query: str | None = None,
         search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
@@ -312,7 +326,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -321,11 +335,10 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
-        group_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        group_by: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
+        property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         query: str | None = None,
         search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
@@ -338,13 +351,17 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across work orders
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             description: The description to filter on.
@@ -385,8 +402,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -515,7 +532,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

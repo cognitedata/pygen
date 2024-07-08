@@ -68,7 +68,7 @@ class PrimitiveRequiredAPI(
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PrimitiveRequiredQueryAPI[PrimitiveRequiredList]:
         """Query starting at primitive requireds.
@@ -228,7 +228,7 @@ class PrimitiveRequiredAPI(
     def search(
         self,
         query: str,
-        properties: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
+        properties: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -328,16 +328,40 @@ class PrimitiveRequiredAPI(
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
-        search_properties: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
+        search_properties: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
+        query: str | None = None,
+        search_properties: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -362,14 +386,13 @@ class PrimitiveRequiredAPI(
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] | None = None,
-        group_by: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] = None,
+        group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields],
+        property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
         search_properties: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
@@ -389,7 +412,7 @@ class PrimitiveRequiredAPI(
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -398,11 +421,10 @@ class PrimitiveRequiredAPI(
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] | None = None,
-        group_by: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] | None = None,
+        group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
+        property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
         search_property: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
@@ -424,13 +446,17 @@ class PrimitiveRequiredAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across primitive requireds
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             boolean: The boolean to filter on.
@@ -489,8 +515,8 @@ class PrimitiveRequiredAPI(
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -673,7 +699,7 @@ class PrimitiveRequiredAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

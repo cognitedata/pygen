@@ -273,8 +273,8 @@ class CDFExternalReferencesAPI(
         )
         return self._aggregate(
             aggregate,
-            property,  # type: ignore[arg-type]
             group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             None,
             None,
             limit,

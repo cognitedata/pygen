@@ -59,7 +59,7 @@ class CDFExternalReferencesListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CDFExternalReferencesListedQueryAPI[CDFExternalReferencesListedList]:
         """Query starting at cdf external references listeds.
@@ -189,14 +189,21 @@ class CDFExternalReferencesListedAPI(
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -206,17 +213,16 @@ class CDFExternalReferencesListedAPI(
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
-        group_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] = None,
+        group_by: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields],
+        property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -225,22 +231,25 @@ class CDFExternalReferencesListedAPI(
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
-        group_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
+        group_by: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
+        property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across cdf external references listeds
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cdf external references listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -267,8 +276,8 @@ class CDFExternalReferencesListedAPI(
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             None,
             None,
             limit,
@@ -357,7 +366,7 @@ class CDFExternalReferencesListedAPI(
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

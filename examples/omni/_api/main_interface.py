@@ -52,7 +52,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MainInterfaceQueryAPI[MainInterfaceList]:
         """Query starting at main interfaces.
@@ -184,7 +184,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
     def search(
         self,
         query: str,
-        properties: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
+        properties: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -245,16 +245,27 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
-        search_properties: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
+        search_properties: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
+        query: str | None = None,
+        search_properties: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -266,21 +277,20 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
-        group_by: MainInterfaceFields | Sequence[MainInterfaceFields] = None,
+        group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields],
+        property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
         search_properties: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -289,11 +299,10 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
-        group_by: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
+        group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
+        property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
         search_property: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
@@ -302,13 +311,17 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across main interfaces
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             main_value: The main value to filter on.
@@ -341,8 +354,8 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -447,7 +460,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

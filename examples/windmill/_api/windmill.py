@@ -63,7 +63,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WindmillQueryAPI[WindmillList]:
         """Query starting at windmills.
@@ -231,7 +231,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
     def search(
         self,
         query: str,
-        properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
+        properties: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -310,16 +310,33 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: WindmillFields | Sequence[WindmillFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
-        search_properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
+        search_properties: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
+        min_capacity: float | None = None,
+        max_capacity: float | None = None,
+        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
+        query: str | None = None,
+        search_properties: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -337,14 +354,13 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: WindmillFields | Sequence[WindmillFields] | None = None,
-        group_by: WindmillFields | Sequence[WindmillFields] = None,
+        group_by: WindmillFields | SequenceNotStr[WindmillFields],
+        property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
         search_properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
@@ -357,7 +373,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -366,11 +382,10 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: WindmillFields | Sequence[WindmillFields] | None = None,
-        group_by: WindmillFields | Sequence[WindmillFields] | None = None,
+        group_by: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
+        property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
         search_property: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
@@ -385,13 +400,17 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across windmills
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             min_capacity: The minimum value of the capacity to filter on.
@@ -436,8 +455,8 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -581,7 +600,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
             retrieve_edges=retrieve_edges,

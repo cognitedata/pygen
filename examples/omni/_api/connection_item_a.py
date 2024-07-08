@@ -57,7 +57,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> ConnectionItemAQueryAPI[ConnectionItemAList]:
         """Query starting at connection item as.
@@ -212,7 +212,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     def search(
         self,
         query: str,
-        properties: ConnectionItemATextFields | Sequence[ConnectionItemATextFields] | None = None,
+        properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         other_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -279,16 +279,29 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         query: str | None = None,
-        search_properties: ConnectionItemATextFields | Sequence[ConnectionItemATextFields] | None = None,
+        search_properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        other_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
+        query: str | None = None,
+        search_properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         other_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -302,14 +315,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
-        group_by: ConnectionItemAFields | Sequence[ConnectionItemAFields] = None,
+        group_by: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields],
+        property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         query: str | None = None,
         search_properties: ConnectionItemATextFields | Sequence[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
@@ -318,7 +330,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -327,11 +339,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
-        group_by: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
+        group_by: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
+        property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemATextFields | Sequence[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
@@ -342,13 +353,17 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across connection item as
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             name: The name to filter on.
@@ -385,8 +400,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -506,7 +521,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
             retrieve_edges=retrieve_edges,

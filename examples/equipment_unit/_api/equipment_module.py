@@ -59,7 +59,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> EquipmentModuleQueryAPI[EquipmentModuleList]:
         """Query starting at equipment modules.
@@ -201,7 +201,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
     def search(
         self,
         query: str,
-        properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
+        properties: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -274,16 +274,31 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         query: str | None = None,
-        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
+        search_properties: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
+        query: str | None = None,
+        search_properties: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -299,14 +314,13 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
-        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] = None,
+        group_by: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields],
+        property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         query: str | None = None,
         search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
@@ -317,7 +331,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -326,11 +340,10 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
-        group_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
+        group_by: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
+        property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         query: str | None = None,
         search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
@@ -343,13 +356,17 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across equipment modules
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             description: The description to filter on.
@@ -390,8 +407,8 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -520,7 +537,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

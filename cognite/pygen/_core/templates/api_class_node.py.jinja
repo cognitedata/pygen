@@ -336,8 +336,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         return self._aggregate(
             aggregate,
-            property,  # type: ignore[arg-type]
-            group_by,  # type: ignore[arg-type]{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
             None,

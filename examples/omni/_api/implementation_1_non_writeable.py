@@ -53,7 +53,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> Implementation1NonWriteableQueryAPI[Implementation1NonWriteableList]:
         """Query starting at implementation 1 non writeables.
@@ -156,7 +156,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         self,
         query: str,
         properties: (
-            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -230,17 +230,34 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
         search_properties: (
-            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
+        value_1: str | list[str] | None = None,
+        value_1_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
+        query: str | None = None,
+        search_properties: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -257,14 +274,13 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
-        group_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] = None,
+        group_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields],
+        property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
         search_properties: (
             Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
@@ -277,7 +293,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -286,11 +302,10 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
-        group_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
+        group_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
+        property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
         search_property: (
             Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
@@ -305,13 +320,17 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across implementation 1 non writeables
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             main_value: The main value to filter on.
@@ -352,8 +371,8 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -484,7 +503,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

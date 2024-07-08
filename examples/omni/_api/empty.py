@@ -66,7 +66,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> EmptyQueryAPI[EmptyList]:
         """Query starting at empties.
@@ -224,7 +224,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
     def search(
         self,
         query: str,
-        properties: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
+        properties: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -324,16 +324,40 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: EmptyFields | Sequence[EmptyFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
-        search_properties: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
+        search_properties: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
+        query: str | None = None,
+        search_properties: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -358,14 +382,13 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: EmptyFields | Sequence[EmptyFields] | None = None,
-        group_by: EmptyFields | Sequence[EmptyFields] = None,
+        group_by: EmptyFields | SequenceNotStr[EmptyFields],
+        property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
         search_properties: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
         boolean: bool | None = None,
@@ -385,7 +408,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -394,11 +417,10 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: EmptyFields | Sequence[EmptyFields] | None = None,
-        group_by: EmptyFields | Sequence[EmptyFields] | None = None,
+        group_by: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
+        property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
         search_property: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
         boolean: bool | None = None,
@@ -420,13 +442,17 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across empties
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             boolean: The boolean to filter on.
@@ -485,8 +511,8 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         )
         return self._aggregate(
             aggregate,
-            property,
-            group_by,
+            group_by,  # type: ignore[arg-type]
+            property,  # type: ignore[arg-type]
             query,
             search_property,
             limit,
@@ -669,7 +695,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
