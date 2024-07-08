@@ -191,7 +191,7 @@ class PrimitiveNullableListedAPI(
         properties: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -257,7 +257,7 @@ class PrimitiveNullableListedAPI(
         ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -296,7 +296,7 @@ class PrimitiveNullableListedAPI(
         search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across primitive nullable listeds
@@ -349,7 +349,7 @@ class PrimitiveNullableListedAPI(
         search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for primitive nullable listeds
@@ -387,7 +387,7 @@ class PrimitiveNullableListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: PrimitiveNullableListedFields | Sequence[PrimitiveNullableListedFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

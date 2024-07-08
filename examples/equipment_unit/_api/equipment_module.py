@@ -210,7 +210,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -292,7 +292,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -341,7 +341,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across equipment modules
@@ -412,7 +412,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for equipment modules
@@ -468,7 +468,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: EquipmentModuleFields | Sequence[EquipmentModuleFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

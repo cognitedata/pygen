@@ -219,7 +219,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -295,7 +295,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -340,7 +340,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across connection item as
@@ -405,7 +405,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for connection item as
@@ -455,7 +455,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: ConnectionItemAFields | Sequence[ConnectionItemAFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

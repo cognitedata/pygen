@@ -229,7 +229,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -305,7 +305,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -350,7 +350,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across unit procedures
@@ -415,7 +415,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for unit procedures
@@ -465,7 +465,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

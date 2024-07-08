@@ -205,7 +205,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -287,7 +287,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -336,7 +336,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across work orders
@@ -407,7 +407,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for work orders
@@ -463,7 +463,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

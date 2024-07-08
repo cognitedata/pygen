@@ -242,7 +242,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: EmptyFields | Sequence[EmptyFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -351,7 +351,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -418,7 +418,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across empties
@@ -516,7 +516,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for empties
@@ -599,7 +599,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         max_timestamp: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: EmptyFields | Sequence[EmptyFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

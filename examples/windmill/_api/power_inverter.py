@@ -194,7 +194,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -227,7 +227,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         group_by: PowerInverterFields | Sequence[PowerInverterFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across power inverters
@@ -276,7 +276,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for power inverters
@@ -312,7 +312,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: PowerInverterFields | Sequence[PowerInverterFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

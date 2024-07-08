@@ -166,7 +166,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -250,7 +250,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -303,7 +303,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across implementation 1 non writeables
@@ -376,7 +376,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for implementation 1 non writeables
@@ -432,7 +432,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         value_1_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

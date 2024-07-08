@@ -214,7 +214,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: ConnectionItemGFields | Sequence[ConnectionItemGFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -284,7 +284,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -325,7 +325,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across connection item gs
@@ -384,7 +384,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for connection item gs
@@ -428,7 +428,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: ConnectionItemGFields | Sequence[ConnectionItemGFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

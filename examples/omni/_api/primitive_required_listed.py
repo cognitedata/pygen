@@ -191,7 +191,7 @@ class PrimitiveRequiredListedAPI(
         properties: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: PrimitiveRequiredListedFields | Sequence[PrimitiveRequiredListedFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -257,7 +257,7 @@ class PrimitiveRequiredListedAPI(
         ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -296,7 +296,7 @@ class PrimitiveRequiredListedAPI(
         search_property: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across primitive required listeds
@@ -349,7 +349,7 @@ class PrimitiveRequiredListedAPI(
         search_property: PrimitiveRequiredListedTextFields | Sequence[PrimitiveRequiredListedTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for primitive required listeds
@@ -387,7 +387,7 @@ class PrimitiveRequiredListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: PrimitiveRequiredListedFields | Sequence[PrimitiveRequiredListedFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

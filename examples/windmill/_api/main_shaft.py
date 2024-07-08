@@ -198,7 +198,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -231,7 +231,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
         group_by: MainShaftFields | Sequence[MainShaftFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across main shafts
@@ -280,7 +280,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for main shafts
@@ -316,7 +316,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: MainShaftFields | Sequence[MainShaftFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

@@ -199,7 +199,7 @@ class CDFExternalReferencesListedAPI(
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -232,7 +232,7 @@ class CDFExternalReferencesListedAPI(
         group_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across cdf external references listeds
@@ -281,7 +281,7 @@ class CDFExternalReferencesListedAPI(
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for cdf external references listeds
@@ -317,7 +317,7 @@ class CDFExternalReferencesListedAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: CDFExternalReferencesListedFields | Sequence[CDFExternalReferencesListedFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

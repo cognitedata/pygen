@@ -302,7 +302,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     def _list(
         self,
         limit: int,
-        filter: dm.Filter,
+        filter: dm.Filter | None,
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]] | None

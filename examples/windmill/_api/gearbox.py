@@ -194,7 +194,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
         group_by: None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -227,7 +227,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
         group_by: GearboxFields | Sequence[GearboxFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across gearboxes
@@ -276,7 +276,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
         interval: float,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for gearboxes
@@ -312,7 +312,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: GearboxFields | Sequence[GearboxFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",

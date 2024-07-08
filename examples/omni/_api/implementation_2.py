@@ -199,7 +199,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: Implementation2Fields | Sequence[Implementation2Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -275,7 +275,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
@@ -320,7 +320,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         """Aggregate data across implementation 2
@@ -385,7 +385,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for implementation 2
@@ -435,7 +435,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         sub_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: Implementation2Fields | Sequence[Implementation2Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
