@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union{% else %}from typing import Any, ClassVar, Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -96,6 +96,8 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
             return value["items"]
         return value{% endif %}
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> {{ data_class.read_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
         if self.data_record is None:
@@ -112,6 +114,8 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         )
 
 {% if data_class.is_writable or data_class.is_interface %}
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
         return {{ data_class.write_name }}(
