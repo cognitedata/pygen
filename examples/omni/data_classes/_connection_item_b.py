@@ -148,12 +148,10 @@ class ConnectionItemB(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            inwards=[
-                inward.as_write() if isinstance(inward, ConnectionItemA) else inward for inward in self.inwards or []
-            ],
+            inwards=[inward.as_write() if isinstance(inward, DomainModel) else inward for inward in self.inwards or []],
             name=self.name,
             self_edge=[
-                self_edge.as_write() if isinstance(self_edge, ConnectionItemB) else self_edge
+                self_edge.as_write() if isinstance(self_edge, DomainModel) else self_edge
                 for self_edge in self.self_edge or []
             ],
         )

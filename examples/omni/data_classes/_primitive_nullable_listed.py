@@ -253,7 +253,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
             properties["boolean"] = self.boolean
 
         if self.date is not None or write_none:
-            properties["date"] = [date.isoformat() for date in self.date or []] or None
+            properties["date"] = [date.isoformat() for date in self.date or []]
 
         if self.float_32 is not None or write_none:
             properties["float32"] = self.float_32
@@ -276,7 +276,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
         if self.timestamp is not None or write_none:
             properties["timestamp"] = [
                 timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []
-            ] or None
+            ]
 
         if properties:
             this_node = dm.NodeApply(

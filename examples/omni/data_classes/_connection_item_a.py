@@ -159,15 +159,12 @@ class ConnectionItemA(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
             other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, ConnectionItemC) else self.other_direct
+                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
             ),
             outwards=[
-                outward.as_write() if isinstance(outward, ConnectionItemB) else outward
-                for outward in self.outwards or []
+                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
             ],
-            self_direct=(
-                self.self_direct.as_write() if isinstance(self.self_direct, ConnectionItemA) else self.self_direct
-            ),
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
         )
 
     def as_apply(self) -> ConnectionItemAWrite:

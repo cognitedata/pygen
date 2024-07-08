@@ -175,12 +175,14 @@ class Windmill(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=[blade.as_write() if isinstance(blade, Blade) else blade for blade in self.blades or []],
+            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
             capacity=self.capacity,
-            metmast=[metmast.as_write() if isinstance(metmast, Metmast) else metmast for metmast in self.metmast or []],
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, Nacelle) else self.nacelle,
+            metmast=[
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_write() if isinstance(self.rotor, Rotor) else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
             windfarm=self.windfarm,
         )
 

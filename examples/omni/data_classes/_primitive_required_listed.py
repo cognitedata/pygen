@@ -253,7 +253,7 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = [date.isoformat() for date in self.date or []] or None
+            properties["date"] = [date.isoformat() for date in self.date or []]
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -276,7 +276,7 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
         if self.timestamp is not None:
             properties["timestamp"] = [
                 timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []
-            ] or None
+            ]
 
         if properties:
             this_node = dm.NodeApply(

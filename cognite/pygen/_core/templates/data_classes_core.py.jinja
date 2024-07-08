@@ -462,7 +462,7 @@ T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWrit
 class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    end_node: Union[str, dm.NodeId]
+    end_node: Any
     data_record: DataRecord
 
     def as_id(self) -> dm.EdgeId:

@@ -255,11 +255,7 @@ class BaseConnectionField(Field, ABC):
         return f"{type_hint} = {self.pydantic_field}({field_args})"
 
     def as_write(self) -> str:
-        base_cls = "DomainModel"
-        if self.end_classes and len(self.end_classes) == 1:
-            base_cls = self.end_classes[0].read_name
-
-        return self._create_as_method("as_write", base_cls, self.use_node_reference)
+        return self._create_as_method("as_write", "DomainModel", self.use_node_reference)
 
     def as_read_graphql(self) -> str:
         return self._create_as_method("as_read", "GraphQLCore", False)

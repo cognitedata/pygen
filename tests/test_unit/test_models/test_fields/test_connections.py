@@ -270,26 +270,26 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "[outward.as_write() if isinstance(outward, ConnectionItemB) else outward "
+                "[outward.as_write() if isinstance(outward, DomainModel) else outward "
                 "for outward in self.outwards or []]",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
                 "ConnectionItemA",
                 "otherDirect",
-                "self.other_direct.as_write() if isinstance(self.other_direct, ConnectionItemC) else self.other_direct",
+                "self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct",
                 id="Direct is_list=False, not writable",
             ),
             pytest.param(
                 "ConnectionItemA",
                 "selfDirect",
-                "self.self_direct.as_write() if isinstance(self.self_direct, ConnectionItemA) else self.self_direct",
+                "self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct",
                 id="Direct to self is_list=False",
             ),
             pytest.param(
                 "ConnectionItemB",
                 "inwards",
-                "[inward.as_write() if isinstance(inward, ConnectionItemA) else inward "
+                "[inward.as_write() if isinstance(inward, DomainModel) else inward "
                 "for inward in self.inwards or []]",
                 id="Inwards MultiEdge",
             ),
@@ -308,14 +308,14 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemD",
                 "outwardsSingle",
-                "self.outwards_single.as_write() if isinstance(self.outwards_single, ConnectionItemE) "
+                "self.outwards_single.as_write() if isinstance(self.outwards_single, DomainModel) "
                 "else self.outwards_single",
                 id="Outwards SingleEdge no properties",
             ),
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "[inwards_single.as_write() if isinstance(inwards_single, ConnectionItemD) else inwards_single "
+                "[inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single "
                 "for inwards_single in self.inwards_single or []]",
                 id="Inwards SingleEdge no properties",
             ),
