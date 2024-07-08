@@ -515,7 +515,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         value = self.data[item]
         if isinstance(item, slice):
             return type(self)(value)  # type: ignore[arg-type]
-        return value
+        return cast(QueryStep, value)
 
     def next_name(self, name: str) -> str:
         counter = Counter(self._clean_name(step.name) for step in self)

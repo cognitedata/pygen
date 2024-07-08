@@ -114,7 +114,7 @@ class PageInfo(BaseModel):
 
 
 class GraphQLList(UserList):
-    def __init__(self, nodes: Collection[GraphQLCore] = None):
+    def __init__(self, nodes: Collection[GraphQLCore] | None = None):
         super().__init__(nodes or [])
         self.page_info: PageInfo | None = None
 
