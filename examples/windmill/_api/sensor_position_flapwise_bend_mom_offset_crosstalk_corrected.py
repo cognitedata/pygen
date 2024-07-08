@@ -87,7 +87,7 @@ class SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -146,7 +146,7 @@ class SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -214,7 +214,7 @@ class SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -298,7 +298,7 @@ class SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedQuery:
                 external_id=list(external_ids),
                 start=start,
                 end=end,
-                aggregates=aggregates,
+                aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
@@ -353,10 +353,10 @@ class SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedQuery:
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
-            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]
+            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]  # type: ignore[arg-type]
         else:
             column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
-            df.columns = [
+            df.columns = [  # type: ignore[arg-type]
                 "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
             ]
         return df
@@ -470,7 +470,7 @@ def _retrieve_timeseries_external_ids_with_extra_flapwise_bend_mom_offset_crosst
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "flapwise_bend_mom_offset_crosstalk_corrected",
 ) -> dict[str, list[str]]:
-    limit = float("inf") if limit is None or limit == -1 else limit
+    limit_input = float("inf") if limit is None or limit == -1 else limit
     properties = ["flapwise_bend_mom_offset_crosstalk_corrected"]
     if extra_properties == "flapwise_bend_mom_offset_crosstalk_corrected":
         ...
@@ -493,7 +493,7 @@ def _retrieve_timeseries_external_ids_with_extra_flapwise_bend_mom_offset_crosst
     external_ids: dict[str, list[str]] = {}
     total_retrieved = 0
     while True:
-        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit - total_retrieved), 0)
+        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit_input - total_retrieved), 0)
         selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
         query = dm.query.Query(
             with_={
@@ -516,6 +516,6 @@ def _retrieve_timeseries_external_ids_with_extra_flapwise_bend_mom_offset_crosst
         total_retrieved += len(batch_external_ids)
         external_ids.update(batch_external_ids)
         cursor = result.cursors["nodes"]
-        if total_retrieved >= limit or cursor is None:
+        if total_retrieved >= limit_input or cursor is None:
             break
     return external_ids
