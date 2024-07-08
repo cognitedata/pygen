@@ -88,7 +88,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
+    def _delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:

@@ -88,7 +88,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
+    def _delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -150,7 +150,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     def _search(
         self,
         query: str,
-        properties: str | Sequence[str],
+        properties: str | SequenceNotStr[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         sort_by: str | list[str] | None = None,
@@ -174,55 +174,24 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         )
         return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
-    @overload
     def _aggregate(
         self,
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        properties: str | Sequence[str] | None = None,
-        group_by: None = None,
+        group_by: str | SequenceNotStr[str] | None = None,
+        properties: str | SequenceNotStr[str] | None = None,
         query: str | None = None,
-        search_properties: str | Sequence[str] | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
-
-    @overload
-    def _aggregate(
-        self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        properties: str | Sequence[str] = None,
-        group_by: str | Sequence[str] | None = None,
-        query: str | None = None,
-        search_properties: str | Sequence[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
-
-    def _aggregate(
-        self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        properties: str | Sequence[str] | None = None,
-        group_by: str | Sequence[str] | None = None,
-        query: str | None = None,
-        search_properties: str | Sequence[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         if isinstance(group_by, str):
             group_by = [group_by]
 

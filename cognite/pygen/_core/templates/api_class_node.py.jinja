@@ -50,7 +50,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def __call__(
             self,{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-            limit: int | None = DEFAULT_QUERY_LIMIT,
+            limit: int = DEFAULT_QUERY_LIMIT,
             filter: dm.Filter | None = None,
     ) -> {{ query_api.name }}[{{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
@@ -324,7 +324,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._aggregate(
             aggregate,
             property,
-            group_by,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            group_by,  # type: ignore[arg-type]{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
             None,
@@ -419,7 +419,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._list(
             limit=limit,
             filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,{% endif %}
             retrieve_edges=retrieve_edges,
@@ -436,7 +436,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% else %}return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         ){% endif %}
