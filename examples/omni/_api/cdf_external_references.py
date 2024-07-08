@@ -187,7 +187,7 @@ class CDFExternalReferencesAPI(
     def aggregate(
         self,
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
-        group_by: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
+        group_by: None = None,
         property: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -199,7 +199,7 @@ class CDFExternalReferencesAPI(
     def aggregate(
         self,
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
-        group_by: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
+        group_by: None = None,
         property: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,

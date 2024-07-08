@@ -194,7 +194,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def search(
         self,
         query: str,
-        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -246,14 +246,25 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
+        group_by: None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        search_properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        query: str | None = None,
+        search_properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -263,16 +274,15 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     @overload
     def aggregate(
         self,
-        aggregations: Aggregations
+        aggregate: Aggregations
         | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}],
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
         ...
@@ -281,22 +291,25 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         self,
         aggregate: Aggregations
         | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
+        property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across {{ data_class.doc_list_name }}
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
-            group_by: The property to group by when doing the aggregation.{% if data_class.has_primitive_field_of_type(dm.Text) %}
+            group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -323,7 +336,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         return self._aggregate(
             aggregate,
-            property,
+            property,  # type: ignore[arg-type]
             group_by,  # type: ignore[arg-type]{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
