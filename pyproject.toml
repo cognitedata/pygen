@@ -39,6 +39,7 @@ known-third-party = ["cognite.client"]
 
 [tool.mypy]
 explicit_package_bases = true
+mypy_path = "examples"
 plugins = ["pydantic.mypy"]
 
 [tool.pydantic-mypy]

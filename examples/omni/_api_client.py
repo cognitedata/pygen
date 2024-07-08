@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from collections.abc import Sequence
-from typing import Any
+from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
@@ -118,7 +117,7 @@ class OmniClient:
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return data_classes.ResourcesWriteResult(result.nodes, result.edges, time_series)
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     def _create_instances(
         self,
