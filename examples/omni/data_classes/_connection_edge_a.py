@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -194,7 +194,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.end_time is not None or write_none:
             properties["endTime"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
