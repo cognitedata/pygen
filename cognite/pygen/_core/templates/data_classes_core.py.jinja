@@ -202,7 +202,7 @@ class DataRecord(BaseModel):
 
 class DomainModel(DomainModelCore, ABC):
     data_record: DataRecord
-    node_type: Optional[dm.DirectRelationReference]
+    node_type: Optional[dm.DirectRelationReference] = None
 
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)

@@ -515,8 +515,8 @@ def create_fields_test_cases():
             edge_direction="outwards",
             use_node_reference=True,
         ),
-        "Union[list[Role], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
-        "Union[list[RoleApply], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)",
+        "Optional[list[Union[Role, str, dm.NodeId]]] = Field(default=None, repr=False)",
+        "Optional[list[Union[RoleApply, str, dm.NodeId]]] = Field(default=None, repr=False)",
         id="List of edges",
     )
     prop = {
@@ -547,7 +547,7 @@ def create_fields_test_cases():
             doc_name="config",
             variable="config",
         ),
-        "Optional[list[str]] = None",
+        "list[str]",
         "list[str]",
         id="List of strings",
     )
