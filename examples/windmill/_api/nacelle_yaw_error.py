@@ -75,7 +75,8 @@ class NacelleYawErrorQuery:
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
-            return self._client.time_series.data.retrieve(
+            # Missing overload in SDK
+            return self._client.time_series.data.retrieve(  # type: ignore[return-value]
                 external_id=list(external_ids),
                 start=start,
                 end=end,
@@ -134,7 +135,8 @@ class NacelleYawErrorQuery:
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
-            return self._client.time_series.data.retrieve_arrays(
+            # Missing overload in SDK
+            return self._client.time_series.data.retrieve_arrays(  # type: ignore[return-value]
                 external_id=list(external_ids),
                 start=start,
                 end=end,
@@ -345,10 +347,10 @@ class NacelleYawErrorQuery:
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
-            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]  # type: ignore[arg-type]
+            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]  # type: ignore[assignment]
         else:
             column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
-            df.columns = [  # type: ignore[arg-type]
+            df.columns = [  # type: ignore[assignment]
                 "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
             ]
         return df
@@ -504,7 +506,7 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_error(
     total_retrieved = 0
     while True:
         query_limit = max(min(INSTANCE_QUERY_LIMIT, limit_input - total_retrieved), 0)
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
+        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=int(query_limit))
         query = dm.query.Query(
             with_={
                 "nodes": selected_nodes,

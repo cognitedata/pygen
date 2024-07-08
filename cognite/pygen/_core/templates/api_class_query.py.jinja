@@ -54,7 +54,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         self,{% for parm in edge_api.filter_parameters(False, include_end_node=True, suffix_edge=True) %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         filter: dm.Filter | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_direct_relations_with_source %}
+        limit: int = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_direct_relations_with_source %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> {{ edge_api.query.name }}[T_DomainModelList]:
         """Query along the {{ edge_api.doc_name }} edges of the {{ data_class.doc_name}}.
