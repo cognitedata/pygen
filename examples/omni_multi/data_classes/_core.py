@@ -606,7 +606,7 @@ class DomainRelationList(CoreList[T_DomainRelation]):
         return DataRecordList([connection.data_record for connection in self.data])
 
 
-class DomainRelationWriteList(CoreList[T_DomainModelWrite]):
+class DomainRelationWriteList(CoreList[T_DomainRelationWrite]):
     _PARENT_CLASS = DomainModelWrite
 
     @property

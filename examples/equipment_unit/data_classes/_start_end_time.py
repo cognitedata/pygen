@@ -346,7 +346,7 @@ def _create_start_end_time_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE = {
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     EquipmentModuleWrite: {UnitProcedureWrite},
     WorkOrderWrite: {UnitProcedureWrite},
 }

@@ -148,7 +148,7 @@ class DependentOnNonWritable(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
             to_non_writable=[
-                to_non_writable.as_write() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
                 for to_non_writable in self.to_non_writable or []
             ],
         )

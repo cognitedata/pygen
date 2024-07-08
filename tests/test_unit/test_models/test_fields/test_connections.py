@@ -277,7 +277,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "otherDirect",
-                "self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct",
+                "self.other_direct.as_id() if isinstance(self.other_direct, DomainModel) else self.other_direct",
                 id="Direct is_list=False, not writable",
             ),
             pytest.param(
