@@ -247,7 +247,7 @@ class PrimitiveRequiredListedAPI(
         group_by: None = None,
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,
@@ -263,7 +263,7 @@ class PrimitiveRequiredListedAPI(
         group_by: None = None,
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,
@@ -283,7 +283,7 @@ class PrimitiveRequiredListedAPI(
         group_by: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields],
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,

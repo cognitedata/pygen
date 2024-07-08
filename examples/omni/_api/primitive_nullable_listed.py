@@ -247,7 +247,7 @@ class PrimitiveNullableListedAPI(
         group_by: None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,
@@ -263,7 +263,7 @@ class PrimitiveNullableListedAPI(
         group_by: None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,
@@ -283,7 +283,7 @@ class PrimitiveNullableListedAPI(
         group_by: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields],
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,

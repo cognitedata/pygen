@@ -234,7 +234,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         group_by: None = None,
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
@@ -256,7 +256,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         group_by: None = None,
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
@@ -282,7 +282,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         group_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields],
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,

@@ -275,7 +275,7 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
         ) = None,
         a_value: str | list[str] | None = None,
@@ -293,7 +293,7 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
         ) = None,
         a_value: str | list[str] | None = None,
@@ -315,7 +315,7 @@ class DependentOnNonWritableAPI(
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields],
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
         ) = None,
         a_value: str | list[str] | None = None,

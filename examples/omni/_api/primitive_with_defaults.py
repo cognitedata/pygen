@@ -285,7 +285,7 @@ class PrimitiveWithDefaultsAPI(
         group_by: None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
         ) = None,
         min_auto_increment_int_32: int | None = None,
@@ -308,7 +308,7 @@ class PrimitiveWithDefaultsAPI(
         group_by: None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
         ) = None,
         min_auto_increment_int_32: int | None = None,
@@ -335,7 +335,7 @@ class PrimitiveWithDefaultsAPI(
         group_by: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields],
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_properties: (
+        search_property: (
             PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
         ) = None,
         min_auto_increment_int_32: int | None = None,
