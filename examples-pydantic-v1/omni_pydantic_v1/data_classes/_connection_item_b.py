@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -85,6 +85,8 @@ class ConnectionItemBGraphQL(GraphQLCore):
             return value["items"]
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionItemB:
         """Convert this GraphQL format of connection item b to the reading format."""
         if self.data_record is None:
@@ -102,6 +104,8 @@ class ConnectionItemBGraphQL(GraphQLCore):
             self_edge=[self_edge.as_read() for self_edge in self.self_edge or []],
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this GraphQL format of connection item b to the writing format."""
         return ConnectionItemBWrite(
@@ -132,9 +136,9 @@ class ConnectionItemB(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemA], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemB], list[str], list[dm.NodeId], None] = Field(
+    self_edge: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="selfEdge"
     )
 
@@ -180,9 +184,9 @@ class ConnectionItemBWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Union[list[ConnectionItemAWrite], list[str], list[dm.NodeId], None] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Union[list[ConnectionItemBWrite], list[str], list[dm.NodeId], None] = Field(
+    self_edge: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="selfEdge"
     )
 
@@ -292,7 +296,7 @@ def _create_connection_item_b_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

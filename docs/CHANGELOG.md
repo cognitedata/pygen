@@ -20,9 +20,10 @@ Changes are grouped as follows
 
 ### Improved
 - Pygen now longer generates code that is deprecated in `pydantic` or `cognite-sdk`.
+- The generated SDK is now compliant with `mypy` with `pydantdic` plugin.
 
 ### Fixed
-- The read data class for a view with required listable properties would generated as optional. This is now fixed.
+- The read data class for a view with required listable properties would generate as optional. This is now fixed.
 - Using `client.upset` with an optional listable `date` or `datetime` property set to `None` would raise
   an `AttributeError`. This is now fixed.
 

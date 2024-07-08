@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -17,6 +17,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
 )
@@ -68,6 +69,8 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> ConnectionEdgeA:
         """Convert this GraphQL format of connection edge a to the reading format."""
         if self.data_record is None:
@@ -86,6 +89,8 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
             start_time=self.start_time,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this GraphQL format of connection edge a to the writing format."""
         return ConnectionEdgeAWrite(
@@ -190,7 +195,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.end_time is not None or write_none:
             properties["endTime"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
@@ -257,7 +262,7 @@ class ConnectionEdgeAList(DomainRelationList[ConnectionEdgeA]):
         return self.as_write()
 
 
-class ConnectionEdgeAWriteList(DomainRelationList[ConnectionEdgeAWrite]):
+class ConnectionEdgeAWriteList(DomainRelationWriteList[ConnectionEdgeAWrite]):
     """List of connection edge as in the writing version."""
 
     _INSTANCE = ConnectionEdgeAWrite
@@ -366,7 +371,7 @@ def _create_connection_edge_a_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE = {
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     ConnectionItemFWrite: {ConnectionItemGWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
 }

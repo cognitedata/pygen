@@ -22,7 +22,7 @@ class EquipmentUnitClient:
 
     Generated with:
         pygen = 0.99.26
-        cognite-sdk = 7.53.2
+        cognite-sdk = 7.51.1
         pydantic = 1.10.7
 
     Data Model:
@@ -77,7 +77,7 @@ class EquipmentUnitClient:
             auto_create_end_nodes=True,
             replace=replace,
         )
-        time_series = []
+        time_series = TimeSeriesList([])
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
@@ -160,12 +160,14 @@ class EquipmentUnitClient:
         """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        elif all(isinstance(item, str) for item in external_id):
+        elif isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id):
             return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
+                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],
             )
-        elif isinstance(external_id, data_classes.DomainModelWrite) or all(
-            isinstance(item, data_classes.DomainModelWrite) for item in external_id
+        elif isinstance(external_id, data_classes.DomainModelWrite) or (
+            isinstance(external_id, Sequence)
+            and not isinstance(external_id, str)
+            and all(isinstance(item, data_classes.DomainModelWrite) for item in external_id)
         ):
             resources = self._create_instances(external_id, False, False)
             return self._client.data_modeling.instances.delete(

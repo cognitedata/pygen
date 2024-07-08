@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 
@@ -16,6 +16,7 @@ from ._core import (
     DomainRelation,
     DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
 )
@@ -61,6 +62,8 @@ class StartEndTimeGraphQL(GraphQLCore):
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> StartEndTime:
         """Convert this GraphQL format of start end time to the reading format."""
         if self.data_record is None:
@@ -78,6 +81,8 @@ class StartEndTimeGraphQL(GraphQLCore):
             start_time=self.start_time,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> StartEndTimeWrite:
         """Convert this GraphQL format of start end time to the writing format."""
         return StartEndTimeWrite(
@@ -176,7 +181,7 @@ class StartEndTimeWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.end_time is not None or write_none:
             properties["end_time"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
@@ -240,7 +245,7 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
         return self.as_write()
 
 
-class StartEndTimeWriteList(DomainRelationList[StartEndTimeWrite]):
+class StartEndTimeWriteList(DomainRelationWriteList[StartEndTimeWrite]):
     """List of start end times in the writing version."""
 
     _INSTANCE = StartEndTimeWrite
@@ -341,7 +346,7 @@ def _create_start_end_time_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE = {
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     EquipmentModuleWrite: {UnitProcedureWrite},
     WorkOrderWrite: {UnitProcedureWrite},
 }

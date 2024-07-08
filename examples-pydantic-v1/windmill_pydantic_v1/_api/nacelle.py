@@ -65,7 +65,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> NacelleQueryAPI[NacelleList]:
         """Query starting at nacelles.
@@ -203,14 +203,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: NacelleFields | Sequence[NacelleFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -218,21 +213,37 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
+        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: NacelleFields | Sequence[NacelleFields] | None = None,
-        group_by: NacelleFields | Sequence[NacelleFields] = None,
+        group_by: NacelleFields | SequenceNotStr[NacelleFields],
+        property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -240,7 +251,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -249,11 +260,10 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: NacelleFields | Sequence[NacelleFields] | None = None,
-        group_by: NacelleFields | Sequence[NacelleFields] | None = None,
+        group_by: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
+        property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -261,15 +271,19 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across nacelles
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             gearbox: The gearbox to filter on.
             generator: The generator to filter on.
             high_speed_shaft: The high speed shaft to filter on.
@@ -305,13 +319,13 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            None,
-            None,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=None,
+            search_properties=None,
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -325,7 +339,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for nacelles
@@ -376,7 +390,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: NacelleFields | Sequence[NacelleFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -426,7 +440,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -97,6 +97,8 @@ class PrimitiveRequiredGraphQL(GraphQLCore):
             )
         return values
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PrimitiveRequired:
         """Convert this GraphQL format of primitive required to the reading format."""
         if self.data_record is None:
@@ -120,6 +122,8 @@ class PrimitiveRequiredGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveRequiredWrite:
         """Convert this GraphQL format of primitive required to the writing format."""
         return PrimitiveRequiredWrite(
@@ -352,7 +356,7 @@ def _create_primitive_required_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
     if min_date is not None or max_date is not None:

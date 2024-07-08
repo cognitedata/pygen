@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -84,6 +84,8 @@ class PowerInverterGraphQL(GraphQLCore):
             return TimeSeries.load(value)
         return value
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_read(self) -> PowerInverter:
         """Convert this GraphQL format of power inverter to the reading format."""
         if self.data_record is None:
@@ -101,6 +103,8 @@ class PowerInverterGraphQL(GraphQLCore):
             reactive_power_total=self.reactive_power_total,
         )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PowerInverterWrite:
         """Convert this GraphQL format of power inverter to the writing format."""
         return PowerInverterWrite(
@@ -285,7 +289,7 @@ def _create_power_inverter_filter(
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters = []
+    filters: list[dm.Filter] = []
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

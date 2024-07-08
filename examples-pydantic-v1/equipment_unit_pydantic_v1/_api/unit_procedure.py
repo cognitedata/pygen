@@ -62,7 +62,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> UnitProcedureQueryAPI[UnitProcedureList]:
         """Query starting at unit procedures.
@@ -222,16 +222,16 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
     def search(
         self,
         query: str,
-        properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        properties: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
+        sort_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> UnitProcedureList:
@@ -281,7 +281,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
@@ -289,46 +289,58 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
     @overload
     def aggregate(
         self,
-        aggregations: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
-        ),
-        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
+        property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
+        query: str | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregations: (
+        aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
-        group_by: UnitProcedureFields | Sequence[UnitProcedureFields] = None,
+        group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields],
+        property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList: ...
 
@@ -337,28 +349,31 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         aggregate: (
             Aggregations
             | dm.aggregations.MetricAggregation
-            | Sequence[Aggregations]
-            | Sequence[dm.aggregations.MetricAggregation]
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        property: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
-        group_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
+        group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
+        property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
         """Aggregate data across unit procedures
 
         Args:
             aggregate: The aggregation to perform.
-            property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
             name: The name to filter on.
@@ -394,13 +409,13 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
         return self._aggregate(
-            aggregate,
-            property,
-            group_by,
-            query,
-            search_property,
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
@@ -408,14 +423,14 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         property: UnitProcedureFields,
         interval: float,
         query: str | None = None,
-        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         """Produces histograms for unit procedures
@@ -452,7 +467,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -465,7 +480,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         sort_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -516,7 +531,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._list(
             limit=limit,
             filter=filter_,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
             retrieve_edges=retrieve_edges,
