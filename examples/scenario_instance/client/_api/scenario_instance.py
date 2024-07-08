@@ -505,13 +505,13 @@ class ScenarioInstanceAPI(
             filter,
         )
         return self._aggregate(
-            aggregate,
-            group_by,  # type: ignore[arg-type]
-            property,  # type: ignore[arg-type]
-            query,
-            search_property,  # type: ignore[arg-type]
-            limit,
-            filter_,
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=query,
+            search_properties=search_property,  # type: ignore[arg-type]
+            limit=limit,
+            filter=filter_,
         )
 
     def histogram(
