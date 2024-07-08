@@ -239,9 +239,13 @@ class BaseConnectionField(Field, ABC):
             field_kwargs["alias"] = f'"{self.prop_name}"'
         if use_node_reference:
             types.extend(self._node_reference)
-        types_hint = ", ".join([f"list[{type_}]" if self._wrap_list else type_ for type_ in types])
+        types_hint = ", ".join(types)
+        if self._wrap_list and len(types) == 1:
+            types_hint = f"list[{types_hint}]"
+        elif self._wrap_list:
+            types_hint = f"list[Union[{types_hint}]]"
         field_args = ", ".join([f"{key}={value}" for key, value in field_kwargs.items()])
-        if len(types) == 1:
+        if len(types) == 1 or self._wrap_list:
             type_hint = f"Optional[{types_hint}]"
         elif len(types) == 0:
             # GraphQL Hint for direct relation with no source

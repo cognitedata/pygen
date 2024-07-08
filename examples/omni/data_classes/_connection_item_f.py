@@ -137,7 +137,7 @@ class ConnectionItemF(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[list[ConnectionItemD], list[str], list[dm.NodeId], None] = Field(
+    direct_list: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
     )
     name: Optional[str] = None
@@ -185,7 +185,7 @@ class ConnectionItemFWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Union[list[ConnectionItemDWrite], list[str], list[dm.NodeId], None] = Field(
+    direct_list: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
     )
     name: Optional[str] = None
