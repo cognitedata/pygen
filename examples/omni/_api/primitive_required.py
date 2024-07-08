@@ -394,7 +394,7 @@ class PrimitiveRequiredAPI(
         group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields],
         property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
-        search_properties: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
+        search_properties: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -426,7 +426,7 @@ class PrimitiveRequiredAPI(
         group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
+        search_property: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -518,7 +518,7 @@ class PrimitiveRequiredAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -528,7 +528,7 @@ class PrimitiveRequiredAPI(
         property: PrimitiveRequiredFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveRequiredTextFields | Sequence[PrimitiveRequiredTextFields] | None = None,
+        search_property: PrimitiveRequiredTextFields | SequenceNotStr[PrimitiveRequiredTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -605,7 +605,7 @@ class PrimitiveRequiredAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

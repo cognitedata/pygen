@@ -335,7 +335,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         group_by: Implementation1Fields | SequenceNotStr[Implementation1Fields],
         property: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         query: str | None = None,
-        search_properties: Implementation1TextFields | Sequence[Implementation1TextFields] | None = None,
+        search_properties: Implementation1TextFields | SequenceNotStr[Implementation1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -360,7 +360,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         group_by: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         property: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         query: str | None = None,
-        search_property: Implementation1TextFields | Sequence[Implementation1TextFields] | None = None,
+        search_property: Implementation1TextFields | SequenceNotStr[Implementation1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -431,7 +431,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -441,7 +441,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         property: Implementation1Fields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1TextFields | Sequence[Implementation1TextFields] | None = None,
+        search_property: Implementation1TextFields | SequenceNotStr[Implementation1TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -497,7 +497,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

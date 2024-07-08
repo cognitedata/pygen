@@ -306,7 +306,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         group_by: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields],
         property: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         query: str | None = None,
-        search_properties: ConnectionItemDTextFields | Sequence[ConnectionItemDTextFields] | None = None,
+        search_properties: ConnectionItemDTextFields | SequenceNotStr[ConnectionItemDTextFields] | None = None,
         direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
@@ -327,7 +327,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         group_by: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         property: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         query: str | None = None,
-        search_property: ConnectionItemDTextFields | Sequence[ConnectionItemDTextFields] | None = None,
+        search_property: ConnectionItemDTextFields | SequenceNotStr[ConnectionItemDTextFields] | None = None,
         direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
@@ -386,7 +386,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -396,7 +396,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         property: ConnectionItemDFields,
         interval: float,
         query: str | None = None,
-        search_property: ConnectionItemDTextFields | Sequence[ConnectionItemDTextFields] | None = None,
+        search_property: ConnectionItemDTextFields | SequenceNotStr[ConnectionItemDTextFields] | None = None,
         direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
@@ -440,7 +440,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

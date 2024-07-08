@@ -315,7 +315,9 @@ class DependentOnNonWritableAPI(
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields],
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_properties: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        search_properties: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -334,7 +336,9 @@ class DependentOnNonWritableAPI(
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -387,7 +391,7 @@ class DependentOnNonWritableAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -397,7 +401,9 @@ class DependentOnNonWritableAPI(
         property: DependentOnNonWritableFields,
         interval: float,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -435,7 +441,7 @@ class DependentOnNonWritableAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

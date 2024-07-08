@@ -335,7 +335,9 @@ class PrimitiveWithDefaultsAPI(
         group_by: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields],
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_properties: PrimitiveWithDefaultsTextFields | Sequence[PrimitiveWithDefaultsTextFields] | None = None,
+        search_properties: (
+            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
+        ) = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -359,7 +361,9 @@ class PrimitiveWithDefaultsAPI(
         group_by: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveWithDefaultsTextFields | Sequence[PrimitiveWithDefaultsTextFields] | None = None,
+        search_property: (
+            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
+        ) = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -427,7 +431,7 @@ class PrimitiveWithDefaultsAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -437,7 +441,9 @@ class PrimitiveWithDefaultsAPI(
         property: PrimitiveWithDefaultsFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveWithDefaultsTextFields | Sequence[PrimitiveWithDefaultsTextFields] | None = None,
+        search_property: (
+            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
+        ) = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -490,7 +496,7 @@ class PrimitiveWithDefaultsAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

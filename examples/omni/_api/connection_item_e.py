@@ -315,7 +315,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         group_by: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields],
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
-        search_properties: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        search_properties: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
         direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -335,7 +335,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         group_by: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
-        search_property: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
         direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -391,7 +391,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -401,7 +401,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields,
         interval: float,
         query: str | None = None,
-        search_property: ConnectionItemETextFields | Sequence[ConnectionItemETextFields] | None = None,
+        search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
         direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -442,7 +442,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

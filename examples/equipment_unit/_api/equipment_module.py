@@ -322,7 +322,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         group_by: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields],
         property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         query: str | None = None,
-        search_properties: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
+        search_properties: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -345,7 +345,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         group_by: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         property: EquipmentModuleFields | SequenceNotStr[EquipmentModuleFields] | None = None,
         query: str | None = None,
-        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
+        search_property: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -410,7 +410,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -420,7 +420,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         property: EquipmentModuleFields,
         interval: float,
         query: str | None = None,
-        search_property: EquipmentModuleTextFields | Sequence[EquipmentModuleTextFields] | None = None,
+        search_property: EquipmentModuleTextFields | SequenceNotStr[EquipmentModuleTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -470,7 +470,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

@@ -317,7 +317,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         group_by: WorkOrderFields | SequenceNotStr[WorkOrderFields],
         property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         query: str | None = None,
-        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_properties: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
@@ -340,7 +340,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         group_by: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         property: WorkOrderFields | SequenceNotStr[WorkOrderFields] | None = None,
         query: str | None = None,
-        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_property: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
@@ -405,7 +405,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -415,7 +415,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         property: WorkOrderFields,
         interval: float,
         query: str | None = None,
-        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        search_property: WorkOrderTextFields | SequenceNotStr[WorkOrderTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
@@ -465,7 +465,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

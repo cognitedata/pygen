@@ -333,7 +333,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields],
         property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_properties: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_properties: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -354,7 +354,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
-        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -413,7 +413,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -423,7 +423,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         property: UnitProcedureFields,
         interval: float,
         query: str | None = None,
-        search_property: UnitProcedureTextFields | Sequence[UnitProcedureTextFields] | None = None,
+        search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         type_: str | list[str] | None = None,
@@ -467,7 +467,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

@@ -310,7 +310,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         group_by: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields],
         property: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         query: str | None = None,
-        search_properties: ConnectionItemGTextFields | Sequence[ConnectionItemGTextFields] | None = None,
+        search_properties: ConnectionItemGTextFields | SequenceNotStr[ConnectionItemGTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -329,7 +329,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         group_by: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         property: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         query: str | None = None,
-        search_property: ConnectionItemGTextFields | Sequence[ConnectionItemGTextFields] | None = None,
+        search_property: ConnectionItemGTextFields | SequenceNotStr[ConnectionItemGTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -382,7 +382,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -392,7 +392,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         property: ConnectionItemGFields,
         interval: float,
         query: str | None = None,
-        search_property: ConnectionItemGTextFields | Sequence[ConnectionItemGTextFields] | None = None,
+        search_property: ConnectionItemGTextFields | SequenceNotStr[ConnectionItemGTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -430,7 +430,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

@@ -362,7 +362,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         group_by: WindmillFields | SequenceNotStr[WindmillFields],
         property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
-        search_properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
+        search_properties: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -387,7 +387,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         group_by: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
-        search_property: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
+        search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -458,7 +458,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -468,7 +468,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         property: WindmillFields,
         interval: float,
         query: str | None = None,
-        search_property: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
+        search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -524,7 +524,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

@@ -313,7 +313,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         group_by: BladeFields | SequenceNotStr[BladeFields],
         property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
-        search_properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_properties: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -333,7 +333,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         group_by: BladeFields | SequenceNotStr[BladeFields] | None = None,
         property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
-        search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -389,7 +389,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -399,7 +399,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         property: BladeFields,
         interval: float,
         query: str | None = None,
-        search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        search_property: BladeTextFields | SequenceNotStr[BladeTextFields] | None = None,
         is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -440,7 +440,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

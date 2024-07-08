@@ -389,7 +389,7 @@ class ScenarioInstanceAPI(
         group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields],
         property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
-        search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_properties: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -420,7 +420,7 @@ class ScenarioInstanceAPI(
         group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
-        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -509,7 +509,7 @@ class ScenarioInstanceAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -519,7 +519,7 @@ class ScenarioInstanceAPI(
         property: ScenarioInstanceFields,
         interval: float,
         query: str | None = None,
-        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        search_property: ScenarioInstanceTextFields | SequenceNotStr[ScenarioInstanceTextFields] | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
         country: str | list[str] | None = None,
@@ -593,7 +593,7 @@ class ScenarioInstanceAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

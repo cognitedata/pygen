@@ -321,7 +321,7 @@ class Implementation1v2API(
         group_by: Implementation1v2Fields | SequenceNotStr[Implementation1v2Fields],
         property: Implementation1v2Fields | SequenceNotStr[Implementation1v2Fields] | None = None,
         query: str | None = None,
-        search_properties: Implementation1v2TextFields | Sequence[Implementation1v2TextFields] | None = None,
+        search_properties: Implementation1v2TextFields | SequenceNotStr[Implementation1v2TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -344,7 +344,7 @@ class Implementation1v2API(
         group_by: Implementation1v2Fields | SequenceNotStr[Implementation1v2Fields] | None = None,
         property: Implementation1v2Fields | SequenceNotStr[Implementation1v2Fields] | None = None,
         query: str | None = None,
-        search_property: Implementation1v2TextFields | Sequence[Implementation1v2TextFields] | None = None,
+        search_property: Implementation1v2TextFields | SequenceNotStr[Implementation1v2TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -409,7 +409,7 @@ class Implementation1v2API(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -419,7 +419,7 @@ class Implementation1v2API(
         property: Implementation1v2Fields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1v2TextFields | Sequence[Implementation1v2TextFields] | None = None,
+        search_property: Implementation1v2TextFields | SequenceNotStr[Implementation1v2TextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -469,7 +469,7 @@ class Implementation1v2API(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

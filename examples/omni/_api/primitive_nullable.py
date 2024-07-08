@@ -394,7 +394,7 @@ class PrimitiveNullableAPI(
         group_by: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields],
         property: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         query: str | None = None,
-        search_properties: PrimitiveNullableTextFields | Sequence[PrimitiveNullableTextFields] | None = None,
+        search_properties: PrimitiveNullableTextFields | SequenceNotStr[PrimitiveNullableTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -426,7 +426,7 @@ class PrimitiveNullableAPI(
         group_by: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         property: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableTextFields | Sequence[PrimitiveNullableTextFields] | None = None,
+        search_property: PrimitiveNullableTextFields | SequenceNotStr[PrimitiveNullableTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -518,7 +518,7 @@ class PrimitiveNullableAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -528,7 +528,7 @@ class PrimitiveNullableAPI(
         property: PrimitiveNullableFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveNullableTextFields | Sequence[PrimitiveNullableTextFields] | None = None,
+        search_property: PrimitiveNullableTextFields | SequenceNotStr[PrimitiveNullableTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -605,7 +605,7 @@ class PrimitiveNullableAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

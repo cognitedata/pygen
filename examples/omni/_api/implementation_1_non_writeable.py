@@ -283,7 +283,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
         search_properties: (
-            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -308,7 +308,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
         search_property: (
-            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -374,7 +374,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -385,7 +385,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         interval: float,
         query: str | None = None,
         search_property: (
-            Implementation1NonWriteableTextFields | Sequence[Implementation1NonWriteableTextFields] | None
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -436,7 +436,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

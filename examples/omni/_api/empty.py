@@ -390,7 +390,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         group_by: EmptyFields | SequenceNotStr[EmptyFields],
         property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
-        search_properties: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
+        search_properties: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -422,7 +422,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         group_by: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
-        search_property: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
+        search_property: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -514,7 +514,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -524,7 +524,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         property: EmptyFields,
         interval: float,
         query: str | None = None,
-        search_property: EmptyTextFields | Sequence[EmptyTextFields] | None = None,
+        search_property: EmptyTextFields | SequenceNotStr[EmptyTextFields] | None = None,
         boolean: bool | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
@@ -601,7 +601,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

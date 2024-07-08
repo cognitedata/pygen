@@ -284,7 +284,7 @@ class PrimitiveNullableListedAPI(
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
         search_properties: (
-            PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
         ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -302,7 +302,9 @@ class PrimitiveNullableListedAPI(
         group_by: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -349,7 +351,7 @@ class PrimitiveNullableListedAPI(
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -359,7 +361,9 @@ class PrimitiveNullableListedAPI(
         property: PrimitiveNullableListedFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | Sequence[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -391,7 +395,7 @@ class PrimitiveNullableListedAPI(
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

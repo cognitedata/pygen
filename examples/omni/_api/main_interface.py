@@ -285,7 +285,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields],
         property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
-        search_properties: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
+        search_properties: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -304,7 +304,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
-        search_property: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
+        search_property: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -357,7 +357,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -367,7 +367,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         property: MainInterfaceFields,
         interval: float,
         query: str | None = None,
-        search_property: MainInterfaceTextFields | Sequence[MainInterfaceTextFields] | None = None,
+        search_property: MainInterfaceTextFields | SequenceNotStr[MainInterfaceTextFields] | None = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -405,7 +405,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )

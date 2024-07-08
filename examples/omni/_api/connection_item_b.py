@@ -316,7 +316,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         group_by: ConnectionItemBFields | SequenceNotStr[ConnectionItemBFields],
         property: ConnectionItemBFields | SequenceNotStr[ConnectionItemBFields] | None = None,
         query: str | None = None,
-        search_properties: ConnectionItemBTextFields | Sequence[ConnectionItemBTextFields] | None = None,
+        search_properties: ConnectionItemBTextFields | SequenceNotStr[ConnectionItemBTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -335,7 +335,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         group_by: ConnectionItemBFields | SequenceNotStr[ConnectionItemBFields] | None = None,
         property: ConnectionItemBFields | SequenceNotStr[ConnectionItemBFields] | None = None,
         query: str | None = None,
-        search_property: ConnectionItemBTextFields | Sequence[ConnectionItemBTextFields] | None = None,
+        search_property: ConnectionItemBTextFields | SequenceNotStr[ConnectionItemBTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -388,7 +388,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             group_by,  # type: ignore[arg-type]
             property,  # type: ignore[arg-type]
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
@@ -398,7 +398,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         property: ConnectionItemBFields,
         interval: float,
         query: str | None = None,
-        search_property: ConnectionItemBTextFields | Sequence[ConnectionItemBTextFields] | None = None,
+        search_property: ConnectionItemBTextFields | SequenceNotStr[ConnectionItemBTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -436,7 +436,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             property,
             interval,
             query,
-            search_property,
+            search_property,  # type: ignore[arg-type]
             limit,
             filter_,
         )
