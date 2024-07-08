@@ -211,7 +211,7 @@ class Implementation1v2API(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation1v2Fields | Sequence[Implementation1v2Fields] | None = None,
+        sort_by: Implementation1v2Fields | SequenceNotStr[Implementation1v2Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation1v2List:
@@ -265,7 +265,7 @@ class Implementation1v2API(
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

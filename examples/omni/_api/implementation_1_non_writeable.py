@@ -168,7 +168,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
+        sort_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation1NonWriteableList:
@@ -222,7 +222,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

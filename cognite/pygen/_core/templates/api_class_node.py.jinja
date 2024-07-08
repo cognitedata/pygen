@@ -198,7 +198,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        sort_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> {{ data_class.read_list_name }}:
@@ -238,7 +238,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         ){% endif %}

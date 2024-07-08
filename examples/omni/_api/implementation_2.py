@@ -201,7 +201,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation2Fields | Sequence[Implementation2Fields] | None = None,
+        sort_by: Implementation2Fields | SequenceNotStr[Implementation2Fields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> Implementation2List:
@@ -251,7 +251,7 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

@@ -248,7 +248,7 @@ class PrimitiveRequiredAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: PrimitiveRequiredFields | Sequence[PrimitiveRequiredFields] | None = None,
+        sort_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> PrimitiveRequiredList:
@@ -320,7 +320,7 @@ class PrimitiveRequiredAPI(
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

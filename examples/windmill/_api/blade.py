@@ -215,7 +215,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: BladeFields | Sequence[BladeFields] | None = None,
+        sort_by: BladeFields | SequenceNotStr[BladeFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> BladeList:
@@ -263,7 +263,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )

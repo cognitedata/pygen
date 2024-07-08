@@ -247,7 +247,7 @@ class ScenarioInstanceAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        sort_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> ScenarioInstanceList:
@@ -317,7 +317,7 @@ class ScenarioInstanceAPI(
             properties=properties,
             filter_=filter_,
             limit=limit,
-            sort_by=sort_by,
+            sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
         )
