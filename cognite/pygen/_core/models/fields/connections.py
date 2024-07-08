@@ -9,7 +9,11 @@ from functools import total_ordering
 from typing import TYPE_CHECKING, ClassVar, Literal
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.views import SingleEdgeConnection
+from cognite.client.data_classes.data_modeling.views import (
+    ReverseDirectRelation,
+    SingleEdgeConnection,
+    SingleReverseDirectRelation,
+)
 
 from .base import Field
 
@@ -108,6 +112,7 @@ class BaseConnectionField(Field, ABC):
     edge_direction: Literal["outwards", "inwards"]
     end_classes: list[DataClass] | None
     use_node_reference: bool
+    through: dm.PropertyId | None
 
     @property
     def data_class(self) -> DataClass:
@@ -119,7 +124,11 @@ class BaseConnectionField(Field, ABC):
 
     @property
     def is_direct_relation(self) -> bool:
-        return self.edge_type is None
+        return self.edge_type is None and self.through is None
+
+    @property
+    def is_reverse_direct_relation(self) -> bool:
+        return self.through is not None
 
     @property
     def is_edge(self) -> bool:
@@ -149,27 +158,32 @@ class BaseConnectionField(Field, ABC):
         variable: str,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
     ) -> Field | None:
-        if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty)):
+        if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
             return None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
         direction: Literal["outwards", "inwards"] = (
             prop.direction if isinstance(prop, dm.EdgeConnection) else "outwards"
         )
+        through = prop.through if isinstance(prop, ReverseDirectRelation) else None
         use_node_reference = True
         end_classes: list[DataClass] | None
         if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
             end_classes = [data_class_by_view_id[prop.edge_source]]
             use_node_reference = False
-        elif isinstance(prop, dm.EdgeConnection) or (isinstance(prop, dm.MappedProperty) and prop.source is not None):
+        elif isinstance(prop, dm.ConnectionDefinition) or (
+            isinstance(prop, dm.MappedProperty) and prop.source is not None
+        ):
             end_classes = [data_class_by_view_id[prop.source]]  # type: ignore[index]
         else:
             end_classes = None
+
         if cls._is_supported_one_to_many_connection(prop):
             return OneToManyConnectionField(
                 name=base.name,
                 doc_name=base.doc_name,
                 prop_name=base.prop_name,
                 pydantic_field=base.pydantic_field,
+                through=through,
                 variable=variable,
                 edge_type=edge_type,
                 edge_direction=direction,
@@ -184,6 +198,7 @@ class BaseConnectionField(Field, ABC):
                 prop_name=base.prop_name,
                 pydantic_field=base.pydantic_field,
                 edge_type=edge_type,
+                through=through,
                 edge_direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
@@ -200,6 +215,8 @@ class BaseConnectionField(Field, ABC):
             return True
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.type.is_list:
             return True
+        elif isinstance(prop, dm.MultiReverseDirectRelation):
+            return True
         return False
 
     @classmethod
@@ -207,6 +224,8 @@ class BaseConnectionField(Field, ABC):
         if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             return True
         elif isinstance(prop, SingleEdgeConnection) and prop.direction == "outwards" and not prop.edge_source:
+            return True
+        elif isinstance(prop, SingleReverseDirectRelation):
             return True
         return False
 

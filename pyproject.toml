@@ -33,7 +33,7 @@ ignore = [
     "RUF009", #Do not perform function call in defaults
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
 known-third-party = ["cognite.client"]
 
