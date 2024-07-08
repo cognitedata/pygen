@@ -57,16 +57,20 @@ class ConnectionItemEGraphQL(GraphQLCore):
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
-        direct_reverse_single: The direct reverse single field.
         direct_reverse_multi: The direct reverse multi field.
+        direct_reverse_single: The direct reverse single field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
     direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
-    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(default=None, alias="directReverseSingle")
-    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, alias="directReverseMulti")
+    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(
+        default=None, repr=False, alias="directReverseMulti"
+    )
+    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(
+        default=None, repr=False, alias="directReverseSingle"
+    )
     inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None
 
@@ -106,11 +110,11 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             direct_no_source=self.direct_no_source,
-            inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
-            direct_reverse_single=self.direct_reverse_single.as_read() if self.direct_reverse_single else None,
             direct_reverse_multi=[
                 direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi or []
             ],
+            direct_reverse_single=self.direct_reverse_single.as_read() if self.direct_reverse_single else None,
+            inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
 
