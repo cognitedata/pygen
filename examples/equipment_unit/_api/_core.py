@@ -505,19 +505,17 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
     def __iter__(self) -> Iterator[QueryStep]:
         return super().__iter__()
 
-    @overload  # type: ignore[override]
-    def __getitem__(self, item: int) -> QueryStep: ...
+    @overload
+    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
 
     @overload
     def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
 
-    def __getitem__(self, item: int | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
+    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
+        value = self.data[item]
         if isinstance(item, slice):
-            return type(self)(self.data[item])  # type: ignore[arg-type]
-        elif isinstance(item, int):
-            return self.data[item]
-        else:
-            raise TypeError(f"Expected int or slice, got {type(item)}")
+            return type(self)(value)  # type: ignore[arg-type]
+        return value
 
     def next_name(self, name: str) -> str:
         counter = Counter(self._clean_name(step.name) for step in self)

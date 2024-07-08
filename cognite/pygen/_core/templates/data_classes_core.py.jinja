@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import (
     Annotated,
     Callable,
+    cast,
     ClassVar,
     Generic,
     Optional,
@@ -17,6 +18,7 @@ from typing import (
     TypeVar,
     overload,
     Union,
+    SupportsIndex,
 )
 
 import pandas as pd
@@ -125,18 +127,16 @@ class GraphQLList(UserList):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> GraphQLCore: ...
+    def __getitem__(self, item: SupportsIndex) -> GraphQLCore: ...
 
     @overload
-    def __getitem__(self, item: slice) -> GraphQLCore: ...
+    def __getitem__(self, item: slice) -> GraphQLList: ...
 
-    def __getitem__(self, item: int | slice) -> GraphQLCore | GraphQLList:
+    def __getitem__(self, item: SupportsIndex | slice) -> GraphQLCore | GraphQLList:
+        value = self.data[item]
         if isinstance(item, slice):
-            return self.__class__(self.data[item])
-        elif isinstance(item, int):
-            return self.data[item]
-        else:
-            raise TypeError(f"Expected int or slice, got {type(item)}")
+            return type(self)(value)
+        return cast(GraphQLCore, value)
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
@@ -248,20 +248,18 @@ class _DataRecordListCore(UserList, Generic[T_DataRecord]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> T_DataRecord: ...
+    def __getitem__(self, item: SupportsIndex) -> T_DataRecord: ...
 
     @overload
     def __getitem__(
         self: type[_DataRecordListCore[T_DataRecord]], item: slice
-    ) -> type[_DataRecordListCore[T_DataRecord]]: ...
+    ) -> _DataRecordListCore[T_DataRecord]: ...
 
-    def __getitem__(self, item: int | slice) -> T_DataRecord | type[_DataRecordListCore[T_DataRecord]]:
+    def __getitem__(self, item: SupportsIndex | slice) -> T_DataRecord | _DataRecordListCore[T_DataRecord]:
+        value = self.data[item]
         if isinstance(item, slice):
-            return self.__class__(self.data[item])
-        elif isinstance(item, int):
-            return self.data[item]
-        else:
-            raise TypeError(f"Expected int or slice, got {type(item)}")
+            return type(self)(value)
+        return cast(T_DataRecord, value)
 
     def to_pandas(self) -> pd.DataFrame:
         """
@@ -370,18 +368,16 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> T_DomainModelCore: ...
+    def __getitem__(self, item: SupportsIndex) -> T_DomainModelCore: ...
 
     @overload
-    def __getitem__(self: type[T_DomainModelList], item: slice) -> T_DomainModelList: ...
+    def __getitem__(self, item: slice) -> T_DomainModelList: ...
 
-    def __getitem__(self, item: int | slice) -> T_DomainModelCore | T_DomainModelList:
+    def __getitem__(self, item: SupportsIndex | slice) -> T_DomainModelCore | T_DomainModelList:
+        value = self.data[item]
         if isinstance(item, slice):
-            return self.__class__(self.data[item])
-        elif isinstance(item, int):
-            return self.data[item]
-        else:
-            raise TypeError(f"Expected int or slice, got {type(item)}")
+            return type(self)(value)
+        return cast(T_DomainModelCore, value)
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.{% if is_pydantic_v2 %}model_dump{% else %}dict{% endif %}() for node in self.data]
