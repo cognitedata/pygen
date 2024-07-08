@@ -166,15 +166,15 @@ class PrimitiveRequiredListed(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    boolean: Optional[list[bool]] = None
-    date: Optional[list[datetime.date]] = None
-    float_32: Optional[list[float]] = Field(None, alias="float32")
-    float_64: Optional[list[float]] = Field(None, alias="float64")
-    int_32: Optional[list[int]] = Field(None, alias="int32")
-    int_64: Optional[list[int]] = Field(None, alias="int64")
-    json_: Optional[list[dict]] = Field(None, alias="json")
-    text: Optional[list[str]] = None
-    timestamp: Optional[list[datetime.datetime]] = None
+    boolean: list[bool]
+    date: list[datetime.date]
+    float_32: list[float] = Field(alias="float32")
+    float_64: list[float] = Field(alias="float64")
+    int_32: list[int] = Field(alias="int32")
+    int_64: list[int] = Field(alias="int64")
+    json_: list[dict] = Field(alias="json")
+    text: list[str]
+    timestamp: list[datetime.datetime]
 
     def as_write(self) -> PrimitiveRequiredListedWrite:
         """Convert this read version of primitive required listed to the writing version."""

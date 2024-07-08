@@ -140,13 +140,13 @@ class PrimitiveListField(BasePrimitiveField):
     variable: str
 
     def as_read_type_hint(self) -> str:
+        return self.as_write_type_hint()
+
+    def as_graphql_type_hint(self) -> str:
         if self.need_alias:
             return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
             return f"Optional[list[{self.type_as_string}]] = None"
-
-    def as_graphql_type_hint(self) -> str:
-        return self.as_read_type_hint()
 
     def as_write_type_hint(self) -> str:
         type_ = self.type_as_string
