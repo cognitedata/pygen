@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
