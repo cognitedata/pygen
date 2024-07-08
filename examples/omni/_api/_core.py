@@ -560,7 +560,6 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
     def is_finished(self):
         return all(expression.is_finished for expression in self)
 
-    @no_type_check
     def unpack(self) -> T_DomainModelList:
         nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
         edges_by_type_by_source_node: dict[tuple[str, str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
