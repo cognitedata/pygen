@@ -238,6 +238,12 @@ class MultiAPIGenerator:
                 seen.add(api.view.as_id())
                 yield api
 
+    @property
+    def topological_order(self) -> list[DataClass]:
+        """Return the topological order of the data classes."""
+        dependencies_by_dataclass = {api.data_class: api.data_class.implements for api in self.unique_apis}
+        return list(TopologicalSorter(dependencies_by_dataclass).static_order())
+
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
         return self.api_by_view_id[view_id]
 
@@ -383,6 +389,20 @@ class MultiAPIGenerator:
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
+            )
+            + "\n"
+        )
+
+    def generate_typed_classes_file(self, include: list[dm.ViewId] | None = None) -> str:
+        """Generate the typed classes file for the SDK.
+
+        Returns:
+            The generated typed classes file as a string.
+        """
+        typed_classes = self.env.get_template("typed_classes.py.jinja")
+        return (
+            typed_classes.render(
+                classes=[d for d in self.topological_order if include is None or d.view_id in include],
             )
             + "\n"
         )
