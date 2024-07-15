@@ -319,7 +319,7 @@ class CSVLoader:
             client: Connected CogniteClient
 
         """
-        self._clean_cdf_resource(client.time_series, TimeSeries) # type: ignore[arg-type]
+        self._clean_cdf_resource(client.time_series, TimeSeries)  # type: ignore[arg-type]
 
     def clean_files(self, client: CogniteClient) -> None:
         """
