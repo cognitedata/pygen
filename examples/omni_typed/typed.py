@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date, datetime
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId
@@ -64,6 +65,7 @@ class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNo
             self.type,
         )
 
+
 class DependentOnNonWritableProperties:
     a_value = PropertyOptions("aValue")
 
@@ -108,6 +110,7 @@ class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
             self.version,
             self.type,
         )
+
 
 class PrimitiveNullableProperties:
     float_32 = PropertyOptions("float32")
@@ -198,6 +201,7 @@ class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
             self.type,
         )
 
+
 class PrimitiveRequiredListedProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
@@ -287,6 +291,7 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
             self.type,
         )
 
+
 class Implementation1Properties:
     main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
@@ -303,18 +308,18 @@ class Implementation1Apply(Implementation1Properties, TypedNodeApply):
         self,
         space: str,
         external_id: str,
+        value_2: str,
         main_value: str | None = None,
         sub_value: str | None = None,
         value_1: str | None = None,
-        value_2: str,
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
         super().__init__(space, external_id, existing_version, None, type)
+        self.value_2 = value_2
         self.main_value = main_value
         self.sub_value = sub_value
         self.value_1 = value_1
-        self.value_2 = value_2
 
 
 class Implementation1(Implementation1Properties, TypedNode):
@@ -325,18 +330,18 @@ class Implementation1(Implementation1Properties, TypedNode):
         version: int,
         last_updated_time: int,
         created_time: int,
+        value_2: str,
         main_value: str | None = None,
         sub_value: str | None = None,
         value_1: str | None = None,
-        value_2: str,
         type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        self.value_2 = value_2
         self.main_value = main_value
         self.sub_value = sub_value
         self.value_1 = value_1
-        self.value_2 = value_2
 
     def as_write(self) -> Implementation1Apply:
         return Implementation1Apply(
@@ -349,6 +354,7 @@ class Implementation1(Implementation1Properties, TypedNode):
             self.version,
             self.type,
         )
+
 
 class Implementation2Properties:
     main_value = PropertyOptions("mainValue")
