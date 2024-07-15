@@ -393,7 +393,7 @@ class MultiAPIGenerator:
             + "\n"
         )
 
-    def generate_typed_classes_file(self, include: list[dm.ViewId] | None = None) -> str:
+    def generate_typed_classes_file(self, include: set[dm.ViewId] | None = None) -> str:
         """Generate the typed classes file for the SDK.
 
         Returns:

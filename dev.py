@@ -46,6 +46,8 @@ def generate_sdks(
     for example_sdk in EXAMPLE_SDKS:
         if not example_sdk.generate_sdk:
             continue
+        if example_sdk.is_typed:
+            raise NotImplementedError()
         if sdk_name is not None and not example_sdk.client_name.casefold().startswith(sdk_name.casefold()):
             continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
