@@ -181,7 +181,7 @@ class CSVLoader:
         Returns:
             A list of TimeSeries created in CDF.
         """
-        return self._populate_cdf_resource(client.time_series, TimeSeries, TimeSeriesList)
+        return self._populate_cdf_resource(client.time_series, TimeSeries, TimeSeriesList)  # type: ignore[arg-type]
 
     def populate_files(self, client: CogniteClient) -> FileMetadataList:
         """
@@ -319,7 +319,7 @@ class CSVLoader:
             client: Connected CogniteClient
 
         """
-        self._clean_cdf_resource(client.time_series, TimeSeries)
+        self._clean_cdf_resource(client.time_series, TimeSeries) # type: ignore[arg-type]
 
     def clean_files(self, client: CogniteClient) -> None:
         """
