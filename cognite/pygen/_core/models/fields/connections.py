@@ -297,6 +297,11 @@ class OneToManyConnectionField(BaseConnectionField):
                 for { self.variable } in self.{ self.name } or []
             ]"""
 
+    def as_typed_hint(self) -> str:
+        if self.is_direct_relation:
+            return "list[DirectRelationReference | tuple[str, str]] | None = None"
+        raise NotImplementedError("as_typed_hint is not implemented for edge fields")
+
 
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
@@ -315,3 +320,8 @@ class OneToOneConnectionField(BaseConnectionField):
                 "space":  self.space if isinstance(self.{ self.name }, str) else self.{ self.name }.space,
                 "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
             }}"""
+
+    def as_typed_hint(self) -> str:
+        if self.is_direct_relation:
+            return "DirectRelationReference | tuple[str, str] | None = None"
+        raise NotImplementedError("as_typed_hint is not implemented for edge fields")
