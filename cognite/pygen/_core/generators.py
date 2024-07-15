@@ -403,9 +403,24 @@ class MultiAPIGenerator:
             The generated typed classes file as a string.
         """
         typed_classes = self.env.get_template("typed_classes.py.jinja")
+        classes = [d for d in self.topological_order if include is None or d.view_id in include]
+        datetime_import: str | None = None
+        relevant_fields = {
+            {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
+            for cls_ in classes
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, (dm.Timestamp, dm.Date))
+        }
+        if relevant_fields:
+            datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
+
         return (
             typed_classes.render(
-                classes=[d for d in self.topological_order if include is None or d.view_id in include],
+                classes=classes,
+                has_node_cls=any(isinstance(cls, NodeDataClass) for cls in classes),
+                has_edge_cls=any(isinstance(cls, EdgeDataClass) for cls in classes),
+                datetime_import=datetime_import,
+                has_datetime_import=bool(datetime_import),
             )
             + "\n"
         )

@@ -1,20 +1,20 @@
 from __future__ import annotations
-
-from datetime import datetime
+{% if datime_import %}
+{{ datetime_import }}{% endif %}
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId
 from cognite.client.data_classes.data_modeling.typed_instances import (
-    PropertyOptions,
+    PropertyOptions,{% if has_edge_cls %}
     TypedEdge,
-    TypedEdgeApply,
+    TypedEdgeApply,{% endif %}{% if has_node_cls %}
     TypedNode,
-    TypedNodeApply,
+    TypedNodeApply,{% endif %}
 )
 
 {% for cls in classes %}{% if cls.has_container_fields %}
-class {{ cls.read_name }}Properties:{{ for field in cls.container_fields }}{% if field.name != field.prop_name %}
-    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endfor %}
+class {{ cls.read_name }}Properties:{%  for field in cls.container_fields %}{% if field.name != field.prop_name %}
+    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}
 
     @classmethod
     def get_source(cls) -> ViewId:
