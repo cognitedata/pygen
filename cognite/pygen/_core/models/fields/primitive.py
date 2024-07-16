@@ -46,12 +46,10 @@ class BasePrimitiveField(Field, ABC):
 
     def as_typed_hint(self) -> str:
         type_ = _to_python_type(self.type_, typed=True)
-        if self.is_nullable:
-            type_ = f"{type_} | None"
         if self.type_.is_list:
             type_ = f"list[{type_}]"
         if self.is_nullable:
-            type_ = f"{type_} = None"
+            type_ = f"{type_} | None = None"
         return type_
 
     @classmethod
