@@ -6,14 +6,10 @@ from _pytest.mark import ParameterSet
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import TypedNode, TypedNodeApply
+from omni_typed import typed
 
 from cognite.pygen.utils import MockGenerator
-from tests.constants import IS_PYDANTIC_V2, OMNI_TYPED
-
-if IS_PYDANTIC_V2:
-    from omni_typed import typed
-else:
-    raise NotImplementedError("Only Pydantic v2 is supported")
+from tests.constants import OMNI_TYPED
 
 
 def omni_typed_view_ids() -> Iterable[ParameterSet]:
