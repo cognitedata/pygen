@@ -187,14 +187,14 @@ class DataClass:
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
         else:
-            return "TypedNode" if isinstance(self, NodeDataClass) else "TypedEdge"
+            return "TypedEdge" if isinstance(self, EdgeDataClass) else "TypedNode"
 
     @property
     def typed_write_bases_classes(self) -> str:
         if self.implements:
             return ", ".join(f"{interface.read_name}Apply" for interface in self.implements)
         else:
-            return "TypedNodeApply" if isinstance(self, NodeDataClass) else "TypedEdgeApply"
+            return "TypedEdgeApply" if isinstance(self, EdgeDataClass) else "TypedNodeApply"
 
     @property
     def text_field_names(self) -> str:
