@@ -13,7 +13,7 @@ from cognite.client.data_classes.data_modeling.typed_instances import (
 )
 
 {% for cls in classes %}{% if cls.has_container_fields %}
-class {{ cls.read_name }}Properties:{%  for field in cls.container_fields %}{% if field.name != field.prop_name %}
+class {{ cls.read_name }}Properties:{%  for field in cls.container_fields_sorted %}{% if field.name != field.prop_name %}
     {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}
 
     @classmethod
@@ -25,12 +25,12 @@ class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, TypedNodeApply):
     def __init__(
         self,
         space: str,
-        external_id: str,{% for field in cls.container_fields %}
+        external_id: str,{% for field in cls.container_fields_sorted %}
         {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type){% for field in cls.container_fields %}
+        super().__init__(space, external_id, existing_version, None, type){% for field in cls.container_fields_sorted %}
         self.{{field.name}} = {{field.name}}{% endfor %}
 
 
@@ -41,18 +41,18 @@ class {{ cls.read_name }}({{ cls.read_name }}Properties, TypedNode):
         external_id: str,
         version: int,
         last_updated_time: int,
-        created_time: int,{% for field in cls.container_fields %}
+        created_time: int,{% for field in cls.container_fields_sorted %}
         {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
         type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type){% for field in cls.container_fields %}
+        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type){% for field in cls.container_fields_sorted %}
         self.{{field.name}} = {{field.name}}{% endfor %}
 
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
             self.space,
-            self.external_id,{% for field in cls.container_fields %}
+            self.external_id,{% for field in cls.container_fields_sorted %}
             self.{{field.name}},{% endfor %}
             self.version,
             self.type,

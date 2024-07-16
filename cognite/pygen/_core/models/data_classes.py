@@ -320,6 +320,13 @@ class DataClass:
         )
 
     @property
+    def container_fields_sorted(self) -> list[Field]:
+        return sorted(
+            self.container_fields,
+            key=lambda x: {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1,
+        )
+
+    @property
     def has_container_fields(self) -> bool:
         """Check if the data class has any container fields."""
         return any(self.container_fields)

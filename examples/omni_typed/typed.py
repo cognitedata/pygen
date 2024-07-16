@@ -293,10 +293,10 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
 
 
 class Implementation1Properties:
+    value_2 = PropertyOptions("value2")
     main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
     value_1 = PropertyOptions("value1")
-    value_2 = PropertyOptions("value2")
 
     @classmethod
     def get_source(cls) -> ViewId:
@@ -347,10 +347,10 @@ class Implementation1(Implementation1Properties, TypedNode):
         return Implementation1Apply(
             self.space,
             self.external_id,
+            self.value_2,
             self.main_value,
             self.sub_value,
             self.value_1,
-            self.value_2,
             self.version,
             self.type,
         )
