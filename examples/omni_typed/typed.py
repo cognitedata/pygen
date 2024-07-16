@@ -339,7 +339,6 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
 
 
 class SubInterfaceProperties:
-    main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
 
     @classmethod
@@ -357,8 +356,7 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
-        self.main_value = main_value
+        super().__init__(space, external_id, main_value, existing_version, type),
         self.sub_value = sub_value
 
 
@@ -375,8 +373,7 @@ class SubInterface(SubInterfaceProperties, MainInterface):
         type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
-        self.main_value = main_value
+        super().__init__(space, external_id, version, last_updated_time, created_time, main_value, type, deleted_time)
         self.sub_value = sub_value
 
     def as_write(self) -> SubInterfaceApply:
@@ -392,8 +389,6 @@ class SubInterface(SubInterfaceProperties, MainInterface):
 
 class Implementation1Properties:
     value_2 = PropertyOptions("value2")
-    main_value = PropertyOptions("mainValue")
-    sub_value = PropertyOptions("subValue")
     value_1 = PropertyOptions("value1")
 
     @classmethod
@@ -413,10 +408,8 @@ class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        super().__init__(space, external_id, main_value, sub_value, existing_version, type)
         self.value_2 = value_2
-        self.main_value = main_value
-        self.sub_value = sub_value
         self.value_1 = value_1
 
 
@@ -435,10 +428,19 @@ class Implementation1(Implementation1Properties, SubInterface):
         type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        super().__init__(
+            space,
+            external_id,
+            version,
+            last_updated_time,
+            created_time,
+            main_value,
+            sub_value,
+            deleted_time,
+            None,
+            type,
+        )
         self.value_2 = value_2
-        self.main_value = main_value
-        self.sub_value = sub_value
         self.value_1 = value_1
 
     def as_write(self) -> Implementation1Apply:
@@ -455,9 +457,6 @@ class Implementation1(Implementation1Properties, SubInterface):
 
 
 class Implementation2Properties:
-    main_value = PropertyOptions("mainValue")
-    sub_value = PropertyOptions("subValue")
-
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("pygen-models", "Implementation2", "1")
@@ -473,9 +472,7 @@ class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
-        self.main_value = main_value
-        self.sub_value = sub_value
+        super().__init__(space, external_id, main_value, sub_value, existing_version, type)
 
 
 class Implementation2(Implementation2Properties, SubInterface):
@@ -491,9 +488,9 @@ class Implementation2(Implementation2Properties, SubInterface):
         type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
-        self.main_value = main_value
-        self.sub_value = sub_value
+        super().__init__(
+            space, external_id, version, last_updated_time, created_time, main_value, sub_value, type, deleted_time
+        )
 
     def as_write(self) -> Implementation2Apply:
         return Implementation2Apply(
