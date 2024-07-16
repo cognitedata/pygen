@@ -333,12 +333,22 @@ class DataClass:
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
         )
 
-    @property
-    def container_fields_sorted(self) -> list[Field]:
-        return sorted(
-            self.container_fields,
-            key=lambda x: {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1,
-        )
+    def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
+        def key(x: Field) -> int:
+            return {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1
+
+        if include == "all":
+            return sorted(self.container_fields, key=key)
+        elif include == "only-self":
+            parent_fields = {field for parent in self.implements for field in parent.container_fields}
+            return sorted([f for f in self.container_fields if f not in parent_fields], key=key)
+        elif isinstance(include, DataClass):
+            fields_by_parent = {parent.read_name: set(parent.container_fields_sorted()) for parent in self.implements}
+            if include.read_name not in fields_by_parent:
+                raise ValueError(f"Data class {include.read_name} is not a parent of {self.read_name}")
+            return sorted(fields_by_parent[include.read_name], key=key)
+        else:
+            raise TypeError(f"Invalid value for include: {include}")
 
     @property
     def has_container_fields(self) -> bool:
@@ -397,6 +407,15 @@ class DataClass:
     @property
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
+
+    @property
+    def container_field_variables(self) -> str:
+        return ", ".join(
+            field_.name
+            for field_ in self
+            if isinstance(field_, BasePrimitiveField)
+            or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
+        )
 
     @property
     def filter_name(self) -> str:

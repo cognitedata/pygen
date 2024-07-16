@@ -421,6 +421,7 @@ class MultiAPIGenerator:
                 has_edge_cls=any(isinstance(cls, EdgeDataClass) for cls in classes),
                 datetime_import=datetime_import,
                 has_datetime_import=bool(datetime_import),
+                len=len,
             )
             + "\n"
         )
