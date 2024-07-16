@@ -21,7 +21,7 @@ class {{ cls.read_name }}Properties:{%  for field in cls.container_fields_sorted
         return ViewId("{{ cls.view_id.space }}", "{{ cls.view_id.external_id }}", "{{ cls.view_id.version }}")
 
 
-class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, TypedNodeApply):
+class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, {{ cls.typed_write_bases_classes }}):
     def __init__(
         self,
         space: str,
@@ -34,7 +34,7 @@ class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, TypedNodeApply):
         self.{{field.name}} = {{field.name}}{% endfor %}
 
 
-class {{ cls.read_name }}({{ cls.read_name }}Properties, TypedNode):
+class {{ cls.read_name }}({{ cls.read_name }}Properties, {{ cls.typed_read_bases_classes }}):
     def __init__(
         self,
         space: str,

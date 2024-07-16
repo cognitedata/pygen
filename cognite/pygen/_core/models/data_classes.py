@@ -183,6 +183,20 @@ class DataClass:
             return "DomainModelWrite"
 
     @property
+    def typed_read_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}" for interface in self.implements)
+        else:
+            return "TypedNode" if isinstance(self, NodeDataClass) else "TypedEdge"
+
+    @property
+    def typed_write_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}Apply" for interface in self.implements)
+        else:
+            return "TypedNodeApply" if isinstance(self, NodeDataClass) else "TypedEdgeApply"
+
+    @property
     def text_field_names(self) -> str:
         return f"{self.read_name}TextFields"
 

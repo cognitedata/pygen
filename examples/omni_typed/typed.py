@@ -112,6 +112,52 @@ class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
         )
 
 
+class MainInterfaceProperties:
+    main_value = PropertyOptions("mainValue")
+
+    @classmethod
+    def get_source(cls) -> ViewId:
+        return ViewId("pygen-models", "MainInterface", "1")
+
+
+class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        main_value: str | None = None,
+        existing_version: int | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+    ) -> None:
+        super().__init__(space, external_id, existing_version, None, type)
+        self.main_value = main_value
+
+
+class MainInterface(MainInterfaceProperties, TypedNode):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        version: int,
+        last_updated_time: int,
+        created_time: int,
+        main_value: str | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+        deleted_time: int | None = None,
+    ) -> None:
+        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        self.main_value = main_value
+
+    def as_write(self) -> MainInterfaceApply:
+        return MainInterfaceApply(
+            self.space,
+            self.external_id,
+            self.main_value,
+            self.version,
+            self.type,
+        )
+
+
 class PrimitiveNullableProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
@@ -292,6 +338,58 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
         )
 
 
+class SubInterfaceProperties:
+    main_value = PropertyOptions("mainValue")
+    sub_value = PropertyOptions("subValue")
+
+    @classmethod
+    def get_source(cls) -> ViewId:
+        return ViewId("pygen-models", "SubInterface", "1")
+
+
+class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        existing_version: int | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+    ) -> None:
+        super().__init__(space, external_id, existing_version, None, type)
+        self.main_value = main_value
+        self.sub_value = sub_value
+
+
+class SubInterface(SubInterfaceProperties, MainInterface):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        version: int,
+        last_updated_time: int,
+        created_time: int,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+        deleted_time: int | None = None,
+    ) -> None:
+        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        self.main_value = main_value
+        self.sub_value = sub_value
+
+    def as_write(self) -> SubInterfaceApply:
+        return SubInterfaceApply(
+            self.space,
+            self.external_id,
+            self.main_value,
+            self.sub_value,
+            self.version,
+            self.type,
+        )
+
+
 class Implementation1Properties:
     value_2 = PropertyOptions("value2")
     main_value = PropertyOptions("mainValue")
@@ -303,7 +401,7 @@ class Implementation1Properties:
         return ViewId("pygen-models", "Implementation1", "1")
 
 
-class Implementation1Apply(Implementation1Properties, TypedNodeApply):
+class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
     def __init__(
         self,
         space: str,
@@ -322,7 +420,7 @@ class Implementation1Apply(Implementation1Properties, TypedNodeApply):
         self.value_1 = value_1
 
 
-class Implementation1(Implementation1Properties, TypedNode):
+class Implementation1(Implementation1Properties, SubInterface):
     def __init__(
         self,
         space: str,
@@ -365,7 +463,7 @@ class Implementation2Properties:
         return ViewId("pygen-models", "Implementation2", "1")
 
 
-class Implementation2Apply(Implementation2Properties, TypedNodeApply):
+class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
     def __init__(
         self,
         space: str,
@@ -380,7 +478,7 @@ class Implementation2Apply(Implementation2Properties, TypedNodeApply):
         self.sub_value = sub_value
 
 
-class Implementation2(Implementation2Properties, TypedNode):
+class Implementation2(Implementation2Properties, SubInterface):
     def __init__(
         self,
         space: str,
