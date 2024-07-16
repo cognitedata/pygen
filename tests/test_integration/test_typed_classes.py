@@ -1,3 +1,6 @@
+import inspect
+from collections.abc import Iterable
+
 import pytest
 from _pytest.mark import ParameterSet
 from cognite.client import CogniteClient
@@ -13,20 +16,34 @@ else:
     raise NotImplementedError("Only Pydantic v2 is supported")
 
 
-def omni_typed_view_ids() -> list[ParameterSet]:
+def omni_typed_view_ids() -> Iterable[ParameterSet]:
     for view in OMNI_TYPED.load_data_model().views:
-        yield pytest.param(view, id=view.external_id)
+        if view.external_id in OMNI_TYPED.typed_classes:
+            if view.external_id == "SubInterface":
+                # Due to the view filter on the SubInterface view, we cannot retrieve nodes
+                # written to it.
+                continue
+            yield pytest.param(view, id=view.external_id)
 
 
 @pytest.fixture(scope="session")
 def typed_classe_by_view_id() -> dict[dm.ViewId, tuple[type[TypedNodeApply], type[TypedNode]]]:
+    write_cls_by_id: dict[dm.ViewId, type[TypedNodeApply]] = {}
+    read_cls_by_id: dict[dm.ViewId, type[TypedNode]] = {}
+    for name, cls_ in vars(typed).items():
+        if name.startswith("_") or not inspect.isclass(cls_):
+            continue
+        if issubclass(cls_, TypedNodeApply) and cls_ is not TypedNodeApply:
+            write_cls_by_id[cls_.get_source()] = cls_
+        elif issubclass(cls_, TypedNode) and cls_ is not TypedNode:
+            read_cls_by_id[cls_.get_source()] = cls_
     output: dict[dm.ViewId, tuple[type[TypedNodeApply], type[TypedNode]]] = {}
-    for _ in vars(typed):
-        ...
+    for view_id in set(write_cls_by_id.keys()) & set(read_cls_by_id.keys()):
+        output[view_id] = write_cls_by_id[view_id], read_cls_by_id[view_id]
     return output
 
 
-class TestCRUDOperations:
+class TestTypedClasses:
     @pytest.mark.parametrize("view", omni_typed_view_ids())
     def test_create_retrieve_delete(
         self,
@@ -52,7 +69,7 @@ class TestCRUDOperations:
             assert len(retrieved) == 2
             assert set(retrieved.as_ids()) == set(node_ids)
 
-            cognite_client.data_modeling.instances.delete(node_ids, space=omni_tmp_space.space)
+            cognite_client.data_modeling.instances.delete(node_ids)
 
             retrieved_after_delete = cognite_client.data_modeling.instances.retrieve_nodes(node_ids, node_cls=read_cls)
             assert len(retrieved_after_delete) == 0

@@ -182,7 +182,7 @@ OMNI_SDK = ExampleSDK(
 )
 
 OMNI_TYPED = ExampleSDK(
-    data_model_ids=[DataModelId("pygen-models", "OmniTyped", "1")],
+    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
     _top_level_package="omni_typed",
     client_name="DoesNotMatter",
     _instance_space="omni-instances",

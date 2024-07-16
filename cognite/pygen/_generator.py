@@ -426,3 +426,47 @@ def write_sdk_to_disk(
         # Encoding and newline are set to ensure consistent file writing across platforms
         with path.open("w", encoding="utf-8", newline="\n") as f:
             f.write(file_content)
+
+
+@overload
+def generate_typed(model_id: DataModel, output_file: Path, client: Optional[CogniteClient]) -> str: ...
+
+
+@overload
+def generate_typed(model_id: DataModel, output_file: None, client: Optional[CogniteClient]) -> None: ...
+
+
+def generate_typed(
+    model_id: DataModel,
+    output_file: Optional[Path] = None,
+    client: Optional[CogniteClient] = None,
+) -> str | None:
+    """Generates typed classes for all views in the given data model.
+
+    Args:
+        model_id: The ID of the data model to generate typed classes for.
+        output_file: The file to write the typed classes to. If None, the typed classes will be returned as a string.
+        client: The client to use for fetching the data model. Required if model_id is a DataModelId.
+
+    Returns:
+        If output_file is None, the typed classes as a string. Otherwise, None.
+
+    """
+    data_model = _get_data_model(model_id, client, print)
+    generator = SDKGenerator(
+        "cognite.pygen.typed",
+        "Typed",
+        data_model,
+        None,
+        "infer",
+        print,
+        PygenConfig(),
+    )
+    typed_classes = generator._multi_api_generator.generate_typed_classes_file()
+
+    if output_file is None:
+        return typed_classes
+
+    with output_file.open("w", encoding="utf-8", newline="\n") as f:
+        f.write(typed_classes)
+    return None
