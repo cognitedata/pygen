@@ -241,10 +241,13 @@ class MultiAPIGenerator:
     @property
     def topological_order(self) -> list[DataClass]:
         """Return the topological order of the data classes."""
-        dataclass_by_read_name = {api.data_class.read_name: api.data_class for api in self.unique_apis}
+        # Sorted by read name to ensure deterministic order
+        sorted_data_classes = sorted([api.data_class for api in self.unique_apis], key=lambda d: d.read_name)
+        dataclass_by_read_name = {data_class.read_name: data_class for data_class in sorted_data_classes}
         dependencies_by_dataclass = {
-            api.data_class.read_name: {p.read_name for p in api.data_class.implements} for api in self.unique_apis
+            data_class.read_name: {p.read_name for p in data_class.implements} for data_class in sorted_data_classes
         }
+        # TopologicalSorter is stable, so we can rely on the sorted data classes to be in the deterministic order
         return [dataclass_by_read_name[name] for name in TopologicalSorter(dependencies_by_dataclass).static_order()]
 
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
