@@ -23,7 +23,7 @@ from cognite.client.data_classes import (
 from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
+from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
@@ -46,14 +46,18 @@ def generate_sdks(
     for example_sdk in EXAMPLE_SDKS:
         if not example_sdk.generate_sdk:
             continue
-        if example_sdk.is_typed:
-            raise NotImplementedError()
         if sdk_name is not None and not example_sdk.client_name.casefold().startswith(sdk_name.casefold()):
             continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
         data_models = example_sdk.load_data_models()
         if len(data_models) == 1:
             data_models = data_models[0]
+
+        if example_sdk.is_typed:
+            output_file = example_sdk.client_dir / "typed.py"
+            generate_typed(data_models, output_file)
+            continue
+
         sdk_generator = SDKGenerator(
             example_sdk.top_level_package,
             example_sdk.client_name,
