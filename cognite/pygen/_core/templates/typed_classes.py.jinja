@@ -32,7 +32,7 @@ class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, {{ cls.typed_write
     ) -> None:{% if len(cls.implements) == 0 %}
         super().__init__(space, external_id, existing_version, None, type){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id,{{ cls.implements[0].container_field_variables }}, existing_version, type){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}Apply.__init__(space, external_id, {{ parent.container_field_variables }} existing_version, type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
+        {{ parent.read_name }}Apply.__init__(space, external_id, {{ parent.container_field_variables }}, existing_version, type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
         self.{{field.name}} = {{field.name}}{% endfor %}
 
 

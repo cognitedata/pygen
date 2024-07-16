@@ -80,7 +80,7 @@ class Field:
             return BaseConnectionField.load(base, prop, variable, data_class_by_view_id)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
-        elif isinstance(prop, dm.MappedProperty):
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.PropertyType):
             return BasePrimitiveField.load(base, prop, variable)
         else:
             warnings.warn(
