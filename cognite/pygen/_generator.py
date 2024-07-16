@@ -430,13 +430,21 @@ def write_sdk_to_disk(
 
 @overload
 def generate_typed(
-    model_id: DataModel, output_file: Path, client: Optional[CogniteClient] = None, format_code: bool = True
+    model_id: DataModel,
+    output_file: Path,
+    client: Optional[CogniteClient] = None,
+    format_code: bool = True,
+    include_views: set[dm.ViewId] | None = None,
 ) -> str: ...
 
 
 @overload
 def generate_typed(
-    model_id: DataModel, output_file: None, client: Optional[CogniteClient] = None, format_code: bool = True
+    model_id: DataModel,
+    output_file: None,
+    client: Optional[CogniteClient] = None,
+    format_code: bool = True,
+    include_views: set[dm.ViewId] | None = None,
 ) -> None: ...
 
 
@@ -445,6 +453,7 @@ def generate_typed(
     output_file: Optional[Path] = None,
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
+    include_views: set[dm.ViewId] | None = None,
 ) -> str | None:
     """Generates typed classes for all views in the given data model.
 
@@ -453,6 +462,7 @@ def generate_typed(
         output_file: The file to write the typed classes to. If None, the typed classes will be returned as a string.
         client: The client to use for fetching the data model. Required if model_id is a DataModelId.
         format_code: Whether to format the generated code using black.
+        include_views: A set of view IDs to include in the typed classes. If None, all views are included.
 
     Returns:
         If output_file is None, the typed classes as a string. Otherwise, None.
@@ -468,7 +478,7 @@ def generate_typed(
         print,
         PygenConfig(),
     )
-    typed_classes = generator._multi_api_generator.generate_typed_classes_file()
+    typed_classes = generator._multi_api_generator.generate_typed_classes_file(include_views)
 
     if format_code:
         formatter = CodeFormatter(format_code, print)

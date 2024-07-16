@@ -96,6 +96,9 @@ class Core(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
         return self.model_dump(by_alias=by_alias)
 
 
+T_Core = TypeVar("T_Core", bound=Core)
+
+
 class DataRecordGraphQL(Core):
     last_updated_time: Optional[datetime.datetime] = Field(None, alias="lastUpdatedTime")
     created_time: Optional[datetime.datetime] = Field(None, alias="createdTime")
@@ -346,28 +349,28 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
 
 
-class CoreList(UserList, Generic[T_DomainModelCore]):
-    _INSTANCE: type[T_DomainModelCore]
-    _PARENT_CLASS: type[DomainModelCore]
+class CoreList(UserList, Generic[T_Core]):
+    _INSTANCE: type[T_Core]
+    _PARENT_CLASS: type[Core]
 
-    def __init__(self, nodes: Collection[T_DomainModelCore] | None = None):
+    def __init__(self, nodes: Collection[T_Core] | None = None):
         super().__init__(nodes or [])
 
     # The dunder implementations are to get proper type hints
-    def __iter__(self) -> Iterator[T_DomainModelCore]:
+    def __iter__(self) -> Iterator[T_Core]:
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: SupportsIndex) -> T_DomainModelCore: ...
+    def __getitem__(self, item: SupportsIndex) -> T_Core: ...
 
     @overload
     def __getitem__(self, item: slice) -> Self: ...
 
-    def __getitem__(self, item: SupportsIndex | slice) -> T_DomainModelCore | Self:
+    def __getitem__(self, item: SupportsIndex | slice) -> T_Core | Self:
         value = self.data[item]
         if isinstance(item, slice):
             return type(self)(value)
-        return cast(T_DomainModelCore, value)
+        return cast(T_Core, value)
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
@@ -398,7 +401,7 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
-class DomainModelList(CoreList[T_DomainModelCore]):
+class DomainModelList(CoreList[T_DomainModel]):
     _PARENT_CLASS = DomainModel
 
     @property
@@ -488,7 +491,7 @@ def default_edge_external_id_factory(
     return f"{start}:{end}"
 
 
-class DomainRelationWrite(BaseModel, extra="forbid", populate_by_name=True):
+class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
     external_id_factory: ClassVar[
         Callable[
             [
@@ -607,7 +610,7 @@ class DomainRelationList(CoreList[T_DomainRelation]):
 
 
 class DomainRelationWriteList(CoreList[T_DomainRelationWrite]):
-    _PARENT_CLASS = DomainModelWrite
+    _PARENT_CLASS = DomainRelationWrite
 
     @property
     def data_records(self) -> DataRecordWriteList:
