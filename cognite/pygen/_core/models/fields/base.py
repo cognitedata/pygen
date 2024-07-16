@@ -97,6 +97,9 @@ class Field:
     def as_graphql_type_hint(self) -> str:
         raise NotImplementedError()
 
+    def as_typed_hint(self) -> str:
+        raise NotImplementedError()
+
     def as_write(self) -> str:
         """Used in the .as_write() method for the read version of the data class."""
         raise NotImplementedError

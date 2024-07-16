@@ -1,0 +1,64 @@
+from __future__ import annotations
+{% if has_datetime_import %}
+{{ datetime_import }}{% endif %}
+
+from cognite.client.data_classes.data_modeling import DirectRelationReference
+from cognite.client.data_classes.data_modeling.ids import ViewId
+from cognite.client.data_classes.data_modeling.typed_instances import (
+    PropertyOptions,{% if has_edge_cls %}
+    TypedEdge,
+    TypedEdgeApply,{% endif %}{% if has_node_cls %}
+    TypedNode,
+    TypedNodeApply,{% endif %}
+)
+
+{% for cls in classes %}{% if cls.has_container_fields %}
+class {{ cls.read_name }}Properties:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
+    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
+{% endif %}
+    @classmethod
+    def get_source(cls) -> ViewId:
+        return ViewId("{{ cls.view_id.space }}", "{{ cls.view_id.external_id }}", "{{ cls.view_id.version }}")
+
+
+class {{ cls.read_name }}Apply({{ cls.read_name }}Properties, {{ cls.typed_write_bases_classes }}):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,{% for field in cls.container_fields_sorted() %}
+        {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
+        existing_version: int | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+    ) -> None:{% if len(cls.implements) == 0 %}
+        super().__init__(space, external_id, existing_version, None, type){% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id,{{ cls.implements[0].container_field_variables }}, existing_version, type){% else %}{% for parent in cls.implements %}
+        {{ parent.read_name }}Apply.__init__(space, external_id, {{ parent.container_field_variables }} existing_version, type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
+        self.{{field.name}} = {{field.name}}{% endfor %}
+
+
+class {{ cls.read_name }}({{ cls.read_name }}Properties, {{ cls.typed_read_bases_classes }}):
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        version: int,
+        last_updated_time: int,
+        created_time: int,{% for field in cls.container_fields_sorted() %}
+        {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
+        type: DirectRelationReference | tuple[str, str] | None = None,
+        deleted_time: int | None = None,
+    ) -> None:{% if len(cls.implements) == 0 %}
+        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type){% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, type, deleted_time){% else %}{% for parent in cls.implements %}
+        {{ parent.read_name }}.__init__(space, external_id, version, last_updated_time, created_time, {{ parent.container_field_variables }}, type, deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
+        self.{{field.name}} = {{field.name}}{% endfor %}
+
+    def as_write(self) -> {{ cls.read_name }}Apply:
+        return {{ cls.read_name }}Apply(
+            self.space,
+            self.external_id,{% for field in cls.container_fields_sorted() %}
+            self.{{field.name}},{% endfor %}
+            self.version,
+            self.type,
+        )
+{% endif %}{% endfor %}

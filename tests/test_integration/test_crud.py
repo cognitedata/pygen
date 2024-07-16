@@ -44,16 +44,6 @@ class DomainAPI(Protocol):
     def list(self, limit: int = 25, **kwargs) -> Sequence: ...
 
 
-@pytest.fixture
-def omni_tmp_space(cognite_client: CogniteClient) -> dm.Space:
-    space = dm.SpaceApply(space="sp_omni_test_tmp", description="Temporary space for omni integration tests")
-    retrieved = cognite_client.data_modeling.spaces.retrieve(space.space)
-    if retrieved:
-        return retrieved
-    created = cognite_client.data_modeling.spaces.apply(space)
-    return created
-
-
 class TestCRUDOperations:
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
     def test_create_retrieve_delete(

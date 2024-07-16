@@ -33,6 +33,8 @@ class ExampleSDK:
     generate_sdk: bool
     download_nodes: bool = False
     _instance_space: str | None = None
+    is_typed: bool = False
+    typed_classes: set[str] = field(default_factory=set)
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
@@ -177,6 +179,28 @@ OMNI_SDK = ExampleSDK(
     generate_sdk=True,
     _instance_space="omni-instances",
     download_nodes=True,
+)
+
+OMNI_TYPED = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
+    _top_level_package="omni_typed",
+    client_name="DoesNotMatter",
+    _instance_space="omni-instances",
+    generate_sdk=True,
+    is_typed=True,
+    # Done above
+    download_nodes=False,
+    typed_classes={
+        "CDFExternalReferencesListed",
+        "PrimitiveNullable",
+        "PrimitiveRequiredListed",
+        "MainInterface",
+        "Implementation1",
+        "Implementation2",
+        "SubInterface",
+        "Implementation1NonWritable",
+        "DependentOnNonWritable",
+    },
 )
 
 OMNI_MULTI_SDK = ExampleSDK(
@@ -335,6 +359,14 @@ class OmniFiles:
 
 
 OMNI_SDK.append_manual_files(OmniFiles)
+
+
+class OmniTypedFiles:
+    client_dir = OMNI_TYPED.client_dir
+    typed = client_dir / "typed.py"
+
+
+OMNI_TYPED.append_manual_files(OmniTypedFiles)
 
 
 class OmniMultiFiles:

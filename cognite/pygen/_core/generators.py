@@ -238,6 +238,15 @@ class MultiAPIGenerator:
                 seen.add(api.view.as_id())
                 yield api
 
+    @property
+    def topological_order(self) -> list[DataClass]:
+        """Return the topological order of the data classes."""
+        dataclass_by_read_name = {api.data_class.read_name: api.data_class for api in self.unique_apis}
+        dependencies_by_dataclass = {
+            api.data_class.read_name: {p.read_name for p in api.data_class.implements} for api in self.unique_apis
+        }
+        return [dataclass_by_read_name[name] for name in TopologicalSorter(dependencies_by_dataclass).static_order()]
+
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
         return self.api_by_view_id[view_id]
 
@@ -383,6 +392,36 @@ class MultiAPIGenerator:
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
+            )
+            + "\n"
+        )
+
+    def generate_typed_classes_file(self, include: set[dm.ViewId] | None = None) -> str:
+        """Generate the typed classes file for the SDK.
+
+        Returns:
+            The generated typed classes file as a string.
+        """
+        typed_classes = self.env.get_template("typed_classes.py.jinja")
+        classes = [d for d in self.topological_order if include is None or d.view_id in include]
+        datetime_import: str | None = None
+        relevant_fields = {
+            {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
+            for cls_ in classes
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, (dm.Timestamp, dm.Date))
+        }
+        if relevant_fields:
+            datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
+
+        return (
+            typed_classes.render(
+                classes=classes,
+                has_node_cls=any(isinstance(cls, NodeDataClass) for cls in classes),
+                has_edge_cls=any(isinstance(cls, EdgeDataClass) for cls in classes),
+                datetime_import=datetime_import,
+                has_datetime_import=bool(datetime_import),
+                len=len,
             )
             + "\n"
         )

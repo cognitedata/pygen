@@ -183,6 +183,20 @@ class DataClass:
             return "DomainModelWrite"
 
     @property
+    def typed_read_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}" for interface in self.implements)
+        else:
+            return "TypedNode" if isinstance(self, NodeDataClass) else "TypedEdge"
+
+    @property
+    def typed_write_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}Apply" for interface in self.implements)
+        else:
+            return "TypedNodeApply" if isinstance(self, NodeDataClass) else "TypedEdgeApply"
+
+    @property
     def text_field_names(self) -> str:
         return f"{self.read_name}TextFields"
 
@@ -319,6 +333,23 @@ class DataClass:
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
         )
 
+    def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
+        def key(x: Field) -> int:
+            return {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1
+
+        if include == "all":
+            return sorted(self.container_fields, key=key)
+        elif include == "only-self":
+            parent_fields = {field.name for parent in self.implements for field in parent.container_fields}
+            return sorted([f for f in self.container_fields if f.name not in parent_fields], key=key)
+        elif isinstance(include, DataClass):
+            fields_by_parent = {parent.read_name: set(parent.container_fields_sorted()) for parent in self.implements}
+            if include.read_name not in fields_by_parent:
+                raise ValueError(f"Data class {include.read_name} is not a parent of {self.read_name}")
+            return sorted(fields_by_parent[include.read_name], key=key)
+        else:
+            raise TypeError(f"Invalid value for include: {include}")
+
     @property
     def has_container_fields(self) -> bool:
         """Check if the data class has any container fields."""
@@ -376,6 +407,15 @@ class DataClass:
     @property
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
+
+    @property
+    def container_field_variables(self) -> str:
+        return ", ".join(
+            field_.name
+            for field_ in self
+            if isinstance(field_, BasePrimitiveField)
+            or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
+        )
 
     @property
     def filter_name(self) -> str:

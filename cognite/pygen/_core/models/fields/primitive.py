@@ -44,6 +44,14 @@ class BasePrimitiveField(Field, ABC):
     def as_read_graphql(self) -> str:
         return f"self.{self.name}"
 
+    def as_typed_hint(self) -> str:
+        type_ = _to_python_type(self.type_, typed=True)
+        if self.type_.is_list:
+            type_ = f"list[{type_}]"
+        if self.is_nullable:
+            type_ = f"{type_} | None = None"
+        return type_
+
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BasePrimitiveField | None:
         if prop.type.is_list:
@@ -173,7 +181,7 @@ class PrimitiveListField(BasePrimitiveField):
             return base
 
 
-def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
+def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, typed: bool = False) -> str:
     if isinstance(type_, (dm.Int32, dm.Int64)):
         out_type = "int"
     elif isinstance(type_, dm.Boolean):
@@ -181,15 +189,27 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     elif isinstance(type_, (dm.Float32, dm.Float64)):
         out_type = "float"
     elif isinstance(type_, dm.Date):
-        out_type = "datetime.date"
+        if typed:
+            out_type = "date"
+        else:
+            out_type = "datetime.date"
     elif isinstance(type_, dm.Timestamp):
-        out_type = "datetime.datetime"
+        if typed:
+            out_type = "datetime"
+        else:
+            out_type = "datetime.datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
     elif isinstance(type_, dm.TimeSeriesReference):
-        out_type = "TimeSeries"
+        if typed:
+            out_type = "str"
+        else:
+            out_type = "TimeSeries"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
-        out_type = "str"
+        if typed and isinstance(type_, (dm.DirectRelation, dm.DirectRelationReference)):
+            out_type = "DirectRelationReference | tuple[str, str]"
+        else:
+            out_type = "str"
     else:
         raise ValueError(f"Unknown type {type_}")
 

@@ -72,3 +72,13 @@ def wind_client(cognite_client: CogniteClient) -> WindmillClient:
 def omni_views_by_external_id(omni_client: OmniClient) -> dict[str, dm.View]:
     data_model = OMNI_SDK.load_data_model()
     return {view.external_id: view for view in data_model.views}
+
+
+@pytest.fixture
+def omni_tmp_space(cognite_client: CogniteClient) -> dm.Space:
+    space = dm.SpaceApply(space="sp_omni_test_tmp", description="Temporary space for omni integration tests")
+    retrieved = cognite_client.data_modeling.spaces.retrieve(space.space)
+    if retrieved:
+        return retrieved
+    created = cognite_client.data_modeling.spaces.apply(space)
+    return created
