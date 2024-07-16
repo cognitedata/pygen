@@ -356,7 +356,7 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, main_value, existing_version, type),
+        super().__init__(space, external_id, main_value, existing_version, type)
         self.sub_value = sub_value
 
 

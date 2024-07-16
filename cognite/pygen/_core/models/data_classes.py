@@ -340,8 +340,8 @@ class DataClass:
         if include == "all":
             return sorted(self.container_fields, key=key)
         elif include == "only-self":
-            parent_fields = {field for parent in self.implements for field in parent.container_fields}
-            return sorted([f for f in self.container_fields if f not in parent_fields], key=key)
+            parent_fields = {field.name for parent in self.implements for field in parent.container_fields}
+            return sorted([f for f in self.container_fields if f.name not in parent_fields], key=key)
         elif isinstance(include, DataClass):
             fields_by_parent = {parent.read_name: set(parent.container_fields_sorted()) for parent in self.implements}
             if include.read_name not in fields_by_parent:

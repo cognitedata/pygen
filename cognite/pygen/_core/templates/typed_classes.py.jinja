@@ -14,8 +14,8 @@ from cognite.client.data_classes.data_modeling.typed_instances import (
 
 {% for cls in classes %}{% if cls.has_container_fields %}
 class {{ cls.read_name }}Properties:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
-    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}
-
+    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
+{% endif %}
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("{{ cls.view_id.space }}", "{{ cls.view_id.external_id }}", "{{ cls.view_id.version }}")
