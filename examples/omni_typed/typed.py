@@ -429,16 +429,7 @@ class Implementation1(Implementation1Properties, SubInterface):
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(
-            space,
-            external_id,
-            version,
-            last_updated_time,
-            created_time,
-            main_value,
-            sub_value,
-            deleted_time,
-            None,
-            type,
+            space, external_id, version, last_updated_time, created_time, main_value, sub_value, type, deleted_time
         )
         self.value_2 = value_2
         self.value_1 = value_1
