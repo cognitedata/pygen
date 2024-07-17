@@ -187,9 +187,17 @@ class MultiAPIGenerator:
         self.default_instance_space = default_instance_space
         self._pydantic_version = pydantic_version
         self._logger = logger or print
-        views = list(itertools.chain.from_iterable(model.views for model in data_models))
-        self.api_by_view_id = self.create_api_by_view_id(
-            list(views),
+        seen_views: set[dm.ViewId] = set()
+        unique_views: list[dm.View] = []
+        for view in itertools.chain.from_iterable(model.views for model in data_models):
+            view_id = view.as_id()
+            if view_id in seen_views:
+                continue
+            unique_views.append(view)
+            seen_views.add(view_id)
+
+        self.api_by_view_id = self.create_api_by_view_id_type(
+            unique_views,
             default_instance_space,
             config,
             base_name_functions=[
@@ -202,10 +210,10 @@ class MultiAPIGenerator:
 
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
-        interfaces = {parent for view in views for parent in view.implements or []}
-        parents_by_view_id = to_unique_parents_by_view_id(views)
+        interfaces = {parent for view in unique_views for parent in view.implements or []}
+        parents_by_view_id = to_unique_parents_by_view_id(unique_views)
         for api in self.unique_apis:
-            api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
+            api.data_class.update_fields(api.view.properties, data_class_by_view_id, unique_views, config)
             api.data_class.update_implements_interface_and_writable(
                 [
                     parent_class
@@ -254,7 +262,7 @@ class MultiAPIGenerator:
         return self.api_by_view_id[view_id]
 
     @classmethod
-    def create_api_by_view_id(
+    def create_api_by_view_id_type(
         cls,
         views: list[dm.View],
         default_instance_space: str,
@@ -282,7 +290,7 @@ class MultiAPIGenerator:
 
             # The base name is not unique, so we need to try another base name function to separate the views.
             api_by_view_id.update(
-                cls.create_api_by_view_id(
+                cls.create_api_by_view_id_type(
                     views_with_base_name, default_instance_space, config, base_name_functions, selected_function + 1
                 )
             )
