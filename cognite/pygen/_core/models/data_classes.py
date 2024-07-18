@@ -450,12 +450,26 @@ class NodeDataClass(DataClass):
     node_type: dm.DirectRelationReference | None
     has_edge_class: bool
 
+    @property
+    def typed_properties_name(self) -> str:
+        if self.has_edge_class:
+            return f"{self.read_name.removesuffix('Node')}Properties"
+        else:
+            return f"{self.read_name}Properties"
+
 
 @dataclass
 class EdgeDataClass(DataClass):
     """This represent data class used for views marked as used_for='edge'."""
 
     has_node_class: bool
+
+    @property
+    def typed_properties_name(self) -> str:
+        if self.has_node_class:
+            return f"{self.read_name.removesuffix('Edge')}Properties"
+        else:
+            return f"{self.read_name}Properties"
 
     @property
     def is_edge_class(self) -> bool:
