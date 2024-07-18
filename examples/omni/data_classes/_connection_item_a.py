@@ -23,7 +23,7 @@ from ._core import (
 
 if TYPE_CHECKING:
     from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
-    from ._connection_item_c import ConnectionItemCNode, ConnectionItemCNodeGraphQL, ConnectionItemCNodeWrite
+    from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeGraphQL, ConnectionItemCNodeWrite
 
 
 __all__ = [

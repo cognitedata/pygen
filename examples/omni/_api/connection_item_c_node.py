@@ -17,7 +17,7 @@ from omni.data_classes import (
     ConnectionItemCNodeList,
     ConnectionItemCNodeWriteList,
 )
-from omni.data_classes._connection_item_c import (
+from omni.data_classes._connection_item_c_node import (
     _create_connection_item_c_node_filter,
 )
 from ._core import (
@@ -29,12 +29,12 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .connection_item_c_connection_item_a import ConnectionItemCConnectionItemAAPI
-from .connection_item_c_connection_item_b import ConnectionItemCConnectionItemBAPI
-from .connection_item_c_query import ConnectionItemCQueryAPI
+from .connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
+from .connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
+from .connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 
 
-class ConnectionItemCAPI(
+class ConnectionItemCNodeAPI(
     NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
 ):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
@@ -46,8 +46,8 @@ class ConnectionItemCAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-        self.connection_item_a_edge = ConnectionItemCConnectionItemAAPI(client)
-        self.connection_item_b_edge = ConnectionItemCConnectionItemBAPI(client)
+        self.connection_item_a_edge = ConnectionItemCNodeConnectionItemAAPI(client)
+        self.connection_item_b_edge = ConnectionItemCNodeConnectionItemBAPI(client)
 
     def __call__(
         self,
@@ -55,7 +55,7 @@ class ConnectionItemCAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> ConnectionItemCQueryAPI[ConnectionItemCNodeList]:
+    ) -> ConnectionItemCNodeQueryAPI[ConnectionItemCNodeList]:
         """Query starting at connection item c nodes.
 
         Args:
@@ -76,22 +76,22 @@ class ConnectionItemCAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemCNodeList)
-        return ConnectionItemCQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemCNodeQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
         self,
-        connection_item_c: ConnectionItemCNodeWrite | Sequence[ConnectionItemCNodeWrite],
+        connection_item_c_node: ConnectionItemCNodeWrite | Sequence[ConnectionItemCNodeWrite],
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item c nodes.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_c and creates them including the edges
+        Note: This method iterates through all nodes and timeseries linked to connection_item_c_node and creates them including the edges
         between the nodes. For example, if any of `connection_item_a` or `connection_item_b` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
-            connection_item_c: connection item c node or sequence of connection item c nodes to upsert.
+            connection_item_c_node: connection item c node or sequence of connection item c nodes to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
@@ -101,26 +101,26 @@ class ConnectionItemCAPI(
 
         Examples:
 
-            Create a new connection_item_c:
+            Create a new connection_item_c_node:
 
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import ConnectionItemCNodeWrite
                 >>> client = OmniClient()
-                >>> connection_item_c = ConnectionItemCNodeWrite(external_id="my_connection_item_c", ...)
-                >>> result = client.connection_item_c.apply(connection_item_c)
+                >>> connection_item_c_node = ConnectionItemCNodeWrite(external_id="my_connection_item_c_node", ...)
+                >>> result = client.connection_item_c_node.apply(connection_item_c_node)
 
         """
         warnings.warn(
             "The .apply method is deprecated and will be removed in v1.0. "
             "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.connection_item_c.apply(my_items)` please use `my_client.upsert(my_items)`."
+            "`my_client.connection_item_c_node.apply(my_items)` please use `my_client.upsert(my_items)`."
             "The motivation is that all apply methods are the same, and having one apply method per API "
             " class encourages users to create items in small batches, which is inefficient."
             "In addition, .upsert method is more descriptive of what the method does.",
             UserWarning,
             stacklevel=2,
         )
-        return self._apply(connection_item_c, replace, write_none)
+        return self._apply(connection_item_c_node, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -136,16 +136,16 @@ class ConnectionItemCAPI(
 
         Examples:
 
-            Delete connection_item_c by id:
+            Delete connection_item_c_node by id:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> client.connection_item_c.delete("my_connection_item_c")
+                >>> client.connection_item_c_node.delete("my_connection_item_c_node")
         """
         warnings.warn(
             "The .delete method is deprecated and will be removed in v1.0. "
             "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.connection_item_c.delete(my_ids)` please use `my_client.delete(my_ids)`."
+            "`my_client.connection_item_c_node.delete(my_ids)` please use `my_client.delete(my_ids)`."
             "The motivation is that all delete methods are the same, and having one delete method per API "
             " class encourages users to delete items in small batches, which is inefficient.",
             UserWarning,
@@ -175,11 +175,11 @@ class ConnectionItemCAPI(
 
         Examples:
 
-            Retrieve connection_item_c by id:
+            Retrieve connection_item_c_node by id:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_c = client.connection_item_c.retrieve("my_connection_item_c")
+                >>> connection_item_c_node = client.connection_item_c_node.retrieve("my_connection_item_c_node")
 
         """
         return self._retrieve(
@@ -230,7 +230,7 @@ class ConnectionItemCAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_cs = client.connection_item_c.list(limit=5)
+                >>> connection_item_cs = client.connection_item_c_node.list(limit=5)
 
         """
         filter_ = _create_connection_item_c_node_filter(

@@ -66,7 +66,7 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
-from ._connection_item_c import (
+from ._connection_item_c_node import (
     ConnectionItemCNode,
     ConnectionItemCNodeApply,
     ConnectionItemCNodeApplyList,

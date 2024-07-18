@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
-class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
+class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     def __init__(
@@ -38,7 +38,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("connection_item_c"),
+                name=self._builder.next_name("connection_item_c_node"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,

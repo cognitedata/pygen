@@ -327,7 +327,7 @@ class OmniFiles:
     implementation_1_data = data_classes / "_implementation_1.py"
     implementation_1_non_writeable_data = data_classes / "_implementation_1_non_writeable.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
-    connection_item_c_data = data_classes / "_connection_item_c.py"
+    connection_item_c_data = data_classes / "_connection_item_c_node.py"
     connection_item_d_data = data_classes / "_connection_item_d.py"
     connection_item_e_data = data_classes / "_connection_item_e.py"
     connection_item_f_data = data_classes / "_connection_item_f.py"
@@ -344,17 +344,17 @@ class OmniFiles:
 
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_b_api = api / "connection_item_b.py"
-    connection_item_c_api = api / "connection_item_c.py"
+    connection_item_c_api = api / "connection_item_c_node.py"
 
     connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
     connection_item_b_edge_apis = (api / "connection_item_b_inwards.py", api / "connection_item_b_self_edge.py")
     connection_item_c_edge_apis = (
-        api / "connection_item_c_connection_item_a.py",
-        api / "connection_item_c_connection_item_b.py",
+        api / "connection_item_c_node_connection_item_a.py",
+        api / "connection_item_c_node_connection_item_b.py",
     )
     connection_item_a_query = api / "connection_item_a_query.py"
     connection_item_b_query = api / "connection_item_b_query.py"
-    connection_item_c_query = api / "connection_item_c_query.py"
+    connection_item_c_query = api / "connection_item_c_node_query.py"
     connection_item_d_query = api / "connection_item_d_query.py"
 
 
