@@ -1,6 +1,7 @@
 from __future__ import annotations
 {% if has_datetime_import %}
-{{ datetime_import }}{% endif %}
+{{ datetime_import }}{% endif %}{% if has_literal_import %}
+from typing import Literal{% endif %}
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId

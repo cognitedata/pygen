@@ -212,7 +212,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, typed: 
         else:
             out_type = "str"
     elif isinstance(type_, Enum):
-        values = ", ".join(sorted(type_.values.keys()))
+        values = ", ".join(f'"{k}"' for k in sorted(type_.values.keys()))
         out_type = f"Literal[{values}]"
     else:
         raise ValueError(f"Unknown type {type_}")

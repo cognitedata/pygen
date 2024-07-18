@@ -18,6 +18,7 @@ from typing import Any, Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -458,12 +459,18 @@ class MultiAPIGenerator:
         }
         if relevant_fields:
             datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
-
+        has_literal_import = any(
+            1
+            for cls_ in classes
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, Enum)
+        )
         return (
             typed_classes.render(
                 classes=classes,
                 has_node_cls=any(isinstance(cls, NodeDataClass) for cls in classes),
                 has_edge_cls=any(isinstance(cls, EdgeDataClass) for cls in classes),
+                has_literal_import=has_literal_import,
                 datetime_import=datetime_import,
                 has_datetime_import=bool(datetime_import),
                 len=len,
