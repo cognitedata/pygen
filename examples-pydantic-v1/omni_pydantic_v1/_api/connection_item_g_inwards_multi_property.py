@@ -25,8 +25,8 @@ class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
         self,
         from_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         from_connection_item_g_space: str = DEFAULT_INSTANCE_SPACE,
-        to_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_connection_item_g_space: str = DEFAULT_INSTANCE_SPACE,
+        to_connection_item_e: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_connection_item_e_space: str = DEFAULT_INSTANCE_SPACE,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
@@ -42,8 +42,8 @@ class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
         Args:
             from_connection_item_g: ID of the source connection item g.
             from_connection_item_g_space: Location of the connection item gs.
-            to_connection_item_g: ID of the target connection item g.
-            to_connection_item_g_space: Location of the connection item gs.
+            to_connection_item_e: ID of the target connection item e.
+            to_connection_item_e_space: Location of the connection item es.
             min_end_time: The minimum value of the end time to filter on.
             max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
@@ -70,8 +70,8 @@ class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
         filter_ = _create_connection_edge_a_filter(
             dm.DirectRelationReference("pygen-models", "multiProperty"),
             self._view_id,
-            to_connection_item_g,
-            to_connection_item_g_space,
+            to_connection_item_e,
+            to_connection_item_e_space,
             from_connection_item_g,
             from_connection_item_g_space,
             min_end_time,

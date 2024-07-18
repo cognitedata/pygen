@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm
+from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -20,60 +20,49 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
 )
-from ._unit_procedure import UnitProcedureWrite
-from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
-from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
 
 if TYPE_CHECKING:
-    from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
-    from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
+    from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [
-    "StartEndTime",
-    "StartEndTimeWrite",
-    "StartEndTimeApply",
-    "StartEndTimeList",
-    "StartEndTimeWriteList",
-    "StartEndTimeApplyList",
-    "StartEndTimeFields",
+    "ConnectionItemCEdge",
+    "ConnectionItemCEdgeWrite",
+    "ConnectionItemCEdgeApply",
+    "ConnectionItemCEdgeList",
+    "ConnectionItemCEdgeWriteList",
+    "ConnectionItemCEdgeApplyList",
 ]
 
 
-StartEndTimeFields = Literal["end_time", "start_time"]
-_STARTENDTIME_PROPERTIES_BY_FIELD = {
-    "end_time": "end_time",
-    "start_time": "start_time",
-}
-
-
-class StartEndTimeGraphQL(GraphQLCore):
-    """This represents the reading version of start end time, used
+class ConnectionItemCEdgeGraphQL(GraphQLCore):
+    """This represents the reading version of connection item c edge, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the start end time.
-        data_record: The data record of the start end time node.
+        external_id: The external id of the connection item c edge.
+        data_record: The data record of the connection item c edge node.
         end_node: The end node of this edge.
-        end_time: The end time field.
-        start_time: The start time field.
+        connection_item_a: The connection item a field.
+        connection_item_b: The connection item b field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
-    end_node: Union[EquipmentModuleGraphQL, WorkOrderGraphQL, None] = None
-    end_time: Optional[datetime.datetime] = None
-    start_time: Optional[datetime.datetime] = None
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    end_node: Union[dm.NodeId, None] = None
+    connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
-    def as_read(self) -> StartEndTime:
-        """Convert this GraphQL format of start end time to the reading format."""
+    def as_read(self) -> ConnectionItemCEdge:
+        """Convert this GraphQL format of connection item c edge to the reading format."""
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return StartEndTime(
+        return ConnectionItemCEdge(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
@@ -82,57 +71,54 @@ class StartEndTimeGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            end_time=self.end_time,
-            start_time=self.start_time,
-        )
-
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
-    def as_write(self) -> StartEndTimeWrite:
-        """Convert this GraphQL format of start end time to the writing format."""
-        return StartEndTimeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            start_time=self.start_time,
+            connection_item_a=[connection_item_a.as_read() for connection_item_a in self.connection_item_a or []],
+            connection_item_b=[connection_item_b.as_read() for connection_item_b in self.connection_item_b or []],
         )
 
 
-class StartEndTime(DomainRelation):
-    """This represents the reading version of start end time.
+class ConnectionItemCEdge(DomainRelation):
+    """This represents the reading version of connection item c edge.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the start end time.
-        data_record: The data record of the start end time edge.
+        external_id: The external id of the connection item c edge.
+        data_record: The data record of the connection item c edge edge.
         end_node: The end node of this edge.
-        end_time: The end time field.
-        start_time: The start time field.
+        connection_item_a: The connection item a field.
+        connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId]
-    end_time: Optional[datetime.datetime] = None
-    start_time: Optional[datetime.datetime] = None
+    end_node: Union[str, dm.NodeId]
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemA"
+    )
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemB"
+    )
 
-    def as_write(self) -> StartEndTimeWrite:
-        """Convert this read version of start end time to the writing version."""
-        return StartEndTimeWrite(
+    def as_write(self) -> ConnectionItemCEdgeWrite:
+        """Convert this read version of connection item c edge to the writing version."""
+        return ConnectionItemCEdgeWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            start_time=self.start_time,
+            end_node=self.end_node,
+            connection_item_a=[
+                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                for connection_item_a in self.connection_item_a or []
+            ],
+            connection_item_b=[
+                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                for connection_item_b in self.connection_item_b or []
+            ],
         )
 
-    def as_apply(self) -> StartEndTimeWrite:
-        """Convert this read version of start end time to the writing version."""
+    def as_apply(self) -> ConnectionItemCEdgeWrite:
+        """Convert this read version of connection item c edge to the writing version."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -141,25 +127,29 @@ class StartEndTime(DomainRelation):
         return self.as_write()
 
 
-class StartEndTimeWrite(DomainRelationWrite):
-    """This represents the writing version of start end time.
+class ConnectionItemCEdgeWrite(DomainRelationWrite):
+    """This represents the writing version of connection item c edge.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the start end time.
-        data_record: The data record of the start end time edge.
+        external_id: The external id of the connection item c edge.
+        data_record: The data record of the connection item c edge edge.
         end_node: The end node of this edge.
-        end_time: The end time field.
-        start_time: The start time field.
+        connection_item_a: The connection item a field.
+        connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
-    end_time: Optional[datetime.datetime] = None
-    start_time: Optional[datetime.datetime] = None
+    end_node: Union[str, dm.NodeId]
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemA"
+    )
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemB"
+    )
 
     def _to_instances_write(
         self,
@@ -188,12 +178,6 @@ class StartEndTimeWrite(DomainRelationWrite):
 
         properties: dict[str, Any] = {}
 
-        if self.end_time is not None or write_none:
-            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
-
-        if self.start_time is not None or write_none:
-            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
-
         if properties:
             this_edge = dm.EdgeApply(
                 space=self.space,
@@ -219,29 +203,29 @@ class StartEndTimeWrite(DomainRelationWrite):
         return resources
 
 
-class StartEndTimeApply(StartEndTimeWrite):
-    def __new__(cls, *args, **kwargs) -> StartEndTimeApply:
+class ConnectionItemCEdgeApply(ConnectionItemCEdgeWrite):
+    def __new__(cls, *args, **kwargs) -> ConnectionItemCEdgeApply:
         warnings.warn(
-            "StartEndTimeApply is deprecated and will be removed in v1.0. Use StartEndTimeWrite instead."
+            "ConnectionItemCEdgeApply is deprecated and will be removed in v1.0. Use ConnectionItemCEdgeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "StartEndTime.",
+            "ConnectionItemCEdge.",
             UserWarning,
             stacklevel=2,
         )
         return super().__new__(cls)
 
 
-class StartEndTimeList(DomainRelationList[StartEndTime]):
-    """List of start end times in the reading version."""
+class ConnectionItemCEdgeList(DomainRelationList[ConnectionItemCEdge]):
+    """List of connection item c edges in the reading version."""
 
-    _INSTANCE = StartEndTime
+    _INSTANCE = ConnectionItemCEdge
 
-    def as_write(self) -> StartEndTimeWriteList:
-        """Convert this read version of start end time list to the writing version."""
-        return StartEndTimeWriteList([edge.as_write() for edge in self])
+    def as_write(self) -> ConnectionItemCEdgeWriteList:
+        """Convert this read version of connection item c edge list to the writing version."""
+        return ConnectionItemCEdgeWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> StartEndTimeWriteList:
-        """Convert these read versions of start end time list to the writing versions."""
+    def as_apply(self) -> ConnectionItemCEdgeWriteList:
+        """Convert these read versions of connection item c edge list to the writing versions."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -250,26 +234,22 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
         return self.as_write()
 
 
-class StartEndTimeWriteList(DomainRelationWriteList[StartEndTimeWrite]):
-    """List of start end times in the writing version."""
+class ConnectionItemCEdgeWriteList(DomainRelationWriteList[ConnectionItemCEdgeWrite]):
+    """List of connection item c edges in the writing version."""
 
-    _INSTANCE = StartEndTimeWrite
-
-
-class StartEndTimeApplyList(StartEndTimeWriteList): ...
+    _INSTANCE = ConnectionItemCEdgeWrite
 
 
-def _create_start_end_time_filter(
+class ConnectionItemCEdgeApplyList(ConnectionItemCEdgeWriteList): ...
+
+
+def _create_connection_item_c_edge_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     space_end_node: str = DEFAULT_INSTANCE_SPACE,
-    min_end_time: datetime.datetime | None = None,
-    max_end_time: datetime.datetime | None = None,
-    min_start_time: datetime.datetime | None = None,
-    max_start_time: datetime.datetime | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -324,22 +304,6 @@ def _create_start_end_time_filter(
                 ],
             )
         )
-    if min_end_time is not None or max_end_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("end_time"),
-                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
-                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
-            )
-        )
-    if min_start_time is not None or max_start_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
-            )
-        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -351,15 +315,10 @@ def _create_start_end_time_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    EquipmentModuleWrite: {UnitProcedureWrite},
-    WorkOrderWrite: {UnitProcedureWrite},
-}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
 
-def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
-) -> None:
+def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
         return

@@ -27,26 +27,26 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "ConnectionItemC",
-    "ConnectionItemCWrite",
-    "ConnectionItemCApply",
-    "ConnectionItemCList",
-    "ConnectionItemCWriteList",
-    "ConnectionItemCApplyList",
-    "ConnectionItemCGraphQL",
+    "ConnectionItemCNode",
+    "ConnectionItemCNodeWrite",
+    "ConnectionItemCNodeApply",
+    "ConnectionItemCNodeList",
+    "ConnectionItemCNodeWriteList",
+    "ConnectionItemCNodeApplyList",
+    "ConnectionItemCNodeGraphQL",
 ]
 
 
-class ConnectionItemCGraphQL(GraphQLCore):
-    """This represents the reading version of connection item c, used
+class ConnectionItemCNodeGraphQL(GraphQLCore):
+    """This represents the reading version of connection item c node, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the connection item c.
-        data_record: The data record of the connection item c node.
+        external_id: The external id of the connection item c node.
+        data_record: The data record of the connection item c node node.
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
@@ -76,11 +76,11 @@ class ConnectionItemCGraphQL(GraphQLCore):
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
-    def as_read(self) -> ConnectionItemC:
-        """Convert this GraphQL format of connection item c to the reading format."""
+    def as_read(self) -> ConnectionItemCNode:
+        """Convert this GraphQL format of connection item c node to the reading format."""
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemC(
+        return ConnectionItemCNode(
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecord(
@@ -94,9 +94,9 @@ class ConnectionItemCGraphQL(GraphQLCore):
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
-    def as_write(self) -> ConnectionItemCWrite:
-        """Convert this GraphQL format of connection item c to the writing format."""
-        return ConnectionItemCWrite(
+    def as_write(self) -> ConnectionItemCNodeWrite:
+        """Convert this GraphQL format of connection item c node to the writing format."""
+        return ConnectionItemCNodeWrite(
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
@@ -105,15 +105,15 @@ class ConnectionItemCGraphQL(GraphQLCore):
         )
 
 
-class ConnectionItemC(DomainModel):
-    """This represents the reading version of connection item c.
+class ConnectionItemCNode(DomainModel):
+    """This represents the reading version of connection item c node.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the connection item c.
-        data_record: The data record of the connection item c node.
+        external_id: The external id of the connection item c node.
+        data_record: The data record of the connection item c node node.
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
@@ -129,9 +129,9 @@ class ConnectionItemC(DomainModel):
         default=None, repr=False, alias="connectionItemB"
     )
 
-    def as_write(self) -> ConnectionItemCWrite:
-        """Convert this read version of connection item c to the writing version."""
-        return ConnectionItemCWrite(
+    def as_write(self) -> ConnectionItemCNodeWrite:
+        """Convert this read version of connection item c node to the writing version."""
+        return ConnectionItemCNodeWrite(
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
@@ -145,8 +145,8 @@ class ConnectionItemC(DomainModel):
             ],
         )
 
-    def as_apply(self) -> ConnectionItemCWrite:
-        """Convert this read version of connection item c to the writing version."""
+    def as_apply(self) -> ConnectionItemCNodeWrite:
+        """Convert this read version of connection item c node to the writing version."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
             UserWarning,
@@ -155,15 +155,15 @@ class ConnectionItemC(DomainModel):
         return self.as_write()
 
 
-class ConnectionItemCWrite(DomainModelWrite):
-    """This represents the writing version of connection item c.
+class ConnectionItemCNodeWrite(DomainModelWrite):
+    """This represents the writing version of connection item c node.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the connection item c.
-        data_record: The data record of the connection item c node.
+        external_id: The external id of the connection item c node.
+        data_record: The data record of the connection item c node node.
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
@@ -226,28 +226,28 @@ class ConnectionItemCWrite(DomainModelWrite):
         return resources
 
 
-class ConnectionItemCApply(ConnectionItemCWrite):
-    def __new__(cls, *args, **kwargs) -> ConnectionItemCApply:
+class ConnectionItemCNodeApply(ConnectionItemCNodeWrite):
+    def __new__(cls, *args, **kwargs) -> ConnectionItemCNodeApply:
         warnings.warn(
-            "ConnectionItemCApply is deprecated and will be removed in v1.0. Use ConnectionItemCWrite instead."
+            "ConnectionItemCNodeApply is deprecated and will be removed in v1.0. Use ConnectionItemCNodeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "ConnectionItemC.",
+            "ConnectionItemCNode.",
             UserWarning,
             stacklevel=2,
         )
         return super().__new__(cls)
 
 
-class ConnectionItemCList(DomainModelList[ConnectionItemC]):
-    """List of connection item cs in the read version."""
+class ConnectionItemCNodeList(DomainModelList[ConnectionItemCNode]):
+    """List of connection item c nodes in the read version."""
 
-    _INSTANCE = ConnectionItemC
+    _INSTANCE = ConnectionItemCNode
 
-    def as_write(self) -> ConnectionItemCWriteList:
-        """Convert these read versions of connection item c to the writing versions."""
-        return ConnectionItemCWriteList([node.as_write() for node in self.data])
+    def as_write(self) -> ConnectionItemCNodeWriteList:
+        """Convert these read versions of connection item c node to the writing versions."""
+        return ConnectionItemCNodeWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> ConnectionItemCWriteList:
+    def as_apply(self) -> ConnectionItemCNodeWriteList:
         """Convert these read versions of primitive nullable to the writing versions."""
         warnings.warn(
             "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
@@ -257,16 +257,16 @@ class ConnectionItemCList(DomainModelList[ConnectionItemC]):
         return self.as_write()
 
 
-class ConnectionItemCWriteList(DomainModelWriteList[ConnectionItemCWrite]):
-    """List of connection item cs in the writing version."""
+class ConnectionItemCNodeWriteList(DomainModelWriteList[ConnectionItemCNodeWrite]):
+    """List of connection item c nodes in the writing version."""
 
-    _INSTANCE = ConnectionItemCWrite
-
-
-class ConnectionItemCApplyList(ConnectionItemCWriteList): ...
+    _INSTANCE = ConnectionItemCNodeWrite
 
 
-def _create_connection_item_c_filter(
+class ConnectionItemCNodeApplyList(ConnectionItemCNodeWriteList): ...
+
+
+def _create_connection_item_c_node_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
