@@ -249,7 +249,12 @@ class MultiAPIGenerator:
         # Data Models require view external IDs to be unique within the data model.
         self._data_class_by_data_model_by_type = {
             model.as_id(): {
-                view.external_id: node_class_by_view_id[view.as_id()] for view in model.views if view.used_for != "edge"
+                view.external_id: (
+                    node_class_by_view_id[view.as_id()]
+                    if view.as_id() in node_class_by_view_id
+                    else edge_class_by_view_id[view.as_id()]
+                )
+                for view in model.views
             }
             for model in data_models
         }

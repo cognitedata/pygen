@@ -158,6 +158,7 @@ def test_load_field(
         property_.name,
         property_,
         data_class_by_id,
+        {},
         pygen_config,
         view_id=dm.ViewId("a", "b", "c"),
         pydantic_field="Field",
@@ -278,6 +279,7 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
         {
             view.as_id(): data_class,
         },
+        {},
         [view],
         pygen_config,
     )
@@ -342,7 +344,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
-        actual = Field.from_property(name, prop, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
+        actual = Field.from_property(name, prop, {}, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
 
     # Assert
     assert actual.name == expected_name
@@ -663,7 +665,7 @@ def test_fields_from_property(
 ):
     # Act
     actual = Field.from_property(
-        prop_name, property_, data_class_by_view_id, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field"
+        prop_name, property_, data_class_by_view_id, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field"
     )
 
     # Assert

@@ -16,7 +16,7 @@ def test_create_list_method_primitive_nullable(
     omni_multi_api_generator: MultiAPIGenerator, pygen_config: PygenConfig
 ) -> None:
     # Arrange
-    data_class = omni_multi_api_generator.api_by_type_by_view_id[
+    data_class = omni_multi_api_generator.api_by_type_by_view_id["node"][
         dm.ViewId("pygen-models", "PrimitiveNullable", "1")
     ].data_class
     parameters = [
@@ -90,7 +90,7 @@ def test_create_list_method_connection_item_a(
     omni_multi_api_generator: MultiAPIGenerator, pygen_config: PygenConfig
 ) -> None:
     # Arrange
-    data_class = omni_multi_api_generator.api_by_type_by_view_id[
+    data_class = omni_multi_api_generator.api_by_type_by_view_id["node"][
         dm.ViewId("pygen-models", "ConnectionItemA", "1")
     ].data_class
     parameters = [
