@@ -124,7 +124,7 @@ class DataClass:
         if used_for == "node":
             node_type = _find_first_node_type(view.filter)
 
-            return NodeDataClass(**args, node_type=node_type)
+            return NodeDataClass(**args, node_type=node_type, has_edge_class=view.used_for == "all")
         elif used_for == "edge":
             return EdgeDataClass(**args, has_node_class=view.used_for == "all")
         else:
@@ -448,6 +448,7 @@ class NodeDataClass(DataClass):
     """This represent data class used for views marked as used_for='node'."""
 
     node_type: dm.DirectRelationReference | None
+    has_edge_class: bool
 
 
 @dataclass
