@@ -97,7 +97,10 @@ class EndNodeField(Field):
             return left_side
 
     def as_write(self) -> str:
-        return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+        if self.end_classes:
+            return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+        else:
+            return f"self.{self.name}.as_write()"
 
     def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
@@ -230,10 +233,7 @@ class BaseConnectionField(Field, ABC):
         )
 
     def as_graphql_type_hint(self) -> str:
-        if self.end_classes:
-            types = [data_class.graphql_name for data_class in self.end_classes]
-        else:
-            types = ["dm.NodeId"]
+        types = [data_class.graphql_name for data_class in self.end_classes or []]
         return self._create_type_hint(types, False)
 
     def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:

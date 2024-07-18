@@ -57,14 +57,14 @@ from ._work_order import (
     WorkOrderWriteList,
 )
 
-StartEndTime.model_rebuild()
-StartEndTimeGraphQL.model_rebuild()
-StartEndTimeWrite.model_rebuild()
-StartEndTimeApply.model_rebuild()
 UnitProcedure.model_rebuild()
 UnitProcedureGraphQL.model_rebuild()
 UnitProcedureWrite.model_rebuild()
 UnitProcedureApply.model_rebuild()
+StartEndTime.model_rebuild()
+StartEndTimeGraphQL.model_rebuild()
+StartEndTimeWrite.model_rebuild()
+StartEndTimeApply.model_rebuild()
 
 
 __all__ = [
