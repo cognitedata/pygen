@@ -67,13 +67,13 @@ from ._connection_item_b import (
     ConnectionItemBWriteList,
 )
 from ._connection_item_c import (
-    ConnectionItemC,
-    ConnectionItemCApply,
-    ConnectionItemCApplyList,
-    ConnectionItemCGraphQL,
-    ConnectionItemCList,
-    ConnectionItemCWrite,
-    ConnectionItemCWriteList,
+    ConnectionItemCNode,
+    ConnectionItemCNodeApply,
+    ConnectionItemCNodeApplyList,
+    ConnectionItemCNodeGraphQL,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeWriteList,
 )
 from ._connection_item_d import (
     ConnectionItemD,
@@ -260,10 +260,10 @@ ConnectionItemB.model_rebuild()
 ConnectionItemBGraphQL.model_rebuild()
 ConnectionItemBWrite.model_rebuild()
 ConnectionItemBApply.model_rebuild()
-ConnectionItemC.model_rebuild()
-ConnectionItemCGraphQL.model_rebuild()
-ConnectionItemCWrite.model_rebuild()
-ConnectionItemCApply.model_rebuild()
+ConnectionItemCNode.model_rebuild()
+ConnectionItemCNodeGraphQL.model_rebuild()
+ConnectionItemCNodeWrite.model_rebuild()
+ConnectionItemCNodeApply.model_rebuild()
 ConnectionItemD.model_rebuild()
 ConnectionItemDGraphQL.model_rebuild()
 ConnectionItemDWrite.model_rebuild()
@@ -343,13 +343,13 @@ __all__ = [
     "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
-    "ConnectionItemC",
-    "ConnectionItemCGraphQL",
-    "ConnectionItemCWrite",
-    "ConnectionItemCApply",
-    "ConnectionItemCList",
-    "ConnectionItemCWriteList",
-    "ConnectionItemCApplyList",
+    "ConnectionItemCNode",
+    "ConnectionItemCNodeGraphQL",
+    "ConnectionItemCNodeWrite",
+    "ConnectionItemCNodeApply",
+    "ConnectionItemCNodeList",
+    "ConnectionItemCNodeWriteList",
+    "ConnectionItemCNodeApplyList",
     "ConnectionItemD",
     "ConnectionItemDGraphQL",
     "ConnectionItemDWrite",

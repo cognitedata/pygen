@@ -18,11 +18,11 @@ class ConnectionItemCConnectionItemAAPI(EdgeAPI):
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
     ) -> dm.EdgeList:
-        """List connection item a edges of a connection item c.
+        """List connection item a edges of a connection item c node.
 
         Args:
-            from_connection_item_c: ID of the source connection item c.
-            from_connection_item_c_space: Location of the connection item cs.
+            from_connection_item_c: ID of the source connection item c node.
+            from_connection_item_c_space: Location of the connection item c nodes.
             to_connection_item_a: ID of the target connection item a.
             to_connection_item_a_space: Location of the connection item as.
             external_id_prefix: The prefix of the external ID to filter on.

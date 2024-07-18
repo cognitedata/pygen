@@ -17,7 +17,7 @@ def test_query_with_direct_relation(omni_client: OmniClient) -> None:
     incorrect_other = [
         item.other_direct
         for item in items
-        if not (isinstance(item.other_direct, dc.ConnectionItemC) or item.other_direct is None)
+        if not (isinstance(item.other_direct, dc.ConnectionItemCNode) or item.other_direct is None)
     ]
     assert len(incorrect_other) == 0, f"Other direct relation should be set, got {incorrect_other}"
     incorrect_self = [
