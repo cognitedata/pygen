@@ -64,7 +64,10 @@ class EndNodeField(Field):
         return self._type_hint([data_class.read_name for data_class in self.end_classes])
 
     def as_graphql_type_hint(self) -> str:
-        data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        if self.end_classes:
+            data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        else:
+            data_class_names = ["dm.NodeId"]
         data_class_names_hint = ", ".join(sorted(data_class_names))
         left_side = f"Union[{data_class_names_hint}, None]"
         if self.need_alias:
@@ -227,7 +230,11 @@ class BaseConnectionField(Field, ABC):
         )
 
     def as_graphql_type_hint(self) -> str:
-        return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []], False)
+        if self.end_classes:
+            types = [data_class.graphql_name for data_class in self.end_classes]
+        else:
+            types = ["dm.NodeId"]
+        return self._create_type_hint(types, False)
 
     def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:
         field_kwargs = {
