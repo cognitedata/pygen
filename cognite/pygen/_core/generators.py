@@ -18,6 +18,7 @@ from typing import Any, Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -448,22 +449,39 @@ class MultiAPIGenerator:
             The generated typed classes file as a string.
         """
         typed_classes = self.env.get_template("typed_classes.py.jinja")
-        classes = [d for d in self.topological_order if include is None or d.view_id in include]
+        available_dataclasses = self.topological_order
+        node_classes = [
+            d
+            for d in available_dataclasses
+            if isinstance(d, NodeDataClass) and (include is None or d.view_id in include)
+        ]
+        edge_classes = [
+            d
+            for d in available_dataclasses
+            if isinstance(d, EdgeDataClass) and (include is None or d.view_id in include)
+        ]
         datetime_import: str | None = None
         relevant_fields = {
             {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
-            for cls_ in classes
+            for cls_ in itertools.chain(node_classes, edge_classes)
             for field in cls_.fields_of_type(fields.BasePrimitiveField)
             if isinstance(field.type_, (dm.Timestamp, dm.Date))
         }
         if relevant_fields:
             datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
-
+        has_literal_import = any(
+            1
+            for cls_ in itertools.chain(node_classes, edge_classes)
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, Enum)
+        )
         return (
             typed_classes.render(
-                classes=classes,
-                has_node_cls=any(isinstance(cls, NodeDataClass) for cls in classes),
-                has_edge_cls=any(isinstance(cls, EdgeDataClass) for cls in classes),
+                node_classes=node_classes,
+                edge_classes=edge_classes,
+                has_node_cls=bool(node_classes),
+                has_edge_cls=bool(edge_classes),
+                has_literal_import=has_literal_import,
                 datetime_import=datetime_import,
                 has_datetime_import=bool(datetime_import),
                 len=len,
