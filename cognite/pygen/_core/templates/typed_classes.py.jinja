@@ -37,7 +37,7 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         self.{{field.name}} = {{field.name}}{% endfor %}
 
 
-class {{ cls.read_name }}({{ cls.read_name }}Properties, {{ cls.typed_read_bases_classes }}):
+class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
     def __init__(
         self,
         space: str,

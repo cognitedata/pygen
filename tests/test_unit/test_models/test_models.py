@@ -498,6 +498,7 @@ def create_fields_test_cases():
         is_writable=True,
         implements=[],
         initialization=set(),
+        has_edge_class=False,
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
     yield pytest.param(
