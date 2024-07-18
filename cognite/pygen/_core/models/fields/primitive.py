@@ -7,7 +7,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
+from cognite.client.data_classes.data_modeling.data_types import Enum, ListablePropertyType
 
 from .base import Field
 
@@ -211,6 +211,9 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, typed: 
             out_type = "DirectRelationReference | tuple[str, str]"
         else:
             out_type = "str"
+    elif isinstance(type_, Enum):
+        values = ", ".join(sorted(type_.values.keys()))
+        out_type = f"Literal[{values}]"
     else:
         raise ValueError(f"Unknown type {type_}")
 
