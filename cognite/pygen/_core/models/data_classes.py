@@ -6,7 +6,7 @@ import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import Literal, cast, overload
+from typing import Literal, overload
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
@@ -137,7 +137,8 @@ class DataClass:
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ) -> None:
@@ -145,7 +146,8 @@ class DataClass:
             field_ = Field.from_property(
                 prop_name,
                 prop,
-                data_class_by_view_id,
+                node_class_by_view_id,
+                edge_class_by_view_id,
                 config,
                 self.view_id,
                 # This is the default value for pydantic_field, it will be updated later
@@ -470,20 +472,26 @@ class EdgeDataClass(DataClass):
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ):
+        # Find all node views that have an edge with properties in this view
+        # and get the node class it is pointing to.
         edge_classes = []
         for view in views:
-            start_class = data_class_by_view_id[view.as_id()]
+            view_id = view.as_id()
+            if view_id not in node_class_by_view_id:
+                continue
+            start_class = node_class_by_view_id[view_id]
             for _prop_name, prop in view.properties.items():
-                if isinstance(prop, dm.MultiEdgeConnection) and prop.edge_source == self.view_id:
+                if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
                     edge_classes.append(
                         EdgeClasses(
-                            cast(NodeDataClass, start_class),
-                            prop.type,
-                            cast(NodeDataClass, data_class_by_view_id[prop.source]),
+                            start_class=start_class,
+                            edge_type=prop.type,
+                            end_class=node_class_by_view_id[prop.source],
                         )
                     )
 
@@ -497,4 +505,4 @@ class EdgeDataClass(DataClass):
                 edge_classes=edge_classes,
             )
         )
-        super().update_fields(properties, data_class_by_view_id, views, config)
+        super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)

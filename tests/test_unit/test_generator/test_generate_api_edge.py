@@ -7,7 +7,9 @@ from tests.constants import OmniFiles
 
 def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_a_edge_apis}
 
     # Act
@@ -22,7 +24,9 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemB", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemB", "1")
+    ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_b_edge_apis}
 
     # Act
@@ -37,7 +41,9 @@ def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_c_edge_apis}
 
     # Act

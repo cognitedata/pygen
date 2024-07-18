@@ -209,36 +209,39 @@ class MultiAPIGenerator:
                 DataClass.to_base_name_with_space_and_version,
             ],
         )
-        data_class_by_type_by_view_id = {
-            type_: {view_id: api.data_class for view_id, api in api_by_view_id.items()}
-            for type_, api_by_view_id in self.api_by_type_by_view_id.items()
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass] = {
+            view_id: api.data_class
+            for view_id, api in self.api_by_type_by_view_id["node"].items()
+            if isinstance(api.data_class, NodeDataClass)
         }
-        query_class_by_type_by_view_id = {
-            type_: {view_id: api.query_api for view_id, api in api_by_view_id.items()}
-            for type_, api_by_view_id in self.api_by_type_by_view_id.items()
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass] = {
+            view_id: api.data_class
+            for view_id, api in self.api_by_type_by_view_id["edge"].items()
+            if isinstance(api.data_class, EdgeDataClass)
+        }
+        query_class_by_view_id = {
+            view_id: api.query_api for view_id, api in self.api_by_type_by_view_id["node"].items()
         }
         parents = {parent for view in unique_views for parent in view.implements or []}
         parents_by_view_id = to_unique_parents_by_view_id(unique_views)
         for api in self.apis:
             api.data_class.update_fields(
-                api.view.properties, data_class_by_type_by_view_id[api.used_for], unique_views, config
+                api.view.properties, node_class_by_view_id, edge_class_by_view_id, unique_views, config
             )
 
             api.data_class.update_implements_interface_and_writable(
                 [
-                    parent_class
+                    parent_api.data_class
                     for parent in parents_by_view_id[api.view_id]
                     # If the interface is not in the data model, then, we cannot inherit from it.
-                    if (parent_class := data_class_by_type_by_view_id[api.used_for].get(parent))
+                    if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
                 ],
                 api.view_id in parents,
             )
 
         # All data classes have been updated, before we can create edge APIs.
         for api in self.apis:
-            api.create_edge_apis(
-                query_class_by_type_by_view_id[api.used_for], self.api_by_type_by_view_id[api.used_for]
-            )
+            api.create_edge_apis(query_class_by_view_id, self.api_by_type_by_view_id["node"])
 
         validate_api_classes_unique_names([api.api_class for api in self.apis])
         validate_data_classes_unique_name([api.data_class for api in self.apis])
@@ -246,9 +249,7 @@ class MultiAPIGenerator:
         # Data Models require view external IDs to be unique within the data model.
         self._data_class_by_data_model_by_type = {
             model.as_id(): {
-                view.external_id: data_class_by_type_by_view_id["node"][view.as_id()]
-                for view in model.views
-                if view.used_for != "edge"
+                view.external_id: node_class_by_view_id[view.as_id()] for view in model.views if view.used_for != "edge"
             }
             for model in data_models
         }

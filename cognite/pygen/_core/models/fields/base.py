@@ -16,7 +16,7 @@ from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.text import create_name, to_words
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.models.data_classes import DataClass
+    from cognite.pygen._core.models.data_classes import EdgeDataClass, NodeDataClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -51,7 +51,8 @@ class Field:
         cls,
         prop_name: str,
         prop: ViewProperty,
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         config: pygen_config.PygenConfig,
         view_id: dm.ViewId,
         pydantic_field: Literal["Field", "pydantic.Field"],
@@ -77,7 +78,7 @@ class Field:
         if isinstance(prop, dm.ConnectionDefinition) or (
             isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         ):
-            return BaseConnectionField.load(base, prop, variable, data_class_by_view_id)
+            return BaseConnectionField.load(base, prop, variable, node_class_by_view_id, edge_class_by_view_id)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.PropertyType):

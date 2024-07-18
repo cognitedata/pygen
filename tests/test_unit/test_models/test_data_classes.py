@@ -27,7 +27,7 @@ class TestDataClasses:
 
     def test_has_date_field(self, omni_multi_api_generator: MultiAPIGenerator) -> None:
         # Arrange
-        api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
             dm.ViewId("pygen-models", "PrimitiveRequired", "1")
         ]
 

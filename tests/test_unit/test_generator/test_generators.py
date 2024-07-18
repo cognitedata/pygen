@@ -11,7 +11,7 @@ def test_to_parents_by_view_id_omni(omni_multi_api_generator: MultiAPIGenerator)
         "Implementation2": ["SubInterface"],
         "SubInterface": ["MainInterface"],
     }
-    views = [api.view for api in omni_multi_api_generator.api_by_type_by_view_id.values()]
+    views = [api.view for api in omni_multi_api_generator.api_by_type_by_view_id["node"].values()]
 
     # Act
     actual = to_unique_parents_by_view_id(views)

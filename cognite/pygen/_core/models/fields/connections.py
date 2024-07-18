@@ -14,7 +14,7 @@ from cognite.client.data_classes.data_modeling.views import SingleEdgeConnection
 from .base import Field
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.models.data_classes import DataClass, NodeDataClass
+    from cognite.pygen._core.models.data_classes import DataClass, EdgeDataClass, NodeDataClass
 
 
 @total_ordering
@@ -147,7 +147,8 @@ class BaseConnectionField(Field, ABC):
         base: Field,
         prop: dm.ConnectionDefinition | dm.MappedProperty,
         variable: str,
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
     ) -> Field | None:
         if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty)):
             return None
@@ -158,10 +159,10 @@ class BaseConnectionField(Field, ABC):
         use_node_reference = True
         end_classes: list[DataClass] | None
         if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
-            end_classes = [data_class_by_view_id[prop.edge_source]]
+            end_classes = [edge_class_by_view_id[prop.edge_source]]
             use_node_reference = False
-        elif isinstance(prop, dm.EdgeConnection) or (isinstance(prop, dm.MappedProperty) and prop.source is not None):
-            end_classes = [data_class_by_view_id[prop.source]]  # type: ignore[index]
+        elif (isinstance(prop, dm.EdgeConnection) or isinstance(prop, dm.MappedProperty)) and prop.source is not None:
+            end_classes = [node_class_by_view_id[prop.source]]
         else:
             end_classes = None
         if cls._is_supported_one_to_many_connection(prop):
