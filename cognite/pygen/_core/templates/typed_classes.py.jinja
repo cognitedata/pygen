@@ -13,7 +13,7 @@ from cognite.client.data_classes.data_modeling.typed_instances import (
     TypedNodeApply,{% endif %}
 )
 
-{% for cls in classes %}{% if cls.has_container_fields %}
+{% for cls in node_classes %}{% if cls.has_container_fields %}
 class {{ cls.read_name }}Properties:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
     {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
 {% endif %}
