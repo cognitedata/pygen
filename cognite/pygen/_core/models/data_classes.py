@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import total_ordering
@@ -82,7 +81,9 @@ class DataClass:
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
-    def from_view(cls, view: dm.View, base_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
+    def from_view(
+        cls, view: dm.View, base_name: str, used_for: Literal["node", "edge"], data_class: pygen_config.DataClassNaming
+    ) -> DataClass:
         class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
@@ -98,13 +99,8 @@ class DataClass:
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
 
-        used_for = view.used_for
-        if used_for == "all":
-            used_for = "node"
-            warnings.warn(
-                f"View {view.as_id()} has 'used_for' set to 'all'. This is not supported. Using 'node' instead.",
-                stacklevel=2,
-            )
+        if view.used_for != used_for and view.used_for != "all":
+            raise ValueError(f"View {view.as_id()} cannot be used for {used_for}")
 
         args = dict(
             read_name=class_name,

@@ -508,7 +508,7 @@ class APIGenerator:
         self._config = config
         self.used_for = used_for
 
-        self.data_class = DataClass.from_view(view, self.base_name, config.naming.data_class)
+        self.data_class = DataClass.from_view(view, self.base_name, used_for, config.naming.data_class)
         self.api_class = NodeAPIClass.from_view(
             view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
         )
