@@ -126,7 +126,7 @@ class DataClass:
 
             return NodeDataClass(**args, node_type=node_type)
         elif used_for == "edge":
-            return EdgeDataClass(**args)
+            return EdgeDataClass(**args, has_node_class=view.used_for == "all")
         else:
             raise ValueError(f"Unsupported used_for={used_for}")
 
@@ -453,6 +453,8 @@ class NodeDataClass(DataClass):
 @dataclass
 class EdgeDataClass(DataClass):
     """This represent data class used for views marked as used_for='edge'."""
+
+    has_node_class: bool
 
     @property
     def is_edge_class(self) -> bool:
