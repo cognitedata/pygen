@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -22,9 +22,13 @@ from ._core import (
     ResourcesWrite,
 )
 from ._connection_item_f import ConnectionItemFWrite
-from ._connection_item_g import ConnectionItemGWrite
-from ._connection_item_f import ConnectionItemF, ConnectionItemFGraphQL, ConnectionItemFWrite
+from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
 from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
+
+if TYPE_CHECKING:
+    from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+    from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
+
 
 __all__ = [
     "ConnectionEdgeA",
@@ -64,7 +68,7 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
+    end_node: Union[ConnectionItemEGraphQL, ConnectionItemGGraphQL, None] = None
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -121,7 +125,7 @@ class ConnectionEdgeA(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemF, ConnectionItemG, str, dm.NodeId]
+    end_node: Union[ConnectionItemE, ConnectionItemG, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -165,7 +169,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
+    end_node: Union[ConnectionItemEWrite, ConnectionItemGWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -372,13 +376,13 @@ def _create_connection_edge_a_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    ConnectionItemFWrite: {ConnectionItemGWrite},
+    ConnectionItemEWrite: {ConnectionItemFWrite, ConnectionItemFWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
 }
 
 
 def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
+    start_node: DomainModelWrite, end_node: Union[ConnectionItemEWrite, ConnectionItemGWrite, str, dm.NodeId]
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate

@@ -58,6 +58,19 @@ from ._work_order import (
 )
 
 
+UnitProcedure.update_forward_refs(
+    StartEndTime=StartEndTime,
+)
+UnitProcedureGraphQL.update_forward_refs(
+    StartEndTimeGraphQL=StartEndTimeGraphQL,
+)
+UnitProcedureWrite.update_forward_refs(
+    StartEndTimeWrite=StartEndTimeWrite,
+)
+UnitProcedureApply.update_forward_refs(
+    StartEndTimeWrite=StartEndTimeWrite,
+)
+
 StartEndTime.update_forward_refs(
     EquipmentModule=EquipmentModule,
     WorkOrder=WorkOrder,
@@ -73,19 +86,6 @@ StartEndTimeWrite.update_forward_refs(
 StartEndTimeApply.update_forward_refs(
     EquipmentModuleWrite=EquipmentModuleWrite,
     WorkOrderWrite=WorkOrderWrite,
-)
-
-UnitProcedure.update_forward_refs(
-    StartEndTime=StartEndTime,
-)
-UnitProcedureGraphQL.update_forward_refs(
-    StartEndTimeGraphQL=StartEndTimeGraphQL,
-)
-UnitProcedureWrite.update_forward_refs(
-    StartEndTimeWrite=StartEndTimeWrite,
-)
-UnitProcedureApply.update_forward_refs(
-    StartEndTimeWrite=StartEndTimeWrite,
 )
 
 

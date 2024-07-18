@@ -38,7 +38,12 @@ def omni_nodes_with_view():
 class TestToFromInstances:
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
     def test_from_to_instances(self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses]):
-        read_cls = omni_data_classes[view_id.external_id].read
+        if view_id in omni_data_classes:
+            read_cls = omni_data_classes[view_id.external_id].read
+        elif f"{view_id}Node" in omni_data_classes:
+            read_cls = omni_data_classes[f"{view_id}Node"].read
+        else:
+            pytest.skip(f"No read class for {view_id}")
 
         domain_node = read_cls.from_instance(node)
         domain_write_node = domain_node.as_write()
@@ -56,7 +61,12 @@ class TestToFromInstances:
 
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
     def test_writeable_to_instances(self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[str, OmniClasses]):
-        view = omni_data_classes[view_id.external_id].view
+        if view_id in omni_data_classes:
+            view = omni_data_classes[view_id.external_id].view
+        elif f"{view_id}Node" in omni_data_classes:
+            view = omni_data_classes[f"{view_id}Node"].view
+        else:
+            pytest.skip(f"No view class for {view_id}")
         if any(prop for prop in view.properties.values() if isinstance(prop, dm.MappedProperty) and prop.default_value):
             # Mapped properties with default values will not return the same node
             # This is intentional, as write note should give hints to the user

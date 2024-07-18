@@ -23,7 +23,7 @@ class OmniClasses:
 class OmniView:
     connection_item_a: str = "ConnectionItemA"
     connection_item_b: str = "ConnectionItemB"
-    connection_item_c: str = "ConnectionItemC"
+    connection_item_c: str = "ConnectionItemCNode"
     connection_item_d: str = "ConnectionItemD"
     connection_item_e: str = "ConnectionItemE"
 

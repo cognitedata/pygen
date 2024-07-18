@@ -158,6 +158,7 @@ def test_load_field(
         property_.name,
         property_,
         data_class_by_id,
+        {},
         pygen_config,
         view_id=dm.ViewId("a", "b", "c"),
         pydantic_field="Field",
@@ -261,7 +262,7 @@ def load_data_classes_test_cases():
 @pytest.mark.parametrize("view, expected", load_data_classes_test_cases())
 def test_load_data_class(view: dm.View, expected: NodeDataClass, pygen_config: PygenConfig) -> None:
     # Act
-    actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
+    actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class)
 
     # Assert
     assert actual == expected
@@ -272,12 +273,13 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
     view = dm.View.load(_VIEW_WITH_TIME_PROPERTY_RAW)
 
     # Act
-    data_class = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class)
     data_class.update_fields(
         view.properties,
         {
             view.as_id(): data_class,
         },
+        {},
         [view],
         pygen_config,
     )
@@ -342,7 +344,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
-        actual = Field.from_property(name, prop, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
+        actual = Field.from_property(name, prop, {}, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
 
     # Assert
     assert actual.name == expected_name
@@ -376,7 +378,7 @@ def test_data_class_from_view_expected_warning(name: str, expected_name: str, py
 
     # Act
     with pytest.warns(ViewNameCollisionWarning):
-        actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
+        actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class)
     # Assert
     assert actual.read_name == expected_name
 
@@ -409,7 +411,7 @@ def test_data_class_from_view_expected_warning_file_name(
 
     # Act
     with pytest.warns(ViewNameCollisionWarning):
-        actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
+        actual = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class)
     # Assert
     assert actual.file_name == expected_name
 
@@ -663,7 +665,7 @@ def test_fields_from_property(
 ):
     # Act
     actual = Field.from_property(
-        prop_name, property_, data_class_by_view_id, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field"
+        prop_name, property_, data_class_by_view_id, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field"
     )
 
     # Assert

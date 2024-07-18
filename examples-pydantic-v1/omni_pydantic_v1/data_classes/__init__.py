@@ -66,14 +66,15 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
-from ._connection_item_c import (
-    ConnectionItemC,
-    ConnectionItemCApply,
-    ConnectionItemCApplyList,
-    ConnectionItemCGraphQL,
-    ConnectionItemCList,
-    ConnectionItemCWrite,
-    ConnectionItemCWriteList,
+from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList
+from ._connection_item_c_node import (
+    ConnectionItemCNode,
+    ConnectionItemCNodeApply,
+    ConnectionItemCNodeApplyList,
+    ConnectionItemCNodeGraphQL,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeWriteList,
 )
 from ._connection_item_d import (
     ConnectionItemD,
@@ -249,42 +250,25 @@ from ._sub_interface import (
 )
 
 
-ConnectionEdgeA.update_forward_refs(
-    ConnectionItemF=ConnectionItemF,
-    ConnectionItemG=ConnectionItemG,
-)
-ConnectionEdgeAGraphQL.update_forward_refs(
-    ConnectionItemFGraphQL=ConnectionItemFGraphQL,
-    ConnectionItemGGraphQL=ConnectionItemGGraphQL,
-)
-ConnectionEdgeAWrite.update_forward_refs(
-    ConnectionItemFWrite=ConnectionItemFWrite,
-    ConnectionItemGWrite=ConnectionItemGWrite,
-)
-ConnectionEdgeAApply.update_forward_refs(
-    ConnectionItemFWrite=ConnectionItemFWrite,
-    ConnectionItemGWrite=ConnectionItemGWrite,
-)
-
 ConnectionItemA.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,
-    ConnectionItemC=ConnectionItemC,
+    ConnectionItemCNode=ConnectionItemCNode,
 )
 ConnectionItemAGraphQL.update_forward_refs(
     ConnectionItemAGraphQL=ConnectionItemAGraphQL,
     ConnectionItemBGraphQL=ConnectionItemBGraphQL,
-    ConnectionItemCGraphQL=ConnectionItemCGraphQL,
+    ConnectionItemCNodeGraphQL=ConnectionItemCNodeGraphQL,
 )
 ConnectionItemAWrite.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
-    ConnectionItemCWrite=ConnectionItemCWrite,
+    ConnectionItemCNodeWrite=ConnectionItemCNodeWrite,
 )
 ConnectionItemAApply.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
-    ConnectionItemCWrite=ConnectionItemCWrite,
+    ConnectionItemCNodeWrite=ConnectionItemCNodeWrite,
 )
 
 ConnectionItemB.update_forward_refs(
@@ -304,19 +288,19 @@ ConnectionItemBApply.update_forward_refs(
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
 
-ConnectionItemC.update_forward_refs(
+ConnectionItemCNode.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,
 )
-ConnectionItemCGraphQL.update_forward_refs(
+ConnectionItemCNodeGraphQL.update_forward_refs(
     ConnectionItemAGraphQL=ConnectionItemAGraphQL,
     ConnectionItemBGraphQL=ConnectionItemBGraphQL,
 )
-ConnectionItemCWrite.update_forward_refs(
+ConnectionItemCNodeWrite.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
-ConnectionItemCApply.update_forward_refs(
+ConnectionItemCNodeApply.update_forward_refs(
     ConnectionItemAWrite=ConnectionItemAWrite,
     ConnectionItemBWrite=ConnectionItemBWrite,
 )
@@ -386,6 +370,32 @@ DependentOnNonWritableGraphQL.update_forward_refs(
 DependentOnNonWritableWrite.update_forward_refs()
 DependentOnNonWritableApply.update_forward_refs()
 
+ConnectionEdgeA.update_forward_refs(
+    ConnectionItemE=ConnectionItemE,
+    ConnectionItemG=ConnectionItemG,
+)
+ConnectionEdgeAGraphQL.update_forward_refs(
+    ConnectionItemEGraphQL=ConnectionItemEGraphQL,
+    ConnectionItemGGraphQL=ConnectionItemGGraphQL,
+)
+ConnectionEdgeAWrite.update_forward_refs(
+    ConnectionItemEWrite=ConnectionItemEWrite,
+    ConnectionItemGWrite=ConnectionItemGWrite,
+)
+ConnectionEdgeAApply.update_forward_refs(
+    ConnectionItemEWrite=ConnectionItemEWrite,
+    ConnectionItemGWrite=ConnectionItemGWrite,
+)
+
+ConnectionItemCEdge.update_forward_refs(
+    ConnectionItemA=ConnectionItemA,
+    ConnectionItemB=ConnectionItemB,
+)
+ConnectionItemCEdgeGraphQL.update_forward_refs(
+    ConnectionItemAGraphQL=ConnectionItemAGraphQL,
+    ConnectionItemBGraphQL=ConnectionItemBGraphQL,
+)
+
 
 __all__ = [
     "DataRecord",
@@ -444,13 +454,16 @@ __all__ = [
     "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
-    "ConnectionItemC",
-    "ConnectionItemCGraphQL",
-    "ConnectionItemCWrite",
-    "ConnectionItemCApply",
-    "ConnectionItemCList",
-    "ConnectionItemCWriteList",
-    "ConnectionItemCApplyList",
+    "ConnectionItemCEdge",
+    "ConnectionItemCEdgeGraphQL",
+    "ConnectionItemCEdgeList",
+    "ConnectionItemCNode",
+    "ConnectionItemCNodeGraphQL",
+    "ConnectionItemCNodeWrite",
+    "ConnectionItemCNodeApply",
+    "ConnectionItemCNodeList",
+    "ConnectionItemCNodeWriteList",
+    "ConnectionItemCNodeApplyList",
     "ConnectionItemD",
     "ConnectionItemDGraphQL",
     "ConnectionItemDWrite",

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm
 
@@ -23,6 +23,11 @@ from ._core import (
 from ._unit_procedure import UnitProcedureWrite
 from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
 from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
+
+if TYPE_CHECKING:
+    from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
+    from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
+
 
 __all__ = [
     "StartEndTime",

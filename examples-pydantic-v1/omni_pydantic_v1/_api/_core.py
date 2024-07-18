@@ -775,7 +775,7 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "ConnectionEdgeA": data_classes.ConnectionEdgeAGraphQL,
         "ConnectionItemA": data_classes.ConnectionItemAGraphQL,
         "ConnectionItemB": data_classes.ConnectionItemBGraphQL,
-        "ConnectionItemC": data_classes.ConnectionItemCGraphQL,
+        "ConnectionItemC": data_classes.ConnectionItemCNodeGraphQL,
         "ConnectionItemD": data_classes.ConnectionItemDGraphQL,
         "ConnectionItemE": data_classes.ConnectionItemEGraphQL,
         "ConnectionItemF": data_classes.ConnectionItemFGraphQL,

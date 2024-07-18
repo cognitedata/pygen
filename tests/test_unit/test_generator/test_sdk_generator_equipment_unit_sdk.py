@@ -41,7 +41,7 @@ def equipment_module_api_generator(
 
 @pytest.fixture
 def start_end_time_api_generator(multi_api_generator: MultiAPIGenerator, start_end_time_view: dm.View) -> APIGenerator:
-    api_generator = multi_api_generator[start_end_time_view.as_id()]
+    api_generator = multi_api_generator.api_by_type_by_view_id["edge"][start_end_time_view.as_id()]
     assert api_generator is not None, "Could not find API generator for start end time view"
     return api_generator
 

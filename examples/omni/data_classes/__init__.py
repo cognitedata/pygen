@@ -66,14 +66,15 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
-from ._connection_item_c import (
-    ConnectionItemC,
-    ConnectionItemCApply,
-    ConnectionItemCApplyList,
-    ConnectionItemCGraphQL,
-    ConnectionItemCList,
-    ConnectionItemCWrite,
-    ConnectionItemCWriteList,
+from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList
+from ._connection_item_c_node import (
+    ConnectionItemCNode,
+    ConnectionItemCNodeApply,
+    ConnectionItemCNodeApplyList,
+    ConnectionItemCNodeGraphQL,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeWriteList,
 )
 from ._connection_item_d import (
     ConnectionItemD,
@@ -248,10 +249,6 @@ from ._sub_interface import (
     SubInterfaceWriteList,
 )
 
-ConnectionEdgeA.model_rebuild()
-ConnectionEdgeAGraphQL.model_rebuild()
-ConnectionEdgeAWrite.model_rebuild()
-ConnectionEdgeAApply.model_rebuild()
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
@@ -260,10 +257,10 @@ ConnectionItemB.model_rebuild()
 ConnectionItemBGraphQL.model_rebuild()
 ConnectionItemBWrite.model_rebuild()
 ConnectionItemBApply.model_rebuild()
-ConnectionItemC.model_rebuild()
-ConnectionItemCGraphQL.model_rebuild()
-ConnectionItemCWrite.model_rebuild()
-ConnectionItemCApply.model_rebuild()
+ConnectionItemCNode.model_rebuild()
+ConnectionItemCNodeGraphQL.model_rebuild()
+ConnectionItemCNodeWrite.model_rebuild()
+ConnectionItemCNodeApply.model_rebuild()
 ConnectionItemD.model_rebuild()
 ConnectionItemDGraphQL.model_rebuild()
 ConnectionItemDWrite.model_rebuild()
@@ -284,6 +281,12 @@ DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
 DependentOnNonWritableApply.model_rebuild()
+ConnectionEdgeA.model_rebuild()
+ConnectionEdgeAGraphQL.model_rebuild()
+ConnectionEdgeAWrite.model_rebuild()
+ConnectionEdgeAApply.model_rebuild()
+ConnectionItemCEdge.model_rebuild()
+ConnectionItemCEdgeGraphQL.model_rebuild()
 
 
 __all__ = [
@@ -343,13 +346,16 @@ __all__ = [
     "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
-    "ConnectionItemC",
-    "ConnectionItemCGraphQL",
-    "ConnectionItemCWrite",
-    "ConnectionItemCApply",
-    "ConnectionItemCList",
-    "ConnectionItemCWriteList",
-    "ConnectionItemCApplyList",
+    "ConnectionItemCEdge",
+    "ConnectionItemCEdgeGraphQL",
+    "ConnectionItemCEdgeList",
+    "ConnectionItemCNode",
+    "ConnectionItemCNodeGraphQL",
+    "ConnectionItemCNodeWrite",
+    "ConnectionItemCNodeApply",
+    "ConnectionItemCNodeList",
+    "ConnectionItemCNodeWriteList",
+    "ConnectionItemCNodeApplyList",
     "ConnectionItemD",
     "ConnectionItemDGraphQL",
     "ConnectionItemDWrite",

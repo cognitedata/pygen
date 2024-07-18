@@ -12,7 +12,7 @@ from ._api.cdf_external_references import CDFExternalReferencesAPI
 from ._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
 from ._api.connection_item_a import ConnectionItemAAPI
 from ._api.connection_item_b import ConnectionItemBAPI
-from ._api.connection_item_c import ConnectionItemCAPI
+from ._api.connection_item_c_node import ConnectionItemCNodeAPI
 from ._api.connection_item_d import ConnectionItemDAPI
 from ._api.connection_item_e import ConnectionItemEAPI
 from ._api.connection_item_f import ConnectionItemFAPI
@@ -65,7 +65,7 @@ class OmniClient:
         self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client)
         self.connection_item_a = ConnectionItemAAPI(client)
         self.connection_item_b = ConnectionItemBAPI(client)
-        self.connection_item_c = ConnectionItemCAPI(client)
+        self.connection_item_c_node = ConnectionItemCNodeAPI(client)
         self.connection_item_d = ConnectionItemDAPI(client)
         self.connection_item_e = ConnectionItemEAPI(client)
         self.connection_item_f = ConnectionItemFAPI(client)
@@ -255,7 +255,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references_listed<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
-&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c_node<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_d<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_e<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_f<br />

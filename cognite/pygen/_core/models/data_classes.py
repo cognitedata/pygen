@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import Literal, cast, overload
+from typing import Literal, overload
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
@@ -82,7 +81,9 @@ class DataClass:
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
-    def from_view(cls, view: dm.View, base_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
+    def from_view(
+        cls, view: dm.View, base_name: str, used_for: Literal["node", "edge"], data_class: pygen_config.DataClassNaming
+    ) -> DataClass:
         class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
@@ -98,13 +99,8 @@ class DataClass:
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
 
-        used_for = view.used_for
-        if used_for == "all":
-            used_for = "node"
-            warnings.warn(
-                f"View {view.as_id()} has 'used_for' set to 'all'. This is not supported. Using 'node' instead.",
-                stacklevel=2,
-            )
+        if view.used_for != used_for and view.used_for != "all":
+            raise ValueError(f"View {view.as_id()} cannot be used for {used_for}")
 
         args = dict(
             read_name=class_name,
@@ -137,7 +133,8 @@ class DataClass:
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ) -> None:
@@ -145,7 +142,8 @@ class DataClass:
             field_ = Field.from_property(
                 prop_name,
                 prop,
-                data_class_by_view_id,
+                node_class_by_view_id,
+                edge_class_by_view_id,
                 config,
                 self.view_id,
                 # This is the default value for pydantic_field, it will be updated later
@@ -470,22 +468,27 @@ class EdgeDataClass(DataClass):
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ):
+        # Find all node views that have an edge with properties in this view
+        # and get the node class it is pointing to.
         edge_classes = []
         for view in views:
-            start_class = data_class_by_view_id[view.as_id()]
+            view_id = view.as_id()
+            if view_id not in node_class_by_view_id:
+                continue
+            start_class = node_class_by_view_id[view_id]
             for _prop_name, prop in view.properties.items():
-                if isinstance(prop, dm.MultiEdgeConnection) and prop.edge_source == self.view_id:
-                    edge_classes.append(
-                        EdgeClasses(
-                            cast(NodeDataClass, start_class),
-                            prop.type,
-                            cast(NodeDataClass, data_class_by_view_id[prop.source]),
-                        )
-                    )
+                if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
+                    end_class = node_class_by_view_id[prop.source]
+                    start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
+
+                    new_edge_class = EdgeClasses(start, prop.type, end)
+                    if new_edge_class not in edge_classes:
+                        edge_classes.append(new_edge_class)
 
         self.fields.append(
             EndNodeField(
@@ -497,4 +500,4 @@ class EdgeDataClass(DataClass):
                 edge_classes=edge_classes,
             )
         )
-        super().update_fields(properties, data_class_by_view_id, views, config)
+        super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)

@@ -7,7 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 
 from omni.data_classes import (
     DomainModelCore,
-    ConnectionItemC,
+    ConnectionItemCNode,
 )
 from omni.data_classes._connection_item_a import (
     ConnectionItemA,
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
-class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
+class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     def __init__(
@@ -38,13 +38,13 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("connection_item_c"),
+                name=self._builder.next_name("connection_item_c_node"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
-                result_cls=ConnectionItemC,
+                result_cls=ConnectionItemCNode,
                 max_retrieve_limit=limit,
             )
         )
@@ -62,7 +62,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemAQueryAPI[T_DomainModelList]:
-        """Query along the connection item a edges of the connection item c.
+        """Query along the connection item a edges of the connection item c node.
 
         Args:
             name: The name to filter on.
@@ -126,7 +126,7 @@ class ConnectionItemCQueryAPI(QueryAPI[T_DomainModelList]):
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ) -> ConnectionItemBQueryAPI[T_DomainModelList]:
-        """Query along the connection item b edges of the connection item c.
+        """Query along the connection item b edges of the connection item c node.
 
         Args:
             name: The name to filter on.
