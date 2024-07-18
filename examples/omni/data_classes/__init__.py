@@ -66,15 +66,7 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
-from ._connection_item_c_edge import (
-    ConnectionItemCEdge,
-    ConnectionItemCEdgeApply,
-    ConnectionItemCEdgeApplyList,
-    ConnectionItemCEdgeGraphQL,
-    ConnectionItemCEdgeList,
-    ConnectionItemCEdgeWrite,
-    ConnectionItemCEdgeWriteList,
-)
+from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList
 from ._connection_item_c_node import (
     ConnectionItemCNode,
     ConnectionItemCNodeApply,
@@ -295,8 +287,6 @@ ConnectionEdgeAWrite.model_rebuild()
 ConnectionEdgeAApply.model_rebuild()
 ConnectionItemCEdge.model_rebuild()
 ConnectionItemCEdgeGraphQL.model_rebuild()
-ConnectionItemCEdgeWrite.model_rebuild()
-ConnectionItemCEdgeApply.model_rebuild()
 
 
 __all__ = [
@@ -358,11 +348,7 @@ __all__ = [
     "ConnectionItemBTextFields",
     "ConnectionItemCEdge",
     "ConnectionItemCEdgeGraphQL",
-    "ConnectionItemCEdgeWrite",
-    "ConnectionItemCEdgeApply",
     "ConnectionItemCEdgeList",
-    "ConnectionItemCEdgeWriteList",
-    "ConnectionItemCEdgeApplyList",
     "ConnectionItemCNode",
     "ConnectionItemCNodeGraphQL",
     "ConnectionItemCNodeWrite",

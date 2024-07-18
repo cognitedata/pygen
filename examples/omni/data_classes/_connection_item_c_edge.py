@@ -22,8 +22,9 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
     from ._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+
 
 __all__ = [
     "ConnectionItemCEdge",
