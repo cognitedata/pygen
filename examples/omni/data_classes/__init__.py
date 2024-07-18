@@ -66,6 +66,15 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
+from ._connection_item_c_edge import (
+    ConnectionItemCEdge,
+    ConnectionItemCEdgeApply,
+    ConnectionItemCEdgeApplyList,
+    ConnectionItemCEdgeGraphQL,
+    ConnectionItemCEdgeList,
+    ConnectionItemCEdgeWrite,
+    ConnectionItemCEdgeWriteList,
+)
 from ._connection_item_c_node import (
     ConnectionItemCNode,
     ConnectionItemCNodeApply,
@@ -248,10 +257,6 @@ from ._sub_interface import (
     SubInterfaceWriteList,
 )
 
-ConnectionEdgeA.model_rebuild()
-ConnectionEdgeAGraphQL.model_rebuild()
-ConnectionEdgeAWrite.model_rebuild()
-ConnectionEdgeAApply.model_rebuild()
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
@@ -284,6 +289,14 @@ DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
 DependentOnNonWritableApply.model_rebuild()
+ConnectionEdgeA.model_rebuild()
+ConnectionEdgeAGraphQL.model_rebuild()
+ConnectionEdgeAWrite.model_rebuild()
+ConnectionEdgeAApply.model_rebuild()
+ConnectionItemCEdge.model_rebuild()
+ConnectionItemCEdgeGraphQL.model_rebuild()
+ConnectionItemCEdgeWrite.model_rebuild()
+ConnectionItemCEdgeApply.model_rebuild()
 
 
 __all__ = [
@@ -343,6 +356,13 @@ __all__ = [
     "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
+    "ConnectionItemCEdge",
+    "ConnectionItemCEdgeGraphQL",
+    "ConnectionItemCEdgeWrite",
+    "ConnectionItemCEdgeApply",
+    "ConnectionItemCEdgeList",
+    "ConnectionItemCEdgeWriteList",
+    "ConnectionItemCEdgeApplyList",
     "ConnectionItemCNode",
     "ConnectionItemCNodeGraphQL",
     "ConnectionItemCNodeWrite",
