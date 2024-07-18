@@ -63,7 +63,7 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
             self.type,
         )
 {% endif %}{% endfor %}
-{% for cls in edge_class %}{% if not cls.has_node_class %}{% if cls.has_container_fields %}
+{% for cls in edge_classes %}{% if not cls.has_node_class %}{% if cls.has_container_fields %}
 class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
     {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
 {% endif %}
