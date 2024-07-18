@@ -91,7 +91,7 @@ class ConnectionItemCNodeAPI(
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
-            connection_item_c_node: connection item c node or sequence of connection item c nodes to upsert.
+            connection_item_c_node: Connection item c node or sequence of connection item c nodes to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
             write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
@@ -230,7 +230,7 @@ class ConnectionItemCNodeAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_cs = client.connection_item_c_node.list(limit=5)
+                >>> connection_item_c_nodes = client.connection_item_c_node.list(limit=5)
 
         """
         filter_ = _create_connection_item_c_node_filter(

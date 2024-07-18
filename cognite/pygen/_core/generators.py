@@ -89,6 +89,7 @@ class SDKGenerator:
                         view_id
                     ].api_class
                     for view in model.views
+                    if view.as_id() in self._multi_api_generator.api_by_type_by_view_id["node"]
                 },
                 config.naming.multi_api_class,
             )
@@ -124,7 +125,7 @@ class SDKGenerator:
                 top_level_package=self.top_level_package,
                 api_classes=sorted(self._multi_api_generator.apis),
                 data_model=self._data_model[0],
-                api_by_view_id=self._multi_api_generator.api_by_type_by_view_id,
+                api_by_view_id=self._multi_api_generator.api_by_type_by_view_id["node"],
                 multi_apis=self._multi_api_classes,
             )
             + "\n"
