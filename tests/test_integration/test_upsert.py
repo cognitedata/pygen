@@ -43,7 +43,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
         assert len(created.edges) == 2
 
         # Act
-        retrieved = omni_client.connection_item_c.retrieve(new_connection_c.external_id)
+        retrieved = omni_client.connection_item_c_node.retrieve(new_connection_c.external_id)
 
         # Assert
         assert retrieved.external_id == new_connection_c.external_id

@@ -10,9 +10,9 @@ from omni.data_classes import (
     ConnectionItemF,
     ConnectionEdgeA,
 )
-from omni.data_classes._connection_item_g import (
-    ConnectionItemG,
-    _create_connection_item_g_filter,
+from omni.data_classes._connection_item_e import (
+    ConnectionItemE,
+    _create_connection_item_e_filter,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -21,7 +21,7 @@ from omni.data_classes._connection_edge_a import (
 )
 
 if TYPE_CHECKING:
-    from .connection_item_g_query import ConnectionItemGQueryAPI
+    from .connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
@@ -51,6 +51,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
 
     def outwards_multi(
         self,
+        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -65,10 +66,11 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemGQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemEQueryAPI[T_DomainModelList]:
         """Query along the outwards multi edges of the connection item f.
 
         Args:
+            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -86,9 +88,9 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
                 to return all items.
 
         Returns:
-            ConnectionItemGQueryAPI: The query API for the connection item g.
+            ConnectionItemEQueryAPI: The query API for the connection item e.
         """
-        from .connection_item_g_query import ConnectionItemGQueryAPI
+        from .connection_item_e_query import ConnectionItemEQueryAPI
 
         from_ = self._builder[-1].name
         edge_view = ConnectionEdgeA._view_id
@@ -120,17 +122,18 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = ConnectionItemGQueryAPI._view_id
+        view_id = ConnectionItemEQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_g_filter(
+        node_filer = _create_connection_item_e_filter(
             view_id,
+            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemGQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemEQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,

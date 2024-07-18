@@ -36,7 +36,9 @@ def test_query_limit_with_direct_relations(omni_client: OmniClient) -> None:
 
 def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
     items = (
-        omni_client.connection_item_c(limit=-1).connection_item_a(external_id_prefix="ConnectionItemA:Joseph").query()
+        omni_client.connection_item_c_node(limit=-1)
+        .connection_item_a(external_id_prefix="ConnectionItemA:Joseph")
+        .query()
     )
 
     assert len(items) > 0
