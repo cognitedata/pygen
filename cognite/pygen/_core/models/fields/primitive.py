@@ -7,6 +7,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 
 from .base import Field
 
@@ -46,7 +47,7 @@ class BasePrimitiveField(Field, ABC):
 
     def as_typed_hint(self) -> str:
         type_ = _to_python_type(self.type_, typed=True)
-        if self.type_.is_list:
+        if isinstance(self.type_, ListablePropertyType) and self.type_.is_list:
             type_ = f"list[{type_}]"
         if self.is_nullable:
             type_ = f"{type_} | None = None"
@@ -54,7 +55,7 @@ class BasePrimitiveField(Field, ABC):
 
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BasePrimitiveField | None:
-        if prop.type.is_list:
+        if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
             return PrimitiveListField(
                 name=base.name,
                 doc_name=base.doc_name,

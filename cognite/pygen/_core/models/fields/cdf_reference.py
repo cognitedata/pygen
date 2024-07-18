@@ -7,6 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 
 from .base import Field
 from .primitive import BasePrimitiveField, PrimitiveListField
@@ -25,7 +26,7 @@ class CDFExternalField(BasePrimitiveField):
 
     @property
     def is_list(self) -> bool:
-        return self.type_.is_list
+        return isinstance(self.type_, ListablePropertyType) and self.type_.is_list
 
     def as_read_type_hint(self) -> str:
         return self.as_write_type_hint()
