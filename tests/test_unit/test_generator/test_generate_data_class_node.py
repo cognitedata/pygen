@@ -7,7 +7,7 @@ from tests.constants import IS_PYDANTIC_V2, OmniFiles
 
 def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullable", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullable", "1")]
     expected = OmniFiles.primitive_nullable_data.read_text()
 
     # Act
@@ -20,7 +20,7 @@ def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator
 
 def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
     expected = OmniFiles.primitive_required_data.read_text()
 
     # Act
@@ -33,7 +33,9 @@ def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator
 
 def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
+    ]
     expected = OmniFiles.primitive_nullable_list_data.read_text()
 
     # Act
@@ -46,7 +48,9 @@ def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGene
 
 def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    ]
     expected = OmniFiles.primitive_required_list_data.read_text()
 
     # Act
@@ -59,7 +63,9 @@ def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGene
 
 def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    ]
     expected = OmniFiles.primitive_with_defaults_data.read_text()
 
     # Act
@@ -72,7 +78,9 @@ def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGene
 
 def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "CDFExternalReferences", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    ]
     expected = OmniFiles.cdf_external_data.read_text()
 
     # Act
@@ -87,7 +95,7 @@ def test_generate_cdf_external_references_list(
     omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
 ):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
         dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
     ]
     expected = OmniFiles.cdf_external_list_data.read_text()
@@ -102,7 +110,7 @@ def test_generate_cdf_external_references_list(
 
 def test_generate_implementation1(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "Implementation1", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "Implementation1", "1")]
     expected = OmniFiles.implementation_1_data.read_text()
 
     # Act
@@ -117,7 +125,7 @@ def test_generate_implementation1_non_writable(
     omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
 ):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
         dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
     ]
     expected = OmniFiles.implementation_1_non_writeable_data.read_text()
@@ -132,7 +140,7 @@ def test_generate_implementation1_non_writable(
 
 def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
     expected = OmniFiles.connection_item_a_data.read_text()
 
     # Act
@@ -145,7 +153,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
     expected = OmniFiles.connection_item_c_data.read_text()
 
     # Act
@@ -158,7 +166,7 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_d(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemD", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemD", "1")]
     expected = OmniFiles.connection_item_d_data.read_text()
 
     # Act
@@ -171,7 +179,7 @@ def test_generate_connection_item_d(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemE", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemE", "1")]
     expected = OmniFiles.connection_item_e_data.read_text()
 
     # Act
@@ -184,7 +192,7 @@ def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_f(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemF", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemF", "1")]
     expected = OmniFiles.connection_item_f_data.read_text()
 
     # Act

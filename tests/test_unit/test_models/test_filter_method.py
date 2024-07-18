@@ -16,7 +16,9 @@ def test_create_list_method_primitive_nullable(
     omni_multi_api_generator: MultiAPIGenerator, pygen_config: PygenConfig
 ) -> None:
     # Arrange
-    data_class = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullable", "1")].data_class
+    data_class = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+    ].data_class
     parameters = [
         FilterParameter("boolean", "bool", description="The boolean to filter on."),
         FilterParameter("min_date", "datetime.date", description="The minimum value of the date to filter on."),
@@ -88,7 +90,9 @@ def test_create_list_method_connection_item_a(
     omni_multi_api_generator: MultiAPIGenerator, pygen_config: PygenConfig
 ) -> None:
     # Arrange
-    data_class = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")].data_class
+    data_class = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    ].data_class
     parameters = [
         FilterParameter("name", "str | list[str]", description="The name to filter on."),
         FilterParameter("name_prefix", "str", description="The prefix of the name to filter on."),

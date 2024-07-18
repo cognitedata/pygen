@@ -7,7 +7,7 @@ from tests.constants import OmniFiles
 
 def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
     expected = OmniFiles.connection_item_a_query.read_text()
 
     # Act
@@ -22,7 +22,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemB", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemB", "1")]
     expected = OmniFiles.connection_item_b_query.read_text()
 
     # Act
@@ -37,7 +37,7 @@ def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
     expected = OmniFiles.connection_item_c_query.read_text()
 
     # Act
@@ -52,7 +52,7 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_d(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemD", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[dm.ViewId("pygen-models", "ConnectionItemD", "1")]
     expected = OmniFiles.connection_item_d_query.read_text()
 
     # Act

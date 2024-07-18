@@ -9,7 +9,9 @@ from tests.constants import OmniFiles
 
 def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "CDFExternalReferences", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id[
+        dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    ]
     expected = OmniFiles.cdf_external_timeseries_api.read_text()
 
     # Act
