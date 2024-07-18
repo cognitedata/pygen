@@ -10,7 +10,7 @@ def test_generate_connection_item_c_edge(omni_multi_api_generator: MultiAPIGener
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["edge"][
         dm.ViewId("pygen-models", "ConnectionItemC", "1")
     ]
-    expected = OmniFiles.connection_item_c_node_data.read_text()
+    expected = OmniFiles.connection_item_c_edge_data.read_text()
 
     # Act
     actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)

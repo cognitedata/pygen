@@ -483,13 +483,12 @@ class EdgeDataClass(DataClass):
             start_class = node_class_by_view_id[view_id]
             for _prop_name, prop in view.properties.items():
                 if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
-                    edge_classes.append(
-                        EdgeClasses(
-                            start_class=start_class,
-                            edge_type=prop.type,
-                            end_class=node_class_by_view_id[prop.source],
-                        )
-                    )
+                    end_class = node_class_by_view_id[prop.source]
+                    start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
+
+                    new_edge_class = EdgeClasses(start, prop.type, end)
+                    if new_edge_class not in edge_classes:
+                        edge_classes.append(new_edge_class)
 
         self.fields.append(
             EndNodeField(

@@ -34,11 +34,14 @@ class EdgeClasses:
     def __eq__(self, other: object) -> bool:
         if isinstance(other, EdgeClasses):
             return (
-                self.end_class == other.end_class
+                self.end_class.read_name == other.end_class.read_name
                 and self.edge_type == other.edge_type
-                and self.start_class == other.start_class
+                and self.start_class.read_name == other.start_class.read_name
             )
         return NotImplemented
+
+    def __repr__(self) -> str:
+        return f"EdgeClass({self.start_class.read_name} - {self.edge_type} - {self.end_class.read_name})"
 
 
 @dataclass(frozen=True)
@@ -100,7 +103,7 @@ class EndNodeField(Field):
         if self.end_classes:
             return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
         else:
-            return f"self.{self.name}.as_write()"
+            return f"self.{self.name}"
 
     def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
