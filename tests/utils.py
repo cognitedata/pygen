@@ -15,18 +15,18 @@ def to_data_class_by_view_id(
         if view.used_for == "all":
             base_name = DataClass.to_base_name(view)
             node_by_view_id[view.as_id()] = NodeDataClass.from_view(
-                view, f"{base_name}Node", pygen_config.naming.data_class
+                view, f"{base_name}Node", "node", pygen_config.naming.data_class
             )
             edge_by_view_id[view.as_id()] = EdgeDataClass.from_view(
-                view, f"{base_name}Edge", pygen_config.naming.data_class
+                view, f"{base_name}Edge", "edge", pygen_config.naming.data_class
             )
         elif view.used_for == "node":
             node_by_view_id[view.as_id()] = NodeDataClass.from_view(
-                view, DataClass.to_base_name(view), pygen_config.naming.data_class
+                view, DataClass.to_base_name(view), "node", pygen_config.naming.data_class
             )
         elif view.used_for == "edge":
             edge_by_view_id[view.as_id()] = EdgeDataClass.from_view(
-                view, DataClass.to_base_name(view), pygen_config.naming.data_class
+                view, DataClass.to_base_name(view), "edge", pygen_config.naming.data_class
             )
 
     return node_by_view_id, edge_by_view_id
