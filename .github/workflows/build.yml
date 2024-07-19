@@ -164,7 +164,7 @@ jobs:
           whl_file=$(find dist -name "*.whl" | sed 's|^dist/||') # Find the built wheel file, remove dist/ prefix
           echo "Found built wheel file: $whl_file"
           PYGEN_FILE_PATH=$whl_file \
-          PACKAGES="[\"pyodide-http\", \"http://localhost:3000/dist/$whl_file\"]" \
+          PACKAGES="[\"pyodide-http\", \"pandas\", \"typing-extensions>=4.10.0\", \"http://localhost:3000/dist/$whl_file\"]" \
           node test-pyodide.js
 
 
@@ -191,5 +191,5 @@ jobs:
           whl_file=$(find dist -name "*.whl" | sed 's|^dist/||') # Find the built wheel file, remove dist/ prefix
           echo "Found built wheel file: $whl_file"
           PYGEN_FILE_PATH=$whl_file \
-          PACKAGES="[\"pyodide-http\", \"http://localhost:3000/dist/$whl_file\"]" \
+          PACKAGES="[\"pyodide-http\", \"pandas\", \"typing-extensions>=4.10.0\", \"http://localhost:3000/dist/$whl_file\"]" \
           node test-pyodide.js

@@ -12,7 +12,7 @@ const path = require('path');
 const PORT = 3000;
 
 // The Cognite Python SDK wheel filename will be sent in as environment variable
-const wheelFilePath = path.join(__dirname, '..', 'dist', process.env.PYGEN_FILE_PATH);
+const wheelFilePath = path.join(__dirname, 'dist', process.env.PYGEN_FILE_PATH);
 
 // Create an HTTP server to serve the wheel file
 const server = http.createServer((req, res) => {
