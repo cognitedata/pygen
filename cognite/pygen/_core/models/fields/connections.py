@@ -313,6 +313,12 @@ class OneToManyConnectionField(BaseConnectionField):
             return "list[DirectRelationReference | tuple[str, str]] | None = None"
         raise NotImplementedError("as_typed_hint is not implemented for edge fields")
 
+    def as_typed_init_set(self) -> str:
+        if self.is_direct_relation:
+            return (f"[DirectRelationReference.load({self.variable}) for {self.variable} in {self.name}] "
+                    f"if {self.name} else None")
+        return self.name
+
 
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
