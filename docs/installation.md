@@ -107,6 +107,8 @@ cognite-pygen==0.99.17
 
 **Context Seen**: CDF Notebook Environment
 
+This is a known bug in `pyodide`, GitHub issue [pyodide#4234](https://github.com/pyodide/pyodide/issues/4234).
+
 ??? Error
 
     ValueError                                Traceback (most recent call last)
