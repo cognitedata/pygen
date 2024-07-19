@@ -29,7 +29,7 @@ class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, Ty
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
         self.files = files
         self.sequences = sequences
         self.timeseries = timeseries
@@ -46,10 +46,10 @@ class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNo
         files: list[str] | None = None,
         sequences: list[str] | None = None,
         timeseries: list[str] | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
         self.files = files
         self.sequences = sequences
         self.timeseries = timeseries
@@ -83,7 +83,7 @@ class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApp
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
         self.a_value = a_value
 
 
@@ -96,10 +96,10 @@ class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
         last_updated_time: int,
         created_time: int,
         a_value: str | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
         self.a_value = a_value
 
     def as_write(self) -> DependentOnNonWritableApply:
@@ -129,7 +129,7 @@ class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
         self.main_value = main_value
 
 
@@ -142,10 +142,10 @@ class MainInterface(MainInterfaceProperties, TypedNode):
         last_updated_time: int,
         created_time: int,
         main_value: str | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
         self.main_value = main_value
 
     def as_write(self) -> MainInterfaceApply:
@@ -187,7 +187,7 @@ class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -216,10 +216,10 @@ class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
         json_: dict | None = None,
         text: str | None = None,
         timestamp: datetime | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -277,7 +277,7 @@ class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeA
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -306,10 +306,10 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
         json_: list[dict],
         text: list[str],
         timestamp: list[datetime],
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -370,7 +370,7 @@ class SubInterface(SubInterfaceProperties, MainInterface):
         created_time: int,
         main_value: str | None = None,
         sub_value: str | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(space, external_id, version, last_updated_time, created_time, main_value, type, deleted_time)
@@ -425,7 +425,7 @@ class Implementation1(Implementation1Properties, SubInterface):
         main_value: str | None = None,
         sub_value: str | None = None,
         value_1: str | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(
@@ -476,7 +476,7 @@ class Implementation2(Implementation2Properties, SubInterface):
         created_time: int,
         main_value: str | None = None,
         sub_value: str | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
+        type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(

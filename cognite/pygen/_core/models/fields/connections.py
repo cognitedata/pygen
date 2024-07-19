@@ -150,6 +150,10 @@ class BaseConnectionField(Field, ABC):
     def is_connection(self) -> bool:
         return True
 
+    @property
+    def is_one_to_many(self) -> bool:
+        raise NotImplementedError()
+
     @classmethod
     def load(
         cls,
@@ -288,6 +292,10 @@ class OneToManyConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = True
     variable: str
 
+    @property
+    def is_one_to_many(self) -> bool:
+        return True
+
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes and use_node_reference:
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
@@ -308,15 +316,29 @@ class OneToManyConnectionField(BaseConnectionField):
                 for { self.variable } in self.{ self.name } or []
             ]"""
 
-    def as_typed_hint(self) -> str:
-        if self.is_direct_relation:
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
             return "list[DirectRelationReference | tuple[str, str]] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "list[DirectRelationReference] | None = None"
         raise NotImplementedError("as_typed_hint is not implemented for edge fields")
+
+    def as_typed_init_set(self) -> str:
+        if self.is_direct_relation:
+            return (
+                f"[DirectRelationReference.load({self.variable}) for {self.variable} in {self.name}] "
+                f"if {self.name} else None"
+            )
+        return self.name
 
 
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
+
+    @property
+    def is_one_to_many(self) -> bool:
+        return False
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes:
@@ -332,7 +354,14 @@ class OneToOneConnectionField(BaseConnectionField):
                 "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
             }}"""
 
-    def as_typed_hint(self) -> str:
-        if self.is_direct_relation:
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
             return "DirectRelationReference | tuple[str, str] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "DirectRelationReference | None = None"
         raise NotImplementedError("as_typed_hint is not implemented for edge fields")
+
+    def as_typed_init_set(self) -> str:
+        if self.is_direct_relation:
+            return f"DirectRelationReference.load({self.name}) if {self.name} else None"
+        return self.name
