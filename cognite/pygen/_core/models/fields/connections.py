@@ -315,8 +315,10 @@ class OneToManyConnectionField(BaseConnectionField):
 
     def as_typed_init_set(self) -> str:
         if self.is_direct_relation:
-            return (f"[DirectRelationReference.load({self.variable}) for {self.variable} in {self.name}] "
-                    f"if {self.name} else None")
+            return (
+                f"[DirectRelationReference.load({self.variable}) for {self.variable} in {self.name}] "
+                f"if {self.name} else None"
+            )
         return self.name
 
 
