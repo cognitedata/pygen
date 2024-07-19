@@ -308,9 +308,11 @@ class OneToManyConnectionField(BaseConnectionField):
                 for { self.variable } in self.{ self.name } or []
             ]"""
 
-    def as_typed_hint(self) -> str:
-        if self.is_direct_relation:
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
             return "list[DirectRelationReference | tuple[str, str]] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "list[DirectRelationReference] | None = None"
         raise NotImplementedError("as_typed_hint is not implemented for edge fields")
 
     def as_typed_init_set(self) -> str:
@@ -340,9 +342,11 @@ class OneToOneConnectionField(BaseConnectionField):
                 "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
             }}"""
 
-    def as_typed_hint(self) -> str:
-        if self.is_direct_relation:
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
             return "DirectRelationReference | tuple[str, str] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "DirectRelationReference | None = None"
         raise NotImplementedError("as_typed_hint is not implemented for edge fields")
 
     def as_typed_init_set(self) -> str:

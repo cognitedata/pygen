@@ -98,7 +98,7 @@ class Field:
     def as_graphql_type_hint(self) -> str:
         raise NotImplementedError()
 
-    def as_typed_hint(self) -> str:
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
         raise NotImplementedError()
 
     def as_typed_init_set(self) -> str:
