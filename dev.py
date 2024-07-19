@@ -278,6 +278,8 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     api_client_files_v2 = list((REPO_ROOT / "examples").glob("**/_api_client.py"))
     api_client_files_v1 = list((REPO_ROOT / "examples-pydantic-v1").glob("**/_api_client.py"))
     api_client_files = api_client_files_v1 + api_client_files_v2
+    quickstart_streamlit = REPO_ROOT / "docs" / "quickstart" / "cdf_streamlit.md"
+
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
     current_major, current_minor, current_patch = (int(x) for x in current_version.split("."))
@@ -309,6 +311,13 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
         if file not in api_client_files_v1:
             # pydantic v1 is frozen at 1.10.7
             content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
+        file.write_text(content)
+        typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
+    for file in [quickstart_streamlit]:
+        content = file.read_text()
+        if not skip:
+            content = content.replace(current_version, new_version)
+        content = re.sub(r"cognite-sdk==\d+.\d+.\d+", f"cognite-sdk=={cognite_sdk_version}", content)
         file.write_text(content)
         typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
     typer.echo("Done")

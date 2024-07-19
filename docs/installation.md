@@ -99,13 +99,14 @@ You will get the error above because `cognite-pygen` requires the `cognite-sdk` 
 can fix this by updating the `cognite-sdk` version to `>=7.13.6` in the `requirements.txt` file.
 
 ```requirements
-cognite-sdk>=7.13.6
+cognite-sdk==7.13.6
 cognite-pygen==0.99.17
 ```
 
 ### Requested 'typing-extensions>=4.10.0; python_version < "3.13"', but typing-extensions==4.7.1 is already installed
 
 **Context Seen**: CDF Notebook Environment
+
 
 ??? Error
 
@@ -259,8 +260,7 @@ cognite-pygen==0.99.17
 
     ValueError: Requested 'typing-extensions>=4.10.0; python_version < "3.13"', but typing-extensions==4.7.1 is already installed
 
-The cause of this error is currently unknown, other that there exist some other dependency requiring `typing-extensions>4.10`
-that is not `cognite-pygen`.
+This is a known bug in `pyodide`, GitHub issue [pyodide#4234](https://github.com/pyodide/pyodide/issues/4234).
 
 The workaround is to manually uninstall the `typing-extensions` package and then install the `cognite-pygen` package.
 
@@ -275,4 +275,14 @@ Then, install `cognite-pygen`:
 
 ```python
 %pip install cognite-pygen
+```
+
+In a `CDF Streamlit` environment, you can install the `typing-extensions` package before installing `cognite-pygen`:
+
+```text
+pyodide-http==0.2.1
+pydantic==1.10.7
+typing-extensions>=4.10.0
+cognite-sdk==7.54.4
+cognite-pygen==0.99.27
 ```
