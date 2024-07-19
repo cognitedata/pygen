@@ -92,15 +92,15 @@ In a `CDF Notebook` you can install `cognite-pygen` by running the following cod
 
 This error can occur if one of the dependencies of `cognite-pygen` is violated. For example, if you have
 ```requirements
-cognite-sdk==7.54.4
-cognite-pygen==0.99.27
+cognite-sdk==7.5.0
+cognite-pygen==0.99.17
 ```
 You will get the error above because `cognite-pygen` requires the `cognite-sdk` version to be `>=7.13.6`. You
 can fix this by updating the `cognite-sdk` version to `>=7.13.6` in the `requirements.txt` file.
 
 ```requirements
-cognite-sdk==7.54.4
-cognite-pygen==0.99.27
+cognite-sdk==7.13.6
+cognite-pygen==0.99.17
 ```
 
 ### Requested 'typing-extensions>=4.10.0; python_version < "3.13"', but typing-extensions==4.7.1 is already installed
