@@ -46,13 +46,13 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         last_updated_time: int,
         created_time: int,{% for field in cls.container_fields_sorted() %}
         {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
-        type: DirectRelationReference | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
         deleted_time: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
         super().__init__(space, external_id, version, last_updated_time, created_time, deleted_time, None, type){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, type, deleted_time){% else %}{% for parent in cls.implements %}
         {{ parent.read_name }}.__init__(self, space, external_id, version, last_updated_time, created_time, {{ parent.container_field_variables }}, type, deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.name}}{% endfor %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
 
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
@@ -94,9 +94,9 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         self,
         space: str,
         external_id: str,
-        type: DirectRelationReference,
-        start_node: DirectRelationReference,
-        end_node: DirectRelationReference,
+        type: DirectRelationReference | tuple[str, str],
+        start_node: DirectRelationReference | tuple[str, str],
+        end_node: DirectRelationReference | tuple[str, str],
         version: int,
         last_updated_time: int,
         created_time: int,{% for field in cls.container_fields_sorted() %}
@@ -106,7 +106,7 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         super().__init__(space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time, None){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, deleted_time){% else %}{% for parent in cls.implements %}
         {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.name}}{% endfor %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
 
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
