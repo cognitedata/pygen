@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
+from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import Enum, ListablePropertyType
@@ -45,8 +46,8 @@ class BasePrimitiveField(Field, ABC):
     def as_read_graphql(self) -> str:
         return f"self.{self.name}"
 
-    def as_typed_hint(self) -> str:
-        type_ = _to_python_type(self.type_, typed=True)
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        type_ = _to_python_type(self.type_, typed=True, operation=operation)
         if isinstance(self.type_, ListablePropertyType) and self.type_.is_list:
             type_ = f"list[{type_}]"
         if self.is_nullable:
@@ -182,7 +183,11 @@ class PrimitiveListField(BasePrimitiveField):
             return base
 
 
-def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, typed: bool = False) -> str:
+def _to_python_type(
+    type_: dm.DirectRelationReference | dm.PropertyType,
+    typed: bool = False,
+    operation: Literal["read", "write"] = "write",
+) -> str:
     if isinstance(type_, (dm.Int32, dm.Int64)):
         out_type = "int"
     elif isinstance(type_, dm.Boolean):
@@ -208,7 +213,10 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, typed: 
             out_type = "TimeSeries"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
         if typed and isinstance(type_, (dm.DirectRelation, dm.DirectRelationReference)):
-            out_type = "DirectRelationReference | tuple[str, str]"
+            if operation == "write":
+                out_type = "DirectRelationReference | tuple[str, str]"
+            else:
+                out_type = "DirectRelationReference"
         else:
             out_type = "str"
     elif isinstance(type_, Enum):
