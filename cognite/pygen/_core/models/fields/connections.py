@@ -150,6 +150,10 @@ class BaseConnectionField(Field, ABC):
     def is_connection(self) -> bool:
         return True
 
+    @property
+    def is_one_to_many(self) -> bool:
+        raise NotImplementedError()
+
     @classmethod
     def load(
         cls,
@@ -288,6 +292,10 @@ class OneToManyConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = True
     variable: str
 
+    @property
+    def is_one_to_many(self) -> bool:
+        return True
+
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes and use_node_reference:
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
@@ -327,6 +335,10 @@ class OneToManyConnectionField(BaseConnectionField):
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
+
+    @property
+    def is_one_to_many(self) -> bool:
+        return False
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes:

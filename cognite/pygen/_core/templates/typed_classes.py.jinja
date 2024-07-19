@@ -58,7 +58,7 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         return {{ cls.read_name }}Apply(
             self.space,
             self.external_id,{% for field in cls.container_fields_sorted() %}
-            self.{{field.name}},{% if field.is_connection %}  # type: ignore[arg-type]{% endif %}{% endfor %}
+            self.{{field.name}},{% if field.is_connection and field.is_one_to_many %}  # type: ignore[arg-type]{% endif %}{% endfor %}
             self.version,
             self.type,
         )
