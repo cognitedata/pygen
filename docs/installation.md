@@ -99,7 +99,7 @@ You will get the error above because `cognite-pygen` requires the `cognite-sdk` 
 can fix this by updating the `cognite-sdk` version to `>=7.13.6` in the `requirements.txt` file.
 
 ```requirements
-cognite-sdk>=7.13.6
+cognite-sdk==7.13.6
 cognite-pygen==0.99.17
 ```
 
