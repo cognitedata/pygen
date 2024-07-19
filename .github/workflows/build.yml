@@ -165,7 +165,7 @@ jobs:
           echo "Found built wheel file: $whl_file"
           PYGEN_FILE_PATH=$whl_file \
           PACKAGES="[\"pyodide-http\", \"http://localhost:3000/dist/$whl_file\"]" \
-          node scripts/test-pyodide.js
+          node test-pyodide.js
 
 
   build_and_test_jupyter_pyodide:
