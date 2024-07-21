@@ -243,14 +243,19 @@ class DataClass:
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
 
-    @property
-    def non_parent_fields(self) -> Iterator[Field]:
+    def non_parent_fields(self, fields: Iterator[Field] | None = None) -> Iterator[Field]:
         parent_fields = {field.prop_name for parent in self.implements for field in parent}
-        return (field for field in self if field.prop_name not in parent_fields)
+        return (field for field in fields or self if field.prop_name not in parent_fields)
 
     @property
     def read_fields(self) -> Iterator[Field]:
-        return (field for field in self if not field.is_write_field)
+        """These fields are used when creating the read data class."""
+        return self.non_parent_fields()
+
+    @property
+    def write_fields(self) -> Iterator[Field]:
+        """These fields are used when creating the write data class."""
+        return (field for field in self.non_parent_fields() if field.is_write_field)
 
     @overload
     def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]: ...
