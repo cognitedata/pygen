@@ -299,6 +299,9 @@ class DomainModelWrite(DomainModelCore{% if is_pydantic_v2 %}, extra="ignore", p
         extra = Extra.ignore
         allow_population_by_field_name = True{% endif %}
 
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
+
     def to_instances_write(
         self,
         write_none: bool = False,

@@ -51,7 +51,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class.non_parent_fields %}
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -79,8 +79,8 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
-            {{ field.name }}={{ field.as_write() }},{% endfor %}
+            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
+            {{ field.name }}={{ field.as_write() }},{% endif %}{% endfor %}
         )
 {% endif %}
 
@@ -96,7 +96,7 @@ class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_cla
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_write(self) -> {{ data_class.write_name }}:
@@ -104,8 +104,8 @@ class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_cla
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}
-            {{ field.name }}={{ field.as_write() }},{% endfor %}
+            data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}{% if field.is_write_field %}
+            {{ field.name }}={{ field.as_write() }},{% endif %}{% endfor %}
         )
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -126,11 +126,11 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}{% if field.is_write_field %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_write(

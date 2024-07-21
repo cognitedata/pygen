@@ -217,7 +217,9 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
 
 def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemE", "1")]
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    ]
     expected = OmniFiles.connection_item_e_api.read_text()
 
     # Act
