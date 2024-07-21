@@ -85,6 +85,7 @@ class EdgeAPIClass(APIClass):
     query: QueryAPIClass
     end_view_id: dm.ViewId
     end_filter_method: FilterMethod
+    field: BaseConnectionField
 
     @property
     def has_edge_class(self) -> bool:
@@ -191,6 +192,7 @@ class EdgeAPIClass(APIClass):
             direction=field.edge_direction,
             end_view_id=end_class.view_id,
             end_filter_method=api_generator_by_view_id[end_class.view_id].list_method,
+            field=field,
         )
 
 

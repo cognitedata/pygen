@@ -434,7 +434,7 @@ class DataClass:
 
     @property
     def one_to_many_edges_docs(self) -> str:
-        edges = list(self.fields_of_type(OneToManyConnectionField))
+        edges = [f for f in self.fields_of_type(OneToManyConnectionField) if f.is_write_field]
         if len(edges) == 1:
             return f"`{edges[0].name}`"
         else:
