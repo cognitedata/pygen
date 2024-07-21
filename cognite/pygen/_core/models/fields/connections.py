@@ -365,7 +365,7 @@ class OneToOneConnectionField(BaseConnectionField):
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes:
-            return f"self.{self.name}.{method}() if isinstance(self.{self.name}, {base_cls}) else self.{self.name}"
+            return f"self.{self.name}.{method}()\nif isinstance(self.{self.name}, {base_cls})\nelse self.{self.name}"
         else:
             return f"self.{self.name}"
 

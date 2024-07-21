@@ -121,8 +121,8 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         return {{ data_class.write_name }}(
             space=self.space or DEFAULT_INSTANCE_SPACE,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}
-            {{ field.name }}={{ field.as_write_graphql() }},{% endfor %}
+            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
+            {{ field.name }}={{ field.as_write_graphql() }},{% endif %}{% endfor %}
         )
 {% endif %}
 
