@@ -18,7 +18,7 @@ from cognite.client.data_classes.data_modeling.views import (
 from .base import Field
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.models.data_classes import DataClass, NodeDataClass
+    from cognite.pygen._core.models.data_classes import DataClass, EdgeDataClass, NodeDataClass
 
 
 @total_ordering
@@ -38,11 +38,14 @@ class EdgeClasses:
     def __eq__(self, other: object) -> bool:
         if isinstance(other, EdgeClasses):
             return (
-                self.end_class == other.end_class
+                self.end_class.read_name == other.end_class.read_name
                 and self.edge_type == other.edge_type
-                and self.start_class == other.start_class
+                and self.start_class.read_name == other.start_class.read_name
             )
         return NotImplemented
+
+    def __repr__(self) -> str:
+        return f"EdgeClass({self.start_class.read_name} - {self.edge_type} - {self.end_class.read_name})"
 
 
 @dataclass(frozen=True)
@@ -68,7 +71,10 @@ class EndNodeField(Field):
         return self._type_hint([data_class.read_name for data_class in self.end_classes])
 
     def as_graphql_type_hint(self) -> str:
-        data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        if self.end_classes:
+            data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        else:
+            data_class_names = ["dm.NodeId"]
         data_class_names_hint = ", ".join(sorted(data_class_names))
         left_side = f"Union[{data_class_names_hint}, None]"
         if self.need_alias:
@@ -98,7 +104,10 @@ class EndNodeField(Field):
             return left_side
 
     def as_write(self) -> str:
-        return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+        if self.end_classes:
+            return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+        else:
+            return f"self.{self.name}"
 
     def as_read_graphql(self) -> str:
         return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
@@ -150,13 +159,18 @@ class BaseConnectionField(Field, ABC):
     def is_connection(self) -> bool:
         return True
 
+    @property
+    def is_one_to_many(self) -> bool:
+        raise NotImplementedError()
+
     @classmethod
     def load(
         cls,
         base: Field,
         prop: dm.ConnectionDefinition | dm.MappedProperty,
         variable: str,
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
     ) -> Field | None:
         if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
             return None
@@ -168,12 +182,12 @@ class BaseConnectionField(Field, ABC):
         use_node_reference = True
         end_classes: list[DataClass] | None
         if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
-            end_classes = [data_class_by_view_id[prop.edge_source]]
+            end_classes = [edge_class_by_view_id[prop.edge_source]]
             use_node_reference = False
-        elif isinstance(prop, dm.ConnectionDefinition) or (
-            isinstance(prop, dm.MappedProperty) and prop.source is not None
-        ):
-            end_classes = [data_class_by_view_id[prop.source]]  # type: ignore[index]
+        elif (
+            isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
+        ) and prop.source is not None:
+            end_classes = [node_class_by_view_id[prop.source]]
         else:
             end_classes = None
 
@@ -245,7 +259,8 @@ class BaseConnectionField(Field, ABC):
         )
 
     def as_graphql_type_hint(self) -> str:
-        return self._create_type_hint([data_class.graphql_name for data_class in self.end_classes or []], False)
+        types = [data_class.graphql_name for data_class in self.end_classes or []]
+        return self._create_type_hint(types, False)
 
     def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:
         field_kwargs = {
@@ -296,6 +311,10 @@ class OneToManyConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = True
     variable: str
 
+    @property
+    def is_one_to_many(self) -> bool:
+        return True
+
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes and use_node_reference:
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
@@ -316,10 +335,29 @@ class OneToManyConnectionField(BaseConnectionField):
                 for { self.variable } in self.{ self.name } or []
             ]"""
 
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
+            return "list[DirectRelationReference | tuple[str, str]] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "list[DirectRelationReference] | None = None"
+        raise NotImplementedError("as_typed_hint is not implemented for edge fields")
+
+    def as_typed_init_set(self) -> str:
+        if self.is_direct_relation:
+            return (
+                f"[DirectRelationReference.load({self.variable}) for {self.variable} in {self.name}] "
+                f"if {self.name} else None"
+            )
+        return self.name
+
 
 @dataclass(frozen=True)
 class OneToOneConnectionField(BaseConnectionField):
     _wrap_list: ClassVar[bool] = False
+
+    @property
+    def is_one_to_many(self) -> bool:
+        return False
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
         if self.end_classes:
@@ -334,3 +372,15 @@ class OneToOneConnectionField(BaseConnectionField):
                 "space":  self.space if isinstance(self.{ self.name }, str) else self.{ self.name }.space,
                 "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
             }}"""
+
+    def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
+        if self.is_direct_relation and operation == "write":
+            return "DirectRelationReference | tuple[str, str] | None = None"
+        elif self.is_direct_relation and operation == "read":
+            return "DirectRelationReference | None = None"
+        raise NotImplementedError("as_typed_hint is not implemented for edge fields")
+
+    def as_typed_init_set(self) -> str:
+        if self.is_direct_relation:
+            return f"DirectRelationReference.load({self.name}) if {self.name} else None"
+        return self.name

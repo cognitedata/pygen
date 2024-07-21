@@ -1,25 +1,25 @@
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
-from cognite.pygen._core.models import DataClass
 from cognite.pygen.config import PygenConfig
+from tests.utils import to_data_class_by_view_id
 
 
 class TestDataClasses:
     def test_dependency_named_Field(self, pygen_config: PygenConfig) -> None:
         # Arrange
         views = dm.ViewList.load(_DEPENDENCY_NAMED_FIELD).data
-        data_classes = [
-            DataClass.from_view(view, DataClass.to_base_name(view), pygen_config.naming.data_class) for view in views
-        ]
-        data_class_by_view_id = {data_class.view_id: data_class for data_class in data_classes}
+
+        node_class_by_view_id, edge_class_by_view_id = to_data_class_by_view_id(views, pygen_config)
 
         # Act
-        for data_class, view in zip(data_classes, views):
-            data_class.update_fields(view.properties, data_class_by_view_id, list(views), pygen_config)
+        for data_class, view in zip(node_class_by_view_id.values(), views):
+            data_class.update_fields(
+                view.properties, node_class_by_view_id, edge_class_by_view_id, list(views), pygen_config
+            )
 
         # Assert
-        country_data_class = data_class_by_view_id[dm.ViewId("ReportedBugs", "Country", "c93d79472dd1cb")]
+        country_data_class = node_class_by_view_id[dm.ViewId("ReportedBugs", "Country", "c93d79472dd1cb")]
 
         assert country_data_class.pydantic_field == "pydantic.Field"
         wrong_field = [field.name for field in country_data_class if field.pydantic_field != "pydantic.Field"]
@@ -27,7 +27,9 @@ class TestDataClasses:
 
     def test_has_date_field(self, omni_multi_api_generator: MultiAPIGenerator) -> None:
         # Arrange
-        api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
+        api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+            dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+        ]
 
         # Assert
         assert api_generator.data_class.has_primitive_field_of_type(dm.Date)

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import Literal, cast, overload
+from typing import Literal, overload
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
@@ -82,7 +81,9 @@ class DataClass:
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
-    def from_view(cls, view: dm.View, base_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
+    def from_view(
+        cls, view: dm.View, base_name: str, used_for: Literal["node", "edge"], data_class: pygen_config.DataClassNaming
+    ) -> DataClass:
         class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
@@ -98,13 +99,8 @@ class DataClass:
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
 
-        used_for = view.used_for
-        if used_for == "all":
-            used_for = "node"
-            warnings.warn(
-                f"View {view.as_id()} has 'used_for' set to 'all'. This is not supported. Using 'node' instead.",
-                stacklevel=2,
-            )
+        if view.used_for != used_for and view.used_for != "all":
+            raise ValueError(f"View {view.as_id()} cannot be used for {used_for}")
 
         args = dict(
             read_name=class_name,
@@ -128,16 +124,17 @@ class DataClass:
         if used_for == "node":
             node_type = _find_first_node_type(view.filter)
 
-            return NodeDataClass(**args, node_type=node_type)
+            return NodeDataClass(**args, node_type=node_type, has_edge_class=view.used_for == "all")
         elif used_for == "edge":
-            return EdgeDataClass(**args)
+            return EdgeDataClass(**args, has_node_class=view.used_for == "all")
         else:
             raise ValueError(f"Unsupported used_for={used_for}")
 
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ) -> None:
@@ -145,7 +142,8 @@ class DataClass:
             field_ = Field.from_property(
                 prop_name,
                 prop,
-                data_class_by_view_id,
+                node_class_by_view_id,
+                edge_class_by_view_id,
                 config,
                 self.view_id,
                 # This is the default value for pydantic_field, it will be updated later
@@ -181,6 +179,20 @@ class DataClass:
             return ", ".join(f"{interface.write_name}" for interface in self.implements)
         else:
             return "DomainModelWrite"
+
+    @property
+    def typed_read_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}" for interface in self.implements)
+        else:
+            return "TypedEdge" if isinstance(self, EdgeDataClass) else "TypedNode"
+
+    @property
+    def typed_write_bases_classes(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}Apply" for interface in self.implements)
+        else:
+            return "TypedEdgeApply" if isinstance(self, EdgeDataClass) else "TypedNodeApply"
 
     @property
     def text_field_names(self) -> str:
@@ -319,6 +331,23 @@ class DataClass:
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
         )
 
+    def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
+        def key(x: Field) -> int:
+            return {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1
+
+        if include == "all":
+            return sorted(self.container_fields, key=key)
+        elif include == "only-self":
+            parent_fields = {field.name for parent in self.implements for field in parent.container_fields}
+            return sorted([f for f in self.container_fields if f.name not in parent_fields], key=key)
+        elif isinstance(include, DataClass):
+            fields_by_parent = {parent.read_name: set(parent.container_fields_sorted()) for parent in self.implements}
+            if include.read_name not in fields_by_parent:
+                raise ValueError(f"Data class {include.read_name} is not a parent of {self.read_name}")
+            return sorted(fields_by_parent[include.read_name], key=key)
+        else:
+            raise TypeError(f"Invalid value for include: {include}")
+
     @property
     def has_container_fields(self) -> bool:
         """Check if the data class has any container fields."""
@@ -378,6 +407,15 @@ class DataClass:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
 
     @property
+    def container_field_variables(self) -> str:
+        return ", ".join(
+            field_.name
+            for field_ in self
+            if isinstance(field_, BasePrimitiveField)
+            or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
+        )
+
+    @property
     def filter_name(self) -> str:
         return f"_create_{self.variable}_filter"
 
@@ -410,11 +448,28 @@ class NodeDataClass(DataClass):
     """This represent data class used for views marked as used_for='node'."""
 
     node_type: dm.DirectRelationReference | None
+    has_edge_class: bool
+
+    @property
+    def typed_properties_name(self) -> str:
+        if self.has_edge_class:
+            return f"{self.read_name.removesuffix('Node')}Properties"
+        else:
+            return f"{self.read_name}Properties"
 
 
 @dataclass
 class EdgeDataClass(DataClass):
     """This represent data class used for views marked as used_for='edge'."""
+
+    has_node_class: bool
+
+    @property
+    def typed_properties_name(self) -> str:
+        if self.has_node_class:
+            return f"{self.read_name.removesuffix('Edge')}Properties"
+        else:
+            return f"{self.read_name}Properties"
 
     @property
     def is_edge_class(self) -> bool:
@@ -430,22 +485,27 @@ class EdgeDataClass(DataClass):
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         config: pygen_config.PygenConfig,
     ):
+        # Find all node views that have an edge with properties in this view
+        # and get the node class it is pointing to.
         edge_classes = []
         for view in views:
-            start_class = data_class_by_view_id[view.as_id()]
+            view_id = view.as_id()
+            if view_id not in node_class_by_view_id:
+                continue
+            start_class = node_class_by_view_id[view_id]
             for _prop_name, prop in view.properties.items():
-                if isinstance(prop, dm.MultiEdgeConnection) and prop.edge_source == self.view_id:
-                    edge_classes.append(
-                        EdgeClasses(
-                            cast(NodeDataClass, start_class),
-                            prop.type,
-                            cast(NodeDataClass, data_class_by_view_id[prop.source]),
-                        )
-                    )
+                if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
+                    end_class = node_class_by_view_id[prop.source]
+                    start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
+
+                    new_edge_class = EdgeClasses(start, prop.type, end)
+                    if new_edge_class not in edge_classes:
+                        edge_classes.append(new_edge_class)
 
         self.fields.append(
             EndNodeField(
@@ -457,4 +517,4 @@ class EdgeDataClass(DataClass):
                 edge_classes=edge_classes,
             )
         )
-        super().update_fields(properties, data_class_by_view_id, views, config)
+        super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)

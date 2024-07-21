@@ -2,7 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
@@ -23,6 +23,11 @@ from ._core import (
 ){% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
+{% if data_class.has_dependencies %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
+{% endif %}
+
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 

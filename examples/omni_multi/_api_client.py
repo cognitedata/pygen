@@ -109,8 +109,8 @@ class OmniMultiClient:
     OmniMultiClient
 
     Generated with:
-        pygen = 0.99.26
-        cognite-sdk = 7.53.2
+        pygen = 0.99.27
+        cognite-sdk = 7.54.4
         pydantic = 2.8.2
 
     """
@@ -123,7 +123,7 @@ class OmniMultiClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.26"
+        client.config.client_name = "CognitePygen:0.99.27"
 
         self.omni_multi_a = OmniMultiAAPIs(client)
         self.omni_multi_b = OmniMultiBAPIs(client)

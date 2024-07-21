@@ -169,7 +169,7 @@ class EdgeAPIClass(APIClass):
                     c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type
                 )
             except StopIteration:
-                raise ValueError("Could not find end class") from None
+                raise ValueError(f"Could not find end class {field_end_class.view_id}") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
         else:  #  NodeDataClass
             end_class = field_end_class

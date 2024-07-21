@@ -12,7 +12,7 @@ from ._api.cdf_external_references import CDFExternalReferencesAPI
 from ._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
 from ._api.connection_item_a import ConnectionItemAAPI
 from ._api.connection_item_b import ConnectionItemBAPI
-from ._api.connection_item_c import ConnectionItemCAPI
+from ._api.connection_item_c_node import ConnectionItemCNodeAPI
 from ._api.connection_item_d import ConnectionItemDAPI
 from ._api.connection_item_e import ConnectionItemEAPI
 from ._api.connection_item_f import ConnectionItemFAPI
@@ -39,8 +39,8 @@ class OmniClient:
     OmniClient
 
     Generated with:
-        pygen = 0.99.26
-        cognite-sdk = 7.53.2
+        pygen = 0.99.27
+        cognite-sdk = 7.54.4
         pydantic = 1.10.7
 
     Data Model:
@@ -57,7 +57,7 @@ class OmniClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.26"
+        client.config.client_name = "CognitePygen:0.99.27"
 
         self._client = client
 
@@ -65,7 +65,7 @@ class OmniClient:
         self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client)
         self.connection_item_a = ConnectionItemAAPI(client)
         self.connection_item_b = ConnectionItemBAPI(client)
-        self.connection_item_c = ConnectionItemCAPI(client)
+        self.connection_item_c_node = ConnectionItemCNodeAPI(client)
         self.connection_item_d = ConnectionItemDAPI(client)
         self.connection_item_e = ConnectionItemEAPI(client)
         self.connection_item_f = ConnectionItemFAPI(client)
@@ -255,7 +255,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references_listed<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
-&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c_node<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_d<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_e<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_f<br />

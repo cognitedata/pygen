@@ -23,7 +23,7 @@ from cognite.client.data_classes import (
 from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
+from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
@@ -52,6 +52,13 @@ def generate_sdks(
         data_models = example_sdk.load_data_models()
         if len(data_models) == 1:
             data_models = data_models[0]
+
+        if example_sdk.is_typed:
+            output_file = example_sdk.client_dir / "typed.py"
+            include_views = {dm.ViewId(data_models.space, t, "1") for t in example_sdk.typed_classes} or None
+            generate_typed(data_models, output_file, include_views=include_views)
+            continue
+
         sdk_generator = SDKGenerator(
             example_sdk.top_level_package,
             example_sdk.client_name,
@@ -271,6 +278,8 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     api_client_files_v2 = list((REPO_ROOT / "examples").glob("**/_api_client.py"))
     api_client_files_v1 = list((REPO_ROOT / "examples-pydantic-v1").glob("**/_api_client.py"))
     api_client_files = api_client_files_v1 + api_client_files_v2
+    quickstart_streamlit = REPO_ROOT / "docs" / "quickstart" / "cdf_streamlit.md"
+
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
     current_major, current_minor, current_patch = (int(x) for x in current_version.split("."))
@@ -302,6 +311,13 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
         if file not in api_client_files_v1:
             # pydantic v1 is frozen at 1.10.7
             content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
+        file.write_text(content)
+        typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
+    for file in [quickstart_streamlit]:
+        content = file.read_text()
+        if not skip:
+            content = content.replace(current_version, new_version)
+        content = re.sub(r"cognite-sdk==\d+.\d+.\d+", f"cognite-sdk=={cognite_sdk_version}", content)
         file.write_text(content)
         typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
     typer.echo("Done")

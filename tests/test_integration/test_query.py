@@ -17,7 +17,7 @@ def test_query_with_direct_relation(omni_client: OmniClient) -> None:
     incorrect_other = [
         item.other_direct
         for item in items
-        if not (isinstance(item.other_direct, dc.ConnectionItemC) or item.other_direct is None)
+        if not (isinstance(item.other_direct, dc.ConnectionItemCNode) or item.other_direct is None)
     ]
     assert len(incorrect_other) == 0, f"Other direct relation should be set, got {incorrect_other}"
     incorrect_self = [
@@ -36,7 +36,9 @@ def test_query_limit_with_direct_relations(omni_client: OmniClient) -> None:
 
 def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
     items = (
-        omni_client.connection_item_c(limit=-1).connection_item_a(external_id_prefix="ConnectionItemA:Joseph").query()
+        omni_client.connection_item_c_node(limit=-1)
+        .connection_item_a(external_id_prefix="ConnectionItemA:Joseph")
+        .query()
     )
 
     assert len(items) > 0

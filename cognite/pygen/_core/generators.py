@@ -18,6 +18,7 @@ from typing import Any, Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -85,8 +86,11 @@ class SDKGenerator:
             MultiAPIClass.from_data_model(
                 model,
                 {
-                    (view_id := view.as_id()): self._multi_api_generator.api_by_view_id[view_id].api_class
+                    (view_id := view.as_id()): self._multi_api_generator.api_by_type_by_view_id["node"][
+                        view_id
+                    ].api_class
                     for view in model.views
+                    if view.as_id() in self._multi_api_generator.api_by_type_by_view_id["node"]
                 },
                 config.naming.multi_api_class,
             )
@@ -120,9 +124,9 @@ class SDKGenerator:
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
                 top_level_package=self.top_level_package,
-                api_classes=sorted(self._multi_api_generator.unique_apis),
+                api_classes=sorted(self._multi_api_generator.apis),
                 data_model=self._data_model[0],
-                api_by_view_id=self._multi_api_generator.api_by_view_id,
+                api_by_view_id=self._multi_api_generator.api_by_type_by_view_id["node"],
                 multi_apis=self._multi_api_classes,
             )
             + "\n"
@@ -187,9 +191,17 @@ class MultiAPIGenerator:
         self.default_instance_space = default_instance_space
         self._pydantic_version = pydantic_version
         self._logger = logger or print
-        views = list(itertools.chain.from_iterable(model.views for model in data_models))
-        self.api_by_view_id = self.create_api_by_view_id(
-            list(views),
+        seen_views: set[dm.ViewId] = set()
+        unique_views: list[dm.View] = []
+        for view in itertools.chain.from_iterable(model.views for model in data_models):
+            view_id = view.as_id()
+            if view_id in seen_views:
+                continue
+            unique_views.append(view)
+            seen_views.add(view_id)
+
+        self.api_by_type_by_view_id = self.create_api_by_view_id_type(
+            unique_views,
             default_instance_space,
             config,
             base_name_functions=[
@@ -199,57 +211,86 @@ class MultiAPIGenerator:
                 DataClass.to_base_name_with_space_and_version,
             ],
         )
+        node_class_by_view_id: dict[dm.ViewId, NodeDataClass] = {
+            view_id: api.data_class
+            for view_id, api in self.api_by_type_by_view_id["node"].items()
+            if isinstance(api.data_class, NodeDataClass)
+        }
+        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass] = {
+            view_id: api.data_class
+            for view_id, api in self.api_by_type_by_view_id["edge"].items()
+            if isinstance(api.data_class, EdgeDataClass)
+        }
+        query_class_by_view_id = {
+            view_id: api.query_api for view_id, api in self.api_by_type_by_view_id["node"].items()
+        }
+        parents = {parent for view in unique_views for parent in view.implements or []}
+        parents_by_view_id = to_unique_parents_by_view_id(unique_views)
+        for api in self.apis:
+            api.data_class.update_fields(
+                api.view.properties, node_class_by_view_id, edge_class_by_view_id, unique_views, config
+            )
 
-        data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
-        query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
-        interfaces = {parent for view in views for parent in view.implements or []}
-        parents_by_view_id = to_unique_parents_by_view_id(views)
-        for api in self.unique_apis:
-            api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
                 [
-                    parent_class
+                    parent_api.data_class
                     for parent in parents_by_view_id[api.view_id]
                     # If the interface is not in the data model, then, we cannot inherit from it.
-                    if (parent_class := data_class_by_view_id.get(parent))
+                    if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
                 ],
-                api.view_id in interfaces,
+                api.view_id in parents,
             )
 
         # All data classes have been updated, before we can create edge APIs.
-        for api in self.unique_apis:
-            api.create_edge_apis(query_class_by_view_id, self.api_by_view_id)
+        for api in self.apis:
+            api.create_edge_apis(query_class_by_view_id, self.api_by_type_by_view_id["node"])
 
-        validate_api_classes_unique_names([api.api_class for api in self.unique_apis])
-        validate_data_classes_unique_name([api.data_class for api in self.unique_apis])
+        validate_api_classes_unique_names([api.api_class for api in self.apis])
+        validate_data_classes_unique_name([api.data_class for api in self.apis])
 
         # Data Models require view external IDs to be unique within the data model.
         self._data_class_by_data_model_by_type = {
-            model.as_id(): {view.external_id: data_class_by_view_id[view.as_id()] for view in model.views}
+            model.as_id(): {
+                view.external_id: (
+                    node_class_by_view_id[view.as_id()]
+                    if view.as_id() in node_class_by_view_id
+                    else edge_class_by_view_id[view.as_id()]
+                )
+                for view in model.views
+            }
             for model in data_models
         }
 
     @property
-    def unique_apis(self) -> Iterator[APIGenerator]:
+    def apis(self) -> Iterator[APIGenerator]:
         """Iterate over the unique APIs."""
-        seen = set()
-        for api in self.api_by_view_id.values():
-            if api.view.as_id() not in seen:
-                seen.add(api.view.as_id())
-                yield api
+        for api_by_view_id in self.api_by_type_by_view_id.values():
+            yield from api_by_view_id.values()
+
+    @property
+    def topological_order(self) -> list[DataClass]:
+        """Return the topological order of the data classes."""
+        # Sorted by read name to ensure deterministic order
+        sorted_data_classes = sorted([api.data_class for api in self.apis], key=lambda d: d.read_name)
+        dataclass_by_read_name = {data_class.read_name: data_class for data_class in sorted_data_classes}
+        dependencies_by_dataclass = {
+            data_class.read_name: {p.read_name for p in data_class.implements} for data_class in sorted_data_classes
+        }
+        # TopologicalSorter is stable, so we can rely on the sorted data classes to be in the deterministic order
+        return [dataclass_by_read_name[name] for name in TopologicalSorter(dependencies_by_dataclass).static_order()]
 
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
-        return self.api_by_view_id[view_id]
+        return self.api_by_type_by_view_id["node"][view_id]
 
     @classmethod
-    def create_api_by_view_id(
+    def create_api_by_view_id_type(
         cls,
         views: list[dm.View],
         default_instance_space: str,
         config: PygenConfig,
         base_name_functions: list[Callable[[dm.View], str]],
         selected_function: int = 0,
-    ) -> dict[dm.ViewId, APIGenerator]:
+    ) -> dict[Literal["node", "edge"], dict[dm.ViewId, APIGenerator]]:
         """Create the API by view ID for the given views."""
         try:
             base_name_fun = base_name_functions[selected_function]
@@ -257,7 +298,9 @@ class MultiAPIGenerator:
             raise ValueError("Failed to Generate SDK. Failed to find an unique data class name for each view.") from e
 
         view_by_id = {view.as_id(): view for view in views}
-        api_by_view_id: dict[dm.ViewId, APIGenerator] = {}
+        api_by_view_id: dict[Literal["node", "edge"], dict[dm.ViewId, APIGenerator]] = {"node": {}, "edge": {}}
+        base_name: str
+        view: dm.View
         for base_name, view_group in itertools.groupby(
             sorted(((base_name_fun(view), view) for view in view_by_id.values()), key=lambda pair: pair[0]),
             key=lambda pair: pair[0],
@@ -265,15 +308,27 @@ class MultiAPIGenerator:
             views_with_base_name = [view for _, view in view_group]
             if len(views_with_base_name) == 1:
                 view = views_with_base_name[0]
-                api_by_view_id[view.as_id()] = APIGenerator(view, default_instance_space, config, base_name)
+                if view.used_for == "all":
+                    api_by_view_id["node"][view.as_id()] = APIGenerator(
+                        view, default_instance_space, config, "node", f"{base_name}Node"
+                    )
+                    api_by_view_id["edge"][view.as_id()] = APIGenerator(
+                        view, default_instance_space, config, "edge", f"{base_name}Edge"
+                    )
+                elif view.used_for == "node" or view.used_for == "edge":
+                    api_by_view_id[view.used_for][view.as_id()] = APIGenerator(
+                        view, default_instance_space, config, view.used_for, base_name
+                    )
+                else:
+                    warnings.warn("View used_for is not set. Skipping view", UserWarning, stacklevel=2)
                 continue
 
             # The base name is not unique, so we need to try another base name function to separate the views.
-            api_by_view_id.update(
-                cls.create_api_by_view_id(
-                    views_with_base_name, default_instance_space, config, base_name_functions, selected_function + 1
-                )
+            update = cls.create_api_by_view_id_type(
+                views_with_base_name, default_instance_space, config, base_name_functions, selected_function + 1
             )
+            api_by_view_id["node"].update(update["node"])
+            api_by_view_id["edge"].update(update["edge"])
 
         return api_by_view_id
 
@@ -300,7 +355,7 @@ class MultiAPIGenerator:
         api_dir = client_dir / "_api"
 
         sdk = {(api_dir / "__init__.py"): ""}
-        for api in self.api_by_view_id.values():
+        for api in self.apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
             if isinstance(api.data_class, EdgeDataClass):
@@ -365,7 +420,7 @@ class MultiAPIGenerator:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         dependencies_by_names: dict[tuple[str, str, str, bool], list[DataClass]] = defaultdict(list)
-        for api in self.unique_apis:
+        for api in self.apis:
             for dep in api.data_class.dependencies:
                 dependencies_by_names[
                     (
@@ -378,11 +433,58 @@ class MultiAPIGenerator:
 
         return (
             data_class_init.render(
-                classes=sorted([api.data_class for api in self.unique_apis]),
+                classes=sorted([api.data_class for api in self.apis]),
                 is_pydantic_v2=self.pydantic_version == "v2",
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
+            )
+            + "\n"
+        )
+
+    def generate_typed_classes_file(self, include: set[dm.ViewId] | None = None) -> str:
+        """Generate the typed classes file for the SDK.
+
+        Returns:
+            The generated typed classes file as a string.
+        """
+        typed_classes = self.env.get_template("typed_classes.py.jinja")
+        available_dataclasses = self.topological_order
+        node_classes = [
+            d
+            for d in available_dataclasses
+            if isinstance(d, NodeDataClass) and (include is None or d.view_id in include)
+        ]
+        edge_classes = [
+            d
+            for d in available_dataclasses
+            if isinstance(d, EdgeDataClass) and (include is None or d.view_id in include)
+        ]
+        datetime_import: str | None = None
+        relevant_fields = {
+            {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
+            for cls_ in itertools.chain(node_classes, edge_classes)
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, (dm.Timestamp, dm.Date))
+        }
+        if relevant_fields:
+            datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
+        has_literal_import = any(
+            1
+            for cls_ in itertools.chain(node_classes, edge_classes)
+            for field in cls_.fields_of_type(fields.BasePrimitiveField)
+            if isinstance(field.type_, Enum)
+        )
+        return (
+            typed_classes.render(
+                node_classes=node_classes,
+                edge_classes=edge_classes,
+                has_node_cls=bool(node_classes),
+                has_edge_cls=bool(edge_classes),
+                has_literal_import=has_literal_import,
+                datetime_import=datetime_import,
+                has_datetime_import=bool(datetime_import),
+                len=len,
             )
             + "\n"
         )
@@ -407,7 +509,14 @@ class APIGenerator:
 
     """
 
-    def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, base_name: str | None = None):
+    def __init__(
+        self,
+        view: dm.View,
+        default_instance_space: str,
+        config: PygenConfig,
+        used_for: Literal["node", "edge"],
+        base_name: str | None = None,
+    ):
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
@@ -415,8 +524,9 @@ class APIGenerator:
         self.base_name = base_name or DataClass.to_base_name(view)
         self.default_instance_space = default_instance_space
         self._config = config
+        self.used_for = used_for
 
-        self.data_class = DataClass.from_view(view, self.base_name, config.naming.data_class)
+        self.data_class = DataClass.from_view(view, self.base_name, used_for, config.naming.data_class)
         self.api_class = NodeAPIClass.from_view(
             view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
         )

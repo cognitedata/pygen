@@ -24,6 +24,10 @@ NOT_SUPPORTED = {
     ("file", False, False),
     ("sequence", True, False),
     ("sequence", False, False),
+    ("enum", False, True),
+    ("enum", True, True),
+    ("enum", True, False),
+    ("enum", False, False),
 }
 
 

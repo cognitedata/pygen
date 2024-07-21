@@ -23,7 +23,7 @@ from ._core import (
 
 if TYPE_CHECKING:
     from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
-    from ._connection_item_c import ConnectionItemC, ConnectionItemCGraphQL, ConnectionItemCWrite
+    from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeGraphQL, ConnectionItemCNodeWrite
 
 
 __all__ = [
@@ -65,7 +65,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
     name: Optional[str] = None
-    other_direct: Optional[ConnectionItemCGraphQL] = Field(default=None, repr=False, alias="otherDirect")
+    other_direct: Optional[ConnectionItemCNodeGraphQL] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
     self_direct: Optional[ConnectionItemAGraphQL] = Field(default=None, repr=False, alias="selfDirect")
 
@@ -147,7 +147,9 @@ class ConnectionItemA(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
+    other_direct: Union[ConnectionItemCNode, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="otherDirect"
+    )
     outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
@@ -197,7 +199,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemCWrite, str, dm.NodeId, None] = Field(
+    other_direct: Union[ConnectionItemCNodeWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="otherDirect"
     )
     outwards: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False)

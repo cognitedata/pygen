@@ -33,6 +33,8 @@ class ExampleSDK:
     generate_sdk: bool
     download_nodes: bool = False
     _instance_space: str | None = None
+    is_typed: bool = False
+    typed_classes: set[str] = field(default_factory=set)
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
@@ -179,6 +181,28 @@ OMNI_SDK = ExampleSDK(
     download_nodes=True,
 )
 
+OMNI_TYPED = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
+    _top_level_package="omni_typed",
+    client_name="DoesNotMatter",
+    _instance_space="omni-instances",
+    generate_sdk=True,
+    is_typed=True,
+    # Done above
+    download_nodes=False,
+    typed_classes={
+        "CDFExternalReferencesListed",
+        "PrimitiveNullable",
+        "PrimitiveRequiredListed",
+        "MainInterface",
+        "Implementation1",
+        "Implementation2",
+        "SubInterface",
+        "Implementation1NonWritable",
+        "DependentOnNonWritable",
+    },
+)
+
 OMNI_MULTI_SDK = ExampleSDK(
     data_model_ids=[
         DataModelId("pygen-models", "OmniMultiA", "1"),
@@ -303,7 +327,8 @@ class OmniFiles:
     implementation_1_data = data_classes / "_implementation_1.py"
     implementation_1_non_writeable_data = data_classes / "_implementation_1_non_writeable.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
-    connection_item_c_data = data_classes / "_connection_item_c.py"
+    connection_item_c_node_data = data_classes / "_connection_item_c_node.py"
+    connection_item_c_edge_data = data_classes / "_connection_item_c_edge.py"
     connection_item_d_data = data_classes / "_connection_item_d.py"
     connection_item_e_data = data_classes / "_connection_item_e.py"
     connection_item_f_data = data_classes / "_connection_item_f.py"
@@ -320,22 +345,30 @@ class OmniFiles:
 
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_b_api = api / "connection_item_b.py"
-    connection_item_c_api = api / "connection_item_c.py"
+    connection_item_c_api = api / "connection_item_c_node.py"
     connection_item_e_api = api / "connection_item_e.py"
 
     connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
     connection_item_b_edge_apis = (api / "connection_item_b_inwards.py", api / "connection_item_b_self_edge.py")
     connection_item_c_edge_apis = (
-        api / "connection_item_c_connection_item_a.py",
-        api / "connection_item_c_connection_item_b.py",
+        api / "connection_item_c_node_connection_item_a.py",
+        api / "connection_item_c_node_connection_item_b.py",
     )
     connection_item_a_query = api / "connection_item_a_query.py"
     connection_item_b_query = api / "connection_item_b_query.py"
-    connection_item_c_query = api / "connection_item_c_query.py"
+    connection_item_c_query = api / "connection_item_c_node_query.py"
     connection_item_d_query = api / "connection_item_d_query.py"
 
 
 OMNI_SDK.append_manual_files(OmniFiles)
+
+
+class OmniTypedFiles:
+    client_dir = OMNI_TYPED.client_dir
+    typed = client_dir / "typed.py"
+
+
+OMNI_TYPED.append_manual_files(OmniTypedFiles)
 
 
 class OmniMultiFiles:

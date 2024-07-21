@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.27] - 24-07-18
 ### Added
 - Support for advanced sort in generated `.list` method.
 - Support for sort and advanced sort in generated `.search` method.
@@ -24,8 +24,9 @@ Changes are grouped as follows
 
 ### Fixed
 - The read data class for a view with required listable properties would generate as optional. This is now fixed.
-- Using `client.upset` with an optional listable `date` or `datetime` property set to `None` would raise
+- Using `client.upsert` with an optional listable `date` or `datetime` property set to `None` would raise
   an `AttributeError`. This is now fixed.
+- Updated to match internal change for `cognite-sdk=7.54.3`.
 
 ## [0.99.26] - 24-06-24
 ### Added
