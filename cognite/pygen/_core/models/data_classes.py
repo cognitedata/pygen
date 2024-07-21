@@ -248,6 +248,10 @@ class DataClass:
         parent_fields = {field.prop_name for parent in self.implements for field in parent}
         return (field for field in self if field.prop_name not in parent_fields)
 
+    @property
+    def read_fields(self) -> Iterator[Field]:
+        return (field for field in self if not field.is_write_field)
+
     @overload
     def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]: ...
 

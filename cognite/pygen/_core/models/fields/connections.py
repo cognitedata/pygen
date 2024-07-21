@@ -140,6 +140,10 @@ class BaseConnectionField(Field, ABC):
         return self.through is not None
 
     @property
+    def is_write_field(self) -> bool:
+        return not self.is_reverse_direct_relation
+
+    @property
     def is_edge(self) -> bool:
         return self.edge_type is not None
 
