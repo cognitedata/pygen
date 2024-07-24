@@ -104,7 +104,11 @@ def domain_name(domain_cls: type, data: dict) -> str:
     Returns:
         A string based on the domain class name
     """
-    return domain_cls.__name__.casefold().removesuffix("write")
+
+    # Note: Using mro instead of issubclass(domain_cls, DomainModelWrite) because DomainModelWrite is not available here
+    if "DomainModelWrite" in [c.__name__ for c in domain_cls.__mro__]:
+        return domain_cls.__name__.casefold().removesuffix("write")
+    return domain_cls.__name__.casefold()
 
 
 def uuid(domain_cls: type, data: dict) -> str:
