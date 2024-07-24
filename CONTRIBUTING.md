@@ -128,6 +128,12 @@ To see the available commands run:
 python dev.py --help
 ```
 
+This can (should) be use for bumping the version number:
+```bash
+python dev.py bump --patch
+```
+(replace `--patch` with `--minor` or `--major` per [semantic versioning](https://semver.org/))
+
 ### Documentation
 
 We use material docs for the documentation. First, ensure that you have installed the `docs` extra dependencies with `poetry`:
