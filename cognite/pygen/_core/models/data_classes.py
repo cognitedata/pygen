@@ -409,7 +409,7 @@ class DataClass:
     @property
     def container_field_variables(self) -> str:
         return ", ".join(
-            field_.name
+            f"{field_.name}={field_.name}"
             for field_ in self
             if isinstance(field_, BasePrimitiveField)
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)

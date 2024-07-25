@@ -60,11 +60,11 @@ class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNo
         return CDFExternalReferencesListedApply(
             self.space,
             self.external_id,
-            self.files,
-            self.sequences,
-            self.timeseries,
-            self.version,
-            self.type,
+            files=self.files,
+            sequences=self.sequences,
+            timeseries=self.timeseries,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -110,9 +110,9 @@ class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
         return DependentOnNonWritableApply(
             self.space,
             self.external_id,
-            self.a_value,
-            self.version,
-            self.type,
+            a_value=self.a_value,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -158,9 +158,9 @@ class MainInterface(MainInterfaceProperties, TypedNode):
         return MainInterfaceApply(
             self.space,
             self.external_id,
-            self.main_value,
-            self.version,
-            self.type,
+            main_value=self.main_value,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -242,17 +242,17 @@ class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
         return PrimitiveNullableApply(
             self.space,
             self.external_id,
-            self.boolean,
-            self.date,
-            self.float_32,
-            self.float_64,
-            self.int_32,
-            self.int_64,
-            self.json_,
-            self.text,
-            self.timestamp,
-            self.version,
-            self.type,
+            boolean=self.boolean,
+            date=self.date,
+            float_32=self.float_32,
+            float_64=self.float_64,
+            int_32=self.int_32,
+            int_64=self.int_64,
+            json_=self.json_,
+            text=self.text,
+            timestamp=self.timestamp,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -334,17 +334,17 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
         return PrimitiveRequiredListedApply(
             self.space,
             self.external_id,
-            self.boolean,
-            self.date,
-            self.float_32,
-            self.float_64,
-            self.int_32,
-            self.int_64,
-            self.json_,
-            self.text,
-            self.timestamp,
-            self.version,
-            self.type,
+            boolean=self.boolean,
+            date=self.date,
+            float_32=self.float_32,
+            float_64=self.float_64,
+            int_32=self.int_32,
+            int_64=self.int_64,
+            json_=self.json_,
+            text=self.text,
+            timestamp=self.timestamp,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -367,7 +367,7 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, main_value, existing_version, type)
+        super().__init__(space, external_id, main_value=main_value, existing_version=existing_version, type=type)
         self.sub_value = sub_value
 
 
@@ -385,17 +385,26 @@ class SubInterface(SubInterfaceProperties, MainInterface):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(space, external_id, version, last_updated_time, created_time, main_value, type, deleted_time)
+        super().__init__(
+            space,
+            external_id,
+            version,
+            last_updated_time,
+            created_time,
+            main_value=main_value,
+            type=type,
+            deleted_time=deleted_time,
+        )
         self.sub_value = sub_value
 
     def as_write(self) -> SubInterfaceApply:
         return SubInterfaceApply(
             self.space,
             self.external_id,
-            self.main_value,
-            self.sub_value,
-            self.version,
-            self.type,
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -421,7 +430,9 @@ class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, main_value, sub_value, existing_version, type)
+        super().__init__(
+            space, external_id, main_value=main_value, sub_value=sub_value, existing_version=existing_version, type=type
+        )
         self.value_2 = value_2
         self.value_1 = value_1
 
@@ -443,7 +454,15 @@ class Implementation1(Implementation1Properties, SubInterface):
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(
-            space, external_id, version, last_updated_time, created_time, main_value, sub_value, type, deleted_time
+            space,
+            external_id,
+            version,
+            last_updated_time,
+            created_time,
+            main_value=main_value,
+            sub_value=sub_value,
+            type=type,
+            deleted_time=deleted_time,
         )
         self.value_2 = value_2
         self.value_1 = value_1
@@ -452,12 +471,12 @@ class Implementation1(Implementation1Properties, SubInterface):
         return Implementation1Apply(
             self.space,
             self.external_id,
-            self.value_2,
-            self.main_value,
-            self.sub_value,
-            self.value_1,
-            self.version,
-            self.type,
+            value_2=self.value_2,
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            value_1=self.value_1,
+            existing_version=self.version,
+            type=self.type,
         )
 
 
@@ -478,7 +497,9 @@ class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, main_value, sub_value, existing_version, type)
+        super().__init__(
+            space, external_id, main_value=main_value, sub_value=sub_value, existing_version=existing_version, type=type
+        )
 
 
 class Implementation2(Implementation2Properties, SubInterface):
@@ -496,15 +517,23 @@ class Implementation2(Implementation2Properties, SubInterface):
         deleted_time: int | None = None,
     ) -> None:
         super().__init__(
-            space, external_id, version, last_updated_time, created_time, main_value, sub_value, type, deleted_time
+            space,
+            external_id,
+            version,
+            last_updated_time,
+            created_time,
+            main_value=main_value,
+            sub_value=sub_value,
+            type=type,
+            deleted_time=deleted_time,
         )
 
     def as_write(self) -> Implementation2Apply:
         return Implementation2Apply(
             self.space,
             self.external_id,
-            self.main_value,
-            self.sub_value,
-            self.version,
-            self.type,
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            existing_version=self.version,
+            type=self.type,
         )
