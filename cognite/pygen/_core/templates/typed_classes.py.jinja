@@ -26,6 +26,8 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
     """This represents the writing format of {{ cls.doc_name }}.
 
     It is used to when data is written to CDF.
+{% if cls.description %}
+    {{ cls.description }}{% endif %}
 
     Args:
         space: The space where the node is located.
@@ -57,6 +59,8 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
     """This represents the reading format of {{ cls.doc_name }}.
 
     It is used to when data is read from CDF.
+{% if cls.description %}
+    {{ cls.description }}{% endif %}
 
     Args:
         space: The space where the node is located.
@@ -109,6 +113,8 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
     """This represents the writing format of {{ cls.doc_name }}.
 
     It is used to when data is written to CDF.
+{% if cls.description %}
+    {{ cls.description }}{% endif %}
 
     Args:
         space: The space where the node is located.
@@ -145,6 +151,8 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
     """This represents the reading format of {{ cls.doc_name }}.
 
     It is used to when data is read from CDF.
+{% if cls.description %}
+    {{ cls.description }}{% endif %}
 
     Args:
         space: The space where the node is located.
