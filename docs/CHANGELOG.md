@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.28] - 24-07-24
+### Improved
+- External ID factories: Updated domain_name to remove 'write' suffix only if domain_cls inherits from DomainModelWrite
+
 ## [0.99.27] - 24-07-18
 ### Added
 - Support for advanced sort in generated `.list` method.
