@@ -23,6 +23,21 @@ class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sort
 
 
 class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_write_bases_classes }}):
+    """This represents the writing format of {{ cls.doc_name }}.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ cls.doc_name }}.{% for field in cls.container_fields_sorted() %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
     def __init__(
         self,
         space: str,
@@ -39,6 +54,22 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
 
 
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
+    """This represents the reading format of {{ cls.doc_name }}.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ cls.doc_name }}.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.{% for field in cls.container_fields_sorted() %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
     def __init__(
         self,
         space: str,

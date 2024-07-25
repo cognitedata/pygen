@@ -19,6 +19,24 @@ class CDFExternalReferencesListedProperties:
 
 
 class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, TypedNodeApply):
+    """This represents the writing format of cdf external references listed.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the cdf external references listed.
+        files: The file field.
+        sequences: The sequence field.
+        timeseries: The timesery field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -37,6 +55,25 @@ class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, Ty
 
 
 class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNode):
+    """This represents the reading format of cdf external references listed.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the cdf external references listed.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        files: The file field.
+        sequences: The sequence field.
+        timeseries: The timesery field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -77,6 +114,22 @@ class DependentOnNonWritableProperties:
 
 
 class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApply):
+    """This represents the writing format of dependent on non writable.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the dependent on non writable.
+        a_value: The a value field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -91,6 +144,23 @@ class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApp
 
 
 class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
+    """This represents the reading format of dependent on non writable.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the dependent on non writable.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        a_value: The a value field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -125,6 +195,22 @@ class MainInterfaceProperties:
 
 
 class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
+    """This represents the writing format of main interface.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the main interface.
+        main_value: The main value field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -139,6 +225,23 @@ class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
 
 
 class MainInterface(MainInterfaceProperties, TypedNode):
+    """This represents the reading format of main interface.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the main interface.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        main_value: The main value field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -177,6 +280,30 @@ class PrimitiveNullableProperties:
 
 
 class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
+    """This represents the writing format of primitive nullable.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive nullable.
+        boolean: The boolean field.
+        date: The date field.
+        float_32: The float 32 field.
+        float_64: The float 64 field.
+        int_32: The int 32 field.
+        int_64: The int 64 field.
+        json_: The json field.
+        text: The text field.
+        timestamp: The timestamp field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -207,6 +334,31 @@ class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
 
 
 class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
+    """This represents the reading format of primitive nullable.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive nullable.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        boolean: The boolean field.
+        date: The date field.
+        float_32: The float 32 field.
+        float_64: The float 64 field.
+        int_32: The int 32 field.
+        int_64: The int 64 field.
+        json_: The json field.
+        text: The text field.
+        timestamp: The timestamp field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -269,6 +421,30 @@ class PrimitiveRequiredListedProperties:
 
 
 class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeApply):
+    """This represents the writing format of primitive required listed.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive required listed.
+        boolean: The boolean field.
+        date: The date field.
+        float_32: The float 32 field.
+        float_64: The float 64 field.
+        int_32: The int 32 field.
+        int_64: The int 64 field.
+        json_: The json field.
+        text: The text field.
+        timestamp: The timestamp field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -299,6 +475,31 @@ class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeA
 
 
 class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
+    """This represents the reading format of primitive required listed.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the primitive required listed.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        boolean: The boolean field.
+        date: The date field.
+        float_32: The float 32 field.
+        float_64: The float 64 field.
+        int_32: The int 32 field.
+        int_64: The int 64 field.
+        json_: The json field.
+        text: The text field.
+        timestamp: The timestamp field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -357,6 +558,23 @@ class SubInterfaceProperties:
 
 
 class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
+    """This represents the writing format of sub interface.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the sub interface.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -372,6 +590,24 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
 
 
 class SubInterface(SubInterfaceProperties, MainInterface):
+    """This represents the reading format of sub interface.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the sub interface.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -418,6 +654,25 @@ class Implementation1Properties:
 
 
 class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
+    """This represents the writing format of implementation 1.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 1.
+        value_2: The value 2 field.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        value_1: The value 1 field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -438,6 +693,26 @@ class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
 
 
 class Implementation1(Implementation1Properties, SubInterface):
+    """This represents the reading format of implementation 1.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 1.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        value_2: The value 2 field.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        value_1: The value 1 field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
@@ -487,6 +762,23 @@ class Implementation2Properties:
 
 
 class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
+    """This represents the writing format of implementation 2.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 2.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
     def __init__(
         self,
         space: str,
@@ -503,6 +795,24 @@ class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
 
 
 class Implementation2(Implementation2Properties, SubInterface):
+    """This represents the reading format of implementation 2.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 2.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
     def __init__(
         self,
         space: str,
