@@ -37,7 +37,7 @@ def client_config() -> dict[str, str]:
 
 @pytest.fixture(scope="session")
 def client_config_alpha() -> dict[str, str]:
-    config_file = Path(__file__).parent / "config_alpha.toml"
+    config_file = Path(__file__).parent.parent.parent / "alpha_config.toml"
     if config_file.exists():
         return toml.load(config_file)["cognite"]
     pytest.skip("No config_alpha.toml file found")
