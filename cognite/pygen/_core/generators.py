@@ -268,7 +268,7 @@ class MultiAPIGenerator:
             yield from api_by_view_id.values()
 
     @property
-    def topological_order(self) -> list[DataClass]:
+    def data_classes_topological_order(self) -> list[DataClass]:
         """Return the topological order of the data classes."""
         # Sorted by read name to ensure deterministic order
         sorted_data_classes = sorted([api.data_class for api in self.apis], key=lambda d: d.read_name)
@@ -449,7 +449,7 @@ class MultiAPIGenerator:
             The generated typed classes file as a string.
         """
         typed_classes = self.env.get_template("typed_classes.py.jinja")
-        available_dataclasses = self.topological_order
+        available_dataclasses = self.data_classes_topological_order
         node_classes = [
             d
             for d in available_dataclasses
