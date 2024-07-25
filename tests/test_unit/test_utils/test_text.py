@@ -34,6 +34,7 @@ def test_to_pascal(word: str, singularize: bool, pluralize: bool, expected: str)
         ("APM_Material", False, True, "apm_materials"),
         ("Implementation1", False, False, "implementation_1"),
         ("power-models", False, False, "power_models"),
+        ("object3D", False, False, "object_3d"),
     ],
 )
 def test_to_snake(word: str, singularize: bool, pluralize: bool, expected: str):
