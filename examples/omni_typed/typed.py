@@ -29,7 +29,7 @@ class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, Ty
         files: The file field.
         sequences: The sequence field.
         timeseries: The timesery field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -122,7 +122,7 @@ class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApp
         space: The space where the node is located.
         external_id: The external id of the dependent on non writable.
         a_value: The a value field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -203,7 +203,7 @@ class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
         space: The space where the node is located.
         external_id: The external id of the main interface.
         main_value: The main value field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -296,7 +296,7 @@ class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -437,7 +437,7 @@ class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeA
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -567,7 +567,7 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
         external_id: The external id of the sub interface.
         main_value: The main value field.
         sub_value: The sub value field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -665,7 +665,7 @@ class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
         main_value: The main value field.
         sub_value: The sub value field.
         value_1: The value 1 field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
@@ -771,7 +771,7 @@ class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
         external_id: The external id of the implementation 2.
         main_value: The main value field.
         sub_value: The sub value field.
-        existing_version: TFail the ingestion request if the node's version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
             so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
