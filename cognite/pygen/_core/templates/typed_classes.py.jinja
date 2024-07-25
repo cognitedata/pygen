@@ -26,7 +26,8 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
     def __init__(
         self,
         space: str,
-        external_id: str,{% for field in cls.container_fields_sorted() %}
+        external_id: str,
+        *,{% for field in cls.container_fields_sorted() %}
         {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
@@ -44,7 +45,8 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         external_id: str,
         version: int,
         last_updated_time: int,
-        created_time: int,{% for field in cls.container_fields_sorted() %}
+        created_time: int,
+        *,{% for field in cls.container_fields_sorted() %}
         {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
@@ -79,7 +81,8 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         external_id: str,
         type: DirectRelationReference | tuple[str, str],
         start_node: DirectRelationReference | tuple[str, str],
-        end_node: DirectRelationReference | tuple[str, str],{% for field in cls.container_fields_sorted() %}
+        end_node: DirectRelationReference | tuple[str, str],
+        *,{% for field in cls.container_fields_sorted() %}
         {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
         existing_version: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
@@ -99,7 +102,8 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         end_node: DirectRelationReference,
         version: int,
         last_updated_time: int,
-        created_time: int,{% for field in cls.container_fields_sorted() %}
+        created_time: int,
+        *,{% for field in cls.container_fields_sorted() %}
         {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
         deleted_time: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
