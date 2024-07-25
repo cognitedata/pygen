@@ -244,7 +244,7 @@ def load_data_classes_test_cases():
             read_list_name="SeriesList",
             doc_name="series",
             doc_list_name="series",
-            description="No description",
+            description=None,
             view_id=view.as_id(),
             variable="series",
             variable_list="series_list",
