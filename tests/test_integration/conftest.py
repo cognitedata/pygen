@@ -35,6 +35,14 @@ def client_config() -> dict[str, str]:
         }
 
 
+@pytest.fixture(scope="session")
+def client_config_alpha() -> dict[str, str]:
+    config_file = Path(__file__).parent.parent.parent / "alpha_config.toml"
+    if config_file.exists():
+        return toml.load(config_file)["cognite"]
+    pytest.skip("No config_alpha.toml file found")
+
+
 def create_cognite_client_config(
     tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
 ) -> ClientConfig:
@@ -56,6 +64,11 @@ def create_cognite_client_config(
 @pytest.fixture(scope="session")
 def cognite_client(client_config) -> CogniteClient:
     return CogniteClient(create_cognite_client_config(**client_config))
+
+
+@pytest.fixture(scope="session")
+def cognite_client_alpha(client_config_alpha: dict[str, str]) -> CogniteClient:
+    return CogniteClient(create_cognite_client_config(**client_config_alpha))
 
 
 @pytest.fixture(scope="session")

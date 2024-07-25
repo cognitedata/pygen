@@ -1,3 +1,5 @@
+import random
+
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
@@ -18,3 +20,23 @@ def test_generate_typed_classes(omni_multi_api_generator: MultiAPIGenerator, cod
 
     # Assert
     assert actual == expected
+
+
+def test_topological_sort(omni_multi_api_generator: MultiAPIGenerator):
+    sorted_data_classes = tuple([d.read_name for d in omni_multi_api_generator.data_classes_topological_order])
+    original_nodes = omni_multi_api_generator.api_by_type_by_view_id["node"]
+    original_edges = omni_multi_api_generator.api_by_type_by_view_id["edge"]
+    node_views = list(original_nodes.keys())
+    edge_views = list(original_edges.keys())
+    random.shuffle(node_views)
+    random.shuffle(edge_views)
+    try:
+        omni_multi_api_generator.api_by_type_by_view_id["node"] = {v: original_nodes[v] for v in node_views}
+        omni_multi_api_generator.api_by_type_by_view_id["edge"] = {v: original_edges[v] for v in edge_views}
+
+        new_sorted_data_classes = tuple([d.read_name for d in omni_multi_api_generator.data_classes_topological_order])
+
+        assert sorted_data_classes == new_sorted_data_classes
+    finally:
+        omni_multi_api_generator.api_by_type_by_view_id["node"] = original_nodes
+        omni_multi_api_generator.api_by_type_by_view_id["edge"] = original_edges

@@ -268,16 +268,17 @@ class MultiAPIGenerator:
             yield from api_by_view_id.values()
 
     @property
-    def topological_order(self) -> list[DataClass]:
+    def data_classes_topological_order(self) -> list[DataClass]:
         """Return the topological order of the data classes."""
         # Sorted by read name to ensure deterministic order
-        sorted_data_classes = sorted([api.data_class for api in self.apis], key=lambda d: d.read_name)
-        dataclass_by_read_name = {data_class.read_name: data_class for data_class in sorted_data_classes}
-        dependencies_by_dataclass = {
-            data_class.read_name: {p.read_name for p in data_class.implements} for data_class in sorted_data_classes
-        }
-        # TopologicalSorter is stable, so we can rely on the sorted data classes to be in the deterministic order
-        return [dataclass_by_read_name[name] for name in TopologicalSorter(dependencies_by_dataclass).static_order()]
+        dataclass_by_read_name = {}
+        sorter: TopologicalSorter = TopologicalSorter()
+        for data_class in sorted([api.data_class for api in self.apis], key=lambda d: d.read_name):
+            sorter.add(data_class.read_name, *sorted(p.read_name for p in data_class.implements))
+            dataclass_by_read_name[data_class.read_name] = data_class
+        # TopologicalSorter is stable in the order the nodes were inserted, so we can rely on the sorted
+        # data classes to be in the deterministic order
+        return [dataclass_by_read_name[name] for name in sorter.static_order()]
 
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
         return self.api_by_type_by_view_id["node"][view_id]
@@ -449,7 +450,7 @@ class MultiAPIGenerator:
             The generated typed classes file as a string.
         """
         typed_classes = self.env.get_template("typed_classes.py.jinja")
-        available_dataclasses = self.topological_order
+        available_dataclasses = self.data_classes_topological_order
         node_classes = [
             d
             for d in available_dataclasses

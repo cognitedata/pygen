@@ -1,4 +1,5 @@
 import inspect
+import random
 from collections.abc import Iterable
 
 import pytest
@@ -8,6 +9,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import TypedNode, TypedNodeApply
 from omni_typed import typed
 
+from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
+from cognite.pygen._generator import _get_data_model
+from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils import MockGenerator
 from tests.constants import OMNI_TYPED
 
@@ -72,3 +76,31 @@ class TestTypedClasses:
 
         finally:
             cognite_client.data_modeling.instances.delete(nodes=mock_data.nodes.as_ids())
+
+    @staticmethod
+    def create_core_multi_api_generator(client: CogniteClient) -> MultiAPIGenerator:
+        data_model = _get_data_model(("cdf_cdm_experimental", "core_data_model", "v1"), client, print)
+        # Ensure we have a random order of views
+        # This should be sorted before generating the typed classes
+        random.shuffle(data_model.views)
+        generator = SDKGenerator(
+            "cognite.pygen.typed",
+            "Typed",
+            data_model,
+            None,
+            "infer",
+            print,
+            PygenConfig(),
+        )
+        return generator._multi_api_generator
+
+    def test_generate_deterministic_typed_class_file(self, cognite_client_alpha: CogniteClient) -> None:
+        first = self.create_core_multi_api_generator(cognite_client_alpha)
+
+        second = self.create_core_multi_api_generator(cognite_client_alpha)
+
+        assert [d.read_name for d in first.data_classes_topological_order] == [
+            d.read_name for d in second.data_classes_topological_order
+        ]
+
+        assert first.generate_typed_classes_file() == second.generate_typed_classes_file()

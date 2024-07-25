@@ -41,6 +41,7 @@ class DataClass:
     write_list_name: str
     doc_name: str
     doc_list_name: str
+    description: str | None
     variable: str
     variable_list: str
     file_name: str
@@ -110,6 +111,7 @@ class DataClass:
             write_list_name=f"{class_name}WriteList",
             doc_name=doc_name,
             doc_list_name=doc_list_name,
+            description=view.description,
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
@@ -409,7 +411,7 @@ class DataClass:
     @property
     def container_field_variables(self) -> str:
         return ", ".join(
-            field_.name
+            f"{field_.name}={field_.name}"
             for field_ in self
             if isinstance(field_, BasePrimitiveField)
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)

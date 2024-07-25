@@ -175,6 +175,11 @@ def to_snake(string: str, pluralize: bool = False, singularize: bool = False) ->
         words = [word for section in string.split("_") for word in pattern.findall(section)]
     else:
         words = pattern.findall(string)
+    # Exception for 3D
+    if len(words) > 1:
+        if words[-2] == "3" and words[-1].lower() == "d":
+            words[-2:] = [f"{words[-2]}{words[-1]}"]
+
     if pluralize and singularize:
         raise ValueError("Cannot pluralize and singularize at the same time")
     elif pluralize:
