@@ -338,3 +338,13 @@ def test_doc_example():
     assert uuid_.UUID(rotor_no_name.external_id.removeprefix("rotor_"))
     windmill_with_external_id = WindmillWrite(external_id="custom_external_id")
     assert windmill_with_external_id.external_id == "custom_external_id"
+
+
+def test_domain_name_for_class_name_ending_with_write():
+    class _FooBarWrite:
+        """Class not inheriting from DomainModelWrite with name ending with Write"""
+
+        pass
+
+    assert domain_name(_FooBarWrite, {}) == "foobarwrite"
+    assert domain_name(WindmillWrite, {}) == "windmill"

@@ -56,6 +56,7 @@ tests/test_gqlpygen/tmp
 playground/
 examples/movie_domain/data/settings.toml
 config*.toml
+*config.toml
 playground
 examples/playground.ipynb
 playground.py
