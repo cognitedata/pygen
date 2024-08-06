@@ -492,6 +492,9 @@ class QueryStep:
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
+    """This is a helper class to build and execute a query. It is responsible for
+    doing the paging of the query and keeping track of the results."""
+
     # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
     # clean the name of the field.
     _unique_str = "_a418"
@@ -644,6 +647,19 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
         return self._result_cls(nodes_by_type[self[0].name].values())
 
+    def execute(self, client: CogniteClient) -> T_DomainModelList:
+        self.reset()
+        query = self.build()
+
+        while True:
+            self.update_expression_limits()
+            query.cursors = self.cursors
+            batch = client.data_modeling.instances.query(query)
+            self.update(batch)
+            if self.is_finished:
+                break
+        return self.unpack()
+
 
 class QueryAPI(Generic[T_DomainModelList]):
     def __init__(
@@ -655,17 +671,7 @@ class QueryAPI(Generic[T_DomainModelList]):
         self._builder = builder
 
     def _query(self) -> T_DomainModelList:
-        self._builder.reset()
-        query = self._builder.build()
-
-        while True:
-            self._builder.update_expression_limits()
-            query.cursors = self._builder.cursors
-            batch = self._client.data_modeling.instances.query(query)
-            self._builder.update(batch)
-            if self._builder.is_finished:
-                break
-        return self._builder.unpack()
+        return self._builder.execute(self._client)
 
 
 def _create_edge_filter(
