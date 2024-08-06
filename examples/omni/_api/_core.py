@@ -6,8 +6,8 @@ import warnings
 from abc import ABC
 from itertools import groupby
 
-from collections import Counter, defaultdict, UserList
-from collections.abc import Sequence, Collection
+from collections import Counter, defaultdict
+from collections.abc import Sequence, Collection, MutableSequence
 from dataclasses import dataclass, field
 from typing import (
     Generic,
@@ -459,7 +459,7 @@ class QueryStep:
     name: str
     expression: dm.query.ResultSetExpression
     max_retrieve_limit: int
-    select: dm.query.Select
+    select: dm.query.Select | None = None
     result_cls: type[DomainModelCore] | None = None
     is_single_direct_relation: bool = False
 
@@ -491,14 +491,14 @@ class QueryStep:
         )
 
 
-class QueryBuilder(UserList, Generic[T_DomainModelList]):
+class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
     # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
     # clean the name of the field.
-    _unique_str = "a418"
+    _unique_str = "_a418"
     _name_pattern = re.compile(r"_a418\d+$")
 
-    def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] | None = None):
-        super().__init__(nodes or [])
+    def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
+        super().__init__(steps or [])
         self._result_cls = result_cls
 
     # The dunder implementations are to get proper type hints
@@ -512,15 +512,15 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
     def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
 
     def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
-        value = self.data[item]
+        value = super().__getitem__(item)
         if isinstance(item, slice):
-            return type(self)(value)  # type: ignore[arg-type]
+            return QueryBuilder(self._result_cls, value)  # type: ignore[arg-type]
         return cast(QueryStep, value)
 
     def next_name(self, name: str) -> str:
         counter = Counter(self._clean_name(step.name) for step in self)
         if name in counter:
-            return f"{name}_{self._unique_str}{counter[name]}"
+            return f"{name}{self._unique_str}{counter[name]}"
         return name
 
     def _clean_name(self, name: str) -> str:
