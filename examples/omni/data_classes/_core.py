@@ -200,6 +200,8 @@ class DataRecord(BaseModel):
 
 
 class DomainModel(DomainModelCore, ABC):
+    _view_id: ClassVar[dm.ViewId]
+
     data_record: DataRecord
     node_type: Optional[dm.DirectRelationReference] = None
 

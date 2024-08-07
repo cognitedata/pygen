@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import math
-import re
 import warnings
 from abc import ABC
 from itertools import groupby
 
-from collections import Counter, defaultdict
-from collections.abc import Sequence, Collection, MutableSequence
+from collections import defaultdict
+from collections.abc import Sequence, Collection, MutableSequence, Iterable
 from dataclasses import dataclass, field
 from typing import (
     Generic,
@@ -30,9 +29,7 @@ from cognite.client.data_classes.data_modeling.instances import Instance, Instan
 
 from omni.data_classes._core import (
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
-    DomainRelationWrite,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -458,16 +455,23 @@ class QueryStep:
     # Setup Variables
     name: str
     expression: dm.query.ResultSetExpression
-    max_retrieve_limit: int
-    select: dm.query.Select | None = None
     result_cls: type[DomainModelCore] | None = None
-    is_single_direct_relation: bool = False
+    max_retrieve_limit: int = -1
+    select: dm.query.Select | None = field(default_factory=dm.query.Select)
 
     # Query Variables
-    cursor: str | None = None
-    total_retrieved: int = 0
-    results: list[Instance] = field(default_factory=list)
-    last_batch_count: int = 0
+    cursor: str | None = field(default=None, init=False)
+    total_retrieved: int = field(default=0, init=False)
+    results: list[Instance] = field(default_factory=list, init=False)
+    last_batch_count: int = field(default=0, init=False)
+
+    @property
+    def is_edge_without_properties(self) -> bool:
+        return isinstance(self.expression, dm.query.EdgeResultSetExpression) and self.result_cls is None
+
+    @property
+    def is_single_direct_relation(self) -> bool:
+        return isinstance(self.expression, dm.query.NodeResultSetExpression) and self.expression.through is not None
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
@@ -495,62 +499,32 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
     """This is a helper class to build and execute a query. It is responsible for
     doing the paging of the query and keeping track of the results."""
 
-    # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
-    # clean the name of the field.
-    _unique_str = "_a418"
-    _name_pattern = re.compile(r"_a418\d+$")
-
     def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
         super().__init__(steps or [])
         self._result_cls = result_cls
 
-    # The dunder implementations are to get proper type hints
-    def __iter__(self) -> Iterator[QueryStep]:
-        return super().__iter__()
-
-    @overload
-    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
-
-    @overload
-    def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
-
-    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
-        value = super().__getitem__(item)
-        if isinstance(item, slice):
-            return QueryBuilder(self._result_cls, value)  # type: ignore[arg-type]
-        return cast(QueryStep, value)
-
-    def next_name(self, name: str) -> str:
-        counter = Counter(self._clean_name(step.name) for step in self)
-        if name in counter:
-            return f"{name}{self._unique_str}{counter[name]}"
-        return name
-
-    def _clean_name(self, name: str) -> str:
-        return self._name_pattern.sub("", name)
-
-    def reset(self):
+    def _reset(self):
         for expression in self:
             expression.total_retrieved = 0
             expression.cursor = None
             expression.results = []
 
-    def update_expression_limits(self) -> None:
+    def _update_expression_limits(self) -> None:
         for expression in self:
             expression.update_expression_limit()
 
-    def build(self) -> dm.query.Query:
+    def _build(self) -> dm.query.Query:
         with_ = {expression.name: expression.expression for expression in self}
         select = {expression.name: expression.select for expression in self if expression.select}
-        cursors = self.cursors
+        cursors = self._cursors
 
         return dm.query.Query(with_=with_, select=select, cursors=cursors)
 
     @property
-    def cursors(self) -> dict[str, str | None]:
+    def _cursors(self) -> dict[str, str | None]:
         return {expression.name: expression.cursor for expression in self}
 
-    def update(self, batch: dm.query.QueryResult):
+    def _update(self, batch: dm.query.QueryResult):
         for expression in self:
             if expression.name not in batch:
                 continue
@@ -560,11 +534,11 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             expression.results.extend(batch[expression.name].data)
 
     @property
-    def is_finished(self):
+    def _is_finished(self):
         return all(expression.is_finished for expression in self)
 
     @no_type_check
-    def unpack(self) -> T_DomainModelList:
+    def _unpack(self) -> T_DomainModelList:
         nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
         edges_by_type_by_source_node: dict[tuple[str, str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
             lambda: defaultdict(list)
@@ -648,17 +622,49 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         return self._result_cls(nodes_by_type[self[0].name].values())
 
     def execute(self, client: CogniteClient) -> T_DomainModelList:
-        self.reset()
-        query = self.build()
+        self._reset()
+        query = self._build()
 
         while True:
-            self.update_expression_limits()
-            query.cursors = self.cursors
+            self._update_expression_limits()
+            query.cursors = self._cursors
             batch = client.data_modeling.instances.query(query)
-            self.update(batch)
-            if self.is_finished:
+            self._update(batch)
+            if self._is_finished:
                 break
-        return self.unpack()
+        return self._unpack()
+
+    def get_from(self) -> str | None:
+        if len(self) == 0:
+            return None
+        return self[-1].name
+
+    def create_name(self, from_: str | None) -> str:
+        if from_ is None:
+            return "0"
+        return f"{from_}_{len(self)}"
+
+    # The implementations below are to get proper type hints
+    def append(self, __object: QueryStep, /) -> None:
+        super().append(__object)
+
+    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
+        super().extend(__iterable)
+
+    def __iter__(self) -> Iterator[QueryStep]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
+
+    @overload
+    def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
+
+    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
+        value = super().__getitem__(item)
+        if isinstance(item, slice):
+            return QueryBuilder(self._result_cls, value)  # type: ignore[arg-type]
+        return cast(QueryStep, value)
 
 
 class QueryAPI(Generic[T_DomainModelList]):
