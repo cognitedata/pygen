@@ -31,7 +31,7 @@ ignore = [
     # Typer do function calls when setting up the CLI.
     "B008", # Do not perform function call {name} in argument defaults
     # This is done when setting the pygen configs, and useful for getting pretty docs.
-    # In that case this is also safe as the function call produced immutable data.
+    # In that case, this is also safe as the function calls produced immutable data.
     "RUF009", #Do not perform function call in defaults
 ]
 
