@@ -20,9 +20,11 @@ include = '\.py$'
 line-length = 120
 target-version = "py39"
 exclude = ["examples","examples-pydantic-v1", "scripts"]
+fix = true
+
+[tool.ruff.lint]
 select = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 fixable = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
-fix = true
 ignore = [
     # This is causing issues for pydantic which does not support use of X | Y for type annotations before 3.10
     "UP007", # Use X | Y for type annotations
