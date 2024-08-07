@@ -91,7 +91,7 @@ class TestQueryBuilder:
             QueryStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
-                    from_=edge_name,
+                    from_=from_a,
                     chain_to="destination",
                     direction="outwards",
                 ),
@@ -101,11 +101,7 @@ class TestQueryBuilder:
             QueryStep(
                 builder.create_name(edge_name),
                 dm.query.NodeResultSetExpression(
-                    from_=from_a,
-                    through=dm.PropertyId(
-                        item_a,
-                        "directSingle",
-                    ),
+                    from_=edge_name,
                 ),
                 dc.ConnectionItemB,
             )
