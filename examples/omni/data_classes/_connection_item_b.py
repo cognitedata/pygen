@@ -170,7 +170,7 @@ class ConnectionItemB(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemA],
+        instances: dict[dm.NodeId | str, ConnectionItemB],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
@@ -188,9 +188,13 @@ class ConnectionItemB(DomainModel):
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
-                    if edge.type == dm.DirectRelationReference("pygen-models", "bidirectional"):
+                    if edge.type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
+                        value, (ConnectionItemA, str, dm.NodeId)
+                    ):
                         inwards.append(value)
-                    if edge.type == dm.DirectRelationReference("pygen-models", "reflexive"):
+                    if edge.type == dm.DirectRelationReference("pygen-models", "reflexive") and isinstance(
+                        value, (ConnectionItemB, str, dm.NodeId)
+                    ):
                         self_edge.append(value)
                 instance.inwards = inwards or None
                 instance.self_edge = self_edge or None

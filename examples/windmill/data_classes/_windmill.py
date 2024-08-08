@@ -200,7 +200,7 @@ class Windmill(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemA],
+        instances: dict[dm.NodeId | str, Windmill],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
@@ -222,9 +222,13 @@ class Windmill(DomainModel):
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
-                    if edge.type == dm.DirectRelationReference("power-models", "Windmill.blades"):
+                    if edge.type == dm.DirectRelationReference("power-models", "Windmill.blades") and isinstance(
+                        value, (Blade, str, dm.NodeId)
+                    ):
                         blades.append(value)
-                    if edge.type == dm.DirectRelationReference("power-models", "Windmill.metmast"):
+                    if edge.type == dm.DirectRelationReference("power-models", "Windmill.metmast") and isinstance(
+                        value, (Metmast, str, dm.NodeId)
+                    ):
                         metmast.append(value)
                 instance.blades = blades or None
                 instance.metmast = metmast or None

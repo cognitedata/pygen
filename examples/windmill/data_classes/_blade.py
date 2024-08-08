@@ -169,7 +169,7 @@ class Blade(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemA],
+        instances: dict[dm.NodeId | str, Blade],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
@@ -186,7 +186,9 @@ class Blade(DomainModel):
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
-                    if edge.type == dm.DirectRelationReference("power-models", "Blade.sensor_positions"):
+                    if edge.type == dm.DirectRelationReference("power-models", "Blade.sensor_positions") and isinstance(
+                        value, (SensorPosition, str, dm.NodeId)
+                    ):
                         sensor_positions.append(value)
                 instance.sensor_positions = sensor_positions or None
 
