@@ -18,10 +18,12 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
+    as_node_id,
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
@@ -159,7 +161,20 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
             UserWarning,
             stacklevel=2,
         )
-        return self.as_write()
+        return self.as_write(){% if data_class.has_dependencies %}
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemA],
+        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+    ) -> None:
+        for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
+            if instance.{{ field.name }} in {% if field.to_self %}instances{% else %}connections{% endif %}:
+                instance.{{ field.name }} = {% if field.to_self %}instances{% else %}connections{% endif %}[instance.{{ field.name }}]{% endfor %}
+
+    {% endif %}
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
