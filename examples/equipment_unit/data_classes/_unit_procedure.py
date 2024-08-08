@@ -16,9 +16,11 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
 )
 
 if TYPE_CHECKING:
@@ -167,6 +169,25 @@ class UnitProcedure(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemA],
+        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+    ) -> None:
+        for instance in instances.values():
+            if edges := edges_by_source_node.get(instance.as_id()):
+                for edge in edges:
+                    destination = (
+                        as_node_id(edge.end_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.end_node.external_id
+                    )
+                    value: DomainModel | str | dm.NodeId
+                    if destination in connections:
+                        value = connections[destination]
+                    else:
+                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
 
 class UnitProcedureWrite(DomainModelWrite):

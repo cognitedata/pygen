@@ -16,9 +16,11 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
 )
 from ._sub_interface import SubInterface
 

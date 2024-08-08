@@ -35,15 +35,14 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("connection_item_f"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemF,
                 max_retrieve_limit=limit,
             )
@@ -92,7 +91,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .connection_item_e_query import ConnectionItemEQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_view = ConnectionEdgeA._view_id
         edge_filter = _create_connection_edge_a_filter(
             dm.DirectRelationReference("pygen-models", "multiProperty"),
@@ -108,14 +107,11 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("outwards_multi"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
-                ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=ConnectionEdgeA,
                 max_retrieve_limit=limit,

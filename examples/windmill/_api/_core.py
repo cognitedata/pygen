@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import math
-import re
-import warnings
 from abc import ABC
 from itertools import groupby
 
-from collections import Counter, defaultdict, UserList
-from collections.abc import Sequence, Collection
+from collections import defaultdict
+from collections.abc import Sequence, Collection, MutableSequence, Iterable
 from dataclasses import dataclass, field
 from typing import (
     Generic,
@@ -20,7 +18,6 @@ from typing import (
     overload,
     cast,
     ClassVar,
-    no_type_check,
 )
 
 from cognite.client import CogniteClient
@@ -30,9 +27,7 @@ from cognite.client.data_classes.data_modeling.instances import Instance, Instan
 
 from windmill.data_classes._core import (
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
-    DomainRelationWrite,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -46,6 +41,8 @@ from windmill.data_classes._core import (
     T_DomainRelationList,
     DomainModelCore,
     DomainRelation,
+    DEFAULT_INSTANCE_SPACE,
+    as_node_id,
 )
 from windmill import data_classes
 
@@ -453,21 +450,42 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
 
 
+class _NotSetSentinel: ...
+
+
 @dataclass
 class QueryStep:
     # Setup Variables
     name: str
     expression: dm.query.ResultSetExpression
-    max_retrieve_limit: int
-    select: dm.query.Select
     result_cls: type[DomainModelCore] | None = None
-    is_single_direct_relation: bool = False
+    max_retrieve_limit: int = -1
+    select: dm.query.Select | None = field(default=_NotSetSentinel)
 
     # Query Variables
-    cursor: str | None = None
-    total_retrieved: int = 0
-    results: list[Instance] = field(default_factory=list)
-    last_batch_count: int = 0
+    cursor: str | None = field(default=None, init=False)
+    total_retrieved: int = field(default=0, init=False)
+    results: list[Instance] = field(default_factory=list, init=False)
+    last_batch_count: int = field(default=0, init=False)
+
+    def __post_init__(self):
+        if self.select is _NotSetSentinel:
+            if self.result_cls is None:
+                self.select = dm.query.Select()
+            else:
+                self.select = dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
+
+    @property
+    def from_(self) -> str | None:
+        return self.expression.from_
+
+    @property
+    def is_edge_without_properties(self) -> bool:
+        return isinstance(self.expression, dm.query.EdgeResultSetExpression) and self.result_cls is None
+
+    @property
+    def is_single_direct_relation(self) -> bool:
+        return isinstance(self.expression, dm.query.NodeResultSetExpression) and self.expression.through is not None
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
@@ -490,18 +508,123 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
+    def unpack_results(self) -> dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation]:
+        if self.result_cls is None:
+            raise ValueError("Cannot unpack results for Edges without properties")
+        return {
+            (
+                instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
+            ): self.result_cls.from_instance(instance)
+            for instance in self.results
+        }
 
-class QueryBuilder(UserList, Generic[T_DomainModelList]):
-    # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
-    # clean the name of the field.
-    _unique_str = "a418"
-    _name_pattern = re.compile(r"_a418\d+$")
 
-    def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] | None = None):
-        super().__init__(nodes or [])
+class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
+    """This is a helper class to build and execute a query. It is responsible for
+    doing the paging of the query and keeping track of the results."""
+
+    def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
+        super().__init__(steps or [])
         self._result_cls = result_cls
 
-    # The dunder implementations are to get proper type hints
+    def _reset(self):
+        for expression in self:
+            expression.total_retrieved = 0
+            expression.cursor = None
+            expression.results = []
+
+    def _update_expression_limits(self) -> None:
+        for expression in self:
+            expression.update_expression_limit()
+
+    def _build(self) -> dm.query.Query:
+        with_ = {expression.name: expression.expression for expression in self}
+        select = {expression.name: expression.select for expression in self if expression.select}
+        cursors = self._cursors
+
+        return dm.query.Query(with_=with_, select=select, cursors=cursors)
+
+    @property
+    def _cursors(self) -> dict[str, str | None]:
+        return {expression.name: expression.cursor for expression in self}
+
+    def _update(self, batch: dm.query.QueryResult):
+        for expression in self:
+            if expression.name not in batch:
+                continue
+            expression.last_batch_count = len(batch[expression.name])
+            expression.total_retrieved += expression.last_batch_count
+            expression.cursor = batch.cursors.get(expression.name)
+            expression.results.extend(batch[expression.name].data)
+
+    @property
+    def _is_finished(self):
+        return all(expression.is_finished for expression in self)
+
+    def _unpack(self) -> T_DomainModelList:
+        unpacked_by_from: dict[str, dict[dm.NodeId | dm.EdgeId | str, DomainRelation | DomainModel]] = defaultdict(dict)
+        edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge]]] = defaultdict(dict)
+        for step in reversed(self):
+            if step.is_edge_without_properties and step.from_ is not None:
+                edge_by_source = defaultdict(list)
+                for edge in step.results:
+                    if not isinstance(edge, dm.Edge):
+                        continue
+                    edge_source = edge.start_node if step.expression.direction == "outwards" else edge.end_node
+                    edge_by_source[as_node_id(edge_source)].append(edge)
+                edges_by_from[step.from_].update(edge_by_source)
+                if step.name in unpacked_by_from:
+                    # We need to include the destination of the edges in the unpacked results
+                    unpacked_by_from[step.from_].update(unpacked_by_from[step.name])
+                continue
+            elif step.is_edge_without_properties:
+                raise ValueError("Cannot have edges without a start node")
+
+            unpacked = step.unpack_results()
+            if isinstance(step.from_, str):
+                unpacked_by_from[step.from_].update(unpacked)
+
+            if step.name in unpacked_by_from and step.result_cls is not None:
+                step.result_cls._update_connections(
+                    unpacked,
+                    unpacked_by_from[step.name],
+                    edges_by_from[step.name],
+                )
+
+            if step.from_ is None:
+                return self._result_cls(unpacked.values())
+        raise ValueError("Could not find the root node")
+
+    def execute(self, client: CogniteClient) -> T_DomainModelList:
+        self._reset()
+        query = self._build()
+
+        while True:
+            self._update_expression_limits()
+            query.cursors = self._cursors
+            batch = client.data_modeling.instances.query(query)
+            self._update(batch)
+            if self._is_finished:
+                break
+        return self._unpack()
+
+    def get_from(self) -> str | None:
+        if len(self) == 0:
+            return None
+        return self[-1].name
+
+    def create_name(self, from_: str | None) -> str:
+        if from_ is None:
+            return "0"
+        return f"{from_}_{len(self)}"
+
+    # The implementations below are to get proper type hints
+    def append(self, __object: QueryStep, /) -> None:
+        super().append(__object)
+
+    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
+        super().extend(__iterable)
+
     def __iter__(self) -> Iterator[QueryStep]:
         return super().__iter__()
 
@@ -512,137 +635,10 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
     def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
 
     def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
-        value = self.data[item]
+        value = super().__getitem__(item)
         if isinstance(item, slice):
-            return type(self)(value)  # type: ignore[arg-type]
+            return QueryBuilder(self._result_cls, value)  # type: ignore[arg-type]
         return cast(QueryStep, value)
-
-    def next_name(self, name: str) -> str:
-        counter = Counter(self._clean_name(step.name) for step in self)
-        if name in counter:
-            return f"{name}_{self._unique_str}{counter[name]}"
-        return name
-
-    def _clean_name(self, name: str) -> str:
-        return self._name_pattern.sub("", name)
-
-    def reset(self):
-        for expression in self:
-            expression.total_retrieved = 0
-            expression.cursor = None
-            expression.results = []
-
-    def update_expression_limits(self) -> None:
-        for expression in self:
-            expression.update_expression_limit()
-
-    def build(self) -> dm.query.Query:
-        with_ = {expression.name: expression.expression for expression in self}
-        select = {expression.name: expression.select for expression in self if expression.select}
-        cursors = self.cursors
-
-        return dm.query.Query(with_=with_, select=select, cursors=cursors)
-
-    @property
-    def cursors(self) -> dict[str, str | None]:
-        return {expression.name: expression.cursor for expression in self}
-
-    def update(self, batch: dm.query.QueryResult):
-        for expression in self:
-            if expression.name not in batch:
-                continue
-            expression.last_batch_count = len(batch[expression.name])
-            expression.total_retrieved += expression.last_batch_count
-            expression.cursor = batch.cursors.get(expression.name)
-            expression.results.extend(batch[expression.name].data)
-
-    @property
-    def is_finished(self):
-        return all(expression.is_finished for expression in self)
-
-    @no_type_check
-    def unpack(self) -> T_DomainModelList:
-        nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
-        edges_by_type_by_source_node: dict[tuple[str, str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
-            lambda: defaultdict(list)
-        )
-        relation_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[DomainRelation]]] = (
-            defaultdict(lambda: defaultdict(list))
-        )
-        node_attribute_to_node_type: dict[str, str] = {}
-
-        for step in self:
-            name = step.name
-            from_ = step.expression.from_
-
-            if isinstance(step.expression, dm.query.NodeResultSetExpression) and from_:
-                node_attribute_to_node_type[from_] = name
-
-            if step.result_cls is None:  # This is a data model edge.
-                for edge in step.results:
-                    edge = cast(dm.Edge, edge)
-                    edge_source = edge.start_node if step.expression.direction == "outwards" else edge.end_node
-                    edges_by_type_by_source_node[(from_, name, step.expression.direction)][
-                        (edge_source.space, edge_source.external_id)
-                    ].append(edge)
-            elif issubclass(step.result_cls, DomainModel):
-                for node in step.results:
-                    domain = step.result_cls.from_instance(node)
-                    if (id_ := domain.as_tuple_id()) not in nodes_by_type[name]:
-                        nodes_by_type[name][id_] = domain
-            elif issubclass(step.result_cls, DomainRelation):
-                for edge in step.results:
-                    domain = step.result_cls.from_instance(edge)
-                    relation_by_type_by_start_node[(from_, name)][domain.start_node.as_tuple()].append(domain)
-
-            # Link direct relations
-            is_direct_relation = (
-                isinstance(step.expression, dm.query.NodeResultSetExpression) and from_ and from_ in nodes_by_type
-            )
-            if is_direct_relation:
-                end_nodes = nodes_by_type[name]
-                attribute_name = node_attribute_to_node_type[from_]
-                for parent_node in nodes_by_type[from_].values():
-                    attribute_value = getattr(parent_node, attribute_name)
-                    if isinstance(attribute_value, str):
-                        end_id = (parent_node.space, attribute_value)
-                    elif isinstance(attribute_value, dm.NodeId):
-                        end_id = attribute_value.space, attribute_value.external_id
-                    else:
-                        continue
-                    if end_id in end_nodes:
-                        setattr(parent_node, attribute_name, end_nodes[end_id])
-                    else:
-                        warnings.warn(f"Unpacking of query result: Could not find node with id {end_id}", stacklevel=2)
-
-        for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
-            for node in nodes_by_type[node_name].values():
-                setattr(node, node_attribute, relations_by_start_node.get(node.as_tuple_id(), []))
-            for relations in relations_by_start_node.values():
-                for relation in relations:
-                    edge_name = relation.edge_type.external_id.split(".")[-1]
-                    if (nodes := nodes_by_type.get(edge_name)) and (
-                        node := nodes.get((relation.end_node.space, relation.end_node.external_id))
-                    ):
-                        # Relations always have an end node.
-                        relation.end_node = node
-
-        for (node_name, node_attribute, direction), edges_by_source_node in edges_by_type_by_source_node.items():
-            for node in nodes_by_type[node_name].values():
-                edges = edges_by_source_node.get(node.as_tuple_id(), [])
-                nodes = nodes_by_type.get(node_attribute_to_node_type.get(node_attribute), {})
-                if direction == "outwards":
-                    setattr(
-                        node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))]
-                    )
-                else:  # inwards
-                    setattr(
-                        node,
-                        node_attribute,
-                        [node for edge in edges if (node := nodes.get(edge.start_node.as_tuple()))],
-                    )
-
-        return self._result_cls(nodes_by_type[self[0].name].values())
 
 
 class QueryAPI(Generic[T_DomainModelList]):
@@ -655,17 +651,7 @@ class QueryAPI(Generic[T_DomainModelList]):
         self._builder = builder
 
     def _query(self) -> T_DomainModelList:
-        self._builder.reset()
-        query = self._builder.build()
-
-        while True:
-            self._builder.update_expression_limits()
-            query.cursors = self._builder.cursors
-            batch = self._client.data_modeling.instances.query(query)
-            self._builder.update(batch)
-            if self._builder.is_finished:
-                break
-        return self._builder.unpack()
+        return self._builder.execute(self._client)
 
 
 def _create_edge_filter(

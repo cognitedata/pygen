@@ -17,10 +17,12 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    as_node_id,
 )
 
 

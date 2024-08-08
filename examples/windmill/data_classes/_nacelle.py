@@ -17,10 +17,12 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    as_node_id,
 )
 
 if TYPE_CHECKING:
@@ -240,6 +242,35 @@ class Nacelle(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemA],
+        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+    ) -> None:
+        for instance in instances.values():
+            if instance.gearbox in connections:
+                instance.gearbox = connections[instance.gearbox]
+            if instance.generator in connections:
+                instance.generator = connections[instance.generator]
+            if instance.high_speed_shaft in connections:
+                instance.high_speed_shaft = connections[instance.high_speed_shaft]
+            if instance.main_shaft in connections:
+                instance.main_shaft = connections[instance.main_shaft]
+            if instance.power_inverter in connections:
+                instance.power_inverter = connections[instance.power_inverter]
+            if edges := edges_by_source_node.get(instance.as_id()):
+                for edge in edges:
+                    destination = (
+                        as_node_id(edge.end_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.end_node.external_id
+                    )
+                    value: DomainModel | str | dm.NodeId
+                    if destination in connections:
+                        value = connections[destination]
+                    else:
+                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
 
 class NacelleWrite(DomainModelWrite):

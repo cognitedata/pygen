@@ -37,15 +37,14 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("windmill"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=Windmill,
                 max_retrieve_limit=limit,
             )
@@ -86,7 +85,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .blade_query import BladeQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.blades"),
             external_id_prefix=external_id_prefix_edge,
@@ -94,13 +93,12 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("blades"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
@@ -155,7 +153,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .metmast_query import MetmastQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.metmast"),
             external_id_prefix=external_id_prefix_edge,
@@ -163,13 +161,12 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("metmast"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
@@ -213,37 +210,27 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_nacelle(self, from_: str) -> None:
-        view_id = Nacelle._view_id
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("nacelle"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
                     through=self._view_id.as_property_ref("nacelle"),
                     direction="outwards",
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
-                max_retrieve_limit=-1,
                 result_cls=Nacelle,
-                is_single_direct_relation=True,
             ),
         )
 
     def _query_append_rotor(self, from_: str) -> None:
-        view_id = Rotor._view_id
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("rotor"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
                     through=self._view_id.as_property_ref("rotor"),
                     direction="outwards",
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
-                max_retrieve_limit=-1,
                 result_cls=Rotor,
-                is_single_direct_relation=True,
             ),
         )

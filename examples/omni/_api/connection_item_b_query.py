@@ -34,15 +34,14 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("connection_item_b"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemB,
                 max_retrieve_limit=limit,
             )
@@ -81,7 +80,7 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .connection_item_a_query import ConnectionItemAQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "bidirectional"),
             external_id_prefix=external_id_prefix_edge,
@@ -89,13 +88,12 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("inwards"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="inwards",
                 ),
-                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
@@ -143,7 +141,7 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .connection_item_b_query import ConnectionItemBQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "reflexive"),
             external_id_prefix=external_id_prefix_edge,
@@ -151,13 +149,12 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("self_edge"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )

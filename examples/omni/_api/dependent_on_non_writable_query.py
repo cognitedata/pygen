@@ -30,15 +30,14 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("dependent_on_non_writable"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=DependentOnNonWritable,
                 max_retrieve_limit=limit,
             )
@@ -81,7 +80,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
-        from_ = self._builder[-1].name
+        from_ = self._builder.get_from()
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "toNonWritable"),
             external_id_prefix=external_id_prefix_edge,
@@ -89,13 +88,12 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("to_non_writable"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )

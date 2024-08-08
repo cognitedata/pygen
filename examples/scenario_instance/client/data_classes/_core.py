@@ -169,7 +169,13 @@ class GraphQLList(UserList):
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
+def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
+    return dm.NodeId(space=value.space, external_id=value.external_id)
+
+
 class DomainModelCore(Core, ABC):
+    _view_id: ClassVar[dm.ViewId]
+
     space: str
     external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
@@ -178,6 +184,16 @@ class DomainModelCore(Core, ABC):
 
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
+        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+    ) -> None:
+        # This is used when unpacking a query result and should be overridden in the subclasses
+        return None
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
@@ -290,6 +306,9 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     node_type: Optional[dm.DirectRelationReference] = None
+
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
 
     def to_instances_write(
         self,
