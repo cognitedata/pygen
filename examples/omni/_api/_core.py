@@ -649,16 +649,16 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
     def _unpack2(self) -> T_DomainModelList:
         unpacked_by_from: dict[str, dict[dm.NodeId | dm.EdgeId | str, DomainRelation | DomainModel]] = defaultdict(dict)
-        edges_by_from: dict[str, dict[dm.NodeId | str, dm.Edge]] = defaultdict(dict)
+        edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge]]] = defaultdict(dict)
         for step in reversed(self):
             if step.is_edge_without_properties and step.from_ is not None:
-                edges_by_from[step.from_].update(
-                    {
-                        as_node_id(edge.start_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.external_id: edge
-                        for edge in step.results
-                        if isinstance(edge, dm.Edge)
-                    }
-                )
+                edge_by_source = defaultdict(list)
+                for edge in step.results:
+                    if not isinstance(edge, dm.Edge):
+                        continue
+                    edge_source = edge.start_node if step.expression.direction == "outwards" else edge.end_node
+                    edge_by_source[as_node_id(edge_source)].append(edge)
+                edges_by_from[step.from_].update(edge_by_source)
                 if step.name in unpacked_by_from:
                     # We need to include the destination of the edges in the unpacked results
                     unpacked_by_from[step.from_].update(unpacked_by_from[step.name])

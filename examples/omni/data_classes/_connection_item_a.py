@@ -185,25 +185,27 @@ class ConnectionItemA(DomainModel):
         cls,
         instances: dict[dm.NodeId | str, ConnectionItemA],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, dm.Edge],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():
             if instance.other_direct in connections:
                 instance.other_direct = connections[instance.other_direct]
             if instance.self_direct in instances:
                 instance.self_direct = instances[instance.self_direct]
-            if instance.outwards:
-                new_edges = []
-                for outward in instance.outwards:
-                    if edge := edges_by_source_node.get(outward):
-                        destination = as_node_id(edge.start_node)
-                        if destination in connections:
-                            new_edges.append(connections[destination])
-                        else:
-                            new_edges.append(outward)
+            if edges := edges_by_source_node.get(instance.as_id()):
+                outwards: list[ConnectionItemB | str | dm.NodeId] = []
+                for edge in edges:
+                    destination = (
+                        as_node_id(edge.end_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.end_node.external_id
+                    )
+                    value: DomainModel | str | dm.NodeId
+                    if destination in connections:
+                        value = connections[destination]
                     else:
-                        new_edges.append(outward)
-                instance.outwards = new_edges
+                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+                    if edge.type == dm.DirectRelationReference("pygen-models", "bidirectional"):
+                        outwards.append(value)
+                instance.outwards = outwards or None
 
 
 class ConnectionItemAWrite(DomainModelWrite):

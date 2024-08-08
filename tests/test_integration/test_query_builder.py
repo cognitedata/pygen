@@ -112,4 +112,18 @@ class TestQueryBuilder:
 
         # Assert
         assert isinstance(result, dc.ConnectionItemAList)
-        assert builder[0].total_retrieved == 5
+        assert builder[0].total_retrieved == len(result) > 0
+
+        actual_direct_set = sum(1 for item in result if item.other_direct)
+        assert builder[1].total_retrieved == actual_direct_set
+
+        actual_edge_set = sum(len(item.outwards or []) for item in result)
+        assert builder[2].total_retrieved == actual_edge_set
+
+        unique_destination_set = set(
+            destination.as_id()
+            for item in result
+            for destination in item.outwards
+            if isinstance(destination, dc.ConnectionItemB)
+        )
+        assert builder[3].total_retrieved == len(unique_destination_set)

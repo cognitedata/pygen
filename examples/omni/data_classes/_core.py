@@ -188,7 +188,7 @@ class DomainModelCore(Core, ABC):
         cls,
         instances: dict[dm.NodeId | dm.EdgeId | str, Self],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_snode: dict[dm.NodeId | str, dm.Edge],
+        edges_by_source_snode: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         # This is used when unpacking a query result and should be overridden in the subclasses
         return None
