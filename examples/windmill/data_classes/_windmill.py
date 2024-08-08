@@ -213,10 +213,11 @@ class Windmill(DomainModel):
                 blades: list[Blade | str | dm.NodeId] = []
                 metmast: list[Metmast | str | dm.NodeId] = []
                 for edge in edges:
+                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
                     destination = (
-                        as_node_id(edge.end_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.end_node.external_id
+                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
                     )
-                    value: DomainModel | str | dm.NodeId
+                    value: DomainModel | DomainRelation | str | dm.NodeId
                     if destination in connections:
                         value = connections[destination]
                     else:
