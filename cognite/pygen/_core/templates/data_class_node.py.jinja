@@ -171,8 +171,20 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
-            if instance.{{ field.name }} in {% if field.to_self %}instances{% else %}connections{% endif %}:
-                instance.{{ field.name }} = {% if field.to_self %}instances{% else %}connections{% endif %}[instance.{{ field.name }}]{% endfor %}
+            if ({{ field.name }} := {% if field.to_self %}instances{% else %}connections{% endif %}.get(instance.{{ field.name }}) and isinstance(
+                    {{ field.name }}, {{ field.data_class.read_name }}
+            ):
+                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
+            if instance.{{ field.name }}:
+                new_{{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []
+                for relation in instance.{{ field.name }}:
+                    if (other := {% if field.to_self %}instances{% else %}connections{% endif %}.get(relation)) and isinstance(
+                        other, {{ field.data_class.read_name }}
+                    ):
+                        new_{{ field.name }}.append(other)
+                    else:
+                        new_{{ field.name }}.append(relation)
+                instance.{{ field.name }} = new_{{ field.name }}{% endfor %}
             if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
                 {{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []{% endfor %}
                 for edge in edges:
