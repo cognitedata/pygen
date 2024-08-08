@@ -5,7 +5,7 @@ import sys
 import warnings
 from abc import abstractmethod, ABC
 from collections import UserList
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Iterable
 from dataclasses import dataclass, field
 from typing import (
     Annotated,
@@ -169,6 +169,10 @@ class GraphQLList(UserList):
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
+def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
+    return dm.NodeId(space=value.space, external_id=value.external_id)
+
+
 class DomainModelCore(Core, ABC):
     space: str
     external_id: str = Field(min_length=1, max_length=255, alias="externalId")
@@ -178,6 +182,16 @@ class DomainModelCore(Core, ABC):
 
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
+        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        edges_by_source_snode: dict[dm.NodeId | str, dm.Edge],
+    ) -> None:
+        # This is used when unpacking a query result and should be overridden in the subclasses
+        return None
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)

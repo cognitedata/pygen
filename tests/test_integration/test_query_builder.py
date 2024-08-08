@@ -112,4 +112,4 @@ class TestQueryBuilder:
 
         # Assert
         assert isinstance(result, dc.ConnectionItemAList)
-        assert builder[0].total_retrieved == 1
+        assert builder[0].total_retrieved == 5

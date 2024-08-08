@@ -43,6 +43,8 @@ from omni.data_classes._core import (
     T_DomainRelationList,
     DomainModelCore,
     DomainRelation,
+    DEFAULT_INSTANCE_SPACE,
+    as_node_id,
 )
 from omni import data_classes
 
@@ -465,6 +467,9 @@ class QueryStep:
     results: list[Instance] = field(default_factory=list, init=False)
     last_batch_count: int = field(default=0, init=False)
 
+    def __post_init__(self):
+        ...
+
     @property
     def from_(self) -> str | None:
         return self.expression.from_
@@ -498,21 +503,15 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
-    def unpack_results(self) -> dict[dm.NodeId | dm.EdgeId, DomainModel | DomainRelation]:
+    def unpack_results(self) -> dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation]:
         if self.result_cls is None:
             raise ValueError("Cannot unpack results for Edges without properties")
-        return {instance.as_id(): self.result_cls.from_instance(instance) for instance in self.results}
-
-    def create_domain_edges(self) -> dict[dm.EdgeId, DomainRelation | dm.Edge]:
-        if self.result_cls is None:
-            return {edge.as_id(): edge for edge in self.results}
-        elif issubclass(self.result_cls, DomainRelation):
-            output: dict[dm.EdgeId, DomainRelation] = {}
-            for edge in self.results:
-                domain = self.result_cls.from_instance(edge)
-                output[domain.as_id()] = domain
-            return output
-        raise ValueError("Cannot create domain edges for non-DomainRelation classes")
+        return {
+            (
+                instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
+            ): self.result_cls.from_instance(instance)
+            for instance in self.results
+        }
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
@@ -642,11 +641,17 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         return self._result_cls(nodes_by_type[self[0].name].values())
 
     def _unpack2(self) -> T_DomainModelList:
-        unpacked_by_from: dict[str, dict[dm.NodeId | dm.EdgeId, DomainRelation | DomainModel]] = defaultdict(dict)
-        edges_by_from: dict[str, dict[dm.EdgeId, dm.Edge]] = defaultdict(dict)
+        unpacked_by_from: dict[str, dict[dm.NodeId | dm.EdgeId | str, DomainRelation | DomainModel]] = defaultdict(dict)
+        edges_by_from: dict[str, dict[dm.NodeId | str, dm.Edge]] = defaultdict(dict)
         for step in reversed(self):
             if step.is_edge_without_properties and step.from_ is not None:
-                edges_by_from[step.from_].update({edge.as_id(): edge for edge in step.results})
+                edges_by_from[step.from_].update(
+                    {
+                        as_node_id(edge.start_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.external_id: edge
+                        for edge in step.results
+                        if isinstance(edge, dm.Edge)
+                    }
+                )
                 if step.name in unpacked_by_from:
                     # We need to include the destination of the edges in the unpacked results
                     unpacked_by_from[step.from_].update(unpacked_by_from[step.name])
@@ -660,7 +665,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
             if step.name in unpacked_by_from and step.result_cls is not None:
                 step.result_cls._update_connections(
-                    unpacked.values(),
+                    unpacked,
                     unpacked_by_from[step.name],
                     edges_by_from[step.name],
                 )
