@@ -5,7 +5,7 @@ import sys
 import warnings
 from abc import abstractmethod, ABC
 from collections import UserList
-from collections.abc import Collection, Mapping, Iterable
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from typing import (
     Annotated,
@@ -174,6 +174,8 @@ def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
 
 
 class DomainModelCore(Core, ABC):
+    _view_id: ClassVar[dm.ViewId]
+
     space: str
     external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
@@ -188,7 +190,7 @@ class DomainModelCore(Core, ABC):
         cls,
         instances: dict[dm.NodeId | dm.EdgeId | str, Self],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_snode: dict[dm.NodeId, list[dm.Edge]],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         # This is used when unpacking a query result and should be overridden in the subclasses
         return None
@@ -214,8 +216,6 @@ class DataRecord(BaseModel):
 
 
 class DomainModel(DomainModelCore, ABC):
-    _view_id: ClassVar[dm.ViewId]
-
     data_record: DataRecord
     node_type: Optional[dm.DirectRelationReference] = None
 
