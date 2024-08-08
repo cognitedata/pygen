@@ -452,6 +452,9 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
 
 
+class _NotSetSentinel: ...
+
+
 @dataclass
 class QueryStep:
     # Setup Variables
@@ -459,7 +462,7 @@ class QueryStep:
     expression: dm.query.ResultSetExpression
     result_cls: type[DomainModelCore] | None = None
     max_retrieve_limit: int = -1
-    select: dm.query.Select | None = field(default_factory=dm.query.Select)
+    select: dm.query.Select | None = field(default=_NotSetSentinel)
 
     # Query Variables
     cursor: str | None = field(default=None, init=False)
@@ -468,7 +471,11 @@ class QueryStep:
     last_batch_count: int = field(default=0, init=False)
 
     def __post_init__(self):
-        ...
+        if self.select is _NotSetSentinel:
+            if self.result_cls is None:
+                self.select = dm.query.Select()
+            else:
+                self.select = dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
 
     @property
     def from_(self) -> str | None:
