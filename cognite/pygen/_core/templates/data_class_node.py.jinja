@@ -171,7 +171,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
-            if ({{ field.name }} := {% if field.to_self %}instances{% else %}connections{% endif %}.get(instance.{{ field.name }}) and isinstance(
+            if isinstance({{ field.name }},( dm.NodeId,str )) and ({{ field.name }} := {% if field.to_self %}instances{% else %}connections{% endif %}.get(instance.{{ field.name }}) and isinstance(
                     {{ field.name }}, {{ field.data_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
