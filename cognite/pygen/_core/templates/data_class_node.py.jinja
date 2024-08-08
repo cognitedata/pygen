@@ -166,7 +166,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemA],
+        instances: dict[dm.NodeId | str, {{ data_class.read_name }}],
         connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
@@ -185,7 +185,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 {% for field in data_class.one_to_many_edges_without_properties %}
-                    if edge.type == dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"):
+                    if edge.type == {{ field.edge_type_str }} and isinstance(
+                        value, ({{ field.data_class.read_name }}, str, dm.NodeId)
+                    ):
                         {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
                 instance.{{ field.name }} = {{ field.name }} or None{% endfor %}
 

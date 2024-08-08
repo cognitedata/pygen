@@ -165,6 +165,12 @@ class BaseConnectionField(Field, ABC):
         return True
 
     @property
+    def edge_type_str(self) -> str:
+        if self.edge_type is None:
+            raise ValueError("Bug in Pygen: Missing edge type")
+        return f'dm.DirectRelationReference("{ self.edge_type.space }", "{ self.edge_type.external_id }")'
+
+    @property
     def is_one_to_many(self) -> bool:
         raise NotImplementedError()
 
