@@ -36,15 +36,14 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("{{ data_class.variable }}"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls={{ data_class.read_name }},
                 max_retrieve_limit=limit,
             )
@@ -71,7 +70,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         """
         from .{{ edge_api.query.file_name }} import {{ edge_api.query.name}}
 
-        from_ = self._builder[-1].name{% if edge_api.has_edge_class %}
+        from_ = self._builder.get_from(){% if edge_api.has_edge_class %}
         edge_view = {{ edge_api.edge_class.read_name }}._view_id{% endif %}
         edge_filter = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
@@ -80,17 +79,13 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("{{ edge_api.field_name }}"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="{{ edge_api.direction }}",
                 ),{% if edge_api.has_edge_class %}
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, ["*"])],
-                ),
-                result_cls= {{ edge_api.edge_class.read_name }},{% else %}
-                select=dm.query.Select(),{% endif %}
+                result_cls= {{ edge_api.edge_class.read_name }},{% endif %}
                 max_retrieve_limit=limit,
             )
         )
@@ -125,20 +120,15 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         return self._query()
 {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
-        view_id = {{ field.data_class.read_name }}._view_id
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("{{ field.name }}"),
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
-                max_retrieve_limit=-1,
                 result_cls={{ field.data_class.read_name }},
-                is_single_direct_relation=True,
             ),
         )
 {% endfor %}
