@@ -186,6 +186,17 @@ class ConnectionItemF(DomainModel):
                     else:
                         new_direct_list.append(relation)
                 instance.direct_list = new_direct_list
+            if edges := edges_by_source_node.get(instance.as_id()):
+                for edge in edges:
+                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                    destination = (
+                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
+                    )
+                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    if destination in connections:
+                        value = connections[destination]
+                    else:
+                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
 
 class ConnectionItemFWrite(DomainModelWrite):

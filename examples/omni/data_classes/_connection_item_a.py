@@ -188,10 +188,18 @@ class ConnectionItemA(DomainModel):
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():
-            if instance.other_direct in connections:
-                instance.other_direct = connections[instance.other_direct]
-            if instance.self_direct in instances:
-                instance.self_direct = instances[instance.self_direct]
+            if (
+                isinstance(instance.other_direct, (dm.NodeId, str))
+                and (other_direct := connections.get(instance.other_direct))
+                and isinstance(other_direct, ConnectionItemCNode)
+            ):
+                instance.other_direct = other_direct
+            if (
+                isinstance(instance.self_direct, (dm.NodeId, str))
+                and (self_direct := instances.get(instance.self_direct))
+                and isinstance(self_direct, ConnectionItemA)
+            ):
+                instance.self_direct = self_direct
             if edges := edges_by_source_node.get(instance.as_id()):
                 outwards: list[ConnectionItemB | str | dm.NodeId] = []
                 for edge in edges:

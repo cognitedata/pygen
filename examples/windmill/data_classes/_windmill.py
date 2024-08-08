@@ -205,10 +205,18 @@ class Windmill(DomainModel):
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():
-            if instance.nacelle in connections:
-                instance.nacelle = connections[instance.nacelle]
-            if instance.rotor in connections:
-                instance.rotor = connections[instance.rotor]
+            if (
+                isinstance(instance.nacelle, (dm.NodeId, str))
+                and (nacelle := connections.get(instance.nacelle))
+                and isinstance(nacelle, Nacelle)
+            ):
+                instance.nacelle = nacelle
+            if (
+                isinstance(instance.rotor, (dm.NodeId, str))
+                and (rotor := connections.get(instance.rotor))
+                and isinstance(rotor, Rotor)
+            ):
+                instance.rotor = rotor
             if edges := edges_by_source_node.get(instance.as_id()):
                 blades: list[Blade | str | dm.NodeId] = []
                 metmast: list[Metmast | str | dm.NodeId] = []
