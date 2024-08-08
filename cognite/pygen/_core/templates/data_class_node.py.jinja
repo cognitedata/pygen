@@ -173,6 +173,21 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
             if instance.{{ field.name }} in {% if field.to_self %}instances{% else %}connections{% endif %}:
                 instance.{{ field.name }} = {% if field.to_self %}instances{% else %}connections{% endif %}[instance.{{ field.name }}]{% endfor %}
+            if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
+                {{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []{% endfor %}
+                for edge in edges:
+                    destination = (
+                        as_node_id(edge.end_node) if edge.space != DEFAULT_INSTANCE_SPACE else edge.end_node.external_id
+                    )
+                    value: DomainModel | str | dm.NodeId
+                    if destination in connections:
+                        value = connections[destination]
+                    else:
+                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+{% for field in data_class.one_to_many_edges_without_properties %}
+                    if edge.type == dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"):
+                        {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
+                instance.{{ field.name }} = {{ field.name }} or None{% endfor %}
 
     {% endif %}
 

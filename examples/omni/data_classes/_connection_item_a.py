@@ -203,6 +203,7 @@ class ConnectionItemA(DomainModel):
                         value = connections[destination]
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+
                     if edge.type == dm.DirectRelationReference("pygen-models", "bidirectional"):
                         outwards.append(value)
                 instance.outwards = outwards or None
