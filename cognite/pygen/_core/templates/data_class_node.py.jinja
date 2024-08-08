@@ -178,7 +178,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
             if instance.{{ field.name }}:
                 new_{{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
-                    if (other := {% if field.to_self %}instances{% else %}connections{% endif %}.get(relation)) and isinstance(
+                    if isinstance(relation, {{ field.data_class.read_name }}):
+                        new_direct_list.append(relation)
+                    elif (other := {% if field.to_self %}instances{% else %}connections{% endif %}.get(relation)) and isinstance(
                         other, {{ field.data_class.read_name }}
                     ):
                         new_{{ field.name }}.append(other)

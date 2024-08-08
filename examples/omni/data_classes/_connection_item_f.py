@@ -179,7 +179,9 @@ class ConnectionItemF(DomainModel):
             if instance.direct_list:
                 new_direct_list: list[ConnectionItemD | str | dm.NodeId] = []
                 for relation in instance.direct_list:
-                    if (other := connections.get(relation)) and isinstance(other, ConnectionItemD):
+                    if isinstance(relation, ConnectionItemD):
+                        new_direct_list.append(relation)
+                    elif (other := connections.get(relation)) and isinstance(other, ConnectionItemD):
                         new_direct_list.append(other)
                     else:
                         new_direct_list.append(relation)
