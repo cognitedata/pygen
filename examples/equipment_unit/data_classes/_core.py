@@ -248,10 +248,12 @@ T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
 
 
 def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
-    if isinstance(value, (dm.NodeId, str)):
+    if isinstance(value, str):
         return value
-    if value.space == DEFAULT_INSTANCE_SPACE:
+    elif value.space == DEFAULT_INSTANCE_SPACE:
         return value.external_id
+    elif isinstance(value, dm.NodeId):
+        return value
     return value.as_id()
 
 

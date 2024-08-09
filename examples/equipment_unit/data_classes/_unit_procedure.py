@@ -212,10 +212,15 @@ class UnitProcedure(DomainModel):
                         "IntegrationTestsImmutable", "UnitProcedure.work_order"
                     ) and isinstance(value, StartEndTime):
                         work_orders.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
                     if edge_type == dm.DirectRelationReference(
                         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
                     ) and isinstance(value, StartEndTime):
                         work_units.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
+
                 instance.work_orders = work_orders
                 instance.work_units = work_units
 
