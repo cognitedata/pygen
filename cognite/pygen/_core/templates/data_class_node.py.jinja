@@ -169,7 +169,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         instances: dict[dm.NodeId | str, {{ data_class.read_name }}],  # type: ignore[override]
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
+    ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
+{% endif %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
             if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.data_class.read_name }}

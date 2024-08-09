@@ -9,7 +9,7 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as dc
-    from omni._api._core import NodeQueryStep, QueryBuilder
+    from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
@@ -88,7 +88,7 @@ class TestQueryBuilder:
         )
         edge_name = builder.create_name(from_a)
         builder.append(
-            NodeQueryStep(
+            EdgeQueryStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=from_a,

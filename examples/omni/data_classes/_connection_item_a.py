@@ -187,6 +187,9 @@ class ConnectionItemA(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._connection_item_b import ConnectionItemB
+        from ._connection_item_c_node import ConnectionItemCNode
+
         for instance in instances.values():
             if (
                 isinstance(instance.other_direct, (dm.NodeId, str))
