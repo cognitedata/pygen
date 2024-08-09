@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
@@ -7,11 +8,9 @@ from cognite.client.data_classes import filters
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from omni import OmniClient
     from omni import data_classes as dc
     from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 else:
-    from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
     from omni_pydantic_v1._api._core import QueryBuilder
 
@@ -74,7 +73,7 @@ class TestQueryBuilder:
         assert builder[2].total_retrieved == actual_direct_multi_set > 0
 
     def test_query_with_edge_and_direct_relation(
-        self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client: OmniClient
+        self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     ) -> None:
         # Arrange
         item_a = omni_views["ConnectionItemA"].as_id()
@@ -145,3 +144,59 @@ class TestQueryBuilder:
             if isinstance(destination, dc.ConnectionItemB)
         )
         assert builder[3].total_retrieved == len(unique_destination_set) > 0
+
+    @pytest.mark.skip(reason="Missing test data")
+    def test_query_across_edge_with_properties(
+        self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client
+    ) -> None:
+        item_f = omni_views["ConnectionItemF"].as_id()
+        builder = QueryBuilder(dc.ConnectionItemFList)
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=filters.HasData(views=[item_f]),
+                ),
+                dc.ConnectionItemF,
+                max_retrieve_limit=1,
+            )
+        )
+        from_f = builder.get_from()
+        edge_view = omni_views["ConnectionEdgeA"].as_id()
+        builder.append(
+            EdgeQueryStep(
+                builder.create_name(from_f),
+                dm.query.EdgeResultSetExpression(
+                    from_=from_f,
+                    chain_to="destination",
+                    direction="outwards",
+                    filter=filters.HasData(views=[edge_view]),
+                ),
+                dc.ConnectionEdgeA,
+            )
+        )
+        item_g = omni_views["ConnectionItemG"].as_id()
+        from_edge = builder.get_from()
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(from_edge),
+                dm.query.NodeResultSetExpression(
+                    from_=from_edge,
+                    filter=filters.HasData(views=[item_g]),
+                ),
+                dc.ConnectionItemG,
+            )
+        )
+
+        result = builder.execute(cognite_client)
+
+        assert isinstance(result, dc.ConnectionItemFList)
+        assert builder[0].total_retrieved == len(result) > 0
+
+        actual_edge_set = sum(len(item.outwards_multi or []) for item in result)
+        assert builder[1].total_retrieved == actual_edge_set > 0
+
+        actual_node_set = sum(
+            1 for item in result for edge in item.outwards_multi or [] if isinstance(edge.end_node, dc.ConnectionItemG)
+        )
+        assert builder[2].total_retrieved == actual_node_set > 0
