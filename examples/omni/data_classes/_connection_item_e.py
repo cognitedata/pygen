@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     as_node_id,
+    as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
 )
@@ -205,22 +206,6 @@ class ConnectionItemE(DomainModel):
         from ._connection_item_d import ConnectionItemD
 
         for instance in instances.values():
-            if (
-                isinstance(instance.direct_reverse_single, (dm.NodeId, str))
-                and (direct_reverse_single := nodes_by_id.get(instance.direct_reverse_single))
-                and isinstance(direct_reverse_single, ConnectionItemD)
-            ):
-                instance.direct_reverse_single = direct_reverse_single
-            if instance.direct_reverse_multi:
-                new_direct_reverse_multi: list[ConnectionItemD | str | dm.NodeId] = []
-                for relation in instance.direct_reverse_multi:
-                    if isinstance(relation, ConnectionItemD):
-                        new_direct_reverse_multi.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
-                        new_direct_reverse_multi.append(other)
-                    else:
-                        new_direct_reverse_multi.append(relation)
-                instance.direct_reverse_multi = new_direct_reverse_multi
             if edges := edges_by_source_node.get(instance.as_id()):
                 inwards_single: list[ConnectionItemD | str | dm.NodeId] = []
                 for edge in edges:
@@ -251,6 +236,32 @@ class ConnectionItemE(DomainModel):
                         inwards_single.append(value)
 
                 instance.inwards_single = inwards_single or None
+
+        for node in nodes_by_id.values():
+            if (
+                isinstance(node, ConnectionItemD)
+                and node.direct_single is not None
+                and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
+            ):
+                node.direct_single = direct_single
+                if direct_single.direct_reverse_single is None:
+                    direct_single.direct_reverse_single = node
+                elif are_nodes_equal(node, direct_single.direct_reverse_single):
+                    direct_single.direct_reverse_single = select_best_node(node, direct_single.direct_reverse_single)
+                else:
+                    warnings.warn(
+                        f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
+                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}."
+                    )
+            if (
+                isinstance(node, ConnectionItemD)
+                and node.direct_multi is not None
+                and (direct_multi := instances.get(as_pygen_node_id(node.direct_multi)))
+            ):
+                node.direct_multi = direct_multi
+                if direct_multi.direct_reverse_multi is None:
+                    direct_multi.direct_reverse_multi = []
+                direct_multi.direct_reverse_multi.append(node)
 
 
 class ConnectionItemEWrite(DomainModelWrite):

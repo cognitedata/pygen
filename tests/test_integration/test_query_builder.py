@@ -17,7 +17,7 @@ else:
 
 
 class TestQueryBuilder:
-    def test_list_with_reverse_direct_relations(
+    def test_query_with_reverse_direct_relations(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     ) -> None:
         # Arrange
@@ -47,6 +47,18 @@ class TestQueryBuilder:
                 dc.ConnectionItemD,
             )
         )
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(from_),
+                dm.query.NodeResultSetExpression(
+                    from_=from_,
+                    filter=filters.HasData(views=[item_d]),
+                    through=item_d.as_property_ref("directMulti"),
+                    direction="inwards",
+                ),
+                dc.ConnectionItemD,
+            )
+        )
 
         # Act
         result = builder.execute(cognite_client)
@@ -57,6 +69,9 @@ class TestQueryBuilder:
 
         actual_direct_set = sum(1 for item in result if item.direct_reverse_single)
         assert builder[1].total_retrieved == actual_direct_set > 0
+
+        actual_direct_multi_set = sum(len(item.direct_reverse_multi or []) for item in result)
+        assert builder[2].total_retrieved == actual_direct_multi_set > 0
 
     def test_query_with_edge_and_direct_relation(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client: OmniClient
