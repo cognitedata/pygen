@@ -122,7 +122,6 @@ class BaseConnectionField(Field, ABC):
     end_classes: list[DataClass] | None
     use_node_reference: bool
     through: dm.PropertyId | None
-    to_self: bool
 
     @property
     def data_class(self) -> DataClass:
@@ -197,7 +196,6 @@ class BaseConnectionField(Field, ABC):
         variable: str,
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
-        view_id: dm.ViewId,
     ) -> Field | None:
         if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
             return None
@@ -210,15 +208,12 @@ class BaseConnectionField(Field, ABC):
         end_classes: list[DataClass] | None
         if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
             end_classes = [edge_class_by_view_id[prop.edge_source]]
-            to_self = end_classes[0].view_id == view_id
             use_node_reference = False
         elif (
             isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
         ) and prop.source is not None:
             end_classes = [node_class_by_view_id[prop.source]]
-            to_self = end_classes[0].view_id == view_id
         else:
-            to_self = False
             end_classes = None
 
         if cls._is_supported_one_to_many_connection(prop):
@@ -234,7 +229,6 @@ class BaseConnectionField(Field, ABC):
                 description=prop.description,
                 end_classes=end_classes,
                 use_node_reference=use_node_reference,
-                to_self=to_self,
             )
         elif cls._is_supported_one_to_one_connection(prop):
             return OneToOneConnectionField(
@@ -248,7 +242,6 @@ class BaseConnectionField(Field, ABC):
                 description=prop.description,
                 end_classes=end_classes,
                 use_node_reference=use_node_reference,
-                to_self=to_self,
             )
         else:
             return None

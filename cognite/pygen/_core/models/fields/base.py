@@ -78,7 +78,7 @@ class Field:
         if isinstance(prop, dm.ConnectionDefinition) or (
             isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         ):
-            return BaseConnectionField.load(base, prop, variable, node_class_by_view_id, edge_class_by_view_id, view_id)
+            return BaseConnectionField.load(base, prop, variable, node_class_by_view_id, edge_class_by_view_id)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.PropertyType):

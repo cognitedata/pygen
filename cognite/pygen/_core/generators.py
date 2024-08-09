@@ -672,7 +672,6 @@ class APIGenerator:
                 unique_end_classes=unique_end_classes,
                 grouped_edge_classes=grouped_edge_classes,
                 create_start_node_set=create_start_node_set,
-                chain=itertools.chain,
             )
             + "\n"
         )
