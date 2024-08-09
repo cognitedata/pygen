@@ -250,6 +250,12 @@ class Nacelle(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._gearbox import Gearbox
+        from ._generator import Generator
+        from ._high_speed_shaft import HighSpeedShaft
+        from ._main_shaft import MainShaft
+        from ._power_inverter import PowerInverter
+
         for instance in instances.values():
             if (
                 isinstance(instance.gearbox, (dm.NodeId, str))

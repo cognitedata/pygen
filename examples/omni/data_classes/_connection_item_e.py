@@ -200,6 +200,8 @@ class ConnectionItemE(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._connection_item_d import ConnectionItemD
+
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
                 inwards_single: list[ConnectionItemD | str | dm.NodeId] = []

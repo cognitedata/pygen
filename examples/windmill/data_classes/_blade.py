@@ -173,6 +173,8 @@ class Blade(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._sensor_position import SensorPosition
+
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
                 sensor_positions: list[SensorPosition | str | dm.NodeId] = []

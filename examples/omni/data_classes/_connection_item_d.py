@@ -202,6 +202,8 @@ class ConnectionItemD(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._connection_item_e import ConnectionItemE
+
         for instance in instances.values():
             if (
                 isinstance(instance.direct_multi, (dm.NodeId, str))

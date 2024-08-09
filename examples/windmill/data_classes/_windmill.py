@@ -204,6 +204,11 @@ class Windmill(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._blade import Blade
+        from ._metmast import Metmast
+        from ._nacelle import Nacelle
+        from ._rotor import Rotor
+
         for instance in instances.values():
             if (
                 isinstance(instance.nacelle, (dm.NodeId, str))
