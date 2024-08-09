@@ -6,7 +6,6 @@ from itertools import groupby
 
 from collections import defaultdict
 from collections.abc import Sequence, Collection, MutableSequence, Iterable
-from dataclasses import dataclass, field
 from typing import (
     Generic,
     Literal,
@@ -39,7 +38,6 @@ from omni.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
-    DomainModelCore,
     DomainRelation,
     DEFAULT_INSTANCE_SPACE,
     as_node_id,
