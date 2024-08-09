@@ -203,6 +203,22 @@ class ConnectionItemE(DomainModel):
         from ._connection_item_d import ConnectionItemD
 
         for instance in instances.values():
+            if (
+                isinstance(instance.direct_reverse_single, (dm.NodeId, str))
+                and (direct_reverse_single := nodes_by_id.get(instance.direct_reverse_single))
+                and isinstance(direct_reverse_single, ConnectionItemD)
+            ):
+                instance.direct_reverse_single = direct_reverse_single
+            if instance.direct_reverse_multi:
+                new_direct_reverse_multi: list[ConnectionItemD | str | dm.NodeId] = []
+                for relation in instance.direct_reverse_multi:
+                    if isinstance(relation, ConnectionItemD):
+                        new_direct_reverse_multi.append(relation)
+                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
+                        new_direct_reverse_multi.append(other)
+                    else:
+                        new_direct_reverse_multi.append(relation)
+                instance.direct_reverse_multi = new_direct_reverse_multi
             if edges := edges_by_source_node.get(instance.as_id()):
                 inwards_single: list[ConnectionItemD | str | dm.NodeId] = []
                 for edge in edges:

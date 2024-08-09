@@ -172,16 +172,16 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
 {% endif %}
-        for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
+        for instance in instances.values():{% for field in chain(data_class.one_to_one_direct_relations_with_source, data_class.one_to_one_reverse_direct_relation) %}
             if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.data_class.read_name }}
             ):
-                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
+                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in chain(data_class.one_to_many_direct_relations_with_source, data_class.one_to_many_reverse_direct_relations) %}
             if instance.{{ field.name }}:
                 new_{{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
                     if isinstance(relation, {{ field.data_class.read_name }}):
-                        new_direct_list.append(relation)
+                        new_{{ field.name }}.append(relation)
                     elif (other := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(relation)) and isinstance(
                         other, {{ field.data_class.read_name }}
                     ):
