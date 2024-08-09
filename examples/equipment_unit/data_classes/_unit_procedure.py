@@ -186,7 +186,12 @@ class UnitProcedure(DomainModel):
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:
-                        other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                        other_end: dm.DirectRelationReference = (
+                            edge.end_node
+                            if edge.start_node.space == instance.space
+                            and edge.start_node.external_id == instance.external_id
+                            else edge.start_node
+                        )
                         destination: dm.NodeId | str = (
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
