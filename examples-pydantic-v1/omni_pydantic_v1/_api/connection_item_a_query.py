@@ -144,6 +144,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_other_direct(self, from_: str) -> None:
+        view_id = ConnectionItemCNode._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -151,12 +152,14 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
+                    filter=dm.filters.HasData(views=[view_id]),
                 ),
                 result_cls=ConnectionItemCNode,
             ),
         )
 
     def _query_append_self_direct(self, from_: str) -> None:
+        view_id = ConnectionItemA._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -164,6 +167,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     through=self._view_id.as_property_ref("selfDirect"),
                     direction="outwards",
+                    filter=dm.filters.HasData(views=[view_id]),
                 ),
                 result_cls=ConnectionItemA,
             ),
