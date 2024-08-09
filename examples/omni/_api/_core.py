@@ -608,20 +608,21 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         # More than one step, we need to unpack the nodes and edges
         nodes_by_from: dict[str, dict[dm.NodeId | str, DomainModel]] = defaultdict(dict)
         edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge | DomainRelation]]] = defaultdict(dict)
-        for step in reversed(self[1:]):
+        for step in reversed(self):
             # Validated in the append method
             from_ = cast(str, step.from_)
             if isinstance(step, EdgeQueryStep):
                 edges_by_from[from_].update(step.unpack())
             elif isinstance(step, NodeQueryStep):
-                unpacked = step.unpack()
-                nodes_by_from[from_].update(unpacked)
+                node_unpacked = step.unpack()
+                nodes_by_from[from_].update(node_unpacked)
                 if step.name in nodes_by_from:
                     step.result_cls._update_connections(
-                        unpacked,
+                        unpacked,  # type: ignore[arg-type]
                         nodes_by_from[step.name],
                         edges_by_from[step.name],
                     )
+        return self._result_list_cls(nodes_by_from[first_step.name].values())
 
     def execute(self, client: CogniteClient) -> T_DomainModelList:
         self._reset()
