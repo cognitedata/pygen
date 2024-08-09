@@ -31,7 +31,7 @@ class TestQueryBuilder:
                     filter=filters.HasData(views=[item_e]),
                 ),
                 dc.ConnectionItemE,
-                max_retrieve_limit=10,
+                max_retrieve_limit=1,
             )
         )
         from_ = builder.get_from()
@@ -70,6 +70,7 @@ class TestQueryBuilder:
                     filter=filters.HasData(views=[item_a]),
                 ),
                 dc.ConnectionItemA,
+                max_retrieve_limit=5,
             )
         )
         from_a = builder.get_from()
