@@ -463,7 +463,7 @@ class QueryStep:
         if select is _NotSetSentinel:
             self.select = self._default_select()
         else:
-            self.select = select
+            self.select = select  # type: ignore[assignment]
         self.cursor: str | None = None
         self.total_retrieved: int = 0
         self.last_batch_count: int = 0
@@ -550,7 +550,7 @@ class EdgeQueryStep(QueryStep):
         for edge in cast(list[dm.Edge], self.results):
             edge_source = edge.start_node if self.expression.direction == "outwards" else edge.end_node
             value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
-            output[as_node_id(edge_source)].append(value)
+            output[as_node_id(edge_source)].append(value)  # type: ignore[arg-type]
         return output
 
 

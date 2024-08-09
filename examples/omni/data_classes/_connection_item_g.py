@@ -168,7 +168,7 @@ class ConnectionItemG(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemG],
+        instances: dict[dm.NodeId | str, ConnectionItemG],  # type: ignore[override]
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
@@ -181,7 +181,7 @@ class ConnectionItemG(DomainModel):
                         value = edge
                     else:
                         other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                        destination = (
+                        destination: dm.NodeId | str = (
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
                             else other_end.external_id

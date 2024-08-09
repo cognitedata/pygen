@@ -246,7 +246,7 @@ class Nacelle(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, Nacelle],
+        instances: dict[dm.NodeId | str, Nacelle],  # type: ignore[override]
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
