@@ -202,7 +202,7 @@ class ConnectionItemA(DomainModel):
                 instance.other_direct = other_direct
             if (
                 isinstance(instance.self_direct, (dm.NodeId, str))
-                and (self_direct := instances.get(instance.self_direct))
+                and (self_direct := nodes_by_id.get(instance.self_direct))
                 and isinstance(self_direct, ConnectionItemA)
             ):
                 instance.self_direct = self_direct

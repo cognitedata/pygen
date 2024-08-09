@@ -502,6 +502,9 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r})"
+
 
 class NodeQueryStep(QueryStep):
     def __init__(

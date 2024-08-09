@@ -176,7 +176,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
 {% endif %}{% if data_class.has_edges_or_direct_relations %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
-            if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(instance.{{ field.name }})) and isinstance(
+            if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.data_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
@@ -185,7 +185,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                 for relation in instance.{{ field.name }}:
                     if isinstance(relation, {{ field.data_class.read_name }}):
                         new_{{ field.name }}.append(relation)
-                    elif (other := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(relation)) and isinstance(
+                    elif (other := nodes_by_id.get(relation)) and isinstance(
                         other, {{ field.data_class.read_name }}
                     ):
                         new_{{ field.name }}.append(other)
