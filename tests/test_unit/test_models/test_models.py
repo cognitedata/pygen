@@ -86,6 +86,7 @@ def load_field_test_cases():
     data_class.write_name = "ModelTemplateApply"
     data_class.read_name = "ModelTemplate"
     data_class.is_writable = True
+    data_class.view_id = dm.ViewId("cogShop", "ModelTemplate", "8ae35635bb3f8a")
 
     yield pytest.param(
         mapped,

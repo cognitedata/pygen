@@ -330,6 +330,18 @@ class DataClass:
         return bool(self.dependencies)
 
     @property
+    def has_edges_or_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are edges or direct relations."""
+        return any(
+            isinstance(field_, BaseConnectionField) and (field_.is_edge or field_.is_direct_relation) for field_ in self
+        )
+
+    @property
+    def has_reverse_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are reverse direct relations."""
+        return any(isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation for field_ in self)
+
+    @property
     def container_fields(self) -> Iterable[Field]:
         """Container fields are fields that store their value in a container.
 
@@ -389,12 +401,28 @@ class DataClass:
         )
 
     @property
+    def one_to_one_reverse_direct_relation(self) -> Iterable[OneToOneConnectionField]:
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToOneConnectionField)
+            if field_.is_reverse_direct_relation and field_.end_classes
+        )
+
+    @property
     def one_to_many_direct_relations_with_source(self) -> Iterable[OneToManyConnectionField]:
         """All direct relations."""
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
             if field_.is_direct_relation and field_.end_classes
+        )
+
+    @property
+    def one_to_many_reverse_direct_relations(self) -> Iterable[OneToManyConnectionField]:
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToManyConnectionField)
+            if field_.is_reverse_direct_relation and field_.end_classes
         )
 
     @property
@@ -452,6 +480,10 @@ class DataClass:
     @property
     def has_any_field_model_prefix(self) -> bool:
         return any(field_.name.startswith("model") for field_ in self)
+
+    @property
+    def has_edges(self) -> bool:
+        return any(isinstance(field_, BaseConnectionField) and field_.is_edge for field_ in self)
 
 
 @dataclass

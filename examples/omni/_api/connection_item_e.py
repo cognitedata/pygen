@@ -460,7 +460,6 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_edges: bool = True,
-        retrieve_connections: Literal["id", "full"] | None = "id",
     ) -> ConnectionItemEList:
         """List/filter connection item es
 

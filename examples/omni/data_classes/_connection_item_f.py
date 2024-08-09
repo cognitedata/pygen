@@ -16,9 +16,14 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 if TYPE_CHECKING:
@@ -165,6 +170,60 @@ class ConnectionItemF(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemF],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
+    ) -> None:
+        from ._connection_edge_a import ConnectionEdgeA
+        from ._connection_item_d import ConnectionItemD
+
+        for instance in instances.values():
+            if instance.direct_list:
+                new_direct_list: list[ConnectionItemD | str | dm.NodeId] = []
+                for relation in instance.direct_list:
+                    if isinstance(relation, ConnectionItemD):
+                        new_direct_list.append(relation)
+                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
+                        new_direct_list.append(other)
+                    else:
+                        new_direct_list.append(relation)
+                instance.direct_list = new_direct_list
+            if edges := edges_by_source_node.get(instance.as_id()):
+                outwards_multi: list[ConnectionEdgeA] = []
+                for edge in edges:
+                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    if isinstance(edge, DomainRelation):
+                        value = edge
+                    else:
+                        other_end: dm.DirectRelationReference = (
+                            edge.end_node
+                            if edge.start_node.space == instance.space
+                            and edge.start_node.external_id == instance.external_id
+                            else edge.start_node
+                        )
+                        destination: dm.NodeId | str = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
+
+                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                        value, ConnectionEdgeA
+                    ):
+                        outwards_multi.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
+
+                instance.outwards_multi = outwards_multi
 
 
 class ConnectionItemFWrite(DomainModelWrite):
