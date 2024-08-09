@@ -23,6 +23,7 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     as_node_id,
+    as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
 )
