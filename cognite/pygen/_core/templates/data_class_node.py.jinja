@@ -24,6 +24,7 @@ from ._core import (
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
     as_node_id,
+    as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
 ){% if data_class.implements %}{% for implements in data_class.implements %}
@@ -173,12 +174,12 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
-{% endif %}
-        for instance in instances.values():{% for field in chain(data_class.one_to_one_direct_relations_with_source, data_class.one_to_one_reverse_direct_relation) %}
+{% endif %}{% if data_class.has_edges_or_direct_relations %}
+        for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
             if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := {% if field.to_self %}instances{% else %}nodes_by_id{% endif %}.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.data_class.read_name }}
             ):
-                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in chain(data_class.one_to_many_direct_relations_with_source, data_class.one_to_many_reverse_direct_relations) %}
+                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
                 new_{{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
@@ -249,8 +250,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
 {% for field in data_class.one_to_many_edges_without_properties %}
                 instance.{{ field.name }} = {{ field.name }} or None{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}
-{% endif %}
-{% endif %}
+{% endif %}{% endif %}{% endif %}
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):

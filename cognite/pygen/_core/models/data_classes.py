@@ -330,6 +330,13 @@ class DataClass:
         return bool(self.dependencies)
 
     @property
+    def has_edges_or_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are edges or direct relations."""
+        return any(
+            isinstance(field_, BaseConnectionField) and (field_.is_edge or field_.is_direct_relation) for field_ in self
+        )
+
+    @property
     def container_fields(self) -> Iterable[Field]:
         """Container fields are fields that store their value in a container.
 
