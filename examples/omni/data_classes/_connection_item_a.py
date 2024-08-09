@@ -184,8 +184,8 @@ class ConnectionItemA(DomainModel):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | str, ConnectionItemA],
-        nodes_by_id: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         for instance in instances.values():
             if (
