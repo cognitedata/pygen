@@ -24,6 +24,8 @@ from ._core import (
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
     as_node_id,
+    are_nodes_equal,
+    select_best_node,
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
@@ -221,8 +223,30 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, {{ field.data_class.read_name }}
                     ):
-                        {{ field.name }}.append(value){% endfor %}
-                {% for field in data_class.one_to_many_edges_without_properties %}
+                        {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
+                    if edge_type == {{ field.edge_type_str }} and isinstance(
+                        value, ({{ field.data_class.read_name }}, str, dm.NodeId)
+                    ):
+                        if instance.{{ field.name }} is None:
+                            instance.{{ field.name }} = value
+                        elif are_nodes_equal(value, instance.{{ field.name }}):
+                            instance.{{ field.name }} = select_best_node(value, instance.{{ field.name }})
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                            ){% endfor %}{% for field in data_class.one_to_one_edge_with_properties %}
+                    if edge_type == {{ field.edge_type_str }} and isinstance(
+                        value, {{ field.data_class.read_name }}
+                    ):
+                        if instance.{{ field.name }} is None:
+                            instance.{{ field.name }} = value
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                            ){% endfor %}
+{% for field in data_class.one_to_many_edges_without_properties %}
                 instance.{{ field.name }} = {{ field.name }} or None{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}
 {% endif %}

@@ -21,6 +21,8 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     as_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 if TYPE_CHECKING:
@@ -239,6 +241,19 @@ class ConnectionItemD(DomainModel):
                         else:
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
+
+                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectionalSingle") and isinstance(
+                        value, (ConnectionItemE, str, dm.NodeId)
+                    ):
+                        if instance.outwards_single is None:
+                            instance.outwards_single = value
+                        elif are_nodes_equal(value, instance.outwards_single):
+                            instance.outwards_single = select_best_node(value, instance.outwards_single)
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for 'outwards_single' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                            )
 
 
 class ConnectionItemDWrite(DomainModelWrite):
