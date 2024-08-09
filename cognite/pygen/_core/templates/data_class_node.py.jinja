@@ -224,7 +224,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, {{ field.data_class.read_name }}
                     ):
-                        {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
+                        {{ field.name }}.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, ({{ field.data_class.read_name }}, str, dm.NodeId)
                     ):
