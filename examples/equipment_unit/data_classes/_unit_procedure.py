@@ -216,7 +216,6 @@ class UnitProcedure(DomainModel):
                         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
                     ) and isinstance(value, StartEndTime):
                         work_units.append(value)
-
                 instance.work_orders = work_orders
                 instance.work_units = work_units
 

@@ -503,7 +503,7 @@ class QueryStep:
         )
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r})"
+        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
 
 
 class NodeQueryStep(QueryStep):

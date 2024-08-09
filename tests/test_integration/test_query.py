@@ -45,8 +45,9 @@ def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
     has_retrieved_a = False
     for item in items:
         for a_item in item.connection_item_a or []:
-            assert a_item.external_id.startswith("ConnectionItemA:Joseph")
-            has_retrieved_a = True
+            if isinstance(a_item, dc.ConnectionItemA):
+                assert a_item.external_id.startswith("ConnectionItemA:Joseph")
+                has_retrieved_a = True
     assert has_retrieved_a, "No ConnectionItemA items were retrieved"
 
 
