@@ -15,7 +15,15 @@ from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} imp
     {{ edge_api.end_class.read_name }},
     {{ edge_api.end_class.filter_name }},
 ){% endfor %}
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not query_api.is_only_one_to_many_edges  %}, _create_edge_filter{% endif %}
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,{% if not query_api.is_only_one_to_many_edges  %}
+    _create_edge_filter,{% endif %}
+)
 {% for class_ in unique_edge_data_classes %}
 from {{ top_level_package }}.data_classes.{{ class_.file_name }} import (
     {{ class_.filter_name }},
@@ -38,7 +46,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -78,7 +86,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
             {{ parm.name.removesuffix('_edge') }}={{ parm.name }},{% endfor %}
         )
         self._builder.append(
-            QueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -121,7 +129,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
 {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
