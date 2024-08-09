@@ -9,7 +9,15 @@ from omni.data_classes import (
     DomainModelCore,
     Implementation2,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, NodeQueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 
 class Implementation2QueryAPI(QueryAPI[T_DomainModelList]):

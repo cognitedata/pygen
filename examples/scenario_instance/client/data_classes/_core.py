@@ -55,6 +55,13 @@ TimeSeries = Annotated[
 DEFAULT_INSTANCE_SPACE = "IntegrationTestsImmutable"
 
 
+class _NotSetSentinel:
+    """This is a special class that indicates that a value has not been set.
+    It is used when we need to distinguish between not set and None."""
+
+    ...
+
+
 @dataclass
 class ResourcesWrite:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
@@ -189,8 +196,8 @@ class DomainModelCore(Core, ABC):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | dm.EdgeId | str, Self],
-        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         # This is used when unpacking a query result and should be overridden in the subclasses
         return None

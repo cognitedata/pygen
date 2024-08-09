@@ -30,7 +30,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
+    QueryStep,
     QueryBuilder,
 )
 from .connection_item_b_inwards import ConnectionItemBInwardsAPI

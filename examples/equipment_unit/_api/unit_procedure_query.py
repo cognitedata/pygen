@@ -18,7 +18,15 @@ from equipment_unit.data_classes._equipment_module import (
     EquipmentModule,
     _create_equipment_module_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 from equipment_unit.data_classes._start_end_time import (
     _create_start_end_time_filter,
@@ -42,7 +50,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -111,7 +119,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -197,7 +205,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,

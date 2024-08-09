@@ -247,51 +247,40 @@ class Nacelle(DomainModel):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | str, Nacelle],
-        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         for instance in instances.values():
             if (
                 isinstance(instance.gearbox, (dm.NodeId, str))
-                and (gearbox := connections.get(instance.gearbox))
+                and (gearbox := nodes_by_id.get(instance.gearbox))
                 and isinstance(gearbox, Gearbox)
             ):
                 instance.gearbox = gearbox
             if (
                 isinstance(instance.generator, (dm.NodeId, str))
-                and (generator := connections.get(instance.generator))
+                and (generator := nodes_by_id.get(instance.generator))
                 and isinstance(generator, Generator)
             ):
                 instance.generator = generator
             if (
                 isinstance(instance.high_speed_shaft, (dm.NodeId, str))
-                and (high_speed_shaft := connections.get(instance.high_speed_shaft))
+                and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft))
                 and isinstance(high_speed_shaft, HighSpeedShaft)
             ):
                 instance.high_speed_shaft = high_speed_shaft
             if (
                 isinstance(instance.main_shaft, (dm.NodeId, str))
-                and (main_shaft := connections.get(instance.main_shaft))
+                and (main_shaft := nodes_by_id.get(instance.main_shaft))
                 and isinstance(main_shaft, MainShaft)
             ):
                 instance.main_shaft = main_shaft
             if (
                 isinstance(instance.power_inverter, (dm.NodeId, str))
-                and (power_inverter := connections.get(instance.power_inverter))
+                and (power_inverter := nodes_by_id.get(instance.power_inverter))
                 and isinstance(power_inverter, PowerInverter)
             ):
                 instance.power_inverter = power_inverter
-            if edges := edges_by_source_node.get(instance.as_id()):
-                for edge in edges:
-                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                    destination = (
-                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
-                    )
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in connections:
-                        value = connections[destination]
-                    else:
-                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
 
 class NacelleWrite(DomainModelWrite):

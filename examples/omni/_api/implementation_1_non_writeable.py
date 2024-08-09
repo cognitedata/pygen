@@ -28,7 +28,7 @@ from ._core import (
     Aggregations,
     NodeReadAPI,
     SequenceNotStr,
-    NodeQueryStep,
+    QueryStep,
     QueryBuilder,
 )
 from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI

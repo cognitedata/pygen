@@ -30,7 +30,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
+    QueryStep,
     QueryBuilder,
 )
 from .implementation_1_query import Implementation1QueryAPI

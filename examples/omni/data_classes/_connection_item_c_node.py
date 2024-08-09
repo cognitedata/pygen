@@ -168,24 +168,31 @@ class ConnectionItemCNode(DomainModel):
                 connection_item_a: list[ConnectionItemA | str | dm.NodeId] = []
                 connection_item_b: list[ConnectionItemB | str | dm.NodeId] = []
                 for edge in edges:
-                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                    destination = (
-                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
-                    )
                     value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in nodes_by_id:
-                        value = nodes_by_id[destination]
+                    if isinstance(edge, DomainRelation):
+                        value = edge
                     else:
-                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+                        other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                        destination = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge.type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
                         value, (ConnectionItemA, str, dm.NodeId)
                     ):
                         connection_item_a.append(value)
-                    if edge.type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
                         value, (ConnectionItemB, str, dm.NodeId)
                     ):
                         connection_item_b.append(value)
+
                 instance.connection_item_a = connection_item_a or None
                 instance.connection_item_b = connection_item_b or None
 

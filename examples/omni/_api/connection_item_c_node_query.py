@@ -17,7 +17,15 @@ from omni.data_classes._connection_item_b import (
     ConnectionItemB,
     _create_connection_item_b_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, NodeQueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 if TYPE_CHECKING:
     from .connection_item_a_query import ConnectionItemAQueryAPI
@@ -88,7 +96,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            NodeQueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -149,7 +157,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            NodeQueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,

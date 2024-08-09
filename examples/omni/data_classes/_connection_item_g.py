@@ -169,21 +169,35 @@ class ConnectionItemG(DomainModel):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | str, ConnectionItemG],
-        nodes_by_id: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
+                inwards_multi_property: list[ConnectionEdgeA] = []
                 for edge in edges:
-                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                    destination = (
-                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
-                    )
                     value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in nodes_by_id:
-                        value = nodes_by_id[destination]
+                    if isinstance(edge, DomainRelation):
+                        value = edge
                     else:
-                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+                        other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                        destination = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
+
+                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                        value, ConnectionEdgeA
+                    ):
+                        inwards_multi_property.append(value)
+
+                instance.inwards_multi_property = inwards_multi_property
 
 
 class ConnectionItemGWrite(DomainModelWrite):

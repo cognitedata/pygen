@@ -203,20 +203,27 @@ class ConnectionItemA(DomainModel):
             if edges := edges_by_source_node.get(instance.as_id()):
                 outwards: list[ConnectionItemB | str | dm.NodeId] = []
                 for edge in edges:
-                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                    destination = (
-                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
-                    )
                     value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in nodes_by_id:
-                        value = nodes_by_id[destination]
+                    if isinstance(edge, DomainRelation):
+                        value = edge
                     else:
-                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+                        other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                        destination = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge.type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
                         value, (ConnectionItemB, str, dm.NodeId)
                     ):
                         outwards.append(value)
+
                 instance.outwards = outwards or None
 
 

@@ -33,7 +33,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
+    QueryStep,
     QueryBuilder,
 )
 from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI

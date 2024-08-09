@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import math
-from abc import ABC
+from abc import ABC, abstractmethod
 from itertools import groupby
 
 from collections import defaultdict
 from collections.abc import Sequence, Collection, MutableSequence, Iterable
-from dataclasses import dataclass, field
 from typing import (
     Generic,
     Literal,
@@ -39,10 +38,10 @@ from windmill.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
-    DomainModelCore,
     DomainRelation,
     DEFAULT_INSTANCE_SPACE,
     as_node_id,
+    _NotSetSentinel,
 )
 from windmill import data_classes
 
@@ -450,38 +449,33 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
 
 
-class _NotSetSentinel: ...
-
-
-@dataclass
 class QueryStep:
-    # Setup Variables
-    name: str
-    expression: dm.query.ResultSetExpression
-    result_cls: type[DomainModelCore] | None = None
-    max_retrieve_limit: int = -1
-    select: dm.query.Select | None = field(default=_NotSetSentinel)
+    def __init__(
+        self,
+        name: str,
+        expression: dm.query.ResultSetExpression,
+        max_retrieve_limit: int = -1,
+        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+    ):
+        self.name = name
+        self.expression = expression
+        self.max_retrieve_limit = max_retrieve_limit
+        if select is _NotSetSentinel:
+            self.select = self._default_select()
+        else:
+            self.select = select
+        self.cursor: str | None = None
+        self.total_retrieved: int = 0
+        self.last_batch_count: int = 0
+        self.results: list[Instance] = []
 
-    # Query Variables
-    cursor: str | None = field(default=None, init=False)
-    total_retrieved: int = field(default=0, init=False)
-    results: list[Instance] = field(default_factory=list, init=False)
-    last_batch_count: int = field(default=0, init=False)
-
-    def __post_init__(self):
-        if self.select is _NotSetSentinel:
-            if self.result_cls is None:
-                self.select = dm.query.Select()
-            else:
-                self.select = dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
+    @abstractmethod
+    def _default_select(self) -> dm.query.Select:
+        raise NotImplementedError()
 
     @property
     def from_(self) -> str | None:
         return self.expression.from_
-
-    @property
-    def is_edge_without_properties(self) -> bool:
-        return isinstance(self.expression, dm.query.EdgeResultSetExpression) and self.result_cls is None
 
     @property
     def is_single_direct_relation(self) -> bool:
@@ -508,15 +502,56 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
-    def unpack_results(self) -> dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation]:
-        if self.result_cls is None:
-            raise ValueError("Cannot unpack results for Edges without properties")
+
+class NodeQueryStep(QueryStep):
+    def __init__(
+        self,
+        name: str,
+        expression: dm.query.NodeResultSetExpression,
+        result_cls: type[DomainModel],
+        max_retrieve_limit: int = -1,
+        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+    ):
+        self.result_cls = result_cls
+        super().__init__(name, expression, max_retrieve_limit, select)
+
+    def _default_select(self) -> dm.query.Select:
+        return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
+
+    def unpack(self) -> dict[dm.NodeId | str, DomainModel]:
         return {
             (
                 instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
             ): self.result_cls.from_instance(instance)
-            for instance in self.results
+            for instance in cast(list[dm.Node], self.results)
         }
+
+
+class EdgeQueryStep(QueryStep):
+    def __init__(
+        self,
+        name: str,
+        expression: dm.query.EdgeResultSetExpression,
+        result_cls: type[DomainRelation] | None = None,
+        max_retrieve_limit: int = -1,
+        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+    ):
+        self.result_cls = result_cls
+        super().__init__(name, expression, max_retrieve_limit, select)
+
+    def _default_select(self) -> dm.query.Select:
+        if self.result_cls is None:
+            return dm.query.Select()
+        else:
+            return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
+
+    def unpack(self) -> dict[dm.NodeId, list[dm.Edge | DomainRelation]]:
+        output: dict[dm.NodeId, list[dm.Edge | DomainRelation]] = defaultdict(list)
+        for edge in cast(list[dm.Edge], self.results):
+            edge_source = edge.start_node if self.expression.direction == "outwards" else edge.end_node
+            value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
+            output[as_node_id(edge_source)].append(value)
+        return output
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
@@ -525,7 +560,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
     def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
         super().__init__(steps or [])
-        self._result_cls = result_cls
+        self._result_list_cls = result_cls
 
     def _reset(self):
         for expression in self:
@@ -539,7 +574,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
     def _build(self) -> dm.query.Query:
         with_ = {expression.name: expression.expression for expression in self}
-        select = {expression.name: expression.select for expression in self if expression.select}
+        select = {expression.name: expression.select for expression in self if expression.select is not None}
         cursors = self._cursors
 
         return dm.query.Query(with_=with_, select=select, cursors=cursors)
@@ -562,38 +597,30 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         return all(expression.is_finished for expression in self)
 
     def _unpack(self) -> T_DomainModelList:
-        unpacked_by_from: dict[str, dict[dm.NodeId | dm.EdgeId | str, DomainRelation | DomainModel]] = defaultdict(dict)
-        edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge]]] = defaultdict(dict)
+        if len(self) == 0:
+            return self._result_list_cls([])
+        # Validated in the append method
+        first_step = cast(NodeQueryStep, self[0])
+        if len(self) == 1:
+            return self._result_list_cls(first_step.unpack().values())
+        # More than one step, we need to unpack the nodes and edges
+        nodes_by_from: dict[str, dict[dm.NodeId | str, DomainModel]] = defaultdict(dict)
+        edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge | DomainRelation]]] = defaultdict(dict)
         for step in reversed(self):
-            if step.is_edge_without_properties and step.from_ is not None:
-                edge_by_source = defaultdict(list)
-                for edge in step.results:
-                    if not isinstance(edge, dm.Edge):
-                        continue
-                    edge_source = edge.start_node if step.expression.direction == "outwards" else edge.end_node
-                    edge_by_source[as_node_id(edge_source)].append(edge)
-                edges_by_from[step.from_].update(edge_by_source)
-                if step.name in unpacked_by_from:
-                    # We need to include the destination of the edges in the unpacked results
-                    unpacked_by_from[step.from_].update(unpacked_by_from[step.name])
-                continue
-            elif step.is_edge_without_properties:
-                raise ValueError("Cannot have edges without a start node")
-
-            unpacked = step.unpack_results()
-            if isinstance(step.from_, str):
-                unpacked_by_from[step.from_].update(unpacked)
-
-            if step.name in unpacked_by_from and step.result_cls is not None:
-                step.result_cls._update_connections(
-                    unpacked,
-                    unpacked_by_from[step.name],
-                    edges_by_from[step.name],
-                )
-
-            if step.from_ is None:
-                return self._result_cls(unpacked.values())
-        raise ValueError("Could not find the root node")
+            # Validated in the append method
+            from_ = cast(str, step.from_)
+            if isinstance(step, EdgeQueryStep):
+                edges_by_from[from_].update(step.unpack())
+            elif isinstance(step, NodeQueryStep):
+                unpacked = step.unpack()
+                nodes_by_from[from_].update(unpacked)
+                if step.name in nodes_by_from:
+                    step.result_cls._update_connections(
+                        unpacked,  # type: ignore[arg-type]
+                        nodes_by_from[step.name],
+                        edges_by_from[step.name],
+                    )
+        return self._result_list_cls(nodes_by_from[first_step.name].values())
 
     def execute(self, client: CogniteClient) -> T_DomainModelList:
         self._reset()
@@ -618,13 +645,23 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             return "0"
         return f"{from_}_{len(self)}"
 
-    # The implementations below are to get proper type hints
     def append(self, __object: QueryStep, /) -> None:
+        # Extra validation to ensure all assumptions are met
+        if len(self) == 0:
+            if __object.from_ is not None:
+                raise ValueError("The first step should not have a 'from_' value")
+            if not isinstance(__object, NodeQueryStep):
+                raise ValueError("The first step should be a NodeQueryStep")
+        else:
+            if __object.from_ is None:
+                raise ValueError("The 'from_' value should be set")
         super().append(__object)
 
     def extend(self, __iterable: Iterable[QueryStep], /) -> None:
-        super().extend(__iterable)
+        for item in __iterable:
+            self.append(item)
 
+    # The implementations below are to get proper type hints
     def __iter__(self) -> Iterator[QueryStep]:
         return super().__iter__()
 
@@ -637,7 +674,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
     def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
         value = super().__getitem__(item)
         if isinstance(item, slice):
-            return QueryBuilder(self._result_cls, value)  # type: ignore[arg-type]
+            return QueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type]
         return cast(QueryStep, value)
 
 

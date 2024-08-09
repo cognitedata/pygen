@@ -14,7 +14,15 @@ from windmill.data_classes import (
     MainShaft,
     PowerInverter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 
 class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
@@ -30,7 +38,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -77,7 +85,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_gearbox(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -90,7 +98,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_generator(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -103,7 +111,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_high_speed_shaft(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -116,7 +124,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_main_shaft(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -129,7 +137,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_power_inverter(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,

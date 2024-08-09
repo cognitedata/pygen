@@ -13,7 +13,15 @@ from omni.data_classes._implementation_1_non_writeable import (
     Implementation1NonWriteable,
     _create_implementation_1_non_writeable_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, NodeQueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 if TYPE_CHECKING:
     from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
@@ -87,7 +95,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            NodeQueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,

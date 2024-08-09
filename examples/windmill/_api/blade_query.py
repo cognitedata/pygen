@@ -13,7 +13,15 @@ from windmill.data_classes._sensor_position import (
     SensorPosition,
     _create_sensor_position_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 if TYPE_CHECKING:
     from .sensor_position_query import SensorPositionQueryAPI
@@ -32,7 +40,7 @@ class BladeQueryAPI(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -79,7 +87,7 @@ class BladeQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
+            EdgeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,

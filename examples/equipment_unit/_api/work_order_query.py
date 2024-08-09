@@ -9,7 +9,15 @@ from equipment_unit.data_classes import (
     DomainModelCore,
     WorkOrder,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 
 class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
@@ -25,7 +33,7 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
