@@ -17,9 +17,14 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 if TYPE_CHECKING:
@@ -249,6 +254,51 @@ class Nacelle(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, Nacelle],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
+    ) -> None:
+        from ._gearbox import Gearbox
+        from ._generator import Generator
+        from ._high_speed_shaft import HighSpeedShaft
+        from ._main_shaft import MainShaft
+        from ._power_inverter import PowerInverter
+
+        for instance in instances.values():
+            if (
+                isinstance(instance.gearbox, (dm.NodeId, str))
+                and (gearbox := nodes_by_id.get(instance.gearbox))
+                and isinstance(gearbox, Gearbox)
+            ):
+                instance.gearbox = gearbox
+            if (
+                isinstance(instance.generator, (dm.NodeId, str))
+                and (generator := nodes_by_id.get(instance.generator))
+                and isinstance(generator, Generator)
+            ):
+                instance.generator = generator
+            if (
+                isinstance(instance.high_speed_shaft, (dm.NodeId, str))
+                and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft))
+                and isinstance(high_speed_shaft, HighSpeedShaft)
+            ):
+                instance.high_speed_shaft = high_speed_shaft
+            if (
+                isinstance(instance.main_shaft, (dm.NodeId, str))
+                and (main_shaft := nodes_by_id.get(instance.main_shaft))
+                and isinstance(main_shaft, MainShaft)
+            ):
+                instance.main_shaft = main_shaft
+            if (
+                isinstance(instance.power_inverter, (dm.NodeId, str))
+                and (power_inverter := nodes_by_id.get(instance.power_inverter))
+                and isinstance(power_inverter, PowerInverter)
+            ):
+                instance.power_inverter = power_inverter
 
 
 class NacelleWrite(DomainModelWrite):

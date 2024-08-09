@@ -220,6 +220,8 @@ class ConnectionItemF(DomainModel):
                         value, ConnectionEdgeA
                     ):
                         outwards_multi.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
 
                 instance.outwards_multi = outwards_multi
 

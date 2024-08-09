@@ -206,6 +206,8 @@ class ConnectionItemG(DomainModel):
                         value, ConnectionEdgeA
                     ):
                         inwards_multi_property.append(value)
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
 
                 instance.inwards_multi_property = inwards_multi_property
 
