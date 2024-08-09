@@ -243,6 +243,7 @@ class ConnectionItemE(DomainModel):
                 if direct_single.direct_reverse_single is None:
                     direct_single.direct_reverse_single = node
                 elif are_nodes_equal(direct_single.direct_reverse_single, node):
+                    # This is the same node, so we don't need to do anything...
                     ...
                 else:
                     warnings.warn(
