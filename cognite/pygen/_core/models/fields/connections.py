@@ -213,6 +213,8 @@ class BaseConnectionField(Field, ABC):
             isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
         ) and prop.source is not None:
             end_classes = [node_class_by_view_id[prop.source]]
+            if isinstance(prop, ReverseDirectRelation):
+                use_node_reference = False
         else:
             end_classes = None
 

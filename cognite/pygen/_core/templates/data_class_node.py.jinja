@@ -266,7 +266,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                 if {{  field.reverse_property.name }}.{{ field.name }} is None:
                     {{  field.reverse_property.name }}.{{ field.name }} = node
                 elif are_nodes_equal(node, {{  field.reverse_property.name }}.{{ field.name }}):
-                    {{  field.reverse_property.name }}.{{ field.name }} = select_best_node(node, {{  field.reverse_property.name }}.{{ field.name }})
+                    # This is the same node, so we don't need to do anything...
+                    ...
                 else:
                     warnings.warn(
                         f"Expected one direct relation for '{{ field.name }}' in {% raw %}{{% endraw %}{{  field.reverse_property.name }}.as_id(){% raw %}}{% endraw %}."

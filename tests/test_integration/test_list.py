@@ -145,10 +145,9 @@ def test_list_advanced_sort(omni_client: OmniClient) -> None:
     assert list(sorted_items) == sorted(sorted_items, key=key)
 
 
-@pytest.mark.skip("Not implemented")
 @pytest.mark.usefixtures("setup_reverse_direct_relations")
 def test_list_with_reverse_direct_relations(omni_client: OmniClient) -> None:
-    connections = omni_client.connection_item_e.list(limit=1, retrieve_edges=True)
+    connections = omni_client.connection_item_e.list(limit=1, retrieve_connections="full")
 
     assert len(connections) > 0
     first = connections[0]
