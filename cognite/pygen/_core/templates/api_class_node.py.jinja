@@ -28,7 +28,7 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% 
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, NodeQueryStep, EdgeQueryStep, QueryBuilder{% for class_ in edge_apis %}{% if class_.field.is_write_field %}
+from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, NodeQueryStep, EdgeQueryStep, QueryStep, QueryBuilder{% for class_ in edge_apis %}{% if class_.field.is_write_field %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
@@ -499,6 +499,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     {{field.data_class.read_name }},
                 )
             ){% endif %}{% endfor %}
+
         return builder.execute(self._client){% else %}
         return self._list(
             limit=limit,
