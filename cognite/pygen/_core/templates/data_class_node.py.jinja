@@ -256,8 +256,11 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                 isinstance(node, {{ field.data_class.read_name }})
                 and node.{{ field.reverse_property.name }} is not None
                 and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{ field.reverse_property.name }})))
-            ):
-                node.{{  field.reverse_property.name }} = {{  field.reverse_property.name }}
+            ):{% if field.reverse_property.is_one_to_one %}
+                node.{{  field.reverse_property.name }} = {{  field.reverse_property.name }}{% else %}
+                if node.{{  field.reverse_property.name }} is None:
+                    node.{{  field.reverse_property.name }} = []
+                node.{{  field.reverse_property.name }}.append({{  field.reverse_property.name }}){% endif %}
                 if {{  field.reverse_property.name }}.{{ field.name }} is None:
                     {{  field.reverse_property.name }}.{{ field.name }} = node
                 elif are_nodes_equal(node, {{  field.reverse_property.name }}.{{ field.name }}):

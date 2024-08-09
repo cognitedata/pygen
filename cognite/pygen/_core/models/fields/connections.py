@@ -185,6 +185,10 @@ class BaseConnectionField(Field, ABC):
     def is_one_to_many(self) -> bool:
         raise NotImplementedError()
 
+    @property
+    def is_one_to_one(self) -> bool:
+        return not self.is_one_to_many
+
     @classmethod
     def load(
         cls,
