@@ -86,6 +86,7 @@ def load_field_test_cases():
     data_class.write_name = "ModelTemplateApply"
     data_class.read_name = "ModelTemplate"
     data_class.is_writable = True
+    data_class.view_id = dm.ViewId("cogShop", "ModelTemplate", "8ae35635bb3f8a")
 
     yield pytest.param(
         mapped,
@@ -99,6 +100,7 @@ def load_field_test_cases():
             use_node_reference=True,
             edge_type=None,
             edge_direction="outwards",
+            through=None,
         ),
         {dm.ViewId("cogShop", "ModelTemplate", "8ae35635bb3f8a"): data_class},
         'Union[ModelTemplate, str, dm.NodeId, None] = Field(default=None, repr=False, alias="modelTemplate")',
@@ -520,6 +522,7 @@ def create_fields_test_cases():
             edge_type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
             edge_direction="outwards",
             use_node_reference=True,
+            through=None,
         ),
         "Optional[list[Union[Role, str, dm.NodeId]]] = Field(default=None, repr=False)",
         "Optional[list[Union[RoleApply, str, dm.NodeId]]] = Field(default=None, repr=False)",
@@ -613,6 +616,7 @@ def create_fields_test_cases():
             use_node_reference=True,
             edge_type=None,
             edge_direction="outwards",
+            through=None,
         ),
         "Union[Person, str, dm.NodeId, None] = Field(default=None, repr=False)",
         "Union[PersonApply, str, dm.NodeId, None] = Field(default=None, repr=False)",

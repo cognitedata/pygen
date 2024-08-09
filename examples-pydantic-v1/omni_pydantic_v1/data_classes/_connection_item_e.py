@@ -16,9 +16,14 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 if TYPE_CHECKING:
@@ -57,12 +62,20 @@ class ConnectionItemEGraphQL(GraphQLCore):
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
+        direct_reverse_multi: The direct reverse multi field.
+        direct_reverse_single: The direct reverse single field.
         inwards_single: The inwards single field.
         name: The name field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
     direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
+    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(
+        default=None, repr=False, alias="directReverseMulti"
+    )
+    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(
+        default=None, repr=False, alias="directReverseSingle"
+    )
     inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None
 
@@ -77,7 +90,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("direct_no_source", "inwards_single", pre=True)
+    @validator("direct_no_source", "direct_reverse_multi", "direct_reverse_single", "inwards_single", pre=True)
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -100,6 +113,14 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             direct_no_source=self.direct_no_source,
+            direct_reverse_multi=[
+                direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi or []
+            ],
+            direct_reverse_single=(
+                self.direct_reverse_single.as_read()
+                if isinstance(self.direct_reverse_single, GraphQLCore)
+                else self.direct_reverse_single
+            ),
             inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
             name=self.name,
         )
@@ -128,6 +149,8 @@ class ConnectionItemE(DomainModel):
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
+        direct_reverse_multi: The direct reverse multi field.
+        direct_reverse_single: The direct reverse single field.
         inwards_single: The inwards single field.
         name: The name field.
     """
@@ -137,6 +160,12 @@ class ConnectionItemE(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
+    direct_reverse_multi: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="directReverseMulti"
+    )
+    direct_reverse_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="directReverseSingle"
+    )
     inwards_single: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
@@ -164,6 +193,73 @@ class ConnectionItemE(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemE],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
+    ) -> None:
+        from ._connection_item_d import ConnectionItemD
+
+        for instance in instances.values():
+            if edges := edges_by_source_node.get(instance.as_id()):
+                inwards_single: list[ConnectionItemD | str | dm.NodeId] = []
+                for edge in edges:
+                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    if isinstance(edge, DomainRelation):
+                        value = edge
+                    else:
+                        other_end: dm.DirectRelationReference = (
+                            edge.end_node
+                            if edge.start_node.space == instance.space
+                            and edge.start_node.external_id == instance.external_id
+                            else edge.start_node
+                        )
+                        destination: dm.NodeId | str = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
+
+                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectionalSingle") and isinstance(
+                        value, (ConnectionItemD, str, dm.NodeId)
+                    ):
+                        inwards_single.append(value)
+
+                instance.inwards_single = inwards_single or None
+
+        for node in nodes_by_id.values():
+            if (
+                isinstance(node, ConnectionItemD)
+                and node.direct_single is not None
+                and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
+            ):
+                node.direct_single = direct_single
+                if direct_single.direct_reverse_single is None:
+                    direct_single.direct_reverse_single = node
+                elif are_nodes_equal(node, direct_single.direct_reverse_single):
+                    direct_single.direct_reverse_single = select_best_node(node, direct_single.direct_reverse_single)
+                else:
+                    warnings.warn(
+                        f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
+                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}."
+                    )
+            if (
+                isinstance(node, ConnectionItemD)
+                and node.direct_multi is not None
+                and (direct_multi := instances.get(as_pygen_node_id(node.direct_multi)))
+            ):
+                node.direct_multi = direct_multi
+                if direct_multi.direct_reverse_multi is None:
+                    direct_multi.direct_reverse_multi = []
+                direct_multi.direct_reverse_multi.append(node)
 
 
 class ConnectionItemEWrite(DomainModelWrite):

@@ -153,5 +153,9 @@ class Field:
     def is_text_field(self) -> bool:
         return False
 
+    @property
+    def is_write_field(self) -> bool:
+        return True
+
 
 T_Field = TypeVar("T_Field", bound=Field)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -14,7 +14,15 @@ from omni_pydantic_v1.data_classes._connection_item_e import (
     ConnectionItemE,
     _create_connection_item_e_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 from omni_pydantic_v1.data_classes._connection_edge_a import (
     _create_connection_edge_a_filter,
@@ -35,15 +43,14 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("connection_item_g"),
+            NodeQueryStep(
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=ConnectionItemG,
                 max_retrieve_limit=limit,
             )
@@ -92,7 +99,8 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .connection_item_e_query import ConnectionItemEQueryAPI
 
-        from_ = self._builder[-1].name
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = ConnectionEdgeA._view_id
         edge_filter = _create_connection_edge_a_filter(
             dm.DirectRelationReference("pygen-models", "multiProperty"),
@@ -107,15 +115,12 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("inwards_multi_property"),
+            EdgeQueryStep(
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="inwards",
-                ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=ConnectionEdgeA,
                 max_retrieve_limit=limit,

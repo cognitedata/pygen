@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- When querying, in the unpacking, the generated SDK no longer assumes that all
+  edges pointing out/in of a node have unique edge type.
+
 ## [0.99.28] - 24-07-24
 ### Improved
 - External ID factories: Updated domain_name to remove 'write' suffix only if domain_cls inherits from DomainModelWrite

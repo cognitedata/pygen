@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 
-from .fields import Field, OneToManyConnectionField, OneToOneConnectionField, PrimitiveField
+from .fields import BaseConnectionField, Field, OneToManyConnectionField, OneToOneConnectionField, PrimitiveField
 
 
 @dataclass
@@ -176,6 +176,9 @@ class FilterMethod:
         list_filters: list[FilterImplementation] = []
 
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD, _SPACE_FIELD)):
+            if isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation:
+                # Reverse direct relations are not supported in list methods.
+                continue
             # Only primitive and edge one-to-one fields supported for now
             if isinstance(field_, PrimitiveField):
                 for selected_filter in config.get(field_.type_, field_.prop_name):

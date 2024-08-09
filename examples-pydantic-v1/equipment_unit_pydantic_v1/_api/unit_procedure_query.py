@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -18,7 +18,15 @@ from equipment_unit_pydantic_v1.data_classes._equipment_module import (
     EquipmentModule,
     _create_equipment_module_filter,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import (
+    DEFAULT_QUERY_LIMIT,
+    EdgeQueryStep,
+    NodeQueryStep,
+    QueryBuilder,
+    QueryAPI,
+    T_DomainModelList,
+    _create_edge_filter,
+)
 
 from equipment_unit_pydantic_v1.data_classes._start_end_time import (
     _create_start_end_time_filter,
@@ -40,15 +48,14 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder)
-
+        from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("unit_procedure"),
+            NodeQueryStep(
+                name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=self._builder[-1].name if self._builder else None,
+                    from_=from_,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                 result_cls=UnitProcedure,
                 max_retrieve_limit=limit,
             )
@@ -99,7 +106,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .work_order_query import WorkOrderQueryAPI
 
-        from_ = self._builder[-1].name
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
@@ -112,15 +120,12 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("work_orders"),
+            EdgeQueryStep(
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
-                ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=StartEndTime,
                 max_retrieve_limit=limit,
@@ -188,7 +193,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .equipment_module_query import EquipmentModuleQueryAPI
 
-        from_ = self._builder[-1].name
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
@@ -201,15 +207,12 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("work_units"),
+            EdgeQueryStep(
+                name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
-                ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=StartEndTime,
                 max_retrieve_limit=limit,

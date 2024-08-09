@@ -3,10 +3,6 @@ name: build
 
 on:
   pull_request:
-    branches:
-      - main
-      - v*
-      - prep*
 
 env:
   PYTHON_VERSION: '3.9'

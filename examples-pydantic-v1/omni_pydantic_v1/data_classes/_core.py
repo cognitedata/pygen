@@ -37,6 +37,13 @@ from pydantic import BaseModel, Extra, Field, root_validator
 DEFAULT_INSTANCE_SPACE = "omni-instances"
 
 
+class _NotSetSentinel:
+    """This is a special class that indicates that a value has not been set.
+    It is used when we need to distinguish between not set and None."""
+
+    ...
+
+
 @dataclass
 class ResourcesWrite:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
@@ -155,7 +162,13 @@ class GraphQLList(UserList):
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
+def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
+    return dm.NodeId(space=value.space, external_id=value.external_id)
+
+
 class DomainModelCore(Core, ABC):
+    _view_id: ClassVar[dm.ViewId]
+
     space: str
     external_id: str = Field(min_length=1, max_length=255, alias="externalId")
 
@@ -164,6 +177,16 @@ class DomainModelCore(Core, ABC):
 
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
+    ) -> None:
+        # This is used when unpacking a query result and should be overridden in the subclasses
+        return None
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
@@ -208,6 +231,39 @@ class DomainModel(DomainModelCore, ABC):
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
+
+
+def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
+    if isinstance(value, str):
+        return value
+    elif value.space == DEFAULT_INSTANCE_SPACE:
+        return value.external_id
+    elif isinstance(value, dm.NodeId):
+        return value
+    return value.as_id()
+
+
+def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
+    if isinstance(node1, (str, dm.NodeId)):
+        node1_id = node1
+    else:
+        node1_id = node1.as_id() if node1.space != DEFAULT_INSTANCE_SPACE else node1.external_id
+    if isinstance(node2, (str, dm.NodeId)):
+        node2_id = node2
+    else:
+        node2_id = node2.as_id() if node2.space != DEFAULT_INSTANCE_SPACE else node2.external_id
+    return node1_id == node2_id
+
+
+def select_best_node(
+    node1: T_DomainModel | str | dm.NodeId, node2: T_DomainModel | str | dm.NodeId
+) -> T_DomainModel | str | dm.NodeId:
+    if isinstance(node1, DomainModel):
+        return node1  # type: ignore[return-value]
+    elif isinstance(node2, DomainModel):
+        return node2  # type: ignore[return-value]
+    else:
+        return node1
 
 
 class DataRecordWrite(BaseModel):
@@ -280,6 +336,9 @@ class DomainModelWrite(DomainModelCore):
     class Config:
         extra = Extra.ignore
         allow_population_by_field_name = True
+
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
 
     def to_instances_write(
         self,

@@ -17,9 +17,14 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 

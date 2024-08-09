@@ -87,3 +87,32 @@ def test_query_paging(omni_client: OmniClient) -> None:
     )
     assert result.page_info is not None
     assert result.page_info.has_next_page is True
+
+
+def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
+    result = omni_client.graphql_query(
+        """{
+  listConnectionItemE{
+    items{
+      __typename
+      name
+      directReverseMulti{
+        items{
+          externalId
+          name
+        }
+      }
+      directReverseSingle{
+        name
+        externalId
+      }
+    }
+  }
+}"""
+    )
+
+    assert len(result) > 0
+    first = result[0]
+    assert isinstance(first, odc.ConnectionItemEGraphQL)
+    assert first.direct_reverse_single is not None
+    assert first.direct_reverse_multi is not None
