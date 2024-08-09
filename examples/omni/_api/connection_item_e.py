@@ -19,6 +19,7 @@ from omni.data_classes import (
     ConnectionItemEList,
     ConnectionItemEWriteList,
     ConnectionItemETextFields,
+    ConnectionItemD,
 )
 from omni.data_classes._connection_item_e import (
     _CONNECTIONITEME_PROPERTIES_BY_FIELD,
@@ -28,7 +29,9 @@ from ._core import (
     DEFAULT_LIMIT_READ,
     DEFAULT_QUERY_LIMIT,
     Aggregations,
+    EdgeQueryStep,
     NodeAPI,
+    NodeQueryStep,
     SequenceNotStr,
     QueryStep,
     QueryBuilder,
@@ -459,7 +462,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         sort_by: ConnectionItemEFields | Sequence[ConnectionItemEFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemEList:
         """List/filter connection item es
 
@@ -476,7 +479,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `inwards_single` external ids for the connection item es. Defaults to True.
+            retrieve_connections: Whether to retrieve `inwards_single` external ids for the connection item es.
 
         Returns:
             List of requested connection item es
@@ -499,21 +502,74 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             space,
             filter,
         )
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.inwards_single_edge,
-                    "inwards_single",
-                    dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
-                    "inwards",
-                    dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+        builder = QueryBuilder(ConnectionItemEList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-            ],
+                ConnectionItemE,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_inwards_single = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_inwards_single,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="inwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_inwards_single),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_inwards_single,
+                        filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
+                    ),
+                    ConnectionItemD,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
+                        direction="inwards",
+                        through=ConnectionItemD._view_id.as_property_ref("directSingle"),
+                    ),
+                    ConnectionItemD,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
+                        direction="inwards",
+                        through=ConnectionItemD._view_id.as_property_ref("directMulti"),
+                    ),
+                    ConnectionItemD,
+                )
+            )
+
+        return builder.execute(self._client)

@@ -162,12 +162,8 @@ class ConnectionItemE(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
-    direct_reverse_multi: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="directReverseMulti"
-    )
-    direct_reverse_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
-        default=None, repr=False, alias="directReverseSingle"
-    )
+    direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
+    direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
     inwards_single: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
@@ -246,8 +242,8 @@ class ConnectionItemE(DomainModel):
                 node.direct_single = direct_single
                 if direct_single.direct_reverse_single is None:
                     direct_single.direct_reverse_single = node
-                elif are_nodes_equal(node, direct_single.direct_reverse_single):
-                    direct_single.direct_reverse_single = select_best_node(node, direct_single.direct_reverse_single)
+                elif are_nodes_equal(direct_single.direct_reverse_single, node):
+                    ...
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
