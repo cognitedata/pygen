@@ -453,6 +453,10 @@ class DataClass:
     def has_any_field_model_prefix(self) -> bool:
         return any(field_.name.startswith("model") for field_ in self)
 
+    @property
+    def has_edges(self) -> bool:
+        return any(isinstance(field_, BaseConnectionField) and field_.is_edge for field_ in self)
+
 
 @dataclass
 class NodeDataClass(DataClass):

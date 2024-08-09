@@ -187,22 +187,29 @@ class ConnectionItemF(DomainModel):
                         new_direct_list.append(relation)
                 instance.direct_list = new_direct_list
             if edges := edges_by_source_node.get(instance.as_id()):
-                outwards_multi = []
+                outwards_multi: list[ConnectionEdgeA] = []
                 for edge in edges:
-                    other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
-                    destination = (
-                        as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
-                    )
                     value: DomainModel | DomainRelation | str | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
-                    elif destination in nodes_by_id:
-                        value = nodes_by_id[destination]
                     else:
-                        value = destination
+                        other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
+                        destination = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if isinstance(value, ConnectionEdgeA):
+                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                        value, ConnectionEdgeA
+                    ):
                         outwards_multi.append(value)
+
                 instance.outwards_multi = outwards_multi
 
 
