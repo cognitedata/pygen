@@ -133,6 +133,17 @@ class BaseConnectionField(Field, ABC):
         return self.end_classes[0]
 
     @property
+    def reverse_property(self) -> BaseConnectionField:
+        if self.through is None:
+            raise ValueError("Bug in Pygen: Trying to get reverse property for a non-reverse direct relation")
+        other = next((field for field in self.data_class if field.prop_name == self.through.property), None)
+        if other is None:
+            raise ValueError(f"Bug in Pygen: Missing reverse property in {self.data_class.read_name}")
+        elif isinstance(other, BaseConnectionField):
+            return other
+        raise ValueError("Bug in Pygen: Reverse property is not a connection field")
+
+    @property
     def is_direct_relation(self) -> bool:
         return self.edge_type is None and self.through is None
 

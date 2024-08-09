@@ -337,6 +337,11 @@ class DataClass:
         )
 
     @property
+    def has_reverse_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are reverse direct relations."""
+        return any(isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation for field_ in self)
+
+    @property
     def container_fields(self) -> Iterable[Field]:
         """Container fields are fields that store their value in a container.
 
