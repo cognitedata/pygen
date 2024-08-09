@@ -471,6 +471,14 @@ class DataClass:
             return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
 
     @property
+    def connections_docs(self) -> str:
+        connections = [f for f in self.fields_of_type(BaseConnectionField)]  # type: ignore[type-abstract]
+        if len(connections) == 1:
+            return f"`{connections[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in connections[:-1]) + f" and `{connections[-1].name}`"
+
+    @property
     def import_pydantic_field(self) -> str:
         if self.pydantic_field == "Field":
             return "from pydantic import Field"
