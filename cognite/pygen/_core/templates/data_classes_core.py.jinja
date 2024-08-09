@@ -251,6 +251,14 @@ class DomainModel(DomainModelCore, ABC):
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
 
 
+def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
+    if isinstance(value, (dm.NodeId, str)):
+        return value
+    if value.space == DEFAULT_INSTANCE_SPACE:
+        return value.external_id
+    return value.as_id()
+
+
 def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
     if isinstance(node1, (str, dm.NodeId)):
         node1_id = node1
