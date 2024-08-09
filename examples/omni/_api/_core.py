@@ -614,8 +614,8 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             if isinstance(step, EdgeQueryStep):
                 edges_by_from[from_].update(step.unpack())
             elif isinstance(step, NodeQueryStep):
-                node_unpacked = step.unpack()
-                nodes_by_from[from_].update(node_unpacked)
+                unpacked = step.unpack()
+                nodes_by_from[from_].update(unpacked)
                 if step.name in nodes_by_from:
                     step.result_cls._update_connections(
                         unpacked,  # type: ignore[arg-type]
