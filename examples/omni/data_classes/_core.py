@@ -206,29 +206,6 @@ class DomainModelCore(Core, ABC):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
-    if isinstance(node1, (str, dm.NodeId)):
-        node1_id = node1
-    else:
-        node1_id = node1.as_id() if node1.space != DEFAULT_INSTANCE_SPACE else node1.external_id
-    if isinstance(node2, (str, dm.NodeId)):
-        node2_id = node2
-    else:
-        node2_id = node2.as_id() if node2.space != DEFAULT_INSTANCE_SPACE else node2.external_id
-    return node1_id == node2_id
-
-
-def select_best_node(
-    node1: T_DomainModel | str | dm.NodeId, node2: T_DomainModel | str | dm.NodeId
-) -> T_DomainModel | str | dm.NodeId:
-    if isinstance(node1, DomainModel):
-        return node1  # type: ignore[return-value]
-    elif isinstance(node2, DomainModel):
-        return node2  # type: ignore[return-value]
-    else:
-        return node1
-
-
 class DataRecord(BaseModel):
     """The data record represents the metadata of a node.
 
@@ -268,6 +245,29 @@ class DomainModel(DomainModelCore, ABC):
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
+
+
+def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
+    if isinstance(node1, (str, dm.NodeId)):
+        node1_id = node1
+    else:
+        node1_id = node1.as_id() if node1.space != DEFAULT_INSTANCE_SPACE else node1.external_id
+    if isinstance(node2, (str, dm.NodeId)):
+        node2_id = node2
+    else:
+        node2_id = node2.as_id() if node2.space != DEFAULT_INSTANCE_SPACE else node2.external_id
+    return node1_id == node2_id
+
+
+def select_best_node(
+    node1: T_DomainModel | str | dm.NodeId, node2: T_DomainModel | str | dm.NodeId
+) -> T_DomainModel | str | dm.NodeId:
+    if isinstance(node1, DomainModel):
+        return node1  # type: ignore[return-value]
+    elif isinstance(node2, DomainModel):
+        return node2  # type: ignore[return-value]
+    else:
+        return node1
 
 
 class DataRecordWrite(BaseModel):

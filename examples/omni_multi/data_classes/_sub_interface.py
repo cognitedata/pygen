@@ -21,6 +21,8 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     as_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 from ._main_interface import MainInterface, MainInterfaceWrite
 
