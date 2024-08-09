@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -78,7 +78,8 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         """
         from .{{ edge_api.query.file_name }} import {{ edge_api.query.name}}
 
-        from_ = self._builder.get_from(){% if edge_api.has_edge_class %}
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from()){% if edge_api.has_edge_class %}
         edge_view = {{ edge_api.edge_class.read_name }}._view_id{% endif %}
         edge_filter = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),

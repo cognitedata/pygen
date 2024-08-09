@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -99,7 +99,8 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .connection_item_e_query import ConnectionItemEQueryAPI
 
-        from_ = self._builder.get_from()
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = ConnectionEdgeA._view_id
         edge_filter = _create_connection_edge_a_filter(
             dm.DirectRelationReference("pygen-models", "multiProperty"),

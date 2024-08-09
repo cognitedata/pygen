@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -106,7 +106,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .work_order_query import WorkOrderQueryAPI
 
-        from_ = self._builder.get_from()
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
@@ -192,7 +193,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .equipment_module_query import EquipmentModuleQueryAPI
 
-        from_ = self._builder.get_from()
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_view = StartEndTime._view_id
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),

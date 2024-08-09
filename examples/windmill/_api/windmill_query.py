@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -93,7 +93,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .blade_query import BladeQueryAPI
 
-        from_ = self._builder.get_from()
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.blades"),
             external_id_prefix=external_id_prefix_edge,
@@ -161,7 +162,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .metmast_query import MetmastQueryAPI
 
-        from_ = self._builder.get_from()
+        # from is a string as we added a node query step in the __init__ method
+        from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.metmast"),
             external_id_prefix=external_id_prefix_edge,
