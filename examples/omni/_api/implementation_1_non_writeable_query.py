@@ -9,7 +9,7 @@ from omni.data_classes import (
     DomainModelCore,
     Implementation1NonWriteable,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, NodeQueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModelList]):
@@ -25,7 +25,7 @@ class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModelList]):
         super().__init__(client, builder)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,

@@ -29,7 +29,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
     QueryBuilder,
 )
 from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI

@@ -33,7 +33,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
     QueryBuilder,
 )
 from .connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI

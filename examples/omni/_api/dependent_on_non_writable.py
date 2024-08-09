@@ -30,7 +30,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
     QueryBuilder,
 )
 from .dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI

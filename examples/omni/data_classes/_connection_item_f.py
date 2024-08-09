@@ -172,8 +172,8 @@ class ConnectionItemF(DomainModel):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | str, ConnectionItemF],
-        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         for instance in instances.values():
             if instance.direct_list:
@@ -181,22 +181,29 @@ class ConnectionItemF(DomainModel):
                 for relation in instance.direct_list:
                     if isinstance(relation, ConnectionItemD):
                         new_direct_list.append(relation)
-                    elif (other := connections.get(relation)) and isinstance(other, ConnectionItemD):
+                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
                         new_direct_list.append(other)
                     else:
                         new_direct_list.append(relation)
                 instance.direct_list = new_direct_list
             if edges := edges_by_source_node.get(instance.as_id()):
+                outwards_multi = []
                 for edge in edges:
                     other_end = edge.end_node if edge.start_node == instance.as_id() else edge.start_node
                     destination = (
                         as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
                     )
                     value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in connections:
-                        value = connections[destination]
+                    if isinstance(edge, DomainRelation):
+                        value = edge
+                    elif destination in nodes_by_id:
+                        value = nodes_by_id[destination]
                     else:
-                        value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
+                        value = destination
+
+                    if isinstance(value, ConnectionEdgeA):
+                        outwards_multi.append(value)
+                instance.outwards_multi = outwards_multi
 
 
 class ConnectionItemFWrite(DomainModelWrite):

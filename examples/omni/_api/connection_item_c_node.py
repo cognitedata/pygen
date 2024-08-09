@@ -26,7 +26,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
     QueryBuilder,
 )
 from .connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI

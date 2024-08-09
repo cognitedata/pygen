@@ -9,11 +9,11 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as dc
-    from omni._api._core import QueryBuilder, QueryStep
+    from omni._api._core import NodeQueryStep, QueryBuilder
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1._api._core import QueryBuilder, QueryStep
+    from omni_pydantic_v1._api._core import QueryBuilder
 
 
 class TestQueryBuilder:
@@ -25,7 +25,7 @@ class TestQueryBuilder:
         item_d = omni_views["ConnectionItemD"].as_id()
         builder = QueryBuilder(dc.ConnectionItemEList)
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_e]),
@@ -36,7 +36,7 @@ class TestQueryBuilder:
         )
         from_ = builder.get_from()
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 builder.create_name(from_),
                 dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -64,7 +64,7 @@ class TestQueryBuilder:
         builder = QueryBuilder(dc.ConnectionItemAList)
 
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_a]),
@@ -74,7 +74,7 @@ class TestQueryBuilder:
         )
         from_a = builder.get_from()
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 builder.create_name(from_a),
                 dm.query.NodeResultSetExpression(
                     from_=from_a,
@@ -88,7 +88,7 @@ class TestQueryBuilder:
         )
         edge_name = builder.create_name(from_a)
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=from_a,
@@ -98,7 +98,7 @@ class TestQueryBuilder:
             )
         )
         builder.append(
-            QueryStep(
+            NodeQueryStep(
                 builder.create_name(edge_name),
                 dm.query.NodeResultSetExpression(
                     from_=edge_name,

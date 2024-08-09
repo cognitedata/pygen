@@ -31,7 +31,7 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
     QueryBuilder,
 )
 from .primitive_required_query import PrimitiveRequiredQueryAPI

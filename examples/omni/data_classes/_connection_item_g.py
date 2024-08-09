@@ -169,7 +169,7 @@ class ConnectionItemG(DomainModel):
     def _update_connections(
         cls,
         instances: dict[dm.NodeId | str, ConnectionItemG],
-        connections: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
+        nodes_by_id: dict[dm.NodeId | dm.EdgeId | str, DomainModel | DomainRelation],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge]],
     ) -> None:
         for instance in instances.values():
@@ -180,8 +180,8 @@ class ConnectionItemG(DomainModel):
                         as_node_id(other_end) if other_end.space != DEFAULT_INSTANCE_SPACE else other_end.external_id
                     )
                     value: DomainModel | DomainRelation | str | dm.NodeId
-                    if destination in connections:
-                        value = connections[destination]
+                    if destination in nodes_by_id:
+                        value = nodes_by_id[destination]
                     else:
                         value = destination if destination.space != DEFAULT_INSTANCE_SPACE else destination.external_id
 
