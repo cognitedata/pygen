@@ -22,7 +22,6 @@ class TestQueryBuilder:
     ) -> None:
         # Arrange
         item_e = omni_views["ConnectionItemE"].as_id()
-        item_d = omni_views["ConnectionItemD"].as_id()
         builder = QueryBuilder(dc.ConnectionItemEList)
         builder.append(
             NodeQueryStep(
@@ -31,19 +30,19 @@ class TestQueryBuilder:
                     filter=filters.HasData(views=[item_e]),
                 ),
                 dc.ConnectionItemE,
-                max_retrieve_limit=1,
+                max_retrieve_limit=-1,
             )
         )
         from_ = builder.get_from()
+        item_d = omni_views["ConnectionItemD"].as_id()
         builder.append(
             NodeQueryStep(
                 builder.create_name(from_),
                 dm.query.NodeResultSetExpression(
                     from_=from_,
-                    through=dm.PropertyId(
-                        item_d,
-                        "directSingle",
-                    ),
+                    filter=filters.HasData(views=[item_d]),
+                    through=item_d.as_property_ref("directSingle"),
+                    direction="inwards",
                 ),
                 dc.ConnectionItemD,
             )
@@ -54,9 +53,12 @@ class TestQueryBuilder:
 
         # Assert
         assert isinstance(result, dc.ConnectionItemEList)
-        assert builder[0].total_retrieved == 1
+        assert builder[0].total_retrieved == len(result) > 0
 
-    def test_list_with_direct_relations(
+        actual_direct_set = sum(1 for item in result if item.direct_reverse_single)
+        assert builder[1].total_retrieved == actual_direct_set > 0
+
+    def test_query_with_edge_and_direct_relation(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client: OmniClient
     ) -> None:
         # Arrange
