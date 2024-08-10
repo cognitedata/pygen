@@ -330,14 +330,21 @@ class DataClass:
         """Return a list of all dependencies which also includes the edge
         destination if th dependency is a EdgeClass."""
         unique: dict[dm.ViewId, DataClass] = {}
-        for dependency in self.dependencies:
-            unique[dependency.view_id] = dependency
-            if isinstance(dependency, EdgeDataClass):
-                for edge_class in dependency.end_node_field.edge_classes:
-                    if edge_class.original_direction == "outwards":
-                        unique[edge_class.end_class.view_id] = edge_class.end_class
-                    else:
-                        unique[edge_class.start_class.view_id] = edge_class.start_class
+        for field_ in self.fields:
+            if isinstance(field_, BaseConnectionField):
+                for class_ in field_.end_classes or []:
+                    # This will overwrite any existing data class with the same view id
+                    # however, this is not a problem as all data classes are uniquely identified by their view id
+                    unique[class_.view_id] = class_
+                    if isinstance(class_, EdgeDataClass):
+                        for edge_class in class_.end_node_field.edge_classes:
+                            if field_.edge_direction == "outwards":
+                                unique[edge_class.end_class.view_id] = edge_class.end_class
+                            else:
+                                unique[edge_class.start_class.view_id] = edge_class.start_class
+            elif isinstance(field_, EndNodeField):
+                for class_ in field_.end_classes:
+                    unique[class_.view_id] = class_
 
         return sorted(unique.values(), key=lambda x: x.read_name)
 
@@ -570,7 +577,7 @@ class EdgeDataClass(DataClass):
                     end_class = node_class_by_view_id[prop.source]
                     start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
 
-                    new_edge_class = EdgeClasses(start, prop.type, end, prop.direction)
+                    new_edge_class = EdgeClasses(start, prop.type, end)
                     if new_edge_class not in edge_classes:
                         edge_classes.append(new_edge_class)
 

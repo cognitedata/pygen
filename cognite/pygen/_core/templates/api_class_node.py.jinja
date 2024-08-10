@@ -485,7 +485,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     ),
                     {{ field.data_class.read_name }},
                 )
-            ){% else %}{% for end_class in field.data_class.end_node_field.end_classes %}
+            ){% else %}{% for end_class in field.destination_classes %}
             builder.append(
                 NodeQueryStep(
                     builder.create_name( edge_{{ field.name }}),

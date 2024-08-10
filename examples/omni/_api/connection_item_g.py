@@ -23,7 +23,6 @@ from omni.data_classes import (
     ConnectionEdgeAWrite,
     ConnectionEdgeAList,
     ConnectionEdgeA,
-    ConnectionItemE,
     ConnectionItemF,
 )
 from omni.data_classes._connection_item_g import (

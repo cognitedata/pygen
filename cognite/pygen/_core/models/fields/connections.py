@@ -29,7 +29,6 @@ class EdgeClasses:
     start_class: NodeDataClass
     edge_type: dm.DirectRelationReference
     end_class: NodeDataClass
-    original_direction: Literal["outwards", "inwards"]
 
     def __lt__(self, other: EdgeClasses) -> bool:
         if isinstance(other, EdgeClasses):
@@ -194,6 +193,26 @@ class BaseConnectionField(Field, ABC):
     @property
     def is_one_to_one(self) -> bool:
         return not self.is_one_to_many
+
+    @property
+    def destination_classes(self) -> list[DataClass]:
+        from cognite.pygen._core.models.data_classes import EdgeDataClass
+
+        output: list[DataClass] = []
+        seen: set[str] = set()
+        for data_class in self.end_classes or []:
+            if isinstance(data_class, EdgeDataClass):
+                for edge_class in data_class.end_node_field.edge_classes:
+                    if self.edge_direction == "outwards":
+                        destination = edge_class.end_class
+                    else:
+                        destination = edge_class.start_class
+                    if destination.read_name not in seen:
+                        output.append(destination)
+                        seen.add(destination.read_name)
+            else:
+                raise ValueError("Bug in Pygen: Destination classes should only be edge data classes")
+        return output
 
     @classmethod
     def load(
