@@ -129,15 +129,14 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         return self._query()
 {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
-        view_id = {{ field.data_class.read_name }}._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
-                    direction="outwards",
-                    filter=dm.filters.HasData(views=[view_id]),
+                    direction="outwards",{% if field.data_class.has_container_fields %}
+                    filter=dm.filters.HasData(views=[{{ field.data_class.read_name }}._view_id]),{% endif %}
                 ),
                 result_cls={{ field.data_class.read_name }},
             ),

@@ -64,8 +64,14 @@ class EndNodeField(Field):
         return True
 
     @property
-    def end_classes(self) -> list[DataClass]:
-        return [edge_class.end_class for edge_class in self.edge_classes]
+    def end_classes(self) -> list[NodeDataClass]:
+        seen = set()
+        output: list[NodeDataClass] = []
+        for edge_class in self.edge_classes:
+            if edge_class.end_class.read_name not in seen:
+                output.append(edge_class.end_class)
+                seen.add(edge_class.end_class.read_name)
+        return output
 
     def as_read_type_hint(self) -> str:
         return self._type_hint([data_class.read_name for data_class in self.end_classes])
@@ -188,6 +194,26 @@ class BaseConnectionField(Field, ABC):
     def is_one_to_one(self) -> bool:
         return not self.is_one_to_many
 
+    @property
+    def destination_classes(self) -> list[DataClass]:
+        from cognite.pygen._core.models.data_classes import EdgeDataClass
+
+        output: list[DataClass] = []
+        seen: set[str] = set()
+        for data_class in self.end_classes or []:
+            if isinstance(data_class, EdgeDataClass):
+                for edge_class in data_class.end_node_field.edge_classes:
+                    if self.edge_direction == "outwards":
+                        destination = edge_class.end_class
+                    else:
+                        destination = edge_class.start_class
+                    if destination.read_name not in seen:
+                        output.append(destination)
+                        seen.add(destination.read_name)
+            else:
+                raise ValueError("Bug in Pygen: Destination classes should only be edge data classes")
+        return output
+
     @classmethod
     def load(
         cls,
@@ -213,6 +239,8 @@ class BaseConnectionField(Field, ABC):
             isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
         ) and prop.source is not None:
             end_classes = [node_class_by_view_id[prop.source]]
+            if isinstance(prop, ReverseDirectRelation):
+                use_node_reference = False
         else:
             end_classes = None
 

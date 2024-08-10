@@ -31,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .empty_query import EmptyQueryAPI
@@ -692,6 +693,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

@@ -326,6 +326,29 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
+    def dependencies_with_edge_destinations(self) -> list[DataClass]:
+        """Return a list of all dependencies which also includes the edge
+        destination if th dependency is a EdgeClass."""
+        unique: dict[dm.ViewId, DataClass] = {}
+        for field_ in self.fields:
+            if isinstance(field_, BaseConnectionField):
+                for class_ in field_.end_classes or []:
+                    # This will overwrite any existing data class with the same view id
+                    # however, this is not a problem as all data classes are uniquely identified by their view id
+                    unique[class_.view_id] = class_
+                    if isinstance(class_, EdgeDataClass):
+                        for edge_class in class_.end_node_field.edge_classes:
+                            if field_.edge_direction == "outwards":
+                                unique[edge_class.end_class.view_id] = edge_class.end_class
+                            else:
+                                unique[edge_class.start_class.view_id] = edge_class.start_class
+            elif isinstance(field_, EndNodeField):
+                for class_ in field_.end_classes:
+                    unique[class_.view_id] = class_
+
+        return sorted(unique.values(), key=lambda x: x.read_name)
+
+    @property
     def has_dependencies(self) -> bool:
         return bool(self.dependencies)
 
@@ -469,6 +492,14 @@ class DataClass:
             return f"`{edges[0].name}`"
         else:
             return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
+
+    @property
+    def connections_docs(self) -> str:
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
+        if len(connections) == 1:
+            return f"`{connections[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in connections[:-1]) + f" and `{connections[-1].name}`"
 
     @property
     def import_pydantic_field(self) -> str:

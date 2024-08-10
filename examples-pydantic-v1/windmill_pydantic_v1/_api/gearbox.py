@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .gearbox_displacement_x import GearboxDisplacementXAPI
@@ -358,6 +359,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

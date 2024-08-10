@@ -16,6 +16,8 @@ from omni_pydantic_v1.data_classes import (
     ConnectionItemCNodeWrite,
     ConnectionItemCNodeList,
     ConnectionItemCNodeWriteList,
+    ConnectionItemA,
+    ConnectionItemB,
 )
 from omni_pydantic_v1.data_classes._connection_item_c_node import (
     _create_connection_item_c_node_filter,
@@ -26,7 +28,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
@@ -210,7 +213,7 @@ class ConnectionItemCNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemCNodeList:
         """List/filter connection item c nodes
 
@@ -219,7 +222,8 @@ class ConnectionItemCNodeAPI(
             space: The space to filter on.
             limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `connection_item_a` or `connection_item_b` external ids for the connection item c nodes. Defaults to True.
+            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection item c nodes. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested connection item c nodes
@@ -240,24 +244,66 @@ class ConnectionItemCNodeAPI(
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.connection_item_a_edge,
-                    "connection_item_a",
-                    dm.DirectRelationReference("pygen-models", "unidirectional"),
-                    "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemA", "1"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+            )
+
+        builder = QueryBuilder(ConnectionItemCNodeList)
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=filter_,
                 ),
-                (
-                    self.connection_item_b_edge,
-                    "connection_item_b",
-                    dm.DirectRelationReference("pygen-models", "unidirectional"),
-                    "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
-                ),
-            ],
+                ConnectionItemCNode,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_connection_item_a = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_connection_item_a,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        edge_connection_item_b = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_connection_item_b,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_connection_item_a),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_connection_item_a,
+                        filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
+                    ),
+                    ConnectionItemA,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_connection_item_b),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_connection_item_b,
+                        filter=dm.filters.HasData(views=[ConnectionItemB._view_id]),
+                    ),
+                    ConnectionItemB,
+                )
+            )
+
+        return builder.execute(self._client)

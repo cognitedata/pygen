@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .rotor_rotor_speed_controller import RotorRotorSpeedControllerAPI
@@ -356,6 +357,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

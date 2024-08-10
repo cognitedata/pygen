@@ -19,6 +19,7 @@ from omni.data_classes import (
     DependentOnNonWritableList,
     DependentOnNonWritableWriteList,
     DependentOnNonWritableTextFields,
+    Implementation1NonWriteable,
 )
 from omni.data_classes._dependent_on_non_writable import (
     _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
@@ -30,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
@@ -457,7 +459,7 @@ class DependentOnNonWritableAPI(
         sort_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> DependentOnNonWritableList:
         """List/filter dependent on non writables
 
@@ -473,7 +475,8 @@ class DependentOnNonWritableAPI(
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `to_non_writable` external ids for the dependent on non writables. Defaults to True.
+            retrieve_connections: Whether to retrieve `to_non_writable` for the dependent on non writables. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested dependent on non writables
@@ -496,20 +499,50 @@ class DependentOnNonWritableAPI(
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.to_non_writable_edge,
-                    "to_non_writable",
-                    dm.DirectRelationReference("pygen-models", "toNonWritable"),
-                    "outwards",
-                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(DependentOnNonWritableList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-            ],
+                DependentOnNonWritable,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_to_non_writable = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_to_non_writable,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_to_non_writable),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_to_non_writable,
+                        filter=dm.filters.HasData(views=[Implementation1NonWriteable._view_id]),
+                    ),
+                    Implementation1NonWriteable,
+                )
+            )
+
+        return builder.execute(self._client)

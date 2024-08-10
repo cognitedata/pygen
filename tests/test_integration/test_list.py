@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 
 import pytest
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import InstanceSort
 
 from tests.constants import IS_PYDANTIC_V2
@@ -74,7 +75,7 @@ def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
     expected = next((item for item in all_items if item.other_direct), None)
     assert expected is not None, "No item with self_direct set"
 
-    items = omni_client.connection_item_a.list(other_direct=expected.other_direct, limit=-1, retrieve_edges=False)
+    items = omni_client.connection_item_a.list(other_direct=expected.other_direct, limit=-1)
 
     assert len(items) > 0
     assert expected.external_id in [item.external_id for item in items]
@@ -145,12 +146,33 @@ def test_list_advanced_sort(omni_client: OmniClient) -> None:
     assert list(sorted_items) == sorted(sorted_items, key=key)
 
 
-@pytest.mark.skip("Not implemented")
 @pytest.mark.usefixtures("setup_reverse_direct_relations")
 def test_list_with_reverse_direct_relations(omni_client: OmniClient) -> None:
-    connections = omni_client.connection_item_e.list(limit=1, retrieve_edges=True)
+    connections = omni_client.connection_item_e.list(limit=1, retrieve_connections="full")
 
     assert len(connections) > 0
     first = connections[0]
     assert first.direct_reverse_single is not None
     assert first.direct_reverse_multi is not None
+
+
+def test_list_with_full_connections(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.list(limit=5, retrieve_connections="full")
+
+    assert len(items) > 0
+    missing_other_direct = [item.as_id() for item in items if isinstance(item.other_direct, (str, dm.NodeId))]
+    assert not missing_other_direct, f"Missing {len(missing_other_direct)} other_direct: {missing_other_direct}"
+    missing_self_direct = [item.as_id() for item in items if isinstance(item.self_direct, (str, dm.NodeId))]
+    assert not missing_self_direct, f"Missing {len(missing_self_direct)} self_direct: {missing_self_direct}"
+    outwards_edges = [edge for item in items if item.outwards for edge in item.outwards or []]
+    assert outwards_edges, f"Missing outwards edges: {outwards_edges}"
+
+
+def test_list_with_identifier_connections(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.list(limit=5, retrieve_connections="identifier")
+
+    assert len(items) > 0
+    edges = [edge for item in items if item.outwards for edge in item.outwards or []]
+    assert len(edges) > 0
+    full_edges = [edge for edge in edges if not isinstance(edge, (str, dm.NodeId))]
+    assert not full_edges, f"Expect only identifier. Found full outwards edges: {full_edges}"

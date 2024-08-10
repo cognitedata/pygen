@@ -22,6 +22,10 @@ from omni_pydantic_v1.data_classes import (
     ConnectionEdgeA,
     ConnectionEdgeAWrite,
     ConnectionEdgeAList,
+    ConnectionEdgeA,
+    ConnectionItemD,
+    ConnectionItemE,
+    ConnectionItemG,
 )
 from omni_pydantic_v1.data_classes._connection_item_f import (
     _CONNECTIONITEMF_PROPERTIES_BY_FIELD,
@@ -33,7 +37,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
@@ -462,7 +467,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         sort_by: ConnectionItemFFields | Sequence[ConnectionItemFFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemFList:
         """List/filter connection item fs
 
@@ -479,7 +484,8 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `direct_list` or `outwards_multi` external ids for the connection item fs. Defaults to True.
+            retrieve_connections: Whether to retrieve `direct_list` and `outwards_multi` for the connection item fs. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested connection item fs
@@ -503,20 +509,73 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.outwards_multi_edge,
-                    "outwards_multi",
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
-                    "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(ConnectionItemFList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-            ],
+                ConnectionItemF,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_outwards_multi = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_outwards_multi,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                ConnectionEdgeA,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_outwards_multi),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_outwards_multi,
+                        filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
+                    ),
+                    ConnectionItemE,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_outwards_multi),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_outwards_multi,
+                        filter=dm.filters.HasData(views=[ConnectionItemG._view_id]),
+                    ),
+                    ConnectionItemG,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("directList"),
+                    ),
+                    ConnectionItemD,
+                )
+            )
+
+        return builder.execute(self._client)

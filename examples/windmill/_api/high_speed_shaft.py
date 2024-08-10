@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .high_speed_shaft_bending_moment_y import HighSpeedShaftBendingMomentYAPI
@@ -358,6 +359,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

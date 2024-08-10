@@ -19,6 +19,10 @@ from windmill.data_classes import (
     WindmillList,
     WindmillWriteList,
     WindmillTextFields,
+    Blade,
+    Metmast,
+    Nacelle,
+    Rotor,
 )
 from windmill.data_classes._windmill import (
     _WINDMILL_PROPERTIES_BY_FIELD,
@@ -30,7 +34,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .windmill_blades import WindmillBladesAPI
@@ -546,7 +551,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         sort_by: WindmillFields | Sequence[WindmillFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> WindmillList:
         """List/filter windmills
 
@@ -568,7 +573,8 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `blades` or `metmast` external ids for the windmills. Defaults to True.
+            retrieve_connections: Whether to retrieve `blades`, `metmast`, `nacelle` and `rotor` for the windmills. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested windmills
@@ -597,27 +603,95 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.blades_edge,
-                    "blades",
-                    dm.DirectRelationReference("power-models", "Windmill.blades"),
-                    "outwards",
-                    dm.ViewId("power-models", "Blade", "1"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(WindmillList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-                (
-                    self.metmast_edge,
-                    "metmast",
-                    dm.DirectRelationReference("power-models", "Windmill.metmast"),
-                    "outwards",
-                    dm.ViewId("power-models", "Metmast", "1"),
-                ),
-            ],
+                Windmill,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_blades = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_blades,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        edge_metmast = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_metmast,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_blades),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_blades,
+                        filter=dm.filters.HasData(views=[Blade._view_id]),
+                    ),
+                    Blade,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_metmast),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_metmast,
+                        filter=dm.filters.HasData(views=[Metmast._view_id]),
+                    ),
+                    Metmast,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[Nacelle._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("nacelle"),
+                    ),
+                    Nacelle,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[Rotor._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("rotor"),
+                    ),
+                    Rotor,
+                )
+            )
+
+        return builder.execute(self._client)

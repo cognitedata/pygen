@@ -22,13 +22,23 @@ from {{ top_level_package }}.data_classes import (
     {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
-    {{ edge_data_class.read_list_name }},{% endfor %}
+    {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
+    {{ dependency.read_name }},{% endif %}{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, QueryStep, QueryBuilder{% for class_ in edge_apis %}{% if class_.field.is_write_field %}
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,{% if data_class.is_writable %}
+    NodeAPI{% else %}NodeReadAPI{% endif %},
+    SequenceNotStr,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+){% for class_ in edge_apis %}{% if class_.field.is_write_field %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
@@ -395,8 +405,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
         sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,{% endif %}{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
-        retrieve_edges: bool = True,{% endif %}
+        sort: InstanceSort | list[InstanceSort] | None = None,{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
 
@@ -408,8 +418,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.{% endif %}{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
-            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
+                specify the direction for each field as well as how to handle null values.{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+            retrieve_connections: Whether to retrieve {{ data_class.connections_docs }} for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.{% endif %}
 
         Returns:
             List of requested {{ data_class.doc_list_name}}
@@ -428,28 +439,93 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }},{% endfor %}
             filter,
         )
-        {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        if retrieve_connections == "skip":
+                return self._list(
+                limit=limit,
+                filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,{% endif %}
+            )
+
+        builder = QueryBuilder({{ data_class.read_list_name }}){% if data_class.has_container_fields %}
+        has_data = dm.filters.HasData(views=[self._view_id]){% endif %}
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression({% if data_class.has_container_fields %}
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data{% else %}filter=filter_{% endif %},{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
+                ),
+                {{ data_class.read_name }},
+                max_retrieve_limit=limit,
+            )
+        )
+        from_root = builder.get_from(){% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_edge %}
+        edge_{{ field.name }} = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_{{ field.name }},
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="{{ field.edge_direction}}",
+                    chain_to="destination",
+                ),{% if field.is_property_edge %}
+                {{ field.data_class.read_name }},{% endif %}
+            )
+        ){% endif %}{% endfor %}
+        if retrieve_connections == "full":{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_edge %}{% if field.is_no_property_edge %}
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name( edge_{{ field.name }}),
+                    dm.query.NodeResultSetExpression(
+                        from_= edge_{{ field.name }},{% if field.data_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{ field.data_class.read_name }}._view_id]),{% endif %}
+                    ),
+                    {{ field.data_class.read_name }},
+                )
+            ){% else %}{% for end_class in field.destination_classes %}
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name( edge_{{ field.name }}),
+                    dm.query.NodeResultSetExpression(
+                        from_= edge_{{ field.name }},{% if end_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{ end_class.read_name }}._view_id]),{% endif %}
+                    ),
+                    {{ end_class.read_name }},
+                )
+            ){% endfor %}{% endif %}{% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_reverse_direct_relation %}
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,{% if field.data_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{field.data_class.read_name }}._view_id]),{% endif %}
+                        direction="inwards",
+                        through={{field.data_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
+                    ),
+                    {{field.data_class.read_name }},
+                )
+            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_direct_relation and field.end_classes %}
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,{% if field.data_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{field.data_class.read_name }}._view_id]),{% endif %}
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("{{ field.prop_name }}"),
+                    ),
+                    {{field.data_class.read_name }},
+                )
+            ){% endif %}{% endfor %}
+
+        return builder.execute(self._client){% else %}
         return self._list(
             limit=limit,
             filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
             sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,{% endif %}
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[{% for edge_api in edge_apis %}{% if edge_api.field.is_write_field %}
-                (
-                    self.{{ edge_api.parent_attribute }},
-                    "{{ edge_api.field_name }}",
-                    dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
-                    "{{ edge_api.direction }}",
-                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
-                ),{% endif %}{% endfor %}
-                                               ]
-        )
-        {% else %}return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
         ){% endif %}

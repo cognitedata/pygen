@@ -289,12 +289,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> InstanceSort | list[InstanceSort] | None:
-        sort_input: InstanceSort | list[InstanceSort] | None = None
+    ) -> list[InstanceSort] | None:
+        sort_input: list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
-            sort_input = InstanceSort(
-                self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction
-            )
+            sort_input = [
+                InstanceSort(self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction)
+            ]
         elif sort is None and isinstance(sort_by, list):
             sort_input = [
                 InstanceSort(
@@ -620,11 +620,11 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             elif isinstance(step, NodeQueryStep):
                 unpacked = step.unpack()
                 nodes_by_from[from_].update(unpacked)
-                if step.name in nodes_by_from:
+                if step.name in nodes_by_from or step.name in edges_by_from:
                     step.result_cls._update_connections(
                         unpacked,  # type: ignore[arg-type]
-                        nodes_by_from[step.name],
-                        edges_by_from[step.name],
+                        nodes_by_from.get(step.name, {}),
+                        edges_by_from.get(step.name, {}),
                     )
         return self._result_list_cls(nodes_by_from[None].values())
 

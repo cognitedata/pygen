@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .metmast_temperature import MetmastTemperatureAPI
@@ -388,6 +389,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

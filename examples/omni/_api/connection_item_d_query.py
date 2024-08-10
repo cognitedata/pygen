@@ -147,7 +147,6 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_direct_multi(self, from_: str) -> None:
-        view_id = ConnectionItemE._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -155,14 +154,13 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     through=self._view_id.as_property_ref("directMulti"),
                     direction="outwards",
-                    filter=dm.filters.HasData(views=[view_id]),
+                    filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                 ),
                 result_cls=ConnectionItemE,
             ),
         )
 
     def _query_append_direct_single(self, from_: str) -> None:
-        view_id = ConnectionItemE._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -170,7 +168,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     through=self._view_id.as_property_ref("directSingle"),
                     direction="outwards",
-                    filter=dm.filters.HasData(views=[view_id]),
+                    filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                 ),
                 result_cls=ConnectionItemE,
             ),
