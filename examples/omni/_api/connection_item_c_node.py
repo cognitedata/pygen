@@ -251,12 +251,11 @@ class ConnectionItemCNodeAPI(
             )
 
         builder = QueryBuilder(ConnectionItemCNodeList)
-        has_data = dm.filters.HasData(views=[self._view_id])
         builder.append(
             NodeQueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    filter=filter_,
                 ),
                 ConnectionItemCNode,
                 max_retrieve_limit=limit,
