@@ -472,7 +472,7 @@ class DataClass:
 
     @property
     def connections_docs(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField)]  # type: ignore[type-abstract]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
         if len(connections) == 1:
             return f"`{connections[0].name}`"
         else:

@@ -22,13 +22,23 @@ from {{ top_level_package }}.data_classes import (
     {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
-    {{ edge_data_class.read_list_name }},{% endfor %}
+    {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies %}{% if dependency.filen_name != data_class.file_name %}
+    {{ dependency.read_name }}{% endif %}{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, NodeQueryStep, EdgeQueryStep, QueryStep, QueryBuilder{% for class_ in edge_apis %}{% if class_.field.is_write_field %}
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,{% if data_class.is_writable %}
+    NodeAPI{% else %}NodeReadAPI{% endif %},
+    SequenceNotStr,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+){% for class_ in edge_apis %}{% if class_.field.is_write_field %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
@@ -409,7 +419,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
-            retrieve_connections: Whether to retrieve `{{ data_class.connections_docs }} for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve {{ data_class.connections_docs }} for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.{% endif %}
 
         Returns:
@@ -459,7 +469,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 edge_{{ field.name }},
                 dm.query.EdgeResultSetExpression(
                     from_=from_root,
-                    direction={{ field.edge_direction}},
+                    direction="{{ field.edge_direction}}",
                     chain_to="destination",
                 ),
             )

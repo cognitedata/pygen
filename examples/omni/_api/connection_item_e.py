@@ -31,7 +31,6 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
     NodeQueryStep,
     EdgeQueryStep,
     QueryBuilder,
@@ -479,7 +478,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `inwards_single`, `direct_reverse_multi`, and `direct_reverse_single` for the connection item es. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `direct_reverse_multi`, `direct_reverse_single` and `inwards_single` for the connection item es. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
@@ -503,6 +502,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             space,
             filter,
         )
+
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -555,7 +555,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
                         direction="inwards",
-                        through=ConnectionItemD._view_id.as_property_ref("directSingle"),
+                        through=ConnectionItemD._view_id.as_property_ref("directMulti"),
                     ),
                     ConnectionItemD,
                 )
@@ -567,7 +567,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
                         direction="inwards",
-                        through=ConnectionItemD._view_id.as_property_ref("directMulti"),
+                        through=ConnectionItemD._view_id.as_property_ref("directSingle"),
                     ),
                     ConnectionItemD,
                 )
