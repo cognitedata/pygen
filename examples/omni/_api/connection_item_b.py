@@ -20,7 +20,6 @@ from omni.data_classes import (
     ConnectionItemBWriteList,
     ConnectionItemBTextFields,
     ConnectionItemA,
-    ConnectionItemB,
 )
 from omni.data_classes._connection_item_b import (
     _CONNECTIONITEMB_PROPERTIES_BY_FIELD,

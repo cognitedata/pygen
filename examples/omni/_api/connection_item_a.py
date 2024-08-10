@@ -19,7 +19,6 @@ from omni.data_classes import (
     ConnectionItemAList,
     ConnectionItemAWriteList,
     ConnectionItemATextFields,
-    ConnectionItemA,
     ConnectionItemB,
     ConnectionItemCNode,
 )

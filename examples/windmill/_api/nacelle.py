@@ -478,7 +478,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                         from_=from_root,
                         filter=dm.filters.HasData(views=[Gearbox._view_id]),
                         direction="outwards",
-                        through=Gearbox._view_id.as_property_ref("gearbox"),
+                        through=self._view_id.as_property_ref("gearbox"),
                     ),
                     Gearbox,
                 )
@@ -490,7 +490,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                         from_=from_root,
                         filter=dm.filters.HasData(views=[Generator._view_id]),
                         direction="outwards",
-                        through=Generator._view_id.as_property_ref("generator"),
+                        through=self._view_id.as_property_ref("generator"),
                     ),
                     Generator,
                 )
@@ -502,7 +502,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                         from_=from_root,
                         filter=dm.filters.HasData(views=[HighSpeedShaft._view_id]),
                         direction="outwards",
-                        through=HighSpeedShaft._view_id.as_property_ref("high_speed_shaft"),
+                        through=self._view_id.as_property_ref("high_speed_shaft"),
                     ),
                     HighSpeedShaft,
                 )
@@ -514,7 +514,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                         from_=from_root,
                         filter=dm.filters.HasData(views=[MainShaft._view_id]),
                         direction="outwards",
-                        through=MainShaft._view_id.as_property_ref("main_shaft"),
+                        through=self._view_id.as_property_ref("main_shaft"),
                     ),
                     MainShaft,
                 )
@@ -526,7 +526,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                         from_=from_root,
                         filter=dm.filters.HasData(views=[PowerInverter._view_id]),
                         direction="outwards",
-                        through=PowerInverter._view_id.as_property_ref("power_inverter"),
+                        through=self._view_id.as_property_ref("power_inverter"),
                     ),
                     PowerInverter,
                 )

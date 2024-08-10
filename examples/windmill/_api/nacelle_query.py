@@ -84,7 +84,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_gearbox(self, from_: str) -> None:
-        view_id = Gearbox._view_id
+        view_id = Nacelle._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -99,7 +99,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_generator(self, from_: str) -> None:
-        view_id = Generator._view_id
+        view_id = Nacelle._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -114,7 +114,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_high_speed_shaft(self, from_: str) -> None:
-        view_id = HighSpeedShaft._view_id
+        view_id = Nacelle._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -129,7 +129,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_main_shaft(self, from_: str) -> None:
-        view_id = MainShaft._view_id
+        view_id = Nacelle._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -144,7 +144,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_power_inverter(self, from_: str) -> None:
-        view_id = PowerInverter._view_id
+        view_id = Nacelle._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),

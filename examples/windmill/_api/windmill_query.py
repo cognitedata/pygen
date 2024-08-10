@@ -220,7 +220,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_nacelle(self, from_: str) -> None:
-        view_id = Nacelle._view_id
+        view_id = Windmill._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -235,7 +235,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_rotor(self, from_: str) -> None:
-        view_id = Rotor._view_id
+        view_id = Windmill._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),

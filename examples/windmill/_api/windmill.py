@@ -676,7 +676,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
                         from_=from_root,
                         filter=dm.filters.HasData(views=[Nacelle._view_id]),
                         direction="outwards",
-                        through=Nacelle._view_id.as_property_ref("nacelle"),
+                        through=self._view_id.as_property_ref("nacelle"),
                     ),
                     Nacelle,
                 )
@@ -688,7 +688,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
                         from_=from_root,
                         filter=dm.filters.HasData(views=[Rotor._view_id]),
                         direction="outwards",
-                        through=Rotor._view_id.as_property_ref("rotor"),
+                        through=self._view_id.as_property_ref("rotor"),
                     ),
                     Rotor,
                 )

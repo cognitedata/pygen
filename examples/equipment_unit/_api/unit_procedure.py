@@ -22,7 +22,9 @@ from equipment_unit.data_classes import (
     StartEndTime,
     StartEndTimeWrite,
     StartEndTimeList,
+    EquipmentModule,
     StartEndTime,
+    WorkOrder,
 )
 from equipment_unit.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
@@ -563,6 +565,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
                     direction="outwards",
                     chain_to="destination",
                 ),
+                StartEndTime,
             )
         )
         edge_work_units = builder.create_name(from_root)
@@ -574,6 +577,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
                     direction="outwards",
                     chain_to="destination",
                 ),
+                StartEndTime,
             )
         )
         if retrieve_connections == "full":
@@ -582,9 +586,19 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
                     builder.create_name(edge_work_orders),
                     dm.query.NodeResultSetExpression(
                         from_=edge_work_orders,
-                        filter=dm.filters.HasData(views=[StartEndTime._view_id]),
+                        filter=dm.filters.HasData(views=[WorkOrder._view_id]),
                     ),
-                    StartEndTime,
+                    WorkOrder,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_work_orders),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_work_orders,
+                        filter=dm.filters.HasData(views=[EquipmentModule._view_id]),
+                    ),
+                    EquipmentModule,
                 )
             )
             builder.append(
@@ -592,9 +606,19 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
                     builder.create_name(edge_work_units),
                     dm.query.NodeResultSetExpression(
                         from_=edge_work_units,
-                        filter=dm.filters.HasData(views=[StartEndTime._view_id]),
+                        filter=dm.filters.HasData(views=[WorkOrder._view_id]),
                     ),
-                    StartEndTime,
+                    WorkOrder,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_work_units),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_work_units,
+                        filter=dm.filters.HasData(views=[EquipmentModule._view_id]),
+                    ),
+                    EquipmentModule,
                 )
             )
 

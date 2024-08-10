@@ -556,7 +556,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                         direction="outwards",
-                        through=ConnectionItemE._view_id.as_property_ref("directMulti"),
+                        through=self._view_id.as_property_ref("directMulti"),
                     ),
                     ConnectionItemE,
                 )
@@ -568,7 +568,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                         direction="outwards",
-                        through=ConnectionItemE._view_id.as_property_ref("directSingle"),
+                        through=self._view_id.as_property_ref("directSingle"),
                     ),
                     ConnectionItemE,
                 )

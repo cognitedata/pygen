@@ -147,7 +147,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_direct_multi(self, from_: str) -> None:
-        view_id = ConnectionItemE._view_id
+        view_id = ConnectionItemD._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
@@ -162,7 +162,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_direct_single(self, from_: str) -> None:
-        view_id = ConnectionItemE._view_id
+        view_id = ConnectionItemD._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
