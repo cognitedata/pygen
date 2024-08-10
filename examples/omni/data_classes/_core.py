@@ -705,3 +705,15 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
             else:
                 unpacked[prop_name] = prop_value
     return unpacked
+
+
+class QueryCore:
+    def __init__(self, created_types: set[type], creation_path: "list[QueryCore]"):
+        created_types.add(type(self))
+        self._creation_path = creation_path[:] + [self]
+
+    def execute(self):
+        raise NotImplementedError()
+
+    def list(self):
+        raise NotImplementedError()

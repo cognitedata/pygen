@@ -24,6 +24,7 @@ from ._core import (
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
 )
 
 if TYPE_CHECKING:
@@ -452,3 +453,17 @@ def _create_connection_item_a_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _ConnectionItemAQuery(QueryCore):
+    def __init__(self, created_types: set[type], creation_path: list[QueryCore]):
+        from ._connection_item_b import _ConnectionItemBQuery
+        from ._connection_item_c_node import _ConnectionItemCNodeQuery
+
+        super().__init__(created_types, creation_path)
+        self.self_direct = self
+        if _ConnectionItemBQuery not in created_types:
+            self.outwards = _ConnectionItemBQuery(created_types.copy(), self._creation_path)
+
+        if _ConnectionItemCNodeQuery not in created_types:
+            self.other_direct = _ConnectionItemCNodeQuery(created_types.copy(), self._creation_path)
