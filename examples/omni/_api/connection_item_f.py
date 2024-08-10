@@ -571,7 +571,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
                         direction="outwards",
-                        through=ConnectionItemD._view_id.as_property_ref("directList"),
+                        through=self._view_id.as_property_ref("directList"),
                     ),
                     ConnectionItemD,
                 )

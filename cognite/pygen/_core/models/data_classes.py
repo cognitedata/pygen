@@ -326,6 +326,19 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
+    def dependencies_with_edge_destinations(self) -> list[DataClass]:
+        """Return a list of all dependencies which also includes the edge
+        destination if th dependency is a EdgeClass."""
+        unique: dict[dm.ViewId, DataClass] = {}
+        for dependency in self.dependencies:
+            unique[dependency.view_id] = dependency
+            if isinstance(dependency, EdgeDataClass):
+                for edge_class in dependency.end_node_field.edge_classes:
+                    unique[edge_class.end_class.view_id] = edge_class.end_class
+
+        return sorted(unique.values(), key=lambda x: x.read_name)
+
+    @property
     def has_dependencies(self) -> bool:
         return bool(self.dependencies)
 
