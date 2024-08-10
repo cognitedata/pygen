@@ -23,6 +23,7 @@ from omni.data_classes import (
     ConnectionItemCNode,
 )
 from omni.data_classes._connection_item_a import (
+    ConnectionItemAQuery,
     _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
     _create_connection_item_a_filter,
 )
@@ -464,6 +465,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             limit,
             filter_,
         )
+
+    def query(self) -> ConnectionItemAQuery:
+        """Start a query for connection item as."""
+        return ConnectionItemAQuery(self._client)
 
     def list(
         self,

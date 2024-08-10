@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -467,3 +467,9 @@ class _ConnectionItemAQuery(QueryCore):
 
         if _ConnectionItemCNodeQuery not in created_types:
             self.other_direct = _ConnectionItemCNodeQuery(created_types.copy(), self._creation_path)
+
+
+class ConnectionItemAQuery(_ConnectionItemAQuery):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [])
+        self._client = client
