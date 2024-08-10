@@ -129,7 +129,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         return self._query()
 {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
-        view_id = {{ field.data_class.read_name }}._view_id
+        view_id = {{ data_class.read_name }}._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
