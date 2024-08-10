@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .generator_generator_speed_controller import GeneratorGeneratorSpeedControllerAPI
@@ -356,6 +357,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

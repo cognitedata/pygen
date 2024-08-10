@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .main_shaft_bending_x import MainShaftBendingXAPI
@@ -362,6 +363,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

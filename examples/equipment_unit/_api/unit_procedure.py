@@ -22,6 +22,7 @@ from equipment_unit.data_classes import (
     StartEndTime,
     StartEndTimeWrite,
     StartEndTimeList,
+    StartEndTime,
 )
 from equipment_unit.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
@@ -33,7 +34,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
@@ -485,7 +487,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         sort_by: UnitProcedureFields | Sequence[UnitProcedureFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> UnitProcedureList:
         """List/filter unit procedures
 
@@ -503,7 +505,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `work_orders` or `work_units` external ids for the unit procedures. Defaults to True.
+            retrieve_connections: Whether to retrieve `work_orders` and `work_units` for the unit procedures. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested unit procedures
@@ -528,27 +531,71 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.work_orders_edge,
-                    "work_orders",
-                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
-                    "outwards",
-                    dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(UnitProcedureList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-                (
-                    self.work_units_edge,
-                    "work_units",
-                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
-                    "outwards",
-                    dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
-                ),
-            ],
+                UnitProcedure,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_work_orders = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_work_orders,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        edge_work_units = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_work_units,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_work_orders),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_work_orders,
+                        filter=dm.filters.HasData(views=[StartEndTime._view_id]),
+                    ),
+                    StartEndTime,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_work_units),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_work_units,
+                        filter=dm.filters.HasData(views=[StartEndTime._view_id]),
+                    ),
+                    StartEndTime,
+                )
+            )
+
+        return builder.execute(self._client)

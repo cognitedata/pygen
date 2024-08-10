@@ -289,12 +289,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> InstanceSort | list[InstanceSort] | None:
-        sort_input: InstanceSort | list[InstanceSort] | None = None
+    ) -> list[InstanceSort] | None:
+        sort_input: list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
-            sort_input = InstanceSort(
-                self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction
-            )
+            sort_input = [
+                InstanceSort(self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction)
+            ]
         elif sort is None and isinstance(sort_by, list):
             sort_input = [
                 InstanceSort(

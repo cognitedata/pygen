@@ -30,7 +30,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .implementation_1_query import Implementation1QueryAPI
@@ -567,6 +568,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,
