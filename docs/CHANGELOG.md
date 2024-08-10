@@ -13,9 +13,9 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.29] - 24-08-10
 ### Added
-- Support for reverse direct relations. This includes
+- Support for **reverse direct relations**. This includes
   - All read data classes now include reverse direct relations fields.
   - In the `.list` method a `retrieve_connections` parameter is added that can be set to
     `full` to retrieve all reverse direct relations, direct relations, and edges with

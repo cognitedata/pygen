@@ -19,7 +19,7 @@ class ScenarioInstanceClient:
     ScenarioInstanceClient
 
     Generated with:
-        pygen = 0.99.28
+        pygen = 0.99.29
         cognite-sdk = 7.54.4
         pydantic = 2.8.2
 
@@ -37,7 +37,7 @@ class ScenarioInstanceClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.28"
+        client.config.client_name = "CognitePygen:0.99.29"
 
         self._client = client
 
