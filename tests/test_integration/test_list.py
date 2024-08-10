@@ -74,7 +74,7 @@ def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
     expected = next((item for item in all_items if item.other_direct), None)
     assert expected is not None, "No item with self_direct set"
 
-    items = omni_client.connection_item_a.list(other_direct=expected.other_direct, limit=-1, retrieve_edges=False)
+    items = omni_client.connection_item_a.list(other_direct=expected.other_direct, limit=-1)
 
     assert len(items) > 0
     assert expected.external_id in [item.external_id for item in items]
