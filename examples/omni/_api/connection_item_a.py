@@ -573,9 +573,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                     builder.create_name(from_root),
                     dm.query.NodeResultSetExpression(
                         from_=from_root,
-                        filter=dm.filters.HasData(views=[ConnectionItemCNode._view_id]),
                         direction="outwards",
-                        through=ConnectionItemCNode._view_id.as_property_ref("otherDirect"),
+                        through=ConnectionItemA._view_id.as_property_ref("otherDirect"),
                     ),
                     ConnectionItemCNode,
                 )

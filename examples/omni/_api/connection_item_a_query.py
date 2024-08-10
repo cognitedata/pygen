@@ -144,7 +144,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_other_direct(self, from_: str) -> None:
-        view_id = ConnectionItemCNode._view_id
+        view_id = ConnectionItemA._view_id
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),
