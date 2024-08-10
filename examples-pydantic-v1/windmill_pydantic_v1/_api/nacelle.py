@@ -18,6 +18,11 @@ from windmill_pydantic_v1.data_classes import (
     NacelleFields,
     NacelleList,
     NacelleWriteList,
+    Gearbox,
+    Generator,
+    HighSpeedShaft,
+    MainShaft,
+    PowerInverter,
 )
 from windmill_pydantic_v1.data_classes._nacelle import (
     _NACELLE_PROPERTIES_BY_FIELD,
@@ -29,7 +34,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .nacelle_acc_from_back_side_x import NacelleAccFromBackSideXAPI
@@ -395,6 +401,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         sort_by: NacelleFields | Sequence[NacelleFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> NacelleList:
         """List/filter nacelles
 
@@ -413,6 +420,8 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
+            retrieve_connections: Whether to retrieve `gearbox`, `generator`, `high_speed_shaft`, `main_shaft` and `power_inverter` for the nacelles. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested nacelles
@@ -437,10 +446,90 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             space,
             filter,
         )
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
+
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(NacelleList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                ),
+                Nacelle,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[Gearbox._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("gearbox"),
+                    ),
+                    Gearbox,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[Generator._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("generator"),
+                    ),
+                    Generator,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[HighSpeedShaft._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("high_speed_shaft"),
+                    ),
+                    HighSpeedShaft,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[MainShaft._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("main_shaft"),
+                    ),
+                    MainShaft,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[PowerInverter._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("power_inverter"),
+                    ),
+                    PowerInverter,
+                )
+            )
+
+        return builder.execute(self._client)

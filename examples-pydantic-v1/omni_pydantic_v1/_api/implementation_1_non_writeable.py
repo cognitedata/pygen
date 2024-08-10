@@ -28,7 +28,8 @@ from ._core import (
     Aggregations,
     NodeReadAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
@@ -500,6 +501,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

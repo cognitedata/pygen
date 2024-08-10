@@ -30,7 +30,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
@@ -563,6 +564,7 @@ class PrimitiveWithDefaultsAPI(
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

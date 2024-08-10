@@ -245,10 +245,19 @@ class DataClass:
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
 
-    @property
-    def non_parent_fields(self) -> Iterator[Field]:
+    def non_parent_fields(self, fields: Iterator[Field] | None = None) -> Iterator[Field]:
         parent_fields = {field.prop_name for parent in self.implements for field in parent}
-        return (field for field in self if field.prop_name not in parent_fields)
+        return (field for field in fields or self if field.prop_name not in parent_fields)
+
+    @property
+    def read_fields(self) -> Iterator[Field]:
+        """These fields are used when creating the read data class."""
+        return self.non_parent_fields()
+
+    @property
+    def write_fields(self) -> Iterator[Field]:
+        """These fields are used when creating the write data class."""
+        return (field for field in self.non_parent_fields() if field.is_write_field)
 
     @overload
     def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]: ...
@@ -317,8 +326,43 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
+    def dependencies_with_edge_destinations(self) -> list[DataClass]:
+        """Return a list of all dependencies which also includes the edge
+        destination if th dependency is a EdgeClass."""
+        unique: dict[dm.ViewId, DataClass] = {}
+        for field_ in self.fields:
+            if isinstance(field_, BaseConnectionField):
+                for class_ in field_.end_classes or []:
+                    # This will overwrite any existing data class with the same view id
+                    # however, this is not a problem as all data classes are uniquely identified by their view id
+                    unique[class_.view_id] = class_
+                    if isinstance(class_, EdgeDataClass):
+                        for edge_class in class_.end_node_field.edge_classes:
+                            if field_.edge_direction == "outwards":
+                                unique[edge_class.end_class.view_id] = edge_class.end_class
+                            else:
+                                unique[edge_class.start_class.view_id] = edge_class.start_class
+            elif isinstance(field_, EndNodeField):
+                for class_ in field_.end_classes:
+                    unique[class_.view_id] = class_
+
+        return sorted(unique.values(), key=lambda x: x.read_name)
+
+    @property
     def has_dependencies(self) -> bool:
         return bool(self.dependencies)
+
+    @property
+    def has_edges_or_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are edges or direct relations."""
+        return any(
+            isinstance(field_, BaseConnectionField) and (field_.is_edge or field_.is_direct_relation) for field_ in self
+        )
+
+    @property
+    def has_reverse_direct_relations(self) -> bool:
+        """Whether the data class has any fields that are reverse direct relations."""
+        return any(isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation for field_ in self)
 
     @property
     def container_fields(self) -> Iterable[Field]:
@@ -380,12 +424,28 @@ class DataClass:
         )
 
     @property
+    def one_to_one_reverse_direct_relation(self) -> Iterable[OneToOneConnectionField]:
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToOneConnectionField)
+            if field_.is_reverse_direct_relation and field_.end_classes
+        )
+
+    @property
     def one_to_many_direct_relations_with_source(self) -> Iterable[OneToManyConnectionField]:
         """All direct relations."""
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
             if field_.is_direct_relation and field_.end_classes
+        )
+
+    @property
+    def one_to_many_reverse_direct_relations(self) -> Iterable[OneToManyConnectionField]:
+        return (
+            field_
+            for field_ in self.fields_of_type(OneToManyConnectionField)
+            if field_.is_reverse_direct_relation and field_.end_classes
         )
 
     @property
@@ -427,11 +487,19 @@ class DataClass:
 
     @property
     def one_to_many_edges_docs(self) -> str:
-        edges = list(self.fields_of_type(OneToManyConnectionField))
+        edges = [f for f in self.fields_of_type(OneToManyConnectionField) if f.is_write_field]
         if len(edges) == 1:
             return f"`{edges[0].name}`"
         else:
             return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
+
+    @property
+    def connections_docs(self) -> str:
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
+        if len(connections) == 1:
+            return f"`{connections[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in connections[:-1]) + f" and `{connections[-1].name}`"
 
     @property
     def import_pydantic_field(self) -> str:
@@ -443,6 +511,10 @@ class DataClass:
     @property
     def has_any_field_model_prefix(self) -> bool:
         return any(field_.name.startswith("model") for field_ in self)
+
+    @property
+    def has_edges(self) -> bool:
+        return any(isinstance(field_, BaseConnectionField) and field_.is_edge for field_ in self)
 
 
 @dataclass

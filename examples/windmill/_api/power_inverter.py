@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .power_inverter_active_power_total import PowerInverterActivePowerTotalAPI
@@ -358,6 +359,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

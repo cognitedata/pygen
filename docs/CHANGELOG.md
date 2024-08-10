@@ -13,6 +13,24 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.29] - 24-08-10
+### Added
+- Support for **reverse direct relations**. This includes
+  - All read data classes now include reverse direct relations fields.
+  - In the `.list` method a `retrieve_connections` parameter is added that can be set to
+    `full` to retrieve all reverse direct relations, direct relations, and edges with
+    destination node for each item in the returned list.
+
+### Removed
+- In the `.list` method, the `retrieve_edges` parameter is removed. This has been replaced
+  by the `retrieve_connections` parameter. Setting the `retrieve_connections="identifier'`
+  will have the same behavior as `retrieve_edges=True` and `retrieve_connections="skip"`
+  the same as `retrieve_edges=False`.
+
+### Fixed
+- When querying, in the unpacking, the generated SDK no longer assumes that all
+  edges pointing out/in of a node have unique edge type.
+
 ## [0.99.28] - 24-07-24
 ### Improved
 - External ID factories: Updated domain_name to remove 'write' suffix only if domain_cls inherits from DomainModelWrite

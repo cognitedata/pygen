@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .sensor_position_edgewise_bend_mom_crosstalk_corrected import SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI
@@ -410,6 +411,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

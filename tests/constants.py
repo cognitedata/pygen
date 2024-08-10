@@ -346,6 +346,9 @@ class OmniFiles:
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_b_api = api / "connection_item_b.py"
     connection_item_c_api = api / "connection_item_c_node.py"
+    connection_item_e_api = api / "connection_item_e.py"
+    connection_item_f_api = api / "connection_item_f.py"
+    connection_item_g_api = api / "connection_item_g.py"
 
     connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
     connection_item_b_edge_apis = (api / "connection_item_b_inwards.py", api / "connection_item_b_self_edge.py")

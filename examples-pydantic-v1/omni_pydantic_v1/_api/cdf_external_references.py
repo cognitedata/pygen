@@ -29,7 +29,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
@@ -360,6 +361,7 @@ class CDFExternalReferencesAPI(
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

@@ -31,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
@@ -441,6 +442,7 @@ class PrimitiveRequiredListedAPI(
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

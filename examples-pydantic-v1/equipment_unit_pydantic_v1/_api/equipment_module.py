@@ -30,7 +30,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
@@ -534,6 +535,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

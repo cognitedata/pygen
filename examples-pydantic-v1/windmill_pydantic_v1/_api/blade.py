@@ -19,6 +19,7 @@ from windmill_pydantic_v1.data_classes import (
     BladeList,
     BladeWriteList,
     BladeTextFields,
+    SensorPosition,
 )
 from windmill_pydantic_v1.data_classes._blade import (
     _BLADE_PROPERTIES_BY_FIELD,
@@ -30,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .blade_sensor_positions import BladeSensorPositionsAPI
@@ -457,7 +459,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         sort_by: BladeFields | Sequence[BladeFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_edges: bool = True,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> BladeList:
         """List/filter blades
 
@@ -474,7 +476,8 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_edges: Whether to retrieve `sensor_positions` external ids for the blades. Defaults to True.
+            retrieve_connections: Whether to retrieve `sensor_positions` for the blades. Defaults to 'skip'.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested blades
@@ -498,20 +501,50 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             filter,
         )
 
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.sensor_positions_edge,
-                    "sensor_positions",
-                    dm.DirectRelationReference("power-models", "Blade.sensor_positions"),
-                    "outwards",
-                    dm.ViewId("power-models", "SensorPosition", "1"),
+        if retrieve_connections == "skip":
+            return self._list(
+                limit=limit,
+                filter=filter_,
+                sort_by=sort_by,  # type: ignore[arg-type]
+                direction=direction,
+                sort=sort,
+            )
+
+        builder = QueryBuilder(BladeList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
-            ],
+                Blade,
+                max_retrieve_limit=limit,
+            )
         )
+        from_root = builder.get_from()
+        edge_sensor_positions = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_sensor_positions,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
+        if retrieve_connections == "full":
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_sensor_positions),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_sensor_positions,
+                        filter=dm.filters.HasData(views=[SensorPosition._view_id]),
+                    ),
+                    SensorPosition,
+                )
+            )
+
+        return builder.execute(self._client)

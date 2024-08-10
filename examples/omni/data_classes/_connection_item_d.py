@@ -16,9 +16,14 @@ from ._core import (
     DomainModelWrite,
     DomainModelWriteList,
     DomainModelList,
+    DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    select_best_node,
 )
 
 if TYPE_CHECKING:
@@ -192,6 +197,64 @@ class ConnectionItemD(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
+
+    @classmethod
+    def _update_connections(
+        cls,
+        instances: dict[dm.NodeId | str, ConnectionItemD],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
+    ) -> None:
+        from ._connection_item_e import ConnectionItemE
+
+        for instance in instances.values():
+            if (
+                isinstance(instance.direct_multi, (dm.NodeId, str))
+                and (direct_multi := nodes_by_id.get(instance.direct_multi))
+                and isinstance(direct_multi, ConnectionItemE)
+            ):
+                instance.direct_multi = direct_multi
+            if (
+                isinstance(instance.direct_single, (dm.NodeId, str))
+                and (direct_single := nodes_by_id.get(instance.direct_single))
+                and isinstance(direct_single, ConnectionItemE)
+            ):
+                instance.direct_single = direct_single
+            if edges := edges_by_source_node.get(instance.as_id()):
+                for edge in edges:
+                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    if isinstance(edge, DomainRelation):
+                        value = edge
+                    else:
+                        other_end: dm.DirectRelationReference = (
+                            edge.end_node
+                            if edge.start_node.space == instance.space
+                            and edge.start_node.external_id == instance.external_id
+                            else edge.start_node
+                        )
+                        destination: dm.NodeId | str = (
+                            as_node_id(other_end)
+                            if other_end.space != DEFAULT_INSTANCE_SPACE
+                            else other_end.external_id
+                        )
+                        if destination in nodes_by_id:
+                            value = nodes_by_id[destination]
+                        else:
+                            value = destination
+                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
+
+                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectionalSingle") and isinstance(
+                        value, (ConnectionItemE, str, dm.NodeId)
+                    ):
+                        if instance.outwards_single is None:
+                            instance.outwards_single = value
+                        elif are_nodes_equal(value, instance.outwards_single):
+                            instance.outwards_single = select_best_node(value, instance.outwards_single)
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for 'outwards_single' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                            )
 
 
 class ConnectionItemDWrite(DomainModelWrite):

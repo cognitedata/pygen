@@ -31,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .primitive_nullable_query import PrimitiveNullableQueryAPI
@@ -696,6 +697,7 @@ class PrimitiveNullableAPI(
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

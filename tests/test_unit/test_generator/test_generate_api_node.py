@@ -213,3 +213,54 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
 
     # Assert
     assert actual == expected
+
+
+def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    ]
+    expected = OmniFiles.connection_item_e_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_f(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemF", "1")
+    ]
+    expected = OmniFiles.connection_item_f_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_g(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    ]
+    expected = OmniFiles.connection_item_g_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
