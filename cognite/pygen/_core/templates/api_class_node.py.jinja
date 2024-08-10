@@ -449,13 +449,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 sort=sort,{% endif %}
             )
 
-        builder = QueryBuilder({{ data_class.read_list_name }})
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder({{ data_class.read_list_name }}){% if data_class.has_container_fields %}
+        has_data = dm.filters.HasData(views=[self._view_id]){% endif %}
         builder.append(
             NodeQueryStep(
                 builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+                dm.query.NodeResultSetExpression({% if data_class.has_container_fields %}
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data{% else %}filter=filter_{% endif %},{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
                     sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
                 ),
                 {{ data_class.read_name }},
@@ -479,8 +479,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 NodeQueryStep(
                     builder.create_name( edge_{{ field.name }}),
                     dm.query.NodeResultSetExpression(
-                        from_= edge_{{ field.name }},
-                        filter=dm.filters.HasData(views=[{{ field.data_class.read_name }}._view_id]),
+                        from_= edge_{{ field.name }},{% if field.data_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{ field.data_class.read_name }}._view_id]),{% endif %}
                     ),
                     {{ field.data_class.read_name }},
                 )
@@ -489,8 +489,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 NodeQueryStep(
                     builder.create_name(from_root),
                     dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[{{field.data_class.read_name }}._view_id]),
+                        from_=from_root,{% if field.data_class.has_container_fields %}
+                        filter=dm.filters.HasData(views=[{{field.data_class.read_name }}._view_id]),{% endif %}
                         direction="inwards",
                         through={{field.data_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
                     ),
