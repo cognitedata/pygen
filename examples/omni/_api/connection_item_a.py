@@ -574,7 +574,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                     dm.query.NodeResultSetExpression(
                         from_=from_root,
                         direction="outwards",
-                        through=ConnectionItemA._view_id.as_property_ref("otherDirect"),
+                        through=self._view_id.as_property_ref("otherDirect"),
                     ),
                     ConnectionItemCNode,
                 )
@@ -586,7 +586,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
                         direction="outwards",
-                        through=ConnectionItemA._view_id.as_property_ref("selfDirect"),
+                        through=self._view_id.as_property_ref("selfDirect"),
                     ),
                     ConnectionItemA,
                 )
