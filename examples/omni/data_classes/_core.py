@@ -708,11 +708,13 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
 
 
 class QueryCore:
+    DEFAULT_QUERY_LIMIT = 5
+
     def __init__(self, created_types: set[type], creation_path: "list[QueryCore]"):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
 
-    def execute(self):
+    def execute(self, limit: int = DEFAULT_QUERY_LIMIT):
         raise NotImplementedError()
 
     def list(self):

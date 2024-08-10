@@ -468,6 +468,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
     def query(self) -> ConnectionItemAQuery:
         """Start a query for connection item as."""
+        warnings.warn("The .query method is in alpha. Thus is might be changed/removed without warning.")
         return ConnectionItemAQuery(self._client)
 
     def list(
