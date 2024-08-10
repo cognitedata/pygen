@@ -22,7 +22,7 @@ from {{ top_level_package }}.data_classes import (
     {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
-    {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.filen_name != data_class.file_name %}
+    {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
     {{ dependency.read_name }},{% endif %}{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}

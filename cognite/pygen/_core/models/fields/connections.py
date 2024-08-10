@@ -29,6 +29,7 @@ class EdgeClasses:
     start_class: NodeDataClass
     edge_type: dm.DirectRelationReference
     end_class: NodeDataClass
+    original_direction: Literal["outwards", "inwards"]
 
     def __lt__(self, other: EdgeClasses) -> bool:
         if isinstance(other, EdgeClasses):

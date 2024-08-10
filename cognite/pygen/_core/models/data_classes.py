@@ -334,7 +334,10 @@ class DataClass:
             unique[dependency.view_id] = dependency
             if isinstance(dependency, EdgeDataClass):
                 for edge_class in dependency.end_node_field.edge_classes:
-                    unique[edge_class.end_class.view_id] = edge_class.end_class
+                    if edge_class.original_direction == "outwards":
+                        unique[edge_class.end_class.view_id] = edge_class.end_class
+                    else:
+                        unique[edge_class.start_class.view_id] = edge_class.start_class
 
         return sorted(unique.values(), key=lambda x: x.read_name)
 
@@ -567,7 +570,7 @@ class EdgeDataClass(DataClass):
                     end_class = node_class_by_view_id[prop.source]
                     start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
 
-                    new_edge_class = EdgeClasses(start, prop.type, end)
+                    new_edge_class = EdgeClasses(start, prop.type, end, prop.direction)
                     if new_edge_class not in edge_classes:
                         edge_classes.append(new_edge_class)
 
