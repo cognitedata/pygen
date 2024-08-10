@@ -30,7 +30,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .sub_interface_query import SubInterfaceQueryAPI
@@ -493,6 +494,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

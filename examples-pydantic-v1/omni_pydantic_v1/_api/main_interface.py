@@ -30,7 +30,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .main_interface_query import MainInterfaceQueryAPI
@@ -457,6 +458,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

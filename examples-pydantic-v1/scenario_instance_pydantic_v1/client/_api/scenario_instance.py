@@ -31,7 +31,8 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
+    NodeQueryStep,
+    EdgeQueryStep,
     QueryBuilder,
 )
 from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
@@ -681,6 +682,7 @@ class ScenarioInstanceAPI(
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,
