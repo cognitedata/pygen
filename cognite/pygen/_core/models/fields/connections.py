@@ -64,8 +64,14 @@ class EndNodeField(Field):
         return True
 
     @property
-    def end_classes(self) -> list[DataClass]:
-        return [edge_class.end_class for edge_class in self.edge_classes]
+    def end_classes(self) -> list[NodeDataClass]:
+        seen = set()
+        output: list[NodeDataClass] = []
+        for edge_class in self.edge_classes:
+            if edge_class.end_class.read_name not in seen:
+                output.append(edge_class.end_class)
+                seen.add(edge_class.end_class.read_name)
+        return output
 
     def as_read_type_hint(self) -> str:
         return self._type_hint([data_class.read_name for data_class in self.end_classes])

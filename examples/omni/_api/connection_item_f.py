@@ -550,18 +550,19 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     builder.create_name(edge_outwards_multi),
                     dm.query.NodeResultSetExpression(
                         from_=edge_outwards_multi,
-                        filter=dm.filters.HasData(views=[ConnectionItemG._view_id]),
+                        filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                     ),
-                    ConnectionItemG,
+                    ConnectionItemE,
                 )
             )
             builder.append(
                 NodeQueryStep(
                     builder.create_name(edge_outwards_multi),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_outwards_multi, filter=dm.filters.HasData(views=[ConnectionItemE._view_id])
+                        from_=edge_outwards_multi,
+                        filter=dm.filters.HasData(views=[ConnectionItemG._view_id]),
                     ),
-                    ConnectionItemE,
+                    ConnectionItemG,
                 )
             )
             builder.append(
