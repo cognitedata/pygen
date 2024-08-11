@@ -9,7 +9,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort{% endif %}
 
-from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
+from {{ top_level_package }}.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -25,19 +31,16 @@ from {{ top_level_package }}.data_classes import (
     {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
     {{ dependency.read_name }},{% endif %}{% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
+    {{ data_class.query_cls_name }},{% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,{% if data_class.is_writable %}
     NodeAPI{% else %}NodeReadAPI{% endif %},
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 ){% for class_ in edge_apis %}{% if class_.field.is_write_field %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
@@ -397,6 +400,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter_,
         )
 {% endif %}
+
+    def query(self) -> {{ data_class.query_cls_name }}:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return {{ data_class.query_cls_name }}(self._client)
 
     def list(
         self,{% for parm in list_method.parameters %}

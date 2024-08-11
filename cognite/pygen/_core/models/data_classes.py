@@ -183,6 +183,11 @@ class DataClass:
             return "DomainModelWrite"
 
     @property
+    def query_cls_name(self) -> str:
+        """The name of the class used to create queries for this data class."""
+        return f"{self.read_name}Query"
+
+    @property
     def typed_read_bases_classes(self) -> str:
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
