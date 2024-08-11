@@ -4,7 +4,7 @@ import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from ._core import (
@@ -20,6 +20,8 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
+    QueryCore,
 )
 from ._connection_item_f import ConnectionItemFWrite
 from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
@@ -395,3 +397,30 @@ def _validate_end_node(
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
+
+
+class _ConnectionEdgeAQuery(QueryCore[T_DomainModelList, ConnectionEdgeAList]):
+    _view_id = ConnectionEdgeA._view_id
+    _result_cls = ConnectionEdgeA
+    _result_list_cls_end = ConnectionEdgeAList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+        from ._connection_item_e import _ConnectionItemEQuery
+        from ._connection_item_g import _ConnectionItemGQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class ConnectionEdgeAQuery(_ConnectionEdgeAQuery[ConnectionEdgeAList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, ConnectionEdgeAList)

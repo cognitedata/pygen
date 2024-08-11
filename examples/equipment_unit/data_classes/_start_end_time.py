@@ -4,7 +4,7 @@ import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -19,6 +19,8 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
+    QueryCore,
 )
 from ._unit_procedure import UnitProcedureWrite
 from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
@@ -371,3 +373,30 @@ def _validate_end_node(
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
+
+
+class _StartEndTimeQuery(QueryCore[T_DomainModelList, StartEndTimeList]):
+    _view_id = StartEndTime._view_id
+    _result_cls = StartEndTime
+    _result_list_cls_end = StartEndTimeList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+        from ._equipment_module import _EquipmentModuleQuery
+        from ._work_order import _WorkOrderQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class StartEndTimeQuery(_StartEndTimeQuery[StartEndTimeList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, StartEndTimeList)

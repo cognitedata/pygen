@@ -4,7 +4,7 @@ import datetime{% endif %}
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
+from cognite.client import data_modeling as dm, CogniteClient{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import (
@@ -19,7 +19,9 @@ from ._core import (
     DomainRelationList,
     DomainRelationWriteList,
     GraphQLCore,
-    ResourcesWrite
+    ResourcesWrite,
+    T_DomainModelList,
+    QueryCore,
 ){% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
@@ -311,3 +313,51 @@ def _validate_end_node(
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
+
+
+class _{{ data_class.query_cls_name }}(QueryCore[T_DomainModelList, {{ data_class.read_list_name }}]):
+    _view_id = {{ data_class.read_name }}._view_id
+    _result_cls = {{ data_class.read_name }}
+    _result_list_cls_end = {{ data_class.read_list_name }}
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
+        if _{{ field.data_class.query_cls_name }} not in created_types:
+            self.{{ field.name }} = _{{ field.data_class.query_cls_name }}(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,{% if field.is_direct_relation %}
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("{{ field.prop_name }}"),
+                    direction="outwards",
+                ),{% elif field.is_reverse_direct_relation %}
+                dm.query.NodeResultSetExpression(
+                    through={{ field.reverse_property.data_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
+                    direction="inwards",
+                ),{% else %}
+                dm.query.EdgeResultSetExpression(
+                    direction="{{ field.edge_direction }}",
+                    chain_to="destination",
+                ),{% endif %}
+            ){% endif %}
+{% endfor %}
+
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class {{ data_class.query_cls_name }}(_{{ data_class.query_cls_name }}[{{ data_class.read_list_name }}]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, {{ data_class.read_list_name }})

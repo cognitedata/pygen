@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from ._core import (
@@ -19,6 +19,8 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
+    QueryCore,
 )
 
 if TYPE_CHECKING:
@@ -330,3 +332,54 @@ def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.Nod
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
+
+
+class _ConnectionItemCEdgeQuery(QueryCore[T_DomainModelList, ConnectionItemCEdgeList]):
+    _view_id = ConnectionItemCEdge._view_id
+    _result_cls = ConnectionItemCEdge
+    _result_list_cls_end = ConnectionItemCEdgeList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+        from ._connection_item_a import _ConnectionItemAQuery
+        from ._connection_item_b import _ConnectionItemBQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+        if _ConnectionItemAQuery not in created_types:
+            self.connection_item_a = _ConnectionItemAQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+        if _ConnectionItemBQuery not in created_types:
+            self.connection_item_b = _ConnectionItemBQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class ConnectionItemCEdgeQuery(_ConnectionItemCEdgeQuery[ConnectionItemCEdgeList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, ConnectionItemCEdgeList)
