@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from windmill.data_classes import (
     MainShaftWriteList,
 )
 from windmill.data_classes._main_shaft import (
+    MainShaftQuery,
     _MAINSHAFT_PROPERTIES_BY_FIELD,
     _create_main_shaft_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .main_shaft_bending_x import MainShaftBendingXAPI
 from .main_shaft_bending_y import MainShaftBendingYAPI
@@ -321,6 +324,11 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
             limit,
             filter_,
         )
+
+    def query(self) -> MainShaftQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return MainShaftQuery(self._client)
 
     def list(
         self,

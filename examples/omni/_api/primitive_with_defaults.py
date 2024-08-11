@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -21,18 +27,15 @@ from omni.data_classes import (
     PrimitiveWithDefaultsTextFields,
 )
 from omni.data_classes._primitive_with_defaults import (
+    PrimitiveWithDefaultsQuery,
     _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
     _create_primitive_with_default_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
@@ -501,6 +504,11 @@ class PrimitiveWithDefaultsAPI(
             limit,
             filter_,
         )
+
+    def query(self) -> PrimitiveWithDefaultsQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return PrimitiveWithDefaultsQuery(self._client)
 
     def list(
         self,

@@ -3,8 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -357,11 +356,12 @@ class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList, ConnectionItemCNode
         from ._connection_item_b import _ConnectionItemBQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
         if _ConnectionItemAQuery not in created_types:
             self.connection_item_a = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
-                self._client,
+                client,
                 result_list_cls,
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
@@ -373,7 +373,7 @@ class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList, ConnectionItemCNode
             self.connection_item_b = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,
-                self._client,
+                client,
                 result_list_cls,
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
@@ -382,7 +382,9 @@ class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList, ConnectionItemCNode
             )
 
     def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.Equals(
-            ["node", "type"],
-            {"space": "pygen-models", "externalId": "ConnectionItemC"},
-        )
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class ConnectionItemCNodeQuery(_ConnectionItemCNodeQuery[ConnectionItemCNodeList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, ConnectionItemCNodeList)

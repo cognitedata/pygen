@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from windmill.data_classes import (
     SensorPositionWriteList,
 )
 from windmill.data_classes._sensor_position import (
+    SensorPositionQuery,
     _SENSORPOSITION_PROPERTIES_BY_FIELD,
     _create_sensor_position_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .sensor_position_edgewise_bend_mom_crosstalk_corrected import SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI
 from .sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
@@ -363,6 +366,11 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             limit,
             filter_,
         )
+
+    def query(self) -> SensorPositionQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return SensorPositionQuery(self._client)
 
     def list(
         self,

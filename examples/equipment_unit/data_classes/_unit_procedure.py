@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -20,10 +20,12 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
 )
 
 if TYPE_CHECKING:
@@ -376,3 +378,53 @@ def _create_unit_procedure_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _UnitProcedureQuery(QueryCore[T_DomainModelList, UnitProcedureList]):
+    _view_id = UnitProcedure._view_id
+    _result_cls = UnitProcedure
+    _result_list_cls_end = UnitProcedureList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+        from ._start_end_time import _StartEndTimeQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+        if _StartEndTimeQuery not in created_types:
+            self.work_orders = _StartEndTimeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+        if _StartEndTimeQuery not in created_types:
+            self.work_units = _StartEndTimeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, UnitProcedureList)

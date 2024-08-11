@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -20,10 +20,12 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
 )
 
 
@@ -332,3 +334,28 @@ def _create_primitive_with_default_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _PrimitiveWithDefaultsQuery(QueryCore[T_DomainModelList, PrimitiveWithDefaultsList]):
+    _view_id = PrimitiveWithDefaults._view_id
+    _result_cls = PrimitiveWithDefaults
+    _result_list_cls_end = PrimitiveWithDefaultsList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class PrimitiveWithDefaultsQuery(_PrimitiveWithDefaultsQuery[PrimitiveWithDefaultsList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, PrimitiveWithDefaultsList)

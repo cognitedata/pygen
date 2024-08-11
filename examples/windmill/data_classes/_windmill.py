@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -20,10 +20,12 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
 )
 
 if TYPE_CHECKING:
@@ -502,3 +504,80 @@ def _create_windmill_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _WindmillQuery(QueryCore[T_DomainModelList, WindmillList]):
+    _view_id = Windmill._view_id
+    _result_cls = Windmill
+    _result_list_cls_end = WindmillList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
+        from ._blade import _BladeQuery
+        from ._metmast import _MetmastQuery
+        from ._nacelle import _NacelleQuery
+        from ._rotor import _RotorQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+        if _BladeQuery not in created_types:
+            self.blades = _BladeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+        if _MetmastQuery not in created_types:
+            self.metmast = _MetmastQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+        if _NacelleQuery not in created_types:
+            self.nacelle = _NacelleQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("nacelle"),
+                    direction="outwards",
+                ),
+            )
+
+        if _RotorQuery not in created_types:
+            self.rotor = _RotorQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("rotor"),
+                    direction="outwards",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class WindmillQuery(_WindmillQuery[WindmillList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, WindmillList)

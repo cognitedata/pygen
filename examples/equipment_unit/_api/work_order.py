@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from equipment_unit.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -21,18 +27,15 @@ from equipment_unit.data_classes import (
     WorkOrderTextFields,
 )
 from equipment_unit.data_classes._work_order import (
+    WorkOrderQuery,
     _WORKORDER_PROPERTIES_BY_FIELD,
     _create_work_order_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .work_order_query import WorkOrderQueryAPI
 
@@ -470,6 +473,11 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             limit,
             filter_,
         )
+
+    def query(self) -> WorkOrderQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return WorkOrderQuery(self._client)
 
     def list(
         self,

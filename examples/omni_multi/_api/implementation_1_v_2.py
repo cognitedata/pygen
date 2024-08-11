@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni_multi.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_multi.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni_multi.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -21,18 +27,15 @@ from omni_multi.data_classes import (
     Implementation1v2TextFields,
 )
 from omni_multi.data_classes._implementation_1_v_2 import (
+    Implementation1v2Query,
     _IMPLEMENTATION1V2_PROPERTIES_BY_FIELD,
     _create_implementation_1_v_2_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .implementation_1_v_2_query import Implementation1v2QueryAPI
 
@@ -474,6 +477,11 @@ class Implementation1v2API(
             limit,
             filter_,
         )
+
+    def query(self) -> Implementation1v2Query:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return Implementation1v2Query(self._client)
 
     def list(
         self,
