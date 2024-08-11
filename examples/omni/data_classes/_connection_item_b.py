@@ -369,9 +369,10 @@ def _create_connection_item_b_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemBQuery(QueryCore[T_DomainModelList]):
+class _ConnectionItemBQuery(QueryCore[T_DomainModelList, ConnectionItemBList]):
     _view_id = ConnectionItemB._view_id
     _result_cls = ConnectionItemB
+    _result_list_cls_end = ConnectionItemBList
 
     def __init__(
         self,

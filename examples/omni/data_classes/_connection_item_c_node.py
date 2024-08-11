@@ -340,9 +340,10 @@ def _create_connection_item_c_node_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList]):
+class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList, ConnectionItemCNodeList]):
     _view_id = ConnectionItemCNode._view_id
     _result_cls = ConnectionItemCNode
+    _result_list_cls_end = ConnectionItemCNodeList
 
     def __init__(
         self,

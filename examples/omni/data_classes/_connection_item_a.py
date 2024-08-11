@@ -456,9 +456,10 @@ def _create_connection_item_a_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemAQuery(QueryCore[T_DomainModelList]):
+class _ConnectionItemAQuery(QueryCore[T_DomainModelList, ConnectionItemAList]):
     _view_id = ConnectionItemA._view_id
     _result_cls = ConnectionItemA
+    _result_list_cls_end = ConnectionItemAList
 
     def __init__(
         self,

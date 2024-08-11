@@ -715,10 +715,14 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
     return unpacked
 
 
-class QueryCore(Generic[T_DomainModelList]):
+T_DomainModelListEnd = TypeVar("T_DomainModelListEnd", bound=DomainModelList, covariant=True)
+
+
+class QueryCore(Generic[T_DomainModelList, T_DomainModelListEnd]):
     DEFAULT_QUERY_LIMIT = 5
     _view_id: ClassVar[dm.ViewId]
     _result_cls: ClassVar[type[DomainModel]]
+    _result_list_cls_end: type[T_DomainModelListEnd]
 
     def __init__(
         self,
@@ -738,7 +742,7 @@ class QueryCore(Generic[T_DomainModelList]):
         builder = self._create_query(limit)
         return builder.execute(self._client)
 
-    def list(self):
+    def list(self) -> T_DomainModelListEnd:
         raise NotImplementedError()
 
     def _create_query(self, limit: int) -> QueryBuilder:
