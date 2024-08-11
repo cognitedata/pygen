@@ -24,6 +24,7 @@ from typing import (
     overload,
     Union,
     SupportsIndex,
+    Literal,
 )
 
 import pandas as pd
@@ -739,14 +740,17 @@ class QueryCore(Generic[T_DomainModelList, T_DomainModelListEnd]):
         self._expression = expression or dm.query.NodeResultSetExpression()
 
     def execute(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
-        builder = self._create_query(limit)
+        builder = self._create_query(limit, self._result_list_cls)
         return builder.execute(self._client)
 
-    def list(self) -> T_DomainModelListEnd:
-        raise NotImplementedError()
+    def list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelListEnd:
+        builder = self._create_query(limit, self._result_list_cls_end)
+        for step in builder[:-1]:
+            step.select = None
+        return builder.execute(self._client)
 
-    def _create_query(self, limit: int) -> QueryBuilder:
-        builder = QueryBuilder(self._result_list_cls)
+    def _create_query(self, limit: int, result_list_cls: type[DomainModelList]) -> QueryBuilder:
+        builder = QueryBuilder(result_list_cls)
         from_: str | None = None
         first: bool = True
         for item in self._creation_path:
@@ -801,6 +805,7 @@ class QueryStep:
         self.name = name
         self.expression = expression
         self.max_retrieve_limit = max_retrieve_limit
+        self.select: dm.query.Select | None
         if select is _NotSetSentinel:
             self.select = self._default_select()
         else:
@@ -905,6 +910,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
     def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
         super().__init__(steps or [])
         self._result_list_cls = result_cls
+        self._return_step: Literal["first", "last"] = "first"
 
     def _reset(self):
         for expression in self:
@@ -967,7 +973,14 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                         nodes_by_from.get(step.name, {}),
                         edges_by_from.get(step.name, {}),
                     )
-        return self._result_list_cls(nodes_by_from[None].values())
+        if self._return_step == "first":
+            return self._result_list_cls(nodes_by_from[None].values())
+        elif self._return_step == "last" and self[-1].from_ in nodes_by_from:
+            return self._result_list_cls(nodes_by_from[self[-1].from_].values())
+        elif self._return_step == "last":
+            raise ValueError("Cannot return the last step when the last step is an edge query")
+        else:
+            raise ValueError(f"Invalid return_step: {self._return_step}")
 
     def execute(self, client: CogniteClient) -> T_DomainModelList:
         self._reset()
@@ -999,6 +1012,13 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 raise ValueError("The first step should not have a 'from_' value")
             if not isinstance(__object, NodeQueryStep):
                 raise ValueError("The first step should be a NodeQueryStep")
+            # If the first step is a NodeQueryStep, and matches the instance
+            # in the result_list_cls we can return the result from the first step
+            if __object.result_cls is self._result_list_cls._INSTANCE:
+                self._return_step = "first"
+            else:
+                # If not, we assume that the last step is the one we want to return
+                self._return_step = "last"
         else:
             if __object.from_ is None:
                 raise ValueError("The 'from_' value should be set")

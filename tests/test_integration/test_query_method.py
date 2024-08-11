@@ -21,3 +21,10 @@ def test_query_across_direct_relation(omni_client: OmniClient) -> None:
         if not (isinstance(item.other_direct, dc.ConnectionItemCNode) or item.other_direct is None)
     ]
     assert len(incorrect_other) == 0, f"Other direct relation should be set, got {incorrect_other}"
+
+
+def test_query_list_method(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.query().other_direct.list(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemCNodeList)
