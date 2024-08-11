@@ -4,7 +4,7 @@ import datetime{% endif %}
 import warnings
 {% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
-from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
@@ -23,10 +23,12 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
@@ -142,7 +144,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+    _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
     {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
@@ -300,7 +302,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
         data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}{% if field.is_write_field %}
         {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
     """
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+    _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
 {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
@@ -470,3 +472,51 @@ def {{ data_class.filter_name }}(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _{{ data_class.query_cls_name }}(QueryCore[T_DomainModelList, {{ data_class.read_list_name }}]):
+    _view_id = {{ data_class.read_name }}._view_id
+    _result_cls = {{ data_class.read_name }}
+    _result_list_cls_end = {{ data_class.read_list_name }}
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
+        if _{{ field.data_class.query_cls_name }} not in created_types:
+            self.{{ field.name }} = _{{ field.data_class.query_cls_name }}(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,{% if field.is_direct_relation %}
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("{{ field.prop_name }}"),
+                    direction="outwards",
+                ),{% elif field.is_reverse_direct_relation %}
+                dm.query.NodeResultSetExpression(
+                    through={{ field.reverse_property.data_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
+                    direction="inwards",
+                ),{% else %}
+                dm.query.EdgeResultSetExpression(
+                    direction="{{ field.edge_direction }}",
+                    chain_to="destination",
+                ),{% endif %}
+            ){% endif %}
+{% endfor %}
+
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
+
+
+class {{ data_class.query_cls_name }}(_{{ data_class.query_cls_name }}[{{ data_class.read_list_name }}]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, {{ data_class.read_list_name }})

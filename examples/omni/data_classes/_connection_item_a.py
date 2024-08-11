@@ -474,14 +474,14 @@ class _ConnectionItemAQuery(QueryCore[T_DomainModelList, ConnectionItemAList]):
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
 
-        if _ConnectionItemAQuery not in created_types:
-            self.self_direct = _ConnectionItemAQuery(
+        if _ConnectionItemCNodeQuery not in created_types:
+            self.other_direct = _ConnectionItemCNodeQuery(
                 created_types.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=self._view_id.as_property_ref("selfDirect"),
+                    through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
             )
@@ -493,19 +493,19 @@ class _ConnectionItemAQuery(QueryCore[T_DomainModelList, ConnectionItemAList]):
                 client,
                 result_list_cls,
                 dm.query.EdgeResultSetExpression(
-                    chain_to="destination",
                     direction="outwards",
+                    chain_to="destination",
                 ),
             )
 
-        if _ConnectionItemCNodeQuery not in created_types:
-            self.other_direct = _ConnectionItemCNodeQuery(
+        if _ConnectionItemAQuery not in created_types:
+            self.self_direct = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=self._view_id.as_property_ref("otherDirect"),
+                    through=self._view_id.as_property_ref("selfDirect"),
                     direction="outwards",
                 ),
             )

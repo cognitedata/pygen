@@ -153,6 +153,10 @@ class BaseConnectionField(Field, ABC):
         return self.edge_type is None and self.through is None
 
     @property
+    def is_no_source_direct_relation(self) -> bool:
+        return self.edge_type is None and self.through is None and self.end_classes is None
+
+    @property
     def is_reverse_direct_relation(self) -> bool:
         return self.through is not None
 

@@ -188,6 +188,10 @@ class DataClass:
         return f"{self.read_name}Query"
 
     @property
+    def view_id_str(self) -> str:
+        return f'dm.ViewId("{self.view_id.space}", "{self.view_id.external_id}", "{self.view_id.version}")'
+
+    @property
     def typed_read_bases_classes(self) -> str:
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
