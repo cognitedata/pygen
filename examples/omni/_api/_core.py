@@ -29,7 +29,6 @@ from omni.data_classes._core import (
     GraphQLCore,
     GraphQLList,
     ResourcesWriteResult,
-    QueryBuilder,
     T_DomainModel,
     T_DomainModelWrite,
     T_DomainModelWriteList,
@@ -37,6 +36,7 @@ from omni.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+    QueryBuilder,
     NodeQueryStep,
     EdgeQueryStep,
 )
