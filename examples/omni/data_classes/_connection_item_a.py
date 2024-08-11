@@ -20,6 +20,7 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -455,23 +456,63 @@ def _create_connection_item_a_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemAQuery(QueryCore):
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+class _ConnectionItemAQuery(QueryCore[T_DomainModelList]):
+    _view_id = ConnectionItemA._view_id
+    _result_cls = ConnectionItemA
 
-    def __init__(self, created_types: set[type], creation_path: list[QueryCore]):
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
         from ._connection_item_b import _ConnectionItemBQuery
         from ._connection_item_c_node import _ConnectionItemCNodeQuery
 
-        super().__init__(created_types, creation_path)
-        self.self_direct = self
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+
+        if _ConnectionItemAQuery not in created_types:
+            self.self_direct = _ConnectionItemAQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("selfDirect"),
+                    direction="outwards",
+                ),
+            )
+
         if _ConnectionItemBQuery not in created_types:
-            self.outwards = _ConnectionItemBQuery(created_types, self._creation_path)
+            self.outwards = _ConnectionItemBQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    chain_to="destination",
+                    direction="outwards",
+                ),
+            )
 
         if _ConnectionItemCNodeQuery not in created_types:
-            self.other_direct = _ConnectionItemCNodeQuery(created_types, self._creation_path)
+            self.other_direct = _ConnectionItemCNodeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("otherDirect"),
+                    direction="outwards",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
 
 
-class ConnectionItemAQuery(_ConnectionItemAQuery):
+class ConnectionItemAQuery(_ConnectionItemAQuery[ConnectionItemAList]):
     def __init__(self, client: CogniteClient):
-        super().__init__(set(), [])
-        self._client = client
+        super().__init__(set(), [], client, ConnectionItemAList)

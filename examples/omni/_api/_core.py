@@ -37,6 +37,8 @@ from omni.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+    NodeQueryStep,
+    EdgeQueryStep,
 )
 
 DEFAULT_LIMIT_READ = 25

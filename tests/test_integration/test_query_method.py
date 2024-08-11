@@ -11,7 +11,7 @@ else:
 
 
 def test_query_across_direct_relation(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().other_direct.execute(limit=-1)
+    items = omni_client.connection_item_a.query().other_direct.execute(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)

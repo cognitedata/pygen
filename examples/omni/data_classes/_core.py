@@ -715,17 +715,70 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
     return unpacked
 
 
-class QueryCore:
+class QueryCore(Generic[T_DomainModelList]):
     DEFAULT_QUERY_LIMIT = 5
+    _view_id: ClassVar[dm.ViewId]
+    _result_cls: ClassVar[type[DomainModel]]
 
-    def __init__(self, created_types: set[type], creation_path: "list[QueryCore]"):
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: "list[QueryCore]",
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
+        self._client = client
+        self._result_list_cls = result_list_cls
+        self._expression = expression or dm.query.NodeResultSetExpression()
 
-    def execute(self, limit: int = DEFAULT_QUERY_LIMIT):
-        raise NotImplementedError()
+    def execute(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
+        builder = QueryBuilder(self._result_list_cls)
+        from_: str | None = None
+        first: bool = True
+        for item in self._creation_path:
+            name = builder.create_name(from_)
+            max_retrieve_limit = limit if first else -1
+            step: QueryStep
+            if isinstance(item._expression, dm.query.NodeResultSetExpression):
+                step = NodeQueryStep(
+                    name=name,
+                    expression=item._expression,
+                    result_cls=item._result_cls,
+                    max_retrieve_limit=max_retrieve_limit,
+                )
+            elif isinstance(item._expression, dm.query.EdgeResultSetExpression):
+                step = EdgeQueryStep(name=name, expression=item._expression, max_retrieve_limit=max_retrieve_limit)
+            else:
+                raise TypeError(f"Unsupported query step type: {type(item._expression)}")
+
+            step.expression.from_ = from_
+            if isinstance(step.expression, dm.query.NodeResultSetExpression):
+                step.expression.filter = item._assemble_filter()
+                builder.append(step)
+            else:  # EdgeResultSetExpression
+                builder.append(step)
+                name = builder.create_name(from_)
+                node_step = NodeQueryStep(
+                    name=name,
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=from_,
+                        filter=item._assemble_filter(),
+                    ),
+                    result_cls=item._result_cls,
+                )
+                builder.append(node_step)
+            first = False
+            from_ = name
+        return builder.execute(self._client)
 
     def list(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _assemble_filter(self) -> dm.filters.Filter:
         raise NotImplementedError()
 
 

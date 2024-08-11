@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
+from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from pydantic import Field
 from pydantic import field_validator, model_validator
@@ -20,6 +21,7 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -338,14 +340,48 @@ def _create_connection_item_c_node_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemCNodeQuery(QueryCore):
-    def __init__(self, created_types: set[type], creation_path: list[QueryCore]):
+class _ConnectionItemCNodeQuery(QueryCore[T_DomainModelList]):
+    _view_id = ConnectionItemCNode._view_id
+    _result_cls = ConnectionItemCNode
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
 
-        super().__init__(created_types, creation_path)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
         if _ConnectionItemAQuery not in created_types:
-            self.connection_item_a = _ConnectionItemAQuery(created_types, self._creation_path)
+            self.connection_item_a = _ConnectionItemAQuery(
+                created_types.copy(),
+                self._creation_path,
+                self._client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
 
         if _ConnectionItemBQuery not in created_types:
-            self.connection_item_b = _ConnectionItemBQuery(created_types, self._creation_path)
+            self.connection_item_b = _ConnectionItemBQuery(
+                created_types.copy(),
+                self._creation_path,
+                self._client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.Equals(
+            ["node", "type"],
+            {"space": "pygen-models", "externalId": "ConnectionItemC"},
+        )

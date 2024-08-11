@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
+from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from pydantic import Field
 from pydantic import field_validator, model_validator
@@ -20,6 +21,7 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -367,10 +369,32 @@ def _create_connection_item_b_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemBQuery(QueryCore):
-    def __init__(self, created_types: set[type], creation_path: list[QueryCore]):
+class _ConnectionItemBQuery(QueryCore[T_DomainModelList]):
+    _view_id = ConnectionItemB._view_id
+    _result_cls = ConnectionItemB
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+    ):
         from ._connection_item_a import _ConnectionItemAQuery
 
-        super().__init__(created_types, creation_path)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression)
         if _ConnectionItemAQuery not in created_types:
-            self.inwards = _ConnectionItemAQuery(created_types, self._creation_path)
+            self.inwards = _ConnectionItemAQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="inwards",
+                    chain_to="destination",
+                ),
+            )
+
+    def _assemble_filter(self) -> dm.filters.Filter:
+        return dm.filters.HasData(views=[self._view_id])
