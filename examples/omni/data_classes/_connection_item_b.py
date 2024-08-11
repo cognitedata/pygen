@@ -373,4 +373,4 @@ class _ConnectionItemBQuery(QueryCore):
 
         super().__init__(created_types, creation_path)
         if _ConnectionItemAQuery not in created_types:
-            self.inwards = _ConnectionItemAQuery(created_types.copy(), self._creation_path)
+            self.inwards = _ConnectionItemAQuery(created_types, self._creation_path)

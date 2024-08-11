@@ -345,7 +345,7 @@ class _ConnectionItemCNodeQuery(QueryCore):
 
         super().__init__(created_types, creation_path)
         if _ConnectionItemAQuery not in created_types:
-            self.connection_item_a = _ConnectionItemAQuery(created_types.copy(), self._creation_path)
+            self.connection_item_a = _ConnectionItemAQuery(created_types, self._creation_path)
 
         if _ConnectionItemBQuery not in created_types:
-            self.connection_item_b = _ConnectionItemBQuery(created_types.copy(), self._creation_path)
+            self.connection_item_b = _ConnectionItemBQuery(created_types, self._creation_path)

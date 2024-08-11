@@ -456,6 +456,8 @@ def _create_connection_item_a_filter(
 
 
 class _ConnectionItemAQuery(QueryCore):
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+
     def __init__(self, created_types: set[type], creation_path: list[QueryCore]):
         from ._connection_item_b import _ConnectionItemBQuery
         from ._connection_item_c_node import _ConnectionItemCNodeQuery
@@ -463,10 +465,10 @@ class _ConnectionItemAQuery(QueryCore):
         super().__init__(created_types, creation_path)
         self.self_direct = self
         if _ConnectionItemBQuery not in created_types:
-            self.outwards = _ConnectionItemBQuery(created_types.copy(), self._creation_path)
+            self.outwards = _ConnectionItemBQuery(created_types, self._creation_path)
 
         if _ConnectionItemCNodeQuery not in created_types:
-            self.other_direct = _ConnectionItemCNodeQuery(created_types.copy(), self._creation_path)
+            self.other_direct = _ConnectionItemCNodeQuery(created_types, self._creation_path)
 
 
 class ConnectionItemAQuery(_ConnectionItemAQuery):
