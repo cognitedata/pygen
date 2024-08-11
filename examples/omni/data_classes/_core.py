@@ -735,6 +735,13 @@ class QueryCore(Generic[T_DomainModelList]):
         self._expression = expression or dm.query.NodeResultSetExpression()
 
     def execute(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
+        builder = self._create_query(limit)
+        return builder.execute(self._client)
+
+    def list(self):
+        raise NotImplementedError()
+
+    def _create_query(self, limit: int) -> QueryBuilder:
         builder = QueryBuilder(self._result_list_cls)
         from_: str | None = None
         first: bool = True
@@ -749,17 +756,14 @@ class QueryCore(Generic[T_DomainModelList]):
                     result_cls=item._result_cls,
                     max_retrieve_limit=max_retrieve_limit,
                 )
-            elif isinstance(item._expression, dm.query.EdgeResultSetExpression):
-                step = EdgeQueryStep(name=name, expression=item._expression, max_retrieve_limit=max_retrieve_limit)
-            else:
-                raise TypeError(f"Unsupported query step type: {type(item._expression)}")
-
-            step.expression.from_ = from_
-            if isinstance(step.expression, dm.query.NodeResultSetExpression):
+                step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
                 builder.append(step)
-            else:  # EdgeResultSetExpression
+            elif isinstance(item._expression, dm.query.EdgeResultSetExpression):
+                step = EdgeQueryStep(name=name, expression=item._expression, max_retrieve_limit=max_retrieve_limit)
+                step.expression.from_ = from_
                 builder.append(step)
+
                 name = builder.create_name(from_)
                 node_step = NodeQueryStep(
                     name=name,
@@ -770,12 +774,12 @@ class QueryCore(Generic[T_DomainModelList]):
                     result_cls=item._result_cls,
                 )
                 builder.append(node_step)
+            else:
+                raise TypeError(f"Unsupported query step type: {type(item._expression)}")
+
             first = False
             from_ = name
-        return builder.execute(self._client)
-
-    def list(self):
-        raise NotImplementedError()
+        return builder
 
     @abstractmethod
     def _assemble_filter(self) -> dm.filters.Filter:
