@@ -1110,3 +1110,47 @@ class StringFilter(Filtering[T_QueryCore]):
         self._raise_if_filter_set()
         self._filter = dm.filters.Prefix(self._prop_path, prefix)
         return self._query
+
+    def in_(self, values: list[str]) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.In(self._prop_path, values)
+        return self._query
+
+
+class BoolFilter(Filtering[T_QueryCore]):
+    def equals(self, value: bool) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Equals(self._prop_path, value)
+        return self._query
+
+
+class IntFilter(Filtering[T_QueryCore]):
+    def range(self, gte: int | None, lte: int | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class FloatFilter(Filtering[T_QueryCore]):
+    def range(self, gte: float | None, lte: float | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class DateTimeFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.datetime | None, lte: datetime.datetime | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(
+            self._prop_path,
+            gte=gte and gte.isoformat(timespec="milliseconds"),
+            lte=lte and lte.isoformat(timespec="milliseconds"),
+        )
+        return self._query
+
+
+class DateFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.date | None, lte: datetime.date | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte and gte.isoformat(), lte=lte and lte.isoformat())
+        return self._query

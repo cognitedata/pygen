@@ -1079,7 +1079,7 @@ class Filtering(Generic[T_QueryCore], ABC):
         if self._filter is not None:
             raise ValueError("Filter has already been set")
 
-    def as_filter(self) -> dm.Filter | None:
+    def _as_filter(self) -> dm.Filter | None:
         return self._filter
 
 
@@ -1092,4 +1092,52 @@ class StringFilter(Filtering[T_QueryCore]):
     def prefix(self, prefix: str) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Prefix(self._prop_path, prefix)
+        return self._query
+
+    def in_(self, values: list[str]) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.In(self._prop_path, values)
+        return self._query
+
+
+class BoolFilter(Filtering[T_QueryCore]):
+    def equals(self, value: bool) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Equals(self._prop_path, value)
+        return self._query
+
+
+class IntFilter(Filtering[T_QueryCore]):
+    def range(self, gte: int | None, lte: int | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class FloatFilter(Filtering[T_QueryCore]):
+    def range(self, gte: float | None, lte: float | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class DateTimeFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.datetime | None, lte: datetime.datetime | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(
+            self._prop_path,
+            gte=gte.isoformat(timespec="milliseconds") if gte else None,
+            lte=lte.isoformat(timespec="milliseconds") if lte else None,
+        )
+        return self._query
+
+
+class DateFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.date | None, lte: datetime.date | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(
+            self._prop_path,
+            gte=gte.isoformat() if gte else None,
+            lte=lte.isoformat() if lte else None,
+        )
         return self._query
