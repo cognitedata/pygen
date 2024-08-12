@@ -1076,7 +1076,7 @@ T_QueryCore = TypeVar("T_QueryCore")
 
 
 class Filtering(Generic[T_QueryCore], ABC):
-    def __init__(self, query: T_QueryCore, prop_path: list[str]):
+    def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]):
         self._query = query
         self._prop_path = prop_path
         self._filter: dm.Filter | None = None
