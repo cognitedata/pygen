@@ -24,11 +24,13 @@ from ._core import (
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
@@ -474,7 +476,7 @@ def {{ data_class.filter_name }}(
     return dm.filters.And(*filters) if filters else None
 
 
-class _{{ data_class.query_cls_name }}(QueryCore[T_DomainModelList, {{ data_class.read_list_name }}]):
+class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_class.read_list_name }}]):
     _view_id = {{ data_class.read_name }}._view_id
     _result_cls = {{ data_class.read_name }}
     _result_list_cls_end = {{ data_class.read_list_name }}
@@ -484,7 +486,7 @@ class _{{ data_class.query_cls_name }}(QueryCore[T_DomainModelList, {{ data_clas
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
