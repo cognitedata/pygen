@@ -394,7 +394,9 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
+        from ._equipment_module import _EquipmentModuleQuery
         from ._start_end_time import _StartEndTimeQuery
+        from ._work_order import _WorkOrderQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
 
@@ -404,6 +406,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 self._creation_path,
                 client,
                 result_list_cls,
+                _WorkOrderQuery,
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
                     chain_to="destination",
@@ -416,6 +419,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 self._creation_path,
                 client,
                 result_list_cls,
+                _EquipmentModuleQuery,
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
                     chain_to="destination",

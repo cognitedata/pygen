@@ -425,7 +425,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
                 created_types=created_types,
                 creation_path=creation_path,
                 client=client,
-                result_list_cls=result_list_cls,
+                result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
 

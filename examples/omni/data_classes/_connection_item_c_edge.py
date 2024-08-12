@@ -360,7 +360,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                 created_types=created_types,
                 creation_path=creation_path,
                 client=client,
-                result_list_cls=result_list_cls,
+                result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
 
