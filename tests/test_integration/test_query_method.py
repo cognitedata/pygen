@@ -28,3 +28,21 @@ def test_query_list_method(omni_client: OmniClient) -> None:
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemCNodeList)
+
+
+def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.query().outwards.execute(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemAList)
+    item_bs = [edge for item in items for edge in item.outwards or []]
+    assert len(item_bs) > 0
+
+
+def test_query_across_edge_properties(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_f.query().outwards_multi.node.execute(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemFList)
+    item_bs = [edge for item in items for edge in item.outwards_multi or []]
+    assert len(item_bs) > 0

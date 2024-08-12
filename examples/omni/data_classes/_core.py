@@ -768,15 +768,16 @@ class QueryCore(Generic[T_DomainModelList, T_DomainModelListEnd]):
                 step.expression.filter = item._assemble_filter()
                 builder.append(step)
             elif isinstance(item._expression, dm.query.EdgeResultSetExpression):
-                step = EdgeQueryStep(name=name, expression=item._expression, max_retrieve_limit=max_retrieve_limit)
+                edge_name = name
+                step = EdgeQueryStep(name=edge_name, expression=item._expression, max_retrieve_limit=max_retrieve_limit)
                 step.expression.from_ = from_
                 builder.append(step)
 
-                name = builder.create_name(from_)
+                name = builder.create_name(edge_name)
                 node_step = NodeQueryStep(
                     name=name,
                     expression=dm.query.NodeResultSetExpression(
-                        from_=from_,
+                        from_=edge_name,
                         filter=item._assemble_filter(),
                     ),
                     result_cls=item._result_cls,
