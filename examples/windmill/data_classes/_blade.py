@@ -27,6 +27,8 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    BooleanFilter,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -369,7 +371,14 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
     ):
         from ._sensor_position import _SensorPositionQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _SensorPositionQuery not in created_types:
             self.sensor_positions = _SensorPositionQuery(
@@ -383,8 +392,10 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.is_damaged = BooleanFilter(self, self._view_id.as_property_ref("is_damaged"))
+        self._filter_classes.append(self.is_damaged)
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
 
 
 class BladeQuery(_BladeQuery[BladeList]):

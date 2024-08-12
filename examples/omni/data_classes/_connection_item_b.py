@@ -27,6 +27,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -384,7 +385,14 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
     ):
         from ._connection_item_a import _ConnectionItemAQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _ConnectionItemAQuery not in created_types:
             self.inwards = _ConnectionItemAQuery(
@@ -410,8 +418,8 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
 
 
 class ConnectionItemBQuery(_ConnectionItemBQuery[ConnectionItemBList]):

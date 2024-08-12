@@ -682,7 +682,14 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         from ._main_shaft import _MainShaftQuery
         from ._power_inverter import _PowerInverterQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _GearboxQuery not in created_types:
             self.gearbox = _GearboxQuery(
@@ -743,9 +750,6 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
             )
-
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
 
 
 class NacelleQuery(_NacelleQuery[NacelleList]):

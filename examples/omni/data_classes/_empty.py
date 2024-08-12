@@ -28,6 +28,14 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    BooleanFilter,
+    DateFilter,
+    FloatFilter,
+    FloatFilter,
+    IntFilter,
+    IntFilter,
+    StringFilter,
+    TimestampFilter,
 )
 
 
@@ -420,10 +428,31 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.boolean = BooleanFilter(self, self._view_id.as_property_ref("boolean"))
+        self._filter_classes.append(self.boolean)
+        self.date = DateFilter(self, self._view_id.as_property_ref("date"))
+        self._filter_classes.append(self.date)
+        self.float_32 = FloatFilter(self, self._view_id.as_property_ref("float32"))
+        self._filter_classes.append(self.float_32)
+        self.float_64 = FloatFilter(self, self._view_id.as_property_ref("float64"))
+        self._filter_classes.append(self.float_64)
+        self.int_32 = IntFilter(self, self._view_id.as_property_ref("int32"))
+        self._filter_classes.append(self.int_32)
+        self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
+        self._filter_classes.append(self.int_64)
+        self.text = StringFilter(self, self._view_id.as_property_ref("text"))
+        self._filter_classes.append(self.text)
+        self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
+        self._filter_classes.append(self.timestamp)
 
 
 class EmptyQuery(_EmptyQuery[EmptyList]):

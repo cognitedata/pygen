@@ -29,6 +29,9 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
+    StringFilter,
+    StringFilter,
 )
 
 
@@ -340,10 +343,21 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self._filter_classes.append(self.description)
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
+        self._filter_classes.append(self.type_)
 
 
 class EquipmentModuleQuery(_EquipmentModuleQuery[EquipmentModuleList]):

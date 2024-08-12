@@ -27,6 +27,8 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -398,7 +400,14 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
         from ._start_end_time import _StartEndTimeQuery
         from ._work_order import _WorkOrderQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _StartEndTimeQuery not in created_types:
             self.work_orders = _StartEndTimeQuery(
@@ -426,8 +435,10 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
+        self._filter_classes.append(self.type_)
 
 
 class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):

@@ -27,6 +27,9 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
+    StringFilter,
+    StringFilter,
 )
 from ._sub_interface import SubInterface, SubInterfaceWrite
 
@@ -313,10 +316,21 @@ class _Implementation1v2Query(NodeQueryCore[T_DomainModelList, Implementation1v2
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
+        self._filter_classes.append(self.main_value)
+        self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
+        self._filter_classes.append(self.sub_value)
+        self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
+        self._filter_classes.append(self.value_2)
 
 
 class Implementation1v2Query(_Implementation1v2Query[Implementation1v2List]):

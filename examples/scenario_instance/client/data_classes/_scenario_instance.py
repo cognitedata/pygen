@@ -30,6 +30,13 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
+    StringFilter,
+    StringFilter,
+    StringFilter,
+    StringFilter,
+    TimestampFilter,
+    TimestampFilter,
 )
 
 
@@ -431,10 +438,29 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.aggregation = StringFilter(self, self._view_id.as_property_ref("aggregation"))
+        self._filter_classes.append(self.aggregation)
+        self.country = StringFilter(self, self._view_id.as_property_ref("country"))
+        self._filter_classes.append(self.country)
+        self.instance = TimestampFilter(self, self._view_id.as_property_ref("instance"))
+        self._filter_classes.append(self.instance)
+        self.market = StringFilter(self, self._view_id.as_property_ref("market"))
+        self._filter_classes.append(self.market)
+        self.price_area = StringFilter(self, self._view_id.as_property_ref("priceArea"))
+        self._filter_classes.append(self.price_area)
+        self.scenario = StringFilter(self, self._view_id.as_property_ref("scenario"))
+        self._filter_classes.append(self.scenario)
+        self.start = TimestampFilter(self, self._view_id.as_property_ref("start"))
+        self._filter_classes.append(self.start)
 
 
 class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):

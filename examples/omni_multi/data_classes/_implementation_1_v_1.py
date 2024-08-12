@@ -27,6 +27,9 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
+    StringFilter,
+    StringFilter,
 )
 
 
@@ -318,10 +321,21 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
+        self._filter_classes.append(self.main_value)
+        self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
+        self._filter_classes.append(self.value_1)
+        self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
+        self._filter_classes.append(self.value_2)
 
 
 class Implementation1v1Query(_Implementation1v1Query[Implementation1v1List]):

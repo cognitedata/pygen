@@ -297,10 +297,14 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
-
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
 
 class GeneratorQuery(_GeneratorQuery[GeneratorList]):

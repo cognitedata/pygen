@@ -1106,7 +1106,7 @@ class StringFilter(Filtering[T_QueryCore]):
         return self._query
 
 
-class BoolFilter(Filtering[T_QueryCore]):
+class BooleanFilter(Filtering[T_QueryCore]):
     def equals(self, value: bool) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Equals(self._prop_path, value)

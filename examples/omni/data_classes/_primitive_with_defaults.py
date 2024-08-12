@@ -27,6 +27,10 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    BooleanFilter,
+    FloatFilter,
+    IntFilter,
+    StringFilter,
 )
 
 
@@ -351,10 +355,23 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.auto_increment_int_32 = IntFilter(self, self._view_id.as_property_ref("autoIncrementInt32"))
+        self._filter_classes.append(self.auto_increment_int_32)
+        self.default_boolean = BooleanFilter(self, self._view_id.as_property_ref("defaultBoolean"))
+        self._filter_classes.append(self.default_boolean)
+        self.default_float_32 = FloatFilter(self, self._view_id.as_property_ref("defaultFloat32"))
+        self._filter_classes.append(self.default_float_32)
+        self.default_string = StringFilter(self, self._view_id.as_property_ref("defaultString"))
+        self._filter_classes.append(self.default_string)
 
 
 class PrimitiveWithDefaultsQuery(_PrimitiveWithDefaultsQuery[PrimitiveWithDefaultsList]):

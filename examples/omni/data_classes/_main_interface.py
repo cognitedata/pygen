@@ -27,6 +27,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 
@@ -276,10 +277,17 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
         expression: dm.query.ResultSetExpression | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
+        self._filter_classes.append(self.main_value)
 
 
 class MainInterfaceQuery(_MainInterfaceQuery[MainInterfaceList]):

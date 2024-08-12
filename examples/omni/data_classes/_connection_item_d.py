@@ -27,6 +27,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -497,7 +498,14 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
     ):
         from ._connection_item_e import _ConnectionItemEQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _ConnectionItemEQuery not in created_types:
             self.direct_multi = _ConnectionItemEQuery(
@@ -535,8 +543,8 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
 
 
 class ConnectionItemDQuery(_ConnectionItemDQuery[ConnectionItemDList]):

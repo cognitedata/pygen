@@ -733,18 +733,24 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
+        view_filter: dm.filters.Filter | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
         self._client = client
         self._result_list_cls = result_list_cls
+        self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.space = StringFilter(self, ["node", "space"])
+        self._filter_classes: list[Filtering] = [self.external_id, self.space]
 
-    @abstractmethod
     def _assemble_filter(self) -> dm.filters.Filter:
-        raise NotImplementedError()
+        filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
+        for filter_cls in self._filter_classes:
+            if item := filter_cls._as_filter():
+                filters.append(item)
+        return dm.filters.And(*filters)
 
 
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
@@ -1070,7 +1076,7 @@ T_QueryCore = TypeVar("T_QueryCore")
 
 
 class Filtering(Generic[T_QueryCore], ABC):
-    def __init__(self, query: T_QueryCore, prop_path: list[str]):
+    def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]):
         self._query = query
         self._prop_path = prop_path
         self._filter: dm.Filter | None = None
@@ -1079,7 +1085,7 @@ class Filtering(Generic[T_QueryCore], ABC):
         if self._filter is not None:
             raise ValueError("Filter has already been set")
 
-    def as_filter(self) -> dm.Filter | None:
+    def _as_filter(self) -> dm.Filter | None:
         return self._filter
 
 
@@ -1092,4 +1098,52 @@ class StringFilter(Filtering[T_QueryCore]):
     def prefix(self, prefix: str) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Prefix(self._prop_path, prefix)
+        return self._query
+
+    def in_(self, values: list[str]) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.In(self._prop_path, values)
+        return self._query
+
+
+class BooleanFilter(Filtering[T_QueryCore]):
+    def equals(self, value: bool) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Equals(self._prop_path, value)
+        return self._query
+
+
+class IntFilter(Filtering[T_QueryCore]):
+    def range(self, gte: int | None, lte: int | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class FloatFilter(Filtering[T_QueryCore]):
+    def range(self, gte: float | None, lte: float | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(self._prop_path, gte=gte, lte=lte)
+        return self._query
+
+
+class TimestampFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.datetime | None, lte: datetime.datetime | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(
+            self._prop_path,
+            gte=gte.isoformat(timespec="milliseconds") if gte else None,
+            lte=lte.isoformat(timespec="milliseconds") if lte else None,
+        )
+        return self._query
+
+
+class DateFilter(Filtering[T_QueryCore]):
+    def range(self, gte: datetime.date | None, lte: datetime.date | None) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Range(
+            self._prop_path,
+            gte=gte.isoformat() if gte else None,
+            lte=lte.isoformat() if lte else None,
+        )
         return self._query

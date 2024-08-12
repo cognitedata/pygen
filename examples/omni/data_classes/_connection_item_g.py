@@ -27,6 +27,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -362,7 +363,14 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_f import _ConnectionItemFQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _ConnectionEdgeAQuery not in created_types:
             self.inwards_multi_property = _ConnectionEdgeAQuery(
@@ -377,8 +385,8 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.append(self.name)
 
 
 class ConnectionItemGQuery(_ConnectionItemGQuery[ConnectionItemGList]):

@@ -27,6 +27,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -361,7 +362,14 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
     ):
         from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 
         if _Implementation1NonWriteableQuery not in created_types:
             self.to_non_writable = _Implementation1NonWriteableQuery(
@@ -375,8 +383,8 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                 ),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
+        self._filter_classes.append(self.a_value)
 
 
 class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):
