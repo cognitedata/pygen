@@ -25,6 +25,7 @@ from ._core import (
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    NodeQueryCore,
     QueryCore,
 )
 
@@ -403,7 +404,7 @@ def _create_connection_item_f_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemFQuery(QueryCore[T_DomainModelList, ConnectionItemFList]):
+class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList]):
     _view_id = ConnectionItemF._view_id
     _result_cls = ConnectionItemF
     _result_list_cls_end = ConnectionItemFList
@@ -418,6 +419,7 @@ class _ConnectionItemFQuery(QueryCore[T_DomainModelList, ConnectionItemFList]):
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
+        from ._connection_item_g import _ConnectionItemGQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
 
@@ -439,6 +441,7 @@ class _ConnectionItemFQuery(QueryCore[T_DomainModelList, ConnectionItemFList]):
                 self._creation_path,
                 client,
                 result_list_cls,
+                _ConnectionItemGQuery,
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
                     chain_to="destination",

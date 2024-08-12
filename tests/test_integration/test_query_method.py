@@ -40,7 +40,7 @@ def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
 
 
 def test_query_across_edge_properties(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_f.query().outwards_multi.node.execute(limit=5)
+    items = omni_client.connection_item_f.query().outwards_multi.end_node.execute(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemFList)

@@ -19,8 +19,9 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
-    T_DomainModelList,
+    T_DomainList,
     QueryCore,
+    EdgeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -334,7 +335,7 @@ def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.Nod
         )
 
 
-class _ConnectionItemCEdgeQuery(QueryCore[T_DomainModelList, ConnectionItemCEdgeList]):
+class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeList]):
     _view_id = ConnectionItemCEdge._view_id
     _result_cls = ConnectionItemCEdge
     _result_list_cls_end = ConnectionItemCEdgeList
@@ -344,7 +345,7 @@ class _ConnectionItemCEdgeQuery(QueryCore[T_DomainModelList, ConnectionItemCEdge
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery

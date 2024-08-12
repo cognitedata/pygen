@@ -20,7 +20,7 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
-    T_DomainModelList,
+    T_DomainList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -456,7 +456,7 @@ def _create_connection_item_a_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemAQuery(QueryCore[T_DomainModelList, ConnectionItemAList]):
+class _ConnectionItemAQuery(QueryCore[T_DomainList, ConnectionItemAList]):
     _view_id = ConnectionItemA._view_id
     _result_cls = ConnectionItemA
     _result_list_cls_end = ConnectionItemAList
@@ -466,7 +466,7 @@ class _ConnectionItemAQuery(QueryCore[T_DomainModelList, ConnectionItemAList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_b import _ConnectionItemBQuery

@@ -26,6 +26,7 @@ from ._core import (
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -345,7 +346,7 @@ def _create_connection_item_g_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemGQuery(QueryCore[T_DomainModelList, ConnectionItemGList]):
+class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList]):
     _view_id = ConnectionItemG._view_id
     _result_cls = ConnectionItemG
     _result_list_cls_end = ConnectionItemGList
@@ -359,6 +360,7 @@ class _ConnectionItemGQuery(QueryCore[T_DomainModelList, ConnectionItemGList]):
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
+        from ._connection_item_f import _ConnectionItemFQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
 
@@ -368,6 +370,7 @@ class _ConnectionItemGQuery(QueryCore[T_DomainModelList, ConnectionItemGList]):
                 self._creation_path,
                 client,
                 result_list_cls,
+                _ConnectionItemFQuery,
                 dm.query.EdgeResultSetExpression(
                     direction="inwards",
                     chain_to="destination",
