@@ -20,7 +20,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     DomainModelList,
-    T_DomainRelationList,
+    T_DomainList,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -337,7 +337,7 @@ def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.Nod
         )
 
 
-class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainRelationList, ConnectionItemCEdgeList]):
+class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeList]):
     _view_id = ConnectionItemCEdge._view_id
     _result_cls = ConnectionItemCEdge
     _result_list_cls_end = ConnectionItemCEdgeList
@@ -347,7 +347,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainRelationList, ConnectionIt
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -369,7 +369,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainRelationList, ConnectionIt
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,
+                result_list_cls,  # type: ignore[type-var]
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
                     chain_to="destination",
@@ -381,7 +381,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainRelationList, ConnectionIt
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,
+                result_list_cls,  # type: ignore[type-var]
                 dm.query.EdgeResultSetExpression(
                     direction="outwards",
                     chain_to="destination",

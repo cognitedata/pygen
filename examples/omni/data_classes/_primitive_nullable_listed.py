@@ -22,7 +22,6 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -374,7 +373,7 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

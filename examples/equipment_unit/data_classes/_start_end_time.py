@@ -20,7 +20,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     DomainModelList,
-    T_DomainRelationList,
+    T_DomainList,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -378,7 +378,7 @@ def _validate_end_node(
         )
 
 
-class _StartEndTimeQuery(EdgeQueryCore[T_DomainRelationList, StartEndTimeList]):
+class _StartEndTimeQuery(EdgeQueryCore[T_DomainList, StartEndTimeList]):
     _view_id = StartEndTime._view_id
     _result_cls = StartEndTime
     _result_list_cls_end = StartEndTimeList
@@ -388,7 +388,7 @@ class _StartEndTimeQuery(EdgeQueryCore[T_DomainRelationList, StartEndTimeList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
     ):
