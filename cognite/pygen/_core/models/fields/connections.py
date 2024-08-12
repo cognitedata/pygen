@@ -126,8 +126,9 @@ class BaseConnectionField(Field, ABC):
     edge_type: dm.DirectRelationReference | None
     edge_direction: Literal["outwards", "inwards"]
     end_classes: list[DataClass] | None
-    use_node_reference: bool
+    use_node_reference_in_type_hint: bool
     through: dm.PropertyId | None
+    destination_class: NodeDataClass | None
 
     @property
     def data_class(self) -> DataClass:
@@ -234,17 +235,19 @@ class BaseConnectionField(Field, ABC):
             prop.direction if isinstance(prop, dm.EdgeConnection) else "outwards"
         )
         through = prop.through if isinstance(prop, ReverseDirectRelation) else None
-        use_node_reference = True
+        use_node_reference_in_type_hint = True
+        destination_class: NodeDataClass | None = None
         end_classes: list[DataClass] | None
         if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
             end_classes = [edge_class_by_view_id[prop.edge_source]]
-            use_node_reference = False
+            use_node_reference_in_type_hint = False
+            destination_class = node_class_by_view_id[prop.source]
         elif (
             isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
         ) and prop.source is not None:
             end_classes = [node_class_by_view_id[prop.source]]
             if isinstance(prop, ReverseDirectRelation):
-                use_node_reference = False
+                use_node_reference_in_type_hint = False
         else:
             end_classes = None
 
@@ -260,7 +263,8 @@ class BaseConnectionField(Field, ABC):
                 edge_direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
-                use_node_reference=use_node_reference,
+                use_node_reference_in_type_hint=use_node_reference_in_type_hint,
+                destination_class=destination_class,
             )
         elif cls._is_supported_one_to_one_connection(prop):
             return OneToOneConnectionField(
@@ -273,7 +277,8 @@ class BaseConnectionField(Field, ABC):
                 edge_direction=direction,
                 description=prop.description,
                 end_classes=end_classes,
-                use_node_reference=use_node_reference,
+                use_node_reference_in_type_hint=use_node_reference_in_type_hint,
+                destination_class=destination_class,
             )
         else:
             return None
@@ -302,7 +307,7 @@ class BaseConnectionField(Field, ABC):
 
     def as_read_type_hint(self) -> str:
         return self._create_type_hint(
-            [data_class.read_name for data_class in self.end_classes or []], self.use_node_reference
+            [data_class.read_name for data_class in self.end_classes or []], self.use_node_reference_in_type_hint
         )
 
     def as_write_type_hint(self) -> str:
@@ -312,7 +317,7 @@ class BaseConnectionField(Field, ABC):
                 for data_class in self.end_classes or []
                 if data_class.is_writable or data_class.is_interface
             ],
-            self.use_node_reference,
+            self.use_node_reference_in_type_hint,
         )
 
     def as_graphql_type_hint(self) -> str:
@@ -350,7 +355,7 @@ class BaseConnectionField(Field, ABC):
         if isinstance(self.end_classes, list) and len(self.end_classes) == 1 and not self.end_classes[0].is_writable:
             method = "as_id"
 
-        return self._create_as_method(method, "DomainModel", self.use_node_reference)
+        return self._create_as_method(method, "DomainModel", self.use_node_reference_in_type_hint)
 
     def as_read_graphql(self) -> str:
         return self._create_as_method("as_read", "GraphQLCore", False)

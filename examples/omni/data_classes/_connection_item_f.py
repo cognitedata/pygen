@@ -419,6 +419,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
+        from ._connection_item_e import _ConnectionItemEQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)

@@ -487,7 +487,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
-    ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+    ):{% for dependency_class in data_class.dependencies_with_edge_destinations %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
@@ -497,7 +497,8 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,{% if field.is_direct_relation %}
+                result_list_cls,{% if field.is_property_edge %}
+                _{{ field.destination_class.query_cls_name }},{% endif %}{% if field.is_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
