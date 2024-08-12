@@ -1127,7 +1127,7 @@ class FloatFilter(Filtering[T_QueryCore]):
         return self._query
 
 
-class DateTimeFilter(Filtering[T_QueryCore]):
+class TimestampFilter(Filtering[T_QueryCore]):
     def range(self, gte: datetime.datetime | None, lte: datetime.datetime | None) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Range(

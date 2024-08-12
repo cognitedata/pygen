@@ -29,7 +29,8 @@ from ._core import (
     are_nodes_equal,
     select_best_node,
     QueryCore,
-    NodeQueryCore,
+    NodeQueryCore,{% if data_class.has_filtering_fields %}
+    {{ data_class.filtering_import }}{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies %}
@@ -490,7 +491,14 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
     ):{% for dependency_class in data_class.dependencies_with_edge_destinations %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+        )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
         if _{{ field.data_class.query_cls_name }} not in created_types:
             self.{{ field.name }} = _{{ field.data_class.query_cls_name }}(
@@ -512,11 +520,9 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                     chain_to="destination",
                 ),{% endif %}
             ){% endif %}
-{% endfor %}
-
-
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+{% endfor %}{% for field in data_class.filtering_fields %}
+        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
+        self._filter_classes.append(self.{{ field.name }}){% endfor %}
 
 
 class {{ data_class.query_cls_name }}(_{{ data_class.query_cls_name }}[{{ data_class.read_list_name }}]):
