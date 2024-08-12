@@ -731,7 +731,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         created_types: set[type],
         creation_path: "list[QueryCore]",
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         created_types.add(type(self))
@@ -741,7 +741,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._expression = expression or dm.query.NodeResultSetExpression()
 
 
-class NodeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):
+class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
     def execute(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainList:
@@ -802,7 +802,7 @@ class NodeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):
         raise NotImplementedError()
 
 
-class EdgeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):
+class EdgeQueryCore(QueryCore[T_DomainRelationList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainRelation]]
 
 
