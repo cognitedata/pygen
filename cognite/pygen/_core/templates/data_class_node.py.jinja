@@ -24,7 +24,6 @@ from ._core import (
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
     T_DomainModelList,
-    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -486,7 +485,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
     ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
