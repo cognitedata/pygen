@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -356,7 +357,7 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery

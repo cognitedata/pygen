@@ -22,11 +22,13 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -441,7 +443,7 @@ def _create_sensor_position_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _SensorPositionQuery(QueryCore[T_DomainModelList, SensorPositionList]):
+class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList]):
     _view_id = SensorPosition._view_id
     _result_cls = SensorPosition
     _result_list_cls_end = SensorPositionList
@@ -451,7 +453,7 @@ class _SensorPositionQuery(QueryCore[T_DomainModelList, SensorPositionList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

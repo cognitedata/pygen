@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -438,7 +440,7 @@ def _create_connection_item_e_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _ConnectionItemEQuery(QueryCore[T_DomainModelList, ConnectionItemEList]):
+class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList]):
     _view_id = ConnectionItemE._view_id
     _result_cls = ConnectionItemE
     _result_list_cls_end = ConnectionItemEList
@@ -448,7 +450,7 @@ class _ConnectionItemEQuery(QueryCore[T_DomainModelList, ConnectionItemEList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_d import _ConnectionItemDQuery

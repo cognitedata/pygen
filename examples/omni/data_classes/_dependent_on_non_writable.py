@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -345,7 +347,7 @@ def _create_dependent_on_non_writable_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _DependentOnNonWritableQuery(QueryCore[T_DomainModelList, DependentOnNonWritableList]):
+class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnNonWritableList]):
     _view_id = DependentOnNonWritable._view_id
     _result_cls = DependentOnNonWritable
     _result_list_cls_end = DependentOnNonWritableList
@@ -355,7 +357,7 @@ class _DependentOnNonWritableQuery(QueryCore[T_DomainModelList, DependentOnNonWr
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery

@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -380,7 +382,7 @@ def _create_unit_procedure_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _UnitProcedureQuery(QueryCore[T_DomainModelList, UnitProcedureList]):
+class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
     _view_id = UnitProcedure._view_id
     _result_cls = UnitProcedure
     _result_list_cls_end = UnitProcedureList
@@ -390,7 +392,7 @@ class _UnitProcedureQuery(QueryCore[T_DomainModelList, UnitProcedureList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._start_end_time import _StartEndTimeQuery

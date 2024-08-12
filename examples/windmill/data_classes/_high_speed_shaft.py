@@ -22,11 +22,13 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -299,7 +301,7 @@ def _create_high_speed_shaft_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _HighSpeedShaftQuery(QueryCore[T_DomainModelList, HighSpeedShaftList]):
+class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList]):
     _view_id = HighSpeedShaft._view_id
     _result_cls = HighSpeedShaft
     _result_list_cls_end = HighSpeedShaftList
@@ -309,7 +311,7 @@ class _HighSpeedShaftQuery(QueryCore[T_DomainModelList, HighSpeedShaftList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

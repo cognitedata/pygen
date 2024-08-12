@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -303,7 +305,7 @@ def _create_implementation_1_v_1_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _Implementation1v1Query(QueryCore[T_DomainModelList, Implementation1v1List]):
+class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1List]):
     _view_id = Implementation1v1._view_id
     _result_cls = Implementation1v1
     _result_list_cls_end = Implementation1v1List
@@ -313,7 +315,7 @@ class _Implementation1v1Query(QueryCore[T_DomainModelList, Implementation1v1List
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

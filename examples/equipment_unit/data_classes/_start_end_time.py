@@ -19,7 +19,10 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
-    T_DomainModelList,
+    DomainModelList,
+    T_DomainRelationList,
+    EdgeQueryCore,
+    NodeQueryCore,
     QueryCore,
 )
 from ._unit_procedure import UnitProcedureWrite
@@ -375,7 +378,7 @@ def _validate_end_node(
         )
 
 
-class _StartEndTimeQuery(QueryCore[T_DomainModelList, StartEndTimeList]):
+class _StartEndTimeQuery(EdgeQueryCore[T_DomainRelationList, StartEndTimeList]):
     _view_id = StartEndTime._view_id
     _result_cls = StartEndTime
     _result_list_cls_end = StartEndTimeList
@@ -385,18 +388,22 @@ class _StartEndTimeQuery(QueryCore[T_DomainModelList, StartEndTimeList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._equipment_module import _EquipmentModuleQuery
         from ._work_order import _WorkOrderQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        if end_node_cls not in created_types:
+            self.end_node = end_node_cls(
+                created_types=created_types,
+                creation_path=creation_path,
+                client=client,
+                result_list_cls=result_list_cls,
+                expression=dm.query.NodeResultSetExpression(),
+            )
 
     def _assemble_filter(self) -> dm.filters.Filter:
         return dm.filters.HasData(views=[self._view_id])
-
-
-class StartEndTimeQuery(_StartEndTimeQuery[StartEndTimeList]):
-    def __init__(self, client: CogniteClient):
-        super().__init__(set(), [], client, StartEndTimeList)

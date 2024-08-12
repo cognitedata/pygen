@@ -23,11 +23,13 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -662,7 +664,7 @@ def _create_nacelle_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _NacelleQuery(QueryCore[T_DomainModelList, NacelleList]):
+class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
     _view_id = Nacelle._view_id
     _result_cls = Nacelle
     _result_list_cls_end = NacelleList
@@ -672,7 +674,7 @@ class _NacelleQuery(QueryCore[T_DomainModelList, NacelleList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._gearbox import _GearboxQuery

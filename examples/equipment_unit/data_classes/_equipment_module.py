@@ -23,11 +23,13 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -325,7 +327,7 @@ def _create_equipment_module_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _EquipmentModuleQuery(QueryCore[T_DomainModelList, EquipmentModuleList]):
+class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList]):
     _view_id = EquipmentModule._view_id
     _result_cls = EquipmentModule
     _result_list_cls_end = EquipmentModuleList
@@ -335,7 +337,7 @@ class _EquipmentModuleQuery(QueryCore[T_DomainModelList, EquipmentModuleList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

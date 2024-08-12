@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 from ._main_interface import MainInterface, MainInterfaceWrite
 
@@ -279,7 +281,7 @@ def _create_sub_interface_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _SubInterfaceQuery(QueryCore[T_DomainModelList, SubInterfaceList]):
+class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
     _view_id = SubInterface._view_id
     _result_cls = SubInterface
     _result_list_cls_end = SubInterfaceList
@@ -289,7 +291,7 @@ class _SubInterfaceQuery(QueryCore[T_DomainModelList, SubInterfaceList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

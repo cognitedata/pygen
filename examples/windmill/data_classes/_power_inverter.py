@@ -22,11 +22,13 @@ from ._core import (
     ResourcesWrite,
     TimeSeries,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -301,7 +303,7 @@ def _create_power_inverter_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _PowerInverterQuery(QueryCore[T_DomainModelList, PowerInverterList]):
+class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
     _view_id = PowerInverter._view_id
     _result_cls = PowerInverter
     _result_list_cls_end = PowerInverterList
@@ -311,7 +313,7 @@ class _PowerInverterQuery(QueryCore[T_DomainModelList, PowerInverterList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
 

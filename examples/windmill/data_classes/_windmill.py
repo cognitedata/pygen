@@ -21,11 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    DomainRelationList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
     QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -506,7 +508,7 @@ def _create_windmill_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _WindmillQuery(QueryCore[T_DomainModelList, WindmillList]):
+class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
     _view_id = Windmill._view_id
     _result_cls = Windmill
     _result_list_cls_end = WindmillList
@@ -516,7 +518,7 @@ class _WindmillQuery(QueryCore[T_DomainModelList, WindmillList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._blade import _BladeQuery

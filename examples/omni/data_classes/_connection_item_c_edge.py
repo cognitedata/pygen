@@ -19,9 +19,11 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
-    T_DomainList,
-    QueryCore,
+    DomainModelList,
+    T_DomainRelationList,
     EdgeQueryCore,
+    NodeQueryCore,
+    QueryCore,
 )
 
 if TYPE_CHECKING:
@@ -335,7 +337,7 @@ def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.Nod
         )
 
 
-class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeList]):
+class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainRelationList, ConnectionItemCEdgeList]):
     _view_id = ConnectionItemCEdge._view_id
     _result_cls = ConnectionItemCEdge
     _result_list_cls_end = ConnectionItemCEdgeList
@@ -345,13 +347,22 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
+        end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        if end_node_cls not in created_types:
+            self.end_node = end_node_cls(
+                created_types=created_types,
+                creation_path=creation_path,
+                client=client,
+                result_list_cls=result_list_cls,
+                expression=dm.query.NodeResultSetExpression(),
+            )
 
         if _ConnectionItemAQuery not in created_types:
             self.connection_item_a = _ConnectionItemAQuery(
@@ -379,8 +390,3 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
 
     def _assemble_filter(self) -> dm.filters.Filter:
         return dm.filters.HasData(views=[self._view_id])
-
-
-class ConnectionItemCEdgeQuery(_ConnectionItemCEdgeQuery[ConnectionItemCEdgeList]):
-    def __init__(self, client: CogniteClient):
-        super().__init__(set(), [], client, ConnectionItemCEdgeList)
