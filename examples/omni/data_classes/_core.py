@@ -739,8 +739,8 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._client = client
         self._result_list_cls = result_list_cls
         self._expression = expression or dm.query.NodeResultSetExpression()
-        self.external_id = StringFilter(self, ["node", "externalId"])  # type: ignore[type-var]
-        self.space = StringFilter(self, ["node", "space"])  # type: ignore[type-var]
+        self.external_id = StringFilter(self, ["node", "externalId"])
+        self.space = StringFilter(self, ["node", "space"])
 
     @abstractmethod
     def _assemble_filter(self) -> dm.filters.Filter:
@@ -1069,8 +1069,8 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 T_QueryCore = TypeVar("T_QueryCore")
 
 
-class Filtering(Generic[T_Core], ABC):
-    def __init__(self, query: T_Core, prop_path: list[str]):
+class Filtering(Generic[T_QueryCore], ABC):
+    def __init__(self, query: T_QueryCore, prop_path: list[str]):
         self._query = query
         self._prop_path = prop_path
         self._filter: dm.Filter | None = None
@@ -1083,13 +1083,13 @@ class Filtering(Generic[T_Core], ABC):
         return self._filter
 
 
-class StringFilter(Filtering[T_Core]):
-    def equals(self, value: str) -> T_Core:
+class StringFilter(Filtering[T_QueryCore]):
+    def equals(self, value: str) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Equals(self._prop_path, value)
         return self._query
 
-    def prefix(self, prefix: str) -> T_Core:
+    def prefix(self, prefix: str) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Prefix(self._prop_path, prefix)
         return self._query
