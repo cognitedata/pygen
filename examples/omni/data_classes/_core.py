@@ -740,6 +740,10 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._result_list_cls = result_list_cls
         self._expression = expression or dm.query.NodeResultSetExpression()
 
+    @abstractmethod
+    def _assemble_filter(self) -> dm.filters.Filter:
+        raise NotImplementedError()
+
 
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
@@ -789,17 +793,20 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 builder.append(node_step)
             elif isinstance(item, EdgeQueryCore):
-                raise NotImplementedError()
+                step = EdgeQueryStep(
+                    name=name,
+                    expression=cast(dm.query.EdgeResultSetExpression, item._expression),
+                    result_cls=item._result_cls,
+                )
+                step.expression.from_ = from_
+                step.expression.filter = item._assemble_filter()
+                builder.append(step)
             else:
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
 
             first = False
             from_ = name
         return builder
-
-    @abstractmethod
-    def _assemble_filter(self) -> dm.filters.Filter:
-        raise NotImplementedError()
 
 
 class EdgeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):

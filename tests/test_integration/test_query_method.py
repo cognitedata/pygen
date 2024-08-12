@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
@@ -39,6 +41,7 @@ def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
     assert len(item_bs) > 0
 
 
+@pytest.mark.skip("Missing test data")
 def test_query_across_edge_properties(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_f.query().outwards_multi.end_node.execute(limit=5)
 
