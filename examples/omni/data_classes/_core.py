@@ -733,18 +733,24 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
+        view_filter: dm.filters.Filter | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
         self._client = client
         self._result_list_cls = result_list_cls
+        self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.space = StringFilter(self, ["node", "space"])
+        self._filter_classes: list[Filtering] = [self.external_id, self.space]
 
-    @abstractmethod
     def _assemble_filter(self) -> dm.filters.Filter:
-        raise NotImplementedError()
+        filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
+        for filter_cls in self._filter_classes:
+            if item := filter_cls._as_filter():
+                filters.append(item)
+        return dm.filters.And(*filters)
 
 
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
