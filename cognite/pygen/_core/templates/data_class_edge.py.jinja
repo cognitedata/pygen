@@ -340,7 +340,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 created_types=created_types,
                 creation_path=creation_path,
                 client=client,
-                result_list_cls=result_list_cls,
+                result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
@@ -349,7 +349,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,{% if field.is_direct_relation %}
+                result_list_cls,  # type: ignore[type-var]{% if field.is_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
