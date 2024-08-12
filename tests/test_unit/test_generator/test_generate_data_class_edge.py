@@ -5,6 +5,21 @@ from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V2, OmniFiles
 
 
+def test_generate_connection_edge_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_type_by_view_id["edge"][
+        dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
+    ]
+    expected = OmniFiles.connection_edge_a.read_text()
+
+    # Act
+    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
 def test_generate_connection_item_c_edge(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["edge"][

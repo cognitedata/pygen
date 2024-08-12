@@ -20,7 +20,8 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
-    T_DomainList,
+    DomainModelList,
+    T_DomainRelationList,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -401,7 +402,7 @@ def _validate_end_node(
         )
 
 
-class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
+class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainRelationList, ConnectionEdgeAList]):
     _view_id = ConnectionEdgeA._view_id
     _result_cls = ConnectionEdgeA
     _result_list_cls_end = ConnectionEdgeAList
@@ -411,10 +412,13 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[DomainModelList] | type[DomainRelationList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
     ):
+        from ._connection_item_e import _ConnectionItemEQuery
+        from ._connection_item_g import _ConnectionItemGQuery
+
         super().__init__(created_types, creation_path, client, result_list_cls, expression)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
