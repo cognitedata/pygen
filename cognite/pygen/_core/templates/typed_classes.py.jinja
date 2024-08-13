@@ -25,10 +25,9 @@ class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sort
 class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_write_bases_classes }}):
     """This represents the writing format of {{ cls.doc_name }}.
 
-    It is used to when data is written to CDF.{% if cls.description %}
-
+    It is used to when data is written to CDF.
+{% if cls.description %}
     {{ cls.description }}{% endif %}
-
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.{% for field in cls.container_fields_sorted() %}
@@ -58,10 +57,9 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
     """This represents the reading format of {{ cls.doc_name }}.
 
-    It is used to when data is read from CDF.{% if cls.description %}
-
+    It is used to when data is read from CDF.
+{% if cls.description %}
     {{ cls.description }}{% endif %}
-
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
@@ -112,10 +110,9 @@ class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sort
 class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_write_bases_classes }}):
     """This represents the writing format of {{ cls.doc_name }}.
 
-    It is used to when data is written to CDF.{% if cls.description %}
-
+    It is used to when data is written to CDF.
+{% if cls.description %}
     {{ cls.description }}{% endif %}
-
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
@@ -150,10 +147,9 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
     """This represents the reading format of {{ cls.doc_name }}.
 
-    It is used to when data is read from CDF.{% if cls.description %}
-
+    It is used to when data is read from CDF.
+{% if cls.description %}
     {{ cls.description }}{% endif %}
-
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
