@@ -275,6 +275,7 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -284,10 +285,15 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
-        self._filter_classes.append(self.main_value)
+        self._filter_classes.extend(
+            [
+                self.main_value,
+            ]
+        )
 
 
 class MainInterfaceQuery(_MainInterfaceQuery[MainInterfaceList]):

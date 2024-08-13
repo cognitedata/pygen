@@ -734,6 +734,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
         view_filter: dm.filters.Filter | None = None,
+        connection_name: str | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
@@ -741,6 +742,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._result_list_cls = result_list_cls
         self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
+        self._connection_name = connection_name
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.space = StringFilter(self, ["node", "space"])
         self._filter_classes: list[Filtering] = [self.external_id, self.space]
@@ -751,6 +753,56 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             if item := filter_cls._as_filter():
                 filters.append(item)
         return dm.filters.And(*filters)
+
+    def _repr_html_(self) -> str:
+        nodes = [step._result_cls.__name__ for step in self._creation_path]
+        edges = [step._connection_name or "missing" for step in self._creation_path[1:]]
+        w = 120
+        h = 40
+        circles = "    \n".join(f'<circle cx="{i * w + 40}" cy="{h}" r="2" />' for i in range(len(nodes)))
+        circle_text = "    \n".join(
+            f'<text x="{i * w + 40}" y="{h}" dy="-10">{node}</text>' for i, node in enumerate(nodes)
+        )
+        arrows = "    \n".join(
+            f'<path id="arrow-line"  marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="M{i*w+40},{h}, {i*w + 150} {h}" />'
+            for i in range(len(edges))
+        )
+        arrow_text = "    \n".join(
+            f'<text x="{i*w+40+120/2}" y="{h}" dy="-5">{edge}</text>' for i, edge in enumerate(edges)
+        )
+
+        return f"""<h5>Query</h5>
+<div>
+<svg height="50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id='head'
+      orient="auto"
+      markerWidth='3'
+      markerHeight='4'
+      refX='0.1'
+      refY='2'
+    >
+      <path d='M0,0 V4 L2,2 Z' fill="black" />
+    </marker>
+  </defs>
+
+    {arrows}
+
+<g stroke="black" stroke-width="3" fill="black">
+    {circles}
+</g>
+<g font-size="10" font-family="sans-serif" text-anchor="middle">
+    {arrow_text}
+</g>
+<g font-size="10" font-family="sans-serif" text-anchor="middle">
+    {circle_text}
+</g>
+</svg>
+</div>
+<p>Call <em>.execute()</em> to return a list of {nodes[0].title()} and
+<em>.list()</em> to return a list of {nodes[-1].title()}.</p>
+"""
 
 
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):

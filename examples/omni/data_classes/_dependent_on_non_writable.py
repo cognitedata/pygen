@@ -359,6 +359,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery
 
@@ -369,6 +370,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _Implementation1NonWriteableQuery not in created_types:
@@ -381,10 +383,15 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "to_non_writable",
             )
 
         self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
-        self._filter_classes.append(self.a_value)
+        self._filter_classes.extend(
+            [
+                self.a_value,
+            ]
+        )
 
 
 class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):

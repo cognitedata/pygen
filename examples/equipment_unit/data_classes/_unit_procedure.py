@@ -28,7 +28,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -395,6 +394,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._equipment_module import _EquipmentModuleQuery
         from ._start_end_time import _StartEndTimeQuery
@@ -407,6 +407,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _StartEndTimeQuery not in created_types:
@@ -420,6 +421,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "work_orders",
             )
 
         if _StartEndTimeQuery not in created_types:
@@ -433,12 +435,17 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "work_units",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
         self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.append(self.type_)
+        self._filter_classes.extend(
+            [
+                self.name,
+                self.type_,
+            ]
+        )
 
 
 class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):

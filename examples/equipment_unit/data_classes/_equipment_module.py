@@ -30,8 +30,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    StringFilter,
-    StringFilter,
 )
 
 
@@ -341,6 +339,7 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -350,14 +349,19 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
-        self._filter_classes.append(self.description)
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
         self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.append(self.type_)
+        self._filter_classes.extend(
+            [
+                self.description,
+                self.name,
+                self.type_,
+            ]
+        )
 
 
 class EquipmentModuleQuery(_EquipmentModuleQuery[EquipmentModuleList]):

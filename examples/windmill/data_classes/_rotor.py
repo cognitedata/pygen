@@ -294,6 +294,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -303,6 +304,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
 

@@ -375,6 +375,7 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -384,6 +385,7 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
 

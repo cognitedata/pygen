@@ -24,7 +24,8 @@ from ._core import (
     T_DomainList,
     EdgeQueryCore,
     NodeQueryCore,
-    QueryCore,
+    QueryCore,{% if data_class.has_filtering_fields %}
+    {{ data_class.filtering_import }}{% endif %}
 ){% for class_ in unique_start_classes %}
 from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
 from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
@@ -331,10 +332,11 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),

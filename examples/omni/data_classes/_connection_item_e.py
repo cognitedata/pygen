@@ -452,6 +452,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._connection_item_d import _ConnectionItemDQuery
 
@@ -462,6 +463,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _ConnectionItemDQuery not in created_types:
@@ -474,6 +476,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     through=dm.ViewId("pygen-models", "ConnectionItemE", "1").as_property_ref("directReverseMulti"),
                     direction="inwards",
                 ),
+                "direct_reverse_multi",
             )
 
         if _ConnectionItemDQuery not in created_types:
@@ -486,6 +489,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     through=dm.ViewId("pygen-models", "ConnectionItemE", "1").as_property_ref("directReverseSingle"),
                     direction="inwards",
                 ),
+                "direct_reverse_single",
             )
 
         if _ConnectionItemDQuery not in created_types:
@@ -498,10 +502,15 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                     chain_to="destination",
                 ),
+                "inwards_single",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
+        self._filter_classes.extend(
+            [
+                self.name,
+            ]
+        )
 
 
 class ConnectionItemEQuery(_ConnectionItemEQuery[ConnectionItemEList]):

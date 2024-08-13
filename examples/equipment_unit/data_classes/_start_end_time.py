@@ -24,6 +24,7 @@ from ._core import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
+    TimestampFilter,
 )
 from ._unit_procedure import UnitProcedureWrite
 from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
@@ -391,11 +392,12 @@ class _StartEndTimeQuery(EdgeQueryCore[T_DomainList, StartEndTimeList]):
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._equipment_module import _EquipmentModuleQuery
         from ._work_order import _WorkOrderQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -405,5 +407,11 @@ class _StartEndTimeQuery(EdgeQueryCore[T_DomainList, StartEndTimeList]):
                 expression=dm.query.NodeResultSetExpression(),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.end_time = TimestampFilter(self, self._view_id.as_property_ref("end_time"))
+        self.start_time = TimestampFilter(self, self._view_id.as_property_ref("start_time"))
+        self._filter_classes.extend(
+            [
+                self.end_time,
+                self.start_time,
+            ]
+        )

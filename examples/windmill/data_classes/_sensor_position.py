@@ -455,6 +455,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -464,10 +465,15 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))
-        self._filter_classes.append(self.position)
+        self._filter_classes.extend(
+            [
+                self.position,
+            ]
+        )
 
 
 class SensorPositionQuery(_SensorPositionQuery[SensorPositionList]):

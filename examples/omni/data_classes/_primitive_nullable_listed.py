@@ -375,6 +375,7 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -384,6 +385,7 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
 

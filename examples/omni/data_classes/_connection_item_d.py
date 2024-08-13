@@ -495,6 +495,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._connection_item_e import _ConnectionItemEQuery
 
@@ -505,6 +506,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _ConnectionItemEQuery not in created_types:
@@ -517,6 +519,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     through=self._view_id.as_property_ref("directMulti"),
                     direction="outwards",
                 ),
+                "direct_multi",
             )
 
         if _ConnectionItemEQuery not in created_types:
@@ -529,6 +532,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     through=self._view_id.as_property_ref("directSingle"),
                     direction="outwards",
                 ),
+                "direct_single",
             )
 
         if _ConnectionItemEQuery not in created_types:
@@ -541,10 +545,15 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "outwards_single",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
+        self._filter_classes.extend(
+            [
+                self.name,
+            ]
+        )
 
 
 class ConnectionItemDQuery(_ConnectionItemDQuery[ConnectionItemDList]):

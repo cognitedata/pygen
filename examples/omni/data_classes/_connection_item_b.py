@@ -382,6 +382,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
 
@@ -392,6 +393,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _ConnectionItemAQuery not in created_types:
@@ -404,6 +406,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="inwards",
                     chain_to="destination",
                 ),
+                "inwards",
             )
 
         if _ConnectionItemBQuery not in created_types:
@@ -416,10 +419,15 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "self_edge",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
+        self._filter_classes.extend(
+            [
+                self.name,
+            ]
+        )
 
 
 class ConnectionItemBQuery(_ConnectionItemBQuery[ConnectionItemBList]):

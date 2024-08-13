@@ -25,6 +25,8 @@ from ._core import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
+    StringFilter,
+    TimestampFilter,
 )
 from ._connection_item_f import ConnectionItemFWrite
 from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
@@ -415,11 +417,12 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._connection_item_e import _ConnectionItemEQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -429,5 +432,13 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
                 expression=dm.query.NodeResultSetExpression(),
             )
 
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+        self.end_time = TimestampFilter(self, self._view_id.as_property_ref("endTime"))
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.start_time = TimestampFilter(self, self._view_id.as_property_ref("startTime"))
+        self._filter_classes.extend(
+            [
+                self.end_time,
+                self.name,
+                self.start_time,
+            ]
+        )

@@ -29,7 +29,6 @@ from ._core import (
     NodeQueryCore,
     FloatFilter,
     StringFilter,
-    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -522,6 +521,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._blade import _BladeQuery
         from ._metmast import _MetmastQuery
@@ -535,6 +535,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _BladeQuery not in created_types:
@@ -547,6 +548,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "blades",
             )
 
         if _MetmastQuery not in created_types:
@@ -559,6 +561,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "metmast",
             )
 
         if _NacelleQuery not in created_types:
@@ -571,6 +574,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     through=self._view_id.as_property_ref("nacelle"),
                     direction="outwards",
                 ),
+                "nacelle",
             )
 
         if _RotorQuery not in created_types:
@@ -583,14 +587,19 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     through=self._view_id.as_property_ref("rotor"),
                     direction="outwards",
                 ),
+                "rotor",
             )
 
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
-        self._filter_classes.append(self.capacity)
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.append(self.name)
         self.windfarm = StringFilter(self, self._view_id.as_property_ref("windfarm"))
-        self._filter_classes.append(self.windfarm)
+        self._filter_classes.extend(
+            [
+                self.capacity,
+                self.name,
+                self.windfarm,
+            ]
+        )
 
 
 class WindmillQuery(_WindmillQuery[WindmillList]):

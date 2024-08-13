@@ -675,6 +675,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._gearbox import _GearboxQuery
         from ._generator import _GeneratorQuery
@@ -689,6 +690,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         if _GearboxQuery not in created_types:
@@ -701,6 +703,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     through=self._view_id.as_property_ref("gearbox"),
                     direction="outwards",
                 ),
+                "gearbox",
             )
 
         if _GeneratorQuery not in created_types:
@@ -713,6 +716,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     through=self._view_id.as_property_ref("generator"),
                     direction="outwards",
                 ),
+                "generator",
             )
 
         if _HighSpeedShaftQuery not in created_types:
@@ -725,6 +729,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     through=self._view_id.as_property_ref("high_speed_shaft"),
                     direction="outwards",
                 ),
+                "high_speed_shaft",
             )
 
         if _MainShaftQuery not in created_types:
@@ -737,6 +742,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     through=self._view_id.as_property_ref("main_shaft"),
                     direction="outwards",
                 ),
+                "main_shaft",
             )
 
         if _PowerInverterQuery not in created_types:
@@ -749,6 +755,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     through=self._view_id.as_property_ref("power_inverter"),
                     direction="outwards",
                 ),
+                "power_inverter",
             )
 
 

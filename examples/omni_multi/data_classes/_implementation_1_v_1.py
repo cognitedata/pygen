@@ -28,8 +28,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    StringFilter,
-    StringFilter,
 )
 
 
@@ -319,6 +317,7 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -328,14 +327,19 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
-        self._filter_classes.append(self.main_value)
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
-        self._filter_classes.append(self.value_1)
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
-        self._filter_classes.append(self.value_2)
+        self._filter_classes.extend(
+            [
+                self.main_value,
+                self.value_1,
+                self.value_2,
+            ]
+        )
 
 
 class Implementation1v1Query(_Implementation1v1Query[Implementation1v1List]):

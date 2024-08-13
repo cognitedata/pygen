@@ -353,6 +353,7 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -362,16 +363,21 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.auto_increment_int_32 = IntFilter(self, self._view_id.as_property_ref("autoIncrementInt32"))
-        self._filter_classes.append(self.auto_increment_int_32)
         self.default_boolean = BooleanFilter(self, self._view_id.as_property_ref("defaultBoolean"))
-        self._filter_classes.append(self.default_boolean)
         self.default_float_32 = FloatFilter(self, self._view_id.as_property_ref("defaultFloat32"))
-        self._filter_classes.append(self.default_float_32)
         self.default_string = StringFilter(self, self._view_id.as_property_ref("defaultString"))
-        self._filter_classes.append(self.default_string)
+        self._filter_classes.extend(
+            [
+                self.auto_increment_int_32,
+                self.default_boolean,
+                self.default_float_32,
+                self.default_string,
+            ]
+        )
 
 
 class PrimitiveWithDefaultsQuery(_PrimitiveWithDefaultsQuery[PrimitiveWithDefaultsList]):

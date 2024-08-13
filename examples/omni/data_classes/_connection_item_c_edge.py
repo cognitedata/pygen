@@ -350,11 +350,12 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -374,6 +375,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "connection_item_a",
             )
 
         if _ConnectionItemBQuery not in created_types:
@@ -386,7 +388,5 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                     direction="outwards",
                     chain_to="destination",
                 ),
+                "connection_item_b",
             )
-
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])

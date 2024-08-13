@@ -28,7 +28,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    StringFilter,
 )
 from ._sub_interface import SubInterface, SubInterfaceWrite
 
@@ -292,6 +291,7 @@ class _Implementation2Query(NodeQueryCore[T_DomainModelList, Implementation2List
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -301,12 +301,17 @@ class _Implementation2Query(NodeQueryCore[T_DomainModelList, Implementation2List
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
-        self._filter_classes.append(self.main_value)
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
-        self._filter_classes.append(self.sub_value)
+        self._filter_classes.extend(
+            [
+                self.main_value,
+                self.sub_value,
+            ]
+        )
 
 
 class Implementation2Query(_Implementation2Query[Implementation2List]):

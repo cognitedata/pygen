@@ -31,11 +31,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    StringFilter,
-    StringFilter,
-    StringFilter,
-    StringFilter,
-    TimestampFilter,
     TimestampFilter,
 )
 
@@ -436,6 +431,7 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -445,22 +441,27 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.aggregation = StringFilter(self, self._view_id.as_property_ref("aggregation"))
-        self._filter_classes.append(self.aggregation)
         self.country = StringFilter(self, self._view_id.as_property_ref("country"))
-        self._filter_classes.append(self.country)
         self.instance = TimestampFilter(self, self._view_id.as_property_ref("instance"))
-        self._filter_classes.append(self.instance)
         self.market = StringFilter(self, self._view_id.as_property_ref("market"))
-        self._filter_classes.append(self.market)
         self.price_area = StringFilter(self, self._view_id.as_property_ref("priceArea"))
-        self._filter_classes.append(self.price_area)
         self.scenario = StringFilter(self, self._view_id.as_property_ref("scenario"))
-        self._filter_classes.append(self.scenario)
         self.start = TimestampFilter(self, self._view_id.as_property_ref("start"))
-        self._filter_classes.append(self.start)
+        self._filter_classes.extend(
+            [
+                self.aggregation,
+                self.country,
+                self.instance,
+                self.market,
+                self.price_area,
+                self.scenario,
+                self.start,
+            ]
+        )
 
 
 class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):

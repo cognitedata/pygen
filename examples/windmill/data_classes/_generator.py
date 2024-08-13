@@ -295,6 +295,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -304,6 +305,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
 

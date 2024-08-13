@@ -31,8 +31,6 @@ from ._core import (
     BooleanFilter,
     DateFilter,
     FloatFilter,
-    FloatFilter,
-    IntFilter,
     IntFilter,
     StringFilter,
     TimestampFilter,
@@ -426,6 +424,7 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
     ):
 
         super().__init__(
@@ -435,24 +434,29 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
             result_list_cls,
             expression,
             dm.filters.HasData(views=[self._view_id]),
+            connection_name,
         )
 
         self.boolean = BooleanFilter(self, self._view_id.as_property_ref("boolean"))
-        self._filter_classes.append(self.boolean)
         self.date = DateFilter(self, self._view_id.as_property_ref("date"))
-        self._filter_classes.append(self.date)
         self.float_32 = FloatFilter(self, self._view_id.as_property_ref("float32"))
-        self._filter_classes.append(self.float_32)
         self.float_64 = FloatFilter(self, self._view_id.as_property_ref("float64"))
-        self._filter_classes.append(self.float_64)
         self.int_32 = IntFilter(self, self._view_id.as_property_ref("int32"))
-        self._filter_classes.append(self.int_32)
         self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
-        self._filter_classes.append(self.int_64)
         self.text = StringFilter(self, self._view_id.as_property_ref("text"))
-        self._filter_classes.append(self.text)
         self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
-        self._filter_classes.append(self.timestamp)
+        self._filter_classes.extend(
+            [
+                self.boolean,
+                self.date,
+                self.float_32,
+                self.float_64,
+                self.int_32,
+                self.int_64,
+                self.text,
+                self.timestamp,
+            ]
+        )
 
 
 class EmptyQuery(_EmptyQuery[EmptyList]):

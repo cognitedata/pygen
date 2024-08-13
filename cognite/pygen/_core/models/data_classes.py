@@ -202,7 +202,7 @@ class DataClass:
     @property
     def filtering_import(self) -> str:
         return "\n    ".join(
-            f"{cls_name}," for cls_name in sorted(field_.filtering_cls for field_ in self.filtering_fields)
+            f"{cls_name}," for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
         )
 
     @property
