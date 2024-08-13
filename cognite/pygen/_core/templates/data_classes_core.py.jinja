@@ -1053,12 +1053,18 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         return all(expression.is_finished for expression in self)
 
     def _unpack(self) -> T_DomainModelList:
-        if len(self) == 0:
+        selected = [step for step in self if step.select is not None]
+        if len(selected) == 0:
             return self._result_list_cls([])
-        elif len(self) == 1:
+        elif len(selected) == 1:
             # Validated in the append method
-            first_step = cast(NodeQueryStep, self[0])
-            return self._result_list_cls(first_step.unpack().values())
+            if self._return_step == "first":
+                selected_step = cast(NodeQueryStep, self[0])
+            elif self._return_step == "last":
+                selected_step = cast(NodeQueryStep, self[-1])
+            else:
+                raise ValueError(f"Invalid return_step: {self._return_step}")
+            return self._result_list_cls(selected_step.unpack().values())
         # More than one step, we need to unpack the nodes and edges
         nodes_by_from: dict[str | None, dict[dm.NodeId | str, DomainModel]] = defaultdict(dict)
         edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge | DomainRelation]]] = defaultdict(dict)

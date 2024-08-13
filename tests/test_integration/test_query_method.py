@@ -7,9 +7,11 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as dc
+    from windmill import WindmillClient
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
+    from windmill_pydantic_v1 import WindmillClient
 
 
 def test_query_across_direct_relation(omni_client: OmniClient) -> None:
@@ -56,3 +58,9 @@ def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
         omni_client.connection_item_a.query().outwards.inwards.outwards.execute(limit=5)
 
     assert "Circular" in str(e.value)
+
+
+def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
+    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list()
+
+    assert len(items) > 0
