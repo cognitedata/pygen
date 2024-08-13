@@ -91,8 +91,8 @@ class DataClass:
 
         variable_name = create_name(base_name, data_class.variable)
         variable_list = create_name(base_name, data_class.variable_list)
-        doc_name = to_words(base_name, singularize=True)
-        doc_list_name = to_words(base_name, pluralize=True)
+        doc_name = to_words(base_name, singularize=True).replace("cognite", "Cognite")
+        doc_list_name = to_words(base_name, pluralize=True).replace("cognite", "Cognite")
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
         raw_file_name = create_name(base_name, data_class.file)
