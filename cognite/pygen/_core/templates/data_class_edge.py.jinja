@@ -362,9 +362,10 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                     direction="{{ field.edge_direction }}",
                     chain_to="destination",
                 ),{% endif %}
+                "{{ field.name }}",
             ){% endif %}
-{% endfor %}
-
-
-    def _assemble_filter(self) -> dm.filters.Filter:
-        return dm.filters.HasData(views=[self._view_id])
+{% endfor %}{% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
+        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
+        self._filter_classes.extend([{% for field in data_class.filtering_fields %}
+            self.{{ field.name }},{% endfor %}
+        ]){% endif %}

@@ -519,10 +519,13 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                     direction="{{ field.edge_direction }}",
                     chain_to="destination",
                 ),{% endif %}
+                "{{ field.name }}",
             ){% endif %}
-{% endfor %}{% for field in data_class.filtering_fields %}
-        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
-        self._filter_classes.append(self.{{ field.name }}){% endfor %}
+{% endfor %}{% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
+        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
+        self._filter_classes.extend([{% for field in data_class.filtering_fields %}
+            self.{{ field.name }},{% endfor %}
+        ]){% endif %}
 
 
 class {{ data_class.query_cls_name }}(_{{ data_class.query_cls_name }}[{{ data_class.read_list_name }}]):
