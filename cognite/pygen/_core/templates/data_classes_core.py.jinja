@@ -401,9 +401,6 @@ class DomainModelWrite(DomainModelCore{% if is_pydantic_v2 %}, extra="ignore", p
             and data.get("externalId") is None
         ):
             data["external_id"] = cls.external_id_factory(cls, data)
-        return data
-        if isinstance(data, dict) and cls.external_id_factory is not None:
-            data["external_id"] = cls.external_id_factory(cls, data)
         return data{% else %}
     @root_validator(pre=True, allow_reuse=True)
     def create_external_id_if_factory(cls, data: Any) -> Any:
