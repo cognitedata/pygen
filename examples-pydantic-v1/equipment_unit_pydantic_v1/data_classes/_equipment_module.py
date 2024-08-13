@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import TimeSeries
 from pydantic import Field
 from pydantic import validator, root_validator
@@ -21,10 +21,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
 )
 
 
@@ -328,3 +332,45 @@ def _create_equipment_module_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList]):
+    _view_id = EquipmentModule._view_id
+    _result_cls = EquipmentModule
+    _result_list_cls_end = EquipmentModuleList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
+        self._filter_classes.extend(
+            [
+                self.description,
+                self.name,
+                self.type_,
+            ]
+        )
+
+
+class EquipmentModuleQuery(_EquipmentModuleQuery[EquipmentModuleList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, EquipmentModuleList)

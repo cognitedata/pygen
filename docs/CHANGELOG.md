@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.30] - 24-08-13
+### Added
+- New approach to querying. This is accessed through the `.query()` method
+  on the generated SDK. This is a simplification to make it easier to create
+  complex queries. The new approach is currently experimental and may  change
+  based on feedback. What the new approach supports:
+  - Traversing any connection, including edges, direct relations, and reverse direct relations.
+  - Filtering on properties that are not `JSON` or list.
+  - Return either the entire query, `.execute()`, or only the last node, `.list()`.
+
 ## [0.99.29] - 24-08-10
 ### Added
 - Support for **reverse direct relations**. This includes

@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -25,18 +31,15 @@ from windmill_pydantic_v1.data_classes import (
     Rotor,
 )
 from windmill_pydantic_v1.data_classes._windmill import (
+    WindmillQuery,
     _WINDMILL_PROPERTIES_BY_FIELD,
     _create_windmill_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .windmill_blades import WindmillBladesAPI
 from .windmill_metmast import WindmillMetmastAPI
@@ -533,6 +536,11 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             limit,
             filter_,
         )
+
+    def query(self) -> WindmillQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return WindmillQuery(self._client)
 
     def list(
         self,

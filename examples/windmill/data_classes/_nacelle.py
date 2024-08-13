@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 from pydantic import field_validator, model_validator
@@ -22,10 +22,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
 )
 
 if TYPE_CHECKING:
@@ -658,3 +661,104 @@ def _create_nacelle_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
+    _view_id = Nacelle._view_id
+    _result_cls = Nacelle
+    _result_list_cls_end = NacelleList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+        from ._gearbox import _GearboxQuery
+        from ._generator import _GeneratorQuery
+        from ._high_speed_shaft import _HighSpeedShaftQuery
+        from ._main_shaft import _MainShaftQuery
+        from ._power_inverter import _PowerInverterQuery
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        if _GearboxQuery not in created_types:
+            self.gearbox = _GearboxQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("gearbox"),
+                    direction="outwards",
+                ),
+                "gearbox",
+            )
+
+        if _GeneratorQuery not in created_types:
+            self.generator = _GeneratorQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("generator"),
+                    direction="outwards",
+                ),
+                "generator",
+            )
+
+        if _HighSpeedShaftQuery not in created_types:
+            self.high_speed_shaft = _HighSpeedShaftQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("high_speed_shaft"),
+                    direction="outwards",
+                ),
+                "high_speed_shaft",
+            )
+
+        if _MainShaftQuery not in created_types:
+            self.main_shaft = _MainShaftQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("main_shaft"),
+                    direction="outwards",
+                ),
+                "main_shaft",
+            )
+
+        if _PowerInverterQuery not in created_types:
+            self.power_inverter = _PowerInverterQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("power_inverter"),
+                    direction="outwards",
+                ),
+                "power_inverter",
+            )
+
+
+class NacelleQuery(_NacelleQuery[NacelleList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, NacelleList)

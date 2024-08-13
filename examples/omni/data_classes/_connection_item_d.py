@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -20,10 +20,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -477,3 +481,81 @@ def _create_connection_item_d_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList]):
+    _view_id = ConnectionItemD._view_id
+    _result_cls = ConnectionItemD
+    _result_list_cls_end = ConnectionItemDList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+        from ._connection_item_e import _ConnectionItemEQuery
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        if _ConnectionItemEQuery not in created_types:
+            self.direct_multi = _ConnectionItemEQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("directMulti"),
+                    direction="outwards",
+                ),
+                "direct_multi",
+            )
+
+        if _ConnectionItemEQuery not in created_types:
+            self.direct_single = _ConnectionItemEQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("directSingle"),
+                    direction="outwards",
+                ),
+                "direct_single",
+            )
+
+        if _ConnectionItemEQuery not in created_types:
+            self.outwards_single = _ConnectionItemEQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                "outwards_single",
+            )
+
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self._filter_classes.extend(
+            [
+                self.name,
+            ]
+        )
+
+
+class ConnectionItemDQuery(_ConnectionItemDQuery[ConnectionItemDList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, ConnectionItemDList)

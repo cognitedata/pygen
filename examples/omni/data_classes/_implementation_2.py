@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -20,10 +20,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
 )
 from ._sub_interface import SubInterface, SubInterfaceWrite
 
@@ -273,3 +277,43 @@ def _create_implementation_2_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _Implementation2Query(NodeQueryCore[T_DomainModelList, Implementation2List]):
+    _view_id = Implementation2._view_id
+    _result_cls = Implementation2
+    _result_list_cls_end = Implementation2List
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
+        self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
+        self._filter_classes.extend(
+            [
+                self.main_value,
+                self.sub_value,
+            ]
+        )
+
+
+class Implementation2Query(_Implementation2Query[Implementation2List]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, Implementation2List)

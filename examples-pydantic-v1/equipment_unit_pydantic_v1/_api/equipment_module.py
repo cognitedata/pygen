@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from equipment_unit_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from equipment_unit_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -21,18 +27,15 @@ from equipment_unit_pydantic_v1.data_classes import (
     EquipmentModuleTextFields,
 )
 from equipment_unit_pydantic_v1.data_classes._equipment_module import (
+    EquipmentModuleQuery,
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
     _create_equipment_module_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
 from .equipment_module_query import EquipmentModuleQueryAPI
@@ -475,6 +478,11 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             limit,
             filter_,
         )
+
+    def query(self) -> EquipmentModuleQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return EquipmentModuleQuery(self._client)
 
     def list(
         self,

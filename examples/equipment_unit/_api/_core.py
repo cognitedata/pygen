@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import math
-from abc import ABC, abstractmethod
-from itertools import groupby
-
+from abc import ABC
 from collections import defaultdict
-from collections.abc import Sequence, Collection, MutableSequence, Iterable
+from collections.abc import Sequence
+from itertools import groupby
 from typing import (
     Generic,
     Literal,
@@ -15,15 +13,15 @@ from typing import (
     SupportsIndex,
     TypeVar,
     overload,
-    cast,
     ClassVar,
 )
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Instance, InstanceSort, InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
 
+from equipment_unit import data_classes
 from equipment_unit.data_classes._core import (
     DomainModel,
     DomainModelWrite,
@@ -38,20 +36,15 @@ from equipment_unit.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
-    DomainRelation,
-    DEFAULT_INSTANCE_SPACE,
-    as_node_id,
-    _NotSetSentinel,
+    QueryBuilder,
+    NodeQueryStep,
+    EdgeQueryStep,
 )
-from equipment_unit import data_classes
-
 
 DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
-INSTANCE_QUERY_LIMIT = 1_000
-# This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
-ACTUAL_INSTANCE_QUERY_LIMIT = 10_000
 IN_FILTER_LIMIT = 5_000
+INSTANCE_QUERY_LIMIT = 1_000
 
 Aggregations = Literal["avg", "count", "max", "min", "sum"]
 
@@ -447,241 +440,6 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
     ) -> T_DomainRelationList:
         edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
-
-
-class QueryStep:
-    def __init__(
-        self,
-        name: str,
-        expression: dm.query.ResultSetExpression,
-        max_retrieve_limit: int = -1,
-        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
-    ):
-        self.name = name
-        self.expression = expression
-        self.max_retrieve_limit = max_retrieve_limit
-        if select is _NotSetSentinel:
-            self.select = self._default_select()
-        else:
-            self.select = select  # type: ignore[assignment]
-        self.cursor: str | None = None
-        self.total_retrieved: int = 0
-        self.last_batch_count: int = 0
-        self.results: list[Instance] = []
-
-    @abstractmethod
-    def _default_select(self) -> dm.query.Select:
-        raise NotImplementedError()
-
-    @property
-    def from_(self) -> str | None:
-        return self.expression.from_
-
-    @property
-    def is_single_direct_relation(self) -> bool:
-        return isinstance(self.expression, dm.query.NodeResultSetExpression) and self.expression.through is not None
-
-    def update_expression_limit(self) -> None:
-        if self.is_unlimited:
-            self.expression.limit = ACTUAL_INSTANCE_QUERY_LIMIT
-        else:
-            self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
-
-    @property
-    def is_unlimited(self) -> bool:
-        return self.max_retrieve_limit in {None, -1, math.inf}
-
-    @property
-    def is_finished(self) -> bool:
-        return (
-            (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
-            or self.cursor is None
-            or self.last_batch_count == 0
-            # Single direct relations are dependent on the parent node,
-            # so we assume that the parent node is the limiting factor.
-            or self.is_single_direct_relation
-        )
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
-
-
-class NodeQueryStep(QueryStep):
-    def __init__(
-        self,
-        name: str,
-        expression: dm.query.NodeResultSetExpression,
-        result_cls: type[DomainModel],
-        max_retrieve_limit: int = -1,
-        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
-    ):
-        self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
-
-    def _default_select(self) -> dm.query.Select:
-        return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
-
-    def unpack(self) -> dict[dm.NodeId | str, DomainModel]:
-        return {
-            (
-                instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
-            ): self.result_cls.from_instance(instance)
-            for instance in cast(list[dm.Node], self.results)
-        }
-
-
-class EdgeQueryStep(QueryStep):
-    def __init__(
-        self,
-        name: str,
-        expression: dm.query.EdgeResultSetExpression,
-        result_cls: type[DomainRelation] | None = None,
-        max_retrieve_limit: int = -1,
-        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
-    ):
-        self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
-
-    def _default_select(self) -> dm.query.Select:
-        if self.result_cls is None:
-            return dm.query.Select()
-        else:
-            return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
-
-    def unpack(self) -> dict[dm.NodeId, list[dm.Edge | DomainRelation]]:
-        output: dict[dm.NodeId, list[dm.Edge | DomainRelation]] = defaultdict(list)
-        for edge in cast(list[dm.Edge], self.results):
-            edge_source = edge.start_node if self.expression.direction == "outwards" else edge.end_node
-            value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
-            output[as_node_id(edge_source)].append(value)  # type: ignore[arg-type]
-        return output
-
-
-class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
-    """This is a helper class to build and execute a query. It is responsible for
-    doing the paging of the query and keeping track of the results."""
-
-    def __init__(self, result_cls: type[T_DomainModelList], steps: Collection[QueryStep] | None = None):
-        super().__init__(steps or [])
-        self._result_list_cls = result_cls
-
-    def _reset(self):
-        for expression in self:
-            expression.total_retrieved = 0
-            expression.cursor = None
-            expression.results = []
-
-    def _update_expression_limits(self) -> None:
-        for expression in self:
-            expression.update_expression_limit()
-
-    def _build(self) -> dm.query.Query:
-        with_ = {expression.name: expression.expression for expression in self}
-        select = {expression.name: expression.select for expression in self if expression.select is not None}
-        cursors = self._cursors
-
-        return dm.query.Query(with_=with_, select=select, cursors=cursors)
-
-    @property
-    def _cursors(self) -> dict[str, str | None]:
-        return {expression.name: expression.cursor for expression in self}
-
-    def _update(self, batch: dm.query.QueryResult):
-        for expression in self:
-            if expression.name not in batch:
-                continue
-            expression.last_batch_count = len(batch[expression.name])
-            expression.total_retrieved += expression.last_batch_count
-            expression.cursor = batch.cursors.get(expression.name)
-            expression.results.extend(batch[expression.name].data)
-
-    @property
-    def _is_finished(self):
-        return all(expression.is_finished for expression in self)
-
-    def _unpack(self) -> T_DomainModelList:
-        if len(self) == 0:
-            return self._result_list_cls([])
-        elif len(self) == 1:
-            # Validated in the append method
-            first_step = cast(NodeQueryStep, self[0])
-            return self._result_list_cls(first_step.unpack().values())
-        # More than one step, we need to unpack the nodes and edges
-        nodes_by_from: dict[str | None, dict[dm.NodeId | str, DomainModel]] = defaultdict(dict)
-        edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge | DomainRelation]]] = defaultdict(dict)
-        for step in reversed(self):
-            # Validated in the append method
-            from_ = cast(str, step.from_)
-            if isinstance(step, EdgeQueryStep):
-                edges_by_from[from_].update(step.unpack())
-                if step.name in nodes_by_from:
-                    nodes_by_from[from_].update(nodes_by_from[step.name])
-                    del nodes_by_from[step.name]
-            elif isinstance(step, NodeQueryStep):
-                unpacked = step.unpack()
-                nodes_by_from[from_].update(unpacked)
-                if step.name in nodes_by_from or step.name in edges_by_from:
-                    step.result_cls._update_connections(
-                        unpacked,  # type: ignore[arg-type]
-                        nodes_by_from.get(step.name, {}),
-                        edges_by_from.get(step.name, {}),
-                    )
-        return self._result_list_cls(nodes_by_from[None].values())
-
-    def execute(self, client: CogniteClient) -> T_DomainModelList:
-        self._reset()
-        query = self._build()
-
-        while True:
-            self._update_expression_limits()
-            query.cursors = self._cursors
-            batch = client.data_modeling.instances.query(query)
-            self._update(batch)
-            if self._is_finished:
-                break
-        return self._unpack()
-
-    def get_from(self) -> str | None:
-        if len(self) == 0:
-            return None
-        return self[-1].name
-
-    def create_name(self, from_: str | None) -> str:
-        if from_ is None:
-            return "0"
-        return f"{from_}_{len(self)}"
-
-    def append(self, __object: QueryStep, /) -> None:
-        # Extra validation to ensure all assumptions are met
-        if len(self) == 0:
-            if __object.from_ is not None:
-                raise ValueError("The first step should not have a 'from_' value")
-            if not isinstance(__object, NodeQueryStep):
-                raise ValueError("The first step should be a NodeQueryStep")
-        else:
-            if __object.from_ is None:
-                raise ValueError("The 'from_' value should be set")
-        super().append(__object)
-
-    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
-        for item in __iterable:
-            self.append(item)
-
-    # The implementations below are to get proper type hints
-    def __iter__(self) -> Iterator[QueryStep]:
-        return super().__iter__()
-
-    @overload
-    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
-
-    @overload
-    def __getitem__(self, item: slice) -> QueryBuilder[T_DomainModelList]: ...
-
-    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
-        value = super().__getitem__(item)
-        if isinstance(item, slice):
-            return QueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type]
-        return cast(QueryStep, value)
 
 
 class QueryAPI(Generic[T_DomainModelList]):

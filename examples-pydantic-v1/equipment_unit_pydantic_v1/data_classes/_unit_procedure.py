@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import validator, root_validator
 
@@ -20,10 +20,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -376,3 +380,74 @@ def _create_unit_procedure_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
+    _view_id = UnitProcedure._view_id
+    _result_cls = UnitProcedure
+    _result_list_cls_end = UnitProcedureList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+        from ._equipment_module import _EquipmentModuleQuery
+        from ._start_end_time import _StartEndTimeQuery
+        from ._work_order import _WorkOrderQuery
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        if _StartEndTimeQuery not in created_types:
+            self.work_orders = _StartEndTimeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                _WorkOrderQuery,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                "work_orders",
+            )
+
+        if _StartEndTimeQuery not in created_types:
+            self.work_units = _StartEndTimeQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                _EquipmentModuleQuery,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                "work_units",
+            )
+
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
+        self._filter_classes.extend(
+            [
+                self.name,
+                self.type_,
+            ]
+        )
+
+
+class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, UnitProcedureList)

@@ -183,6 +183,29 @@ class DataClass:
             return "DomainModelWrite"
 
     @property
+    def query_cls_name(self) -> str:
+        """The name of the class used to create queries for this data class."""
+        return f"{self.read_name}Query"
+
+    @property
+    def view_id_str(self) -> str:
+        return f'dm.ViewId("{self.view_id.space}", "{self.view_id.external_id}", "{self.view_id.version}")'
+
+    @property
+    def has_filtering_fields(self) -> bool:
+        return any(field_.support_filtering for field_ in self.fields_of_type(PrimitiveField))
+
+    @property
+    def filtering_fields(self) -> Iterable[PrimitiveField]:
+        return (field_ for field_ in self.fields_of_type(PrimitiveField) if field_.support_filtering)
+
+    @property
+    def filtering_import(self) -> str:
+        return "\n    ".join(
+            f"{cls_name}," for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
+        )
+
+    @property
     def typed_read_bases_classes(self) -> str:
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)

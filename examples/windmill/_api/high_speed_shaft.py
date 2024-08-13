@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from windmill.data_classes import (
     HighSpeedShaftWriteList,
 )
 from windmill.data_classes._high_speed_shaft import (
+    HighSpeedShaftQuery,
     _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
     _create_high_speed_shaft_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .high_speed_shaft_bending_moment_y import HighSpeedShaftBendingMomentYAPI
 from .high_speed_shaft_bending_monent_x import HighSpeedShaftBendingMonentXAPI
@@ -317,6 +320,11 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             limit,
             filter_,
         )
+
+    def query(self) -> HighSpeedShaftQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return HighSpeedShaftQuery(self._client)
 
     def list(
         self,

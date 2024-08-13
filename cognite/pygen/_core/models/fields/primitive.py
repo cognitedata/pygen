@@ -89,6 +89,29 @@ class PrimitiveField(BasePrimitiveField):
     default: str | int | dict | None = None
 
     @property
+    def support_filtering(self) -> bool:
+        return isinstance(
+            self.type_, (dm.Int32, dm.Int64, dm.Float32, dm.Float64, dm.Boolean, dm.Text, dm.Date, dm.Timestamp)
+        )
+
+    @property
+    def filtering_cls(self) -> str:
+        if isinstance(self.type_, (dm.Int32, dm.Int64)):
+            return "IntFilter"
+        elif isinstance(self.type_, (dm.Float32, dm.Float64)):
+            return "FloatFilter"
+        elif isinstance(self.type_, dm.Boolean):
+            return "BooleanFilter"
+        elif isinstance(self.type_, dm.Text):
+            return "StringFilter"
+        elif isinstance(self.type_, dm.Date):
+            return "DateFilter"
+        elif isinstance(self.type_, dm.Timestamp):
+            return "TimestampFilter"
+        else:
+            raise ValueError(f"type {self.type_} is not supported for filtering")
+
+    @property
     def default_code(self) -> str:
         if self.default is None:
             return "None"

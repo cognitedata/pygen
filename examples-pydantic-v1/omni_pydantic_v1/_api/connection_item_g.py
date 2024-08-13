@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -26,18 +32,15 @@ from omni_pydantic_v1.data_classes import (
     ConnectionItemF,
 )
 from omni_pydantic_v1.data_classes._connection_item_g import (
+    ConnectionItemGQuery,
     _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
     _create_connection_item_g_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
 from .connection_item_g_query import ConnectionItemGQueryAPI
@@ -437,6 +440,11 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             limit,
             filter_,
         )
+
+    def query(self) -> ConnectionItemGQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return ConnectionItemGQuery(self._client)
 
     def list(
         self,

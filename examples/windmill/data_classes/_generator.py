@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import field_validator, model_validator
 
@@ -21,10 +21,13 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
 )
 
 
@@ -278,3 +281,34 @@ def _create_generator_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
+    _view_id = Generator._view_id
+    _result_cls = Generator
+    _result_list_cls_end = GeneratorList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+
+class GeneratorQuery(_GeneratorQuery[GeneratorList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, GeneratorList)

@@ -4,7 +4,7 @@ import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import TimeSeries
 from pydantic import Field
 from pydantic import validator, root_validator
@@ -22,10 +22,15 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
+    TimestampFilter,
 )
 
 
@@ -419,3 +424,53 @@ def _create_scenario_instance_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceList]):
+    _view_id = ScenarioInstance._view_id
+    _result_cls = ScenarioInstance
+    _result_list_cls_end = ScenarioInstanceList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        self.aggregation = StringFilter(self, self._view_id.as_property_ref("aggregation"))
+        self.country = StringFilter(self, self._view_id.as_property_ref("country"))
+        self.instance = TimestampFilter(self, self._view_id.as_property_ref("instance"))
+        self.market = StringFilter(self, self._view_id.as_property_ref("market"))
+        self.price_area = StringFilter(self, self._view_id.as_property_ref("priceArea"))
+        self.scenario = StringFilter(self, self._view_id.as_property_ref("scenario"))
+        self.start = TimestampFilter(self, self._view_id.as_property_ref("start"))
+        self._filter_classes.extend(
+            [
+                self.aggregation,
+                self.country,
+                self.instance,
+                self.market,
+                self.price_area,
+                self.scenario,
+                self.start,
+            ]
+        )
+
+
+class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, ScenarioInstanceList)

@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from equipment_unit.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -27,18 +33,15 @@ from equipment_unit.data_classes import (
     WorkOrder,
 )
 from equipment_unit.data_classes._unit_procedure import (
+    UnitProcedureQuery,
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
     _create_unit_procedure_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
 from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
@@ -475,6 +478,11 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             limit,
             filter_,
         )
+
+    def query(self) -> UnitProcedureQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return UnitProcedureQuery(self._client)
 
     def list(
         self,

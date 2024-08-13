@@ -29,7 +29,7 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.99.29
+        pygen = 0.99.30
         cognite-sdk = 7.54.4
         pydantic = 1.10.7
 
@@ -47,7 +47,7 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.29"
+        client.config.client_name = "CognitePygen:0.99.30"
 
         self._client = client
 

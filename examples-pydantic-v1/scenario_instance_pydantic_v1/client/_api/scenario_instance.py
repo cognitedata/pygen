@@ -9,7 +9,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from scenario_instance_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
+from scenario_instance_pydantic_v1.client.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from scenario_instance_pydantic_v1.client.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -22,18 +28,15 @@ from scenario_instance_pydantic_v1.client.data_classes import (
     ScenarioInstanceTextFields,
 )
 from scenario_instance_pydantic_v1.client.data_classes._scenario_instance import (
+    ScenarioInstanceQuery,
     _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
     _create_scenario_instance_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
 from .scenario_instance_query import ScenarioInstanceQueryAPI
@@ -598,6 +601,11 @@ class ScenarioInstanceAPI(
             limit,
             filter_,
         )
+
+    def query(self) -> ScenarioInstanceQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return ScenarioInstanceQuery(self._client)
 
     def list(
         self,

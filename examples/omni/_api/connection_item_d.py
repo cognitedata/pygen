@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -22,18 +28,15 @@ from omni.data_classes import (
     ConnectionItemE,
 )
 from omni.data_classes._connection_item_d import (
+    ConnectionItemDQuery,
     _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
     _create_connection_item_d_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
 from .connection_item_d_query import ConnectionItemDQueryAPI
@@ -446,6 +449,11 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             limit,
             filter_,
         )
+
+    def query(self) -> ConnectionItemDQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return ConnectionItemDQuery(self._client)
 
     def list(
         self,

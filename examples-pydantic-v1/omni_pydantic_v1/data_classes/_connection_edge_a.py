@@ -4,7 +4,7 @@ import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from ._core import (
@@ -20,6 +20,13 @@ from ._core import (
     DomainRelationWriteList,
     GraphQLCore,
     ResourcesWrite,
+    DomainModelList,
+    T_DomainList,
+    EdgeQueryCore,
+    NodeQueryCore,
+    QueryCore,
+    StringFilter,
+    TimestampFilter,
 )
 from ._connection_item_f import ConnectionItemFWrite
 from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
@@ -394,4 +401,44 @@ def _validate_end_node(
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
+
+
+class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
+    _view_id = ConnectionEdgeA._view_id
+    _result_cls = ConnectionEdgeA
+    _result_list_cls_end = ConnectionEdgeAList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainList],
+        end_node_cls: type[NodeQueryCore],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+        from ._connection_item_e import _ConnectionItemEQuery
+        from ._connection_item_g import _ConnectionItemGQuery
+
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        if end_node_cls not in created_types:
+            self.end_node = end_node_cls(
+                created_types=created_types.copy(),
+                creation_path=self._creation_path,
+                client=client,
+                result_list_cls=result_list_cls,  # type: ignore[type-var]
+                expression=dm.query.NodeResultSetExpression(),
+            )
+
+        self.end_time = TimestampFilter(self, self._view_id.as_property_ref("endTime"))
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.start_time = TimestampFilter(self, self._view_id.as_property_ref("startTime"))
+        self._filter_classes.extend(
+            [
+                self.end_time,
+                self.name,
+                self.start_time,
+            ]
         )

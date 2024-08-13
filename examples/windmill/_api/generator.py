@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from windmill.data_classes import (
     GeneratorWriteList,
 )
 from windmill.data_classes._generator import (
+    GeneratorQuery,
     _GENERATOR_PROPERTIES_BY_FIELD,
     _create_generator_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .generator_generator_speed_controller import GeneratorGeneratorSpeedControllerAPI
 from .generator_generator_speed_controller_reference import GeneratorGeneratorSpeedControllerReferenceAPI
@@ -315,6 +318,11 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
             limit,
             filter_,
         )
+
+    def query(self) -> GeneratorQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return GeneratorQuery(self._client)
 
     def list(
         self,
