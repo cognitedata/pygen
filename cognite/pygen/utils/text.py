@@ -210,8 +210,16 @@ def to_words(string: str, pluralize: bool = False, singularize: bool = False):
         >>> to_words('APM_Activities', singularize=True)
         'apm activity'
     """
-    return to_snake(string, pluralize, singularize).replace("_", " ")
+    words = to_snake(string, pluralize, singularize).replace("_", " ")
+    for word, fix in _SPECIAL_WORD_FIXES.items():
+        words = words.replace(word, fix)
+    return words
 
+
+_SPECIAL_WORD_FIXES = {
+    "cognite": "Cognite",
+    " 3 d ": " 3D ",
+}
 
 # These are words which are not pluralized as we want to by inflect
 # Fox example, "person" becomes "people" instead of "persons", which is more grammatically correct, however,
