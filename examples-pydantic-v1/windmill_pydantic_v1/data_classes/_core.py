@@ -376,7 +376,12 @@ class DomainModelWrite(DomainModelCore):
 
     @root_validator(pre=True, allow_reuse=True)
     def create_external_id_if_factory(cls, data: Any) -> Any:
-        if isinstance(data, dict) and cls.external_id_factory is not None:
+        if (
+            isinstance(data, dict)
+            and cls.external_id_factory is not None
+            and data.get("external_id") is None
+            and data.get("externalId") is None
+        ):
             data["external_id"] = cls.external_id_factory(cls, data)
         return data
 
