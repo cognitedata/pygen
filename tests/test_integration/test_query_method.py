@@ -49,3 +49,10 @@ def test_query_across_edge_properties(omni_client: OmniClient) -> None:
     assert isinstance(items, dc.ConnectionItemFList)
     item_bs = [edge for item in items for edge in item.outwards_multi or []]
     assert len(item_bs) > 0
+
+
+def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
+    with pytest.raises(ValueError) as e:
+        omni_client.connection_item_a.query().outwards.inwards.outwards.execute(limit=5)
+
+    assert "Circular" in str(e.value)

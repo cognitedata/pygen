@@ -764,6 +764,16 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self.space = StringFilter(self, ["node", "space"])
         self._filter_classes: list[Filtering] = [self.external_id, self.space]
 
+    @property
+    def _connection_names(self) -> set[str]:
+        return {step._connection_name for step in self._creation_path if step._connection_name}
+
+    def __getattr__(self, item: str) -> Any:
+        if item in self._connection_names:
+            nodes = [step._result_cls.__name__ for step in self._creation_path]
+            raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+
     def _assemble_filter(self) -> dm.filters.Filter:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
         for filter_cls in self._filter_classes:
