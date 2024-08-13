@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- The `external_id_factory` will no longer be called when creating a `DomainModelWrite` object
+  if the `external_id` is set. This is to avoid the `external_id_factory` to overwrite the `external_id`
+  when creating a new object.
+
 ## [0.99.30] - 24-08-13
 ### Added
 - New approach to querying. This is accessed through the `.query()` method
