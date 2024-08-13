@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from omni_pydantic_v1.data_classes import (
     CDFExternalReferencesWriteList,
 )
 from omni_pydantic_v1.data_classes._cdf_external_references import (
+    CDFExternalReferencesQuery,
     _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
     _create_cdf_external_reference_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
 from .cdf_external_references_query import CDFExternalReferencesQueryAPI
@@ -319,6 +322,11 @@ class CDFExternalReferencesAPI(
             limit,
             filter_,
         )
+
+    def query(self) -> CDFExternalReferencesQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return CDFExternalReferencesQuery(self._client)
 
     def list(
         self,

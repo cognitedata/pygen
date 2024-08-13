@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import validator, root_validator
 
@@ -20,10 +20,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
@@ -341,3 +345,55 @@ def _create_dependent_on_non_writable_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnNonWritableList]):
+    _view_id = DependentOnNonWritable._view_id
+    _result_cls = DependentOnNonWritable
+    _result_list_cls_end = DependentOnNonWritableList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+        from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        if _Implementation1NonWriteableQuery not in created_types:
+            self.to_non_writable = _Implementation1NonWriteableQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                "to_non_writable",
+            )
+
+        self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
+        self._filter_classes.extend(
+            [
+                self.a_value,
+            ]
+        )
+
+
+class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, DependentOnNonWritableList)

@@ -8,7 +8,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from windmill_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from windmill_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from windmill_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,18 +26,15 @@ from windmill_pydantic_v1.data_classes import (
     RotorWriteList,
 )
 from windmill_pydantic_v1.data_classes._rotor import (
+    RotorQuery,
     _ROTOR_PROPERTIES_BY_FIELD,
     _create_rotor_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .rotor_rotor_speed_controller import RotorRotorSpeedControllerAPI
 from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
@@ -315,6 +318,11 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             limit,
             filter_,
         )
+
+    def query(self) -> RotorQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return RotorQuery(self._client)
 
     def list(
         self,

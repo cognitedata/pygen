@@ -7,7 +7,13 @@ import warnings
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_pydantic_v1.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    QueryBuilder,
+)
 from omni_pydantic_v1.data_classes import (
     DomainModelCore,
     DomainModelWrite,
@@ -20,17 +26,14 @@ from omni_pydantic_v1.data_classes import (
     ConnectionItemB,
 )
 from omni_pydantic_v1.data_classes._connection_item_c_node import (
+    ConnectionItemCNodeQuery,
     _create_connection_item_c_node_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    DEFAULT_QUERY_LIMIT,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    NodeQueryStep,
-    EdgeQueryStep,
-    QueryBuilder,
 )
 from .connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
 from .connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
@@ -206,6 +209,11 @@ class ConnectionItemCNodeAPI(
                 ),
             ],
         )
+
+    def query(self) -> ConnectionItemCNodeQuery:
+        """Start a query for connection item as."""
+        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        return ConnectionItemCNodeQuery(self._client)
 
     def list(
         self,

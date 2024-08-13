@@ -4,7 +4,7 @@ import datetime
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import validator, root_validator
 
@@ -21,10 +21,19 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
     select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    BooleanFilter,
+    DateFilter,
+    FloatFilter,
+    IntFilter,
+    StringFilter,
+    TimestampFilter,
 )
 
 
@@ -401,3 +410,55 @@ def _create_empty_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
+
+
+class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
+    _view_id = Empty._view_id
+    _result_cls = Empty
+    _result_list_cls_end = EmptyList
+
+    def __init__(
+        self,
+        created_types: set[type],
+        creation_path: list[QueryCore],
+        client: CogniteClient,
+        result_list_cls: type[T_DomainModelList],
+        expression: dm.query.ResultSetExpression | None = None,
+        connection_name: str | None = None,
+    ):
+
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            dm.filters.HasData(views=[self._view_id]),
+            connection_name,
+        )
+
+        self.boolean = BooleanFilter(self, self._view_id.as_property_ref("boolean"))
+        self.date = DateFilter(self, self._view_id.as_property_ref("date"))
+        self.float_32 = FloatFilter(self, self._view_id.as_property_ref("float32"))
+        self.float_64 = FloatFilter(self, self._view_id.as_property_ref("float64"))
+        self.int_32 = IntFilter(self, self._view_id.as_property_ref("int32"))
+        self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
+        self.text = StringFilter(self, self._view_id.as_property_ref("text"))
+        self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
+        self._filter_classes.extend(
+            [
+                self.boolean,
+                self.date,
+                self.float_32,
+                self.float_64,
+                self.int_32,
+                self.int_64,
+                self.text,
+                self.timestamp,
+            ]
+        )
+
+
+class EmptyQuery(_EmptyQuery[EmptyList]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(set(), [], client, EmptyList)
