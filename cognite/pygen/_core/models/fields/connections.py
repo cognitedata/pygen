@@ -287,8 +287,6 @@ class BaseConnectionField(Field, ABC):
     def _is_supported_one_to_many_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
         if isinstance(prop, dm.MultiEdgeConnection):
             return True
-        elif isinstance(prop, SingleEdgeConnection) and prop.direction == "inwards" and not prop.edge_source:
-            return True
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.type.is_list:
             return True
         elif isinstance(prop, dm.MultiReverseDirectRelation):
@@ -297,9 +295,10 @@ class BaseConnectionField(Field, ABC):
 
     @classmethod
     def _is_supported_one_to_one_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
-        if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+        if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and not prop.type.is_list:
             return True
-        elif isinstance(prop, SingleEdgeConnection) and prop.direction == "outwards" and not prop.edge_source:
+        # SingleEdgeConnection with properties are not yet supported
+        elif isinstance(prop, SingleEdgeConnection) and not prop.edge_source:
             return True
         elif isinstance(prop, SingleReverseDirectRelation):
             return True
