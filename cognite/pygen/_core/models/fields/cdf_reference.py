@@ -32,7 +32,10 @@ class CDFExternalField(BasePrimitiveField):
         return self.as_write_type_hint()
 
     def as_graphql_type_hint(self) -> str:
-        type_ = self.type_as_string
+        if self.is_time_series:
+            type_ = "TimeSeriesGraphQL"
+        else:
+            type_ = self.type_as_string
         if type_ != "str":
             type_ = f"{type_}, dict"
         else:
