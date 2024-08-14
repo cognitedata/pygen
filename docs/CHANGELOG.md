@@ -21,6 +21,8 @@ Changes are grouped as follows
 - Edges of type `single_edge_connection` with direction `inwards` no longer creates a list
   field.
 - Edges with properties now correctly generates the end_node field for direction `inwards`.
+- Edges with properties now have the correct destination node when multiple edge properties
+  have the same edge type.
 
 ## [0.99.30] - 24-08-13
 ### Added
