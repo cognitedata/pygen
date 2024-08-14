@@ -159,21 +159,13 @@ class EdgeAPIClass(APIClass):
         parent_attribute = create_name(field.name, api_class.client_attribute)
 
         # This is always true for Edge Connection Fields
-        field_end_class = cast(NodeDataClass, field.destination_class)
+        end_class = cast(NodeDataClass, field.destination_class)
 
         edge_class: EdgeDataClass | None = None
-        end_class: NodeDataClass
         if field.edge_class:
             edge_class = field.edge_class
-            try:
-                end_class = next(
-                    c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type
-                )
-            except StopIteration:
-                raise ValueError(f"Could not find end class {field_end_class.view_id}") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
         else:  #  NodeDataClass
-            end_class = field_end_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
 
         return cls(

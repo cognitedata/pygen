@@ -58,7 +58,6 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
 
     def outwards_multi(
         self,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -77,7 +76,6 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outwards multi edges of the connection item f.
 
         Args:
-            direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -95,7 +93,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
                 to return all items.
 
         Returns:
-            ConnectionItemEQueryAPI: The query API for the connection item e.
+            ConnectionItemGQueryAPI: The query API for the connection item g.
         """
         from .connection_item_g_query import ConnectionItemGQueryAPI
 
