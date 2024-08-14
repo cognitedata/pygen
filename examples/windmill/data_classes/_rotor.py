@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -68,8 +69,8 @@ class RotorGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
-    rotor_speed_controller: Union[TimeSeries, dict, None] = None
-    rpm_low_speed_shaft: Union[TimeSeries, dict, None] = None
+    rotor_speed_controller: Union[TimeSeriesGraphQL, dict, None] = None
+    rpm_low_speed_shaft: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

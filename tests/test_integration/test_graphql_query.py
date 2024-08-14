@@ -7,11 +7,15 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as odc
+    from scenario_instance.client import ScenarioInstanceClient
+    from scenario_instance.client import data_classes as sidc
     from windmill import WindmillClient
     from windmill import data_classes as wdc
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as odc
+    from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
+    from scenario_instance_pydantic_v1.client import data_classes as sidc
     from windmill_pydantic_v1 import WindmillClient
     from windmill_pydantic_v1 import data_classes as wdc
 
@@ -116,3 +120,36 @@ def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
     assert isinstance(first, odc.ConnectionItemEGraphQL)
     assert first.direct_reverse_single is not None
     assert first.direct_reverse_multi is not None
+
+
+def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient) -> None:
+    result = scenario_instance_client.graphql_query(
+        """{
+  listScenarioInstance(first: 1){
+    items{
+      __typename
+      priceForecast{
+        externalId
+        name
+        getDataPoints(granularity: "1d", aggregates: SUM){
+          items{
+            timestamp
+            sum
+          }
+        }
+      }
+    }
+  }
+}
+"""
+    )
+    assert len(result) == 1
+    instance = result[0]
+    assert isinstance(instance, sidc.ScenarioInstanceGraphQL)
+    assert instance.price_forecast is not None
+    assert instance.price_forecast.external_id is not None
+    assert instance.price_forecast.name is not None
+    assert instance.price_forecast.data is not None
+    assert len(instance.price_forecast.data) > 0
+    assert instance.price_forecast.data.sum[0] is not None
+    assert instance.price_forecast.data.timestamp[0] is not None

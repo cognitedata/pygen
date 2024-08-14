@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -70,9 +71,9 @@ class PowerInverterGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
-    active_power_total: Union[TimeSeries, dict, None] = None
-    apparent_power_total: Union[TimeSeries, dict, None] = None
-    reactive_power_total: Union[TimeSeries, dict, None] = None
+    active_power_total: Union[TimeSeriesGraphQL, dict, None] = None
+    apparent_power_total: Union[TimeSeriesGraphQL, dict, None] = None
+    reactive_power_total: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

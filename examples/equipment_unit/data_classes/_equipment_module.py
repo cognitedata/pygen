@@ -22,6 +22,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -76,7 +77,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Union[TimeSeries, dict, None] = None
+    sensor_value: Union[TimeSeriesGraphQL, dict, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     @model_validator(mode="before")

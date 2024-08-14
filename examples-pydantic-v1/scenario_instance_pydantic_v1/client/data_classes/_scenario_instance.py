@@ -90,7 +90,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, dict, None] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeriesGraphQL, dict, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 

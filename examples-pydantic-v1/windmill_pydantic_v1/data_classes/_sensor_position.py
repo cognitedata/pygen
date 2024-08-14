@@ -101,14 +101,14 @@ class SensorPositionGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "SensorPosition", "1")
-    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, dict, None] = None
-    edgewise_bend_mom_offset: Union[TimeSeries, dict, None] = None
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, dict, None] = None
-    edgewisewise_bend_mom: Union[TimeSeries, dict, None] = None
-    flapwise_bend_mom: Union[TimeSeries, dict, None] = None
-    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeries, dict, None] = None
-    flapwise_bend_mom_offset: Union[TimeSeries, dict, None] = None
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, dict, None] = None
+    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
+    edgewise_bend_mom_offset: Union[TimeSeriesGraphQL, dict, None] = None
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
+    edgewisewise_bend_mom: Union[TimeSeriesGraphQL, dict, None] = None
+    flapwise_bend_mom: Union[TimeSeriesGraphQL, dict, None] = None
+    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
+    flapwise_bend_mom_offset: Union[TimeSeriesGraphQL, dict, None] = None
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
     position: Optional[float] = None
 
     @root_validator(pre=True)

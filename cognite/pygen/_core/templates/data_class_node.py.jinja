@@ -22,7 +22,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
-    TimeSeries,{% endif %}
+    TimeSeries,
+    TimeSeriesGraphQL,{% endif %}
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,

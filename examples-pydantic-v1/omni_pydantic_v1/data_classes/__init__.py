@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 from ._cdf_external_references import (
     CDFExternalReferences,
@@ -250,6 +251,14 @@ from ._sub_interface import (
 )
 
 
+CDFExternalReferencesGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+CDFExternalReferencesListedGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
 ConnectionItemA.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,
@@ -419,6 +428,7 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
+    "TimeSeriesGraphQL",
     "CDFExternalReferences",
     "CDFExternalReferencesGraphQL",
     "CDFExternalReferencesWrite",

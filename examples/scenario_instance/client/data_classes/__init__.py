@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 from ._scenario_instance import (
     ScenarioInstance,
@@ -24,6 +25,11 @@ from ._scenario_instance import (
     ScenarioInstanceWrite,
     ScenarioInstanceWriteList,
 )
+
+ScenarioInstance.model_rebuild()
+ScenarioInstanceGraphQL.model_rebuild()
+ScenarioInstanceWrite.model_rebuild()
+ScenarioInstanceApply.model_rebuild()
 
 
 __all__ = [
@@ -40,6 +46,7 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
+    "TimeSeriesGraphQL",
     "ScenarioInstance",
     "ScenarioInstanceGraphQL",
     "ScenarioInstanceWrite",

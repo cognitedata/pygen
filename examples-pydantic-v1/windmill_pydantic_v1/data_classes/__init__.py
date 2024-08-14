@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 from ._blade import (
     Blade,
@@ -131,6 +132,26 @@ BladeApply.update_forward_refs(
     SensorPositionWrite=SensorPositionWrite,
 )
 
+GearboxGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+GeneratorGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+HighSpeedShaftGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+MainShaftGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+MetmastGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
 Nacelle.update_forward_refs(
     Gearbox=Gearbox,
     Generator=Generator,
@@ -144,6 +165,7 @@ NacelleGraphQL.update_forward_refs(
     HighSpeedShaftGraphQL=HighSpeedShaftGraphQL,
     MainShaftGraphQL=MainShaftGraphQL,
     PowerInverterGraphQL=PowerInverterGraphQL,
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
 )
 NacelleWrite.update_forward_refs(
     GearboxWrite=GearboxWrite,
@@ -158,6 +180,18 @@ NacelleApply.update_forward_refs(
     HighSpeedShaftWrite=HighSpeedShaftWrite,
     MainShaftWrite=MainShaftWrite,
     PowerInverterWrite=PowerInverterWrite,
+)
+
+PowerInverterGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+RotorGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+SensorPositionGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
 )
 
 Windmill.update_forward_refs(
@@ -200,6 +234,7 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
+    "TimeSeriesGraphQL",
     "Blade",
     "BladeGraphQL",
     "BladeWrite",

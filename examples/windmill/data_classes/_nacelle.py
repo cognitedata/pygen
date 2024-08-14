@@ -22,6 +22,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -91,16 +92,16 @@ class NacelleGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
-    acc_from_back_side_x: Union[TimeSeries, dict, None] = None
-    acc_from_back_side_y: Union[TimeSeries, dict, None] = None
-    acc_from_back_side_z: Union[TimeSeries, dict, None] = None
+    acc_from_back_side_x: Union[TimeSeriesGraphQL, dict, None] = None
+    acc_from_back_side_y: Union[TimeSeriesGraphQL, dict, None] = None
+    acc_from_back_side_z: Union[TimeSeriesGraphQL, dict, None] = None
     gearbox: Optional[GearboxGraphQL] = Field(default=None, repr=False)
     generator: Optional[GeneratorGraphQL] = Field(default=None, repr=False)
     high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(default=None, repr=False)
     main_shaft: Optional[MainShaftGraphQL] = Field(default=None, repr=False)
     power_inverter: Optional[PowerInverterGraphQL] = Field(default=None, repr=False)
-    yaw_direction: Union[TimeSeries, dict, None] = None
-    yaw_error: Union[TimeSeries, dict, None] = None
+    yaw_direction: Union[TimeSeriesGraphQL, dict, None] = None
+    yaw_error: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

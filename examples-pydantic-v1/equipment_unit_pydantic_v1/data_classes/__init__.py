@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 from ._equipment_module import (
     EquipmentModule,
@@ -58,6 +59,10 @@ from ._work_order import (
 )
 
 
+EquipmentModuleGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
 UnitProcedure.update_forward_refs(
     StartEndTime=StartEndTime,
 )
@@ -103,6 +108,7 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
+    "TimeSeriesGraphQL",
     "EquipmentModule",
     "EquipmentModuleGraphQL",
     "EquipmentModuleWrite",

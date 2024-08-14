@@ -69,9 +69,9 @@ class GearboxGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
-    displacement_x: Union[TimeSeries, dict, None] = None
-    displacement_y: Union[TimeSeries, dict, None] = None
-    displacement_z: Union[TimeSeries, dict, None] = None
+    displacement_x: Union[TimeSeriesGraphQL, dict, None] = None
+    displacement_y: Union[TimeSeriesGraphQL, dict, None] = None
+    displacement_z: Union[TimeSeriesGraphQL, dict, None] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:

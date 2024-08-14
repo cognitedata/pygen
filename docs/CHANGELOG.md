@@ -29,6 +29,7 @@ Changes are grouped as follows
 
 ## Added
 - Support for edges with properties of type `single_edge_connection`.
+- Support for retrieving `GraphQL` queries with datapoints`
 
 ## [0.99.30] - 24-08-13
 ### Added
