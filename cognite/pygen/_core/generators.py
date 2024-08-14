@@ -599,7 +599,7 @@ class APIGenerator:
                 self._config,
             )
             for field in self.data_class.fields_of_type(fields.BaseConnectionField)  # type: ignore[type-abstract]
-            if not field.is_direct_relation
+            if field.is_edge
         ]
 
     @property
