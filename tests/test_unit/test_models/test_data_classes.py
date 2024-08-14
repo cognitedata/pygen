@@ -1,8 +1,12 @@
+import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._core.models import NodeDataClass
 from cognite.pygen.config import PygenConfig
+from cognite.pygen.warnings import (
+    ViewNameCollisionWarning,
+)
 from tests.utils import to_data_class_by_view_id
 
 
@@ -62,6 +66,76 @@ class TestDataClasses:
 
         # Assert
         assert data_class.has_primitive_field_of_type(dm.TimeSeriesReference) is True
+
+    @pytest.mark.parametrize(
+        "name, expected_name",
+        [
+            ("DomainModel", "DomainModel_"),
+            ("DomainModelList", "DomainModelList_"),
+            ("DomainModelWrite", "DomainModelWrite_"),
+        ],
+    )
+    def test_data_class_from_view_expected_warning(
+        self, name: str, expected_name: str, pygen_config: PygenConfig
+    ) -> None:
+        # Arrange
+        view = dm.View(
+            space="dummy",
+            external_id=name,
+            version="dummy",
+            properties={},
+            name=name,
+            last_updated_time=1,
+            created_time=1,
+            is_global=False,
+            description="missing",
+            used_for="node",
+            writable=True,
+            filter=None,
+            implements=None,
+        )
+
+        # Act
+        with pytest.warns(ViewNameCollisionWarning):
+            actual = NodeDataClass.from_view(
+                view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
+            )
+        # Assert
+        assert actual.read_name == expected_name
+
+    @pytest.mark.parametrize(
+        "name, expected_name",
+        [
+            ("Core", "_core_"),
+        ],
+    )
+    def test_data_class_from_view_expected_warning_file_name(
+        self, name: str, expected_name: str, pygen_config: PygenConfig
+    ) -> None:
+        # Arrange
+        view = dm.View(
+            space="dummy",
+            external_id=name,
+            version="dummy",
+            properties={},
+            name=name,
+            last_updated_time=1,
+            created_time=1,
+            is_global=False,
+            description="missing",
+            used_for="node",
+            writable=True,
+            filter=None,
+            implements=None,
+        )
+
+        # Act
+        with pytest.warns(ViewNameCollisionWarning):
+            actual = NodeDataClass.from_view(
+                view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
+            )
+        # Assert
+        assert actual.file_name == expected_name
 
 
 _DEPENDENCY_NAMED_FIELD = """

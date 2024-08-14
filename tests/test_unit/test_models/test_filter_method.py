@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
@@ -10,6 +11,9 @@ from cognite.pygen._core.models import (
     FilterParameter,
 )
 from cognite.pygen.config import PygenConfig
+from cognite.pygen.warnings import (
+    ParameterNameCollisionWarning,
+)
 
 
 def test_create_list_method_primitive_nullable(
@@ -156,3 +160,50 @@ def test_create_list_method_connection_item_a(
         assert act.keyword_arguments == exp.keyword_arguments
         assert act == exp
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "filter_condition, expected_args",
+    [
+        (
+            FilterImplementation(
+                dm.filters.Range,
+                prop_name="end_time",
+                keyword_arguments={
+                    "gte": FilterParameter("min_end_time", "datetime.datetime", description="Dummy."),
+                    "lte": FilterParameter("max_end_time", "datetime.datetime", description="Dummy."),
+                },
+                is_edge_class=False,
+            ),
+            'view_id.as_property_ref("end_time"), '
+            'gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, '
+            'lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None',
+        )
+    ],
+)
+def test_filter_condition(filter_condition: FilterImplementation, expected_args: str) -> None:
+    # Act
+    actual = filter_condition.arguments
+
+    # Assert
+    assert actual == expected_args
+
+
+@pytest.mark.parametrize(
+    "name, expected_name",
+    [
+        ("interval", "interval_"),
+        ("limit", "limit_"),
+        ("filter", "filter_"),
+        ("replace", "replace_"),
+        ("retrieve_edges", "retrieve_edges_"),
+        ("property", "property_"),
+    ],
+)
+def test_filter_parameter_expected_warning(name: str, expected_name: str, pygen_config: PygenConfig) -> None:
+    # Act
+    with pytest.warns(ParameterNameCollisionWarning):
+        actual = FilterParameter(name, "str", "dummy")
+
+    # Assert
+    assert actual.name == expected_name
