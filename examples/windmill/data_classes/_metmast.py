@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -74,9 +75,9 @@ class MetmastGraphQL(GraphQLCore):
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
-    temperature: Union[TimeSeries, dict, None] = None
-    tilt_angle: Union[TimeSeries, dict, None] = None
-    wind_speed: Union[TimeSeries, dict, None] = None
+    temperature: Union[TimeSeriesGraphQL, dict, None] = None
+    tilt_angle: Union[TimeSeriesGraphQL, dict, None] = None
+    wind_speed: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

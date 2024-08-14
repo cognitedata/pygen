@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -68,8 +69,8 @@ class GeneratorGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
-    generator_speed_controller: Union[TimeSeries, dict, None] = None
-    generator_speed_controller_reference: Union[TimeSeries, dict, None] = None
+    generator_speed_controller: Union[TimeSeriesGraphQL, dict, None] = None
+    generator_speed_controller_reference: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

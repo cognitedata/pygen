@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -74,11 +75,11 @@ class MainShaftGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
-    bending_x: Union[TimeSeries, dict, None] = None
-    bending_y: Union[TimeSeries, dict, None] = None
-    calculated_tilt_moment: Union[TimeSeries, dict, None] = None
-    calculated_yaw_moment: Union[TimeSeries, dict, None] = None
-    torque: Union[TimeSeries, dict, None] = None
+    bending_x: Union[TimeSeriesGraphQL, dict, None] = None
+    bending_y: Union[TimeSeriesGraphQL, dict, None] = None
+    calculated_tilt_moment: Union[TimeSeriesGraphQL, dict, None] = None
+    calculated_yaw_moment: Union[TimeSeriesGraphQL, dict, None] = None
+    torque: Union[TimeSeriesGraphQL, dict, None] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:

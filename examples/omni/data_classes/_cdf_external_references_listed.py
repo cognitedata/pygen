@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,

@@ -75,7 +75,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Union[TimeSeries, dict, None] = None
+    sensor_value: Union[TimeSeriesGraphQL, dict, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     @root_validator(pre=True)

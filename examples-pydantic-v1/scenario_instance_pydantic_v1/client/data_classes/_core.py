@@ -30,28 +30,48 @@ from typing import (
 import pandas as pd
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes import TimeSeriesList, Datapoints
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
     InstanceApply,
     Properties,
     PropertyValue,
 )
+from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, Extra, Field, root_validator
 
 
-DEFAULT_QUERY_LIMIT = 5
-INSTANCE_QUERY_LIMIT = 1_000
-# This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
-ACTUAL_INSTANCE_QUERY_LIMIT = 10_000
-DEFAULT_INSTANCE_SPACE = "IntegrationTestsImmutable"
+class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
+    id: Optional[int] = None
+    external_id: Optional[str] = Field(None, alias="externalId")
+    instance_id: Optional[dm.NodeId] = Field(None, alias="instanceId")
+    name: Optional[str] = None
+    is_string: Optional[bool] = Field(None, alias="isString")
+    metadata: Optional[dict[str, str]] = None
+    unit: Optional[str] = None
+    unit_external_id: Optional[str] = Field(None, alias="unitExternalId")
+    asset_id: Optional[int] = Field(None, alias="assetId")
+    is_step: Optional[bool] = Field(None, alias="isStep")
+    description: Optional[str] = None
+    security_categories: Optional[list[int]] = Field(None, alias="securityCategories")
+    data_set_id: Optional[int] = Field(None, alias="dataSetId")
+    created_time: Optional[int] = Field(None, alias="createdTime")
+    last_updated_time: Optional[int] = Field(None, alias="lastUpdatedTime")
+    data: Optional[Datapoints] = None
 
-
-class _NotSetSentinel:
-    """This is a special class that indicates that a value has not been set.
-    It is used when we need to distinguish between not set and None."""
-
-    ...
+    @root_validator(pre=True, allow_reuse=True)
+    def parse_datapoints(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "getDataPoints" in data:
+            datapoints = data.pop("getDataPoints")
+            if "items" in datapoints:
+                for item in datapoints["items"]:
+                    # The Datapoints expects the timestamp to be in milliseconds
+                    item["timestamp"] = datetime_to_ms(
+                        datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
+                    )
+                data["datapoints"] = datapoints["items"]
+                data["data"] = Datapoints.load(data)
+        return data
 
 
 @dataclass

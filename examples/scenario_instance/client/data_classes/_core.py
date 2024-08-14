@@ -92,11 +92,12 @@ class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_nam
     data: Optional[Datapoints] = None
 
     @model_validator(mode="before")
-    def parse_datapoints(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if "getDataPoints" in data:
+    def parse_datapoints(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "getDataPoints" in data:
             datapoints = data.pop("getDataPoints")
             if "items" in datapoints:
                 for item in datapoints["items"]:
+                    # The Datapoints expects the timestamp to be in milliseconds
                     item["timestamp"] = datetime_to_ms(
                         datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
                     )

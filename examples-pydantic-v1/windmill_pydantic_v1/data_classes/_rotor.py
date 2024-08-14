@@ -67,8 +67,8 @@ class RotorGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
-    rotor_speed_controller: Union[TimeSeries, dict, None] = None
-    rpm_low_speed_shaft: Union[TimeSeries, dict, None] = None
+    rotor_speed_controller: Union[TimeSeriesGraphQL, dict, None] = None
+    rpm_low_speed_shaft: Union[TimeSeriesGraphQL, dict, None] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
