@@ -58,6 +58,10 @@ from ._work_order import (
     WorkOrderWriteList,
 )
 
+EquipmentModule.model_rebuild()
+EquipmentModuleGraphQL.model_rebuild()
+EquipmentModuleWrite.model_rebuild()
+EquipmentModuleApply.model_rebuild()
 UnitProcedure.model_rebuild()
 UnitProcedureGraphQL.model_rebuild()
 UnitProcedureWrite.model_rebuild()

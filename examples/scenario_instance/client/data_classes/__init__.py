@@ -26,6 +26,11 @@ from ._scenario_instance import (
     ScenarioInstanceWriteList,
 )
 
+ScenarioInstance.model_rebuild()
+ScenarioInstanceGraphQL.model_rebuild()
+ScenarioInstanceWrite.model_rebuild()
+ScenarioInstanceApply.model_rebuild()
+
 
 __all__ = [
     "DataRecord",

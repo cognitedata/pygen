@@ -250,6 +250,14 @@ from ._sub_interface import (
     SubInterfaceWriteList,
 )
 
+CDFExternalReferences.model_rebuild()
+CDFExternalReferencesGraphQL.model_rebuild()
+CDFExternalReferencesWrite.model_rebuild()
+CDFExternalReferencesApply.model_rebuild()
+CDFExternalReferencesListed.model_rebuild()
+CDFExternalReferencesListedGraphQL.model_rebuild()
+CDFExternalReferencesListedWrite.model_rebuild()
+CDFExternalReferencesListedApply.model_rebuild()
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
