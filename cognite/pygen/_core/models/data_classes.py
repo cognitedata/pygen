@@ -510,7 +510,7 @@ class DataClass:
 
     @property
     def connections_docs_write(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes and f.is_write_field]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes and f.is_write_field]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
         elif len(connections) == 1:
