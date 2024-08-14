@@ -149,4 +149,7 @@ def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient)
     assert instance.price_forecast is not None
     assert instance.price_forecast.external_id is not None
     assert instance.price_forecast.name is not None
+    assert instance.price_forecast.data is not None
     assert len(instance.price_forecast.data) > 0
+    assert instance.price_forecast.data.sum[0] is not None
+    assert instance.price_forecast.data.timestamp[0] is not None
