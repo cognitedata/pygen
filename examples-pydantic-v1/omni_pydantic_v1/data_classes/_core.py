@@ -40,6 +40,25 @@ from cognite.client.data_classes.data_modeling.instances import (
 from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, Extra, Field, root_validator
 
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
+
+DEFAULT_QUERY_LIMIT = 5
+INSTANCE_QUERY_LIMIT = 1_000
+# This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
+ACTUAL_INSTANCE_QUERY_LIMIT = 10_000
+DEFAULT_INSTANCE_SPACE = "omni-instances"
+
+
+class _NotSetSentinel:
+    """This is a special class that indicates that a value has not been set.
+    It is used when we need to distinguish between not set and None."""
+
+    ...
+
 
 class TimeSeriesGraphQL(BaseModel):
     class Config:
