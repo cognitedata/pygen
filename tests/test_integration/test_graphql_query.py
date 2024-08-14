@@ -129,6 +129,8 @@ def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient)
     items{
       __typename
       priceForecast{
+        externalId
+        name
         getDataPoints(granularity: "1d", aggregates: SUM){
           items{
             timestamp
@@ -142,4 +144,9 @@ def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient)
 """
     )
     assert len(result) == 1
-    assert isinstance(result[0], sidc.GraphQLList)
+    instance = result[0]
+    assert isinstance(instance, sidc.ScenarioInstanceGraphQL)
+    assert instance.price_forecast is not None
+    assert instance.price_forecast.external_id is not None
+    assert instance.price_forecast.name is not None
+    assert len(instance.price_forecast.data) > 0

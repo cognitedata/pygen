@@ -23,6 +23,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     TimeSeries,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_node_id,
     as_pygen_node_id,
@@ -91,7 +92,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, dict, None] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeriesGraphQL, dict, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
