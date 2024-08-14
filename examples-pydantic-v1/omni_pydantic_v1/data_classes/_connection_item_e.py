@@ -31,6 +31,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
+    from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
     from ._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
 
 
@@ -69,6 +70,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         direct_reverse_multi: The direct reverse multi field.
         direct_reverse_single: The direct reverse single field.
         inwards_single: The inwards single field.
+        inwards_single_property: The inwards single property field.
         name: The name field.
     """
 
@@ -81,6 +83,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
         default=None, repr=False, alias="directReverseSingle"
     )
     inwards_single: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="inwardsSingle")
+    inwards_single_property: Optional[ConnectionEdgeAGraphQL] = Field(
+        default=None, repr=False, alias="inwardsSingleProperty"
+    )
     name: Optional[str] = None
 
     @root_validator(pre=True)
@@ -94,7 +99,14 @@ class ConnectionItemEGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("direct_no_source", "direct_reverse_multi", "direct_reverse_single", "inwards_single", pre=True)
+    @validator(
+        "direct_no_source",
+        "direct_reverse_multi",
+        "direct_reverse_single",
+        "inwards_single",
+        "inwards_single_property",
+        pre=True,
+    )
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -128,6 +140,11 @@ class ConnectionItemEGraphQL(GraphQLCore):
             inwards_single=(
                 self.inwards_single.as_read() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
             ),
+            inwards_single_property=(
+                self.inwards_single_property.as_read()
+                if isinstance(self.inwards_single_property, GraphQLCore)
+                else self.inwards_single_property
+            ),
             name=self.name,
         )
 
@@ -142,6 +159,11 @@ class ConnectionItemEGraphQL(GraphQLCore):
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
+            ),
+            inwards_single_property=(
+                self.inwards_single_property.as_write()
+                if isinstance(self.inwards_single_property, GraphQLCore)
+                else self.inwards_single_property
             ),
             name=self.name,
         )
@@ -160,6 +182,7 @@ class ConnectionItemE(DomainModel):
         direct_reverse_multi: The direct reverse multi field.
         direct_reverse_single: The direct reverse single field.
         inwards_single: The inwards single field.
+        inwards_single_property: The inwards single property field.
         name: The name field.
     """
 
@@ -173,6 +196,7 @@ class ConnectionItemE(DomainModel):
     inwards_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
+    inwards_single_property: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="inwardsSingleProperty")
     name: Optional[str] = None
 
     def as_write(self) -> ConnectionItemEWrite:
@@ -184,6 +208,11 @@ class ConnectionItemE(DomainModel):
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
+            ),
+            inwards_single_property=(
+                self.inwards_single_property.as_write()
+                if isinstance(self.inwards_single_property, DomainModel)
+                else self.inwards_single_property
             ),
             name=self.name,
         )
@@ -204,6 +233,7 @@ class ConnectionItemE(DomainModel):
         nodes_by_id: dict[dm.NodeId | str, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
+        from ._connection_edge_a import ConnectionEdgeA
         from ._connection_item_d import ConnectionItemD
 
         for instance in instances.values():
@@ -282,6 +312,7 @@ class ConnectionItemEWrite(DomainModelWrite):
         data_record: The data record of the connection item e node.
         direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
+        inwards_single_property: The inwards single property field.
         name: The name field.
     """
 
@@ -292,6 +323,9 @@ class ConnectionItemEWrite(DomainModelWrite):
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="inwardsSingle"
+    )
+    inwards_single_property: Optional[ConnectionEdgeAWrite] = Field(
+        default=None, repr=False, alias="inwardsSingleProperty"
     )
     name: Optional[str] = None
 
@@ -459,7 +493,9 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
     ):
+        from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
+        from ._connection_item_f import _ConnectionItemFQuery
 
         super().__init__(
             created_types,
@@ -508,6 +544,20 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     chain_to="destination",
                 ),
                 "inwards_single",
+            )
+
+        if _ConnectionEdgeAQuery not in created_types:
+            self.inwards_single_property = _ConnectionEdgeAQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                _ConnectionItemFQuery,
+                dm.query.EdgeResultSetExpression(
+                    direction="inwards",
+                    chain_to="destination",
+                ),
+                "inwards_single_property",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

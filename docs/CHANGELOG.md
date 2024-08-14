@@ -27,6 +27,9 @@ Changes are grouped as follows
   now have the property name prefixed with `no_` to make it a valid Python variable name instead
   of raising an exception.
 
+## Added
+- Support for edges with properties of type `single_edge_connection`.
+
 ## [0.99.30] - 24-08-13
 ### Added
 - New approach to querying. This is accessed through the `.query()` method

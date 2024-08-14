@@ -319,15 +319,19 @@ ConnectionItemDApply.update_forward_refs(
 )
 
 ConnectionItemE.update_forward_refs(
+    ConnectionEdgeA=ConnectionEdgeA,
     ConnectionItemD=ConnectionItemD,
 )
 ConnectionItemEGraphQL.update_forward_refs(
+    ConnectionEdgeAGraphQL=ConnectionEdgeAGraphQL,
     ConnectionItemDGraphQL=ConnectionItemDGraphQL,
 )
 ConnectionItemEWrite.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
     ConnectionItemDWrite=ConnectionItemDWrite,
 )
 ConnectionItemEApply.update_forward_refs(
+    ConnectionEdgeAWrite=ConnectionEdgeAWrite,
     ConnectionItemDWrite=ConnectionItemDWrite,
 )
 

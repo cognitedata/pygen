@@ -305,8 +305,7 @@ class BaseConnectionField(Field, ABC):
     def _is_supported_one_to_one_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
         if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and not prop.type.is_list:
             return True
-        # SingleEdgeConnection with properties are not yet supported
-        elif isinstance(prop, SingleEdgeConnection) and not prop.edge_source:
+        elif isinstance(prop, SingleEdgeConnection):
             return True
         elif isinstance(prop, SingleReverseDirectRelation):
             return True
