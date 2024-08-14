@@ -345,7 +345,7 @@ class DataClass:
                     # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[field_.destination_class.view_id] = field_.destination_class
             elif isinstance(field_, EndNodeField):
-                for class_ in field_.end_classes:
+                for class_ in field_.destination_classes:
                     unique[class_.view_id] = class_
 
         return sorted(unique.values(), key=lambda x: x.write_name)
@@ -369,7 +369,7 @@ class DataClass:
                         else:
                             unique[edge_class.start_class.view_id] = edge_class.start_class
             elif isinstance(field_, EndNodeField):
-                for class_ in field_.end_classes:
+                for class_ in field_.destination_classes:
                     unique[class_.view_id] = class_
 
         return sorted(unique.values(), key=lambda x: x.read_name)

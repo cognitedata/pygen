@@ -625,7 +625,7 @@ class APIGenerator:
         """
         unique_start_classes = []
         unique_end_classes = []
-        grouped_edge_classes = []
+        grouped_edge_classes: dict[str, list[str]] = {}
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
         elif isinstance(self.data_class, EdgeDataClass):
@@ -636,13 +636,14 @@ class APIGenerator:
             unique_end_classes = sorted(
                 _unique_data_classes([edge.end_class for edge in self.data_class.end_node_field.edge_classes])
             )
-
-            grouped_edge_classes = [
-                (key, list(group))
-                for key, group in itertools.groupby(
-                    sorted(self.data_class.end_node_field.edge_classes), key=lambda c: c.end_class
-                )
-            ]
+            _grouped_edge_classes: dict[str, set[str]] = defaultdict(set)
+            for edge_class in self.data_class.end_node_field.edge_classes:
+                if "outwards" in edge_class.used_directions:
+                    _grouped_edge_classes[edge_class.end_class.write_name].add(edge_class.start_class.write_name)
+                elif "inwards" in edge_class.used_directions:
+                    _grouped_edge_classes[edge_class.start_class.write_name].add(edge_class.end_class.write_name)
+            for start_class, end_classes in _grouped_edge_classes.items():
+                grouped_edge_classes[start_class] = sorted(end_classes)
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
@@ -671,7 +672,6 @@ class APIGenerator:
                 unique_start_classes=unique_start_classes,
                 unique_end_classes=unique_end_classes,
                 grouped_edge_classes=grouped_edge_classes,
-                create_start_node_set=create_start_node_set,
             )
             + "\n"
         )

@@ -298,8 +298,8 @@ def {{ data_class.filter_name }}(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes %}
-    {{ end_class.write_name }}: {{ create_start_node_set(classes) }},{% endfor %}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
+    {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
 {% raw %}}{% endraw %}
 
 

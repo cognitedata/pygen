@@ -384,9 +384,9 @@ def _create_connection_edge_a_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    ConnectionItemEWrite: {ConnectionItemFWrite, ConnectionItemFWrite},
-    ConnectionItemFWrite: {ConnectionItemGWrite},
+    ConnectionItemFWrite: {ConnectionItemEWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
+    ConnectionItemEWrite: {ConnectionItemFWrite},
 }
 
 
@@ -423,6 +423,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         connection_name: str | None = None,
     ):
         from ._connection_item_e import _ConnectionItemEQuery
+        from ._connection_item_f import _ConnectionItemFQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)

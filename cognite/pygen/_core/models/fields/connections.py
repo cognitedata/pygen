@@ -76,21 +76,24 @@ class EndNodeField(Field):
         return True
 
     @property
-    def end_classes(self) -> list[NodeDataClass]:
+    def destination_classes(self) -> list[NodeDataClass]:
         seen = set()
         output: list[NodeDataClass] = []
         for edge_class in self.edge_classes:
-            if edge_class.end_class.read_name not in seen:
+            if "outwards" in edge_class.used_directions and edge_class.end_class.read_name not in seen:
                 output.append(edge_class.end_class)
                 seen.add(edge_class.end_class.read_name)
+            if "inwards" in edge_class.used_directions and edge_class.start_class.read_name not in seen:
+                output.append(edge_class.start_class)
+                seen.add(edge_class.start_class.read_name)
         return output
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint([data_class.read_name for data_class in self.end_classes])
+        return self._type_hint([data_class.read_name for data_class in self.destination_classes])
 
     def as_graphql_type_hint(self) -> str:
-        if self.end_classes:
-            data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        if self.destination_classes:
+            data_class_names = list(set([data_class.graphql_name for data_class in self.destination_classes]))
         else:
             data_class_names = ["dm.NodeId"]
         data_class_names_hint = ", ".join(sorted(data_class_names))
@@ -104,7 +107,7 @@ class EndNodeField(Field):
         return self._type_hint(
             [
                 data_class.write_name
-                for data_class in self.end_classes
+                for data_class in self.destination_classes
                 if data_class.is_writable or data_class.is_interface
             ]
         )
@@ -122,7 +125,7 @@ class EndNodeField(Field):
             return left_side
 
     def as_write(self) -> str:
-        if self.end_classes:
+        if self.destination_classes:
             return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
         else:
             return f"self.{self.name}"
