@@ -437,8 +437,13 @@ class DataClass:
 
     @property
     def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:
-        """All MultiEdges with properties on the edge."""
+        """All MultiEdges with properties."""
         return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_with_properties)
+
+    @property
+    def one_to_one_edges_with_properties(self) -> Iterable[OneToOneConnectionField]:
+        """All SingleEdges with properties."""
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_edge_with_properties)
 
     @property
     def one_to_one_direct_relations_with_source(self) -> Iterable[OneToOneConnectionField]:

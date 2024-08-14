@@ -251,6 +251,7 @@ class ConnectionItemF(DomainModel):
                         if instance.outwards_single is None:
                             instance.outwards_single = value
                         elif instance.outwards_single == value:
+                            # This is the same edge, so we don't need to do anything...
                             ...
                         else:
                             warnings.warn(
