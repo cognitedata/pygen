@@ -207,7 +207,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                     "inwards_multi_property",
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
                     "inwards",
-                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
+                    dm.ViewId("pygen-models", "ConnectionItemF", "1"),
                 ),
             ],
         )

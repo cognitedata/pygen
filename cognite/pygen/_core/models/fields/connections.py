@@ -3,6 +3,7 @@ another object in the data model."""
 
 from __future__ import annotations
 
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import total_ordering
@@ -18,25 +19,36 @@ from cognite.client.data_classes.data_modeling.views import (
 from .base import Field
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.models.data_classes import DataClass, EdgeDataClass, NodeDataClass
+    from cognite.pygen._core.models.data_classes import EdgeDataClass, NodeDataClass
 
 
 @total_ordering
 @dataclass(frozen=True)
-class EdgeClasses:
+class EdgeClass:
     """This represents a specific edge type linking two data classes."""
 
     start_class: NodeDataClass
     edge_type: dm.DirectRelationReference
     end_class: NodeDataClass
+    used_directions: set[Literal["outwards", "inwards"]]
 
-    def __lt__(self, other: EdgeClasses) -> bool:
-        if isinstance(other, EdgeClasses):
-            return self.end_class < other.end_class
+    def __lt__(self, other: EdgeClass) -> bool:
+        if isinstance(other, EdgeClass):
+            return (
+                self.start_class.read_name,
+                self.end_class.read_name,
+                self.edge_type.space,
+                self.edge_type.external_id,
+            ) < (
+                other.start_class.read_name,
+                other.end_class.read_name,
+                other.edge_type.space,
+                other.edge_type.external_id,
+            )
         return NotImplemented
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, EdgeClasses):
+        if isinstance(other, EdgeClass):
             return (
                 self.end_class.read_name == other.end_class.read_name
                 and self.edge_type == other.edge_type
@@ -57,28 +69,31 @@ class EndNodeField(Field):
     This is a special class that is not instantiated from a property, but is created in the edge data class.
     """
 
-    edge_classes: list[EdgeClasses]
+    edge_classes: list[EdgeClass]
 
     @property
     def is_connection(self) -> bool:
         return True
 
     @property
-    def end_classes(self) -> list[NodeDataClass]:
+    def destination_classes(self) -> list[NodeDataClass]:
         seen = set()
         output: list[NodeDataClass] = []
         for edge_class in self.edge_classes:
-            if edge_class.end_class.read_name not in seen:
+            if "outwards" in edge_class.used_directions and edge_class.end_class.read_name not in seen:
                 output.append(edge_class.end_class)
                 seen.add(edge_class.end_class.read_name)
+            if "inwards" in edge_class.used_directions and edge_class.start_class.read_name not in seen:
+                output.append(edge_class.start_class)
+                seen.add(edge_class.start_class.read_name)
         return output
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint([data_class.read_name for data_class in self.end_classes])
+        return self._type_hint([data_class.read_name for data_class in self.destination_classes])
 
     def as_graphql_type_hint(self) -> str:
-        if self.end_classes:
-            data_class_names = list(set([data_class.graphql_name for data_class in self.end_classes]))
+        if self.destination_classes:
+            data_class_names = list(set([data_class.graphql_name for data_class in self.destination_classes]))
         else:
             data_class_names = ["dm.NodeId"]
         data_class_names_hint = ", ".join(sorted(data_class_names))
@@ -92,7 +107,7 @@ class EndNodeField(Field):
         return self._type_hint(
             [
                 data_class.write_name
-                for data_class in self.end_classes
+                for data_class in self.destination_classes
                 if data_class.is_writable or data_class.is_interface
             ]
         )
@@ -110,7 +125,7 @@ class EndNodeField(Field):
             return left_side
 
     def as_write(self) -> str:
-        if self.end_classes:
+        if self.destination_classes:
             return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
         else:
             return f"self.{self.name}"
@@ -125,99 +140,88 @@ class BaseConnectionField(Field, ABC):
     _wrap_list: ClassVar[bool] = False
     edge_type: dm.DirectRelationReference | None
     edge_direction: Literal["outwards", "inwards"]
-    end_classes: list[DataClass] | None
     use_node_reference_in_type_hint: bool
     through: dm.PropertyId | None
     destination_class: NodeDataClass | None
+    edge_class: EdgeDataClass | None
 
     @property
-    def data_class(self) -> DataClass:
-        if self.end_classes is None:
-            raise ValueError("Bug in Pygen: Missing end class")
-        elif len(self.end_classes) > 1:
-            raise ValueError("Bug in Pygen: Multiple end classes")
-        return self.end_classes[0]
+    def linked_class(self) -> NodeDataClass | EdgeDataClass:
+        if self.edge_class:
+            return self.edge_class
+        elif self.destination_class:
+            return self.destination_class
+        raise ValueError("Bug in Pygen: Direct relation without source does not have a linked class")
 
     @property
     def reverse_property(self) -> BaseConnectionField:
         if self.through is None:
             raise ValueError("Bug in Pygen: Trying to get reverse property for a non-reverse direct relation")
-        other = next((field for field in self.data_class if field.prop_name == self.through.property), None)
+        if self.destination_class is None:
+            raise ValueError("Bug in Pygen: Trying to get reverse property for a direct relation without source")
+        other = next((field for field in self.destination_class if field.prop_name == self.through.property), None)
         if other is None:
-            raise ValueError(f"Bug in Pygen: Missing reverse property in {self.data_class.read_name}")
+            raise ValueError(f"Bug in Pygen: Missing reverse property in {self.destination_class.read_name}")
         elif isinstance(other, BaseConnectionField):
             return other
         raise ValueError("Bug in Pygen: Reverse property is not a connection field")
 
     @property
     def is_direct_relation(self) -> bool:
+        """Returns True if the connection is a direct relation."""
         return self.edge_type is None and self.through is None
 
     @property
-    def is_no_source_direct_relation(self) -> bool:
-        return self.edge_type is None and self.through is None and self.end_classes is None
+    def is_direct_relation_no_source(self) -> bool:
+        """Returns True if the connection is a direct relation without a source."""
+        return self.is_direct_relation and self.destination_class is None
 
     @property
     def is_reverse_direct_relation(self) -> bool:
+        """Returns True if the connection is a reverse direct relation."""
         return self.through is not None
 
     @property
     def is_write_field(self) -> bool:
+        """Returns True if the connection is writable."""
         return not self.is_reverse_direct_relation
 
     @property
     def is_edge(self) -> bool:
+        """Returns True if the connection is an edge."""
         return self.edge_type is not None
 
     @property
-    def is_no_property_edge(self) -> bool:
-        from cognite.pygen._core.models.data_classes import NodeDataClass
-
-        return self.is_edge and all(isinstance(data_class, NodeDataClass) for data_class in self.end_classes or [])
+    def is_edge_without_properties(self) -> bool:
+        """Returns True if the connection is an edge without properties."""
+        return self.is_edge and self.edge_class is None
 
     @property
-    def is_property_edge(self) -> bool:
-        from cognite.pygen._core.models.data_classes import EdgeDataClass
-
-        return self.is_edge and all(isinstance(data_class, EdgeDataClass) for data_class in self.end_classes or [])
+    def is_edge_with_properties(self) -> bool:
+        """Returns True if the connection is an edge with properties."""
+        return self.is_edge and self.edge_class is not None
 
     @property
     def is_connection(self) -> bool:
+        """Returns True if the connection is a connection."""
         return True
 
     @property
     def edge_type_str(self) -> str:
+        """Returns the edge type as a string."""
         if self.edge_type is None:
             raise ValueError("Bug in Pygen: Missing edge type")
         return f'dm.DirectRelationReference("{ self.edge_type.space }", "{ self.edge_type.external_id }")'
 
     @property
     def is_one_to_many(self) -> bool:
+        """Returns True if the connection is a one-to-many connection."""
         raise NotImplementedError()
 
     @property
     def is_one_to_one(self) -> bool:
+        """Returns True if the connection is a one-to-one connection."""
         return not self.is_one_to_many
-
-    @property
-    def destination_classes(self) -> list[DataClass]:
-        from cognite.pygen._core.models.data_classes import EdgeDataClass
-
-        output: list[DataClass] = []
-        seen: set[str] = set()
-        for data_class in self.end_classes or []:
-            if isinstance(data_class, EdgeDataClass):
-                for edge_class in data_class.end_node_field.edge_classes:
-                    if self.edge_direction == "outwards":
-                        destination = edge_class.end_class
-                    else:
-                        destination = edge_class.start_class
-                    if destination.read_name not in seen:
-                        output.append(destination)
-                        seen.add(destination.read_name)
-            else:
-                raise ValueError("Bug in Pygen: Destination classes should only be edge data classes")
-        return output
 
     @classmethod
     def load(
@@ -228,28 +232,32 @@ class BaseConnectionField(Field, ABC):
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
     ) -> Field | None:
+        """Load a connection field from a property"""
         if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
             return None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
-        direction: Literal["outwards", "inwards"] = (
-            prop.direction if isinstance(prop, dm.EdgeConnection) else "outwards"
-        )
-        through = prop.through if isinstance(prop, ReverseDirectRelation) else None
-        use_node_reference_in_type_hint = True
-        destination_class: NodeDataClass | None = None
-        end_classes: list[DataClass] | None
-        if isinstance(prop, dm.EdgeConnection) and prop.edge_source:
-            end_classes = [edge_class_by_view_id[prop.edge_source]]
-            use_node_reference_in_type_hint = False
-            destination_class = node_class_by_view_id[prop.source]
-        elif (
-            isinstance(prop, dm.ConnectionDefinition) or isinstance(prop, dm.MappedProperty)
-        ) and prop.source is not None:
-            end_classes = [node_class_by_view_id[prop.source]]
-            if isinstance(prop, ReverseDirectRelation):
-                use_node_reference_in_type_hint = False
+        direction: Literal["outwards", "inwards"]
+        if isinstance(prop, dm.EdgeConnection):
+            direction = prop.direction
+        elif isinstance(prop, dm.MappedProperty):
+            direction = "outwards"
+        elif isinstance(prop, ReverseDirectRelation):
+            direction = "inwards"
         else:
-            end_classes = None
+            warnings.warn(f"Unknown connection type {prop}", stacklevel=2)
+            return None
+
+        through = prop.through if isinstance(prop, ReverseDirectRelation) else None
+
+        destination_class = node_class_by_view_id[prop.source] if prop.source else None
+        use_node_reference_in_type_hint = not (
+            isinstance(prop, ReverseDirectRelation) or (isinstance(prop, dm.EdgeConnection) and prop.edge_source)
+        )
+        edge_class = (
+            edge_class_by_view_id.get(prop.edge_source)
+            if isinstance(prop, dm.EdgeConnection) and prop.edge_source
+            else None
+        )
 
         if cls._is_supported_one_to_many_connection(prop):
             return OneToManyConnectionField(
@@ -262,9 +270,9 @@ class BaseConnectionField(Field, ABC):
                 edge_type=edge_type,
                 edge_direction=direction,
                 description=prop.description,
-                end_classes=end_classes,
                 use_node_reference_in_type_hint=use_node_reference_in_type_hint,
                 destination_class=destination_class,
+                edge_class=edge_class,
             )
         elif cls._is_supported_one_to_one_connection(prop):
             return OneToOneConnectionField(
@@ -276,9 +284,9 @@ class BaseConnectionField(Field, ABC):
                 through=through,
                 edge_direction=direction,
                 description=prop.description,
-                end_classes=end_classes,
                 use_node_reference_in_type_hint=use_node_reference_in_type_hint,
                 destination_class=destination_class,
+                edge_class=edge_class,
             )
         else:
             return None
@@ -305,22 +313,38 @@ class BaseConnectionField(Field, ABC):
         return False
 
     def as_read_type_hint(self) -> str:
-        return self._create_type_hint(
-            [data_class.read_name for data_class in self.end_classes or []], self.use_node_reference_in_type_hint
-        )
+        """Return the type hint for the field in the read data class."""
+        if self.edge_class:
+            types = [self.edge_class.read_name]
+        elif self.destination_class:
+            types = [self.destination_class.read_name]
+        else:
+            types = []
+        return self._create_type_hint(types, self.use_node_reference_in_type_hint)
 
     def as_write_type_hint(self) -> str:
-        return self._create_type_hint(
-            [
-                data_class.write_name
-                for data_class in self.end_classes or []
-                if data_class.is_writable or data_class.is_interface
-            ],
-            self.use_node_reference_in_type_hint,
-        )
+        """Return the type hint for the field in the write data class."""
+
+        cls_: NodeDataClass | EdgeDataClass | None = None
+        if self.edge_class:
+            cls_ = self.edge_class
+        elif self.destination_class:
+            cls_ = self.destination_class
+
+        types: list[str] = []
+        if cls_ and (cls_.is_writable or cls_.is_interface):
+            types = [cls_.write_name]
+
+        return self._create_type_hint(types, self.use_node_reference_in_type_hint)
 
     def as_graphql_type_hint(self) -> str:
-        types = [data_class.graphql_name for data_class in self.end_classes or []]
+        """Return the type hint for the field in the GraphQL data class."""
+        if self.edge_class:
+            types = [self.edge_class.graphql_name]
+        elif self.destination_class:
+            types = [self.destination_class.graphql_name]
+        else:
+            types = []
         return self._create_type_hint(types, False)
 
     def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:
@@ -350,16 +374,19 @@ class BaseConnectionField(Field, ABC):
         return f"{type_hint} = {self.pydantic_field}({field_args})"
 
     def as_write(self) -> str:
+        """Return the code to convert the field from read to write data class."""
         method = "as_write"
-        if isinstance(self.end_classes, list) and len(self.end_classes) == 1 and not self.end_classes[0].is_writable:
+        if self.destination_class and not self.destination_class.is_writable:
             method = "as_id"
 
         return self._create_as_method(method, "DomainModel", self.use_node_reference_in_type_hint)
 
     def as_read_graphql(self) -> str:
+        """Return the code to convert the field from the GraphQL to the read data class."""
         return self._create_as_method("as_read", "GraphQLCore", False)
 
     def as_write_graphql(self) -> str:
+        """Return the code to convert the field from the write data class to the GraphQL."""
         return self._create_as_method("as_write", "GraphQLCore", False)
 
     @abstractmethod
@@ -377,9 +404,9 @@ class OneToManyConnectionField(BaseConnectionField):
         return True
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        if self.end_classes and use_node_reference:
+        if self.destination_class and use_node_reference:
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
-        elif self.end_classes:
+        elif self.destination_class:
             inner = f"{self.variable}.{method}()"
         else:
             inner = f"{self.variable}"
@@ -421,7 +448,7 @@ class OneToOneConnectionField(BaseConnectionField):
         return False
 
     def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        if self.end_classes:
+        if self.destination_class:
             return f"self.{self.name}.{method}()\nif isinstance(self.{self.name}, {base_cls})\nelse self.{self.name}"
         else:
             return f"self.{self.name}"

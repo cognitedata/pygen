@@ -9,7 +9,7 @@ from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
     {{ class_.read_name }},{% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
-    {{ field.data_class.read_name }},{% endfor %}
+    {{ field.destination_class.read_name }},{% endfor %}
 ){% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
     {{ edge_api.end_class.read_name }},
@@ -135,10 +135,10 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
-                    direction="outwards",{% if field.data_class.has_container_fields %}
-                    filter=dm.filters.HasData(views=[{{ field.data_class.read_name }}._view_id]),{% endif %}
+                    direction="outwards",{% if field.destination_class.has_container_fields %}
+                    filter=dm.filters.HasData(views=[{{ field.destination_class.read_name }}._view_id]),{% endif %}
                 ),
-                result_cls={{ field.data_class.read_name }},
+                result_cls={{ field.destination_class.read_name }},
             ),
         )
 {% endfor %}

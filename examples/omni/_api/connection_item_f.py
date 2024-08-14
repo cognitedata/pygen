@@ -212,7 +212,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     "outwards_multi",
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
+                    dm.ViewId("pygen-models", "ConnectionItemG", "1"),
                 ),
             ],
         )
@@ -553,16 +553,6 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             )
         )
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_outwards_multi),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_outwards_multi,
-                        filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
-                    ),
-                    ConnectionItemE,
-                )
-            )
             builder.append(
                 NodeQueryStep(
                     builder.create_name(edge_outwards_multi),

@@ -19,7 +19,7 @@ from .fields import (
     BaseConnectionField,
     BasePrimitiveField,
     CDFExternalField,
-    EdgeClasses,
+    EdgeClass,
     EndNodeField,
     Field,
     OneToManyConnectionField,
@@ -338,12 +338,14 @@ class DataClass:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
-                for class_ in field_.end_classes or []:
+                if field_.edge_class:
+                    unique[field_.edge_class.view_id] = field_.edge_class
+                elif field_.destination_class:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
-                    unique[class_.view_id] = class_
+                    unique[field_.destination_class.view_id] = field_.destination_class
             elif isinstance(field_, EndNodeField):
-                for class_ in field_.end_classes:
+                for class_ in field_.destination_classes:
                     unique[class_.view_id] = class_
 
         return sorted(unique.values(), key=lambda x: x.write_name)
@@ -351,22 +353,23 @@ class DataClass:
     @property
     def dependencies_with_edge_destinations(self) -> list[DataClass]:
         """Return a list of all dependencies which also includes the edge
-        destination if th dependency is a EdgeClass."""
+        destination if the dependency is a EdgeClass."""
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
-                for class_ in field_.end_classes or []:
+                if field_.destination_class:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
-                    unique[class_.view_id] = class_
-                    if isinstance(class_, EdgeDataClass):
-                        for edge_class in class_.end_node_field.edge_classes:
-                            if field_.edge_direction == "outwards":
-                                unique[edge_class.end_class.view_id] = edge_class.end_class
-                            else:
-                                unique[edge_class.start_class.view_id] = edge_class.start_class
+                    unique[field_.destination_class.view_id] = field_.destination_class
+                if field_.edge_class:
+                    unique[field_.edge_class.view_id] = field_.edge_class
+                    for edge_class in field_.edge_class.end_node_field.edge_classes:
+                        if field_.edge_direction == "outwards":
+                            unique[edge_class.end_class.view_id] = edge_class.end_class
+                        else:
+                            unique[edge_class.start_class.view_id] = edge_class.start_class
             elif isinstance(field_, EndNodeField):
-                for class_ in field_.end_classes:
+                for class_ in field_.destination_classes:
                     unique[class_.view_id] = class_
 
         return sorted(unique.values(), key=lambda x: x.read_name)
@@ -425,17 +428,17 @@ class DataClass:
     @property
     def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges without properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_no_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_without_properties)
 
     @property
     def one_to_one_edge_without_properties(self) -> Iterable[OneToOneConnectionField]:
         """All MultiEdges without properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_no_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_edge_without_properties)
 
     @property
     def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges with properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_with_properties)
 
     @property
     def one_to_one_direct_relations_with_source(self) -> Iterable[OneToOneConnectionField]:
@@ -443,7 +446,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToOneConnectionField)
-            if field_.is_direct_relation and field_.end_classes
+            if field_.is_direct_relation and field_.destination_class
         )
 
     @property
@@ -451,7 +454,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToOneConnectionField)
-            if field_.is_reverse_direct_relation and field_.end_classes
+            if field_.is_reverse_direct_relation and field_.destination_class
         )
 
     @property
@@ -460,7 +463,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
-            if field_.is_direct_relation and field_.end_classes
+            if field_.is_direct_relation and field_.destination_class
         )
 
     @property
@@ -468,7 +471,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
-            if field_.is_reverse_direct_relation and field_.end_classes
+            if field_.is_reverse_direct_relation and field_.destination_class
         )
 
     @property
@@ -510,7 +513,7 @@ class DataClass:
 
     @property
     def connections_docs_write(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes and f.is_write_field]  # type: ignore[type-abstract]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class and f.is_write_field]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
         elif len(connections) == 1:
@@ -520,7 +523,7 @@ class DataClass:
 
     @property
     def connections_docs(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
         elif len(connections) == 1:
@@ -564,6 +567,7 @@ class EdgeDataClass(DataClass):
     """This represent data class used for views marked as used_for='edge'."""
 
     has_node_class: bool
+    _end_node_field: EndNodeField | None = None
 
     @property
     def typed_properties_name(self) -> str:
@@ -578,10 +582,9 @@ class EdgeDataClass(DataClass):
 
     @property
     def end_node_field(self) -> EndNodeField:
-        try:
-            return next(field_ for field_ in self.fields if isinstance(field_, EndNodeField))
-        except StopIteration:
-            raise ValueError("EdgeDataClass has not been initialized.") from None
+        if self._end_node_field:
+            return self._end_node_field
+        raise ValueError("EdgeDataClass has not been initialized.")
 
     def update_fields(
         self,
@@ -593,29 +596,33 @@ class EdgeDataClass(DataClass):
     ):
         # Find all node views that have an edge with properties in this view
         # and get the node class it is pointing to.
-        edge_classes = []
+        edge_classes: dict[tuple[str, dm.DirectRelationReference, str], EdgeClass] = {}
         for view in views:
             view_id = view.as_id()
             if view_id not in node_class_by_view_id:
                 continue
-            start_class = node_class_by_view_id[view_id]
-            for _prop_name, prop in view.properties.items():
+            source_class = node_class_by_view_id[view_id]
+            for prop in view.properties.values():
                 if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
-                    end_class = node_class_by_view_id[prop.source]
-                    start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
+                    destination_class = node_class_by_view_id[prop.source]
+                    start, end = (
+                        (source_class, destination_class)
+                        if prop.direction == "outwards"
+                        else (destination_class, source_class)
+                    )
+                    identifier = start.read_name, prop.type, end.read_name
+                    if edge_class := edge_classes.get(identifier):
+                        edge_class.used_directions.add(prop.direction)
+                    else:
+                        edge_classes[identifier] = EdgeClass(start, prop.type, end, {prop.direction})
 
-                    new_edge_class = EdgeClasses(start, prop.type, end)
-                    if new_edge_class not in edge_classes:
-                        edge_classes.append(new_edge_class)
-
-        self.fields.append(
-            EndNodeField(
-                name="end_node",
-                doc_name="end node",
-                prop_name="end_node",
-                description="The end node of this edge.",
-                pydantic_field="Field",
-                edge_classes=edge_classes,
-            )
+        self._end_node_field = EndNodeField(
+            name="end_node",
+            doc_name="end node",
+            prop_name="end_node",
+            description="The end node of this edge.",
+            pydantic_field="Field",
+            edge_classes=list(edge_classes.values()),
         )
+        self.fields.append(self._end_node_field)
         super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)

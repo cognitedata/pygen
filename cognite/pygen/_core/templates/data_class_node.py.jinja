@@ -181,24 +181,24 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
 {% endif %}{% if data_class.has_edges_or_direct_relations %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
             if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
-                    {{ field.name }}, {{ field.data_class.read_name }}
+                    {{ field.name }}, {{ field.destination_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
-                new_{{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []
+                new_{{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
-                    if isinstance(relation, {{ field.data_class.read_name }}):
+                    if isinstance(relation, {{ field.destination_class.read_name }}):
                         new_{{ field.name }}.append(relation)
                     elif (other := nodes_by_id.get(relation)) and isinstance(
-                        other, {{ field.data_class.read_name }}
+                        other, {{ field.destination_class.read_name }}
                     ):
                         new_{{ field.name }}.append(other)
                     else:
                         new_{{ field.name }}.append(relation)
                 instance.{{ field.name }} = new_{{ field.name }}{% endfor %}{% if data_class.has_edges %}
             if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
-                {{ field.name }}: list[{{ field.data_class.read_name }} | str | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
-                {{ field.name }}: list[{{ field.data_class.read_name }}] = []{% endfor %}
+                {{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
+                {{ field.name }}: list[{{ field.edge_class.read_name }}] = []{% endfor %}
                 for edge in edges:
                     value: DomainModel | DomainRelation | str | dm.NodeId
                     if isinstance(edge, DomainRelation):
@@ -222,17 +222,17 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.data_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
                     ):
                         {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.data_class.read_name }}
+                        value, {{ field.edge_class.read_name }}
                     ):
                         {{ field.name }}.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.data_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
@@ -244,7 +244,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                                 f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
                             ){% endfor %}{% for field in data_class.one_to_one_edge_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.data_class.read_name }}
+                        value, {{ field.destination_class.read_name }}
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
@@ -259,7 +259,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
 {% endif %}{% endif %}{% if data_class.has_reverse_direct_relations %}
         for node in nodes_by_id.values():{% for field in data_class.one_to_one_reverse_direct_relation %}
             if (
-                isinstance(node, {{ field.data_class.read_name }})
+                isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{ field.reverse_property.name }} is not None
                 and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{ field.reverse_property.name }})))
             ):{% if field.reverse_property.is_one_to_one %}
@@ -278,7 +278,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                         f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}."
                     ){% endfor %}{% for field in data_class.one_to_many_reverse_direct_relations %}
             if (
-                isinstance(node, {{ field.data_class.read_name }})
+                isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{  field.reverse_property.name }} is not None
                 and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{  field.reverse_property.name }})))
             ):{% if field.reverse_property.is_one_to_one %}
@@ -361,11 +361,11 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 other_resources = {{ field.variable }}._to_instances_write(
                     cache,
                     self,
-                    dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
+                    {{ field.edge_type_str }},
 )
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
-        edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
+        edge_type = {{ field.edge_type_str }}
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
@@ -491,20 +491,20 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
-{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
-        if _{{ field.data_class.query_cls_name }} not in created_types:
-            self.{{ field.name }} = _{{ field.data_class.query_cls_name }}(
+{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
+        if _{{ field.linked_class.query_cls_name }} not in created_types:
+            self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,{% if field.is_property_edge %}
+                result_list_cls,{% if field.is_edge_with_properties %}
                 _{{ field.destination_class.query_cls_name }},{% endif %}{% if field.is_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
                 ),{% elif field.is_reverse_direct_relation %}
                 dm.query.NodeResultSetExpression(
-                    through={{ field.reverse_property.data_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
+                    through={{ field.reverse_property.destination_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
                     direction="inwards",
                 ),{% else %}
                 dm.query.EdgeResultSetExpression(
