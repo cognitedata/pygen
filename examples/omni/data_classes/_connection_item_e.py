@@ -211,7 +211,7 @@ class ConnectionItemE(DomainModel):
             ),
             inwards_single_property=(
                 self.inwards_single_property.as_write()
-                if isinstance(self.inwards_single_property, DomainModel)
+                if isinstance(self.inwards_single_property, DomainRelation)
                 else self.inwards_single_property
             ),
             name=self.name,
