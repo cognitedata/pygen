@@ -211,7 +211,7 @@ class ConnectionItemE(DomainModel):
             ),
             inwards_single_property=(
                 self.inwards_single_property.as_write()
-                if isinstance(self.inwards_single_property, DomainModel)
+                if isinstance(self.inwards_single_property, DomainRelation)
                 else self.inwards_single_property
             ),
             name=self.name,
@@ -272,6 +272,22 @@ class ConnectionItemE(DomainModel):
                                 f"Expected one edge for 'inwards_single' in {instance.as_id()}."
                                 f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}."
                             )
+                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                        value, ConnectionEdgeA
+                    ):
+                        if instance.inwards_single_property is None:
+                            instance.inwards_single_property = value
+                        elif instance.inwards_single_property == value:
+                            # This is the same edge, so we don't need to do anything...
+                            ...
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for 'inwards_single_property' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single_property!s}."
+                            )
+
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
 
         for node in nodes_by_id.values():
             if (
@@ -369,6 +385,14 @@ class ConnectionItemEWrite(DomainModelWrite):
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+
+        if self.inwards_single_property is not None:
+            other_resources = self.inwards_single_property._to_instances_write(
+                cache,
+                self,
+                dm.DirectRelationReference("pygen-models", "multiProperty"),
+            )
+            resources.extend(other_resources)
 
         if self.inwards_single is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
