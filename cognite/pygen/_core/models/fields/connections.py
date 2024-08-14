@@ -292,7 +292,9 @@ class BaseConnectionField(Field, ABC):
 
     def as_read_type_hint(self) -> str:
         """Return the type hint for the field in the read data class."""
-        if self.destination_class:
+        if self.edge_class:
+            types = [self.edge_class.read_name]
+        elif self.destination_class:
             types = [self.destination_class.read_name]
         else:
             types = []
@@ -300,16 +302,24 @@ class BaseConnectionField(Field, ABC):
 
     def as_write_type_hint(self) -> str:
         """Return the type hint for the field in the write data class."""
+
+        cls_: NodeDataClass | EdgeDataClass | None = None
+        if self.edge_class:
+            cls_ = self.edge_class
+        elif self.destination_class:
+            cls_ = self.destination_class
+
         types: list[str] = []
-        if cls_ := self.destination_class:
-            if cls_.is_writable or cls_.is_interface:
-                types = [cls_.write_name]
+        if cls_ and (cls_.is_writable or cls_.is_interface):
+            types = [cls_.write_name]
 
         return self._create_type_hint(types, self.use_node_reference_in_type_hint)
 
     def as_graphql_type_hint(self) -> str:
         """Return the type hint for the field in the GraphQL data class."""
-        if self.destination_class:
+        if self.edge_class:
+            types = [self.edge_class.graphql_name]
+        elif self.destination_class:
             types = [self.destination_class.graphql_name]
         else:
             types = []
