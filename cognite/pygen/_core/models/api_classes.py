@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
-from .data_classes import DataClass, EdgeDataClass
+from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import BaseConnectionField, CDFExternalField
 from .filter_methods import FilterMethod, FilterParameter
 
@@ -159,12 +159,12 @@ class EdgeAPIClass(APIClass):
         parent_attribute = create_name(field.name, api_class.client_attribute)
 
         # This is always true for Edge Connection Fields
-        field_end_class = cast(DataClass, field.end_classes[0])  # type: ignore[index]
+        field_end_class = cast(NodeDataClass, field.destination_class)
 
         edge_class: EdgeDataClass | None = None
-        end_class: DataClass
-        if isinstance(field_end_class, EdgeDataClass):
-            edge_class = field_end_class
+        end_class: NodeDataClass
+        if field.edge_class:
+            edge_class = field.edge_class
             try:
                 end_class = next(
                     c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type

@@ -338,10 +338,10 @@ class DataClass:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
-                for class_ in field_.end_classes or []:
+                if field_.destination_class:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
-                    unique[class_.view_id] = class_
+                    unique[field_.destination_class.view_id] = field_.destination_class
             elif isinstance(field_, EndNodeField):
                 for class_ in field_.end_classes:
                     unique[class_.view_id] = class_
@@ -355,12 +355,12 @@ class DataClass:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
-                for class_ in field_.end_classes or []:
+                if field_.destination_class:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
-                    unique[class_.view_id] = class_
-                    if isinstance(class_, EdgeDataClass):
-                        for edge_class in class_.end_node_field.edge_classes:
+                    unique[field_.destination_class.view_id] = field_.destination_class
+                    if field_.edge_class:
+                        for edge_class in field_.edge_class.end_node_field.edge_classes:
                             if field_.edge_direction == "outwards":
                                 unique[edge_class.end_class.view_id] = edge_class.end_class
                             else:
@@ -425,17 +425,17 @@ class DataClass:
     @property
     def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges without properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_no_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_without_properties)
 
     @property
     def one_to_one_edge_without_properties(self) -> Iterable[OneToOneConnectionField]:
         """All MultiEdges without properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_no_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToOneConnectionField) if field_.is_edge_without_properties)
 
     @property
     def one_to_many_edges_with_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges with properties on the edge."""
-        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_property_edge)
+        return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_with_properties)
 
     @property
     def one_to_one_direct_relations_with_source(self) -> Iterable[OneToOneConnectionField]:
@@ -443,7 +443,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToOneConnectionField)
-            if field_.is_direct_relation and field_.end_classes
+            if field_.is_direct_relation and field_.destination_class
         )
 
     @property
@@ -451,7 +451,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToOneConnectionField)
-            if field_.is_reverse_direct_relation and field_.end_classes
+            if field_.is_reverse_direct_relation and field_.destination_class
         )
 
     @property
@@ -460,7 +460,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
-            if field_.is_direct_relation and field_.end_classes
+            if field_.is_direct_relation and field_.destination_class
         )
 
     @property
@@ -468,7 +468,7 @@ class DataClass:
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
-            if field_.is_reverse_direct_relation and field_.end_classes
+            if field_.is_reverse_direct_relation and field_.destination_class
         )
 
     @property
@@ -510,7 +510,7 @@ class DataClass:
 
     @property
     def connections_docs_write(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes and f.is_write_field]  # type: ignore[type-abstract]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class and f.is_write_field]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
         elif len(connections) == 1:
@@ -520,7 +520,7 @@ class DataClass:
 
     @property
     def connections_docs(self) -> str:
-        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
         elif len(connections) == 1:
