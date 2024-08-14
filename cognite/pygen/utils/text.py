@@ -7,13 +7,14 @@ import inflect
 from cognite.pygen.config import Case, Naming, Number
 
 
-def create_name(raw_name: str, naming: Naming) -> str:
+def create_name(raw_name: str, naming: Naming, python_variable: bool = True) -> str:
     """
     Create a name from a raw name and following the given naming convention.
 
     Args:
         raw_name: The raw string to convert.
         naming: The naming convention to follow.
+        python_variable: Whether to convert to a valid Python variable name.
 
     Returns:
         The converted name.
@@ -21,6 +22,12 @@ def create_name(raw_name: str, naming: Naming) -> str:
     """
     is_plural = naming.number == Number.plural
     is_singular = naming.number == Number.singular
+    if python_variable:
+        if raw_name and raw_name[0].isdigit():
+            raw_name = f"no{raw_name}"
+        if "-" in raw_name:
+            raw_name = raw_name.replace("-", "_")
+
     if naming.case is Case.pascal:
         return to_pascal(raw_name, is_plural, is_singular)
     elif naming.case is Case.snake:
