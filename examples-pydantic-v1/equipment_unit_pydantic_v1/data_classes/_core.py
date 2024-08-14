@@ -41,7 +41,11 @@ from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, Extra, Field, root_validator
 
 
-class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
+class TimeSeriesGraphQL(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+        allow_population_by_field_name = True
+
     id: Optional[int] = None
     external_id: Optional[str] = Field(None, alias="externalId")
     instance_id: Optional[dm.NodeId] = Field(None, alias="instanceId")
