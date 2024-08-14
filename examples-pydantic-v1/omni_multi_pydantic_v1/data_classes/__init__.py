@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 from ._implementation_1_v_1 import (
     Implementation1v1,
@@ -73,6 +74,7 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
+    "TimeSeriesGraphQL",
     "Implementation1v1",
     "Implementation1v1GraphQL",
     "Implementation1v1Write",

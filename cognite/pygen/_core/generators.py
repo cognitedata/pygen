@@ -420,7 +420,7 @@ class MultiAPIGenerator:
         """
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
-        dependencies_by_names: dict[tuple[str, str, str, bool], list[DataClass]] = defaultdict(list)
+        dependencies_by_names: dict[tuple[str, str, str, bool, bool], list[DataClass]] = defaultdict(list)
         for api in self.apis:
             for dep in api.data_class.dependencies:
                 dependencies_by_names[
@@ -429,6 +429,7 @@ class MultiAPIGenerator:
                         api.data_class.graphql_name,
                         api.data_class.write_name,
                         api.data_class.is_writable or api.data_class.is_interface,
+                        api.data_class.has_timeseries_fields(),
                     )
                 ].append(dep)
 
