@@ -509,17 +509,21 @@ class DataClass:
         return False
 
     @property
-    def one_to_many_edges_docs(self) -> str:
-        edges = [f for f in self.fields_of_type(OneToManyConnectionField) if f.is_write_field]
-        if len(edges) == 1:
-            return f"`{edges[0].name}`"
+    def connections_docs_write(self) -> str:
+        connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes and f.is_write_field]  # type: ignore[type-abstract]
+        if len(connections) == 0:
+            raise ValueError("No connections found")
+        elif len(connections) == 1:
+            return f"`{connections[0].name}`"
         else:
-            return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
+            return ", ".join(f"`{field_.name}`" for field_ in connections[:-1]) + f" or `{connections[-1].name}`"
 
     @property
     def connections_docs(self) -> str:
         connections = [f for f in self.fields_of_type(BaseConnectionField) if f.end_classes]  # type: ignore[type-abstract]
-        if len(connections) == 1:
+        if len(connections) == 0:
+            raise ValueError("No connections found")
+        elif len(connections) == 1:
             return f"`{connections[0].name}`"
         else:
             return ", ".join(f"`{field_.name}`" for field_ in connections[:-1]) + f" and `{connections[-1].name}`"

@@ -121,7 +121,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         """Add or update (upsert) windmills.
 
         Note: This method iterates through all nodes and timeseries linked to windmill and creates them including the edges
-        between the nodes. For example, if any of `blades` or `metmast` are set, then these
+        between the nodes. For example, if any of `blades`, `metmast`, `nacelle` or `rotor` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:

@@ -80,7 +80,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
     direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(
         default=None, repr=False, alias="directReverseSingle"
     )
-    inwards_single: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")
+    inwards_single: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="inwardsSingle")
     name: Optional[str] = None
 
     @root_validator(pre=True)
@@ -125,7 +125,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 if isinstance(self.direct_reverse_single, GraphQLCore)
                 else self.direct_reverse_single
             ),
-            inwards_single=[inwards_single.as_read() for inwards_single in self.inwards_single or []],
+            inwards_single=(
+                self.inwards_single.as_read() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
+            ),
             name=self.name,
         )
 
@@ -138,7 +140,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             direct_no_source=self.direct_no_source,
-            inwards_single=[inwards_single.as_write() for inwards_single in self.inwards_single or []],
+            inwards_single=(
+                self.inwards_single.as_write() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
+            ),
             name=self.name,
         )
 
@@ -166,7 +170,7 @@ class ConnectionItemE(DomainModel):
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
     direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
-    inwards_single: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
+    inwards_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
@@ -178,10 +182,9 @@ class ConnectionItemE(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             direct_no_source=self.direct_no_source,
-            inwards_single=[
-                inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single
-                for inwards_single in self.inwards_single or []
-            ],
+            inwards_single=(
+                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
+            ),
             name=self.name,
         )
 
@@ -205,7 +208,6 @@ class ConnectionItemE(DomainModel):
 
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
-                inwards_single: list[ConnectionItemD | str | dm.NodeId] = []
                 for edge in edges:
                     value: DomainModel | DomainRelation | str | dm.NodeId
                     if isinstance(edge, DomainRelation):
@@ -231,9 +233,15 @@ class ConnectionItemE(DomainModel):
                     if edge_type == dm.DirectRelationReference("pygen-models", "bidirectionalSingle") and isinstance(
                         value, (ConnectionItemD, str, dm.NodeId)
                     ):
-                        inwards_single.append(value)
-
-                instance.inwards_single = inwards_single or None
+                        if instance.inwards_single is None:
+                            instance.inwards_single = value
+                        elif are_nodes_equal(value, instance.inwards_single):
+                            instance.inwards_single = select_best_node(value, instance.inwards_single)
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for 'inwards_single' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}."
+                            )
 
         for node in nodes_by_id.values():
             if (
@@ -282,7 +290,7 @@ class ConnectionItemEWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
-    inwards_single: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
+    inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="inwardsSingle"
     )
     name: Optional[str] = None
@@ -328,13 +336,12 @@ class ConnectionItemEWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        edge_type = dm.DirectRelationReference("pygen-models", "bidirectionalSingle")
-        for inwards_single in self.inwards_single or []:
+        if self.inwards_single is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
-                start_node=inwards_single,
+                start_node=self.inwards_single,
                 end_node=self,
-                edge_type=edge_type,
+                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
