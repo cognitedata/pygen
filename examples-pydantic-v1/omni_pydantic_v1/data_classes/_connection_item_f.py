@@ -69,12 +69,14 @@ class ConnectionItemFGraphQL(GraphQLCore):
         direct_list: The direct list field.
         name: The name field.
         outwards_multi: The outwards multi field.
+        outwards_single: The outwards single field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
     direct_list: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")
+    outwards_single: Optional[ConnectionEdgeAGraphQL] = Field(default=None, repr=False, alias="outwardsSingle")
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -87,7 +89,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
             )
         return values
 
-    @validator("direct_list", "outwards_multi", pre=True)
+    @validator("direct_list", "outwards_multi", "outwards_single", pre=True)
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -112,6 +114,11 @@ class ConnectionItemFGraphQL(GraphQLCore):
             direct_list=[direct_list.as_read() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
+            outwards_single=(
+                self.outwards_single.as_read()
+                if isinstance(self.outwards_single, GraphQLCore)
+                else self.outwards_single
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -125,6 +132,11 @@ class ConnectionItemFGraphQL(GraphQLCore):
             direct_list=[direct_list.as_write() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
+            outwards_single=(
+                self.outwards_single.as_write()
+                if isinstance(self.outwards_single, GraphQLCore)
+                else self.outwards_single
+            ),
         )
 
 
@@ -140,6 +152,7 @@ class ConnectionItemF(DomainModel):
         direct_list: The direct list field.
         name: The name field.
         outwards_multi: The outwards multi field.
+        outwards_single: The outwards single field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
@@ -151,6 +164,7 @@ class ConnectionItemF(DomainModel):
     )
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
+    outwards_single: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="outwardsSingle")
 
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this read version of connection item f to the writing version."""
@@ -164,6 +178,11 @@ class ConnectionItemF(DomainModel):
             ],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
+            outwards_single=(
+                self.outwards_single.as_write()
+                if isinstance(self.outwards_single, DomainRelation)
+                else self.outwards_single
+            ),
         )
 
     def as_apply(self) -> ConnectionItemFWrite:
@@ -226,6 +245,22 @@ class ConnectionItemF(DomainModel):
                         outwards_multi.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]
+                    if edge_type == dm.DirectRelationReference("pygen-models", "singleProperty") and isinstance(
+                        value, ConnectionEdgeA
+                    ):
+                        if instance.outwards_single is None:
+                            instance.outwards_single = value
+                        elif instance.outwards_single == value:
+                            # This is the same edge, so we don't need to do anything...
+                            ...
+                        else:
+                            warnings.warn(
+                                f"Expected one edge for 'outwards_single' in {instance.as_id()}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                            )
+
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]
 
                 instance.outwards_multi = outwards_multi
 
@@ -242,6 +277,7 @@ class ConnectionItemFWrite(DomainModelWrite):
         direct_list: The direct list field.
         name: The name field.
         outwards_multi: The outwards multi field.
+        outwards_single: The outwards single field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
@@ -253,6 +289,7 @@ class ConnectionItemFWrite(DomainModelWrite):
     )
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
+    outwards_single: Optional[ConnectionEdgeAWrite] = Field(default=None, repr=False, alias="outwardsSingle")
 
     def _to_instances_write(
         self,
@@ -302,6 +339,14 @@ class ConnectionItemFWrite(DomainModelWrite):
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
                 )
                 resources.extend(other_resources)
+
+        if self.outwards_single is not None:
+            other_resources = self.outwards_single._to_instances_write(
+                cache,
+                self,
+                dm.DirectRelationReference("pygen-models", "singleProperty"),
+            )
+            resources.extend(other_resources)
 
         for direct_list in self.direct_list or []:
             if isinstance(direct_list, DomainModelWrite):
@@ -459,6 +504,20 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                     chain_to="destination",
                 ),
                 "outwards_multi",
+            )
+
+        if _ConnectionEdgeAQuery not in created_types:
+            self.outwards_single = _ConnectionEdgeAQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                _ConnectionItemEQuery,
+                dm.query.EdgeResultSetExpression(
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                "outwards_single",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

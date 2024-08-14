@@ -242,17 +242,23 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
                                 f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
-                            ){% endfor %}{% for field in data_class.one_to_one_edge_with_properties %}
+                            ){% endfor %}{% for field in data_class.one_to_one_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.destination_class.read_name }}
+                        value, {{ field.edge_class.read_name }}
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
+                        elif instance.{{ field.name }} == value:
+                            # This is the same edge, so we don't need to do anything...
+                            ...
                         else:
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
                                 f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
-                            ){% endfor %}
+                            )
+
+                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
+                            value.end_node = end_node  # type: ignore[assignment]{% endfor %}
 {% for field in data_class.one_to_many_edges_without_properties %}
                 instance.{{ field.name }} = {{ field.name }} or None{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}
@@ -364,6 +370,14 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                     {{ field.edge_type_str }},
 )
                 resources.extend(other_resources)
+{% endfor %}{% for field in data_class.one_to_one_edges_with_properties %}
+        if self.{{ field.name }} is not None:
+            other_resources = self.{{ field.name }}._to_instances_write(
+                cache,
+                self,
+                {{ field.edge_type_str }},
+            )
+            resources.extend(other_resources)
 {% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
         edge_type = {{ field.edge_type_str }}
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}

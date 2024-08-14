@@ -305,8 +305,7 @@ class BaseConnectionField(Field, ABC):
     def _is_supported_one_to_one_connection(cls, prop: dm.ConnectionDefinition | dm.MappedProperty) -> bool:
         if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and not prop.type.is_list:
             return True
-        # SingleEdgeConnection with properties are not yet supported
-        elif isinstance(prop, SingleEdgeConnection) and not prop.edge_source:
+        elif isinstance(prop, SingleEdgeConnection):
             return True
         elif isinstance(prop, SingleReverseDirectRelation):
             return True
@@ -379,7 +378,9 @@ class BaseConnectionField(Field, ABC):
         if self.destination_class and not self.destination_class.is_writable:
             method = "as_id"
 
-        return self._create_as_method(method, "DomainModel", self.use_node_reference_in_type_hint)
+        base_cls = "DomainRelation" if self.is_edge_with_properties else "DomainModel"
+
+        return self._create_as_method(method, base_cls, self.use_node_reference_in_type_hint)
 
     def as_read_graphql(self) -> str:
         """Return the code to convert the field from the GraphQL to the read data class."""

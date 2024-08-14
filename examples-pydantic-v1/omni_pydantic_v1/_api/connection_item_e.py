@@ -25,7 +25,12 @@ from omni_pydantic_v1.data_classes import (
     ConnectionItemEList,
     ConnectionItemEWriteList,
     ConnectionItemETextFields,
+    ConnectionEdgeA,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAList,
+    ConnectionEdgeA,
     ConnectionItemD,
+    ConnectionItemF,
 )
 from omni_pydantic_v1.data_classes._connection_item_e import (
     ConnectionItemEQuery,
@@ -39,6 +44,7 @@ from ._core import (
     SequenceNotStr,
 )
 from .connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
+from .connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
 from .connection_item_e_query import ConnectionItemEQueryAPI
 
 
@@ -53,6 +59,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         super().__init__(client=client)
 
         self.inwards_single_edge = ConnectionItemEInwardsSingleAPI(client)
+        self.inwards_single_property_edge = ConnectionItemEInwardsSinglePropertyAPI(client)
 
     def __call__(
         self,
@@ -101,7 +108,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """Add or update (upsert) connection item es.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_e and creates them including the edges
-        between the nodes. For example, if any of `inwards_single` are set, then these
+        between the nodes. For example, if any of `inwards_single` or `inwards_single_property` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -207,6 +214,13 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
                     "inwards",
                     dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+                ),
+                (
+                    self.inwards_single_property_edge,
+                    "inwards_single_property",
+                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    "inwards",
+                    dm.ViewId("pygen-models", "ConnectionItemF", "1"),
                 ),
             ],
         )
@@ -486,7 +500,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `direct_reverse_multi`, `direct_reverse_single` and `inwards_single` for the connection item es. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `direct_reverse_multi`, `direct_reverse_single`, `inwards_single` and `inwards_single_property` for the connection item es. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
@@ -545,6 +559,18 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 ),
             )
         )
+        edge_inwards_single_property = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_inwards_single_property,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="inwards",
+                    chain_to="destination",
+                ),
+                ConnectionEdgeA,
+            )
+        )
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
@@ -554,6 +580,16 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                         filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
                     ),
                     ConnectionItemD,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_inwards_single_property),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_inwards_single_property,
+                        filter=dm.filters.HasData(views=[ConnectionItemF._view_id]),
+                    ),
+                    ConnectionItemF,
                 )
             )
             builder.append(

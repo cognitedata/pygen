@@ -45,6 +45,7 @@ from ._core import (
     SequenceNotStr,
 )
 from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
+from .connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
 from .connection_item_f_query import ConnectionItemFQueryAPI
 
 
@@ -59,6 +60,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         super().__init__(client=client)
 
         self.outwards_multi_edge = ConnectionItemFOutwardsMultiAPI(client)
+        self.outwards_single_edge = ConnectionItemFOutwardsSingleAPI(client)
 
     def __call__(
         self,
@@ -107,7 +109,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         """Add or update (upsert) connection item fs.
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_f and creates them including the edges
-        between the nodes. For example, if any of `direct_list` or `outwards_multi` are set, then these
+        between the nodes. For example, if any of `direct_list`, `outwards_multi` or `outwards_single` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -213,6 +215,13 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
                     "outwards",
                     dm.ViewId("pygen-models", "ConnectionItemG", "1"),
+                ),
+                (
+                    self.outwards_single_edge,
+                    "outwards_single",
+                    dm.DirectRelationReference("pygen-models", "singleProperty"),
+                    "outwards",
+                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
                 ),
             ],
         )
@@ -492,7 +501,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `direct_list` and `outwards_multi` for the connection item fs. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `direct_list`, `outwards_multi` and `outwards_single` for the connection item fs. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
@@ -552,6 +561,18 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                 ConnectionEdgeA,
             )
         )
+        edge_outwards_single = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_outwards_single,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+                ConnectionEdgeA,
+            )
+        )
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
@@ -561,6 +582,16 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                         filter=dm.filters.HasData(views=[ConnectionItemG._view_id]),
                     ),
                     ConnectionItemG,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_outwards_single),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_outwards_single,
+                        filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
+                    ),
+                    ConnectionItemE,
                 )
             )
             builder.append(
