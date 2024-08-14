@@ -18,6 +18,8 @@ Changes are grouped as follows
 - The `external_id_factory` will no longer be called when creating a `DomainModelWrite` object
   if the `external_id` is set. This is to avoid the `external_id_factory` to overwrite the `external_id`
   when creating a new object.
+- Edges of type `single_edge_connection` with direction `inwards` no longer creates a list
+  field.
 
 ## [0.99.30] - 24-08-13
 ### Added
