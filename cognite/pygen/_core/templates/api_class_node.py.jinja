@@ -479,11 +479,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     from_=from_root,
                     direction="{{ field.edge_direction}}",
                     chain_to="destination",
-                ),{% if field.is_property_edge %}
-                {{ field.destination_class.read_name }},{% endif %}
+                ),{% if field.is_edge_with_properties %}
+                {{ field.edge_class.read_name }},{% endif %}
             )
         ){% endif %}{% endfor %}
-        if retrieve_connections == "full":{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_edge %}{% if field.is_no_property_edge %}
+        if retrieve_connections == "full":{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_edge %}
             builder.append(
                 NodeQueryStep(
                     builder.create_name( edge_{{ field.name }}),
@@ -493,17 +493,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     ),
                     {{ field.destination_class.read_name }},
                 )
-            ){% else %}{% for end_class in field.destination_classes %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name( edge_{{ field.name }}),
-                    dm.query.NodeResultSetExpression(
-                        from_= edge_{{ field.name }},{% if end_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{ end_class.read_name }}._view_id]),{% endif %}
-                    ),
-                    {{ end_class.read_name }},
-                )
-            ){% endfor %}{% endif %}{% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_reverse_direct_relation %}
+            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_reverse_direct_relation %}
             builder.append(
                 NodeQueryStep(
                     builder.create_name(from_root),
@@ -515,7 +505,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     ),
                     {{field.destination_class.read_name }},
                 )
-            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_direct_relation and field.end_classes %}
+            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_direct_relation and field.destination_class %}
             builder.append(
                 NodeQueryStep(
                     builder.create_name(from_root),
