@@ -107,7 +107,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
-                    direction="outwards",
+                    direction="inwards",
                 ),
                 max_retrieve_limit=limit,
             )
@@ -173,7 +173,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
-                    direction="outwards",
+                    direction="inwards",
                 ),
                 max_retrieve_limit=limit,
             )

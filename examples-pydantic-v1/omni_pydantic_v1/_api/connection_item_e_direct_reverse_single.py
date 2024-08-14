@@ -44,10 +44,10 @@ class ConnectionItemEDirectReverseSingleAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("", ""),
-            from_connection_item_e,
-            from_connection_item_e_space,
             to_connection_item_d,
             to_connection_item_d_space,
+            from_connection_item_e,
+            from_connection_item_e_space,
             external_id_prefix,
             space,
         )

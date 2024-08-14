@@ -601,26 +601,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             )
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_work_orders),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_work_orders,
-                        filter=dm.filters.HasData(views=[EquipmentModule._view_id]),
-                    ),
-                    EquipmentModule,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_work_units),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_work_units,
-                        filter=dm.filters.HasData(views=[WorkOrder._view_id]),
-                    ),
-                    WorkOrder,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
                     builder.create_name(edge_work_units),
                     dm.query.NodeResultSetExpression(
                         from_=edge_work_units,
