@@ -64,7 +64,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = "
+                "Union[ConnectionItemD, str, dm.NodeId, None] = "
                 'Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
@@ -142,7 +142,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = "
+                "Union[ConnectionItemDWrite, str, dm.NodeId, None] = "
                 'Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
@@ -219,7 +219,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                'Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="inwardsSingle")',
+                'Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
         ],
@@ -291,8 +291,8 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "[inwards_single.as_write() if isinstance(inwards_single, DomainModel) else inwards_single "
-                "for inwards_single in self.inwards_single or []]",
+                "self.inwards_single.as_write() "
+                "if isinstance(self.inwards_single, DomainModel) else self.inwards_single ",
                 id="Inwards SingleEdge no properties",
             ),
         ],
@@ -368,7 +368,8 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "[inwards_single.as_write() for inwards_single in self.inwards_single or []]",
+                "self.inwards_single.as_write()\nif isinstance(self.inwards_single, GraphQLCore)"
+                "\nelse self.inwards_single",
                 id="Inwards SingleEdge no properties",
             ),
         ],
@@ -444,7 +445,8 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "[inwards_single.as_read() for inwards_single in self.inwards_single or []]",
+                "self.inwards_single.as_read()\nif isinstance(self.inwards_single, GraphQLCore)\nelse "
+                "self.inwards_single",
                 id="Inwards SingleEdge no properties",
             ),
         ],
