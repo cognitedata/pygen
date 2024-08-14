@@ -11,7 +11,7 @@ from cognite.pygen._core.models import (
     Field,
     NodeDataClass,
 )
-from cognite.pygen._core.models.fields import EdgeClasses
+from cognite.pygen._core.models.fields import EdgeClass
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ViewPropertyNameCollisionWarning,
@@ -60,14 +60,14 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
 
 def field_type_hints_test_cases():
-    site_apply_edge = MagicMock(spec=EdgeClasses)
+    site_apply_edge = MagicMock(spec=EdgeClass)
     site_apply1 = MagicMock(spec=NodeDataClass)
     site_apply1.read_name = "Site"
     site_apply1.write_name = "SiteApply"
     site_apply1.is_writable = True
     site_apply_edge.end_class = site_apply1
 
-    site_apply_edge2 = MagicMock(spec=EdgeClasses)
+    site_apply_edge2 = MagicMock(spec=EdgeClass)
     site_apply2 = MagicMock(spec=NodeDataClass)
     site_apply2.read_name = "Site"
     site_apply2.write_name = "SiteApply"

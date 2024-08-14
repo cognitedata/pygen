@@ -24,20 +24,31 @@ if TYPE_CHECKING:
 
 @total_ordering
 @dataclass(frozen=True)
-class EdgeClasses:
+class EdgeClass:
     """This represents a specific edge type linking two data classes."""
 
     start_class: NodeDataClass
     edge_type: dm.DirectRelationReference
     end_class: NodeDataClass
+    used_directions: set[Literal["outwards", "inwards"]]
 
-    def __lt__(self, other: EdgeClasses) -> bool:
-        if isinstance(other, EdgeClasses):
-            return self.end_class < other.end_class
+    def __lt__(self, other: EdgeClass) -> bool:
+        if isinstance(other, EdgeClass):
+            return (
+                self.start_class.read_name,
+                self.end_class.read_name,
+                self.edge_type.space,
+                self.edge_type.external_id,
+            ) < (
+                other.start_class.read_name,
+                other.end_class.read_name,
+                other.edge_type.space,
+                other.edge_type.external_id,
+            )
         return NotImplemented
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, EdgeClasses):
+        if isinstance(other, EdgeClass):
             return (
                 self.end_class.read_name == other.end_class.read_name
                 and self.edge_type == other.edge_type
@@ -58,7 +69,7 @@ class EndNodeField(Field):
     This is a special class that is not instantiated from a property, but is created in the edge data class.
     """
 
-    edge_classes: list[EdgeClasses]
+    edge_classes: list[EdgeClass]
 
     @property
     def is_connection(self) -> bool:

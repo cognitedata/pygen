@@ -19,7 +19,7 @@ from .fields import (
     BaseConnectionField,
     BasePrimitiveField,
     CDFExternalField,
-    EdgeClasses,
+    EdgeClass,
     EndNodeField,
     Field,
     OneToManyConnectionField,
@@ -596,20 +596,25 @@ class EdgeDataClass(DataClass):
     ):
         # Find all node views that have an edge with properties in this view
         # and get the node class it is pointing to.
-        edge_classes = []
+        edge_classes: dict[tuple[str, dm.DirectRelationReference, str], EdgeClass] = {}
         for view in views:
             view_id = view.as_id()
             if view_id not in node_class_by_view_id:
                 continue
-            start_class = node_class_by_view_id[view_id]
-            for _prop_name, prop in view.properties.items():
+            source_class = node_class_by_view_id[view_id]
+            for prop in view.properties.values():
                 if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
-                    end_class = node_class_by_view_id[prop.source]
-                    start, end = (start_class, end_class) if prop.direction == "outwards" else (end_class, start_class)
-
-                    new_edge_class = EdgeClasses(start, prop.type, end)
-                    if new_edge_class not in edge_classes:
-                        edge_classes.append(new_edge_class)
+                    destination_class = node_class_by_view_id[prop.source]
+                    start, end = (
+                        (source_class, destination_class)
+                        if prop.direction == "outwards"
+                        else (destination_class, source_class)
+                    )
+                    identifier = start.read_name, prop.type, end.read_name
+                    if edge_class := edge_classes.get(identifier):
+                        edge_class.used_directions.add(prop.direction)
+                    else:
+                        edge_classes[identifier] = EdgeClass(start, prop.type, end, {prop.direction})
 
         self._end_node_field = EndNodeField(
             name="end_node",
@@ -617,7 +622,7 @@ class EdgeDataClass(DataClass):
             prop_name="end_node",
             description="The end node of this edge.",
             pydantic_field="Field",
-            edge_classes=edge_classes,
+            edge_classes=list(edge_classes.values()),
         )
         self.fields.append(self._end_node_field)
         super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)
