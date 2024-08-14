@@ -14,12 +14,12 @@ from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
 
 if IS_PYDANTIC_V2:
     from omni import OmniClient
-    from windmill import WindmillClient
     from scenario_instance.client import ScenarioInstanceClient
+    from windmill import WindmillClient
 else:
     from omni_pydantic_v1 import OmniClient
-    from windmill_pydantic_v1 import WindmillClient
     from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
+    from windmill_pydantic_v1 import WindmillClient
 
 
 @pytest.fixture(scope="session")
