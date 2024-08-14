@@ -251,6 +251,14 @@ from ._sub_interface import (
 )
 
 
+CDFExternalReferencesGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+CDFExternalReferencesListedGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
 ConnectionItemA.update_forward_refs(
     ConnectionItemA=ConnectionItemA,
     ConnectionItemB=ConnectionItemB,

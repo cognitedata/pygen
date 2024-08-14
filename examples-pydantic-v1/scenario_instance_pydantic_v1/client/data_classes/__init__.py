@@ -27,6 +27,11 @@ from ._scenario_instance import (
 )
 
 
+ScenarioInstanceGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
+
 __all__ = [
     "DataRecord",
     "DataRecordGraphQL",

@@ -422,16 +422,28 @@ class MultiAPIGenerator:
 
         dependencies_by_names: dict[tuple[str, str, str, bool, bool], list[DataClass]] = defaultdict(list)
         for api in self.apis:
-            for dep in api.data_class.dependencies:
+            dependencies = api.data_class.dependencies
+            if dependencies:
+                for dep in api.data_class.dependencies:
+                    dependencies_by_names[
+                        (
+                            api.data_class.read_name,
+                            api.data_class.graphql_name,
+                            api.data_class.write_name,
+                            api.data_class.is_writable or api.data_class.is_interface,
+                            api.data_class.has_timeseries_fields(),
+                        )
+                    ].append(dep)
+            elif has_timeseries_fields := api.data_class.has_timeseries_fields():
                 dependencies_by_names[
                     (
                         api.data_class.read_name,
                         api.data_class.graphql_name,
                         api.data_class.write_name,
                         api.data_class.is_writable or api.data_class.is_interface,
-                        api.data_class.has_timeseries_fields(),
+                        has_timeseries_fields,
                     )
-                ].append(dep)
+                ] = []
 
         return (
             data_class_init.render(

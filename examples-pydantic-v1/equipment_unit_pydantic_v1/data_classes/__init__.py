@@ -59,6 +59,10 @@ from ._work_order import (
 )
 
 
+EquipmentModuleGraphQL.update_forward_refs(
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
+)
+
 UnitProcedure.update_forward_refs(
     StartEndTime=StartEndTime,
 )
