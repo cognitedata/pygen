@@ -1,7 +1,12 @@
+import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
+from cognite.pygen._core.models import NodeDataClass
 from cognite.pygen.config import PygenConfig
+from cognite.pygen.warnings import (
+    ViewNameCollisionWarning,
+)
 from tests.utils import to_data_class_by_view_id
 
 
@@ -33,6 +38,104 @@ class TestDataClasses:
 
         # Assert
         assert api_generator.data_class.has_primitive_field_of_type(dm.Date)
+
+    def test_variable_and_variable_list_named_the_same(self, pygen_config: PygenConfig) -> None:
+        view = dm.View.load(_SINGULAR_PLURAL_EQUALS)
+        base_name = NodeDataClass.to_base_name(view)
+        node_class = NodeDataClass.from_view(view, base_name, "node", pygen_config.naming.data_class)
+
+        assert node_class.variable != node_class.variable_list
+
+    def test_data_class_is_time(self, pygen_config: PygenConfig) -> None:
+        # Arrange
+        view = dm.View.load(_VIEW_WITH_TIME_PROPERTY_RAW)
+
+        # Act
+        data_class = NodeDataClass.from_view(
+            view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
+        )
+        data_class.update_fields(
+            view.properties,
+            {
+                view.as_id(): data_class,
+            },
+            {},
+            [view],
+            pygen_config,
+        )
+
+        # Assert
+        assert data_class.has_primitive_field_of_type(dm.TimeSeriesReference) is True
+
+    @pytest.mark.parametrize(
+        "name, expected_name",
+        [
+            ("DomainModel", "DomainModel_"),
+            ("DomainModelList", "DomainModelList_"),
+            ("DomainModelWrite", "DomainModelWrite_"),
+        ],
+    )
+    def test_data_class_from_view_expected_warning(
+        self, name: str, expected_name: str, pygen_config: PygenConfig
+    ) -> None:
+        # Arrange
+        view = dm.View(
+            space="dummy",
+            external_id=name,
+            version="dummy",
+            properties={},
+            name=name,
+            last_updated_time=1,
+            created_time=1,
+            is_global=False,
+            description="missing",
+            used_for="node",
+            writable=True,
+            filter=None,
+            implements=None,
+        )
+
+        # Act
+        with pytest.warns(ViewNameCollisionWarning):
+            actual = NodeDataClass.from_view(
+                view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
+            )
+        # Assert
+        assert actual.read_name == expected_name
+
+    @pytest.mark.parametrize(
+        "name, expected_name",
+        [
+            ("Core", "_core_"),
+        ],
+    )
+    def test_data_class_from_view_expected_warning_file_name(
+        self, name: str, expected_name: str, pygen_config: PygenConfig
+    ) -> None:
+        # Arrange
+        view = dm.View(
+            space="dummy",
+            external_id=name,
+            version="dummy",
+            properties={},
+            name=name,
+            last_updated_time=1,
+            created_time=1,
+            is_global=False,
+            description="missing",
+            used_for="node",
+            writable=True,
+            filter=None,
+            implements=None,
+        )
+
+        # Act
+        with pytest.warns(ViewNameCollisionWarning):
+            actual = NodeDataClass.from_view(
+                view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
+            )
+        # Assert
+        assert actual.file_name == expected_name
 
 
 _DEPENDENCY_NAMED_FIELD = """
@@ -118,3 +221,66 @@ _DEPENDENCY_NAMED_FIELD = """
     lastUpdatedTime: 1705560037472
     createdTime: 1705560037472
 """
+
+_SINGULAR_PLURAL_EQUALS = """
+space: "power-ops"
+externalId: "Series"
+name: "Series"
+version: "59d189398e78be"
+writable: True
+usedFor: "node"
+isGlobal: False
+properties: {}
+lastUpdatedTime: 1695295084756
+createdTime: 1695295084756
+"""
+
+_VIEW_WITH_TIME_PROPERTY_RAW = {
+    "space": "power-ops",
+    "externalId": "PriceArea",
+    "name": "PriceArea",
+    "version": "6849ae787cd368",
+    "writable": True,
+    "usedFor": "node",
+    "isGlobal": False,
+    "properties": {
+        "name": {
+            "container": {"space": "power-ops", "externalId": "PriceArea"},
+            "containerPropertyIdentifier": "name",
+            "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+            "nullable": True,
+            "autoIncrement": False,
+            "immutable": False,
+            "source": None,
+            "defaultValue": None,
+            "name": "name",
+            "description": None,
+        },
+        "description": {
+            "container": {"space": "power-ops", "externalId": "PriceArea"},
+            "containerPropertyIdentifier": "description",
+            "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+            "nullable": True,
+            "autoIncrement": False,
+            "immutable": False,
+            "source": None,
+            "defaultValue": None,
+            "name": "description",
+            "description": None,
+        },
+        "dayAheadPrice": {
+            "container": {"space": "power-ops", "externalId": "PriceArea"},
+            "containerPropertyIdentifier": "dayAheadPrice",
+            "type": {"list": False, "type": "timeseries"},
+            "nullable": True,
+            "autoIncrement": False,
+            "immutable": False,
+            "source": None,
+            "defaultValue": None,
+            "name": "dayAheadPrice",
+            "description": None,
+        },
+    },
+    "lastUpdatedTime": 1692020117686,
+    "createdTime": 1692020117686,
+}
