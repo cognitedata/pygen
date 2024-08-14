@@ -132,6 +132,14 @@ class BaseConnectionField(Field, ABC):
     edge_class: EdgeDataClass | None
 
     @property
+    def linked_class(self) -> NodeDataClass | EdgeDataClass:
+        if self.edge_class:
+            return self.edge_class
+        elif self.destination_class:
+            return self.destination_class
+        raise ValueError("Bug in Pygen: Direct relation without source does not have a linked class")
+
+    @property
     def reverse_property(self) -> BaseConnectionField:
         if self.through is None:
             raise ValueError("Bug in Pygen: Trying to get reverse property for a non-reverse direct relation")

@@ -338,7 +338,9 @@ class DataClass:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
-                if field_.destination_class:
+                if field_.edge_class:
+                    unique[field_.edge_class.view_id] = field_.edge_class
+                elif field_.destination_class:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[field_.destination_class.view_id] = field_.destination_class
@@ -351,7 +353,7 @@ class DataClass:
     @property
     def dependencies_with_edge_destinations(self) -> list[DataClass]:
         """Return a list of all dependencies which also includes the edge
-        destination if th dependency is a EdgeClass."""
+        destination if the dependency is a EdgeClass."""
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
@@ -359,12 +361,13 @@ class DataClass:
                     # This will overwrite any existing data class with the same view id
                     # however, this is not a problem as all data classes are uniquely identified by their view id
                     unique[field_.destination_class.view_id] = field_.destination_class
-                    if field_.edge_class:
-                        for edge_class in field_.edge_class.end_node_field.edge_classes:
-                            if field_.edge_direction == "outwards":
-                                unique[edge_class.end_class.view_id] = edge_class.end_class
-                            else:
-                                unique[edge_class.start_class.view_id] = edge_class.start_class
+                if field_.edge_class:
+                    unique[field_.edge_class.view_id] = field_.edge_class
+                    for edge_class in field_.edge_class.end_node_field.edge_classes:
+                        if field_.edge_direction == "outwards":
+                            unique[edge_class.end_class.view_id] = edge_class.end_class
+                        else:
+                            unique[edge_class.start_class.view_id] = edge_class.start_class
             elif isinstance(field_, EndNodeField):
                 for class_ in field_.end_classes:
                     unique[class_.view_id] = class_
