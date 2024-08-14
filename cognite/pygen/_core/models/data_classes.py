@@ -564,6 +564,7 @@ class EdgeDataClass(DataClass):
     """This represent data class used for views marked as used_for='edge'."""
 
     has_node_class: bool
+    _end_node_field: EndNodeField | None = None
 
     @property
     def typed_properties_name(self) -> str:
@@ -578,10 +579,9 @@ class EdgeDataClass(DataClass):
 
     @property
     def end_node_field(self) -> EndNodeField:
-        try:
-            return next(field_ for field_ in self.fields if isinstance(field_, EndNodeField))
-        except StopIteration:
-            raise ValueError("EdgeDataClass has not been initialized.") from None
+        if self._end_node_field:
+            return self._end_node_field
+        raise ValueError("EdgeDataClass has not been initialized.")
 
     def update_fields(
         self,
@@ -608,14 +608,13 @@ class EdgeDataClass(DataClass):
                     if new_edge_class not in edge_classes:
                         edge_classes.append(new_edge_class)
 
-        self.fields.append(
-            EndNodeField(
-                name="end_node",
-                doc_name="end node",
-                prop_name="end_node",
-                description="The end node of this edge.",
-                pydantic_field="Field",
-                edge_classes=edge_classes,
-            )
+        self._end_node_field = EndNodeField(
+            name="end_node",
+            doc_name="end node",
+            prop_name="end_node",
+            description="The end node of this edge.",
+            pydantic_field="Field",
+            edge_classes=edge_classes,
         )
+        self.fields.append(self._end_node_field)
         super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)
