@@ -23,6 +23,9 @@ Changes are grouped as follows
 - Edges with properties now correctly generates the end_node field for direction `inwards`.
 - Edges with properties now have the correct destination node when multiple edge properties
   have the same edge type.
+- If a view property starts with a digit or contains a hyphen, the generated data class will
+  now have the property name prefixed with `no_` to make it a valid Python variable name instead
+  of raising an exception.
 
 ## [0.99.30] - 24-08-13
 ### Added

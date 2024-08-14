@@ -1,6 +1,7 @@
 import importlib
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 
 from cognite.client import data_modeling as dm
 
@@ -39,6 +40,22 @@ class TestGenerateSDK:
 
         generate_sdk(
             DATA_MODEL_WITH_VIEW_WITHOUT_PROPERTIES,
+            top_level_package=top_level_package,
+            output_dir=tmp_path,
+            overwrite=True,
+            client_name=client_name,
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
+    def test_generate_sdk_with_illegal_property_names(self, tmp_path: Path) -> None:
+        client_name = "IllegalPropertyNamesClient"
+        top_level_package = "illegal_property_names_model"
+
+        generate_sdk(
+            DATA_MODEL_WITH_ILLEGAL_PROPERTY_NAMES,
             top_level_package=top_level_package,
             output_dir=tmp_path,
             overwrite=True,
@@ -136,6 +153,51 @@ DATA_MODEL_WITH_VIEW_WITHOUT_PROPERTIES = dm.DataModel(
             external_id="NoProperties",
             version="1",
             properties={},
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        )
+    ],
+)
+
+DATA_MODEL_WITH_ILLEGAL_PROPERTY_NAMES = dm.DataModel(
+    space="illegal_property_names_space",
+    external_id="IllegalPropertyNamesModel",
+    version="1",
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="illegal_property_names_space",
+            name="IllegalPropertyNames",
+            external_id="IllegalPropertyNames",
+            version="1",
+            properties={
+                "name-tag": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+                "3d-field": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="field",
+                    type=dm.Text(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+            },
             description=None,
             is_global=False,
             last_updated_time=0,
