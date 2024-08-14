@@ -34,6 +34,7 @@ from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, Connect
 
 if TYPE_CHECKING:
     from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+    from ._connection_item_f import ConnectionItemF, ConnectionItemFGraphQL, ConnectionItemFWrite
     from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 
 
@@ -75,7 +76,7 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemEGraphQL, ConnectionItemGGraphQL, None] = None
+    end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -132,7 +133,7 @@ class ConnectionEdgeA(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemE, ConnectionItemG, str, dm.NodeId]
+    end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -176,7 +177,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemEWrite, ConnectionItemGWrite, str, dm.NodeId]
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -383,13 +384,15 @@ def _create_connection_edge_a_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    ConnectionItemEWrite: {ConnectionItemFWrite, ConnectionItemFWrite},
+    ConnectionItemEWrite: {ConnectionItemFWrite},
+    ConnectionItemFWrite: {ConnectionItemEWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
 }
 
 
 def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[ConnectionItemEWrite, ConnectionItemGWrite, str, dm.NodeId]
+    start_node: DomainModelWrite,
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
@@ -420,6 +423,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         connection_name: str | None = None,
     ):
         from ._connection_item_e import _ConnectionItemEQuery
+        from ._connection_item_f import _ConnectionItemFQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)

@@ -372,18 +372,22 @@ DependentOnNonWritableApply.update_forward_refs()
 
 ConnectionEdgeA.update_forward_refs(
     ConnectionItemE=ConnectionItemE,
+    ConnectionItemF=ConnectionItemF,
     ConnectionItemG=ConnectionItemG,
 )
 ConnectionEdgeAGraphQL.update_forward_refs(
     ConnectionItemEGraphQL=ConnectionItemEGraphQL,
+    ConnectionItemFGraphQL=ConnectionItemFGraphQL,
     ConnectionItemGGraphQL=ConnectionItemGGraphQL,
 )
 ConnectionEdgeAWrite.update_forward_refs(
     ConnectionItemEWrite=ConnectionItemEWrite,
+    ConnectionItemFWrite=ConnectionItemFWrite,
     ConnectionItemGWrite=ConnectionItemGWrite,
 )
 ConnectionEdgeAApply.update_forward_refs(
     ConnectionItemEWrite=ConnectionItemEWrite,
+    ConnectionItemFWrite=ConnectionItemFWrite,
     ConnectionItemGWrite=ConnectionItemGWrite,
 )
 

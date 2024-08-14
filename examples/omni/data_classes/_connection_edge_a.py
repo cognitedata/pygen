@@ -384,9 +384,9 @@ def _create_connection_edge_a_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+    ConnectionItemEWrite: {ConnectionItemFWrite},
     ConnectionItemFWrite: {ConnectionItemEWrite},
     ConnectionItemGWrite: {ConnectionItemFWrite},
-    ConnectionItemEWrite: {ConnectionItemFWrite},
 }
 
 
