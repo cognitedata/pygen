@@ -144,6 +144,7 @@ NacelleGraphQL.update_forward_refs(
     HighSpeedShaftGraphQL=HighSpeedShaftGraphQL,
     MainShaftGraphQL=MainShaftGraphQL,
     PowerInverterGraphQL=PowerInverterGraphQL,
+    TimeSeriesGraphQL=TimeSeriesGraphQL,
 )
 NacelleWrite.update_forward_refs(
     GearboxWrite=GearboxWrite,

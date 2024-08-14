@@ -12,6 +12,7 @@ from ._core import (
     ResourcesWrite,
     ResourcesWriteResult,
     PageInfo,
+    TimeSeriesGraphQL,
 )
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
@@ -24,7 +25,8 @@ from ._core import (
     {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
 )
 {{ graphql_name }}.update_forward_refs({% for dependency in dependencies %}
-    {{ dependency.graphql_name }}={{ dependency.graphql_name }},{%  endfor %}
+    {{ dependency.graphql_name }}={{ dependency.graphql_name }},{%  endfor %}{% if dependency.has_timeseries_fields %}
+    TimeSeriesGraphQL=TimeSeriesGraphQL,{% endif %}
 ){% if has_write_class %}
 {{ write_name }}.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
     {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
@@ -48,7 +50,8 @@ __all__ = [
     "GraphQLCore",
     "GraphQLList",
     "ResourcesWriteResult",
-    "PageInfo",{% for class_ in classes %}
+    "PageInfo",
+    "TimeSeriesGraphQL",{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.graphql_name }}",{% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_name }}",
