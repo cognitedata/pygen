@@ -25,8 +25,8 @@ class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
         self,
         from_connection_item_f: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         from_connection_item_f_space: str = DEFAULT_INSTANCE_SPACE,
-        to_connection_item_e: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_connection_item_e_space: str = DEFAULT_INSTANCE_SPACE,
+        to_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_connection_item_g_space: str = DEFAULT_INSTANCE_SPACE,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
@@ -42,8 +42,8 @@ class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
         Args:
             from_connection_item_f: ID of the source connection item f.
             from_connection_item_f_space: Location of the connection item fs.
-            to_connection_item_e: ID of the target connection item e.
-            to_connection_item_e_space: Location of the connection item es.
+            to_connection_item_g: ID of the target connection item g.
+            to_connection_item_g_space: Location of the connection item gs.
             min_end_time: The minimum value of the end time to filter on.
             max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
@@ -72,8 +72,8 @@ class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
             self._view_id,
             from_connection_item_f,
             from_connection_item_f_space,
-            to_connection_item_e,
-            to_connection_item_e_space,
+            to_connection_item_g,
+            to_connection_item_g_space,
             min_end_time,
             max_end_time,
             name,

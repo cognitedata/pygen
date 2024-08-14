@@ -212,7 +212,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     "outwards_multi",
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
+                    dm.ViewId("pygen-models", "ConnectionItemG", "1"),
                 ),
             ],
         )
