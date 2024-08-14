@@ -361,6 +361,7 @@ class OmniFiles:
     connection_item_b_query = api / "connection_item_b_query.py"
     connection_item_c_query = api / "connection_item_c_node_query.py"
     connection_item_d_query = api / "connection_item_d_query.py"
+    connection_item_f_query = api / "connection_item_f_query.py"
 
 
 OMNI_SDK.append_manual_files(OmniFiles)

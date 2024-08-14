@@ -10,9 +10,9 @@ from omni.data_classes import (
     ConnectionItemF,
     ConnectionEdgeA,
 )
-from omni.data_classes._connection_item_e import (
-    ConnectionItemE,
-    _create_connection_item_e_filter,
+from omni.data_classes._connection_item_g import (
+    ConnectionItemG,
+    _create_connection_item_g_filter,
 )
 from ._core import (
     DEFAULT_QUERY_LIMIT,
@@ -29,7 +29,7 @@ from omni.data_classes._connection_edge_a import (
 )
 
 if TYPE_CHECKING:
-    from .connection_item_e_query import ConnectionItemEQueryAPI
+    from .connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
@@ -73,7 +73,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemEQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemGQueryAPI[T_DomainModelList]:
         """Query along the outwards multi edges of the connection item f.
 
         Args:
@@ -97,7 +97,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         Returns:
             ConnectionItemEQueryAPI: The query API for the connection item e.
         """
-        from .connection_item_e_query import ConnectionItemEQueryAPI
+        from .connection_item_g_query import ConnectionItemGQueryAPI
 
         # from is a string as we added a node query step in the __init__ method
         from_ = cast(str, self._builder.get_from())
@@ -127,18 +127,17 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
 
-        view_id = ConnectionItemEQueryAPI._view_id
+        view_id = ConnectionItemGQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_e_filter(
+        node_filer = _create_connection_item_g_filter(
             view_id,
-            direct_no_source,
             name,
             name_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemEQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemGQueryAPI(self._client, self._builder, node_filer, limit)
 
     def query(
         self,
