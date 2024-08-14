@@ -642,7 +642,7 @@ class APIGenerator:
                     _grouped_edge_classes[edge_class.end_class.write_name].add(edge_class.start_class.write_name)
                 elif "inwards" in edge_class.used_directions:
                     _grouped_edge_classes[edge_class.start_class.write_name].add(edge_class.end_class.write_name)
-            for start_class, end_classes in _grouped_edge_classes.items():
+            for start_class, end_classes in sorted(_grouped_edge_classes.items(), key=lambda x: x[0]):
                 grouped_edge_classes[start_class] = sorted(end_classes)
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")

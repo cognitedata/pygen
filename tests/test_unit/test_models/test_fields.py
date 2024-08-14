@@ -66,6 +66,7 @@ def field_type_hints_test_cases():
     site_apply1.write_name = "SiteApply"
     site_apply1.is_writable = True
     site_apply_edge.end_class = site_apply1
+    site_apply_edge.used_directions = {"outwards"}
 
     site_apply_edge2 = MagicMock(spec=EdgeClass)
     site_apply2 = MagicMock(spec=NodeDataClass)
@@ -73,6 +74,7 @@ def field_type_hints_test_cases():
     site_apply2.write_name = "SiteApply"
     site_apply2.is_writable = True
     site_apply_edge2.end_class = site_apply2
+    site_apply_edge2.used_directions = {"outwards"}
 
     field = EndNodeField(
         name="end_node",
