@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    as_direct_relation_reference,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,

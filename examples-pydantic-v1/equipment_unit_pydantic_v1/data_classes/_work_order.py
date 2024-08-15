@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    as_direct_relation_reference,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -179,7 +180,7 @@ class WorkOrderWrite(DomainModelWrite):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
     type_: Optional[str] = Field(None, alias="type")
@@ -210,7 +211,7 @@ class WorkOrderWrite(DomainModelWrite):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=self.node_type,
+                type=as_direct_relation_reference(self.node_type),
                 sources=[
                     dm.NodeOrEdgeData(
                         source=self._view_id,

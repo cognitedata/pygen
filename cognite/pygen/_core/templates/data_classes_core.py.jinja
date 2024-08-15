@@ -233,6 +233,18 @@ def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
     return dm.NodeId(space=value.space, external_id=value.external_id)
 
 
+def as_direct_relation_reference(
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None
+) -> dm.DirectRelationReference | None:
+    if value is None or isinstance(value, dm.DirectRelationReference):
+        return value
+    if isinstance(value, dm.NodeId):
+        return dm.DirectRelationReference(space=value.space, external_id=value.external_id)
+    if isinstance(value, tuple):
+        return dm.DirectRelationReference(space=value[0], external_id=value[1])
+    raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
+
+
 class DomainModelCore(Core, ABC):
     _view_id: ClassVar[dm.ViewId]
 
@@ -398,7 +410,7 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
 class DomainModelWrite(DomainModelCore{% if is_pydantic_v2 %}, extra="ignore", populate_by_name=True{% endif %}):
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
-    node_type: Optional[dm.DirectRelationReference] = None{% if not is_pydantic_v2 %}
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None{% if not is_pydantic_v2 %}
 
     class Config:
         extra = Extra.ignore
