@@ -233,7 +233,9 @@ def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
     return dm.NodeId(space=value.space, external_id=value.external_id)
 
 
-def as_direct_relation_reference(value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None) -> dm.DirectRelationReference | None:
+def as_direct_relation_reference(
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None
+) -> dm.DirectRelationReference | None:
     if value is None or isinstance(value, dm.DirectRelationReference):
         return value
     if isinstance(value, dm.NodeId):
