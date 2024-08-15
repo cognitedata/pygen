@@ -463,7 +463,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression({% if data_class.has_container_fields %}
                     filter=dm.filters.And(filter_, has_data) if filter_ else has_data{% else %}filter=filter_{% endif %},{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
+                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
                 ),
                 {{ data_class.read_name }},
                 max_retrieve_limit=limit,
