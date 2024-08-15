@@ -50,12 +50,13 @@ __all__ = [
 ]
 
 
-PrimitiveNullableTextFields = Literal["text"]
+PrimitiveNullableTextFields = Literal["external_id", "text"]
 PrimitiveNullableFields = Literal[
-    "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+    "externalId", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
 ]
 
 _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "boolean": "boolean",
     "date": "date",
     "float_32": "float32",
