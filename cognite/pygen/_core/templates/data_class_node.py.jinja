@@ -152,7 +152,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
     {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
+    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 {% if data_class.is_writable or data_class.is_interface %}
     def as_write(self) -> {{ data_class.write_name }}:
@@ -316,7 +316,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
 {% if not data_class.implements %}
     space: str = DEFAULT_INSTANCE_SPACE{% endif %}
-    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_write(
@@ -336,7 +336,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             space=self.space,
             external_id=self.external_id,
             existing_version=None if allow_version_increase else self.data_record.existing_version,{% if data_class.node_type %}
-            type=self.node_type,{% endif %}
+            type=as_direct_relation_reference(self.node_type),{% endif %}
             sources=None,
         )
         resources.nodes.append(this_node)

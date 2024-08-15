@@ -21,6 +21,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    as_direct_relation_reference,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -235,7 +236,9 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "pygen-models", "ConnectionItemC"
+    )
     connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )

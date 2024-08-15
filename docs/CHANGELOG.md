@@ -31,6 +31,8 @@ Changes are grouped as follows
 - Support for edges with properties of type `single_edge_connection`.
 - Support for retrieving `GraphQL` queries with datapoints`
 - Support for searching on `external_id` in the generated SDK.
+- In write data class, allow node type to be `tuple` and `NodeId` as well as
+  `DirectRelationReference`.
 
 ## [0.99.30] - 24-08-13
 ### Added

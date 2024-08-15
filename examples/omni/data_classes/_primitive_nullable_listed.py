@@ -22,6 +22,7 @@ from ._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
+    as_direct_relation_reference,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
@@ -235,7 +236,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = None
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     boolean: Optional[list[bool]] = None
     date: Optional[list[datetime.date]] = None
     float_32: Optional[list[float]] = Field(None, alias="float32")
@@ -292,7 +293,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=self.node_type,
+                type=as_direct_relation_reference(self.node_type),
                 sources=[
                     dm.NodeOrEdgeData(
                         source=self._view_id,
