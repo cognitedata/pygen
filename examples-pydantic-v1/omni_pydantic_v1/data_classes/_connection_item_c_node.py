@@ -261,7 +261,7 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
             space=self.space,
             external_id=self.external_id,
             existing_version=None if allow_version_increase else self.data_record.existing_version,
-            type=self.node_type,
+            type=as_direct_relation_reference(self.node_type),
             sources=None,
         )
         resources.nodes.append(this_node)
