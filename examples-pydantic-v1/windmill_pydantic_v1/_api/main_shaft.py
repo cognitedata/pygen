@@ -24,6 +24,7 @@ from windmill_pydantic_v1.data_classes import (
     MainShaftFields,
     MainShaftList,
     MainShaftWriteList,
+    MainShaftTextFields,
 )
 from windmill_pydantic_v1.data_classes._main_shaft import (
     MainShaftQuery,
@@ -188,6 +189,61 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
         """
         return self._retrieve(external_id, space)
+
+    def search(
+        self,
+        query: str,
+        properties: MainShaftTextFields | SequenceNotStr[MainShaftTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        sort_by: MainShaftFields | SequenceNotStr[MainShaftFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+    ) -> MainShaftList:
+        """Search main shafts
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of main shafts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+
+        Returns:
+            Search results main shafts matching the query.
+
+        Examples:
+
+           Search for 'my_main_shaft' in all text properties:
+
+                >>> from windmill_pydantic_v1 import WindmillClient
+                >>> client = WindmillClient()
+                >>> main_shafts = client.main_shaft.search('my_main_shaft')
+
+        """
+        filter_ = _create_main_shaft_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._search(
+            query=query,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,  # type: ignore[arg-type]
+            direction=direction,
+            sort=sort,
+        )
 
     @overload
     def aggregate(

@@ -46,8 +46,10 @@ __all__ = [
 ]
 
 
-StartEndTimeFields = Literal["end_time", "start_time"]
+StartEndTimeTextFields = Literal["external_id",]
+StartEndTimeFields = Literal["external_id", "end_time", "start_time"]
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "end_time": "end_time",
     "start_time": "start_time",
 }

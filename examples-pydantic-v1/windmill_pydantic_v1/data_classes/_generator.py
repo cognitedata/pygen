@@ -43,10 +43,11 @@ __all__ = [
 ]
 
 
-GeneratorTextFields = Literal["generator_speed_controller", "generator_speed_controller_reference"]
-GeneratorFields = Literal["generator_speed_controller", "generator_speed_controller_reference"]
+GeneratorTextFields = Literal["external_id", "generator_speed_controller", "generator_speed_controller_reference"]
+GeneratorFields = Literal["external_id", "generator_speed_controller", "generator_speed_controller_reference"]
 
 _GENERATOR_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "generator_speed_controller": "generator_speed_controller",
     "generator_speed_controller_reference": "generator_speed_controller_reference",
 }

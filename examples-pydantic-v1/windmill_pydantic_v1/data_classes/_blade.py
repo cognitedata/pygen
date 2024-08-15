@@ -48,10 +48,11 @@ __all__ = [
 ]
 
 
-BladeTextFields = Literal["name"]
-BladeFields = Literal["is_damaged", "name"]
+BladeTextFields = Literal["external_id", "name"]
+BladeFields = Literal["external_id", "is_damaged", "name"]
 
 _BLADE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "is_damaged": "is_damaged",
     "name": "name",
 }

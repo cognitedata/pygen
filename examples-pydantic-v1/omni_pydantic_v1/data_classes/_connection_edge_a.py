@@ -50,9 +50,10 @@ __all__ = [
 ]
 
 
-ConnectionEdgeATextFields = Literal["name"]
-ConnectionEdgeAFields = Literal["end_time", "name", "start_time"]
+ConnectionEdgeATextFields = Literal["external_id", "name"]
+ConnectionEdgeAFields = Literal["external_id", "end_time", "name", "start_time"]
 _CONNECTIONEDGEA_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "end_time": "endTime",
     "name": "name",
     "start_time": "startTime",
