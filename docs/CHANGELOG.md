@@ -30,6 +30,7 @@ Changes are grouped as follows
 ## Added
 - Support for edges with properties of type `single_edge_connection`.
 - Support for retrieving `GraphQL` queries with datapoints`
+- Support for searching on `external_id` in the generated SDK.
 
 ## [0.99.30] - 24-08-13
 ### Added
