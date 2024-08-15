@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-SubInterfaceTextFields = Literal["main_value", "sub_value"]
-SubInterfaceFields = Literal["main_value", "sub_value"]
+SubInterfaceTextFields = Literal["external_id", "main_value", "sub_value"]
+SubInterfaceFields = Literal["external_id", "main_value", "sub_value"]
 
 _SUBINTERFACE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "main_value": "mainValue",
     "sub_value": "subValue",
 }

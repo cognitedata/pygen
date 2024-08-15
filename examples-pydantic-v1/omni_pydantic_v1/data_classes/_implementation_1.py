@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-Implementation1TextFields = Literal["main_value", "sub_value", "value_1", "value_2"]
-Implementation1Fields = Literal["main_value", "sub_value", "value_1", "value_2"]
+Implementation1TextFields = Literal["external_id", "main_value", "sub_value", "value_1", "value_2"]
+Implementation1Fields = Literal["external_id", "main_value", "sub_value", "value_1", "value_2"]
 
 _IMPLEMENTATION1_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "main_value": "mainValue",
     "sub_value": "subValue",
     "value_1": "value1",

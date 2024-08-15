@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-RotorTextFields = Literal["rotor_speed_controller", "rpm_low_speed_shaft"]
-RotorFields = Literal["rotor_speed_controller", "rpm_low_speed_shaft"]
+RotorTextFields = Literal["external_id", "rotor_speed_controller", "rpm_low_speed_shaft"]
+RotorFields = Literal["external_id", "rotor_speed_controller", "rpm_low_speed_shaft"]
 
 _ROTOR_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "rotor_speed_controller": "rotor_speed_controller",
     "rpm_low_speed_shaft": "rpm_low_speed_shaft",
 }

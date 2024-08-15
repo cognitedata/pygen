@@ -54,13 +54,14 @@ __all__ = [
 
 
 NacelleTextFields = Literal[
-    "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
+    "external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
 ]
 NacelleFields = Literal[
-    "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
+    "external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
 ]
 
 _NACELLE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "acc_from_back_side_x": "acc_from_back_side_x",
     "acc_from_back_side_y": "acc_from_back_side_y",
     "acc_from_back_side_z": "acc_from_back_side_z",

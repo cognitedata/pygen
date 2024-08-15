@@ -47,10 +47,11 @@ __all__ = [
 ]
 
 
-UnitProcedureTextFields = Literal["name", "type_"]
-UnitProcedureFields = Literal["name", "type_"]
+UnitProcedureTextFields = Literal["external_id", "name", "type_"]
+UnitProcedureFields = Literal["external_id", "name", "type_"]
 
 _UNITPROCEDURE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "name": "name",
     "type_": "type",
 }

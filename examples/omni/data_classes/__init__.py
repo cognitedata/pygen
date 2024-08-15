@@ -21,6 +21,7 @@ from ._cdf_external_references import (
     CDFExternalReferencesFields,
     CDFExternalReferencesGraphQL,
     CDFExternalReferencesList,
+    CDFExternalReferencesTextFields,
     CDFExternalReferencesWrite,
     CDFExternalReferencesWriteList,
 )
@@ -31,6 +32,7 @@ from ._cdf_external_references_listed import (
     CDFExternalReferencesListedFields,
     CDFExternalReferencesListedGraphQL,
     CDFExternalReferencesListedList,
+    CDFExternalReferencesListedTextFields,
     CDFExternalReferencesListedWrite,
     CDFExternalReferencesListedWriteList,
 )
@@ -67,13 +69,21 @@ from ._connection_item_b import (
     ConnectionItemBWrite,
     ConnectionItemBWriteList,
 )
-from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList
+from ._connection_item_c_edge import (
+    ConnectionItemCEdge,
+    ConnectionItemCEdgeFields,
+    ConnectionItemCEdgeGraphQL,
+    ConnectionItemCEdgeList,
+    ConnectionItemCEdgeTextFields,
+)
 from ._connection_item_c_node import (
     ConnectionItemCNode,
     ConnectionItemCNodeApply,
     ConnectionItemCNodeApplyList,
+    ConnectionItemCNodeFields,
     ConnectionItemCNodeGraphQL,
     ConnectionItemCNodeList,
+    ConnectionItemCNodeTextFields,
     ConnectionItemCNodeWrite,
     ConnectionItemCNodeWriteList,
 )
@@ -321,6 +331,7 @@ __all__ = [
     "CDFExternalReferencesWriteList",
     "CDFExternalReferencesApplyList",
     "CDFExternalReferencesFields",
+    "CDFExternalReferencesTextFields",
     "CDFExternalReferencesListed",
     "CDFExternalReferencesListedGraphQL",
     "CDFExternalReferencesListedWrite",
@@ -329,6 +340,7 @@ __all__ = [
     "CDFExternalReferencesListedWriteList",
     "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
+    "CDFExternalReferencesListedTextFields",
     "ConnectionEdgeA",
     "ConnectionEdgeAGraphQL",
     "ConnectionEdgeAWrite",
@@ -359,6 +371,8 @@ __all__ = [
     "ConnectionItemCEdge",
     "ConnectionItemCEdgeGraphQL",
     "ConnectionItemCEdgeList",
+    "ConnectionItemCEdgeFields",
+    "ConnectionItemCEdgeTextFields",
     "ConnectionItemCNode",
     "ConnectionItemCNodeGraphQL",
     "ConnectionItemCNodeWrite",
@@ -366,6 +380,8 @@ __all__ = [
     "ConnectionItemCNodeList",
     "ConnectionItemCNodeWriteList",
     "ConnectionItemCNodeApplyList",
+    "ConnectionItemCNodeFields",
+    "ConnectionItemCNodeTextFields",
     "ConnectionItemD",
     "ConnectionItemDGraphQL",
     "ConnectionItemDWrite",

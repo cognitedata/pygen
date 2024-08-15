@@ -44,10 +44,11 @@ __all__ = [
 ]
 
 
-MainInterfaceTextFields = Literal["main_value"]
-MainInterfaceFields = Literal["main_value"]
+MainInterfaceTextFields = Literal["external_id", "main_value"]
+MainInterfaceFields = Literal["external_id", "main_value"]
 
 _MAININTERFACE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "main_value": "mainValue",
 }
 

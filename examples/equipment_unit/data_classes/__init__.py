@@ -32,6 +32,7 @@ from ._start_end_time import (
     StartEndTimeFields,
     StartEndTimeGraphQL,
     StartEndTimeList,
+    StartEndTimeTextFields,
     StartEndTimeWrite,
     StartEndTimeWriteList,
 )
@@ -104,6 +105,7 @@ __all__ = [
     "StartEndTimeWriteList",
     "StartEndTimeApplyList",
     "StartEndTimeFields",
+    "StartEndTimeTextFields",
     "UnitProcedure",
     "UnitProcedureGraphQL",
     "UnitProcedureWrite",

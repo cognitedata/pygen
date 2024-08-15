@@ -46,10 +46,11 @@ __all__ = [
 ]
 
 
-MetmastTextFields = Literal["temperature", "tilt_angle", "wind_speed"]
-MetmastFields = Literal["position", "temperature", "tilt_angle", "wind_speed"]
+MetmastTextFields = Literal["external_id", "temperature", "tilt_angle", "wind_speed"]
+MetmastFields = Literal["external_id", "position", "temperature", "tilt_angle", "wind_speed"]
 
 _METMAST_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "position": "position",
     "temperature": "temperature",
     "tilt_angle": "tilt_angle",

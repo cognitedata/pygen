@@ -50,14 +50,15 @@ __all__ = [
     {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}"{{ data_class.text_field_names }}",{% endif %}
     "{{ data_class.graphql_name }}",
 ]
-{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
-{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
 
-{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
+{{ data_class.text_field_names }} = Literal["external_id", {{ data_class.text_fields_literals }}]
+{{ data_class.field_names }} = Literal["external_id", {{ data_class.fields_literals }}]
+
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}
+    "external_id": "externalId",{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
-{% raw %}}{% endraw %}{% endif %}
+{% raw %}}{% endraw %}
 
 class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}, used

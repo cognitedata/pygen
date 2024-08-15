@@ -41,6 +41,13 @@ __all__ = [
 ]
 
 
+ConnectionItemCEdgeTextFields = Literal["external_id",]
+ConnectionItemCEdgeFields = Literal["external_id",]
+_CONNECTIONITEMCEDGE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
+}
+
+
 class ConnectionItemCEdgeGraphQL(GraphQLCore):
     """This represents the reading version of connection item c edge, used
     when data is retrieved from CDF using GraphQL.

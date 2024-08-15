@@ -45,6 +45,14 @@ __all__ = [
 ]
 
 
+ConnectionItemCNodeTextFields = Literal["external_id",]
+ConnectionItemCNodeFields = Literal["external_id",]
+
+_CONNECTIONITEMCNODE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
+}
+
+
 class ConnectionItemCNodeGraphQL(GraphQLCore):
     """This represents the reading version of connection item c node, used
     when data is retrieved from CDF using GraphQL.

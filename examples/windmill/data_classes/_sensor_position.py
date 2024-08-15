@@ -47,6 +47,7 @@ __all__ = [
 
 
 SensorPositionTextFields = Literal[
+    "external_id",
     "edgewise_bend_mom_crosstalk_corrected",
     "edgewise_bend_mom_offset",
     "edgewise_bend_mom_offset_crosstalk_corrected",
@@ -57,6 +58,7 @@ SensorPositionTextFields = Literal[
     "flapwise_bend_mom_offset_crosstalk_corrected",
 ]
 SensorPositionFields = Literal[
+    "external_id",
     "edgewise_bend_mom_crosstalk_corrected",
     "edgewise_bend_mom_offset",
     "edgewise_bend_mom_offset_crosstalk_corrected",
@@ -69,6 +71,7 @@ SensorPositionFields = Literal[
 ]
 
 _SENSORPOSITION_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "edgewise_bend_mom_crosstalk_corrected": "edgewise_bend_mom_crosstalk_corrected",
     "edgewise_bend_mom_offset": "edgewise_bend_mom_offset",
     "edgewise_bend_mom_offset_crosstalk_corrected": "edgewise_bend_mom_offset_crosstalk_corrected",

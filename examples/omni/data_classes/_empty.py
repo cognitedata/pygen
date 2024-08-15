@@ -50,10 +50,13 @@ __all__ = [
 ]
 
 
-EmptyTextFields = Literal["text"]
-EmptyFields = Literal["boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+EmptyTextFields = Literal["external_id", "text"]
+EmptyFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _EMPTY_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "boolean": "boolean",
     "date": "date",
     "float_32": "float32",

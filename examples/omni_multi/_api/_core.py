@@ -45,6 +45,7 @@ DEFAULT_LIMIT_READ = 25
 DEFAULT_QUERY_LIMIT = 3
 IN_FILTER_LIMIT = 5_000
 INSTANCE_QUERY_LIMIT = 1_000
+NODE_PROPERTIES = {"externalId", "space"}
 
 Aggregations = Literal["avg", "count", "max", "min", "sum"]
 
@@ -139,7 +140,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     ) -> T_DomainModelList:
         properties_input = self._to_input_properties(properties)
 
-        sort_input = self._get_sort(sort_by, direction, sort)
+        sort_input = self._create_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.search(
             view=self._view_id,
             query=query,
@@ -263,7 +264,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
-        sort_input = self._get_sort(sort_by, direction, sort)
+        sort_input = self._create_sort(sort_by, direction, sort)
         nodes = self._client.data_modeling.instances.list(
             instance_type="node",
             sources=self._view_id,
@@ -277,7 +278,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
         return node_list
 
-    def _get_sort(
+    def _create_sort(
         self,
         sort_by: str | list[str] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
@@ -285,28 +286,27 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     ) -> list[InstanceSort] | None:
         sort_input: list[InstanceSort] | None = None
         if sort is None and isinstance(sort_by, str):
-            sort_input = [
-                InstanceSort(self._view_id.as_property_ref(self._properties_by_field.get(sort_by, sort_by)), direction)
-            ]
+            sort_input = [self._create_sort_entry(sort_by, direction)]
         elif sort is None and isinstance(sort_by, list):
-            sort_input = [
-                InstanceSort(
-                    self._view_id.as_property_ref(self._properties_by_field.get(sort_by_, sort_by_)), direction
-                )
-                for sort_by_ in sort_by
-            ]
+            sort_input = [self._create_sort_entry(sort_by_, direction) for sort_by_ in sort_by]
         elif sort is not None:
             sort_input = sort if isinstance(sort, list) else [sort]
             for sort_ in sort_input:
                 if isinstance(sort_.property, Sequence) and len(sort_.property) == 1:
-                    sort_.property = self._view_id.as_property_ref(
-                        self._properties_by_field.get(sort_.property[0], sort_.property[0])
-                    )
+                    sort_.property = self._create_property_reference(sort_.property[0])
                 elif isinstance(sort_.property, str):
-                    sort_.property = self._view_id.as_property_ref(
-                        self._properties_by_field.get(sort_.property, sort_.property)
-                    )
+                    sort_.property = self._create_property_reference(sort_.property)
         return sort_input
+
+    def _create_sort_entry(self, sort_by: str, direction: Literal["ascending", "descending"]) -> InstanceSort:
+        return InstanceSort(self._create_property_reference(sort_by), direction)
+
+    def _create_property_reference(self, property_: str) -> list[str] | tuple[str, ...]:
+        prop_name = self._properties_by_field.get(property_, property_)
+        if prop_name in NODE_PROPERTIES:
+            return ["node", prop_name]
+        else:
+            return self._view_id.as_property_ref(prop_name)
 
     def _retrieve_and_set_edge_types(
         self,

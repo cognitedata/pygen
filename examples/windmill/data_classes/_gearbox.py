@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-GearboxTextFields = Literal["displacement_x", "displacement_y", "displacement_z"]
-GearboxFields = Literal["displacement_x", "displacement_y", "displacement_z"]
+GearboxTextFields = Literal["external_id", "displacement_x", "displacement_y", "displacement_z"]
+GearboxFields = Literal["external_id", "displacement_x", "displacement_y", "displacement_z"]
 
 _GEARBOX_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "displacement_x": "displacement_x",
     "displacement_y": "displacement_y",
     "displacement_z": "displacement_z",

@@ -44,10 +44,11 @@ __all__ = [
 ]
 
 
-WorkOrderTextFields = Literal["description", "performed_by", "type_"]
-WorkOrderFields = Literal["description", "performed_by", "type_"]
+WorkOrderTextFields = Literal["external_id", "description", "performed_by", "type_"]
+WorkOrderFields = Literal["external_id", "description", "performed_by", "type_"]
 
 _WORKORDER_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "description": "description",
     "performed_by": "performedBy",
     "type_": "type",

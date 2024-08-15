@@ -24,6 +24,7 @@ from omni.data_classes import (
     CDFExternalReferencesFields,
     CDFExternalReferencesList,
     CDFExternalReferencesWriteList,
+    CDFExternalReferencesTextFields,
 )
 from omni.data_classes._cdf_external_references import (
     CDFExternalReferencesQuery,
@@ -186,6 +187,61 @@ class CDFExternalReferencesAPI(
 
         """
         return self._retrieve(external_id, space)
+
+    def search(
+        self,
+        query: str,
+        properties: CDFExternalReferencesTextFields | SequenceNotStr[CDFExternalReferencesTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        sort_by: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+    ) -> CDFExternalReferencesList:
+        """Search cdf external references
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+
+        Returns:
+            Search results cdf external references matching the query.
+
+        Examples:
+
+           Search for 'my_cdf_external_reference' in all text properties:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> cdf_external_references = client.cdf_external_references.search('my_cdf_external_reference')
+
+        """
+        filter_ = _create_cdf_external_reference_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._search(
+            query=query,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,  # type: ignore[arg-type]
+            direction=direction,
+            sort=sort,
+        )
 
     @overload
     def aggregate(

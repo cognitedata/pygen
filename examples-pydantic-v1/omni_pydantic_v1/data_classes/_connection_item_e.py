@@ -48,10 +48,11 @@ __all__ = [
 ]
 
 
-ConnectionItemETextFields = Literal["name"]
-ConnectionItemEFields = Literal["name"]
+ConnectionItemETextFields = Literal["external_id", "name"]
+ConnectionItemEFields = Literal["external_id", "name"]
 
 _CONNECTIONITEME_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "name": "name",
 }
 

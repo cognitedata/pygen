@@ -259,10 +259,8 @@ class DataClass:
         if self.is_writable:
             import_classes.append(self.write_list_name)
             import_classes.append(f"{self.read_name}ApplyList")
-        if self.has_field_of_type(BasePrimitiveField):
-            import_classes.append(self.field_names)
-        if self.has_primitive_field_of_type(dm.Text):
-            import_classes.append(self.text_field_names)
+        import_classes.append(self.field_names)
+        import_classes.append(self.text_field_names)
         return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
 
     def __iter__(self) -> Iterator[Field]:

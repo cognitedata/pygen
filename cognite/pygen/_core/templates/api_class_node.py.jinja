@@ -6,8 +6,8 @@ from typing import overload, Literal
 import warnings
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort{% endif %}
+from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from {{ top_level_package }}.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -21,11 +21,11 @@ from {{ top_level_package }}.data_classes import (
     DomainModelWrite,
     ResourcesWriteResult,
     {{ data_class.read_name }},{% if data_class.is_writable %}
-    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-    {{ data_class.field_names }},{% endif %}
+    {{ data_class.write_name }},{% endif %}
+    {{ data_class.field_names }},
     {{ data_class.read_list_name }},{% if data_class.is_writable %}
-    {{ data_class.write_list_name }},{% endif %}{% if data_class.has_primitive_field_of_type(dm.Text) %}
-    {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
+    {{ data_class.write_list_name }},{% endif %}
+    {{ data_class.text_field_names }},{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
     {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
@@ -203,7 +203,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         {% else %}
         return self._retrieve(external_id, space){% endif %}
-{% if data_class.has_primitive_field_of_type(dm.Text) %}
+
     def search(
         self,
         query: str,
@@ -254,8 +254,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
-        ){% endif %}
-{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        )
+
     @overload
     def aggregate(
         self,
@@ -399,7 +399,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit,
             filter_,
         )
-{% endif %}
 
     def query(self) -> {{ data_class.query_cls_name }}:
         """Start a query for connection item as."""
@@ -464,7 +463,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression({% if data_class.has_container_fields %}
                     filter=dm.filters.And(filter_, has_data) if filter_ else has_data{% else %}filter=filter_{% endif %},{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
+                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
                 ),
                 {{ data_class.read_name }},
                 max_retrieve_limit=limit,

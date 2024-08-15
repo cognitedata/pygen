@@ -528,7 +528,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
                 ConnectionItemD,
                 max_retrieve_limit=limit,

@@ -43,10 +43,11 @@ __all__ = [
 ]
 
 
-CDFExternalReferencesTextFields = Literal["file", "sequence", "timeseries"]
-CDFExternalReferencesFields = Literal["file", "sequence", "timeseries"]
+CDFExternalReferencesTextFields = Literal["external_id", "file", "sequence", "timeseries"]
+CDFExternalReferencesFields = Literal["external_id", "file", "sequence", "timeseries"]
 
 _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "file": "file",
     "sequence": "sequence",
     "timeseries": "timeseries",

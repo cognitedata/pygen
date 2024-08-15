@@ -51,10 +51,11 @@ __all__ = [
 ]
 
 
-WindmillTextFields = Literal["name", "windfarm"]
-WindmillFields = Literal["capacity", "name", "windfarm"]
+WindmillTextFields = Literal["external_id", "name", "windfarm"]
+WindmillFields = Literal["external_id", "capacity", "name", "windfarm"]
 
 _WINDMILL_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "capacity": "capacity",
     "name": "name",
     "windfarm": "windfarm",
