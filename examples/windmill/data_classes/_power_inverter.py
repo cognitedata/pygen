@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-PowerInverterTextFields = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
-PowerInverterFields = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
+PowerInverterTextFields = Literal["external_id", "active_power_total", "apparent_power_total", "reactive_power_total"]
+PowerInverterFields = Literal["external_id", "active_power_total", "apparent_power_total", "reactive_power_total"]
 
 _POWERINVERTER_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "active_power_total": "active_power_total",
     "apparent_power_total": "apparent_power_total",
     "reactive_power_total": "reactive_power_total",

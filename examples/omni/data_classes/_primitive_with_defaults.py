@@ -47,12 +47,13 @@ __all__ = [
 ]
 
 
-PrimitiveWithDefaultsTextFields = Literal["default_string"]
+PrimitiveWithDefaultsTextFields = Literal["external_id", "default_string"]
 PrimitiveWithDefaultsFields = Literal[
-    "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"
+    "external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"
 ]
 
 _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "auto_increment_int_32": "autoIncrementInt32",
     "default_boolean": "defaultBoolean",
     "default_float_32": "defaultFloat32",

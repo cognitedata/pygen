@@ -6,6 +6,7 @@ import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -20,8 +21,10 @@ from omni.data_classes import (
     ResourcesWriteResult,
     ConnectionItemCNode,
     ConnectionItemCNodeWrite,
+    ConnectionItemCNodeFields,
     ConnectionItemCNodeList,
     ConnectionItemCNodeWriteList,
+    ConnectionItemCNodeTextFields,
     ConnectionItemA,
     ConnectionItemB,
 )
@@ -208,6 +211,197 @@ class ConnectionItemCNodeAPI(
                     dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
             ],
+        )
+
+    def search(
+        self,
+        query: str,
+        properties: ConnectionItemCNodeTextFields | SequenceNotStr[ConnectionItemCNodeTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        sort_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+    ) -> ConnectionItemCNodeList:
+        """Search connection item c nodes
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+
+        Returns:
+            Search results connection item c nodes matching the query.
+
+        Examples:
+
+           Search for 'my_connection_item_c_node' in all text properties:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> connection_item_c_nodes = client.connection_item_c_node.search('my_connection_item_c_node')
+
+        """
+        filter_ = _create_connection_item_c_node_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._search(
+            query=query,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,  # type: ignore[arg-type]
+            direction=direction,
+            sort=sort,
+        )
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: Aggregations | dm.aggregations.MetricAggregation,
+        group_by: None = None,
+        property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        group_by: None = None,
+        property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
+        group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields],
+        property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList: ...
+
+    def aggregate(
+        self,
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
+        group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> (
+        dm.aggregations.AggregatedNumberedValue
+        | list[dm.aggregations.AggregatedNumberedValue]
+        | InstanceAggregationResultList
+    ):
+        """Aggregate data across connection item c nodes
+
+        Args:
+            aggregate: The aggregation to perform.
+            group_by: The property to group by when doing the aggregation.
+            property: The property to perform aggregation on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count connection item c nodes in space `my_space`:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> result = client.connection_item_c_node.aggregate("count", space="my_space")
+
+        """
+
+        filter_ = _create_connection_item_c_node_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._aggregate(
+            aggregate=aggregate,
+            group_by=group_by,  # type: ignore[arg-type]
+            properties=property,  # type: ignore[arg-type]
+            query=None,
+            search_properties=None,
+            limit=limit,
+            filter=filter_,
+        )
+
+    def histogram(
+        self,
+        property: ConnectionItemCNodeFields,
+        interval: float,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for connection item c nodes
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
+        filter_ = _create_connection_item_c_node_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._histogram(
+            property,
+            interval,
+            None,
+            None,
+            limit,
+            filter_,
         )
 
     def query(self) -> ConnectionItemCNodeQuery:

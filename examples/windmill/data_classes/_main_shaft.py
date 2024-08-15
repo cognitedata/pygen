@@ -45,10 +45,15 @@ __all__ = [
 ]
 
 
-MainShaftTextFields = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
-MainShaftFields = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
+MainShaftTextFields = Literal[
+    "external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"
+]
+MainShaftFields = Literal[
+    "external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"
+]
 
 _MAINSHAFT_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "bending_x": "bending_x",
     "bending_y": "bending_y",
     "calculated_tilt_moment": "calculated_tilt_moment",

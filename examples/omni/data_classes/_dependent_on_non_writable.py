@@ -47,10 +47,11 @@ __all__ = [
 ]
 
 
-DependentOnNonWritableTextFields = Literal["a_value"]
-DependentOnNonWritableFields = Literal["a_value"]
+DependentOnNonWritableTextFields = Literal["external_id", "a_value"]
+DependentOnNonWritableFields = Literal["external_id", "a_value"]
 
 _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "a_value": "aValue",
 }
 

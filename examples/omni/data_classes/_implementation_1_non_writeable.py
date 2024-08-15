@@ -41,10 +41,11 @@ __all__ = [
 ]
 
 
-Implementation1NonWriteableTextFields = Literal["main_value", "sub_value", "value_1"]
-Implementation1NonWriteableFields = Literal["main_value", "sub_value", "value_1"]
+Implementation1NonWriteableTextFields = Literal["external_id", "main_value", "sub_value", "value_1"]
+Implementation1NonWriteableFields = Literal["external_id", "main_value", "sub_value", "value_1"]
 
 _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "main_value": "mainValue",
     "sub_value": "subValue",
     "value_1": "value1",

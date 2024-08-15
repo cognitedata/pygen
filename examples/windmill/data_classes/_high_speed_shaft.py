@@ -45,10 +45,11 @@ __all__ = [
 ]
 
 
-HighSpeedShaftTextFields = Literal["bending_moment_y", "bending_monent_x", "torque"]
-HighSpeedShaftFields = Literal["bending_moment_y", "bending_monent_x", "torque"]
+HighSpeedShaftTextFields = Literal["external_id", "bending_moment_y", "bending_monent_x", "torque"]
+HighSpeedShaftFields = Literal["external_id", "bending_moment_y", "bending_monent_x", "torque"]
 
 _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "bending_moment_y": "bending_moment_y",
     "bending_monent_x": "bending_monent_x",
     "torque": "torque",

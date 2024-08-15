@@ -24,6 +24,7 @@ from windmill.data_classes import (
     NacelleFields,
     NacelleList,
     NacelleWriteList,
+    NacelleTextFields,
     Gearbox,
     Generator,
     HighSpeedShaft,
@@ -208,6 +209,76 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
         """
         return self._retrieve(external_id, space)
+
+    def search(
+        self,
+        query: str,
+        properties: NacelleTextFields | SequenceNotStr[NacelleTextFields] | None = None,
+        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        sort_by: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+    ) -> NacelleList:
+        """Search nacelles
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            gearbox: The gearbox to filter on.
+            generator: The generator to filter on.
+            high_speed_shaft: The high speed shaft to filter on.
+            main_shaft: The main shaft to filter on.
+            power_inverter: The power inverter to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of nacelles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+
+        Returns:
+            Search results nacelles matching the query.
+
+        Examples:
+
+           Search for 'my_nacelle' in all text properties:
+
+                >>> from windmill import WindmillClient
+                >>> client = WindmillClient()
+                >>> nacelles = client.nacelle.search('my_nacelle')
+
+        """
+        filter_ = _create_nacelle_filter(
+            self._view_id,
+            gearbox,
+            generator,
+            high_speed_shaft,
+            main_shaft,
+            power_inverter,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._search(
+            query=query,
+            properties=properties,
+            filter_=filter_,
+            limit=limit,
+            sort_by=sort_by,  # type: ignore[arg-type]
+            direction=direction,
+            sort=sort,
+        )
 
     @overload
     def aggregate(
@@ -471,7 +542,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._get_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
                 ),
                 Nacelle,
                 max_retrieve_limit=limit,
