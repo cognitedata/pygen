@@ -21,11 +21,11 @@ from {{ top_level_package }}.data_classes import (
     DomainModelWrite,
     ResourcesWriteResult,
     {{ data_class.read_name }},{% if data_class.is_writable %}
-    {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-    {{ data_class.field_names }},{% endif %}
+    {{ data_class.write_name }},{% endif %}
+    {{ data_class.field_names }},
     {{ data_class.read_list_name }},{% if data_class.is_writable %}
-    {{ data_class.write_list_name }},{% endif %}{% if data_class.has_primitive_field_of_type(dm.Text) %}
-    {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
+    {{ data_class.write_list_name }},{% endif %}
+    {{ data_class.text_field_names }},{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
     {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
@@ -203,7 +203,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         {% else %}
         return self._retrieve(external_id, space){% endif %}
-{% if data_class.has_primitive_field_of_type(dm.Text) %}
+
     def search(
         self,
         query: str,
@@ -254,8 +254,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort_by=sort_by,  # type: ignore[arg-type]
             direction=direction,
             sort=sort,
-        ){% endif %}
-{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        )
+
     @overload
     def aggregate(
         self,
@@ -399,7 +399,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit,
             filter_,
         )
-{% endif %}
 
     def query(self) -> {{ data_class.query_cls_name }}:
         """Start a query for connection item as."""
