@@ -442,7 +442,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         )
 
     def query(self) -> ConnectionItemGQuery:
-        """Start a query for connection item as."""
+        """Start a query for connection item gs."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return ConnectionItemGQuery(self._client)
 

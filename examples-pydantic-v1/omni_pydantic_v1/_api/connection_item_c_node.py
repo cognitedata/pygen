@@ -405,7 +405,7 @@ class ConnectionItemCNodeAPI(
         )
 
     def query(self) -> ConnectionItemCNodeQuery:
-        """Start a query for connection item as."""
+        """Start a query for connection item c nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return ConnectionItemCNodeQuery(self._client)
 

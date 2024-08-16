@@ -611,7 +611,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         )
 
     def query(self) -> EmptyQuery:
-        """Start a query for connection item as."""
+        """Start a query for empties."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return EmptyQuery(self._client)
 

@@ -507,7 +507,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         )
 
     def query(self) -> Implementation1Query:
-        """Start a query for connection item as."""
+        """Start a query for implementation 1."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return Implementation1Query(self._client)
 

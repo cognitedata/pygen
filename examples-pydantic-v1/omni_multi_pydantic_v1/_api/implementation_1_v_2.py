@@ -479,7 +479,7 @@ class Implementation1v2API(
         )
 
     def query(self) -> Implementation1v2Query:
-        """Start a query for connection item as."""
+        """Start a query for implementation 1 v 2."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return Implementation1v2Query(self._client)
 

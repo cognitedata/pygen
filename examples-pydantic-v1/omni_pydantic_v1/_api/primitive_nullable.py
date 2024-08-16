@@ -615,7 +615,7 @@ class PrimitiveNullableAPI(
         )
 
     def query(self) -> PrimitiveNullableQuery:
-        """Start a query for connection item as."""
+        """Start a query for primitive nullables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return PrimitiveNullableQuery(self._client)
 

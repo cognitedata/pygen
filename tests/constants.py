@@ -320,6 +320,7 @@ class OmniFiles:
     data_init = data_classes / "__init__.py"
     api = client_dir / "_api"
     core_api = api / "_core.py"
+    core_init = api / "__init__.py"
     client_init = client_dir / "__init__.py"
     cdf_external_data = data_classes / "_cdf_external_references.py"
     cdf_external_timeseries_api = api / "cdf_external_references_timeseries.py"

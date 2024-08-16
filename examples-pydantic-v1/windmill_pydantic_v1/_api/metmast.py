@@ -408,7 +408,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
         )
 
     def query(self) -> MetmastQuery:
-        """Start a query for connection item as."""
+        """Start a query for metmasts."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return MetmastQuery(self._client)
 

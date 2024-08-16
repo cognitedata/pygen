@@ -452,7 +452,7 @@ class DependentOnNonWritableAPI(
         )
 
     def query(self) -> DependentOnNonWritableQuery:
-        """Start a query for connection item as."""
+        """Start a query for dependent on non writables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return DependentOnNonWritableQuery(self._client)
 

@@ -451,7 +451,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         )
 
     def query(self) -> BladeQuery:
-        """Start a query for connection item as."""
+        """Start a query for blades."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return BladeQuery(self._client)
 

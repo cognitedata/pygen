@@ -28,7 +28,7 @@ from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
-from .models.api_classes import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
+from .models.api_classes import APIClass, EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
 
 
@@ -375,7 +375,7 @@ class MultiAPIGenerator:
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
 
-        sdk = {(api_dir / "__init__.py"): ""}
+        sdk: dict[Path, str] = {}
         for api in self.apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
@@ -396,6 +396,7 @@ class MultiAPIGenerator:
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
+        sdk[api_dir / "__init__.py"] = self.generate_api_init_file()
 
         sdk[data_classes_dir / "_core" / "base.py"] = self.generate_data_class_core_base_file()
         sdk[data_classes_dir / "_core" / "constants.py"] = self.generate_data_class_core_constants_file()
@@ -416,6 +417,22 @@ class MultiAPIGenerator:
             )
             + "\n"
         )
+
+    def generate_api_init_file(self) -> str:
+        """Generate the core API file for the SDK."""
+        api_core = self.env.get_template("api_init.py.jinja")
+        api_classes: list[APIClass] = []
+        for api in self.apis:
+            if api.used_for != "node":
+                continue
+            api_classes.append(api.api_class)
+            api_classes.append(api.query_api)
+            api_classes.extend(api.edge_apis or [])
+            api_classes.extend(api.timeseries_apis or [])
+
+        api_classes = sorted(api_classes, key=lambda api: api.name)
+
+        return api_core.render(api_classes=api_classes).removeprefix("\n") + "\n"
 
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""

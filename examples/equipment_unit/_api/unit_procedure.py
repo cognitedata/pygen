@@ -480,7 +480,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         )
 
     def query(self) -> UnitProcedureQuery:
-        """Start a query for connection item as."""
+        """Start a query for unit procedures."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return UnitProcedureQuery(self._client)
 

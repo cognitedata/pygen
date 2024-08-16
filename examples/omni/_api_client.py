@@ -8,27 +8,29 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.cdf_external_references import CDFExternalReferencesAPI
-from ._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
-from ._api.connection_item_a import ConnectionItemAAPI
-from ._api.connection_item_b import ConnectionItemBAPI
-from ._api.connection_item_c_node import ConnectionItemCNodeAPI
-from ._api.connection_item_d import ConnectionItemDAPI
-from ._api.connection_item_e import ConnectionItemEAPI
-from ._api.connection_item_f import ConnectionItemFAPI
-from ._api.connection_item_g import ConnectionItemGAPI
-from ._api.dependent_on_non_writable import DependentOnNonWritableAPI
-from ._api.empty import EmptyAPI
-from ._api.implementation_1 import Implementation1API
-from ._api.implementation_1_non_writeable import Implementation1NonWriteableAPI
-from ._api.implementation_2 import Implementation2API
-from ._api.main_interface import MainInterfaceAPI
-from ._api.primitive_nullable import PrimitiveNullableAPI
-from ._api.primitive_nullable_listed import PrimitiveNullableListedAPI
-from ._api.primitive_required import PrimitiveRequiredAPI
-from ._api.primitive_required_listed import PrimitiveRequiredListedAPI
-from ._api.primitive_with_defaults import PrimitiveWithDefaultsAPI
-from ._api.sub_interface import SubInterfaceAPI
+from ._api import (
+    CDFExternalReferencesAPI,
+    CDFExternalReferencesListedAPI,
+    ConnectionItemAAPI,
+    ConnectionItemBAPI,
+    ConnectionItemCNodeAPI,
+    ConnectionItemDAPI,
+    ConnectionItemEAPI,
+    ConnectionItemFAPI,
+    ConnectionItemGAPI,
+    DependentOnNonWritableAPI,
+    EmptyAPI,
+    Implementation1API,
+    Implementation1NonWriteableAPI,
+    Implementation2API,
+    MainInterfaceAPI,
+    PrimitiveNullableAPI,
+    PrimitiveNullableListedAPI,
+    PrimitiveRequiredAPI,
+    PrimitiveRequiredListedAPI,
+    PrimitiveWithDefaultsAPI,
+    SubInterfaceAPI,
+)
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes

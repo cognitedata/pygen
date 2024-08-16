@@ -462,7 +462,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         )
 
     def query(self) -> NacelleQuery:
-        """Start a query for connection item as."""
+        """Start a query for nacelles."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return NacelleQuery(self._client)
 

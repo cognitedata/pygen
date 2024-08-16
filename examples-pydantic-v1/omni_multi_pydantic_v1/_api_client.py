@@ -8,10 +8,12 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.implementation_1_v_1 import Implementation1v1API
-from ._api.implementation_1_v_2 import Implementation1v2API
-from ._api.main_interface import MainInterfaceAPI
-from ._api.sub_interface import SubInterfaceAPI
+from ._api import (
+    Implementation1v1API,
+    Implementation1v2API,
+    MainInterfaceAPI,
+    SubInterfaceAPI,
+)
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes

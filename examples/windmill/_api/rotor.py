@@ -376,7 +376,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
         )
 
     def query(self) -> RotorQuery:
-        """Start a query for connection item as."""
+        """Start a query for rotors."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return RotorQuery(self._client)
 

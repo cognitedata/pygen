@@ -446,7 +446,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         )
 
     def query(self) -> Implementation1NonWriteableQuery:
-        """Start a query for connection item as."""
+        """Start a query for implementation 1 non writeables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return Implementation1NonWriteableQuery(self._client)
 

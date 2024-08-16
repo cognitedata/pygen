@@ -37,6 +37,15 @@ nav:
         - Home: config/index.md
         - Naming: config/naming.md
         - Filtering: config/filtering_methods.md
+    - Example Docs:
+        - Home: example_docs/index.md
+        - Omni Client: example_docs/omni_client.md
+        - Omni APIs: example_docs/omni_apis.md
+        - Omni Data Classes: example_docs/omni_data_classes.md
+        - Windmill Client: example_docs/wind_client.md
+        - Windmill APIs: example_docs/wind_apis.md
+        - Windmill Data Classes: example_docs/wind_data_classes.md
+
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md

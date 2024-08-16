@@ -380,7 +380,7 @@ class CDFExternalReferencesAPI(
         )
 
     def query(self) -> CDFExternalReferencesQuery:
-        """Start a query for connection item as."""
+        """Start a query for cdf external references."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return CDFExternalReferencesQuery(self._client)
 
