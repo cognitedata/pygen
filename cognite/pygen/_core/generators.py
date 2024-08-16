@@ -397,7 +397,11 @@ class MultiAPIGenerator:
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
 
-        sdk[data_classes_dir / "_core.py"] = self.generate_data_class_core_file()
+        sdk[data_classes_dir / "_core" / "base.py"] = self.generate_data_class_core_base_file()
+        sdk[data_classes_dir / "_core" / "constants.py"] = self.generate_data_class_core_constants_file()
+        sdk[data_classes_dir / "_core" / "helpers.py"] = self.generate_data_class_core_helpers_file()
+        sdk[data_classes_dir / "_core" / "__init__.py"] = self.generate_data_class_core_init_file()
+        sdk[data_classes_dir / "_core" / "query.py"] = self.generate_data_class_core_query_file()
         return sdk
 
     def generate_api_core_file(self) -> str:
@@ -413,9 +417,49 @@ class MultiAPIGenerator:
             + "\n"
         )
 
-    def generate_data_class_core_file(self) -> str:
+    def generate_data_class_core_base_file(self) -> str:
+        """Generate the core/base.py data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_base.py.jinja")
+        return (
+            data_class_core.render(
+                is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_constants_file(self) -> str:
+        """Generate the core/constants data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_constants.py.jinja")
+        return (
+            data_class_core.render(
+                is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_helpers_file(self) -> str:
+        """Generate the core/helpers data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_helpers.py.jinja")
+        return (
+            data_class_core.render(
+                is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_init_file(self) -> str:
+        """Generate the core/__init__ data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_init.py.jinja")
+        return (
+            data_class_core.render(
+                is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_query_file(self) -> str:
         """Generate the core data classes file for the SDK."""
-        data_class_core = self.env.get_template("data_classes_core.py.jinja")
+        data_class_core = self.env.get_template("data_classes_core_query.py.jinja")
         return (
             data_class_core.render(
                 is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
