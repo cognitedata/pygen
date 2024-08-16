@@ -50,8 +50,9 @@ class DataClass:
     implements: list[DataClass]
     is_writable: bool
     is_interface: bool
+    direct_children: list[DataClass]
 
-    initialization: set[Literal["fields", "parents"]]
+    initialization: set[Literal["fields", "parents", "children"]]
 
     def __lt__(self, other: DataClass):
         if isinstance(other, DataClass):
@@ -120,6 +121,7 @@ class DataClass:
             implements=[],
             is_writable=view.writable,
             is_interface=False,
+            direct_children=[],
             initialization=set(),
         )
 
@@ -167,6 +169,10 @@ class DataClass:
         self.implements.extend(parents)
         self.is_writable = self.is_writable or self.is_all_fields_of_type(OneToManyConnectionField)
         self.initialization.add("parents")
+
+    def update_direct_children(self, children: list[DataClass]):
+        self.direct_children.extend(children)
+        self.initialization.add("children")
 
     @property
     def read_base_class(self) -> str:

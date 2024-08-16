@@ -172,6 +172,18 @@ def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, li
     return unique_parents_by_view_id
 
 
+def to_direct_children_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
+    """Given a list of views, return a dictionary of direct children for each view."""
+    direct_children_by_view_id_: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
+    for view in views:
+        for parent in view.implements or []:
+            direct_children_by_view_id_[parent].add(view.as_id())
+    return {
+        view_id: sorted(children, key=lambda v: v.external_id)
+        for view_id, children in direct_children_by_view_id_.items()
+    }
+
+
 class MultiAPIGenerator:
     """This class is responsible for generating the API and Data Classes for multiple views."""
 
@@ -226,6 +238,7 @@ class MultiAPIGenerator:
         }
         parents = {parent for view in unique_views for parent in view.implements or []}
         parents_by_view_id = to_unique_parents_by_view_id(unique_views)
+        direct_children_by_view_id = to_direct_children_by_view_id(unique_views)
         for api in self.apis:
             api.data_class.update_fields(
                 api.view.properties, node_class_by_view_id, edge_class_by_view_id, unique_views, config
@@ -239,6 +252,13 @@ class MultiAPIGenerator:
                     if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
                 ],
                 api.view_id in parents,
+            )
+            api.data_class.update_direct_children(
+                [
+                    child_api.data_class
+                    for child in direct_children_by_view_id.get(api.view_id, [])
+                    if (child_api := self.api_by_type_by_view_id["node"].get(child))
+                ],
             )
 
         # All data classes have been updated, before we can create edge APIs.
@@ -570,7 +590,7 @@ class APIGenerator:
         return self.view.as_id()
 
     def _validate_initialized(self) -> None:
-        if missing := self.data_class.initialization - {"parents", "fields"}:
+        if missing := self.data_class.initialization - {"parents", "fields", "children"}:
             raise ValueError(f"APIGenerator has not been initialized. Missing {missing}")
 
     @property
