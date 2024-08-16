@@ -204,8 +204,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             external_id: External id or list of external ids of the sub interfaces.
             space: The space where all the sub interfaces are located.
             as_child_class: If you want to retrieve the sub interfaces as a child class,
-                you can specify the child class here. This is useful if you want to retrieve
-                the sub interfaces as a specific child class. Note that if one node has properties in
+                you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.
 
         Returns:

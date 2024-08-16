@@ -179,8 +179,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             external_id: External id or list of external ids of the {{ data_class.doc_list_name }}.
             space: The space where all the {{ data_class.doc_list_name }} are located.{% if data_class.direct_children %}
             as_child_class: If you want to retrieve the {{ data_class.doc_list_name }} as a child class,
-                you can specify the child class here. This is useful if you want to retrieve
-                the {{ data_class.doc_list_name }} as a specific child class. Note that if one node has properties in
+                you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.{% endif %}
 
         Returns:

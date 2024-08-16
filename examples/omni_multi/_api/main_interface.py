@@ -25,6 +25,7 @@ from omni_multi.data_classes import (
     MainInterfaceList,
     MainInterfaceWriteList,
     MainInterfaceTextFields,
+    SubInterface,
 )
 from omni_multi.data_classes._main_interface import (
     MainInterfaceQuery,
@@ -43,6 +44,9 @@ from .main_interface_query import MainInterfaceQueryAPI
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):
     _view_id = dm.ViewId("pygen-models", "MainInterface", "1")
     _properties_by_field = _MAININTERFACE_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id = {
+        "SubInterface": SubInterface,
+    }
     _class_type = MainInterface
     _class_list = MainInterfaceList
     _class_write_list = MainInterfaceWriteList
@@ -157,19 +161,35 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> MainInterface | None: ...
+    def retrieve(
+        self,
+        external_id: str,
+        space: str = DEFAULT_INSTANCE_SPACE,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
+    ) -> MainInterface | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> MainInterfaceList: ...
+    def retrieve(
+        self,
+        external_id: SequenceNotStr[str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
+    ) -> MainInterfaceList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | SequenceNotStr[str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterface | MainInterfaceList | None:
         """Retrieve one or more main interfaces by id(s).
 
         Args:
             external_id: External id or list of external ids of the main interfaces.
             space: The space where all the main interfaces are located.
+            as_child_class: If you want to retrieve the main interfaces as a child class,
+                you can specify the child class here. Note that if one node has properties in
+                multiple child classes, you will get duplicate nodes in the result.
 
         Returns:
             The requested main interfaces.
@@ -183,7 +203,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
                 >>> main_interface = client.main_interface.retrieve("my_main_interface")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(external_id, space, as_child_class=as_child_class)
 
     def search(
         self,
