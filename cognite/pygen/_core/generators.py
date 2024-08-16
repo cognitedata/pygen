@@ -28,7 +28,7 @@ from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
-from .models.api_classes import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
+from .models.api_classes import APIClass, EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
 
 
@@ -421,8 +421,16 @@ class MultiAPIGenerator:
     def generate_api_init_file(self) -> str:
         """Generate the core API file for the SDK."""
         api_core = self.env.get_template("api_init.py.jinja")
+        api_classes: list[APIClass] = []
+        for api in self.apis:
+            api_classes.append(api.api_class)
+            api_classes.append(api.query_api)
+            api_classes.extend(api.edge_apis or [])
+            api_classes.extend(api.timeseries_apis or [])
 
-        return api_core.render() + "\n"
+        api_classes = sorted(api_classes, key=lambda api: api.name)
+
+        return api_core.render(api_classes=api_classes) + "\n"
 
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
