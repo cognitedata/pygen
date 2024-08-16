@@ -469,7 +469,7 @@ def _retrieve_timeseries_external_ids_with_extra_temperature(
         properties.add(extra_properties)
         extra_properties_list = [extra_properties]
     elif isinstance(extra_properties, list):
-        properties.update(properties)
+        properties.update(extra_properties)
         extra_properties_list = extra_properties
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
@@ -489,10 +489,17 @@ def _retrieve_timeseries_external_ids_with_extra_temperature(
     )
     builder.execute(client, unpack=False)
 
-    return {
-        cast(str, node.properties[view_id]["temperature"]): [
-            cast(str, node.properties[view_id].get(prop, "MISSING")) for prop in extra_properties_list
-        ]
-        for node in builder[0].results
-        if node.properties
-    }
+    output: dict[str, list[str]] = {}
+    for node in builder[0].results:
+        if node.properties is None:
+            continue
+        view_prop = node.properties[view_id]
+        key = view_prop["priceForecast"]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
+        if isinstance(key, str):
+            output[key] = values
+        elif isinstance(key, list):
+            for k in key:
+                if isinstance(k, str):
+                    output[k] = values
+    return output

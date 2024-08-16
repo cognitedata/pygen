@@ -572,5 +572,6 @@ def _retrieve_timeseries_external_ids_with_extra_price_forecast(
             output[key] = values
         elif isinstance(key, list):
             for k in key:
-                output[k] = values
+                if isinstance(k, str):
+                    output[k] = values
     return output
