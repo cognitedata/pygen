@@ -7,8 +7,9 @@ from typing import Any, Sequence
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
-{% for api in api_classes %}{% if not api.data_class.is_edge_class %}
-from ._api.{{ api.api_class.file_name }} import {{ api.api_class.name }}{% endif %}{% endfor %}
+from ._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
+    {{ api.api_class.name }},{% endif %}{% endfor %})
+)
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes
