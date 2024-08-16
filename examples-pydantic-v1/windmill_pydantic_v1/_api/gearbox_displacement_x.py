@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, cast
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -10,7 +10,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from windmill_pydantic_v1.data_classes._gearbox import _create_gearbox_filter
-from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
+from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from ._core import DEFAULT_LIMIT_READ
+
 
 ColumnNames = Literal["displacement_x", "displacement_y", "displacement_z"]
 
@@ -450,50 +452,35 @@ def _retrieve_timeseries_external_ids_with_extra_displacement_x(
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "displacement_x",
 ) -> dict[str, list[str]]:
-    limit_input = float("inf") if limit is None or limit == -1 else limit
-    properties = ["displacement_x"]
-    if extra_properties == "displacement_x":
-        ...
-    elif isinstance(extra_properties, str) and extra_properties != "displacement_x":
-        properties.append(extra_properties)
+    properties = {"displacement_x"}
+    if isinstance(extra_properties, str):
+        properties.add(extra_properties)
+        extra_properties_list = [extra_properties]
     elif isinstance(extra_properties, list):
-        properties.extend([prop for prop in extra_properties if prop != "displacement_x"])
+        properties.update(properties)
+        extra_properties_list = extra_properties
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
 
-    if isinstance(extra_properties, str):
-        extra_list = [extra_properties]
-    else:
-        extra_list = extra_properties
     has_data = dm.filters.HasData(views=[view_id])
     has_property = dm.filters.Exists(property=view_id.as_property_ref("displacement_x"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    cursor = None
-    external_ids: dict[str, list[str]] = {}
-    total_retrieved = 0
-    while True:
-        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit_input - total_retrieved), 0)
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=int(query_limit))
-        query = dm.query.Query(
-            with_={
-                "nodes": selected_nodes,
-            },
-            select={
-                "nodes": dm.query.Select(
-                    [dm.query.SourceSelector(view_id, properties)],
-                )
-            },
-            cursors={"nodes": cursor},
+    builder = QueryBuilder[DomainModelList](None)
+    builder.append(
+        QueryStep(
+            name="nodes",
+            expression=dm.query.NodeResultSetExpression(filter=filter_),
+            max_retrieve_limit=limit,
+            select=dm.query.Select([dm.query.SourceSelector(view_id, list(properties))]),
         )
-        result = client.data_modeling.instances.query(query)
-        batch_external_ids = {
-            node.properties[view_id]["displacement_x"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
-            for node in result.data["nodes"].data
-        }
-        total_retrieved += len(batch_external_ids)
-        external_ids.update(batch_external_ids)
-        cursor = result.cursors["nodes"]
-        if total_retrieved >= limit_input or cursor is None:
-            break
-    return external_ids
+    )
+    builder.execute(client, unpack=False)
+
+    return {
+        cast(str, node.properties[view_id]["displacement_x"]): [
+            cast(str, node.properties[view_id].get(prop, "MISSING")) for prop in extra_properties_list
+        ]
+        for node in builder[0].results
+        if node.properties
+    }
