@@ -116,6 +116,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         else:
             is_multiple = True
             node_ids = [(space, ext_id) for ext_id in external_id]
+
         items: list[DomainModel] = []
         if as_child_class:
             if not hasattr(self, "_direct_children_by_external_id"):
