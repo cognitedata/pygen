@@ -378,7 +378,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         )
 
     def query(self) -> PowerInverterQuery:
-        """Start a query for connection item as."""
+        """Start a query for power inverters."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return PowerInverterQuery(self._client)
 

@@ -382,7 +382,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
         )
 
     def query(self) -> MainShaftQuery:
-        """Start a query for connection item as."""
+        """Start a query for main shafts."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return MainShaftQuery(self._client)
 

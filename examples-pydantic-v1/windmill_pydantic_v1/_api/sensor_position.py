@@ -430,7 +430,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         )
 
     def query(self) -> SensorPositionQuery:
-        """Start a query for connection item as."""
+        """Start a query for sensor positions."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return SensorPositionQuery(self._client)
 

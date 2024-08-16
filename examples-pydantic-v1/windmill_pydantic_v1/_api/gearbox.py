@@ -378,7 +378,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
         )
 
     def query(self) -> GearboxQuery:
-        """Start a query for connection item as."""
+        """Start a query for gearboxes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return GearboxQuery(self._client)
 

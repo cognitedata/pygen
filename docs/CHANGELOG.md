@@ -14,7 +14,7 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## [0.99.31] - 24-08-16
-## Added
+### Added
 - Support for edges with properties of type `single_edge_connection`.
 - Support for retrieving `GraphQL` queries with datapoints`
 - Support for searching on `external_id` in the generated SDK.

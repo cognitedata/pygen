@@ -480,7 +480,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
         )
 
     def query(self) -> EquipmentModuleQuery:
-        """Start a query for connection item as."""
+        """Start a query for equipment modules."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return EquipmentModuleQuery(self._client)
 

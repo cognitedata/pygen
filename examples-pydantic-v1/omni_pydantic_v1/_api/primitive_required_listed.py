@@ -405,7 +405,7 @@ class PrimitiveRequiredListedAPI(
         )
 
     def query(self) -> PrimitiveRequiredListedQuery:
-        """Start a query for connection item as."""
+        """Start a query for primitive required listeds."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return PrimitiveRequiredListedQuery(self._client)
 
