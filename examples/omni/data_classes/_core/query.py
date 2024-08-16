@@ -42,7 +42,6 @@ from .constants import (
 from .helpers import as_node_id
 
 
-T_DomainModelListOptional = TypeVar("T_DomainModelListOptional", bound=Union[DomainModelList, None])
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
