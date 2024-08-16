@@ -555,6 +555,12 @@ class DataClass:
     def has_edges(self) -> bool:
         return any(isinstance(field_, BaseConnectionField) and field_.is_edge for field_ in self)
 
+    @property
+    def direct_children_literal(self) -> str:
+        """Returns a Literal class with all direct children external IDs."""
+        args = ", ".join(f'"{child.view_id.external_id}"' for child in self.direct_children)
+        return f"Literal[{args}]"
+
 
 @dataclass
 class NodeDataClass(DataClass):

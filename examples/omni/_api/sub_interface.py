@@ -25,8 +25,8 @@ from omni.data_classes import (
     SubInterfaceList,
     SubInterfaceWriteList,
     SubInterfaceTextFields,
-    Implementation1NonWriteable,
     Implementation1,
+    Implementation1NonWriteable,
     Implementation2,
 )
 from omni.data_classes._sub_interface import (
@@ -176,7 +176,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         external_id: str,
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
-            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
         ) = None,
     ) -> SubInterface | None: ...
 
@@ -186,7 +186,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         external_id: SequenceNotStr[str],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
-            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
         ) = None,
     ) -> SubInterfaceList: ...
 
@@ -195,7 +195,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         external_id: str | SequenceNotStr[str],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
-            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
         ) = None,
     ) -> SubInterface | SubInterfaceList | None:
         """Retrieve one or more sub interfaces by id(s).
