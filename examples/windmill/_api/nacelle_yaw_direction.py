@@ -514,7 +514,7 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_direction(
         if node.properties is None:
             continue
         view_prop = node.properties[view_id]
-        key = view_prop["priceForecast"]
+        key = view_prop["yaw_direction"]
         values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values

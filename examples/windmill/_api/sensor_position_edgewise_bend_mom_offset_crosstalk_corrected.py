@@ -504,7 +504,7 @@ def _retrieve_timeseries_external_ids_with_extra_edgewise_bend_mom_offset_crosst
         if node.properties is None:
             continue
         view_prop = node.properties[view_id]
-        key = view_prop["priceForecast"]
+        key = view_prop["edgewise_bend_mom_offset_crosstalk_corrected"]
         values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values

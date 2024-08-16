@@ -482,7 +482,7 @@ def _retrieve_timeseries_external_ids_with_extra_calculated_tilt_moment(
         if node.properties is None:
             continue
         view_prop = node.properties[view_id]
-        key = view_prop["priceForecast"]
+        key = view_prop["calculated_tilt_moment"]
         values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
