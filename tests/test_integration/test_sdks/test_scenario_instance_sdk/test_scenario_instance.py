@@ -146,7 +146,7 @@ def test_retrieve_dataframe_multiple_column_names_missing_values(client: Scenari
     # Assert
     assert isinstance(data, pd.DataFrame)
     assert len(data.columns) == 1
-    assert data.columns[0] == "-"
+    assert data.columns[0] == "MISSING-MISSING"
 
 
 def test_retrieve_arrays(client: ScenarioInstanceClient) -> None:
