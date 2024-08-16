@@ -40,6 +40,7 @@ nav:
     - Example Docs:
         - Home: example_docs/index.md
         - Data Classes: example_docs/data_classes.md
+        - Client: example_docs/client.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md
