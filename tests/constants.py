@@ -343,6 +343,7 @@ class OmniFiles:
     primitive_required_list_api = api / "primitive_required_listed.py"
     implementation_1_api = api / "implementation_1.py"
     implementation_1_non_writeable_api = api / "implementation_1_non_writeable.py"
+    sub_interface = api / "sub_interface.py"
 
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_b_api = api / "connection_item_b.py"
