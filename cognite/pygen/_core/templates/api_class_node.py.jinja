@@ -29,7 +29,8 @@ from {{ top_level_package }}.data_classes import (
     {{ edge_data_class.read_name }},
     {{ edge_data_class.write_name }},
     {{ edge_data_class.read_list_name }},{% endfor %}{% for dependency in data_class.dependencies_with_edge_destinations %}{% if dependency.read_name != data_class.read_name  %}
-    {{ dependency.read_name }},{% endif %}{% endfor %}
+    {{ dependency.read_name }},{% endif %}{% endfor %}{% for child in data_class.direct_children %}
+    {{ child.read_name }},{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.query_cls_name }},{% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
@@ -49,7 +50,10 @@ from .{{ query_api.file_name }} import {{ query_api.name }}
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    _properties_by_field = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif %}
+    _properties_by_field = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif %}{% if data_class.direct_children %}
+    _direct_children_by_external_id = {% raw %}{{% endraw %}{% for child in data_class.direct_children %}
+        "{{ child.view_id.external_id }}": {{ child.read_name }},{% endfor %}
+    {% raw %}}{% endraw %}{% endif %}
     _class_type = {{ data_class.read_name }}
     _class_list = {{ data_class.read_list_name }}{% if data_class.is_writable %}
     _class_write_list = {{ data_class.write_list_name }}{% endif %}
@@ -161,19 +165,22 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> {{ data_class.read_name }} | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> {{ data_class.read_list_name }}:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_list_name }}:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
             external_id: External id or list of external ids of the {{ data_class.doc_list_name }}.
-            space: The space where all the {{ data_class.doc_list_name }} are located.
+            space: The space where all the {{ data_class.doc_list_name }} are located.{% if data_class.direct_children %}
+            as_child_class: If you want to retrieve the {{ data_class.doc_list_name }} as a child class,
+                you can specify the child class here. Note that if one node has properties in
+                multiple child classes, you will get duplicate nodes in the result.{% endif %}
 
         Returns:
             The requested {{ data_class.doc_list_name }}.
@@ -199,10 +206,11 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     "{{ edge_api.direction }}",
                     dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
                 ),{% endif %}{% endfor %}
-                                               ]
+                                               ]{% if data_class.direct_children %},
+            as_child_class=as_child_class{% endif %}
         )
         {% else %}
-        return self._retrieve(external_id, space){% endif %}
+        return self._retrieve(external_id, space{% if data_class.direct_children %}, as_child_class=as_child_class{% endif %}){% endif %}
 
     def search(
         self,

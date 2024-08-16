@@ -85,6 +85,7 @@ class SequenceNotStr(Protocol[_T_co]):
 class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     _view_id: ClassVar[dm.ViewId]
     _properties_by_field: ClassVar[dict[str, str]]
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]]
     _class_type: type[T_DomainModel]
     _class_list: type[T_DomainModelList]
 
@@ -107,6 +108,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
+        as_child_class: SequenceNotStr[str] | None = None,
     ) -> T_DomainModel | T_DomainModelList | None:
         if isinstance(external_id, str):
             node_ids = [(space, external_id)]
@@ -115,8 +117,21 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             is_multiple = True
             node_ids = [(space, ext_id) for ext_id in external_id]
 
-        instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
-        nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
+        items: list[DomainModel] = []
+        if as_child_class:
+            if not hasattr(self, "_direct_children_by_external_id"):
+                raise ValueError(f"{type(self).__name__} does not have any direct children")
+            for child_class_external_id in as_child_class:
+                child_cls = self._direct_children_by_external_id.get(child_class_external_id)
+                if child_cls is None:
+                    raise ValueError(f"Could not find child class with external_id {child_class_external_id}")
+                instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=child_cls._view_id)
+                items.extend([child_cls.from_instance(node) for node in instances.nodes])
+        else:
+            instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
+            items.extend([self._class_type.from_instance(node) for node in instances.nodes])
+
+        nodes = self._class_list(items)
 
         if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_view_id_penta)

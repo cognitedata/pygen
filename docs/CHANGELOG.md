@@ -33,6 +33,7 @@ Changes are grouped as follows
 - Support for searching on `external_id` in the generated SDK.
 - In write data class, allow node type to be `tuple` and `NodeId` as well as
   `DirectRelationReference`.
+- You can now retrieve interfaces as child classes in the generated `.retrieve` method.
 
 ## [0.99.30] - 24-08-13
 ### Added
