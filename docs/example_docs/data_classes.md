@@ -1,1 +1,1 @@
-::: omni.data_classes
+::: examples.omni.data_classes

@@ -39,6 +39,7 @@ nav:
         - Filtering: config/filtering_methods.md
     - Example Docs:
         - Home: example_docs/index.md
+        - Data Classes: example_docs/data_classes.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md
