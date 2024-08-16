@@ -4,8 +4,6 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 from .cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
 from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 from .cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
-from .connection_edge_a import ConnectionEdgeAAPI
-from .connection_edge_a_query import ConnectionEdgeAQueryAPI
 from .connection_item_a import ConnectionItemAAPI
 from .connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from .connection_item_a_query import ConnectionItemAQueryAPI
@@ -13,10 +11,6 @@ from .connection_item_b import ConnectionItemBAPI
 from .connection_item_b_inwards import ConnectionItemBInwardsAPI
 from .connection_item_b_query import ConnectionItemBQueryAPI
 from .connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
-from .connection_item_c_edge import ConnectionItemCEdgeAPI
-from .connection_item_c_edge_connection_item_a import ConnectionItemCEdgeConnectionItemAAPI
-from .connection_item_c_edge_connection_item_b import ConnectionItemCEdgeConnectionItemBAPI
-from .connection_item_c_edge_query import ConnectionItemCEdgeQueryAPI
 from .connection_item_c_node import ConnectionItemCNodeAPI
 from .connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
 from .connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
@@ -68,8 +62,6 @@ __all__ = [
     "CDFExternalReferencesListedTimeseriesAPI",
     "CDFExternalReferencesQueryAPI",
     "CDFExternalReferencesTimeseriesAPI",
-    "ConnectionEdgeAAPI",
-    "ConnectionEdgeAQueryAPI",
     "ConnectionItemAAPI",
     "ConnectionItemAOutwardsAPI",
     "ConnectionItemAQueryAPI",
@@ -77,10 +69,6 @@ __all__ = [
     "ConnectionItemBInwardsAPI",
     "ConnectionItemBQueryAPI",
     "ConnectionItemBSelfEdgeAPI",
-    "ConnectionItemCEdgeAPI",
-    "ConnectionItemCEdgeConnectionItemAAPI",
-    "ConnectionItemCEdgeConnectionItemBAPI",
-    "ConnectionItemCEdgeQueryAPI",
     "ConnectionItemCNodeAPI",
     "ConnectionItemCNodeConnectionItemAAPI",
     "ConnectionItemCNodeConnectionItemBAPI",

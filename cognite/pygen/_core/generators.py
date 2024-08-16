@@ -423,7 +423,7 @@ class MultiAPIGenerator:
         api_core = self.env.get_template("api_init.py.jinja")
         api_classes: list[APIClass] = []
         for api in self.apis:
-            if not isinstance(api.api_class, NodeAPIClass):
+            if api.used_for != "node":
                 continue
             api_classes.append(api.api_class)
             api_classes.append(api.query_api)

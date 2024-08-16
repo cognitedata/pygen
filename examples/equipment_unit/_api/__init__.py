@@ -12,8 +12,6 @@ __all__ = [
     "EquipmentModuleAPI",
     "EquipmentModuleQueryAPI",
     "EquipmentModuleSensorValueAPI",
-    "StartEndTimeAPI",
-    "StartEndTimeQueryAPI",
     "UnitProcedureAPI",
     "UnitProcedureQueryAPI",
     "UnitProcedureWorkOrdersAPI",
