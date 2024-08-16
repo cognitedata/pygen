@@ -29,7 +29,7 @@ def test_generate_data_class_core_constants(omni_multi_api_generator: MultiAPIGe
 
 def test_generate_data_class_core_init(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
-    expected = OmniFiles.data_init.read_text()
+    expected = OmniFiles.data_core_init.read_text()
 
     # Act
     actual = omni_multi_api_generator.generate_data_class_core_init_file()
