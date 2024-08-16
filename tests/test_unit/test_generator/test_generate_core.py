@@ -5,12 +5,56 @@ from cognite.pygen._generator import CodeFormatter
 from tests.constants import OmniFiles
 
 
-def test_generate_data_class_core(omni_multi_api_generator: MultiAPIGenerator) -> None:
+def test_generate_data_class_core_base(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
-    expected = OmniFiles.core_data.read_text()
+    expected = OmniFiles.data_core_base.read_text()
 
     # Act
-    actual = omni_multi_api_generator.generate_data_class_core_file()
+    actual = omni_multi_api_generator.generate_data_class_core_base_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_constants(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_constants.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_constants_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_init(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_init.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_init_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_helpers(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_helpers.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_helpers_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_query(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_query.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_file()
 
     # Assert
     assert actual == expected
