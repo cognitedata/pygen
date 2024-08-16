@@ -465,6 +465,7 @@ def _retrieve_timeseries_external_ids_with_extra_timesery(
     has_data = dm.filters.HasData(views=[view_id])
     has_property = dm.filters.Exists(property=view_id.as_property_ref("timeseries"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
+
     builder = QueryBuilder[DomainModelList](None)
     builder.append(
         QueryStep(
