@@ -108,7 +108,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         edge_api_name_type_direction_view_id_penta: (
             list[tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"], dm.ViewId]] | None
         ) = None,
-        as_child_class: bool = False,
+        as_child_class: SequenceNotStr[str] | None = None,
     ) -> T_DomainModel | T_DomainModelList | None:
         if isinstance(external_id, str):
             node_ids = [(space, external_id)]
@@ -119,8 +119,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         items: list[DomainModel] = []
         if as_child_class:
             if not hasattr(self, "_direct_children_by_external_id"):
-                raise ValueError("No child classes defined")
-            for child_cls in self._direct_children_by_external_id.values():
+                raise ValueError(f"{type(self).__name__} does not have any direct children")
+            for child_class_external_id in as_child_class:
+                child_cls = self._direct_children_by_external_id.get(child_class_external_id)
+                if child_cls is None:
+                    raise ValueError(f"Could not find child class with external_id {child_class_external_id}")
                 instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=child_cls._view_id)
                 items.extend([child_cls.from_instance(node) for node in instances.nodes])
         else:

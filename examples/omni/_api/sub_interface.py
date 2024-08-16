@@ -47,7 +47,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
     _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id = {
-        "Implementation": Implementation1,
+        "Implementation1": Implementation1,
         "Implementation1NonWriteable": Implementation1NonWriteable,
         "Implementation2": Implementation2,
     }
@@ -171,26 +171,42 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> SubInterface | None: ...
+    def retrieve(
+        self,
+        external_id: str,
+        space: str = DEFAULT_INSTANCE_SPACE,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+        ) = None,
+    ) -> SubInterface | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> SubInterfaceList: ...
+    def retrieve(
+        self,
+        external_id: SequenceNotStr[str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+        ) = None,
+    ) -> SubInterfaceList: ...
 
     def retrieve(
         self,
         external_id: str | SequenceNotStr[str],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: bool = False,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWritable", "Implementation2"]] | None
+        ) = None,
     ) -> SubInterface | SubInterfaceList | None:
         """Retrieve one or more sub interfaces by id(s).
 
         Args:
             external_id: External id or list of external ids of the sub interfaces.
             space: The space where all the sub interfaces are located.
-            as_child_class: If set to True, the result will be returned as the direct
-                child class of the class type. If set to a list of child class names, the result will be returned as the
-                corresponding child class for each external id. If set to False, the result will be returned
-                as the sub interfaces type.
+            as_child_class: If you want to retrieve the sub interfaces as a child class,
+                you can specify the child class here. This is useful if you want to retrieve
+                the sub interfaces as a specific child class. Note that if one node has properties in
+                multiple child classes, you will get duplicate nodes in the result.
 
         Returns:
             The requested sub interfaces.
@@ -204,7 +220,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
                 >>> sub_interface = client.sub_interface.retrieve("my_sub_interface")
 
         """
-        return self._retrieve(external_id, space, as_child_class)
+        return self._retrieve(external_id, space, as_child_class=as_child_class)
 
     def search(
         self,

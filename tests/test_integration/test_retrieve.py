@@ -35,3 +35,22 @@ def test_retrieve_and_as_write(omni_client: OmniClient) -> None:
     write = item.as_write()
     dc.DomainModelWrite.external_id_factory = None
     assert write.external_id == item.external_id
+
+
+def test_retrieve_as_child_class(omni_client: OmniClient) -> None:
+    items1 = omni_client.implementation_1.list(limit=1)
+    assert len(items1) > 0
+    item1 = items1[0]
+    items2 = omni_client.implementation_2.list(limit=1)
+    assert len(items2) > 0
+    item2 = items2[0]
+
+    items = omni_client.sub_interface.retrieve(
+        [item1.external_id, item2.external_id],
+        as_child_class=["Implementation1", "Implementation2"],
+    )
+
+    assert len(items) == 2
+
+    assert isinstance(items[0], dc.Implementation1)
+    assert isinstance(items[1], dc.Implementation2)
