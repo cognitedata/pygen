@@ -71,7 +71,7 @@ class SDKGenerator:
                 f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
             )
 
-        self.default_instance_space = default_instance_space or data_model[0].space
+        self.default_instance_space = default_instance_space
 
         self._multi_api_generator = MultiAPIGenerator(
             top_level_package,
@@ -192,7 +192,7 @@ class MultiAPIGenerator:
         top_level_package: str,
         client_name: str,
         data_models: list[dm.DataModel[dm.View]],
-        default_instance_space: str,
+        default_instance_space: str | None,
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
