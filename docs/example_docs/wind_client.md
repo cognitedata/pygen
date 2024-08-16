@@ -1,1 +1,1 @@
-::: examples.windmill._api_client.OmniClient
+::: examples.windmill._api_client.WindmillClient
