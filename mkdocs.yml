@@ -37,6 +37,8 @@ nav:
         - Home: config/index.md
         - Naming: config/naming.md
         - Filtering: config/filtering_methods.md
+    - Example Docs:
+        - Home: example_docs/index.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md
