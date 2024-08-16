@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, cast
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -10,7 +10,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from omni_pydantic_v1.data_classes._cdf_external_references import _create_cdf_external_reference_filter
-from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
+from omni_pydantic_v1.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from ._core import DEFAULT_LIMIT_READ
+
 
 ColumnNames = Literal["file", "sequence", "timeseries"]
 
@@ -450,50 +452,42 @@ def _retrieve_timeseries_external_ids_with_extra_timesery(
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "timeseries",
 ) -> dict[str, list[str]]:
-    limit_input = float("inf") if limit is None or limit == -1 else limit
-    properties = ["timeseries"]
-    if extra_properties == "timeseries":
-        ...
-    elif isinstance(extra_properties, str) and extra_properties != "timeseries":
-        properties.append(extra_properties)
+    properties = {"timeseries"}
+    if isinstance(extra_properties, str):
+        properties.add(extra_properties)
+        extra_properties_list = [extra_properties]
     elif isinstance(extra_properties, list):
-        properties.extend([prop for prop in extra_properties if prop != "timeseries"])
+        properties.update(extra_properties)
+        extra_properties_list = extra_properties
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
 
-    if isinstance(extra_properties, str):
-        extra_list = [extra_properties]
-    else:
-        extra_list = extra_properties
     has_data = dm.filters.HasData(views=[view_id])
     has_property = dm.filters.Exists(property=view_id.as_property_ref("timeseries"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    cursor = None
-    external_ids: dict[str, list[str]] = {}
-    total_retrieved = 0
-    while True:
-        query_limit = max(min(INSTANCE_QUERY_LIMIT, limit_input - total_retrieved), 0)
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=int(query_limit))
-        query = dm.query.Query(
-            with_={
-                "nodes": selected_nodes,
-            },
-            select={
-                "nodes": dm.query.Select(
-                    [dm.query.SourceSelector(view_id, properties)],
-                )
-            },
-            cursors={"nodes": cursor},
+    builder = QueryBuilder[DomainModelList](None)
+    builder.append(
+        QueryStep(
+            name="nodes",
+            expression=dm.query.NodeResultSetExpression(filter=filter_),
+            max_retrieve_limit=limit,
+            select=dm.query.Select([dm.query.SourceSelector(view_id, list(properties))]),
         )
-        result = client.data_modeling.instances.query(query)
-        batch_external_ids = {
-            node.properties[view_id]["timeseries"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
-            for node in result.data["nodes"].data
-        }
-        total_retrieved += len(batch_external_ids)
-        external_ids.update(batch_external_ids)
-        cursor = result.cursors["nodes"]
-        if total_retrieved >= limit_input or cursor is None:
-            break
-    return external_ids
+    )
+    builder.execute(client, unpack=False)
+
+    output: dict[str, list[str]] = {}
+    for node in builder[0].results:
+        if node.properties is None:
+            continue
+        view_prop = node.properties[view_id]
+        key = view_prop["timeseries"]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
+        if isinstance(key, str):
+            output[key] = values
+        elif isinstance(key, list):
+            for k in key:
+                if isinstance(k, str):
+                    output[k] = values
+    return output

@@ -13,7 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.31] - 24-08-16
+## Added
+- Support for edges with properties of type `single_edge_connection`.
+- Support for retrieving `GraphQL` queries with datapoints`
+- Support for searching on `external_id` in the generated SDK.
+- In write data class, allow node type to be `tuple` and `NodeId` as well as
+  `DirectRelationReference`.
+- You can now retrieve interfaces as child classes in the generated `.retrieve` method.
+
 ### Fixed
 - The `external_id_factory` will no longer be called when creating a `DomainModelWrite` object
   if the `external_id` is set. This is to avoid the `external_id_factory` to overwrite the `external_id`
@@ -26,14 +34,6 @@ Changes are grouped as follows
 - If a view property starts with a digit or contains a hyphen, the generated data class will
   now have the property name prefixed with `no_` to make it a valid Python variable name instead
   of raising an exception.
-
-## Added
-- Support for edges with properties of type `single_edge_connection`.
-- Support for retrieving `GraphQL` queries with datapoints`
-- Support for searching on `external_id` in the generated SDK.
-- In write data class, allow node type to be `tuple` and `NodeId` as well as
-  `DirectRelationReference`.
-- You can now retrieve interfaces as child classes in the generated `.retrieve` method.
 
 ## [0.99.30] - 24-08-13
 ### Added
