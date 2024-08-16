@@ -21,9 +21,7 @@ from typing import (
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import (
-    Instance,
-)
+from cognite.client.data_classes.data_modeling.instances import Instance
 
 from .base import (
     DomainModelList,

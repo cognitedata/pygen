@@ -2,22 +2,14 @@ from __future__ import annotations
 
 import datetime
 import math
-import sys
-import warnings
-
 from abc import ABC, abstractmethod
-from collections import UserList
 from collections import defaultdict
-from collections.abc import Collection, Mapping
+from collections.abc import Collection
 from collections.abc import MutableSequence, Iterable
-from dataclasses import dataclass, field
 from typing import (
-    Annotated,
-    Callable,
     cast,
     ClassVar,
     Generic,
-    Optional,
     Any,
     Iterator,
     TypeVar,
@@ -27,25 +19,27 @@ from typing import (
     Literal,
 )
 
-import pandas as pd
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm{% if is_pydantic_v2 %}
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries{% endif %}
-from cognite.client.data_classes import TimeSeriesList, Datapoints
-from cognite.client.data_classes.data_modeling.instances import (
-    Instance,
-    InstanceApply,
-    Properties,
-    PropertyValue,
-)
-from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% else %}, Extra{% endif %}, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}{% if is_pydantic_v2 %}
-from pydantic.functional_serializers import PlainSerializer{% endif %}
+from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Instance
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+from .base import (
+    DomainModelList,
+    T_DomainList,
+    DomainRelationList,
+    DomainModelCore,
+    T_DomainModelList,
+    DomainRelation,
+    DomainModel,
+)
+from .constants import (
+    _NotSetSentinel,
+    DEFAULT_QUERY_LIMIT,
+    DEFAULT_INSTANCE_SPACE,
+    ACTUAL_INSTANCE_QUERY_LIMIT,
+    INSTANCE_QUERY_LIMIT,
+)
+from .helpers import as_node_id
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)

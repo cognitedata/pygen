@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 import datetime
-import math
 import sys
 import warnings
-
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections import defaultdict
 from collections.abc import Collection, Mapping
-from collections.abc import MutableSequence, Iterable
 from dataclasses import dataclass, field
 from typing import (
     Annotated,
@@ -24,11 +20,9 @@ from typing import (
     overload,
     Union,
     SupportsIndex,
-    Literal,
 )
 
 import pandas as pd
-from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList, Datapoints
@@ -41,6 +35,7 @@ from cognite.client.data_classes.data_modeling.instances import (
 from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
+
 from .constants import DEFAULT_INSTANCE_SPACE
 
 if sys.version_info >= (3, 11):
