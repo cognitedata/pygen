@@ -71,6 +71,17 @@ def test_generate_api_core(omni_multi_api_generator: MultiAPIGenerator) -> None:
     assert actual == expected
 
 
+def test_generate_api_init(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.core_init.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_api_init_file()
+
+    # Assert
+    assert actual == expected
+
+
 def test_generate_data_class_init_file(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = OmniFiles.data_init.read_text()
