@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from scenario_instance_pydantic_v1.client.data_classes._scenario_instance import _create_scenario_instance_filter
-from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from scenario_instance_pydantic_v1.client.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 

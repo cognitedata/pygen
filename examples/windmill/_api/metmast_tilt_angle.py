@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from windmill.data_classes._metmast import _create_metmast_filter
-from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from windmill.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 

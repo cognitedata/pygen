@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from windmill_pydantic_v1.data_classes._sensor_position import _create_sensor_position_filter
-from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from windmill_pydantic_v1.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 

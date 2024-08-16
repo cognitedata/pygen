@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from omni_pydantic_v1.data_classes._cdf_external_references import _create_cdf_external_reference_filter
-from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from omni_pydantic_v1.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 

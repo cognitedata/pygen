@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
-from omni.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from {{ top_level_package }}.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
