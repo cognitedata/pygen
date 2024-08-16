@@ -131,6 +131,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
             items.extend([self._class_type.from_instance(node) for node in instances.nodes])
 
+        nodes = self._class_list(items)
+
         if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_view_id_penta)
 
