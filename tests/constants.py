@@ -311,7 +311,12 @@ class OmniFiles:
     client_dir = OMNI_SDK.client_dir
     client = client_dir / "_api_client.py"
     data_classes = client_dir / "data_classes"
-    core_data = data_classes / "_core.py"
+    core_data = data_classes / "_core"
+    data_core_base = core_data / "base.py"
+    data_core_constants = core_data / "constants.py"
+    data_core_init = core_data / "__init__.py"
+    data_core_helpers = core_data / "helpers.py"
+    data_core_query = core_data / "query.py"
     data_init = data_classes / "__init__.py"
     api = client_dir / "_api"
     core_api = api / "_core.py"
