@@ -423,6 +423,8 @@ class MultiAPIGenerator:
         api_core = self.env.get_template("api_init.py.jinja")
         api_classes: list[APIClass] = []
         for api in self.apis:
+            if not isinstance(api.api_class, NodeAPIClass):
+                continue
             api_classes.append(api.api_class)
             api_classes.append(api.query_api)
             api_classes.extend(api.edge_apis or [])
@@ -430,7 +432,7 @@ class MultiAPIGenerator:
 
         api_classes = sorted(api_classes, key=lambda api: api.name)
 
-        return api_core.render(api_classes=api_classes) + "\n"
+        return api_core.render(api_classes=api_classes).removeprefix("\n") + "\n"
 
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
