@@ -8,17 +8,19 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.blade import BladeAPI
-from ._api.gearbox import GearboxAPI
-from ._api.generator import GeneratorAPI
-from ._api.high_speed_shaft import HighSpeedShaftAPI
-from ._api.main_shaft import MainShaftAPI
-from ._api.metmast import MetmastAPI
-from ._api.nacelle import NacelleAPI
-from ._api.power_inverter import PowerInverterAPI
-from ._api.rotor import RotorAPI
-from ._api.sensor_position import SensorPositionAPI
-from ._api.windmill import WindmillAPI
+from ._api import (
+    BladeAPI,
+    GearboxAPI,
+    GeneratorAPI,
+    HighSpeedShaftAPI,
+    MainShaftAPI,
+    MetmastAPI,
+    NacelleAPI,
+    PowerInverterAPI,
+    RotorAPI,
+    SensorPositionAPI,
+    WindmillAPI,
+)
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
 from . import data_classes

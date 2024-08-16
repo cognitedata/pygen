@@ -7,6 +7,7 @@ from typing import Any, Sequence
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.credentials import OAuthClientCredentials
+
 from ._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
     {{ api.api_class.name }},{% endif %}{% endfor %}
 )
