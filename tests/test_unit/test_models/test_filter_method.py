@@ -120,28 +120,68 @@ def test_create_list_method_connection_item_a(
             FilterImplementation(dm.filters.In, "name", dict(values=parameters[0]), is_edge_class=False),
             FilterImplementation(dm.filters.Prefix, "name", dict(value=parameters[1]), is_edge_class=False),
             FilterImplementationOnetoOneEdge(
-                dm.filters.Equals, "otherDirect", dict(value=parameters[2]), is_edge_class=False, instance_type=str
+                dm.filters.Equals,
+                "otherDirect",
+                dict(value=parameters[2]),
+                is_edge_class=False,
+                instance_type=str,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.Equals, "otherDirect", dict(value=parameters[2]), is_edge_class=False, instance_type=tuple
+                dm.filters.Equals,
+                "otherDirect",
+                dict(value=parameters[2]),
+                is_edge_class=False,
+                instance_type=tuple,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.In, "otherDirect", dict(values=parameters[2]), is_edge_class=False, instance_type=str
+                dm.filters.In,
+                "otherDirect",
+                dict(values=parameters[2]),
+                is_edge_class=False,
+                instance_type=str,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.In, "otherDirect", dict(values=parameters[2]), is_edge_class=False, instance_type=tuple
+                dm.filters.In,
+                "otherDirect",
+                dict(values=parameters[2]),
+                is_edge_class=False,
+                instance_type=tuple,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.Equals, "selfDirect", dict(value=parameters[3]), is_edge_class=False, instance_type=str
+                dm.filters.Equals,
+                "selfDirect",
+                dict(value=parameters[3]),
+                is_edge_class=False,
+                instance_type=str,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.Equals, "selfDirect", dict(value=parameters[3]), is_edge_class=False, instance_type=tuple
+                dm.filters.Equals,
+                "selfDirect",
+                dict(value=parameters[3]),
+                is_edge_class=False,
+                instance_type=tuple,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.In, "selfDirect", dict(values=parameters[3]), is_edge_class=False, instance_type=str
+                dm.filters.In,
+                "selfDirect",
+                dict(values=parameters[3]),
+                is_edge_class=False,
+                instance_type=str,
+                has_default_instance_space=True,
             ),
             FilterImplementationOnetoOneEdge(
-                dm.filters.In, "selfDirect", dict(values=parameters[3]), is_edge_class=False, instance_type=tuple
+                dm.filters.In,
+                "selfDirect",
+                dict(values=parameters[3]),
+                is_edge_class=False,
+                instance_type=tuple,
+                has_default_instance_space=True,
             ),
             FilterImplementation(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
             FilterImplementation(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
