@@ -99,6 +99,11 @@ class SDKGenerator:
 
         validation.validate_multi_api_classes_unique_names(self._multi_api_classes)
 
+    @property
+    def has_default_instance_space(self) -> bool:
+        """Whether the SDK has a default instance space."""
+        return self.default_instance_space is not None
+
     def generate_sdk(self) -> dict[Path, str]:
         """
         Generate the SDK.
@@ -128,6 +133,7 @@ class SDKGenerator:
                 data_model=self._data_model[0],
                 api_by_view_id=self._multi_api_generator.api_by_type_by_view_id["node"],
                 multi_apis=self._multi_api_classes,
+                has_default_instance_space=self.has_default_instance_space,
             )
             + "\n"
         )

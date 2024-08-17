@@ -12,7 +12,7 @@ from ._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_
     {{ api.api_class.name }},{% endif %}{% endfor %}
 )
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from .data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
 from . import data_classes
 
 {% for api in multi_apis %}
@@ -159,7 +159,7 @@ class {{ client_name }}:
         external_id: (
             str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
         ),
-        space: str = DEFAULT_INSTANCE_SPACE
+        space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% else %} | None = None{% endif %},
     ) -> dm.InstancesDeleteResult:
         """Delete one or more items.
 
@@ -180,12 +180,17 @@ class {{ client_name }}:
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.delete("my_node_external_id")
-        """
+        """{% if not has_default_instance_space %}
+        if space is None and (
+            isinstance(external_id, str)
+            or (isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id))
+        ):
+            raise ValueError("Expected space to be set when deleting by external_id"){% endif %}
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
         elif isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id):
             return self._client.data_modeling.instances.delete(
-                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],
+                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],{% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
             )
         elif isinstance(external_id, data_classes.DomainModelWrite) or (
             isinstance(external_id, Sequence)
