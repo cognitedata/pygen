@@ -786,6 +786,7 @@ class APIGenerator:
                 edge_apis=self.edge_apis,
                 query_api=self.query_api,
                 edge_data_classes=unique_edge_data_classes,
+                has_default_instance_space=self.has_default_instance_space,
                 # ft = field types
                 ft=fields,
                 dm=dm,

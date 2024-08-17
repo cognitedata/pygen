@@ -9,8 +9,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from {{ top_level_package }}.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
+from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,{% endif %}
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -135,7 +135,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         return self._apply({{ data_class.variable }}, replace, write_none)
 {% endif %}
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}) -> dm.InstancesDeleteResult:
         """Delete one or more {{ data_class.doc_name }}.
 
         Args:
@@ -165,14 +165,14 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | None:
+    def retrieve(self, external_id: str, space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_list_name }}:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_list_name }}:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
