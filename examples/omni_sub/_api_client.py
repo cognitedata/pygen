@@ -14,7 +14,7 @@ from ._api import (
     ConnectionItemCNodeAPI,
 )
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from .data_classes._core import GraphQLList
 from . import data_classes
 
 
@@ -138,7 +138,7 @@ class OmniSubClient:
         external_id: (
             str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
         ),
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str,
     ) -> dm.InstancesDeleteResult:
         """Delete one or more items.
 

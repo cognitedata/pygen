@@ -35,7 +35,6 @@ from .base import (
 from .constants import (
     _NotSetSentinel,
     DEFAULT_QUERY_LIMIT,
-    DEFAULT_INSTANCE_SPACE,
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
 )
