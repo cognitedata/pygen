@@ -118,7 +118,9 @@ def download():
             if not example_sdk.download_nodes:
                 continue
 
-            is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
+            is_space: dm.filters.Filter | None = None
+            if example_sdk.instance_space:
+                is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
             nodes = dm.NodeList([])
             for view in latest.views:
                 nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))

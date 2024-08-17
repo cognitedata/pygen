@@ -31,15 +31,11 @@ class ExampleSDK:
     client_name: str
     _top_level_package: str
     generate_sdk: bool
+    instance_space: str | None
     download_nodes: bool = False
-    _instance_space: str | None = None
     is_typed: bool = False
     typed_classes: set[str] = field(default_factory=set)
     manual_files: list[Path] = field(default_factory=list, init=False)
-
-    @property
-    def instance_space(self) -> str:
-        return self._instance_space or self.data_model_ids[0].space
 
     @property
     def top_level_package(self) -> str:
@@ -95,7 +91,7 @@ class ExampleSDK:
             views = self.load_views(model)
             spaces |= {view.space for view in views}
 
-        if self.instance_space not in spaces:
+        if self.instance_space and self.instance_space not in spaces:
             spaces.add(self.instance_space)
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
@@ -169,7 +165,7 @@ WINDMILL_SDK = ExampleSDK(
     _top_level_package="windmill",
     client_name="WindmillClient",
     generate_sdk=True,
-    _instance_space="windmill-instances",
+    instance_space="windmill-instances",
 )
 
 OMNI_SDK = ExampleSDK(
@@ -177,7 +173,7 @@ OMNI_SDK = ExampleSDK(
     _top_level_package="omni",
     client_name="OmniClient",
     generate_sdk=True,
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
     download_nodes=True,
 )
 
@@ -185,7 +181,7 @@ OMNI_TYPED = ExampleSDK(
     data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
     _top_level_package="omni_typed",
     client_name="DoesNotMatter",
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
     generate_sdk=True,
     is_typed=True,
     # Done above
@@ -212,7 +208,8 @@ OMNI_MULTI_SDK = ExampleSDK(
     _top_level_package="omni_multi",
     client_name="OmniMultiClient",
     generate_sdk=True,
-    _instance_space="omni-instances",
+    # Omni multi is generated without instance space.
+    instance_space=None,
     download_nodes=False,
 )
 
@@ -223,7 +220,7 @@ OMNIUM_CONNECTION_SDK = ExampleSDK(
     _top_level_package="omni_connection",
     client_name="OmniConnectionClient",
     generate_sdk=False,
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
 )
 
 APM_SDK = ExampleSDK(
