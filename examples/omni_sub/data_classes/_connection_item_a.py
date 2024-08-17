@@ -189,8 +189,8 @@ class ConnectionItemA(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemA],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId, ConnectionItemA],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         from ._connection_item_b import ConnectionItemB
@@ -198,21 +198,21 @@ class ConnectionItemA(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.other_direct, (dm.NodeId, str))
+                isinstance(instance.other_direct, dm.NodeId)
                 and (other_direct := nodes_by_id.get(instance.other_direct))
                 and isinstance(other_direct, ConnectionItemCNode)
             ):
                 instance.other_direct = other_direct
             if (
-                isinstance(instance.self_direct, (dm.NodeId, str))
+                isinstance(instance.self_direct, dm.NodeId)
                 and (self_direct := nodes_by_id.get(instance.self_direct))
                 and isinstance(self_direct, ConnectionItemA)
             ):
                 instance.self_direct = self_direct
             if edges := edges_by_source_node.get(instance.as_id()):
-                outwards: list[ConnectionItemB | str | dm.NodeId] = []
+                outwards: list[ConnectionItemB | dm.NodeId] = []
                 for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    value: DomainModel | DomainRelation | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:
@@ -230,7 +230,7 @@ class ConnectionItemA(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
-                        value, (ConnectionItemB, str, dm.NodeId)
+                        value, (ConnectionItemB, dm.NodeId)
                     ):
                         outwards.append(value)
 

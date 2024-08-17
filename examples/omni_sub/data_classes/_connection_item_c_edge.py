@@ -7,7 +7,6 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from ._core import (
-    DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
     DomainModel,
@@ -103,12 +102,12 @@ class ConnectionItemCEdge(DomainRelation):
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemA, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -154,12 +153,12 @@ class ConnectionItemCEdgeWrite(DomainRelationWrite):
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -258,10 +257,8 @@ class ConnectionItemCEdgeApplyList(ConnectionItemCEdgeWriteList): ...
 def _create_connection_item_c_edge_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
-    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = DEFAULT_INSTANCE_SPACE,
-    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = DEFAULT_INSTANCE_SPACE,
+    start_node: dm.NodeId | list[dm.NodeId] | None = None,
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -272,10 +269,6 @@ def _create_connection_item_c_edge_filter(
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
     ]
-    if start_node and isinstance(start_node, str):
-        filters.append(
-            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        )
     if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
@@ -286,18 +279,9 @@ def _create_connection_item_c_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
-                    for ext_id in start_node
-                ],
+                values=[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in start_node],
             )
         )
-    if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
     if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
@@ -306,14 +290,7 @@ def _create_connection_item_c_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
-                    for ext_id in end_node
-                ],
+                values=[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in end_node],
             )
         )
     if external_id_prefix is not None:

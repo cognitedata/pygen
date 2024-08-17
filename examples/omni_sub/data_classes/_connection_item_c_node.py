@@ -173,8 +173,8 @@ class ConnectionItemCNode(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemCNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId, ConnectionItemCNode],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         from ._connection_item_a import ConnectionItemA
@@ -182,10 +182,10 @@ class ConnectionItemCNode(DomainModel):
 
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
-                connection_item_a: list[ConnectionItemA | str | dm.NodeId] = []
-                connection_item_b: list[ConnectionItemB | str | dm.NodeId] = []
+                connection_item_a: list[ConnectionItemA | dm.NodeId] = []
+                connection_item_b: list[ConnectionItemB | dm.NodeId] = []
                 for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    value: DomainModel | DomainRelation | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:
@@ -203,11 +203,11 @@ class ConnectionItemCNode(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
-                        value, (ConnectionItemA, str, dm.NodeId)
+                        value, (ConnectionItemA, dm.NodeId)
                     ):
                         connection_item_a.append(value)
                     if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
-                        value, (ConnectionItemB, str, dm.NodeId)
+                        value, (ConnectionItemB, dm.NodeId)
                     ):
                         connection_item_b.append(value)
 

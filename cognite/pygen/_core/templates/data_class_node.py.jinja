@@ -176,19 +176,19 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, {{ data_class.read_name }}],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, {{ data_class.read_name }}],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
 {% endif %}{% if data_class.has_edges_or_direct_relations %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
-            if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
+            if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}(dm.NodeId, str){% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.destination_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
-                new_{{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []
+                new_{{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
                     if isinstance(relation, {{ field.destination_class.read_name }}):
                         new_{{ field.name }}.append(relation)
@@ -200,10 +200,10 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                         new_{{ field.name }}.append(relation)
                 instance.{{ field.name }} = new_{{ field.name }}{% endfor %}{% if data_class.has_edges %}
             if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
-                {{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
+                {{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                 {{ field.name }}: list[{{ field.edge_class.read_name }}] = []{% endfor %}
                 for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    value: DomainModel | DomainRelation{% if has_default_instance_space %} | str{% endif %} | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:

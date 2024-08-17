@@ -472,10 +472,8 @@ class QueryAPI(Generic[T_DomainModelList]):
 
 def _create_edge_filter(
     edge_type: dm.DirectRelationReference,
-    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
-    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    start_node: dm.NodeId | list[dm.NodeId] | None = None,
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -486,11 +484,7 @@ def _create_edge_filter(
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
     ]
-    if start_node and isinstance(start_node, str):
-        filters.append(
-            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        )
-    elif start_node and isinstance(start_node, dm.NodeId):
+    if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
                 ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
@@ -500,19 +494,10 @@ def _create_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
-                    for ext_id in start_node
-                ],
+                values=[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in start_node],
             )
         )
-    if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
-    elif end_node and isinstance(end_node, dm.NodeId):
+    if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
         )
@@ -520,14 +505,7 @@ def _create_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
-                    for ext_id in end_node
-                ],
+                values=[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in end_node],
             )
         )
     if external_id_prefix:

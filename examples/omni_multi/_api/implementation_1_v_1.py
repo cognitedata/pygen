@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_multi.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -139,9 +138,7 @@ class Implementation1v1API(
         )
         return self._apply(implementation_1_v_1, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         """Delete one or more implementation 1 v 1.
 
         Args:
@@ -171,15 +168,13 @@ class Implementation1v1API(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1v1 | None: ...
+    def retrieve(self, external_id: str, space: str) -> Implementation1v1 | None: ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Implementation1v1List: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> Implementation1v1List: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self, external_id: str | SequenceNotStr[str], space: str
     ) -> Implementation1v1 | Implementation1v1List | None:
         """Retrieve one or more implementation 1 v 1 by id(s).
 

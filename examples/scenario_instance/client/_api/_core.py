@@ -25,6 +25,7 @@ from scenario_instance.client import data_classes
 from scenario_instance.client.data_classes._core import (
     DomainModel,
     DomainModelWrite,
+    DEFAULT_INSTANCE_SPACE,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -473,9 +474,9 @@ class QueryAPI(Generic[T_DomainModelList]):
 def _create_edge_filter(
     edge_type: dm.DirectRelationReference,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -490,7 +491,7 @@ def _create_edge_filter(
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
         )
-    elif start_node and isinstance(start_node, dm.NodeId):
+    if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
                 ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
@@ -512,7 +513,7 @@ def _create_edge_filter(
         )
     if end_node and isinstance(end_node, str):
         filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
-    elif end_node and isinstance(end_node, dm.NodeId):
+    if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
         )
