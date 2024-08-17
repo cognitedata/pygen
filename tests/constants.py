@@ -402,6 +402,7 @@ class OmniSubFiles:
     connection_item_a_data = data_classes / "_connection_item_a.py"
 
     api = client_dir / "_api"
+    connection_item_a_api = api / "connection_item_a.py"
     connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
 
 
