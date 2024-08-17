@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.32] - 24-08-17
+### Changed
+- When generating an SDK if the `default_instance_space` parameter, `pygen` will no longer use the space of the
+  data model as the default space for nodes and edges. Instead, the generated SDK will be without a default space,
+  and all nodes and edges must be specified with space when creating or querying them. The motivation for this change
+  is that it is an anti-pattern to have data (node and edges) in the same space as the schema (data model, views,
+  containers). This change enforces the user to specify an instance space either when creating the SDK or
+  when creating or querying nodes and edges.
+
 ## [0.99.31] - 24-08-16
 ### Added
 - Support for edges with properties of type `single_edge_connection`.
