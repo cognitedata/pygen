@@ -6,7 +6,7 @@ from cognite.client.testing import monkeypatch_cognite_client
 from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import OMNI_SDK
+from tests.constants import OMNI_SDK, OMNI_SUB_SDK
 
 
 @pytest.fixture(scope="session")
@@ -42,4 +42,14 @@ def omni_multi_api_generator(omni_data_model: dm.DataModel[dm.View]) -> MultiAPI
         OMNI_SDK.client_name,
         [omni_data_model],
         OMNI_SDK.instance_space,
+    )
+
+
+@pytest.fixture(scope="session")
+def omnisub_multi_api_generator(omnisub_data_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
+    return MultiAPIGenerator(
+        OMNI_SUB_SDK.top_level_package,
+        OMNI_SUB_SDK.client_name,
+        [omnisub_data_model],
+        OMNI_SUB_SDK.instance_space,
     )
