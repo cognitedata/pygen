@@ -1,5 +1,5 @@
 import difflib
-
+from pathlib import Path
 from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import OmniFiles, OmniSubFiles
