@@ -12,10 +12,12 @@ if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as dc
     from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
+    from omni_sub import OmniSubClient
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
     from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+    from omni_sub_pydantic_v1 import OmniSubClient
 
 
 @pytest.fixture(scope="session")
@@ -176,3 +178,12 @@ def test_list_with_identifier_connections(omni_client: OmniClient) -> None:
     assert len(edges) > 0
     full_edges = [edge for edge in edges if not isinstance(edge, (str, dm.NodeId))]
     assert not full_edges, f"Expect only identifier. Found full outwards edges: {full_edges}"
+
+
+def test_list_without_default_space(omnisub_client: OmniSubClient) -> None:
+    # Act
+    items = omnisub_client.connection_item_b.list(limit=5)
+
+    # Assert
+    assert len(items) > 0
+    assert isinstance(items[0].space, str)
