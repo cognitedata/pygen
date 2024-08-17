@@ -399,6 +399,12 @@ class OmniSubFiles:
     client_dir = OMNI_SUB_SDK.client_dir
 
     data_classes = client_dir / "data_classes"
+    core_data = data_classes / "_core"
+    data_core_base = core_data / "base.py"
+    data_core_constants = core_data / "constants.py"
+    data_core_init = core_data / "__init__.py"
+    data_core_helpers = core_data / "helpers.py"
+    data_core_query = core_data / "query.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
 
     api = client_dir / "_api"
