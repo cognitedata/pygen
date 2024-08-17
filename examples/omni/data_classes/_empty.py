@@ -120,7 +120,7 @@ class EmptyGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Empty(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -143,7 +143,7 @@ class EmptyGraphQL(GraphQLCore):
     def as_write(self) -> EmptyWrite:
         """Convert this GraphQL format of empty to the writing format."""
         return EmptyWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             boolean=self.boolean,

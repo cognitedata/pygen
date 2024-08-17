@@ -105,10 +105,10 @@ class ConnectionItemCEdge(DomainRelation):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemA, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 
@@ -156,10 +156,10 @@ class ConnectionItemCEdgeWrite(DomainRelationWrite):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
-    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemB"
     )
 

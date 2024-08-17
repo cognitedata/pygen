@@ -105,7 +105,7 @@ class BladeGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Blade(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -122,7 +122,7 @@ class BladeGraphQL(GraphQLCore):
     def as_write(self) -> BladeWrite:
         """Convert this GraphQL format of blade to the writing format."""
         return BladeWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             is_damaged=self.is_damaged,

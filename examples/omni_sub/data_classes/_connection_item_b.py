@@ -8,7 +8,6 @@ from pydantic import Field
 from pydantic import field_validator, model_validator
 
 from ._core import (
-    DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -103,7 +102,7 @@ class ConnectionItemBGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return ConnectionItemB(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -120,7 +119,7 @@ class ConnectionItemBGraphQL(GraphQLCore):
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this GraphQL format of connection item b to the writing format."""
         return ConnectionItemBWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             inwards=[inward.as_write() for inward in self.inwards or []],
@@ -145,13 +144,11 @@ class ConnectionItemB(DomainModel):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemB", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
-    inwards: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemA, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="selfEdge"
-    )
+    self_edge: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False, alias="selfEdge")
 
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this read version of connection item b to the writing version."""
@@ -200,11 +197,7 @@ class ConnectionItemB(DomainModel):
                             and edge.start_node.external_id == instance.external_id
                             else edge.start_node
                         )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
+                        destination: dm.NodeId = as_node_id(other_end)
                         if destination in nodes_by_id:
                             value = nodes_by_id[destination]
                         else:
@@ -240,13 +233,13 @@ class ConnectionItemBWrite(DomainModelWrite):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemB", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
         "pygen-models", "ConnectionItemB"
     )
-    inwards: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
+    inwards: Optional[list[Union[ConnectionItemAWrite, dm.NodeId]]] = Field(default=None, repr=False)
     name: Optional[str] = None
-    self_edge: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
+    self_edge: Optional[list[Union[ConnectionItemBWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="selfEdge"
     )
 
