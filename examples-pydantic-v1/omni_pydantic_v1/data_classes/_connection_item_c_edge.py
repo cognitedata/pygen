@@ -276,7 +276,7 @@ def _create_connection_item_c_edge_filter(
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
         )
-    elif start_node and isinstance(start_node, dm.NodeId):
+    if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
                 ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
@@ -298,7 +298,7 @@ def _create_connection_item_c_edge_filter(
         )
     if end_node and isinstance(end_node, str):
         filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
-    elif end_node and isinstance(end_node, dm.NodeId):
+    if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
         )

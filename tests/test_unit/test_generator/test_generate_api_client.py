@@ -5,7 +5,7 @@ from cognite.pygen._generator import CodeFormatter
 from tests.constants import OMNI_MULTI_SDK, OmniMultiFiles
 
 
-def test_generate_api_client(code_formatter: CodeFormatter):
+def test_generate_multi_api_client(code_formatter: CodeFormatter):
     # Arrange
     sdk_generator = SDKGenerator(
         OMNI_MULTI_SDK.top_level_package,

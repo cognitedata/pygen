@@ -28,6 +28,7 @@ class TestGenerateSDK:
             output_dir=tmp_path,
             overwrite=True,
             client_name=client_name,
+            default_instance_space="field_space",
         )
 
         with append_to_sys_path(str(tmp_path)):
@@ -44,6 +45,7 @@ class TestGenerateSDK:
             output_dir=tmp_path,
             overwrite=True,
             client_name=client_name,
+            default_instance_space="no_properties_space",
         )
 
         with append_to_sys_path(str(tmp_path)):
@@ -60,6 +62,7 @@ class TestGenerateSDK:
             output_dir=tmp_path,
             overwrite=True,
             client_name=client_name,
+            default_instance_space="illegal_property_names_space",
         )
 
         with append_to_sys_path(str(tmp_path)):

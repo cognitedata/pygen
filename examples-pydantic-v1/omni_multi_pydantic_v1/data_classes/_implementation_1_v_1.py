@@ -8,7 +8,6 @@ from pydantic import Field
 from pydantic import validator, root_validator
 
 from ._core import (
-    DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -94,7 +93,7 @@ class Implementation1v1GraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Implementation1v1(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -111,7 +110,7 @@ class Implementation1v1GraphQL(GraphQLCore):
     def as_write(self) -> Implementation1v1Write:
         """Convert this GraphQL format of implementation 1 v 1 to the writing format."""
         return Implementation1v1Write(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             main_value=self.main_value,
@@ -136,7 +135,7 @@ class Implementation1v1(DomainModel):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     value_1: Optional[str] = Field(None, alias="value1")
@@ -179,7 +178,7 @@ class Implementation1v1Write(DomainModelWrite):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
         "pygen-models", "Implementation1"
     )

@@ -36,8 +36,6 @@ from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
 
-from .constants import DEFAULT_INSTANCE_SPACE
-
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
@@ -217,8 +215,8 @@ class DomainModelCore(Core, ABC):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId | dm.EdgeId, Self],
+        nodes_by_id: dict[dm.NodeId, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         # This is used when unpacking a query result and should be overridden in the subclasses
@@ -386,12 +384,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         for source in sources:
             for prop_name, prop_value in source["properties"].items():
                 if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                    if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
-                        properties[prop_name] = prop_value["externalId"]
-                    else:
-                        properties[prop_name] = dm.NodeId(
-                            space=prop_value["space"], external_id=prop_value["externalId"]
-                        )
+                    properties[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
                 else:
                     properties[prop_name] = prop_value
         return cls(
@@ -572,29 +565,20 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
     @classmethod
     def create_edge(
         cls,
-        start_node: DomainModelWrite | str | dm.NodeId,
-        end_node: DomainModelWrite | str | dm.NodeId,
+        start_node: DomainModelWrite | dm.NodeId,
+        end_node: DomainModelWrite | dm.NodeId,
         edge_type: dm.DirectRelationReference,
     ) -> dm.EdgeApply:
-        if isinstance(start_node, (DomainModelWrite, dm.NodeId)):
-            space = start_node.space
-        elif isinstance(end_node, (DomainModelWrite, dm.NodeId)):
-            space = end_node.space
-        else:
-            space = DEFAULT_INSTANCE_SPACE
+        space = start_node.space
 
-        if isinstance(end_node, str):
-            end_ref = dm.DirectRelationReference(space, end_node)
-        elif isinstance(end_node, DomainModelWrite):
+        if isinstance(end_node, DomainModelWrite):
             end_ref = end_node.as_direct_reference()
         elif isinstance(end_node, dm.NodeId):
             end_ref = dm.DirectRelationReference(end_node.space, end_node.external_id)
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationWrite.__name__}, got {type(end_node)}")
 
-        if isinstance(start_node, str):
-            start_ref = dm.DirectRelationReference(space, start_node)
-        elif isinstance(start_node, DomainModelWrite):
+        if isinstance(start_node, DomainModelWrite):
             start_ref = start_node.as_direct_reference()
         elif isinstance(start_node, dm.NodeId):
             start_ref = dm.DirectRelationReference(start_node.space, start_node.external_id)
@@ -613,8 +597,8 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
     def from_edge_to_resources(
         cls,
         cache: set[tuple[str, str]],
-        start_node: DomainModelWrite | str | dm.NodeId,
-        end_node: DomainModelWrite | str | dm.NodeId,
+        start_node: DomainModelWrite | dm.NodeId,
+        end_node: DomainModelWrite | dm.NodeId,
         edge_type: dm.DirectRelationReference,
         write_none: bool = False,
         allow_version_increase: bool = False,
@@ -681,18 +665,12 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
-                    unpacked[prop_name] = prop_value["externalId"]
-                else:
-                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
+                unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             elif isinstance(prop_value, list):
-                values = []
+                values: list[Any] = []
                 for value in prop_value:
                     if isinstance(value, dict) and "externalId" in value and "space" in value:
-                        if value["space"] == DEFAULT_INSTANCE_SPACE:
-                            values.append(value["externalId"])
-                        else:
-                            values.append(dm.NodeId(space=value["space"], external_id=value["externalId"]))
+                        values.append(dm.NodeId(space=value["space"], external_id=value["externalId"]))
                     else:
                         values.append(value)
                 unpacked[prop_name] = values

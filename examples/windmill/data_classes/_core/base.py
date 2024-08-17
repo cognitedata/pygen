@@ -686,7 +686,7 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
                 else:
                     unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             elif isinstance(prop_value, list):
-                values = []
+                values: list[Any] = []
                 for value in prop_value:
                     if isinstance(value, dict) and "externalId" in value and "space" in value:
                         if value["space"] == DEFAULT_INSTANCE_SPACE:
