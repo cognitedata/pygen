@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_sub.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -131,9 +130,7 @@ class ConnectionItemCNodeAPI(
         )
         return self._apply(connection_item_c_node, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         """Delete one or more connection item c node.
 
         Args:
@@ -163,15 +160,13 @@ class ConnectionItemCNodeAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemCNode | None: ...
+    def retrieve(self, external_id: str, space: str) -> ConnectionItemCNode | None: ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemCNodeList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> ConnectionItemCNodeList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self, external_id: str | SequenceNotStr[str], space: str
     ) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
         """Retrieve one or more connection item c nodes by id(s).
 

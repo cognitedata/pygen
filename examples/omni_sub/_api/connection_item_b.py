@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_sub.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -135,9 +134,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         )
         return self._apply(connection_item_b, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         """Delete one or more connection item b.
 
         Args:
@@ -167,15 +164,13 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemB | None: ...
+    def retrieve(self, external_id: str, space: str) -> ConnectionItemB | None: ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemBList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> ConnectionItemBList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self, external_id: str | SequenceNotStr[str], space: str
     ) -> ConnectionItemB | ConnectionItemBList | None:
         """Retrieve one or more connection item bs by id(s).
 
