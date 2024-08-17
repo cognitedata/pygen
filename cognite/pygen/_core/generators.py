@@ -214,7 +214,7 @@ class MultiAPIGenerator:
 
         self.api_by_type_by_view_id = self.create_api_by_view_id_type(
             unique_views,
-            default_instance_space,
+            default_instance_space is not None,
             config,
             base_name_functions=[
                 DataClass.to_base_name,
@@ -282,6 +282,11 @@ class MultiAPIGenerator:
         }
 
     @property
+    def has_default_instance_space(self) -> bool:
+        """Whether the SDK has a default instance space."""
+        return self.default_instance_space is not None
+
+    @property
     def apis(self) -> Iterator[APIGenerator]:
         """Iterate over the unique APIs."""
         for api_by_view_id in self.api_by_type_by_view_id.values():
@@ -307,7 +312,7 @@ class MultiAPIGenerator:
     def create_api_by_view_id_type(
         cls,
         views: list[dm.View],
-        default_instance_space: str,
+        has_default_instance_space: bool,
         config: PygenConfig,
         base_name_functions: list[Callable[[dm.View], str]],
         selected_function: int = 0,
@@ -331,14 +336,14 @@ class MultiAPIGenerator:
                 view = views_with_base_name[0]
                 if view.used_for == "all":
                     api_by_view_id["node"][view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, "node", f"{base_name}Node"
+                        view, has_default_instance_space, config, "node", f"{base_name}Node"
                     )
                     api_by_view_id["edge"][view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, "edge", f"{base_name}Edge"
+                        view, has_default_instance_space, config, "edge", f"{base_name}Edge"
                     )
                 elif view.used_for == "node" or view.used_for == "edge":
                     api_by_view_id[view.used_for][view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, view.used_for, base_name
+                        view, has_default_instance_space, config, view.used_for, base_name
                     )
                 else:
                     warnings.warn("View used_for is not set. Skipping view", UserWarning, stacklevel=2)
@@ -346,7 +351,7 @@ class MultiAPIGenerator:
 
             # The base name is not unique, so we need to try another base name function to separate the views.
             update = cls.create_api_by_view_id_type(
-                views_with_base_name, default_instance_space, config, base_name_functions, selected_function + 1
+                views_with_base_name, has_default_instance_space, config, base_name_functions, selected_function + 1
             )
             api_by_view_id["node"].update(update["node"])
             api_by_view_id["edge"].update(update["edge"])
@@ -572,7 +577,7 @@ class APIGenerator:
 
     Args:
         view: The view to generate the API and Data Classes for.
-        default_instance_space: The default instance space to use for the generated SDK.
+        has_default_instance_space: Whether the generated SDK has a default instance space.
         config: The configuration for the SDK generation
         base_name: The base name of the view. If None, the base name will be inferred from the view.
 
@@ -587,7 +592,7 @@ class APIGenerator:
     def __init__(
         self,
         view: dm.View,
-        default_instance_space: str,
+        has_default_instance_space: bool,
         config: PygenConfig,
         used_for: Literal["node", "edge"],
         base_name: str | None = None,
@@ -597,7 +602,7 @@ class APIGenerator:
         )
         self.view = view
         self.base_name = base_name or DataClass.to_base_name(view)
-        self.default_instance_space = default_instance_space
+        self.has_default_instance_space = has_default_instance_space
         self._config = config
         self.used_for = used_for
 
