@@ -397,8 +397,12 @@ OMNI_TYPED.append_manual_files(OmniTypedFiles)
 
 class OmniSubFiles:
     client_dir = OMNI_SUB_SDK.client_dir
+
     data_classes = client_dir / "data_classes"
     connection_item_a_data = data_classes / "_connection_item_a.py"
+
+    api = client_dir / "_api"
+    connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
 
 
 OMNI_SUB_SDK.append_manual_files(OmniSubFiles)
