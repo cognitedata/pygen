@@ -406,6 +406,7 @@ class OmniSubFiles:
     data_core_helpers = core_data / "helpers.py"
     data_core_query = core_data / "query.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
+    connection_item_c_edge_data = data_classes / "_connection_item_c_edge.py"
 
     api = client_dir / "_api"
     core_api = api / "_core.py"
