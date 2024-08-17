@@ -21,6 +21,9 @@ Changes are grouped as follows
   is that it is an anti-pattern to have data (node and edges) in the same space as the schema (data model, views,
   containers). This change enforces the user to specify an instance space either when creating the SDK or
   when creating or querying nodes and edges.
+- In the generated `GraphQL` class methods `as_write` and `as_read` no longer defaults to DEFAULT_INSTANCE_SPACE.
+  This is to ensure that the user must specify the space when creating or querying nodes and edges, and not introdcue
+  a bug where the space is not set correctly.
 
 ## [0.99.31] - 24-08-16
 ### Added
