@@ -413,6 +413,8 @@ class OmniSubFiles:
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
 
+    api_client = client_dir / "_api_client.py"
+
 
 OMNI_SUB_SDK.append_manual_files(OmniSubFiles)
 
