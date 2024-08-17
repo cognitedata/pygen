@@ -9,8 +9,8 @@ from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as Cog
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
-from ._core import (
-    DEFAULT_INSTANCE_SPACE,
+from ._core import ({% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,{% endif %}
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -115,7 +115,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return {{ data_class.read_name }}(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -131,7 +131,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
         return {{ data_class.write_name }}(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
             {{ field.name }}={{ field.as_write_graphql() }},{% endif %}{% endfor %}
@@ -151,7 +151,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     """
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
     {% if not data_class.implements %}
-    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 {% if data_class.is_writable or data_class.is_interface %}
@@ -213,11 +213,11 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                             and edge.start_node.external_id == instance.external_id
                             else edge.start_node
                         )
-                        destination: dm.NodeId | str = (
+                        destination:{% if has_default_instance_space %} dm.NodeId | str = (
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
                             else other_end.external_id
-                        )
+                        ){% else %} str = as_node_id(other_end){% endif %}
                         if destination in nodes_by_id:
                             value = nodes_by_id[destination]
                         else:
@@ -315,7 +315,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
     """
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
 {% if not data_class.implements %}
-    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 

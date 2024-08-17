@@ -747,6 +747,7 @@ class APIGenerator:
                 unique_start_classes=unique_start_classes,
                 unique_end_classes=unique_end_classes,
                 grouped_edge_classes=grouped_edge_classes,
+                has_default_instance_space=self.has_default_instance_space,
             )
             + "\n"
         )
