@@ -86,6 +86,7 @@ class EdgeAPIClass(APIClass):
     end_view_id: dm.ViewId
     end_filter_method: FilterMethod
     field: BaseConnectionField
+    has_default_instance_space: bool
 
     @property
     def has_edge_class(self) -> bool:
@@ -99,37 +100,44 @@ class EdgeAPIClass(APIClass):
         case: Literal["signature", "docs", "filter_call"] = "signature",
     ) -> Iterator[FilterParameter]:
         if include_nodes:
-            nodes = {
-                "from": FilterParameter(
-                    name=f"from_{self.start_class.variable}",
-                    type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                    description=f"ID of the source { self.start_class.doc_name}.",
-                    default=None,
-                ),
-                "from_space": FilterParameter(
+            nodes: dict[str, FilterParameter] = {}
+            type_ = "dm.NodeId | list[dm.NodeId]"
+            if self.has_default_instance_space:
+                type_ = f"str | list[str] | {type_}"
+            nodes["from"] = FilterParameter(
+                name=f"from_{self.start_class.variable}",
+                type_=type_,
+                description=f"ID of the source { self.start_class.doc_name}.",
+                default=None,
+            )
+            if self.has_default_instance_space:
+                nodes["from_space"] = FilterParameter(
                     name=f"from_{self.start_class.variable}_space",
                     type_="str",
                     description=f"Location of the {self.start_class.doc_list_name}.",
                     default="DEFAULT_INSTANCE_SPACE",
                     is_nullable=False,
-                ),
-                "to": FilterParameter(
-                    name=f"to_{self.end_class.variable}",
-                    type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                    description=f"ID of the target { self.end_class.doc_name}.",
-                    default=None,
-                ),
-                "to_space": FilterParameter(
+                )
+            nodes["to"] = FilterParameter(
+                name=f"to_{self.end_class.variable}",
+                type_=type_,
+                description=f"ID of the target { self.end_class.doc_name}.",
+                default=None,
+            )
+            if self.has_default_instance_space:
+                nodes["to_space"] = FilterParameter(
                     name=f"to_{self.end_class.variable}_space",
                     type_="str",
                     description=f"Location of the {self.end_class.doc_list_name}.",
                     default="DEFAULT_INSTANCE_SPACE",
                     is_nullable=False,
-                ),
-            }
+                )
 
             if case == "filter_call" and self.direction == "inwards":
-                yield from [nodes["to"], nodes["to_space"], nodes["from"], nodes["from_space"]]
+                if self.has_default_instance_space:
+                    yield from [nodes["to"], nodes["to_space"], nodes["from"], nodes["from_space"]]
+                else:
+                    yield from [nodes["to"], nodes["from"]]
             else:
                 yield from nodes.values()
 
@@ -190,6 +198,7 @@ class EdgeAPIClass(APIClass):
             end_view_id=end_class.view_id,
             end_filter_method=api_generator_by_view_id[end_class.view_id].list_method,
             field=field,
+            has_default_instance_space=has_default_instance_space,
         )
 
 

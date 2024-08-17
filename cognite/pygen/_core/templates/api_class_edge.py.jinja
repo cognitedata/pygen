@@ -11,8 +11,8 @@ from {{ top_level_package }}.data_classes import (
 )
 from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
 {% endif %}
-from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}
-from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
+from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}{% if has_default_instance_space %}
+from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE{% endif %}
 
 
 class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):{% if edge_api.has_edge_class %}
@@ -40,9 +40,10 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
 
             List 5 {{edge_api.doc_name}} edges connected to "my_{{ edge_api.start_class.variable }}":
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ top_level_package }} import {{ client_name }}{% if not has_default_instance_space %}
+                >>> from cognite.client import data_modeling as dm{% endif %}
                 >>> client = {{ client_name }}()
-                >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list("my_{{ edge_api.start_class.variable }}", limit=5)
+                >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list({% if has_default_instance_space %}"my_{{ edge_api.start_class.variable }}"{% else %}dm.NodeId("my_space", "my_connection_item_a"){% endif %}, limit=5)
 
         """
         filter_ = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(

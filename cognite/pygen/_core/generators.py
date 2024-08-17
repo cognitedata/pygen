@@ -848,6 +848,7 @@ class APIGenerator:
                     client_name=client_name,
                     edge_api=edge_api,
                     api_class=self.api_class,
+                    has_default_instance_space=self.has_default_instance_space,
                     # ft = field types
                     ft=fields,
                     dm=dm,

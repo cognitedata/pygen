@@ -472,10 +472,8 @@ class QueryAPI(Generic[T_DomainModelList]):
 
 def _create_edge_filter(
     edge_type: dm.DirectRelationReference,
-    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
-    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    start_node: dm.NodeId | list[dm.NodeId] | None = None,
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
