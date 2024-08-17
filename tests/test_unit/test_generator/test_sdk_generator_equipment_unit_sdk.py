@@ -14,7 +14,11 @@ from tests.constants import EQUIPMENT_UNIT_SDK, IS_PYDANTIC_V2, EquipmentSDKFile
 @pytest.fixture
 def sdk_generator(equipment_unit_model: dm.DataModel[dm.View], pygen_config: PygenConfig) -> SDKGenerator:
     return SDKGenerator(
-        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name, equipment_unit_model, config=pygen_config
+        EQUIPMENT_UNIT_SDK.top_level_package,
+        EQUIPMENT_UNIT_SDK.client_name,
+        equipment_unit_model,
+        config=pygen_config,
+        default_instance_space=EQUIPMENT_UNIT_SDK.instance_space,
     )
 
 
