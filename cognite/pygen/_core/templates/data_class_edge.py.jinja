@@ -244,7 +244,7 @@ def {{ data_class.filter_name }}(
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     space_end_node: str = DEFAULT_INSTANCE_SPACE,{% else %}
     start_node: dm.NodeId | list[dm.NodeId] | None = None,
-    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% for parm in list_method.parameters %}
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% endif %}{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter:
