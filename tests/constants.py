@@ -177,6 +177,14 @@ OMNI_SDK = ExampleSDK(
     download_nodes=True,
 )
 
+OMNI_SUB_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "OmniSub", "1")],
+    _top_level_package="omni_sub",
+    client_name="OmniSubClient",
+    generate_sdk=True,
+    instance_space=None,
+)
+
 OMNI_TYPED = ExampleSDK(
     data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
     _top_level_package="omni_typed",
@@ -228,6 +236,7 @@ APM_SDK = ExampleSDK(
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 PUMP_SDK = ExampleSDK(
@@ -235,6 +244,7 @@ PUMP_SDK = ExampleSDK(
     _top_level_package="pump.client",
     client_name="PumpClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 SCENARIO_INSTANCE_SDK = ExampleSDK(
@@ -242,13 +252,16 @@ SCENARIO_INSTANCE_SDK = ExampleSDK(
     _top_level_package="scenario_instance.client",
     client_name="ScenarioInstanceClient",
     generate_sdk=True,
+    instance_space="IntegrationTestsImmutable",
 )
+
 
 APM_APP_DATA_SOURCE = ExampleSDK(
     data_model_ids=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
     _top_level_package="apm_domain.client",
     client_name="ApmClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 APM_APP_DATA_SINK = ExampleSDK(
@@ -256,6 +269,7 @@ APM_APP_DATA_SINK = ExampleSDK(
     _top_level_package="sysdm_domain.client",
     client_name="SysDMClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
@@ -263,6 +277,7 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
     _top_level_package="equipment_unit",
     client_name="EquipmentUnitClient",
     generate_sdk=True,
+    instance_space="IntegrationTestsImmutable",
 )
 
 
@@ -378,6 +393,15 @@ class OmniTypedFiles:
 
 
 OMNI_TYPED.append_manual_files(OmniTypedFiles)
+
+
+class OmniSubFiles:
+    client_dir = OMNI_SUB_SDK.client_dir
+    data_classes = client_dir / "data_classes"
+    connection_item_a_data = data_classes / "_connection_item_a.py"
+
+
+OMNI_SUB_SDK.append_manual_files(OmniSubFiles)
 
 
 class OmniMultiFiles:
