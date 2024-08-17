@@ -176,18 +176,18 @@ class ConnectionItemB(DomainModel):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, ConnectionItemB],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId, ConnectionItemB],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         from ._connection_item_a import ConnectionItemA
 
         for instance in instances.values():
             if edges := edges_by_source_node.get(instance.as_id()):
-                inwards: list[ConnectionItemA | str | dm.NodeId] = []
-                self_edge: list[ConnectionItemB | str | dm.NodeId] = []
+                inwards: list[ConnectionItemA | dm.NodeId] = []
+                self_edge: list[ConnectionItemB | dm.NodeId] = []
                 for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    value: DomainModel | DomainRelation | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:

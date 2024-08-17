@@ -225,7 +225,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
                         {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
@@ -235,7 +235,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value

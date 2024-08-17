@@ -282,12 +282,9 @@ class NodeQueryStep(QueryStep):
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
 
-    def unpack(self) -> dict[dm.NodeId | str, DomainModel]:
+    def unpack(self) -> dict[dm.NodeId, DomainModel]:
         return {
-            (
-                instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
-            ): self.result_cls.from_instance(instance)
-            for instance in cast(list[dm.Node], self.results)
+            instance.as_id(): self.result_cls.from_instance(instance) for instance in cast(list[dm.Node], self.results)
         }
 
 
@@ -377,7 +374,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 raise ValueError(f"Invalid return_step: {self._return_step}")
             return self._result_list_cls(selected_step.unpack().values())
         # More than one step, we need to unpack the nodes and edges
-        nodes_by_from: dict[str | None, dict[dm.NodeId | str, DomainModel]] = defaultdict(dict)
+        nodes_by_from: dict[str | None, dict[dm.NodeId, DomainModel]] = defaultdict(dict)
         edges_by_from: dict[str, dict[dm.NodeId, list[dm.Edge | DomainRelation]]] = defaultdict(dict)
         for step in reversed(self):
             # Validated in the append method

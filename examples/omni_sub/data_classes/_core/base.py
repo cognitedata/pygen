@@ -217,8 +217,8 @@ class DomainModelCore(Core, ABC):
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId | dm.EdgeId, Self],
+        nodes_by_id: dict[dm.NodeId, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:
         # This is used when unpacking a query result and should be overridden in the subclasses
