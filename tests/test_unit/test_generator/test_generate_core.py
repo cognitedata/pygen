@@ -2,7 +2,7 @@ import difflib
 
 from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import OmniFiles
+from tests.constants import OmniFiles, OmniSubFiles
 
 
 def test_generate_data_class_core_base(omni_multi_api_generator: MultiAPIGenerator) -> None:
@@ -66,6 +66,17 @@ def test_generate_api_core(omni_multi_api_generator: MultiAPIGenerator) -> None:
 
     # Act
     actual = omni_multi_api_generator.generate_api_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_api_core_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.core_api.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_api_core_file()
 
     # Assert
     assert actual == expected

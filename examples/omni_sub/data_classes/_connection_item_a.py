@@ -230,7 +230,7 @@ class ConnectionItemA(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
-                        value, (ConnectionItemB, str, dm.NodeId)
+                        value, (ConnectionItemB, dm.NodeId)
                     ):
                         outwards.append(value)
 

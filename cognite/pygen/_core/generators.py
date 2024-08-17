@@ -424,6 +424,7 @@ class MultiAPIGenerator:
                 top_level_package=self.top_level_package,
                 data_class_by_data_model_by_type=self._data_class_by_data_model_by_type,
                 is_pydantic_v2=self.pydantic_version == "v2",
+                has_default_instance_space=self.has_default_instance_space,
             )
             + "\n"
         )
