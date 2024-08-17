@@ -103,7 +103,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return DependentOnNonWritable(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -119,7 +119,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this GraphQL format of dependent on non writable to the writing format."""
         return DependentOnNonWritableWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             a_value=self.a_value,

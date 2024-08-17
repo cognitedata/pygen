@@ -105,7 +105,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return PrimitiveWithDefaults(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -124,7 +124,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this GraphQL format of primitive with default to the writing format."""
         return PrimitiveWithDefaultsWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             auto_increment_int_32=self.auto_increment_int_32,

@@ -37,7 +37,7 @@ repos:
   - hooks:
     - id: mypy
       name: mypy
-      entry: dmypy run -- cognite/ examples/omni/
+      entry: dmypy run -- cognite/ examples/omni/ examples/omni_sub
       files: ^.*.(py|pyi)$
       language: system
       pass_filenames: false

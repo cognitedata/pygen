@@ -7,8 +7,8 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKIN
 from cognite.client import data_modeling as dm, CogniteClient{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import (
-    DEFAULT_INSTANCE_SPACE,
+from ._core import ({% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,{% endif %}
     DataRecord,
     DataRecordWrite,
     DomainModel,
@@ -103,7 +103,7 @@ class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_cla
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class.read_fields %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_write(self) -> {{ data_class.write_name }}:
@@ -137,7 +137,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if is_pydantic_v2 and da
         {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class.write_fields %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_write(
@@ -238,11 +238,13 @@ class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
 def {{ data_class.filter_name }}(
     edge_type: dm.DirectRelationReference,
-    view_id: dm.ViewId,
+    view_id: dm.ViewId,{% if has_default_instance_space %}
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% for parm in list_method.parameters %}
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% else %}
+    start_node: dm.NodeId | list[dm.NodeId] | None = None,
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% endif %}{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter:
@@ -251,12 +253,12 @@ def {{ data_class.filter_name }}(
             ["edge", "type"],
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
-    ]
+    ]{% if has_default_instance_space %}
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        )
-    elif start_node and isinstance(start_node, dm.NodeId):
+        ){% endif %}
+    if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
                 ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
@@ -266,17 +268,17 @@ def {{ data_class.filter_name }}(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
+                values=[{% if has_default_instance_space %}
                     {"space": start_node_space, "externalId": ext_id}
                     if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    else {% endif %}ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
-        )
+        ){% if has_default_instance_space %}
     if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
-    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node})){% endif %}
+    if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
         )
@@ -284,10 +286,10 @@ def {{ data_class.filter_name }}(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
+                values=[{% if has_default_instance_space %}
                     {"space": space_end_node, "externalId": ext_id}
                     if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    else {% endif %}ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )

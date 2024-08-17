@@ -8,7 +8,6 @@ from pydantic import Field
 from pydantic import field_validator, model_validator
 
 from ._core import (
-    DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -92,7 +91,7 @@ class SubInterfaceGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return SubInterface(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -108,7 +107,7 @@ class SubInterfaceGraphQL(GraphQLCore):
     def as_write(self) -> SubInterfaceWrite:
         """Convert this GraphQL format of sub interface to the writing format."""
         return SubInterfaceWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             main_value=self.main_value,

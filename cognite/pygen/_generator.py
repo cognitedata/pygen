@@ -90,8 +90,8 @@ def generate_sdk(
             the package will be [external_id:snake] of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
-        default_instance_space: The default instance space to use for the generated SDK. Defaults to the
-            instance space of the first data model given.
+        default_instance_space: The default instance space to use for the generated SDK. If not provided,
+            all nodes and edges as well as filtering must specify instance space in the generated SDK.
         output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use

@@ -8,7 +8,6 @@ from pydantic import Field
 from pydantic import validator, root_validator
 
 from ._core import (
-    DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -88,7 +87,7 @@ class MainInterfaceGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return MainInterface(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -103,7 +102,7 @@ class MainInterfaceGraphQL(GraphQLCore):
     def as_write(self) -> MainInterfaceWrite:
         """Convert this GraphQL format of main interface to the writing format."""
         return MainInterfaceWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             main_value=self.main_value,
@@ -124,7 +123,7 @@ class MainInterface(DomainModel):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
@@ -161,7 +160,7 @@ class MainInterfaceWrite(DomainModelWrite):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
+    space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 

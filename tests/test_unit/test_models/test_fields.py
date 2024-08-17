@@ -53,7 +53,16 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
-        actual = Field.from_property(name, prop, {}, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
+        actual = Field.from_property(
+            name,
+            prop,
+            {},
+            {},
+            pygen_config,
+            dm.ViewId("a", "b", "c"),
+            pydantic_field="Field",
+            has_default_instance_space=True,
+        )
 
     # Assert
     assert actual.name == expected_name

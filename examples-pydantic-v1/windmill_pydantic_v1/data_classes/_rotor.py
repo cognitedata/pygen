@@ -98,7 +98,7 @@ class RotorGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Rotor(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -114,7 +114,7 @@ class RotorGraphQL(GraphQLCore):
     def as_write(self) -> RotorWrite:
         """Convert this GraphQL format of rotor to the writing format."""
         return RotorWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             rotor_speed_controller=self.rotor_speed_controller,

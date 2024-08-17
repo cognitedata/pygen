@@ -2,7 +2,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen.utils.text import to_pascal, to_snake
-from tests.constants import IS_PYDANTIC_V2, OMNI_MULTI_SDK, OMNI_SDK
+from tests.constants import IS_PYDANTIC_V2, OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK
 from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
@@ -14,6 +14,11 @@ else:
 @pytest.fixture(scope="session")
 def omni_data_model() -> dm.DataModel[dm.View]:
     return OMNI_SDK.load_data_model()
+
+
+@pytest.fixture(scope="session")
+def omnisub_data_model() -> dm.DataModel[dm.View]:
+    return OMNI_SUB_SDK.load_data_model()
 
 
 @pytest.fixture(scope="session")

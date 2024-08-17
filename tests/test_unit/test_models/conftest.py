@@ -30,7 +30,7 @@ def omni_field_factory(
         view = omni_views[view_ext_id]
         prop = view.properties[property_name]
         return Field.from_property(
-            property_name, prop, node_class_by_view_id, edge_class_by_view_id, pygen_config, view.as_id(), "Field"
+            property_name, prop, node_class_by_view_id, edge_class_by_view_id, pygen_config, view.as_id(), "Field", True
         )
 
     return factory

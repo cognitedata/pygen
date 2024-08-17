@@ -31,15 +31,11 @@ class ExampleSDK:
     client_name: str
     _top_level_package: str
     generate_sdk: bool
+    instance_space: str | None
     download_nodes: bool = False
-    _instance_space: str | None = None
     is_typed: bool = False
     typed_classes: set[str] = field(default_factory=set)
     manual_files: list[Path] = field(default_factory=list, init=False)
-
-    @property
-    def instance_space(self) -> str:
-        return self._instance_space or self.data_model_ids[0].space
 
     @property
     def top_level_package(self) -> str:
@@ -95,7 +91,7 @@ class ExampleSDK:
             views = self.load_views(model)
             spaces |= {view.space for view in views}
 
-        if self.instance_space not in spaces:
+        if self.instance_space and self.instance_space not in spaces:
             spaces.add(self.instance_space)
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
@@ -169,7 +165,7 @@ WINDMILL_SDK = ExampleSDK(
     _top_level_package="windmill",
     client_name="WindmillClient",
     generate_sdk=True,
-    _instance_space="windmill-instances",
+    instance_space="windmill-instances",
 )
 
 OMNI_SDK = ExampleSDK(
@@ -177,15 +173,23 @@ OMNI_SDK = ExampleSDK(
     _top_level_package="omni",
     client_name="OmniClient",
     generate_sdk=True,
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
     download_nodes=True,
+)
+
+OMNI_SUB_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "OmniSub", "1")],
+    _top_level_package="omni_sub",
+    client_name="OmniSubClient",
+    generate_sdk=True,
+    instance_space=None,
 )
 
 OMNI_TYPED = ExampleSDK(
     data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
     _top_level_package="omni_typed",
     client_name="DoesNotMatter",
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
     generate_sdk=True,
     is_typed=True,
     # Done above
@@ -212,7 +216,8 @@ OMNI_MULTI_SDK = ExampleSDK(
     _top_level_package="omni_multi",
     client_name="OmniMultiClient",
     generate_sdk=True,
-    _instance_space="omni-instances",
+    # Omni multi is generated without instance space.
+    instance_space=None,
     download_nodes=False,
 )
 
@@ -223,7 +228,7 @@ OMNIUM_CONNECTION_SDK = ExampleSDK(
     _top_level_package="omni_connection",
     client_name="OmniConnectionClient",
     generate_sdk=False,
-    _instance_space="omni-instances",
+    instance_space="omni-instances",
 )
 
 APM_SDK = ExampleSDK(
@@ -231,6 +236,7 @@ APM_SDK = ExampleSDK(
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 PUMP_SDK = ExampleSDK(
@@ -238,6 +244,7 @@ PUMP_SDK = ExampleSDK(
     _top_level_package="pump.client",
     client_name="PumpClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 SCENARIO_INSTANCE_SDK = ExampleSDK(
@@ -245,13 +252,16 @@ SCENARIO_INSTANCE_SDK = ExampleSDK(
     _top_level_package="scenario_instance.client",
     client_name="ScenarioInstanceClient",
     generate_sdk=True,
+    instance_space="IntegrationTestsImmutable",
 )
+
 
 APM_APP_DATA_SOURCE = ExampleSDK(
     data_model_ids=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
     _top_level_package="apm_domain.client",
     client_name="ApmClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 APM_APP_DATA_SINK = ExampleSDK(
@@ -259,6 +269,7 @@ APM_APP_DATA_SINK = ExampleSDK(
     _top_level_package="sysdm_domain.client",
     client_name="SysDMClient",
     generate_sdk=False,
+    instance_space=None,
 )
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
@@ -266,6 +277,7 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
     _top_level_package="equipment_unit",
     client_name="EquipmentUnitClient",
     generate_sdk=True,
+    instance_space="IntegrationTestsImmutable",
 )
 
 
@@ -381,6 +393,30 @@ class OmniTypedFiles:
 
 
 OMNI_TYPED.append_manual_files(OmniTypedFiles)
+
+
+class OmniSubFiles:
+    client_dir = OMNI_SUB_SDK.client_dir
+
+    data_classes = client_dir / "data_classes"
+    core_data = data_classes / "_core"
+    data_core_base = core_data / "base.py"
+    data_core_constants = core_data / "constants.py"
+    data_core_init = core_data / "__init__.py"
+    data_core_helpers = core_data / "helpers.py"
+    data_core_query = core_data / "query.py"
+    connection_item_a_data = data_classes / "_connection_item_a.py"
+    connection_item_c_edge_data = data_classes / "_connection_item_c_edge.py"
+
+    api = client_dir / "_api"
+    core_api = api / "_core.py"
+    connection_item_a_api = api / "connection_item_a.py"
+    connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
+
+    api_client = client_dir / "_api_client.py"
+
+
+OMNI_SUB_SDK.append_manual_files(OmniSubFiles)
 
 
 class OmniMultiFiles:

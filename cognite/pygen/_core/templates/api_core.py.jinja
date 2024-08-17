@@ -24,7 +24,8 @@ from cognite.client.data_classes.data_modeling.instances import InstanceSort, In
 from {{ top_level_package }} import data_classes
 from {{ top_level_package }}.data_classes._core import (
     DomainModel,
-    DomainModelWrite,
+    DomainModelWrite,{% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,{% endif %}
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -471,11 +472,13 @@ class QueryAPI(Generic[T_DomainModelList]):
 
 
 def _create_edge_filter(
-    edge_type: dm.DirectRelationReference,
+    edge_type: dm.DirectRelationReference,{% if has_default_instance_space %}
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% else %}
+    start_node: dm.NodeId | list[dm.NodeId] | None = None,
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% endif %}
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -485,12 +488,12 @@ def _create_edge_filter(
             ["edge", "type"],
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
-    ]
+    ]{% if has_default_instance_space %}
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        )
-    elif start_node and isinstance(start_node, dm.NodeId):
+        ){% endif %}
+    if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
                 ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
@@ -500,19 +503,19 @@ def _create_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
+                values={% if has_default_instance_space %}[
                     (
                         {"space": start_node_space, "externalId": ext_id}
                         if isinstance(ext_id, str)
                         else ext_id.dump(camel_case=True, include_instance_type=False)
                     )
                     for ext_id in start_node
-                ],
+                ]{% else %}[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in start_node]{% endif %},
             )
-        )
+        ){% if has_default_instance_space %}
     if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
-    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node})){% endif %}
+    if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
         )
@@ -520,14 +523,14 @@ def _create_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
+                values={% if has_default_instance_space %}[
                     (
                         {"space": space_end_node, "externalId": ext_id}
                         if isinstance(ext_id, str)
                         else ext_id.dump(camel_case=True, include_instance_type=False)
                     )
                     for ext_id in end_node
-                ],
+                ]{% else %}[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in end_node]{% endif %},
             )
         )
     if external_id_prefix:

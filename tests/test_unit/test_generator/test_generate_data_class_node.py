@@ -2,7 +2,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import IS_PYDANTIC_V2, OmniFiles
+from tests.constants import IS_PYDANTIC_V2, OmniFiles, OmniSubFiles
 
 
 def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
@@ -210,6 +210,23 @@ def test_generate_connection_item_f(omni_multi_api_generator: MultiAPIGenerator,
         dm.ViewId("pygen-models", "ConnectionItemF", "1")
     ]
     expected = OmniFiles.connection_item_f_data.read_text()
+
+    # Act
+    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_a_no_default_space(
+    omnisub_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+):
+    # Arrange
+    api_generator = omnisub_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    ]
+    expected = OmniSubFiles.connection_item_a_data.read_text()
 
     # Act
     actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)

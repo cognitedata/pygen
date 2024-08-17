@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_multi.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -135,9 +134,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         )
         return self._apply(sub_interface, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         """Delete one or more sub interface.
 
         Args:
@@ -168,24 +165,21 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     @overload
     def retrieve(
-        self,
-        external_id: str,
-        space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
+        self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None
     ) -> SubInterface | None: ...
 
     @overload
     def retrieve(
         self,
         external_id: SequenceNotStr[str],
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str,
         as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
     ) -> SubInterfaceList: ...
 
     def retrieve(
         self,
         external_id: str | SequenceNotStr[str],
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str,
         as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
     ) -> SubInterface | SubInterfaceList | None:
         """Retrieve one or more sub interfaces by id(s).

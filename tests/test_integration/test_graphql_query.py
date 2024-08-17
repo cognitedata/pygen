@@ -47,6 +47,7 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
         externalId
         name
       }
+      space
       externalId
       files{
         externalId

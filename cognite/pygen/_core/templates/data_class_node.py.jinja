@@ -9,8 +9,8 @@ from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as Cog
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
-from ._core import (
-    DEFAULT_INSTANCE_SPACE,
+from ._core import ({% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,{% endif %}
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -115,7 +115,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return {{ data_class.read_name }}(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -131,7 +131,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
         return {{ data_class.write_name }}(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
             {{ field.name }}={{ field.as_write_graphql() }},{% endif %}{% endfor %}
@@ -151,7 +151,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     """
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
     {% if not data_class.implements %}
-    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 {% if data_class.is_writable or data_class.is_interface %}
@@ -176,19 +176,19 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
     @classmethod
     def _update_connections(
         cls,
-        instances: dict[dm.NodeId | str, {{ data_class.read_name }}],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
+        instances: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, {{ data_class.read_name }}],  # type: ignore[override]
+        nodes_by_id: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
     ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
 {% endif %}{% if data_class.has_edges_or_direct_relations %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
-            if isinstance(instance.{{ field.name }}, (dm.NodeId, str)) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
+            if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}(dm.NodeId, str){% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.destination_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
-                new_{{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []
+                new_{{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
                     if isinstance(relation, {{ field.destination_class.read_name }}):
                         new_{{ field.name }}.append(relation)
@@ -200,10 +200,10 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                         new_{{ field.name }}.append(relation)
                 instance.{{ field.name }} = new_{{ field.name }}{% endfor %}{% if data_class.has_edges %}
             if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
-                {{ field.name }}: list[{{ field.destination_class.read_name }} | str | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
+                {{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                 {{ field.name }}: list[{{ field.edge_class.read_name }}] = []{% endfor %}
                 for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
+                    value: DomainModel | DomainRelation{% if has_default_instance_space %} | str{% endif %} | dm.NodeId
                     if isinstance(edge, DomainRelation):
                         value = edge
                     else:
@@ -213,11 +213,11 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                             and edge.start_node.external_id == instance.external_id
                             else edge.start_node
                         )
-                        destination: dm.NodeId | str = (
+                        destination:{% if has_default_instance_space %} dm.NodeId | str = (
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
                             else other_end.external_id
-                        )
+                        ){% else %} dm.NodeId = as_node_id(other_end){% endif %}
                         if destination in nodes_by_id:
                             value = nodes_by_id[destination]
                         else:
@@ -225,7 +225,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
                         {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
@@ -235,7 +235,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}, str, dm.NodeId)
+                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
@@ -315,7 +315,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
     """
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
 {% if not data_class.implements %}
-    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 

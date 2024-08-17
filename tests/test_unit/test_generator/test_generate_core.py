@@ -2,7 +2,7 @@ import difflib
 
 from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import OmniFiles
+from tests.constants import OmniFiles, OmniSubFiles
 
 
 def test_generate_data_class_core_base(omni_multi_api_generator: MultiAPIGenerator) -> None:
@@ -60,12 +60,67 @@ def test_generate_data_class_core_query(omni_multi_api_generator: MultiAPIGenera
     assert actual == expected
 
 
+def test_generate_data_class_core_base_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.data_core_base.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_data_class_core_base_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_constant_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.data_core_constants.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_data_class_core_constants_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_helpers_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.data_core_helpers.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_data_class_core_helpers_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_query_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.data_core_query.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_data_class_core_query_file()
+
+    # Assert
+    assert actual == expected
+
+
 def test_generate_api_core(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniFiles.core_api.read_text()
 
     # Act
     actual = omni_multi_api_generator.generate_api_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_api_core_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniSubFiles.core_api.read_text()
+
+    # Act
+    actual = omnisub_multi_api_generator.generate_api_core_file()
 
     # Assert
     assert actual == expected

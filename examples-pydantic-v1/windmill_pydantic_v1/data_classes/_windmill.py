@@ -117,7 +117,7 @@ class WindmillGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return Windmill(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -138,7 +138,7 @@ class WindmillGraphQL(GraphQLCore):
     def as_write(self) -> WindmillWrite:
         """Convert this GraphQL format of windmill to the writing format."""
         return WindmillWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             blades=[blade.as_write() for blade in self.blades or []],

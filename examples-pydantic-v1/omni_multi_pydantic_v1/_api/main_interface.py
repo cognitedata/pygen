@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from omni_multi_pydantic_v1.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
@@ -129,9 +128,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         )
         return self._apply(main_interface, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         """Delete one or more main interface.
 
         Args:
@@ -162,24 +159,21 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
     @overload
     def retrieve(
-        self,
-        external_id: str,
-        space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
+        self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None
     ) -> MainInterface | None: ...
 
     @overload
     def retrieve(
         self,
         external_id: SequenceNotStr[str],
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str,
         as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterfaceList: ...
 
     def retrieve(
         self,
         external_id: str | SequenceNotStr[str],
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str,
         as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterface | MainInterfaceList | None:
         """Retrieve one or more main interfaces by id(s).

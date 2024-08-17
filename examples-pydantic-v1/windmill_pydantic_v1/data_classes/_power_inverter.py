@@ -101,7 +101,7 @@ class PowerInverterGraphQL(GraphQLCore):
         if self.data_record is None:
             raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
         return PowerInverter(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecord(
                 version=0,
@@ -118,7 +118,7 @@ class PowerInverterGraphQL(GraphQLCore):
     def as_write(self) -> PowerInverterWrite:
         """Convert this GraphQL format of power inverter to the writing format."""
         return PowerInverterWrite(
-            space=self.space or DEFAULT_INSTANCE_SPACE,
+            space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             active_power_total=self.active_power_total,
