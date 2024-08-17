@@ -78,7 +78,7 @@ def test_create_list_method_primitive_nullable(
     )
 
     # Act
-    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering)
+    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering, has_default_instance_space=True)
 
     # Assert
     assert actual.parameters == expected.parameters
@@ -150,7 +150,7 @@ def test_create_list_method_connection_item_a(
     )
 
     # Act
-    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering)
+    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering, has_default_instance_space=True)
 
     # Assert
     assert actual.parameters == expected.parameters

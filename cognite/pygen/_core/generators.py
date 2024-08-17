@@ -650,7 +650,10 @@ class APIGenerator:
         if self._list_method is None:
             self._validate_initialized()
             self._list_method = FilterMethod.from_fields(
-                self.data_class.fields, self._config.filtering, isinstance(self.data_class, EdgeDataClass)
+                self.data_class.fields,
+                self._config.filtering,
+                self.has_default_instance_space,
+                isinstance(self.data_class, EdgeDataClass),
             )
         return self._list_method
 
@@ -680,6 +683,7 @@ class APIGenerator:
                 self.base_name,
                 query_api_by_view_id,
                 api_generator_by_view_id,
+                self.has_default_instance_space,
                 self._config,
             )
             for field in self.data_class.fields_of_type(fields.BaseConnectionField)  # type: ignore[type-abstract]

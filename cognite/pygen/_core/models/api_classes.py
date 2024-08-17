@@ -148,6 +148,7 @@ class EdgeAPIClass(APIClass):
         base_name: str,
         query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
         api_generator_by_view_id: dict[dm.ViewId, APIGenerator],
+        has_default_instance_space: bool,
         pygen_config: pygen_config.PygenConfig,
     ) -> EdgeAPIClass:
         if field.is_direct_relation:
@@ -164,9 +165,13 @@ class EdgeAPIClass(APIClass):
         edge_class: EdgeDataClass | None = None
         if field.edge_class:
             edge_class = field.edge_class
-            filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
+            filter_method = FilterMethod.from_fields(
+                edge_class.fields, pygen_config.filtering, has_default_instance_space, is_edge_class=True
+            )
         else:  #  NodeDataClass
-            filter_method = FilterMethod.from_fields([], pygen_config.filtering)
+            filter_method = FilterMethod.from_fields(
+                [], pygen_config.filtering, has_default_instance_space, is_edge_class=False
+            )
 
         return cls(
             parent_attribute=f"{parent_attribute}_edge",

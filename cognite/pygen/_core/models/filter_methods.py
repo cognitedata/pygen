@@ -123,15 +123,16 @@ class FilterImplementation:
 @dataclass
 class FilterImplementationOnetoOneEdge(FilterImplementation):
     instance_type: type
+    has_default_instance_space: bool
 
     @property
     def condition(self) -> str:
         if self.filter is dm.filters.In:
             parameter = next(iter(self.keyword_arguments.values())).name
-            return (
-                f"{parameter} and isinstance({parameter}, list) and "
-                f"isinstance({parameter}[0], {self.instance_type.__name__})"
-            )
+            output = f"{parameter} and isinstance({parameter}, list)"
+            if self.has_default_instance_space:
+                output += f" and isinstance({parameter}[0], {self.instance_type.__name__})"
+            return output
         elif self.filter is dm.filters.Equals:
             parameter = next(iter(self.keyword_arguments.values())).name
             return f"{parameter} and isinstance({parameter}, {self.instance_type.__name__})"
@@ -170,7 +171,11 @@ class FilterMethod:
 
     @classmethod
     def from_fields(
-        cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False
+        cls,
+        fields: Iterable[Field],
+        config: pygen_config.Filtering,
+        has_default_instance_space: bool,
+        is_edge_class: bool = False,
     ) -> FilterMethod:
         parameters_by_name: dict[str, FilterParameter] = {}
         list_filters: list[FilterImplementation] = []
@@ -264,17 +269,18 @@ class FilterMethod:
             elif isinstance(field_, (OneToOneConnectionField, OneToManyConnectionField)) and field_.is_direct_relation:
                 for selected_filter in config.get(dm.DirectRelation(), field_.prop_name):
                     if selected_filter is dm.filters.Equals:
+                        type_ = "str | tuple[str, str]" if has_default_instance_space else "tuple[str, str]"
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
                                 name=field_.name,
-                                type_="str | tuple[str, str]",
+                                type_=type_,
                                 description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"str | tuple[str, str] | {parameter.type_}"
+                            parameter.type_ = f"{type_} | {parameter.type_}"
                         list_filters.extend(
                             [
                                 FilterImplementationOnetoOneEdge(
@@ -283,22 +289,29 @@ class FilterMethod:
                                     keyword_arguments=dict(value=parameter),
                                     instance_type=condition_type,
                                     is_edge_class=is_edge_class,
+                                    has_default_instance_space=has_default_instance_space,
                                 )
                                 for condition_type in (str, tuple)
+                                if has_default_instance_space or condition_type is tuple
                             ]
                         )
                     elif selected_filter is dm.filters.In:
+                        type_ = (
+                            "list[str] | list[tuple[str, str]]"
+                            if has_default_instance_space
+                            else "list[tuple[str, str]]"
+                        )
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
                                 name=field_.name,
-                                type_="list[str] | list[tuple[str, str]]",
+                                type_=type_,
                                 description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{parameter.type_} | list[str] | list[tuple[str, str]]"
+                            parameter.type_ = f"{parameter.type_} | {type_}"
                         list_filters.extend(
                             [
                                 FilterImplementationOnetoOneEdge(
@@ -307,8 +320,10 @@ class FilterMethod:
                                     keyword_arguments=dict(values=parameter),
                                     instance_type=condition_type,
                                     is_edge_class=is_edge_class,
+                                    has_default_instance_space=has_default_instance_space,
                                 )
                                 for condition_type in (str, tuple)
+                                if has_default_instance_space or condition_type is tuple
                             ]
                         )
                     else:

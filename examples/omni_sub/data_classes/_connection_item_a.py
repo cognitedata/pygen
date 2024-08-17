@@ -396,7 +396,7 @@ def _create_connection_item_a_filter(
                 view_id.as_property_ref("otherDirect"), value={"space": other_direct[0], "externalId": other_direct[1]}
             )
         )
-    if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], tuple):
+    if other_direct and isinstance(other_direct, list):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("otherDirect"),
@@ -409,7 +409,7 @@ def _create_connection_item_a_filter(
                 view_id.as_property_ref("selfDirect"), value={"space": self_direct[0], "externalId": self_direct[1]}
             )
         )
-    if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], tuple):
+    if self_direct and isinstance(self_direct, list):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("selfDirect"),
