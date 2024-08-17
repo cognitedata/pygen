@@ -15,7 +15,7 @@ from ._api import (
     SubInterfaceAPI,
 )
 from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from .data_classes._core import GraphQLList
 from . import data_classes
 
 
@@ -222,7 +222,7 @@ class OmniMultiClient:
         external_id: (
             str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
         ),
-        space: str = DEFAULT_INSTANCE_SPACE,
+        space: str | None = None,
     ) -> dm.InstancesDeleteResult:
         """Delete one or more items.
 
@@ -244,11 +244,16 @@ class OmniMultiClient:
                 >>> client = OmniMultiClient()
                 >>> client.delete("my_node_external_id")
         """
+        if space is None and (
+            isinstance(external_id, str)
+            or (isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id))
+        ):
+            raise ValueError("Expected space to be set when deleting by external_id")
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))  # type: ignore[arg-type]
         elif isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id):
             return self._client.data_modeling.instances.delete(
-                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],
+                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],  # type: ignore[arg-type]
             )
         elif isinstance(external_id, data_classes.DomainModelWrite) or (
             isinstance(external_id, Sequence)
