@@ -136,11 +136,10 @@ class EndNodeField(Field):
 
 @dataclass(frozen=True)
 class BaseConnectionField(Field, ABC):
-    _node_reference: ClassVar[list[str]] = ["str", "dm.NodeId"]
     _wrap_list: ClassVar[bool] = False
     edge_type: dm.DirectRelationReference | None
     edge_direction: Literal["outwards", "inwards"]
-    use_node_reference_in_type_hint: bool
+    type_hint_node_reference: list[str]
     through: dm.PropertyId | None
     destination_class: NodeDataClass | None
     edge_class: EdgeDataClass | None
@@ -231,6 +230,7 @@ class BaseConnectionField(Field, ABC):
         variable: str,
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
+        has_default_instance_space: bool,
     ) -> Field | None:
         """Load a connection field from a property"""
         if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
@@ -250,9 +250,9 @@ class BaseConnectionField(Field, ABC):
         through = prop.through if isinstance(prop, ReverseDirectRelation) else None
 
         destination_class = node_class_by_view_id[prop.source] if prop.source else None
-        use_node_reference_in_type_hint = not (
-            isinstance(prop, ReverseDirectRelation) or (isinstance(prop, dm.EdgeConnection) and prop.edge_source)
-        )
+        type_hint_node_reference = ["str", "dm.NodeId"] if has_default_instance_space else ["dm.NodeId"]
+        if isinstance(prop, ReverseDirectRelation) or (isinstance(prop, dm.EdgeConnection) and prop.edge_source):
+            type_hint_node_reference = []
         edge_class = (
             edge_class_by_view_id.get(prop.edge_source)
             if isinstance(prop, dm.EdgeConnection) and prop.edge_source
@@ -270,7 +270,7 @@ class BaseConnectionField(Field, ABC):
                 edge_type=edge_type,
                 edge_direction=direction,
                 description=prop.description,
-                use_node_reference_in_type_hint=use_node_reference_in_type_hint,
+                type_hint_node_reference=type_hint_node_reference,
                 destination_class=destination_class,
                 edge_class=edge_class,
             )
@@ -284,7 +284,7 @@ class BaseConnectionField(Field, ABC):
                 through=through,
                 edge_direction=direction,
                 description=prop.description,
-                use_node_reference_in_type_hint=use_node_reference_in_type_hint,
+                type_hint_node_reference=type_hint_node_reference,
                 destination_class=destination_class,
                 edge_class=edge_class,
             )
@@ -319,7 +319,7 @@ class BaseConnectionField(Field, ABC):
             types = [self.destination_class.read_name]
         else:
             types = []
-        return self._create_type_hint(types, self.use_node_reference_in_type_hint)
+        return self._create_type_hint(types, self.type_hint_node_reference)
 
     def as_write_type_hint(self) -> str:
         """Return the type hint for the field in the write data class."""
@@ -334,7 +334,7 @@ class BaseConnectionField(Field, ABC):
         if cls_ and (cls_.is_writable or cls_.is_interface):
             types = [cls_.write_name]
 
-        return self._create_type_hint(types, self.use_node_reference_in_type_hint)
+        return self._create_type_hint(types, self.type_hint_node_reference)
 
     def as_graphql_type_hint(self) -> str:
         """Return the type hint for the field in the GraphQL data class."""
@@ -344,9 +344,9 @@ class BaseConnectionField(Field, ABC):
             types = [self.destination_class.graphql_name]
         else:
             types = []
-        return self._create_type_hint(types, False)
+        return self._create_type_hint(types, [])
 
-    def _create_type_hint(self, types: list[str], use_node_reference: bool) -> str:
+    def _create_type_hint(self, types: list[str], type_hint_node_reference: list[str]) -> str:
         field_kwargs = {
             #  All connection fields are nullable
             "default": "None",
@@ -355,8 +355,7 @@ class BaseConnectionField(Field, ABC):
             field_kwargs["repr"] = "False"
         if self.need_alias:
             field_kwargs["alias"] = f'"{self.prop_name}"'
-        if use_node_reference:
-            types.extend(self._node_reference)
+        types.extend(type_hint_node_reference)
         types_hint = ", ".join(types)
         if self._wrap_list and len(types) == 1:
             types_hint = f"list[{types_hint}]"
@@ -380,7 +379,7 @@ class BaseConnectionField(Field, ABC):
 
         base_cls = "DomainRelation" if self.is_edge_with_properties else "DomainModel"
 
-        return self._create_as_method(method, base_cls, self.use_node_reference_in_type_hint)
+        return self._create_as_method(method, base_cls, bool(self.type_hint_node_reference))
 
     def as_read_graphql(self) -> str:
         """Return the code to convert the field from the GraphQL to the read data class."""

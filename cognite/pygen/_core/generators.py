@@ -241,7 +241,12 @@ class MultiAPIGenerator:
         direct_children_by_view_id = to_direct_children_by_view_id(unique_views)
         for api in self.apis:
             api.data_class.update_fields(
-                api.view.properties, node_class_by_view_id, edge_class_by_view_id, unique_views, config
+                api.view.properties,
+                node_class_by_view_id,
+                edge_class_by_view_id,
+                unique_views,
+                self.has_default_instance_space,
+                config,
             )
 
             api.data_class.update_implements_interface_and_writable(

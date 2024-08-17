@@ -217,7 +217,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
                             else other_end.external_id
-                        ){% else %} str = as_node_id(other_end){% endif %}
+                        ){% else %} dm.NodeId = as_node_id(other_end){% endif %}
                         if destination in nodes_by_id:
                             value = nodes_by_id[destination]
                         else:

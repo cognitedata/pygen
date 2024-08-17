@@ -140,6 +140,7 @@ class DataClass:
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
+        has_default_instance_space: bool,
         config: pygen_config.PygenConfig,
     ) -> None:
         for prop_name, prop in properties.items():
@@ -152,6 +153,7 @@ class DataClass:
                 self.view_id,
                 # This is the default value for pydantic_field, it will be updated later
                 pydantic_field=self.pydantic_field,
+                has_default_instance_space=has_default_instance_space,
             )
             if field_ is None:
                 # Reverse direct relations are skipped
@@ -607,6 +609,7 @@ class EdgeDataClass(DataClass):
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
+        has_default_instance_space: bool,
         config: pygen_config.PygenConfig,
     ):
         # Find all node views that have an edge with properties in this view
@@ -640,4 +643,6 @@ class EdgeDataClass(DataClass):
             edge_classes=list(edge_classes.values()),
         )
         self.fields.append(self._end_node_field)
-        super().update_fields(properties, node_class_by_view_id, edge_class_by_view_id, views, config)
+        super().update_fields(
+            properties, node_class_by_view_id, edge_class_by_view_id, views, has_default_instance_space, config
+        )
