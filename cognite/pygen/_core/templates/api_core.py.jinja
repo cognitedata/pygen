@@ -472,7 +472,7 @@ class QueryAPI(Generic[T_DomainModelList]):
 
 
 def _create_edge_filter(
-    edge_type: dm.DirectRelationReference,{% if DEFAULT_INSTANCE_SPACE %}
+    edge_type: dm.DirectRelationReference,{% if has_default_instance_space %}
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
