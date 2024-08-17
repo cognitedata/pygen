@@ -287,7 +287,8 @@ class NodeQueryStep(QueryStep):
             (
                 instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
             ){% else %}
-            instance.as_id(){% endif %}: self.result_cls.from_instance(instance) for instance in cast(list[dm.Node], self.results)
+            instance.as_id(){% endif %}: self.result_cls.from_instance(instance){% if has_default_instance_space %}
+            {% else %} {% endif %}for instance in cast(list[dm.Node], self.results)
         }
 
 
