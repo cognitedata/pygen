@@ -5,12 +5,12 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
-    TimeSeriesWrite as CogniteTimeSeriesWrite,
-    SequenceWrite as CogniteSequenceWrite,
     FileMetadataWrite as CogniteFileMetadataWrite,
     FileMetadata as CogniteFileMetadata,
     TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
     Sequence as CogniteSequence,
+    SequenceWrite as CogniteSequenceWrite,
 )
 from pydantic import field_validator, model_validator
 
@@ -27,14 +27,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
-    TimeSeries,
-    TimeSeriesWrite,
-    SequenceRead,
-    SequenceWrite,
     FileMetadata,
     FileMetadataWrite,
-    TimeSeriesGraphQL,
     FileMetadataGraphQL,
+    TimeSeries,
+    TimeSeriesWrite,
+    TimeSeriesGraphQL,
+    SequenceRead,
+    SequenceWrite,
     SequenceGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,

@@ -4,8 +4,15 @@ import datetime{% endif %}
 import warnings
 {% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
-from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
-from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
+from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
+    FileMetadataWrite as CogniteFileMetadataWrite,
+    FileMetadata as CogniteFileMetadata,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    Sequence as CogniteSequence,
+    SequenceWrite as CogniteSequenceWrite,{% endif %}
+){% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
@@ -21,9 +28,16 @@ from ._core import ({% if has_default_instance_space %}
     DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
-    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
+    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
     TimeSeries,
-    TimeSeriesGraphQL,{% endif %}
+    TimeSeriesWrite,
+    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    SequenceRead,
+    SequenceWrite,
+    SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
