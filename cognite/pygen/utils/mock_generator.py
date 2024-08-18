@@ -1079,7 +1079,7 @@ class ViewMockConfig:
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(
         default_factory=_create_default_property_types
     )
-    properties: dict[str, GeneratorFunction] = field(default_factory=lambda: {})
+    properties: dict[str, GeneratorFunction] = field(default_factory=dict)
 
     def __post_init__(self):
         if self.null_values is not None and (self.null_values < 0 or self.null_values > 1):
