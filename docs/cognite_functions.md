@@ -6,6 +6,7 @@ Cognite Functions.
 Cognite Functions enables Python code to be hosted and executed in the cloud, on demand or by using a schedule.
 
 A few useful links for Cognite Functions:
+
 - [Cognite Functions documentation](https://docs.cognite.com/cdf/functions/)
 - Deploy and manage your Cognite Functions with [Cognite Toolkit](https://docs.cognite.com/cdf/deploy/cdf_toolkit/)
 - Expected folder structure for Cognite Toolkit [here](https://docs.cognite.com/cdf/deploy/cdf_toolkit/references/configs#functions)
@@ -66,6 +67,7 @@ To deploy generated SDK to Cognite Functions, you can use the `cognite-toolkit` 
     # The Cognite SDK should be specified and match the version used to generate the SDK.
     cognite-sdk==7.54.4
     # This is the syntax for adding a private wheel in a Cognite Function.
+    # Note the 'function' prefix is not a placeholder, it is a required prefix for private packages.
     function/windmill-1.0.0-py3-none-any.whl
     ```
 
@@ -89,3 +91,7 @@ To deploy generated SDK to Cognite Functions, you can use the `cognite-toolkit` 
       data:
         some: "data"
     ```
+
+After you have the folder structure set up, you can deploy the function using the `cognite-toolkit` CLI,
+go to [Deploy](https://docs.cognite.com/cdf/deploy/cdf_toolkit/guides/configure_deploy_modules)
+for more information on how to use the CLI.
