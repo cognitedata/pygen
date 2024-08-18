@@ -2,14 +2,11 @@ space: {{ pygen_power }}
 externalId: WindTurbine
 name: WindTurbine
 version: 1
+implements:
+  - space: {{ pygen_power }}
+    externalId: GeneratingUnit
+    version: '1'
 properties:
-  name:
-    container:
-      space: {{ pygen_power }}
-      externalId: WindTurbine
-      type: container
-    containerPropertyIdentifier: name
-    name: name
   windfarm:
     container:
       space: {{ pygen_power }}
@@ -17,13 +14,6 @@ properties:
       type: container
     containerPropertyIdentifier: windfarm
     name: windfarm
-  capacity:
-    container:
-      space: {{ pygen_power }}
-      externalId: WindTurbine
-      type: container
-    containerPropertyIdentifier: capacity
-    name: capacity
   rotor:
     container:
       space: {{ pygen_power }}
@@ -49,26 +39,45 @@ properties:
       version: 1
       type: view
   blades:
-    type:
+    container:
       space: {{ pygen_power }}
-      externalId: WindTurbine.blades
+      externalId: WindTurbine
+      type: container
     source:
       space: {{ pygen_power }}
       externalId: Blade
       version: 1
       type: view
-    direction: outwards
+    containerPropertyIdentifier: blades
     name: blades
-    connectionType: multi_edge_connection
   metmast:
     type:
       space: {{ pygen_power }}
-      externalId: WindTurbine.metmast
+      externalId: Distance
     source:
       space: {{ pygen_power }}
       externalId: Metmast
       version: 1
       type: view
+    edgeSource:
+      space: {{ pygen_power }}
+      externalId: Distance
+      version: 1
+      type: view
     direction: outwards
     name: metmast
     connectionType: multi_edge_connection
+  datasheets:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: datasheets
+    name: datasheets
+  powerCurve:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: powerCurve
+    name: powerCurve

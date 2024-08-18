@@ -17,3 +17,17 @@ properties:
       type: container
     containerPropertyIdentifier: rpm_low_speed_shaft
     name: rpm_low_speed_shaft
+  wind_turbine:
+    source:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      identifier: rotor
+    connectionType: single_reverse_direct_relation

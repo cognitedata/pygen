@@ -24,3 +24,17 @@ properties:
       type: container
     containerPropertyIdentifier: apparent_power_total
     name: apparent_power_total
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: power_inverter
+    connectionType: single_reverse_direct_relation

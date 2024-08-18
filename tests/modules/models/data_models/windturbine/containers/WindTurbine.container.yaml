@@ -43,3 +43,27 @@ properties:
     autoIncrement: false
     immutable: false
     name: nacelle
+  datasheets:
+    type:
+      list: true
+      type: file
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: datasheet
+  powerCurve:
+    type:
+      list: false
+      type: sequence
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: powerCurve
+  blades:
+    type:
+      list: true
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: nacelle

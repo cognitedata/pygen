@@ -75,3 +75,11 @@ properties:
     autoIncrement: false
     immutable: false
     name: edgewise_bend_mom_offset_crosstalk_corrected
+  blade:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: blade

@@ -24,3 +24,17 @@ properties:
       type: container
     containerPropertyIdentifier: bending_moment_y
     name: bending_moment_y
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: high_speed_shaft
+    connectionType: single_reverse_direct_relation
