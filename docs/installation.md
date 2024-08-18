@@ -9,23 +9,15 @@
 
     ```
     python -m venv venv
-    ```
-    ```
     venv\Scripts\activate.bat
-    ```
-    ```
     pip install cognite-pygen[all]
     ```
 
 === "Mac/Linux"
 
-    ``` bash
+    ```bash
     python -m venv venv
-    ```
-    ``` bash
     source venv/bin/activate
-    ```
-    ``` bash
     pip install "cognite-pygen[all]"
     ```
 
