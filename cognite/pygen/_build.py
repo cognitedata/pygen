@@ -52,8 +52,8 @@ def build_wheel(
             the package will be [external_id:snake] of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
-        default_instance_space: The default instance space to use for the generated SDK. Defaults to the
-            instance space of the first data model given.
+        default_instance_space: The default instance space to use for the generated SDK. If not provided,
+            the space must be specified when creating, deleting, and retrieving nodes and edges.
         output_dir: The location to output the generated SDK wheel. Defaults to "dist".
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
@@ -107,7 +107,7 @@ def generate_pyproject_toml(build_dir: Path, package_name: str) -> None:
     pyproject_toml.write_text(
         f"""[project]
 name = "{package_name}"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
     "cognite-sdk>={cognite_sdk_version}",
     "pydantic>={PYDANTIC_VERSION}",
