@@ -1,0 +1,34 @@
+space: {{ pygen_other_models_space }}
+externalId: Implementation1
+name: Implementation1
+version: '1'
+properties:
+  mainValue:
+    container:
+      space: pygen-models
+      externalId: MainInterface
+      type: container
+    containerPropertyIdentifier: mainValue
+    name: mainValue
+  value1:
+    container:
+      space: pygen-models
+      externalId: Implementation1
+      type: container
+    containerPropertyIdentifier: implementation1Value
+    name: Value1
+  value2:
+    container:
+      space: pygen-models
+      externalId: Implementation1
+      type: container
+    containerPropertyIdentifier: requiredImplementation1Value
+    name: Value2
+filter:
+  equals:
+    property:
+      - node
+      - type
+    value:
+      space: pygen-models
+      externalId: Implementation1

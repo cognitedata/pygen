@@ -4,3 +4,7 @@
 - space: {{ pygen_power }}
   name: PygenPower
   description: This space contains all the schemas for the pygen power models
+- space: {{ pygen_other_models_space }}
+  name: PygenModels
+  description: This is an additional space for the pygen models, used to test
+    creating a model with views in different spaces.

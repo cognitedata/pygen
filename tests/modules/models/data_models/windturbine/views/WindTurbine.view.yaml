@@ -6,28 +6,28 @@ properties:
   name:
     container:
       space: {{ pygen_power }}
-      externalId: Windmill
+      externalId: WindTurbine
       type: container
     containerPropertyIdentifier: name
     name: name
   windfarm:
     container:
       space: {{ pygen_power }}
-      externalId: Windmill
+      externalId: WindTurbine
       type: container
     containerPropertyIdentifier: windfarm
     name: windfarm
   capacity:
     container:
       space: {{ pygen_power }}
-      externalId: Windmill
+      externalId: WindTurbine
       type: container
     containerPropertyIdentifier: capacity
     name: capacity
   rotor:
     container:
       space: {{ pygen_power }}
-      externalId: Windmill
+      externalId: WindTurbine
       type: container
     containerPropertyIdentifier: rotor
     name: rotor
@@ -39,7 +39,7 @@ properties:
   nacelle:
     container:
       space: {{ pygen_power }}
-      externalId: Windmill
+      externalId: WindTurbine
       type: container
     containerPropertyIdentifier: nacelle
     name: nacelle
@@ -51,7 +51,7 @@ properties:
   blades:
     type:
       space: {{ pygen_power }}
-      externalId: Windmill.blades
+      externalId: WindTurbine.blades
     source:
       space: {{ pygen_power }}
       externalId: Blade
@@ -63,7 +63,7 @@ properties:
   metmast:
     type:
       space: {{ pygen_power }}
-      externalId: Windmill.metmast
+      externalId: WindTurbine.metmast
     source:
       space: {{ pygen_power }}
       externalId: Metmast

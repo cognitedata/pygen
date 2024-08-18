@@ -9,3 +9,4 @@ variables:
     models:
       pygen_models_space: sp_pygen_models
       pygen_power: sp_pygen_power
+      pygen_other_models_space: sp_pygen_models_other
