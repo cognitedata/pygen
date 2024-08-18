@@ -339,6 +339,7 @@ class DataClass:
     def primitive_fields_of_type(
         self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]
     ) -> Iterable[BasePrimitiveField]:
+        """Return all primitive fields of a specific type."""
         return (
             field_
             for field_ in self.fields_of_type(BasePrimitiveField)  # type: ignore[type-abstract]
@@ -346,24 +347,24 @@ class DataClass:
         )
 
     def has_primitive_field_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
+        """Check if the data class has any fields of a specific type."""
         return any(self.primitive_fields_of_type(type_))
 
     def is_all_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
+        """Check if all fields are of a specific type."""
         return all(self.primitive_fields_of_type(type_))
 
     def has_timeseries_fields(self) -> bool:
+        """Check if the data class has any time series fields."""
         return any(isinstance(field_, CDFExternalField) and field_.is_time_series for field_ in self)
 
     def timeseries_fields(self) -> Iterable[CDFExternalField]:
+        """Return all time series fields."""
         return (field_ for field_ in self if isinstance(field_, CDFExternalField) and field_.is_time_series)
 
     @property
     def _field_type_hints(self) -> Iterable[str]:
         return (hint for field_ in self.fields for hint in (field_.as_read_type_hint(), field_.as_write_type_hint()))
-
-    @property
-    def use_optional_type(self) -> bool:
-        return any("Optional" in hint for hint in self._field_type_hints)
 
     @property
     def use_pydantic_field(self) -> bool:
@@ -372,6 +373,7 @@ class DataClass:
 
     @property
     def dependencies(self) -> list[DataClass]:
+        """Return a list of all data class dependencies (through fields)."""
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, BaseConnectionField):
@@ -413,6 +415,7 @@ class DataClass:
 
     @property
     def has_dependencies(self) -> bool:
+        """Check if the data class has any dependencies."""
         return bool(self.dependencies)
 
     @property
@@ -441,6 +444,8 @@ class DataClass:
         )
 
     def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
+        """Return all container fields sorted by type."""
+
         def key(x: Field) -> int:
             return {True: 1, False: 0}[x.is_nullable] if isinstance(x, BasePrimitiveField) else 1
 
@@ -493,6 +498,7 @@ class DataClass:
 
     @property
     def one_to_one_reverse_direct_relation(self) -> Iterable[OneToOneConnectionField]:
+        """All one to one reverse direct relations."""
         return (
             field_
             for field_ in self.fields_of_type(OneToOneConnectionField)
@@ -510,6 +516,7 @@ class DataClass:
 
     @property
     def one_to_many_reverse_direct_relations(self) -> Iterable[OneToManyConnectionField]:
+        """All one to many reverse direct relations."""
         return (
             field_
             for field_ in self.fields_of_type(OneToManyConnectionField)
@@ -518,26 +525,31 @@ class DataClass:
 
     @property
     def has_one_to_one_direct_relations_with_source(self) -> bool:
+        """Check if the data class has any one to one direct relations."""
         return any(self.one_to_one_direct_relations_with_source)
 
     @property
     def primitive_fields_literal(self) -> str:
+        """Return a literal with all primitive fields."""
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
         )
 
     @property
     def text_fields_literals(self) -> str:
+        """Return a literal with all text fields."""
         return ", ".join(
             f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference))
         )
 
     @property
     def fields_literals(self) -> str:
+        """Return a literal with all fields."""
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, BasePrimitiveField))
 
     @property
     def container_field_variables(self) -> str:
+        """Return a string with all container fields as variables."""
         return ", ".join(
             f"{field_.name}={field_.name}"
             for field_ in self
