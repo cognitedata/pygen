@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 from ._implementation_1_v_1 import (
     Implementation1v1,
@@ -75,6 +78,9 @@ __all__ = [
     "ResourcesWriteResult",
     "PageInfo",
     "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",
     "Implementation1v1",
     "Implementation1v1GraphQL",
     "Implementation1v1Write",

@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import field_validator, model_validator
 
 from ._core import (
@@ -20,7 +23,11 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,
     TimeSeries,
+    TimeSeriesWrite,
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -71,8 +78,8 @@ class GeneratorGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
-    generator_speed_controller: Union[TimeSeriesGraphQL, dict, None] = None
-    generator_speed_controller_reference: Union[TimeSeriesGraphQL, dict, None] = None
+    generator_speed_controller: Optional[TimeSeriesGraphQL] = None
+    generator_speed_controller_reference: Optional[TimeSeriesGraphQL] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -99,8 +106,14 @@ class GeneratorGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            generator_speed_controller=self.generator_speed_controller,
-            generator_speed_controller_reference=self.generator_speed_controller_reference,
+            generator_speed_controller=(
+                self.generator_speed_controller.as_read() if self.generator_speed_controller else None
+            ),
+            generator_speed_controller_reference=(
+                self.generator_speed_controller_reference.as_read()
+                if self.generator_speed_controller_reference
+                else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -111,8 +124,14 @@ class GeneratorGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            generator_speed_controller=self.generator_speed_controller,
-            generator_speed_controller_reference=self.generator_speed_controller_reference,
+            generator_speed_controller=(
+                self.generator_speed_controller.as_write() if self.generator_speed_controller else None
+            ),
+            generator_speed_controller_reference=(
+                self.generator_speed_controller_reference.as_write()
+                if self.generator_speed_controller_reference
+                else None
+            ),
         )
 
 
@@ -142,8 +161,16 @@ class Generator(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            generator_speed_controller=self.generator_speed_controller,
-            generator_speed_controller_reference=self.generator_speed_controller_reference,
+            generator_speed_controller=(
+                self.generator_speed_controller.as_write()
+                if isinstance(self.generator_speed_controller, CogniteTimeSeries)
+                else self.generator_speed_controller
+            ),
+            generator_speed_controller_reference=(
+                self.generator_speed_controller_reference.as_write()
+                if isinstance(self.generator_speed_controller_reference, CogniteTimeSeries)
+                else self.generator_speed_controller_reference
+            ),
         )
 
     def as_apply(self) -> GeneratorWrite:
@@ -173,8 +200,8 @@ class GeneratorWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    generator_speed_controller: Union[TimeSeries, str, None] = None
-    generator_speed_controller_reference: Union[TimeSeries, str, None] = None
+    generator_speed_controller: Union[TimeSeriesWrite, str, None] = None
+    generator_speed_controller_reference: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -219,10 +246,10 @@ class GeneratorWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.generator_speed_controller, CogniteTimeSeries):
+        if isinstance(self.generator_speed_controller, CogniteTimeSeriesWrite):
             resources.time_series.append(self.generator_speed_controller)
 
-        if isinstance(self.generator_speed_controller_reference, CogniteTimeSeries):
+        if isinstance(self.generator_speed_controller_reference, CogniteTimeSeriesWrite):
             resources.time_series.append(self.generator_speed_controller_reference)
 
         return resources

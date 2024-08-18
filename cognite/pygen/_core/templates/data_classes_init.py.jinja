@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
@@ -51,7 +54,10 @@ __all__ = [
     "GraphQLList",
     "ResourcesWriteResult",
     "PageInfo",
-    "TimeSeriesGraphQL",{% for class_ in classes %}
+    "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.graphql_name }}",{% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_name }}",

@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -21,7 +24,11 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,
     TimeSeries,
+    TimeSeriesWrite,
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -79,7 +86,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Union[TimeSeriesGraphQL, dict, None] = None
+    sensor_value: Optional[TimeSeriesGraphQL] = None
     type_: Optional[str] = Field(None, alias="type")
 
     @model_validator(mode="before")
@@ -109,7 +116,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
             ),
             description=self.description,
             name=self.name,
-            sensor_value=self.sensor_value,
+            sensor_value=self.sensor_value.as_read() if self.sensor_value else None,
             type_=self.type_,
         )
 
@@ -123,7 +130,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             description=self.description,
             name=self.name,
-            sensor_value=self.sensor_value,
+            sensor_value=self.sensor_value.as_write() if self.sensor_value else None,
             type_=self.type_,
         )
 
@@ -160,7 +167,9 @@ class EquipmentModule(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             name=self.name,
-            sensor_value=self.sensor_value,
+            sensor_value=(
+                self.sensor_value.as_write() if isinstance(self.sensor_value, CogniteTimeSeries) else self.sensor_value
+            ),
             type_=self.type_,
         )
 
@@ -195,7 +204,7 @@ class EquipmentModuleWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Union[TimeSeries, str, None] = None
+    sensor_value: Union[TimeSeriesWrite, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_write(
@@ -242,7 +251,7 @@ class EquipmentModuleWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.sensor_value, CogniteTimeSeries):
+        if isinstance(self.sensor_value, CogniteTimeSeriesWrite):
             resources.time_series.append(self.sensor_value)
 
         return resources

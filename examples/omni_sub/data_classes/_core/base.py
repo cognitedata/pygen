@@ -8,7 +8,6 @@ from collections import UserList
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from typing import (
-    Annotated,
     Callable,
     cast,
     ClassVar,
@@ -24,17 +23,21 @@ from typing import (
 
 import pandas as pd
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
-from cognite.client.data_classes import TimeSeriesList, Datapoints
+from cognite.client.data_classes import (
+    TimeSeriesWriteList,
+    FileMetadataWriteList,
+    SequenceWriteList,
+    TimeSeriesList,
+    FileMetadataList,
+    SequenceList,
+)
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
     InstanceApply,
     Properties,
     PropertyValue,
 )
-from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel, BeforeValidator, Field, model_validator
-from pydantic.functional_serializers import PlainSerializer
+from pydantic import BaseModel, Field, model_validator
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -42,60 +45,20 @@ else:
     from typing_extensions import Self
 
 
-TimeSeries = Annotated[
-    CogniteTimeSeries,
-    PlainSerializer(
-        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteTimeSeries) else v,
-        return_type=dict,
-        when_used="unless-none",
-    ),
-    BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
-]
-
-
-class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
-    id: Optional[int] = None
-    external_id: Optional[str] = Field(None, alias="externalId")
-    instance_id: Optional[dm.NodeId] = Field(None, alias="instanceId")
-    name: Optional[str] = None
-    is_string: Optional[bool] = Field(None, alias="isString")
-    metadata: Optional[dict[str, str]] = None
-    unit: Optional[str] = None
-    unit_external_id: Optional[str] = Field(None, alias="unitExternalId")
-    asset_id: Optional[int] = Field(None, alias="assetId")
-    is_step: Optional[bool] = Field(None, alias="isStep")
-    description: Optional[str] = None
-    security_categories: Optional[list[int]] = Field(None, alias="securityCategories")
-    data_set_id: Optional[int] = Field(None, alias="dataSetId")
-    created_time: Optional[int] = Field(None, alias="createdTime")
-    last_updated_time: Optional[int] = Field(None, alias="lastUpdatedTime")
-    data: Optional[Datapoints] = None
-
-    @model_validator(mode="before")
-    def parse_datapoints(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "getDataPoints" in data:
-            datapoints = data.pop("getDataPoints")
-            if "items" in datapoints:
-                for item in datapoints["items"]:
-                    # The Datapoints expects the timestamp to be in milliseconds
-                    item["timestamp"] = datetime_to_ms(
-                        datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
-                    )
-                data["datapoints"] = datapoints["items"]
-                data["data"] = Datapoints.load(data)
-        return data
-
-
 @dataclass
 class ResourcesWrite:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
-    time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
+    time_series: TimeSeriesWriteList = field(default_factory=lambda: TimeSeriesWriteList([]))
+    files: FileMetadataWriteList = field(default_factory=lambda: FileMetadataWriteList([]))
+    sequences: SequenceWriteList = field(default_factory=lambda: SequenceWriteList([]))
 
     def extend(self, other: ResourcesWrite) -> None:
         self.nodes.extend(other.nodes)
         self.edges.extend(other.edges)
         self.time_series.extend(other.time_series)
+        self.files.extend(other.files)
+        self.sequences.extend(other.sequences)
 
 
 @dataclass
@@ -103,6 +66,8 @@ class ResourcesWriteResult:
     nodes: dm.NodeApplyResultList = field(default_factory=lambda: dm.NodeApplyResultList([]))
     edges: dm.EdgeApplyResultList = field(default_factory=lambda: dm.EdgeApplyResultList([]))
     time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
+    files: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
+    sequences: SequenceList = field(default_factory=lambda: SequenceList([]))
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class

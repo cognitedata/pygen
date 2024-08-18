@@ -4,7 +4,14 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
+from cognite.client.data_classes import (
+    TimeSeries,
+    TimeSeriesWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +27,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -69,8 +78,8 @@ class RotorGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
-    rotor_speed_controller: Union[TimeSeriesGraphQL, dict, None] = None
-    rpm_low_speed_shaft: Union[TimeSeriesGraphQL, dict, None] = None
+    rotor_speed_controller: Optional[TimeSeriesGraphQL] = None
+    rpm_low_speed_shaft: Optional[TimeSeriesGraphQL] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -82,14 +91,6 @@ class RotorGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("rotor_speed_controller", "rpm_low_speed_shaft", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -105,8 +106,8 @@ class RotorGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            rotor_speed_controller=self.rotor_speed_controller,
-            rpm_low_speed_shaft=self.rpm_low_speed_shaft,
+            rotor_speed_controller=self.rotor_speed_controller.as_read() if self.rotor_speed_controller else None,
+            rpm_low_speed_shaft=self.rpm_low_speed_shaft.as_read() if self.rpm_low_speed_shaft else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -117,8 +118,8 @@ class RotorGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            rotor_speed_controller=self.rotor_speed_controller,
-            rpm_low_speed_shaft=self.rpm_low_speed_shaft,
+            rotor_speed_controller=self.rotor_speed_controller.as_write() if self.rotor_speed_controller else None,
+            rpm_low_speed_shaft=self.rpm_low_speed_shaft.as_write() if self.rpm_low_speed_shaft else None,
         )
 
 
@@ -148,8 +149,16 @@ class Rotor(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            rotor_speed_controller=self.rotor_speed_controller,
-            rpm_low_speed_shaft=self.rpm_low_speed_shaft,
+            rotor_speed_controller=(
+                self.rotor_speed_controller.as_write()
+                if isinstance(self.rotor_speed_controller, CogniteTimeSeries)
+                else self.rotor_speed_controller
+            ),
+            rpm_low_speed_shaft=(
+                self.rpm_low_speed_shaft.as_write()
+                if isinstance(self.rpm_low_speed_shaft, CogniteTimeSeries)
+                else self.rpm_low_speed_shaft
+            ),
         )
 
     def as_apply(self) -> RotorWrite:
@@ -179,8 +188,8 @@ class RotorWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    rotor_speed_controller: Union[TimeSeries, str, None] = None
-    rpm_low_speed_shaft: Union[TimeSeries, str, None] = None
+    rotor_speed_controller: Union[TimeSeriesWrite, str, None] = None
+    rpm_low_speed_shaft: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -224,10 +233,10 @@ class RotorWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.rotor_speed_controller, TimeSeries):
+        if isinstance(self.rotor_speed_controller, CogniteTimeSeriesWrite):
             resources.time_series.append(self.rotor_speed_controller)
 
-        if isinstance(self.rpm_low_speed_shaft, TimeSeries):
+        if isinstance(self.rpm_low_speed_shaft, CogniteTimeSeriesWrite):
             resources.time_series.append(self.rpm_low_speed_shaft)
 
         return resources

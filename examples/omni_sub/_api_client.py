@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api import (
@@ -58,6 +58,8 @@ class OmniSubClient:
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
+        This method will create the nodes, edges, timeseries, files and sequences of the supplied items.
+
         Args:
             items: One or more instances of the pygen generated data classes.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
@@ -82,8 +84,17 @@ class OmniSubClient:
         time_series = TimeSeriesList([])
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+        files = FileMetadataList([])
+        if instances.files:
+            for file in instances.files:
+                created, _ = self._client.files.create(file, overwrite=True)
+                files.append(created)
 
-        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        sequences = SequenceList([])
+        if instances.sequences:
+            sequences = self._client.sequences.upsert(instances.sequences, mode="patch")
+
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, time_series, files, sequences)
 
     def _create_instances(
         self,
@@ -112,7 +123,7 @@ class OmniSubClient:
         replace: bool = False,
         write_none: bool = False,
     ) -> data_classes.ResourcesWriteResult:
-        """Add or update (upsert) items.
+        """[DEPRECATED] Add or update (upsert) items.
 
         Args:
             items: One or more instances of the pygen generated data classes.

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from cognite.client.data_classes import TimeSeries
-
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
@@ -36,26 +34,30 @@ def test_graphql_query(wind_client: WindmillClient) -> None:
     assert result[0].name
 
 
-def test_query_cdf_external(omni_client: OmniClient) -> None:
+def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> None:
     query = """{
-  listCDFExternalReferencesListed{
+  getCDFExternalReferencesById(instance:
+    {space: "omni-instances", externalId: "CDFExternalReferences:Jeffrey"}
+  ){
     items{
        __typename
+      space
+      externalId
       createdTime
       lastUpdatedTime
+
       timeseries {
         externalId
         name
       }
-      space
-      externalId
-      files{
+
+      sequence{
         externalId
         name
-      }
-      sequences{
-        externalId
-        name
+        columns{
+          externalId
+          valueType
+        }
       }
     }
   }
@@ -64,9 +66,54 @@ def test_query_cdf_external(omni_client: OmniClient) -> None:
     result = omni_client.graphql_query(query)
 
     assert len(result) > 0
-    assert isinstance(result[0], odc.CDFExternalReferencesListedGraphQL)
-    assert len(result[0].timeseries) > 0
-    assert isinstance(result[0].timeseries[0], TimeSeries)
+    jeffery = result[0]
+    assert isinstance(jeffery, odc.CDFExternalReferencesGraphQL)
+    assert jeffery.external_id == "CDFExternalReferences:Jeffrey"
+    assert isinstance(jeffery.timeseries, odc.TimeSeriesGraphQL)
+    assert isinstance(jeffery.sequence, odc.SequenceGraphQL)
+    jeffery.as_read()
+    jeffery.as_write()
+
+
+def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClient) -> None:
+    query = """{
+  getCDFExternalReferencesListedById(instance:
+    {space: "omni-instances", externalId: "CDFExternalReferencesListed:Brandon"}
+  ){
+    items{
+       __typename
+      space
+      externalId
+      createdTime
+      lastUpdatedTime
+
+      timeseries {
+        externalId
+        name
+      }
+
+      sequences{
+        externalId
+        name
+        columns{
+          externalId
+          valueType
+        }
+      }
+    }
+  }
+}
+"""
+    result = omni_client.graphql_query(query)
+
+    assert len(result) > 0
+    brandon = result[0]
+    assert isinstance(brandon, odc.CDFExternalReferencesListedGraphQL)
+    assert brandon.external_id == "CDFExternalReferencesListed:Brandon"
+    assert len(brandon.timeseries or []) > 0
+    assert isinstance(brandon.timeseries[0], odc.TimeSeriesGraphQL)
+    assert len(brandon.sequences or []) > 0
+    assert isinstance(brandon.sequences[0], odc.SequenceGraphQL)
     item: odc.CDFExternalReferencesListedGraphQL
     for item in result:
         item.as_read()

@@ -5,7 +5,14 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
+from cognite.client.data_classes import (
+    TimeSeries,
+    TimeSeriesWrite,
+)
 from pydantic import Field
 from pydantic import validator, root_validator
 
@@ -22,6 +29,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -94,7 +103,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeriesGraphQL, dict, None] = Field(None, alias="priceForecast")
+    price_forecast: Optional[TimeSeriesGraphQL] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
@@ -108,14 +117,6 @@ class ScenarioInstanceGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("price_forecast", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -136,7 +137,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
             instance=self.instance,
             market=self.market,
             price_area=self.price_area,
-            price_forecast=self.price_forecast,
+            price_forecast=self.price_forecast.as_read() if self.price_forecast else None,
             scenario=self.scenario,
             start=self.start,
         )
@@ -154,7 +155,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
             instance=self.instance,
             market=self.market,
             price_area=self.price_area,
-            price_forecast=self.price_forecast,
+            price_forecast=self.price_forecast.as_write() if self.price_forecast else None,
             scenario=self.scenario,
             start=self.start,
         )
@@ -203,7 +204,11 @@ class ScenarioInstance(DomainModel):
             instance=self.instance,
             market=self.market,
             price_area=self.price_area,
-            price_forecast=self.price_forecast,
+            price_forecast=(
+                self.price_forecast.as_write()
+                if isinstance(self.price_forecast, CogniteTimeSeries)
+                else self.price_forecast
+            ),
             scenario=self.scenario,
             start=self.start,
         )
@@ -246,7 +251,7 @@ class ScenarioInstanceWrite(DomainModelWrite):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeriesWrite, str, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
@@ -306,7 +311,7 @@ class ScenarioInstanceWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.price_forecast, TimeSeries):
+        if isinstance(self.price_forecast, CogniteTimeSeriesWrite):
             resources.time_series.append(self.price_forecast)
 
         return resources

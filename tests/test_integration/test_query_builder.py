@@ -12,7 +12,7 @@ if IS_PYDANTIC_V2:
     from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 else:
     from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1._api._core import QueryBuilder
+    from omni_pydantic_v1._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 
 
 class TestQueryBuilder:

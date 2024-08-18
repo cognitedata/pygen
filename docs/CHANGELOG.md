@@ -14,12 +14,22 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## TBD
+### Added
+- Support for `files` and `sequences` in the generated SDK. This includes the ability to create and retrieve
+  `files` and `sequences` in the generated SDK.
+
 ### Changed
 - In the `MockGenerator`, setting the `seed` makes the generator produce the same data for every view. For example, if
   you use the same `seed` for a data model and add a new view, the generator will create the same data for all
   existing views.
 
+### Fixed
+- In the generated SDK, fields of `TimeSeries` as now set to `TimeSeriesWrite` in the write Data Class of the generated
+  SDK.
+
 ## [0.99.32] - 24-08-17
+### Added
+- Support for files and sequences in the generated SDK.
 ### Changed
 - When generating an SDK if the `default_instance_space` parameter, `pygen` will no longer use the space of the
   data model as the default space for nodes and edges. Instead, the generated SDK will be without a default space,
@@ -30,6 +40,10 @@ Changes are grouped as follows
 - In the generated `GraphQL` class methods `as_write` and `as_read` no longer defaults to DEFAULT_INSTANCE_SPACE.
   This is to ensure that the user must specify the space when creating or querying nodes and edges, and not introdcue
   a bug where the space is not set correctly.
+
+### Fixed
+- In the generated SDK, fields of `TimeSeries` as now set to `TimeSeriesWrite` in the write format of the generated
+  SDK.
 
 ## [0.99.31] - 24-08-16
 ### Added

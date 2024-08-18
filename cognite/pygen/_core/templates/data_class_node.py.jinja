@@ -4,8 +4,23 @@ import datetime{% endif %}
 import warnings
 {% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
-from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
-from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
+from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
+    FileMetadata as CogniteFileMetadata,
+    FileMetadataWrite as CogniteFileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    Sequence as CogniteSequence,
+    SequenceWrite as CogniteSequenceWrite,{% endif %}
+){% if not is_pydantic_v2 %}
+from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
+    FileMetadata,
+    FileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    TimeSeries,
+    TimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    Sequence as SequenceRead,
+    SequenceWrite,{% endif %}
+){% endif %}{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 
@@ -21,9 +36,16 @@ from ._core import ({% if has_default_instance_space %}
     DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
-    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
+    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}{% if is_pydantic_v2 %}
+    FileMetadata,
+    FileMetadataWrite,{% endif %}
+    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}{% if is_pydantic_v2 %}
     TimeSeries,
-    TimeSeriesGraphQL,{% endif %}
+    TimeSeriesWrite,{% endif %}
+    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}{% if is_pydantic_v2 %}
+    SequenceRead,
+    SequenceWrite,{% endif %}
+    SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -90,14 +112,6 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     def clean_list(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [v for v in value if v is not None] or None
-        return value
-{% endif %}{% if not is_pydantic_v2 and data_class.has_timeseries_fields() %}
-    @validator({% for field in data_class.timeseries_fields() %}"{{ field.name }}", {% endfor %}pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
         return value
 {% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
     @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
@@ -410,9 +424,12 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             if isinstance({{ field.variable }}, DomainModelWrite):
                 other_resources = {{ field.variable }}._to_instances_write(cache)
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
-        if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
-            resources.time_series.append(self.{{ field.name }})
+{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.CDFExternalIdReference) %}{% if field.is_list %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            if isinstance({{ field.variable }}, {{ field.cognite_type_name('write') }}):
+                resources.{{ field.resource_write_name }}.append({{ field.variable }}){% else %}
+        if isinstance(self.{{ field.name }}, {{ field.cognite_type_name('write') }}):
+            resources.{{ field.resource_write_name }}.append(self.{{ field.name }}){% endif %}
 {% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
         if self.{{field.name}} is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(

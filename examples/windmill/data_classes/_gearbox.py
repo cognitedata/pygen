@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import field_validator, model_validator
 
 from ._core import (
@@ -20,7 +23,11 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,
     TimeSeries,
+    TimeSeriesWrite,
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -73,9 +80,9 @@ class GearboxGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
-    displacement_x: Union[TimeSeriesGraphQL, dict, None] = None
-    displacement_y: Union[TimeSeriesGraphQL, dict, None] = None
-    displacement_z: Union[TimeSeriesGraphQL, dict, None] = None
+    displacement_x: Optional[TimeSeriesGraphQL] = None
+    displacement_y: Optional[TimeSeriesGraphQL] = None
+    displacement_z: Optional[TimeSeriesGraphQL] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -102,9 +109,9 @@ class GearboxGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            displacement_x=self.displacement_x,
-            displacement_y=self.displacement_y,
-            displacement_z=self.displacement_z,
+            displacement_x=self.displacement_x.as_read() if self.displacement_x else None,
+            displacement_y=self.displacement_y.as_read() if self.displacement_y else None,
+            displacement_z=self.displacement_z.as_read() if self.displacement_z else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -115,9 +122,9 @@ class GearboxGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            displacement_x=self.displacement_x,
-            displacement_y=self.displacement_y,
-            displacement_z=self.displacement_z,
+            displacement_x=self.displacement_x.as_write() if self.displacement_x else None,
+            displacement_y=self.displacement_y.as_write() if self.displacement_y else None,
+            displacement_z=self.displacement_z.as_write() if self.displacement_z else None,
         )
 
 
@@ -149,9 +156,21 @@ class Gearbox(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            displacement_x=self.displacement_x,
-            displacement_y=self.displacement_y,
-            displacement_z=self.displacement_z,
+            displacement_x=(
+                self.displacement_x.as_write()
+                if isinstance(self.displacement_x, CogniteTimeSeries)
+                else self.displacement_x
+            ),
+            displacement_y=(
+                self.displacement_y.as_write()
+                if isinstance(self.displacement_y, CogniteTimeSeries)
+                else self.displacement_y
+            ),
+            displacement_z=(
+                self.displacement_z.as_write()
+                if isinstance(self.displacement_z, CogniteTimeSeries)
+                else self.displacement_z
+            ),
         )
 
     def as_apply(self) -> GearboxWrite:
@@ -182,9 +201,9 @@ class GearboxWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    displacement_x: Union[TimeSeries, str, None] = None
-    displacement_y: Union[TimeSeries, str, None] = None
-    displacement_z: Union[TimeSeries, str, None] = None
+    displacement_x: Union[TimeSeriesWrite, str, None] = None
+    displacement_y: Union[TimeSeriesWrite, str, None] = None
+    displacement_z: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -235,13 +254,13 @@ class GearboxWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.displacement_x, CogniteTimeSeries):
+        if isinstance(self.displacement_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.displacement_x)
 
-        if isinstance(self.displacement_y, CogniteTimeSeries):
+        if isinstance(self.displacement_y, CogniteTimeSeriesWrite):
             resources.time_series.append(self.displacement_y)
 
-        if isinstance(self.displacement_z, CogniteTimeSeries):
+        if isinstance(self.displacement_z, CogniteTimeSeriesWrite):
             resources.time_series.append(self.displacement_z)
 
         return resources
