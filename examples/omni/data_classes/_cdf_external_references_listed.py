@@ -5,12 +5,12 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
-    TimeSeriesWrite as CogniteTimeSeriesWrite,
-    SequenceWrite as CogniteSequenceWrite,
-    FileMetadataWrite as CogniteFileMetadataWrite,
     FileMetadata as CogniteFileMetadata,
+    FileMetadataWrite as CogniteFileMetadataWrite,
     TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
     Sequence as CogniteSequence,
+    SequenceWrite as CogniteSequenceWrite,
 )
 from pydantic import field_validator, model_validator
 
@@ -27,14 +27,14 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
-    TimeSeries,
-    TimeSeriesWrite,
-    SequenceRead,
-    SequenceWrite,
     FileMetadata,
     FileMetadataWrite,
-    TimeSeriesGraphQL,
     FileMetadataGraphQL,
+    TimeSeries,
+    TimeSeriesWrite,
+    TimeSeriesGraphQL,
+    SequenceRead,
+    SequenceWrite,
     SequenceGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -124,7 +124,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             ),
             files=[file.as_read() for file in self.files or []] or None,
             sequences=[sequence.as_read() for sequence in self.sequences or []] or None,
-            timeseries=[timeseries.as_read() for timeseries in self.timeseries or []] or None,
+            timeseries=[timesery.as_read() for timesery in self.timeseries or []] or None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -137,7 +137,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             files=[file.as_write() for file in self.files or []] or None,
             sequences=[sequence.as_write() for sequence in self.sequences or []] or None,
-            timeseries=[timeseries.as_write() for timeseries in self.timeseries or []] or None,
+            timeseries=[timesery.as_write() for timesery in self.timeseries or []] or None,
         )
 
 
@@ -177,8 +177,8 @@ class CDFExternalReferencesListed(DomainModel):
             ]
             or None,
             timeseries=[
-                timeseries.as_write() if isinstance(timeseries, CogniteTimeSeries) else timeseries
-                for timeseries in self.timeseries or []
+                timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
+                for timesery in self.timeseries or []
             ]
             or None,
         )
@@ -229,17 +229,17 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
 
         if self.files is not None or write_none:
             properties["files"] = [
-                value if isinstance(value, str) else value.external_id for value in self.files or []
+                file if isinstance(file, str) else file.external_id for file in self.files or []
             ] or None
 
         if self.sequences is not None or write_none:
             properties["sequences"] = [
-                value if isinstance(value, str) else value.external_id for value in self.sequences or []
+                sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []
             ] or None
 
         if self.timeseries is not None or write_none:
             properties["timeseries"] = [
-                value if isinstance(value, str) else value.external_id for value in self.timeseries or []
+                timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []
             ] or None
 
         if properties:
@@ -266,9 +266,9 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
             if isinstance(sequence, CogniteSequenceWrite):
                 resources.sequences.append(sequence)
 
-        for timeseries in self.timeseries or []:
-            if isinstance(timeseries, CogniteTimeSeriesWrite):
-                resources.time_series.append(timeseries)
+        for timesery in self.timeseries or []:
+            if isinstance(timesery, CogniteTimeSeriesWrite):
+                resources.time_series.append(timesery)
 
         return resources
 

@@ -6,8 +6,8 @@ import warnings
 
 from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
 from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
-    FileMetadataWrite as CogniteFileMetadataWrite,
-    FileMetadata as CogniteFileMetadata,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    FileMetadata as CogniteFileMetadata,
+    FileMetadataWrite as CogniteFileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
     TimeSeries as CogniteTimeSeries,
     TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     Sequence as CogniteSequence,
@@ -104,14 +104,6 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     def clean_list(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [v for v in value if v is not None] or None
-        return value
-{% endif %}{% if not is_pydantic_v2 and data_class.has_timeseries_fields() %}
-    @validator({% for field in data_class.timeseries_fields() %}"{{ field.name }}", {% endfor %}pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
         return value
 {% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
     @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
@@ -426,9 +418,9 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.CDFExternalIdReference) %}{% if field.is_list %}
         for {{ field.variable }} in self.{{ field.name }} or []:
-            if isinstance({{ field.variable }}, Cognite{{ field.type_name }}Write):
+            if isinstance({{ field.variable }}, {{ field.cognite_type_name('write') }}):
                 resources.{{ field.resource_write_name }}.append({{ field.variable }}){% else %}
-        if isinstance(self.{{ field.name }}, Cognite{{ field.type_name }}Write):
+        if isinstance(self.{{ field.name }}, {{ field.cognite_type_name('write') }}):
             resources.{{ field.resource_write_name }}.append(self.{{ field.name }}){% endif %}
 {% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
         if self.{{field.name}} is not None:

@@ -5,6 +5,7 @@ outside of the data model."""
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -41,6 +42,13 @@ class CDFExternalField(BasePrimitiveField):
             return "files"
         else:
             raise ValueError(f"Unknown CDF External Field type: {self.type_}")
+
+    def cognite_type_name(self, format: Literal["read", "write"]) -> str:
+        type_name = self.type_name
+        if format == "write":
+            return f"Cognite{type_name}Write"
+        else:
+            return f"Cognite{type_name}"
 
     @property
     def type_name(self) -> str:
@@ -126,64 +134,41 @@ class CDFExternalListField(PrimitiveListField, CDFExternalField):
     """
 
     def as_read_type_hint(self) -> str:
-        type = self.type_as_string
-        if type != "str":
-            if self.need_alias:
-                return (
-                    f"Union[list[{self.type_as_string}], list[str], None] = "
-                    f'{self.pydantic_field}(None, alias="{self.prop_name}")'
-                )
-            else:
-                return f"Union[list[{self.type_as_string}], list[str], None] = None"
+        return self._create_type_hint(self.type_as_string)
+
+    def _create_type_hint(self, type_: str) -> str:
+        if self.need_alias:
+            return f'Optional[list[Union[{type_}, str]]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            if self.need_alias:
-                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-            else:
-                return "Optional[list[str]] = None"
+            return f"Optional[list[Union[{type_}, str]]] = None"
 
     def as_write_type_hint(self) -> str:
-        type_ = self.type_as_string
-        if type_ != "str":
-            if self.is_nullable and self.need_alias:
-                return f'Union[list[{type_}], list[str], None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-            elif self.need_alias:
-                return f'Union[list[{type_}], list[str]] = {self.pydantic_field}(alias="{self.prop_name}")'
-            elif self.is_nullable:
-                return f"Union[list[{type_}], list[str], None] = None"
-            else:  # not self.is_nullable and not self.need_alias
-                return f"Union[list[{type_}], list[str]]"
-        else:
-            if self.is_nullable and self.need_alias:
-                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-            elif self.need_alias:
-                return f'list[str] = {self.pydantic_field}(alias="{self.prop_name}")'
-            elif self.is_nullable:
-                return "Optional[list[str]] = None"
-            else:
-                return "list[str]"
+        type_ = f"{self.type_name}Write"
+        return self._create_type_hint(type_)
 
     def as_graphql_type_hint(self) -> str:
-        type_ = self.type_as_string
-        if type_ != "str":
-            if self.is_nullable and self.need_alias:
-                return f'Union[list[{type_}], list[dict], None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-            elif self.need_alias:
-                return f'Union[list[{type_}], list[dict]] = {self.pydantic_field}(alias="{self.prop_name}")'
-            elif self.is_nullable:
-                return f"Union[list[{type_}], list[dict], None] = None"
-            else:
-                return f"Union[list[{type_}], list[dict]]"
+        type_ = f"{self.type_name}GraphQL"
+        if self.need_alias:
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            if self.is_nullable and self.need_alias:
-                return f'Optional[list[dict]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-            elif self.need_alias:
-                return f'list[dict] = {self.pydantic_field}(alias="{self.prop_name}")'
-            elif self.is_nullable:
-                return "Optional[list[dict]] = None"
-            else:
-                return "list[dict]"
+            return f"Optional[list[{type_}]] = None"
+
+    def as_write(self) -> str:
+        return (
+            f"[{self.variable}.as_write() if isinstance({self.variable}, {self.cognite_type_name('read')}) "
+            f"else {self.variable}"
+            f" for {self.variable} in self.{self.name} or []] or None"
+        )
+
+    def as_write_graphql(self) -> str:
+        return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []] or None"
+
+    def as_read_graphql(self) -> str:
+        # Read is only used in graphql
+        return f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []] or None"
 
     def as_value(self) -> str:
-        if not isinstance(self.type_, dm.TimeSeriesReference):
-            return f"self.{self.name}"
-        return f"[value if isinstance(value, str) else value.external_id for value in self.{self.name} or []] or None"
+        return (
+            f"[{self.variable} if isinstance({self.variable}, str) else {self.variable}.external_id "
+            f"for {self.variable} in self.{self.name} or []] or None "
+        )

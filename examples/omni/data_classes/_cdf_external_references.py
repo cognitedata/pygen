@@ -5,8 +5,8 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
-    FileMetadataWrite as CogniteFileMetadataWrite,
     FileMetadata as CogniteFileMetadata,
+    FileMetadataWrite as CogniteFileMetadataWrite,
     TimeSeries as CogniteTimeSeries,
     TimeSeriesWrite as CogniteTimeSeriesWrite,
     Sequence as CogniteSequence,
