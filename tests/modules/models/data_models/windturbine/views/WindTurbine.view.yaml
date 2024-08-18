@@ -2,14 +2,11 @@ space: {{ pygen_power }}
 externalId: WindTurbine
 name: WindTurbine
 version: 1
+implements:
+  - space: {{ pygen_power }}
+    externalId: GeneratingUnit
+    version: '1'
 properties:
-  name:
-    container:
-      space: {{ pygen_power }}
-      externalId: WindTurbine
-      type: container
-    containerPropertyIdentifier: name
-    name: name
   windfarm:
     container:
       space: {{ pygen_power }}
@@ -17,13 +14,6 @@ properties:
       type: container
     containerPropertyIdentifier: windfarm
     name: windfarm
-  capacity:
-    container:
-      space: {{ pygen_power }}
-      externalId: WindTurbine
-      type: container
-    containerPropertyIdentifier: capacity
-    name: capacity
   rotor:
     container:
       space: {{ pygen_power }}
