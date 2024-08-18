@@ -125,8 +125,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
                 data["data"] = Datapoints.load(data)
         return data
 
-    def as_write(self) -> TimeSeriesWrite:
-        return TimeSeriesWrite(
+    def as_write(self) -> CogniteTimeSeriesWrite:
+        return CogniteTimeSeriesWrite(
             external_id=self.external_id,
             name=self.name,
             is_string=self.is_string,
@@ -138,8 +138,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
             description=self.description,
         )
 
-    def as_read(self) -> TimeSeries:
-        return TimeSeries(
+    def as_read(self) -> CogniteTimeSeries:
+        return CogniteTimeSeries(
             id=self.id,
             external_id=self.external_id,
             instance_id=self.instance_id,
@@ -176,8 +176,8 @@ class FileMetadataGraphQL(GraphQLExternal):
     last_updated_time: Optional[int] = None
 
     @no_type_check
-    def as_write(self) -> FileMetadataWrite:
-        return FileMetadataWrite(
+    def as_write(self) -> CogniteFileMetadataWrite:
+        return CogniteFileMetadataWrite(
             external_id=self.external_id,
             name=self.name,
             source=self.source,
@@ -194,8 +194,8 @@ class FileMetadataGraphQL(GraphQLExternal):
         )
 
     @no_type_check
-    def as_read(self) -> FileMetadata:
-        return FileMetadata(
+    def as_read(self) -> CogniteFileMetadata:
+        return CogniteFileMetadata(
             external_id=self.external_id,
             name=self.name,
             source=self.source,
@@ -272,8 +272,8 @@ class SequenceGraphQL(GraphQLExternal):
     data_set_id: Optional[int] = None
 
     @no_type_check
-    def as_write(self) -> SequenceWrite:
-        return SequenceWrite(
+    def as_write(self) -> CogniteSequenceWrite:
+        return CogniteSequenceWrite(
             name=self.name,
             description=self.description,
             asset_id=self.asset_id,
@@ -284,8 +284,8 @@ class SequenceGraphQL(GraphQLExternal):
         )
 
     @no_type_check
-    def as_read(self) -> SequenceRead:
-        return SequenceRead(
+    def as_read(self) -> CogniteSequence:
+        return CogniteSequence(
             id=self.id,
             name=self.name,
             description=self.description,

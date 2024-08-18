@@ -18,7 +18,6 @@ from cognite.client.data_classes import (
     SequenceWrite as CogniteSequenceWrite,
     FileMetadataWrite as CogniteFileMetadataWrite,
 )
-from cognite.client.data_classes.sequences import ValueType
 from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, Extra, root_validator, validator
 
@@ -162,7 +161,7 @@ class SequenceColumnGraphQL(GraphQLExternal):
     external_id: Optional[str] = None
     name: Optional[str] = None
     description: Optional[str] = None
-    value_type: Optional[ValueType] = None
+    value_type: Optional[str] = None
     metadata: Optional[dict[str, str]] = None
     created_time: Optional[int] = None
     last_updated_time: Optional[int] = None
