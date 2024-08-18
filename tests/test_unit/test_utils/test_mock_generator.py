@@ -178,3 +178,4 @@ def test_generate_mock_data_seed_per_view(omni_data_classes: dict[str, OmniClass
     data2 = generator2.generate_mock_data(node_count=1, null_values=0.0)
 
     assert data1[0].node[0].sources[0].properties == data2[1].node[0].sources[0].properties
+    assert data2[1].node[0].sources[0].properties != data2[0].node[0].sources[0].properties
