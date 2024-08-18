@@ -5,12 +5,15 @@
   - space: {{ pygen_models_space }}
     externalId: Implementation1
     version: "1"
+    type: view
   - space: {{ pygen_models_space }}
     externalId: MainInterface
     version: "1"
+    type: view
   - space: {{ pygen_models_space }}
     externalId: SubInterface
     version: "1"
+    type: view
 - space: {{ pygen_models_space }}
   externalId: OmniMultiB
   version: "1"
@@ -18,12 +21,15 @@
   - space: {{ pygen_models_space }}
     externalId: Implementation1
     version: "2"
+    type: view
   - space: {{ pygen_models_space }}
     externalId: MainInterface
     version: "1"
+    type: view
   - space: {{ pygen_models_space }}
     externalId: SubInterface
     version: "1"
+    type: view
 
 - space: {{ pygen_models_space }}
   externalId: OmniMultiC
@@ -34,3 +40,4 @@
   - space: {{ pygen_other_models_space }}
     externalId: Implementation1
     version: '1'
+    type: view

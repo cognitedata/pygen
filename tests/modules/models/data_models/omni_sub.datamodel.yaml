@@ -8,9 +8,12 @@ views:
 - space: {{ pygen_models_space }}
   externalId: ConnectionItemA
   version: "1"
+  type: view
 - space: {{ pygen_models_space }}
   externalId: ConnectionItemB
   version: "1"
+  type: view
 - space: {{ pygen_models_space }}
   externalId: ConnectionItemC
   version: "1"
+  type: view
