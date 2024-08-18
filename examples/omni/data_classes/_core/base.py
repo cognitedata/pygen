@@ -24,7 +24,12 @@ from typing import (
 
 import pandas as pd
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    Sequence as CogniteSequence,
+    FileMetadata as CogniteFileMetadata,
+)
+from cognite.client.data_classes.sequences import ValueType
 from cognite.client.data_classes import TimeSeriesList, Datapoints
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
@@ -35,6 +40,7 @@ from cognite.client.data_classes.data_modeling.instances import (
 from cognite.client.utils import datetime_to_ms
 from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
+from pydantic.alias_generators import to_camel
 
 from .constants import DEFAULT_INSTANCE_SPACE
 
@@ -55,22 +61,47 @@ TimeSeries = Annotated[
 ]
 
 
-class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_name=True):
+SequenceResource = Annotated[
+    CogniteSequence,
+    PlainSerializer(
+        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteSequence) else v,
+        return_type=dict,
+        when_used="unless-none",
+    ),
+    BeforeValidator(lambda v: CogniteSequence.load(v) if isinstance(v, dict) else v),
+]
+
+
+FileMetadata = Annotated[
+    CogniteFileMetadata,
+    PlainSerializer(
+        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteFileMetadata) else v,
+        return_type=dict,
+        when_used="unless-none",
+    ),
+    BeforeValidator(lambda v: CogniteFileMetadata.load(v) if isinstance(v, dict) else v),
+]
+
+
+class GraphQLExternal(BaseModel, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel): ...
+
+
+class TimeSeriesGraphQL(GraphQLExternal):
     id: Optional[int] = None
-    external_id: Optional[str] = Field(None, alias="externalId")
-    instance_id: Optional[dm.NodeId] = Field(None, alias="instanceId")
+    external_id: Optional[str] = None
+    instance_id: Optional[dm.NodeId] = None
     name: Optional[str] = None
-    is_string: Optional[bool] = Field(None, alias="isString")
+    is_string: Optional[bool] = None
     metadata: Optional[dict[str, str]] = None
     unit: Optional[str] = None
-    unit_external_id: Optional[str] = Field(None, alias="unitExternalId")
-    asset_id: Optional[int] = Field(None, alias="assetId")
-    is_step: Optional[bool] = Field(None, alias="isStep")
+    unit_external_id: Optional[str] = None
+    asset_id: Optional[int] = None
+    is_step: Optional[bool] = None
     description: Optional[str] = None
-    security_categories: Optional[list[int]] = Field(None, alias="securityCategories")
-    data_set_id: Optional[int] = Field(None, alias="dataSetId")
-    created_time: Optional[int] = Field(None, alias="createdTime")
-    last_updated_time: Optional[int] = Field(None, alias="lastUpdatedTime")
+    security_categories: Optional[list[int]] = None
+    data_set_id: Optional[int] = None
+    created_time: Optional[int] = None
+    last_updated_time: Optional[int] = None
     data: Optional[Datapoints] = None
 
     @model_validator(mode="before")
@@ -86,6 +117,50 @@ class TimeSeriesGraphQL(BaseModel, arbitrary_types_allowed=True, populate_by_nam
                 data["datapoints"] = datapoints["items"]
                 data["data"] = Datapoints.load(data)
         return data
+
+
+class FileMetadataGraphQL(GraphQLExternal):
+    external_id: Optional[str] = None
+    name: Optional[str] = None
+    source: Optional[str] = None
+    mime_type: Optional[str] = None
+    metadata: Optional[dict[str, str]] = None
+    directory: Optional[str] = None
+    asset_ids: Optional[list[int]] = None
+    data_set_id: Optional[int] = None
+    labels: Optional[list[dict]] = None
+    geo_location: Optional[dict] = None
+    source_created_time: Optional[int] = None
+    source_modified_time: Optional[int] = None
+    security_categories: Optional[list[int]] = None
+    id: Optional[int] = None
+    uploaded: Optional[bool] = None
+    uploaded_time: Optional[int] = None
+    created_time: Optional[int] = None
+    last_updated_time: Optional[int] = None
+
+
+class SequenceColumnGraphQL(GraphQLExternal):
+    external_id: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    value_type: Optional[ValueType] = "Double"
+    metadata: Optional[dict[str, str]] = None
+    created_time: Optional[int] = None
+    last_updated_time: Optional[int] = None
+
+
+class SequenceGraphQL(GraphQLExternal):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    asset_id: Optional[int] = None
+    external_id: Optional[str] = None
+    metadata: Optional[dict[str, str]] = None
+    columns: Optional[list[SequenceColumnGraphQL]] = None
+    created_time: Optional[int] = None
+    last_updated_time: Optional[int] = None
+    data_set_id: Optional[int] = None
 
 
 @dataclass

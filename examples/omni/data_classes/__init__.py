@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 from ._cdf_external_references import (
     CDFExternalReferences,
@@ -323,6 +326,9 @@ __all__ = [
     "ResourcesWriteResult",
     "PageInfo",
     "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",
     "CDFExternalReferences",
     "CDFExternalReferencesGraphQL",
     "CDFExternalReferencesWrite",
