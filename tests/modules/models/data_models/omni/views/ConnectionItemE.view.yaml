@@ -1,4 +1,4 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: ConnectionItemE
 name: ConnectionItemE
 version: '1'
@@ -8,22 +8,22 @@ filter:
     - node
     - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemE
 properties:
   name:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionBase
       type: container
     containerPropertyIdentifier: name
     name: name
   inwardsSingle:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: bidirectionalSingle
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemD
       version: '1'
       type: view
@@ -32,13 +32,13 @@ properties:
     connectionType: single_edge_connection
   directReverseSingle:
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemD
       version: '1'
       type: view
     through:
       source:
-        space: pygen-models
+        space: {{ pygen_models_space }}
         externalId: ConnectionItemD
         version: '1'
         type: view
@@ -46,13 +46,13 @@ properties:
     connectionType: single_reverse_direct_relation
   directReverseMulti:
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemD
       version: '1'
       type: view
     through:
       source:
-        space: pygen-models
+        space: {{ pygen_models_space }}
         externalId: ConnectionItemD
         version: '1'
         type: view
@@ -60,22 +60,22 @@ properties:
     connectionType: multi_reverse_direct_relation
   directNoSource:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionBase
       type: container
     containerPropertyIdentifier: direct1
     name: directNoSource
   inwardsSingleProperty:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: multiProperty
     edgeSource:
-        space: pygen-models
+        space: {{ pygen_models_space }}
         externalId: ConnectionEdgeA
         version: '1'
         type: view
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemF
       version: '1'
       type: view

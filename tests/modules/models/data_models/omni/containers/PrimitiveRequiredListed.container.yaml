@@ -1,4 +1,4 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: PrimitiveRequiredListed
 name: PrimitiveRequiredListed
 usedFor: node

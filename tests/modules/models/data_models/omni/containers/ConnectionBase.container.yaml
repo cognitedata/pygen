@@ -1,4 +1,4 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: ConnectionBase
 name: ConnectionBase
 usedFor: node

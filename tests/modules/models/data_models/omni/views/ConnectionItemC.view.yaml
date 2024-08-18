@@ -1,4 +1,4 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: ConnectionItemC
 name: ConnectionItemC
 version: '1'
@@ -8,15 +8,15 @@ filter:
     - node
     - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemC
 properties:
   connectionItemA:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: unidirectional
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemA
       version: '1'
       type: view
@@ -25,10 +25,10 @@ properties:
     connectionType: multi_edge_connection
   connectionItemB:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: unidirectional
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemB
       version: '1'
       type: view

@@ -1,21 +1,21 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: DependentOnNonWritable
 name: DependentOnNonWritable
 version: '1'
 properties:
   aValue:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: MainInterface
       type: container
     containerPropertyIdentifier: mainValue
     name: aValue
   toNonWritable:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: toNonWritable
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1NonWriteable
       version: '1'
       type: view
@@ -28,5 +28,5 @@ filter:
       - node
       - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: DependentOnNonWritable

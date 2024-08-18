@@ -1,9 +1,9 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: Implementation2
 name: Implementation2
 version: '1'
 implements:
-  - space: pygen-models
+  - space: {{ pygen_models_space }}
     externalId: SubInterface
     version: '1'
 properties: {}
@@ -13,5 +13,5 @@ filter:
       - node
       - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation2

@@ -1,15 +1,15 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: Implementation1NonWriteable
 name: Implementation1NonWriteable
 version: '1'
 implements:
-  - space: pygen-models
+  - space: {{ pygen_models_space }}
     externalId: SubInterface
     version: '1'
 properties:
   value1:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1
       type: container
     containerPropertyIdentifier: implementation1Value
@@ -20,5 +20,5 @@ filter:
       - node
       - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1

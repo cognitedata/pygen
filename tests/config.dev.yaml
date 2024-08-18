@@ -1,0 +1,10 @@
+environment:
+  project: python-pygen
+  type: dev
+  selected:
+    - models
+
+variables:
+  modules:
+    models:
+      pygen_models_space: sp_pygen_models

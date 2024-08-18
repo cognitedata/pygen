@@ -1,25 +1,25 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: Implementation1
 name: Implementation1
 version: '1'
 implements:
-  - space: pygen-models
+  - space: {{ pygen_models_space }}
     externalId: SubInterface
     version: '1'
-  - space: pygen-models
+  - space: {{ pygen_models_space }}
     externalId: MainInterface
     version: '1'
 properties:
   value1:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1
       type: container
     containerPropertyIdentifier: implementation1Value
     name: Value1
   value2:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1
       type: container
     containerPropertyIdentifier: requiredImplementation1Value
@@ -30,5 +30,5 @@ filter:
       - node
       - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: Implementation1

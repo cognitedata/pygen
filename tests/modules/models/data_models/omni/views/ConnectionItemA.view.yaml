@@ -1,4 +1,4 @@
-space: pygen-models
+space: {{ pygen_models_space }}
 externalId: ConnectionItemA
 name: ConnectionItemA
 version: '1'
@@ -8,46 +8,46 @@ filter:
     - node
     - type
     value:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemA
 properties:
   name:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionBase
       type: container
     containerPropertyIdentifier: name
     name: name
   selfDirect:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionBase
       type: container
     containerPropertyIdentifier: direct1
     name: selfDirect
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemA
       version: '1'
       type: view
   otherDirect:
     container:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionBase
       type: container
     containerPropertyIdentifier: direct2
     name: otherDirect
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemC
       version: '1'
       type: view
   outwards:
     type:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: bidirectional
     source:
-      space: pygen-models
+      space: {{ pygen_models_space }}
       externalId: ConnectionItemB
       version: '1'
       type: view
