@@ -62,3 +62,17 @@ properties:
     direction: outwards
     name: metmast
     connectionType: multi_edge_connection
+  datasheets:
+    container:
+      space: { { pygen_power } }
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: datasheets
+    name: datasheets
+  powerCurve:
+    container:
+      space: { { pygen_power } }
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: powerCurve
+    name: powerCurve
