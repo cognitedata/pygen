@@ -4,7 +4,8 @@ edges, timeseries, sequences, and files for a given data model/views.
 
 from __future__ import annotations
 
-import itertools
+import hashlib
+import json
 import random
 import string
 import typing
@@ -74,7 +75,8 @@ class MockGenerator:
         default_config (ViewMockConfig): Default configuration for how to generate mock data for the different
             views.
         data_set_id (int): The data set id to use for TimeSeries, Sequences, and FileMetadata.
-        seed (int): The seed to use for the random number generator.
+        seed (int): The seed to use for the random number generator. If provided, it is used to reset the seed for
+            each view to ensure reproducible results.
         skip_interfaces (bool): Whether to skip interfaces when generating mock data. Defaults to False.
     """
 
@@ -167,18 +169,10 @@ class MockGenerator:
         Returns:
             MockData: The generated mock data.
         """
-        if self._seed:
-            random.seed(self._seed)
-            for config in itertools.chain(self._view_configs.values(), [self._default_config]):
-                for generator in config.property_types.values():
-                    if hasattr(generator, "reset") and isinstance(generator.reset, Callable):  # type: ignore[arg-type]
-                        # This is for generators that have a state.
-                        generator.reset()
-
         self._interfaces = {interface for view in self._views for interface in view.implements or []}
         mock_data = MockData()
-        for components in _connected_views(self._views):
-            data = self._generate_views_mock_data(components, node_count, max_edge_per_type, null_values)
+        for connected_views in _connected_views(self._views):
+            data = self._generate_views_mock_data(connected_views, node_count, max_edge_per_type, null_values)
             mock_data.extend(data)
         return mock_data
 
@@ -201,8 +195,10 @@ class MockGenerator:
             }
 
             node_type = _find_first_node_type(view.filter)
-
             view_id = view.as_id()
+            if self._seed:
+                self._reset_seed(view_id)
+
             config = self._view_configs.get(view_id, self._default_config)
             properties, external = self._generate_mock_values(
                 mapped_properties,
@@ -262,6 +258,10 @@ class MockGenerator:
             if not connection_properties:
                 continue
             view_id = view.as_id()
+
+            if self._seed:
+                self._reset_seed(view_id)
+
             config = self._view_configs.get(view_id, self._default_config)
             for this_node in outputs[view_id].node:
                 for property_name, connection in connection_properties.items():
@@ -458,6 +458,27 @@ class MockGenerator:
             )
             edges.append(edge)
         return edges
+
+    def _reset_seed(self, view_id: dm.ViewId) -> None:
+        """Resets the seed for the random number generator for the given view.
+
+        The goal is to have reproducible results for each view in a data model.
+        """
+        if self._seed is None:
+            return  # No seed set, nothing to reset
+        user_seed: int = self._seed
+        view_str = json.dumps(view_id.dump(camel_case=True, include_type=False), sort_keys=True)
+        view_seed = user_seed + int(hashlib.md5(view_str.encode("utf-8"), usedforsecurity=False).hexdigest(), 16)
+        random.seed(view_seed)
+        configs = [self._default_config]
+        if view_id in self._view_configs:
+            configs.append(self._view_configs[view_id])
+
+        for config in configs:
+            for generator in config.property_types.values():
+                if hasattr(generator, "reset") and isinstance(generator.reset, Callable):  # type: ignore[arg-type]
+                    # This is for generators that have a state.
+                    generator.reset()
 
     @staticmethod
     def _set_direct_relation_property(

@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Changed
+- In the `MockGenerator`, setting the `seed` makes the generator produce the same data for every view. For example, if
+  you use the same `seed` for a data model and add a new view, the generator will create the same data for all
+  existing views.
+
 ## [0.99.32] - 24-08-17
 ### Changed
 - When generating an SDK if the `default_instance_space` parameter, `pygen` will no longer use the space of the
