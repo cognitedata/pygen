@@ -68,9 +68,9 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
     brandon = result[0]
     assert isinstance(brandon, odc.CDFExternalReferencesListedGraphQL)
     assert brandon.external_id == "CDFExternalReferencesListed:Brandon"
-    assert len(brandon.timeseries) > 0
+    assert len(brandon.timeseries or []) > 0
     assert isinstance(brandon.timeseries[0], odc.TimeSeriesGraphQL)
-    assert len(brandon.sequences) > 0
+    assert len(brandon.sequences or []) > 0
     assert isinstance(brandon.sequences[0], odc.SequenceGraphQL)
     item: odc.CDFExternalReferencesListedGraphQL
     for item in result:
@@ -112,7 +112,7 @@ def test_query_cdf_external_listed_files(omni_client: OmniClient) -> None:
     linda = result[0]
     assert isinstance(linda, odc.CDFExternalReferencesListedGraphQL)
     assert linda.external_id == "CDFExternalReferencesListed:Linda"
-    assert len(linda.files) > 0
+    assert len(linda.files or []) > 0
     assert isinstance(linda.files[0], odc.FileMetadataGraphQL)
     for item in result:
         item.as_read()

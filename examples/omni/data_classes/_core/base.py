@@ -8,7 +8,6 @@ from collections import UserList
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from typing import (
-    Annotated,
     Callable,
     cast,
     ClassVar,
@@ -25,22 +24,20 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
-    TimeSeries as CogniteTimeSeries,
-    Sequence as CogniteSequence,
-    FileMetadata as CogniteFileMetadata,
+    TimeSeriesWriteList,
+    FileMetadataWriteList,
+    SequenceWriteList,
+    TimeSeriesList,
+    FileMetadataList,
+    SequenceList,
 )
-from cognite.client.data_classes.sequences import ValueType
-from cognite.client.data_classes import TimeSeriesList, Datapoints
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
     InstanceApply,
     Properties,
     PropertyValue,
 )
-from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel, BeforeValidator, Field, model_validator
-from pydantic.functional_serializers import PlainSerializer
-from pydantic.alias_generators import to_camel
+from pydantic import BaseModel, Field, model_validator
 
 from .constants import DEFAULT_INSTANCE_SPACE
 
@@ -50,129 +47,20 @@ else:
     from typing_extensions import Self
 
 
-TimeSeries = Annotated[
-    CogniteTimeSeries,
-    PlainSerializer(
-        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteTimeSeries) else v,
-        return_type=dict,
-        when_used="unless-none",
-    ),
-    BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
-]
-
-
-SequenceResource = Annotated[
-    CogniteSequence,
-    PlainSerializer(
-        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteSequence) else v,
-        return_type=dict,
-        when_used="unless-none",
-    ),
-    BeforeValidator(lambda v: CogniteSequence.load(v) if isinstance(v, dict) else v),
-]
-
-
-FileMetadata = Annotated[
-    CogniteFileMetadata,
-    PlainSerializer(
-        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteFileMetadata) else v,
-        return_type=dict,
-        when_used="unless-none",
-    ),
-    BeforeValidator(lambda v: CogniteFileMetadata.load(v) if isinstance(v, dict) else v),
-]
-
-
-class GraphQLExternal(BaseModel, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel): ...
-
-
-class TimeSeriesGraphQL(GraphQLExternal):
-    id: Optional[int] = None
-    external_id: Optional[str] = None
-    instance_id: Optional[dm.NodeId] = None
-    name: Optional[str] = None
-    is_string: Optional[bool] = None
-    metadata: Optional[dict[str, str]] = None
-    unit: Optional[str] = None
-    unit_external_id: Optional[str] = None
-    asset_id: Optional[int] = None
-    is_step: Optional[bool] = None
-    description: Optional[str] = None
-    security_categories: Optional[list[int]] = None
-    data_set_id: Optional[int] = None
-    created_time: Optional[int] = None
-    last_updated_time: Optional[int] = None
-    data: Optional[Datapoints] = None
-
-    @model_validator(mode="before")
-    def parse_datapoints(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "getDataPoints" in data:
-            datapoints = data.pop("getDataPoints")
-            if "items" in datapoints:
-                for item in datapoints["items"]:
-                    # The Datapoints expects the timestamp to be in milliseconds
-                    item["timestamp"] = datetime_to_ms(
-                        datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
-                    )
-                data["datapoints"] = datapoints["items"]
-                data["data"] = Datapoints.load(data)
-        return data
-
-
-class FileMetadataGraphQL(GraphQLExternal):
-    external_id: Optional[str] = None
-    name: Optional[str] = None
-    source: Optional[str] = None
-    mime_type: Optional[str] = None
-    metadata: Optional[dict[str, str]] = None
-    directory: Optional[str] = None
-    asset_ids: Optional[list[int]] = None
-    data_set_id: Optional[int] = None
-    labels: Optional[list[dict]] = None
-    geo_location: Optional[dict] = None
-    source_created_time: Optional[int] = None
-    source_modified_time: Optional[int] = None
-    security_categories: Optional[list[int]] = None
-    id: Optional[int] = None
-    uploaded: Optional[bool] = None
-    uploaded_time: Optional[int] = None
-    created_time: Optional[int] = None
-    last_updated_time: Optional[int] = None
-
-
-class SequenceColumnGraphQL(GraphQLExternal):
-    external_id: Optional[str] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    value_type: Optional[ValueType] = "Double"
-    metadata: Optional[dict[str, str]] = None
-    created_time: Optional[int] = None
-    last_updated_time: Optional[int] = None
-
-
-class SequenceGraphQL(GraphQLExternal):
-    id: Optional[int] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    asset_id: Optional[int] = None
-    external_id: Optional[str] = None
-    metadata: Optional[dict[str, str]] = None
-    columns: Optional[list[SequenceColumnGraphQL]] = None
-    created_time: Optional[int] = None
-    last_updated_time: Optional[int] = None
-    data_set_id: Optional[int] = None
-
-
 @dataclass
 class ResourcesWrite:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
-    time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
+    time_series: TimeSeriesWriteList = field(default_factory=lambda: TimeSeriesWriteList([]))
+    files: FileMetadataWriteList = field(default_factory=lambda: FileMetadataWriteList([]))
+    sequences: SequenceWriteList = field(default_factory=lambda: SequenceWriteList([]))
 
     def extend(self, other: ResourcesWrite) -> None:
         self.nodes.extend(other.nodes)
         self.edges.extend(other.edges)
         self.time_series.extend(other.time_series)
+        self.files.extend(other.files)
+        self.sequences.extend(other.sequences)
 
 
 @dataclass
@@ -180,6 +68,8 @@ class ResourcesWriteResult:
     nodes: dm.NodeApplyResultList = field(default_factory=lambda: dm.NodeApplyResultList([]))
     edges: dm.EdgeApplyResultList = field(default_factory=lambda: dm.EdgeApplyResultList([]))
     time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
+    files: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
+    sequences: SequenceList = field(default_factory=lambda: SequenceList([]))
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
