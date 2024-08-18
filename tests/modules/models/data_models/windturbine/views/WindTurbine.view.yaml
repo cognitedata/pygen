@@ -59,6 +59,11 @@ properties:
       externalId: Metmast
       version: 1
       type: view
+    edgeSource:
+      space: {{ pygen_power }}
+      externalId: Distance
+      version: 1
+      type: view
     direction: outwards
     name: metmast
     connectionType: multi_edge_connection
