@@ -1,0 +1,7 @@
+environment:
+  project: python-pygen
+  type: dev
+  selected:
+    - models
+
+variables: {}
