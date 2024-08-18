@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 from ._connection_item_a import (
     ConnectionItemA,
@@ -136,6 +139,9 @@ __all__ = [
     "ResourcesWriteResult",
     "PageInfo",
     "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",
     "ConnectionItemA",
     "ConnectionItemAGraphQL",
     "ConnectionItemAWrite",

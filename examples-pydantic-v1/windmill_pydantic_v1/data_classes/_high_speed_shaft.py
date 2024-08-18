@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +23,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -71,9 +76,9 @@ class HighSpeedShaftGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
-    bending_moment_y: Union[TimeSeriesGraphQL, dict, None] = None
-    bending_monent_x: Union[TimeSeriesGraphQL, dict, None] = None
-    torque: Union[TimeSeriesGraphQL, dict, None] = None
+    bending_moment_y: Optional[TimeSeriesGraphQL] = None
+    bending_monent_x: Optional[TimeSeriesGraphQL] = None
+    torque: Optional[TimeSeriesGraphQL] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -85,14 +90,6 @@ class HighSpeedShaftGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("bending_moment_y", "bending_monent_x", "torque", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -108,9 +105,9 @@ class HighSpeedShaftGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            bending_moment_y=self.bending_moment_y,
-            bending_monent_x=self.bending_monent_x,
-            torque=self.torque,
+            bending_moment_y=self.bending_moment_y.as_read() if self.bending_moment_y else None,
+            bending_monent_x=self.bending_monent_x.as_read() if self.bending_monent_x else None,
+            torque=self.torque.as_read() if self.torque else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -121,9 +118,9 @@ class HighSpeedShaftGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            bending_moment_y=self.bending_moment_y,
-            bending_monent_x=self.bending_monent_x,
-            torque=self.torque,
+            bending_moment_y=self.bending_moment_y.as_write() if self.bending_moment_y else None,
+            bending_monent_x=self.bending_monent_x.as_write() if self.bending_monent_x else None,
+            torque=self.torque.as_write() if self.torque else None,
         )
 
 
@@ -155,9 +152,17 @@ class HighSpeedShaft(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_moment_y=self.bending_moment_y,
-            bending_monent_x=self.bending_monent_x,
-            torque=self.torque,
+            bending_moment_y=(
+                self.bending_moment_y.as_write()
+                if isinstance(self.bending_moment_y, CogniteTimeSeries)
+                else self.bending_moment_y
+            ),
+            bending_monent_x=(
+                self.bending_monent_x.as_write()
+                if isinstance(self.bending_monent_x, CogniteTimeSeries)
+                else self.bending_monent_x
+            ),
+            torque=self.torque.as_write() if isinstance(self.torque, CogniteTimeSeries) else self.torque,
         )
 
     def as_apply(self) -> HighSpeedShaftWrite:
@@ -188,9 +193,9 @@ class HighSpeedShaftWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    bending_moment_y: Union[TimeSeries, str, None] = None
-    bending_monent_x: Union[TimeSeries, str, None] = None
-    torque: Union[TimeSeries, str, None] = None
+    bending_moment_y: Union[TimeSeriesWrite, str, None] = None
+    bending_monent_x: Union[TimeSeriesWrite, str, None] = None
+    torque: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -239,13 +244,13 @@ class HighSpeedShaftWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.bending_moment_y, TimeSeries):
+        if isinstance(self.bending_moment_y, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_moment_y)
 
-        if isinstance(self.bending_monent_x, TimeSeries):
+        if isinstance(self.bending_monent_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_monent_x)
 
-        if isinstance(self.torque, TimeSeries):
+        if isinstance(self.torque, CogniteTimeSeriesWrite):
             resources.time_series.append(self.torque)
 
         return resources

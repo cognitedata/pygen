@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +23,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -79,11 +84,11 @@ class MainShaftGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
-    bending_x: Union[TimeSeriesGraphQL, dict, None] = None
-    bending_y: Union[TimeSeriesGraphQL, dict, None] = None
-    calculated_tilt_moment: Union[TimeSeriesGraphQL, dict, None] = None
-    calculated_yaw_moment: Union[TimeSeriesGraphQL, dict, None] = None
-    torque: Union[TimeSeriesGraphQL, dict, None] = None
+    bending_x: Optional[TimeSeriesGraphQL] = None
+    bending_y: Optional[TimeSeriesGraphQL] = None
+    calculated_tilt_moment: Optional[TimeSeriesGraphQL] = None
+    calculated_yaw_moment: Optional[TimeSeriesGraphQL] = None
+    torque: Optional[TimeSeriesGraphQL] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -95,14 +100,6 @@ class MainShaftGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -118,11 +115,11 @@ class MainShaftGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            bending_x=self.bending_x,
-            bending_y=self.bending_y,
-            calculated_tilt_moment=self.calculated_tilt_moment,
-            calculated_yaw_moment=self.calculated_yaw_moment,
-            torque=self.torque,
+            bending_x=self.bending_x.as_read() if self.bending_x else None,
+            bending_y=self.bending_y.as_read() if self.bending_y else None,
+            calculated_tilt_moment=self.calculated_tilt_moment.as_read() if self.calculated_tilt_moment else None,
+            calculated_yaw_moment=self.calculated_yaw_moment.as_read() if self.calculated_yaw_moment else None,
+            torque=self.torque.as_read() if self.torque else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -133,11 +130,11 @@ class MainShaftGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            bending_x=self.bending_x,
-            bending_y=self.bending_y,
-            calculated_tilt_moment=self.calculated_tilt_moment,
-            calculated_yaw_moment=self.calculated_yaw_moment,
-            torque=self.torque,
+            bending_x=self.bending_x.as_write() if self.bending_x else None,
+            bending_y=self.bending_y.as_write() if self.bending_y else None,
+            calculated_tilt_moment=self.calculated_tilt_moment.as_write() if self.calculated_tilt_moment else None,
+            calculated_yaw_moment=self.calculated_yaw_moment.as_write() if self.calculated_yaw_moment else None,
+            torque=self.torque.as_write() if self.torque else None,
         )
 
 
@@ -173,11 +170,19 @@ class MainShaft(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_x=self.bending_x,
-            bending_y=self.bending_y,
-            calculated_tilt_moment=self.calculated_tilt_moment,
-            calculated_yaw_moment=self.calculated_yaw_moment,
-            torque=self.torque,
+            bending_x=self.bending_x.as_write() if isinstance(self.bending_x, CogniteTimeSeries) else self.bending_x,
+            bending_y=self.bending_y.as_write() if isinstance(self.bending_y, CogniteTimeSeries) else self.bending_y,
+            calculated_tilt_moment=(
+                self.calculated_tilt_moment.as_write()
+                if isinstance(self.calculated_tilt_moment, CogniteTimeSeries)
+                else self.calculated_tilt_moment
+            ),
+            calculated_yaw_moment=(
+                self.calculated_yaw_moment.as_write()
+                if isinstance(self.calculated_yaw_moment, CogniteTimeSeries)
+                else self.calculated_yaw_moment
+            ),
+            torque=self.torque.as_write() if isinstance(self.torque, CogniteTimeSeries) else self.torque,
         )
 
     def as_apply(self) -> MainShaftWrite:
@@ -210,11 +215,11 @@ class MainShaftWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    bending_x: Union[TimeSeries, str, None] = None
-    bending_y: Union[TimeSeries, str, None] = None
-    calculated_tilt_moment: Union[TimeSeries, str, None] = None
-    calculated_yaw_moment: Union[TimeSeries, str, None] = None
-    torque: Union[TimeSeries, str, None] = None
+    bending_x: Union[TimeSeriesWrite, str, None] = None
+    bending_y: Union[TimeSeriesWrite, str, None] = None
+    calculated_tilt_moment: Union[TimeSeriesWrite, str, None] = None
+    calculated_yaw_moment: Union[TimeSeriesWrite, str, None] = None
+    torque: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -277,19 +282,19 @@ class MainShaftWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.bending_x, TimeSeries):
+        if isinstance(self.bending_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_x)
 
-        if isinstance(self.bending_y, TimeSeries):
+        if isinstance(self.bending_y, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_y)
 
-        if isinstance(self.calculated_tilt_moment, TimeSeries):
+        if isinstance(self.calculated_tilt_moment, CogniteTimeSeriesWrite):
             resources.time_series.append(self.calculated_tilt_moment)
 
-        if isinstance(self.calculated_yaw_moment, TimeSeries):
+        if isinstance(self.calculated_yaw_moment, CogniteTimeSeriesWrite):
             resources.time_series.append(self.calculated_yaw_moment)
 
-        if isinstance(self.torque, TimeSeries):
+        if isinstance(self.torque, CogniteTimeSeriesWrite):
             resources.time_series.append(self.torque)
 
         return resources

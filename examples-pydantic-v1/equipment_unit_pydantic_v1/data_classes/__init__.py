@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 from ._equipment_module import (
     EquipmentModule,
@@ -110,6 +113,9 @@ __all__ = [
     "ResourcesWriteResult",
     "PageInfo",
     "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",
     "EquipmentModule",
     "EquipmentModuleGraphQL",
     "EquipmentModuleWrite",

@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +23,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -71,9 +76,9 @@ class PowerInverterGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
-    active_power_total: Union[TimeSeriesGraphQL, dict, None] = None
-    apparent_power_total: Union[TimeSeriesGraphQL, dict, None] = None
-    reactive_power_total: Union[TimeSeriesGraphQL, dict, None] = None
+    active_power_total: Optional[TimeSeriesGraphQL] = None
+    apparent_power_total: Optional[TimeSeriesGraphQL] = None
+    reactive_power_total: Optional[TimeSeriesGraphQL] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -85,14 +90,6 @@ class PowerInverterGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("active_power_total", "apparent_power_total", "reactive_power_total", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -108,9 +105,9 @@ class PowerInverterGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            active_power_total=self.active_power_total,
-            apparent_power_total=self.apparent_power_total,
-            reactive_power_total=self.reactive_power_total,
+            active_power_total=self.active_power_total.as_read() if self.active_power_total else None,
+            apparent_power_total=self.apparent_power_total.as_read() if self.apparent_power_total else None,
+            reactive_power_total=self.reactive_power_total.as_read() if self.reactive_power_total else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -121,9 +118,9 @@ class PowerInverterGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            active_power_total=self.active_power_total,
-            apparent_power_total=self.apparent_power_total,
-            reactive_power_total=self.reactive_power_total,
+            active_power_total=self.active_power_total.as_write() if self.active_power_total else None,
+            apparent_power_total=self.apparent_power_total.as_write() if self.apparent_power_total else None,
+            reactive_power_total=self.reactive_power_total.as_write() if self.reactive_power_total else None,
         )
 
 
@@ -155,9 +152,21 @@ class PowerInverter(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            active_power_total=self.active_power_total,
-            apparent_power_total=self.apparent_power_total,
-            reactive_power_total=self.reactive_power_total,
+            active_power_total=(
+                self.active_power_total.as_write()
+                if isinstance(self.active_power_total, CogniteTimeSeries)
+                else self.active_power_total
+            ),
+            apparent_power_total=(
+                self.apparent_power_total.as_write()
+                if isinstance(self.apparent_power_total, CogniteTimeSeries)
+                else self.apparent_power_total
+            ),
+            reactive_power_total=(
+                self.reactive_power_total.as_write()
+                if isinstance(self.reactive_power_total, CogniteTimeSeries)
+                else self.reactive_power_total
+            ),
         )
 
     def as_apply(self) -> PowerInverterWrite:
@@ -188,9 +197,9 @@ class PowerInverterWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    active_power_total: Union[TimeSeries, str, None] = None
-    apparent_power_total: Union[TimeSeries, str, None] = None
-    reactive_power_total: Union[TimeSeries, str, None] = None
+    active_power_total: Union[TimeSeriesWrite, str, None] = None
+    apparent_power_total: Union[TimeSeriesWrite, str, None] = None
+    reactive_power_total: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -241,13 +250,13 @@ class PowerInverterWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.active_power_total, TimeSeries):
+        if isinstance(self.active_power_total, CogniteTimeSeriesWrite):
             resources.time_series.append(self.active_power_total)
 
-        if isinstance(self.apparent_power_total, TimeSeries):
+        if isinstance(self.apparent_power_total, CogniteTimeSeriesWrite):
             resources.time_series.append(self.apparent_power_total)
 
-        if isinstance(self.reactive_power_total, TimeSeries):
+        if isinstance(self.reactive_power_total, CogniteTimeSeriesWrite):
             resources.time_series.append(self.reactive_power_total)
 
         return resources

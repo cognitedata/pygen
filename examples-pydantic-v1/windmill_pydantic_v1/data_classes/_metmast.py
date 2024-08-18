@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +23,8 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -75,9 +80,9 @@ class MetmastGraphQL(GraphQLCore):
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
-    temperature: Union[TimeSeriesGraphQL, dict, None] = None
-    tilt_angle: Union[TimeSeriesGraphQL, dict, None] = None
-    wind_speed: Union[TimeSeriesGraphQL, dict, None] = None
+    temperature: Optional[TimeSeriesGraphQL] = None
+    tilt_angle: Optional[TimeSeriesGraphQL] = None
+    wind_speed: Optional[TimeSeriesGraphQL] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -89,14 +94,6 @@ class MetmastGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
-    @validator("temperature", "tilt_angle", "wind_speed", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -113,9 +110,9 @@ class MetmastGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             position=self.position,
-            temperature=self.temperature,
-            tilt_angle=self.tilt_angle,
-            wind_speed=self.wind_speed,
+            temperature=self.temperature.as_read() if self.temperature else None,
+            tilt_angle=self.tilt_angle.as_read() if self.tilt_angle else None,
+            wind_speed=self.wind_speed.as_read() if self.wind_speed else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -127,9 +124,9 @@ class MetmastGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             position=self.position,
-            temperature=self.temperature,
-            tilt_angle=self.tilt_angle,
-            wind_speed=self.wind_speed,
+            temperature=self.temperature.as_write() if self.temperature else None,
+            tilt_angle=self.tilt_angle.as_write() if self.tilt_angle else None,
+            wind_speed=self.wind_speed.as_write() if self.wind_speed else None,
         )
 
 
@@ -164,9 +161,15 @@ class Metmast(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             position=self.position,
-            temperature=self.temperature,
-            tilt_angle=self.tilt_angle,
-            wind_speed=self.wind_speed,
+            temperature=(
+                self.temperature.as_write() if isinstance(self.temperature, CogniteTimeSeries) else self.temperature
+            ),
+            tilt_angle=(
+                self.tilt_angle.as_write() if isinstance(self.tilt_angle, CogniteTimeSeries) else self.tilt_angle
+            ),
+            wind_speed=(
+                self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed
+            ),
         )
 
     def as_apply(self) -> MetmastWrite:
@@ -199,9 +202,9 @@ class MetmastWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     position: Optional[float] = None
-    temperature: Union[TimeSeries, str, None] = None
-    tilt_angle: Union[TimeSeries, str, None] = None
-    wind_speed: Union[TimeSeries, str, None] = None
+    temperature: Union[TimeSeriesWrite, str, None] = None
+    tilt_angle: Union[TimeSeriesWrite, str, None] = None
+    wind_speed: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -255,13 +258,13 @@ class MetmastWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.temperature, TimeSeries):
+        if isinstance(self.temperature, CogniteTimeSeriesWrite):
             resources.time_series.append(self.temperature)
 
-        if isinstance(self.tilt_angle, TimeSeries):
+        if isinstance(self.tilt_angle, CogniteTimeSeriesWrite):
             resources.time_series.append(self.tilt_angle)
 
-        if isinstance(self.wind_speed, TimeSeries):
+        if isinstance(self.wind_speed, CogniteTimeSeriesWrite):
             resources.time_series.append(self.wind_speed)
 
         return resources

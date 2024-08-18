@@ -28,15 +28,15 @@ from ._core import ({% if has_default_instance_space %}
     DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
-    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}{% if is_pydantic_v2 %}
     FileMetadata,
-    FileMetadataWrite,
-    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    FileMetadataWrite,{% endif %}
+    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}{% if is_pydantic_v2 %}
     TimeSeries,
-    TimeSeriesWrite,
-    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    TimeSeriesWrite,{% endif %}
+    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}{% if is_pydantic_v2 %}
     SequenceRead,
-    SequenceWrite,
+    SequenceWrite,{% endif %}
     SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,

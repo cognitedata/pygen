@@ -37,7 +37,7 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}{% if has_default_instance_space %}
+from pydantic import BaseModel, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator, Extra{% endif %}{% if has_default_instance_space %}
 
 from .constants import DEFAULT_INSTANCE_SPACE{% endif %}
 

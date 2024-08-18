@@ -4,7 +4,14 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import (
+    FileMetadata as CogniteFileMetadata,
+    FileMetadataWrite as CogniteFileMetadataWrite,
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+    Sequence as CogniteSequence,
+    SequenceWrite as CogniteSequenceWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (
@@ -20,6 +27,9 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadataGraphQL,
+    TimeSeriesGraphQL,
+    SequenceGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
     as_node_id,
@@ -71,9 +81,9 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
-    files: Optional[list[dict]] = None
-    sequences: Optional[list[dict]] = None
-    timeseries: Union[list[TimeSeries], list[dict], None] = None
+    files: Optional[list[FileMetadataGraphQL]] = None
+    sequences: Optional[list[SequenceGraphQL]] = None
+    timeseries: Optional[list[TimeSeriesGraphQL]] = None
 
     @root_validator(pre=True)
     def parse_data_record(cls, values: Any) -> Any:
@@ -92,14 +102,6 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             return [v for v in value if v is not None] or None
         return value
 
-    @validator("timeseries", pre=True)
-    def parse_timeseries(cls, value: Any) -> Any:
-        if isinstance(value, list):
-            return [TimeSeries.load(v) if isinstance(v, dict) else v for v in value]
-        elif isinstance(value, dict):
-            return TimeSeries.load(value)
-        return value
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_read(self) -> CDFExternalReferencesListed:
@@ -114,9 +116,9 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            files=[item["externalId"] for item in self.files or [] if "externalId" in item] or None,
-            sequences=[item["externalId"] for item in self.sequences or [] if "externalId" in item] or None,
-            timeseries=self.timeseries,
+            files=[file.as_read() for file in self.files or []] or None,
+            sequences=[sequence.as_read() for sequence in self.sequences or []] or None,
+            timeseries=[timesery.as_read() for timesery in self.timeseries or []] or None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -127,9 +129,9 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            files=[item["externalId"] for item in self.files or [] if "externalId" in item] or None,
-            sequences=[item["externalId"] for item in self.sequences or [] if "externalId" in item] or None,
-            timeseries=self.timeseries,
+            files=[file.as_write() for file in self.files or []] or None,
+            sequences=[sequence.as_write() for sequence in self.sequences or []] or None,
+            timeseries=[timesery.as_write() for timesery in self.timeseries or []] or None,
         )
 
 
@@ -151,9 +153,9 @@ class CDFExternalReferencesListed(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    files: Optional[list[str]] = None
-    sequences: Optional[list[str]] = None
-    timeseries: Union[list[TimeSeries], list[str], None] = None
+    files: Optional[list[Union[FileMetadata, str]]] = None
+    sequences: Optional[list[Union[SequenceRead, str]]] = None
+    timeseries: Optional[list[Union[TimeSeries, str]]] = None
 
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this read version of cdf external references listed to the writing version."""
@@ -161,9 +163,18 @@ class CDFExternalReferencesListed(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            files=self.files,
-            sequences=self.sequences,
-            timeseries=self.timeseries,
+            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []]
+            or None,
+            sequences=[
+                sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
+                for sequence in self.sequences or []
+            ]
+            or None,
+            timeseries=[
+                timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
+                for timesery in self.timeseries or []
+            ]
+            or None,
         )
 
     def as_apply(self) -> CDFExternalReferencesListedWrite:
@@ -194,9 +205,9 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    files: Optional[list[str]] = None
-    sequences: Optional[list[str]] = None
-    timeseries: Union[list[TimeSeries], list[str], None] = None
+    files: Optional[list[Union[FileMetadataWrite, str]]] = None
+    sequences: Optional[list[Union[SequenceWrite, str]]] = None
+    timeseries: Optional[list[Union[TimeSeriesWrite, str]]] = None
 
     def _to_instances_write(
         self,
@@ -211,14 +222,18 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.files is not None or write_none:
-            properties["files"] = self.files
+            properties["files"] = [
+                file if isinstance(file, str) else file.external_id for file in self.files or []
+            ] or None
 
         if self.sequences is not None or write_none:
-            properties["sequences"] = self.sequences
+            properties["sequences"] = [
+                sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []
+            ] or None
 
         if self.timeseries is not None or write_none:
             properties["timeseries"] = [
-                value if isinstance(value, str) else value.external_id for value in self.timeseries or []
+                timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []
             ] or None
 
         if properties:
@@ -237,8 +252,17 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.timeseries, TimeSeries):
-            resources.time_series.append(self.timeseries)
+        for file in self.files or []:
+            if isinstance(file, CogniteFileMetadataWrite):
+                resources.files.append(file)
+
+        for sequence in self.sequences or []:
+            if isinstance(sequence, CogniteSequenceWrite):
+                resources.sequences.append(sequence)
+
+        for timesery in self.timeseries or []:
+            if isinstance(timesery, CogniteTimeSeriesWrite):
+                resources.time_series.append(timesery)
 
         return resources
 
