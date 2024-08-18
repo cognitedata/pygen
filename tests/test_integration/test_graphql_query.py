@@ -34,6 +34,47 @@ def test_graphql_query(wind_client: WindmillClient) -> None:
     assert result[0].name
 
 
+def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> None:
+    query = """{
+  getCDFExternalReferencesById(instance:
+    {space: "omni-instances", externalId: "CDFExternalReferences:Jeffrey"}
+  ){
+    items{
+       __typename
+      space
+      externalId
+      createdTime
+      lastUpdatedTime
+
+      timeseries {
+        externalId
+        name
+      }
+
+      sequence{
+        externalId
+        name
+        columns{
+          externalId
+          valueType
+        }
+      }
+    }
+  }
+}
+"""
+    result = omni_client.graphql_query(query)
+
+    assert len(result) > 0
+    jeffery = result[0]
+    assert isinstance(jeffery, odc.CDFExternalReferencesGraphQL)
+    assert jeffery.external_id == "CDFExternalReferences:Jeffrey"
+    assert isinstance(jeffery.timeseries, odc.TimeSeriesGraphQL)
+    assert isinstance(jeffery.sequence, odc.SequenceGraphQL)
+    jeffery.as_read()
+    jeffery.as_write()
+
+
 def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClient) -> None:
     query = """{
   getCDFExternalReferencesListedById(instance:
