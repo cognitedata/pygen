@@ -33,15 +33,15 @@ properties:
     name: temperature
   wind_turbines:
     type:
-      space: { { pygen_power } }
-      externalId: WindTurbine.metmast
+      space: {{ pygen_power }}
+      externalId: Distance
     source:
-      space: { { pygen_power } }
+      space: {{ pygen_power }}
       externalId: WindTurbine
       version: 1
       type: view
     edgeSource:
-      space: { { pygen_power } }
+      space: {{ pygen_power }}
       externalId: Distance
       version: 1
       type: view

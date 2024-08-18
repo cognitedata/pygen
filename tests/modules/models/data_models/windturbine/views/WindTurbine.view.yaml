@@ -40,7 +40,7 @@ properties:
       type: view
   blades:
     container:
-      space: { { pygen_power } }
+      space: {{ pygen_power }}
       externalId: WindTurbine
       type: container
     source:
@@ -53,7 +53,7 @@ properties:
   metmast:
     type:
       space: {{ pygen_power }}
-      externalId: WindTurbine.metmast
+      externalId: Distance
     source:
       space: {{ pygen_power }}
       externalId: Metmast
@@ -69,14 +69,14 @@ properties:
     connectionType: multi_edge_connection
   datasheets:
     container:
-      space: { { pygen_power } }
+      space: {{ pygen_power }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: datasheets
     name: datasheets
   powerCurve:
     container:
-      space: { { pygen_power } }
+      space: {{ pygen_power }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: powerCurve
