@@ -88,8 +88,10 @@ FileMetadataWrite = Annotated[
     ),
     BeforeValidator(lambda v: CogniteFileMetadataWrite.load(v) if isinstance(v, dict) else v),
 ]{% else %}
+
+
 def to_camel(string: str) -> str:
-    return ''.join(word.capitalize() if no > 0 else word.casefold() for no, word in enumerate(string.split('_'))){% endif %}
+    return "".join(word.capitalize() if no > 0 else word.casefold() for no, word in enumerate(string.split("_"))){% endif %}
 
 
 class GraphQLExternal(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel{% endif %}):{% if is_pydantic_v2 %} ...{% else %}
