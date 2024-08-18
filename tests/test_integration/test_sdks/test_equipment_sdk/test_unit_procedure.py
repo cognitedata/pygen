@@ -1,6 +1,6 @@
 import pytest
 from cognite.client import CogniteClient
-from cognite.client.data_classes import TimeSeries
+from cognite.client.data_classes import TimeSeriesWrite
 
 from tests.constants import IS_PYDANTIC_V2
 
@@ -96,7 +96,7 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
                     external_id="module:new_module",
                     name="New module",
                     type_="New type",
-                    sensor_value=TimeSeries(
+                    sensor_value=TimeSeriesWrite(
                         external_id="timeseries:123",
                         is_step=True,
                         description="This is a test timeseries, it should not persist",
