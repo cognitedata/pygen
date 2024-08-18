@@ -1,0 +1,19 @@
+space: {{ pygen_power }}
+externalId: Generator
+name: Generator
+version: 1
+properties:
+  generator_speed_controller:
+    container:
+      space: {{ pygen_power }}
+      externalId: Generator
+      type: container
+    containerPropertyIdentifier: generator_speed_controller
+    name: generator_speed_controller
+  generator_speed_controller_reference:
+    container:
+      space: {{ pygen_power }}
+      externalId: Generator
+      type: container
+    containerPropertyIdentifier: generator_speed_controller_reference
+    name: generator_speed_controller_reference

@@ -1,3 +1,0 @@
-space: {{ pygen_models_space }}
-name: PygenModels
-description: This space contains all the schemas for the pygen models

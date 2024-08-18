@@ -8,3 +8,4 @@ variables:
   modules:
     models:
       pygen_models_space: sp_pygen_models
+      pygen_power: sp_pygen_power

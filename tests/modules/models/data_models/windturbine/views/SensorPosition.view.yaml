@@ -1,0 +1,68 @@
+space: {{ pygen_power }}
+externalId: SensorPosition
+name: SensorPosition
+version: 1
+properties:
+  position:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: position
+    name: position
+  flapwise_bend_mom:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: flapwise_bend_mom
+    name: flapwise_bend_mom
+  flapwise_bend_mom_offset:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: flapwise_bend_mom_offset
+    name: flapwise_bend_mom_offset
+  flapwise_bend_mom_crosstalk_corrected:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: flapwise_bend_mom_crosstalk_corrected
+    name: flapwise_bend_mom_crosstalk_corrected
+  flapwise_bend_mom_offset_crosstalk_corrected:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: flapwise_bend_mom_offset_crosstalk_corrected
+    name: flapwise_bend_mom_offset_crosstalk_corrected
+  edgewisewise_bend_mom:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: edgewisewise_bend_mom
+    name: edgewisewise_bend_mom
+  edgewise_bend_mom_offset:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: edgewise_bend_mom_offset
+    name: edgewise_bend_mom_offset
+  edgewise_bend_mom_crosstalk_corrected:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: edgewise_bend_mom_crosstalk_corrected
+    name: edgewise_bend_mom_crosstalk_corrected
+  edgewise_bend_mom_offset_crosstalk_corrected:
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: edgewise_bend_mom_offset_crosstalk_corrected
+    name: edgewise_bend_mom_offset_crosstalk_corrected
