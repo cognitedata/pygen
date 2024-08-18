@@ -29,3 +29,17 @@ properties:
     direction: outwards
     name: sensor_positions
     connectionType: multi_edge_connection
+  wind_turbine:
+    source:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      identifier: blades
+    connectionType: single_reverse_direct_relation

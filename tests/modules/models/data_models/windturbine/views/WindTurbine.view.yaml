@@ -39,17 +39,17 @@ properties:
       version: 1
       type: view
   blades:
-    type:
-      space: {{ pygen_power }}
-      externalId: WindTurbine.blades
+    container:
+      space: { { pygen_power } }
+      externalId: WindTurbine
+      type: container
     source:
       space: {{ pygen_power }}
       externalId: Blade
       version: 1
       type: view
-    direction: outwards
+    containerPropertyIdentifier: blades
     name: blades
-    connectionType: multi_edge_connection
   metmast:
     type:
       space: {{ pygen_power }}

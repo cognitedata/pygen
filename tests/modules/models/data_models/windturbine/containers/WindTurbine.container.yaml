@@ -59,3 +59,11 @@ properties:
     autoIncrement: false
     immutable: false
     name: powerCurve
+  blades:
+    type:
+      list: true
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: nacelle
