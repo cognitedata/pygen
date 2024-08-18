@@ -38,3 +38,17 @@ properties:
       type: container
     containerPropertyIdentifier: bending_y
     name: bending_y
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: generator
+    connectionType: single_reverse_direct_relation

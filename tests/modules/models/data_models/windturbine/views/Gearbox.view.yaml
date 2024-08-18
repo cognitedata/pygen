@@ -24,3 +24,17 @@ properties:
       type: container
     containerPropertyIdentifier: displacement_z
     name: displacement_z
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: gearbox
+    connectionType: single_reverse_direct_relation
