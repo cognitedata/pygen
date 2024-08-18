@@ -1,5 +1,8 @@
 - space: {{ pygen_models_space }}
   externalId: OmniMultiA
+  name: OmniMultiA
+  description: This is a small model with one view, which has been designed to test the generation of one SDK
+    for multiple models.
   version: "1"
   views:
   - space: {{ pygen_models_space }}
@@ -16,6 +19,9 @@
     type: view
 - space: {{ pygen_models_space }}
   externalId: OmniMultiB
+  name: OmniMultiB
+  description: This is a small model with one view, which has been designed to test the generation of one SDK
+    for multiple models.
   version: "1"
   views:
   - space: {{ pygen_models_space }}
@@ -34,7 +40,8 @@
 - space: {{ pygen_models_space }}
   externalId: OmniMultiC
   name: OmniMultiC
-  description: ''
+  description: This is a small model with one view, which has been designed to test the generation of one SDK
+      for multiple models.
   version: '1'
   views:
   - space: {{ pygen_other_models_space }}

@@ -3,6 +3,10 @@ externalId: WindTurbine
 version: "1"
 views:
 - space: {{ pygen_power }}
+  externalId: Blade
+  version: 1
+  type: view
+- space: {{ pygen_power }}
   externalId: Gearbox
   version: 1
   type: view
