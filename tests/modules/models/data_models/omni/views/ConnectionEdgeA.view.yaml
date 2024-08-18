@@ -1,0 +1,26 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionEdgeA
+name: ConnectionEdgeA
+version: '1'
+properties:
+  name:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionEdge
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  startTime:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionEdge
+      type: container
+    containerPropertyIdentifier: startTime
+    name: startTime
+  endTime:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionEdge
+      type: container
+    containerPropertyIdentifier: endTime
+    name: endTime

@@ -1,0 +1,48 @@
+space: {{ pygen_power }}
+externalId: WindTurbine
+version: "1"
+views:
+- space: {{ pygen_power }}
+  externalId: Blade
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Gearbox
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Generator
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: HighSpeedShaft
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: MainShaft
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Metmast
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Nacelle
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: PowerInverter
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Rotor
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: SensorPosition
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: WindTurbine
+  version: 1
+  type: view

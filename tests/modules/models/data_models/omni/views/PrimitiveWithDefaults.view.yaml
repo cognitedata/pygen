@@ -1,0 +1,40 @@
+space: {{ pygen_models_space }}
+externalId: PrimitiveWithDefaults
+name: PrimitiveWithDefaults
+version: '1'
+properties:
+  defaultString:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: defaultString
+    name: defaultString
+  defaultBoolean:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: defaultBoolean
+    name: defaultBoolean
+  defaultFloat32:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: defaultFloat32
+    name: defaultFloat32
+  autoIncrementInt32:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: autoIncrementInt32
+    name: autoIncrementInt32
+  defaultObject:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: defaultObject
+    name: defaultObject

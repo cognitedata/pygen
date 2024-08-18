@@ -1,0 +1,50 @@
+space: {{ pygen_models_space }}
+externalId: PrimitiveWithDefaults
+name: PrimitiveWithDefaults
+usedFor: node
+properties:
+  defaultString:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    defaultValue: 'my default text'
+    autoIncrement: false
+    immutable: false
+    name: defaultString
+  defaultBoolean:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    defaultValue: true
+    autoIncrement: false
+    immutable: false
+    name: defaultBoolean
+  defaultFloat32:
+    type:
+      list: false
+      type: float32
+    nullable: true
+    defaultValue: 0.42
+    autoIncrement: false
+    immutable: false
+    name: defaultFloat32
+  autoIncrementInt32:
+    type:
+      list: false
+      type: int32
+    nullable: false
+    autoIncrement: true
+    name: autoIncrementInt32
+  defaultObject:
+    type:
+      list: false
+      type: json
+    nullable: true
+    defaultValue:
+      foo: bar
+    autoIncrement: false
+    immutable: false
+    name: defaultObject

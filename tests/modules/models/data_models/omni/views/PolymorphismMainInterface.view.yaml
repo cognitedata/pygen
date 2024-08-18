@@ -1,0 +1,12 @@
+space: {{ pygen_models_space }}
+externalId: MainInterface
+name: MainInterface
+version: '1'
+properties:
+  mainValue:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: MainInterface
+      type: container
+    containerPropertyIdentifier: mainValue
+    name: MainValue

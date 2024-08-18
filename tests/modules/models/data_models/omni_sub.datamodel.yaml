@@ -1,0 +1,19 @@
+space: {{ pygen_models_space }}
+externalId: OmniSub
+name: OmniSub
+description: This is a small subset of the Omni data model. It is used to test the generation of SDKs
+  for a subset of the model where the instance space is not set.
+version: "1"
+views:
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemA
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemB
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemC
+  version: "1"
+  type: view

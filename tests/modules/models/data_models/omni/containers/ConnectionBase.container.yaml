@@ -1,0 +1,30 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionBase
+name: ConnectionBase
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name
+  direct1:
+    type:
+      type: direct
+      list: false
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: direct1
+  direct2:
+    type:
+      type: direct
+      list: false
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: direct2

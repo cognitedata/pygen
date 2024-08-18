@@ -1,0 +1,37 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionItemG
+name: ConnectionItemG
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemG
+properties:
+  name:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  inwardsMultiProperty:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: multiProperty
+    edgeSource:
+        space: {{ pygen_models_space }}
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+    direction: inwards
+    name: inwardsMultiProperty
+    connectionType: multi_edge_connection

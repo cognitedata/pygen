@@ -1,0 +1,29 @@
+space: {{ pygen_models_space }}
+externalId: CDFExternalReferencesListed
+name: CDFExternalReferencesListed
+usedFor: node
+properties:
+  timeseries:
+    type:
+      list: true
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: timeseries
+  files:
+    type:
+      list: true
+      type: file
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: files
+  sequences:
+    type:
+      list: true
+      type: sequence
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: sequences

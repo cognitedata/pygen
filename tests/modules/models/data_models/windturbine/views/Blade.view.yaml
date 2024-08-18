@@ -1,0 +1,31 @@
+space: {{ pygen_power }}
+externalId: Blade
+name: Blade
+version: 1
+properties:
+  name:
+    container:
+      space: {{ pygen_power }}
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  is_damaged:
+    container:
+      space: {{ pygen_power }}
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: is_damaged
+    name: is_damaged
+  sensor_positions:
+    type:
+      space: {{ pygen_power }}
+      externalId: Blade.sensor_positions
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      version: 1
+      type: view
+    direction: outwards
+    name: sensor_positions
+    connectionType: multi_edge_connection

@@ -1,0 +1,14 @@
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemA
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemB
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemC
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemD
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemE
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemF
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemG

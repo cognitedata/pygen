@@ -1,0 +1,30 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionEdge
+name: ConnectionEdge
+usedFor: edge
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name
+  startTime:
+    type:
+      type: timestamp
+      list: false
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: startTime
+  endTime:
+    type:
+      type: timestamp
+      list: false
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: endTime

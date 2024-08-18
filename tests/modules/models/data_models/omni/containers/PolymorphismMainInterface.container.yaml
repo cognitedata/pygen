@@ -1,0 +1,14 @@
+space: {{ pygen_models_space }}
+externalId: MainInterface
+name: MainInterface
+usedFor: node
+properties:
+  mainValue:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: mainValue

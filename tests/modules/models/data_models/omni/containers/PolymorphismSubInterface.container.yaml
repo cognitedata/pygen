@@ -1,0 +1,14 @@
+space: {{ pygen_models_space }}
+externalId: SubInterface
+name: SubInterface
+usedFor: node
+properties:
+  subValue:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: subValue

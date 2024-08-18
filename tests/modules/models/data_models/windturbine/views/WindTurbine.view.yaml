@@ -1,0 +1,74 @@
+space: {{ pygen_power }}
+externalId: WindTurbine
+name: WindTurbine
+version: 1
+properties:
+  name:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  windfarm:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: windfarm
+    name: windfarm
+  capacity:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: capacity
+    name: capacity
+  rotor:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: rotor
+    name: rotor
+    source:
+      space: {{ pygen_power }}
+      externalId: Rotor
+      version: 1
+      type: view
+  nacelle:
+    container:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: nacelle
+    name: nacelle
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: 1
+      type: view
+  blades:
+    type:
+      space: {{ pygen_power }}
+      externalId: WindTurbine.blades
+    source:
+      space: {{ pygen_power }}
+      externalId: Blade
+      version: 1
+      type: view
+    direction: outwards
+    name: blades
+    connectionType: multi_edge_connection
+  metmast:
+    type:
+      space: {{ pygen_power }}
+      externalId: WindTurbine.metmast
+    source:
+      space: {{ pygen_power }}
+      externalId: Metmast
+      version: 1
+      type: view
+    direction: outwards
+    name: metmast
+    connectionType: multi_edge_connection

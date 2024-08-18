@@ -1,0 +1,68 @@
+space: {{ pygen_models_space }}
+externalId: PrimitiveNullable
+name: PrimitiveNullable
+version: '1'
+properties:
+  text:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: text
+    name: text
+  boolean:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: boolean
+    name: text
+  float32:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: float32
+    name: float32
+  float64:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: float64
+    name: float64
+  int32:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: int32
+    name: int32
+  int64:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: int64
+    name: int64
+  timestamp:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: timestamp
+    name: timestamp
+  date:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: date
+    name: date
+  json:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveNullable
+      type: container
+    containerPropertyIdentifier: json
+    name: json

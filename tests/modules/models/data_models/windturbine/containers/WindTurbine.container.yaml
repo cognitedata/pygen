@@ -1,0 +1,45 @@
+space: {{ pygen_power }}
+externalId: WindTurbine
+name: WindTurbine
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name
+  windfarm:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: windfarm
+  capacity:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: capacity
+  rotor:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: rotor
+  nacelle:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: nacelle
