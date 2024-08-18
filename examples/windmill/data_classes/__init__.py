@@ -13,6 +13,9 @@ from ._core import (
     ResourcesWriteResult,
     PageInfo,
     TimeSeriesGraphQL,
+    FileMetadataGraphQL,
+    SequenceColumnGraphQL,
+    SequenceGraphQL,
 )
 from ._blade import (
     Blade,
@@ -197,6 +200,9 @@ __all__ = [
     "ResourcesWriteResult",
     "PageInfo",
     "TimeSeriesGraphQL",
+    "FileMetadataGraphQL",
+    "SequenceColumnGraphQL",
+    "SequenceGraphQL",
     "Blade",
     "BladeGraphQL",
     "BladeWrite",

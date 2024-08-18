@@ -4,7 +4,10 @@ import warnings
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
@@ -21,7 +24,11 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,
     TimeSeries,
+    TimeSeriesWrite,
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -94,16 +101,16 @@ class NacelleGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
-    acc_from_back_side_x: Union[TimeSeriesGraphQL, dict, None] = None
-    acc_from_back_side_y: Union[TimeSeriesGraphQL, dict, None] = None
-    acc_from_back_side_z: Union[TimeSeriesGraphQL, dict, None] = None
+    acc_from_back_side_x: Optional[TimeSeriesGraphQL] = None
+    acc_from_back_side_y: Optional[TimeSeriesGraphQL] = None
+    acc_from_back_side_z: Optional[TimeSeriesGraphQL] = None
     gearbox: Optional[GearboxGraphQL] = Field(default=None, repr=False)
     generator: Optional[GeneratorGraphQL] = Field(default=None, repr=False)
     high_speed_shaft: Optional[HighSpeedShaftGraphQL] = Field(default=None, repr=False)
     main_shaft: Optional[MainShaftGraphQL] = Field(default=None, repr=False)
     power_inverter: Optional[PowerInverterGraphQL] = Field(default=None, repr=False)
-    yaw_direction: Union[TimeSeriesGraphQL, dict, None] = None
-    yaw_error: Union[TimeSeriesGraphQL, dict, None] = None
+    yaw_direction: Optional[TimeSeriesGraphQL] = None
+    yaw_error: Optional[TimeSeriesGraphQL] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -138,9 +145,9 @@ class NacelleGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=self.acc_from_back_side_y,
-            acc_from_back_side_z=self.acc_from_back_side_z,
+            acc_from_back_side_x=self.acc_from_back_side_x.as_read() if self.acc_from_back_side_x else None,
+            acc_from_back_side_y=self.acc_from_back_side_y.as_read() if self.acc_from_back_side_y else None,
+            acc_from_back_side_z=self.acc_from_back_side_z.as_read() if self.acc_from_back_side_z else None,
             gearbox=self.gearbox.as_read() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
             generator=self.generator.as_read() if isinstance(self.generator, GraphQLCore) else self.generator,
             high_speed_shaft=(
@@ -152,8 +159,8 @@ class NacelleGraphQL(GraphQLCore):
             power_inverter=(
                 self.power_inverter.as_read() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
             ),
-            yaw_direction=self.yaw_direction,
-            yaw_error=self.yaw_error,
+            yaw_direction=self.yaw_direction.as_read() if self.yaw_direction else None,
+            yaw_error=self.yaw_error.as_read() if self.yaw_error else None,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -164,9 +171,9 @@ class NacelleGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=self.acc_from_back_side_y,
-            acc_from_back_side_z=self.acc_from_back_side_z,
+            acc_from_back_side_x=self.acc_from_back_side_x.as_write() if self.acc_from_back_side_x else None,
+            acc_from_back_side_y=self.acc_from_back_side_y.as_write() if self.acc_from_back_side_y else None,
+            acc_from_back_side_z=self.acc_from_back_side_z.as_write() if self.acc_from_back_side_z else None,
             gearbox=self.gearbox.as_write() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
             generator=self.generator.as_write() if isinstance(self.generator, GraphQLCore) else self.generator,
             high_speed_shaft=(
@@ -178,8 +185,8 @@ class NacelleGraphQL(GraphQLCore):
             power_inverter=(
                 self.power_inverter.as_write() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
             ),
-            yaw_direction=self.yaw_direction,
-            yaw_error=self.yaw_error,
+            yaw_direction=self.yaw_direction.as_write() if self.yaw_direction else None,
+            yaw_error=self.yaw_error.as_write() if self.yaw_error else None,
         )
 
 
@@ -225,9 +232,21 @@ class Nacelle(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=self.acc_from_back_side_y,
-            acc_from_back_side_z=self.acc_from_back_side_z,
+            acc_from_back_side_x=(
+                self.acc_from_back_side_x.as_write()
+                if isinstance(self.acc_from_back_side_x, CogniteTimeSeries)
+                else self.acc_from_back_side_x
+            ),
+            acc_from_back_side_y=(
+                self.acc_from_back_side_y.as_write()
+                if isinstance(self.acc_from_back_side_y, CogniteTimeSeries)
+                else self.acc_from_back_side_y
+            ),
+            acc_from_back_side_z=(
+                self.acc_from_back_side_z.as_write()
+                if isinstance(self.acc_from_back_side_z, CogniteTimeSeries)
+                else self.acc_from_back_side_z
+            ),
             gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
             generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
             high_speed_shaft=(
@@ -239,8 +258,12 @@ class Nacelle(DomainModel):
             power_inverter=(
                 self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
             ),
-            yaw_direction=self.yaw_direction,
-            yaw_error=self.yaw_error,
+            yaw_direction=(
+                self.yaw_direction.as_write()
+                if isinstance(self.yaw_direction, CogniteTimeSeries)
+                else self.yaw_direction
+            ),
+            yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, CogniteTimeSeries) else self.yaw_error,
         )
 
     def as_apply(self) -> NacelleWrite:
@@ -323,16 +346,16 @@ class NacelleWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    acc_from_back_side_x: Union[TimeSeries, str, None] = None
-    acc_from_back_side_y: Union[TimeSeries, str, None] = None
-    acc_from_back_side_z: Union[TimeSeries, str, None] = None
+    acc_from_back_side_x: Union[TimeSeriesWrite, str, None] = None
+    acc_from_back_side_y: Union[TimeSeriesWrite, str, None] = None
+    acc_from_back_side_z: Union[TimeSeriesWrite, str, None] = None
     gearbox: Union[GearboxWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     generator: Union[GeneratorWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     high_speed_shaft: Union[HighSpeedShaftWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     main_shaft: Union[MainShaftWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     power_inverter: Union[PowerInverterWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    yaw_direction: Union[TimeSeries, str, None] = None
-    yaw_error: Union[TimeSeries, str, None] = None
+    yaw_direction: Union[TimeSeriesWrite, str, None] = None
+    yaw_error: Union[TimeSeriesWrite, str, None] = None
 
     def _to_instances_write(
         self,
@@ -453,19 +476,19 @@ class NacelleWrite(DomainModelWrite):
             other_resources = self.power_inverter._to_instances_write(cache)
             resources.extend(other_resources)
 
-        if isinstance(self.acc_from_back_side_x, CogniteTimeSeries):
+        if isinstance(self.acc_from_back_side_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.acc_from_back_side_x)
 
-        if isinstance(self.acc_from_back_side_y, CogniteTimeSeries):
+        if isinstance(self.acc_from_back_side_y, CogniteTimeSeriesWrite):
             resources.time_series.append(self.acc_from_back_side_y)
 
-        if isinstance(self.acc_from_back_side_z, CogniteTimeSeries):
+        if isinstance(self.acc_from_back_side_z, CogniteTimeSeriesWrite):
             resources.time_series.append(self.acc_from_back_side_z)
 
-        if isinstance(self.yaw_direction, CogniteTimeSeries):
+        if isinstance(self.yaw_direction, CogniteTimeSeriesWrite):
             resources.time_series.append(self.yaw_direction)
 
-        if isinstance(self.yaw_error, CogniteTimeSeries):
+        if isinstance(self.yaw_error, CogniteTimeSeriesWrite):
             resources.time_series.append(self.yaw_error)
 
         return resources

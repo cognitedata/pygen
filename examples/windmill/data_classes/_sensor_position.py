@@ -4,7 +4,10 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
 from pydantic import field_validator, model_validator
 
 from ._core import (
@@ -20,7 +23,11 @@ from ._core import (
     DomainRelationWrite,
     GraphQLCore,
     ResourcesWrite,
+    FileMetadata,
+    FileMetadataWrite,
+    FileMetadataGraphQL,
     TimeSeries,
+    TimeSeriesWrite,
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
@@ -107,14 +114,14 @@ class SensorPositionGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "SensorPosition", "1")
-    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
-    edgewise_bend_mom_offset: Union[TimeSeriesGraphQL, dict, None] = None
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
-    edgewisewise_bend_mom: Union[TimeSeriesGraphQL, dict, None] = None
-    flapwise_bend_mom: Union[TimeSeriesGraphQL, dict, None] = None
-    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
-    flapwise_bend_mom_offset: Union[TimeSeriesGraphQL, dict, None] = None
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesGraphQL, dict, None] = None
+    edgewise_bend_mom_crosstalk_corrected: Optional[TimeSeriesGraphQL] = None
+    edgewise_bend_mom_offset: Optional[TimeSeriesGraphQL] = None
+    edgewise_bend_mom_offset_crosstalk_corrected: Optional[TimeSeriesGraphQL] = None
+    edgewisewise_bend_mom: Optional[TimeSeriesGraphQL] = None
+    flapwise_bend_mom: Optional[TimeSeriesGraphQL] = None
+    flapwise_bend_mom_crosstalk_corrected: Optional[TimeSeriesGraphQL] = None
+    flapwise_bend_mom_offset: Optional[TimeSeriesGraphQL] = None
+    flapwise_bend_mom_offset_crosstalk_corrected: Optional[TimeSeriesGraphQL] = None
     position: Optional[float] = None
 
     @model_validator(mode="before")
@@ -142,14 +149,30 @@ class SensorPositionGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
-            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
-            edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
-            edgewisewise_bend_mom=self.edgewisewise_bend_mom,
-            flapwise_bend_mom=self.flapwise_bend_mom,
-            flapwise_bend_mom_crosstalk_corrected=self.flapwise_bend_mom_crosstalk_corrected,
-            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset,
-            flapwise_bend_mom_offset_crosstalk_corrected=self.flapwise_bend_mom_offset_crosstalk_corrected,
+            edgewise_bend_mom_crosstalk_corrected=(
+                self.edgewise_bend_mom_crosstalk_corrected.as_read()
+                if self.edgewise_bend_mom_crosstalk_corrected
+                else None
+            ),
+            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset.as_read() if self.edgewise_bend_mom_offset else None,
+            edgewise_bend_mom_offset_crosstalk_corrected=(
+                self.edgewise_bend_mom_offset_crosstalk_corrected.as_read()
+                if self.edgewise_bend_mom_offset_crosstalk_corrected
+                else None
+            ),
+            edgewisewise_bend_mom=self.edgewisewise_bend_mom.as_read() if self.edgewisewise_bend_mom else None,
+            flapwise_bend_mom=self.flapwise_bend_mom.as_read() if self.flapwise_bend_mom else None,
+            flapwise_bend_mom_crosstalk_corrected=(
+                self.flapwise_bend_mom_crosstalk_corrected.as_read()
+                if self.flapwise_bend_mom_crosstalk_corrected
+                else None
+            ),
+            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset.as_read() if self.flapwise_bend_mom_offset else None,
+            flapwise_bend_mom_offset_crosstalk_corrected=(
+                self.flapwise_bend_mom_offset_crosstalk_corrected.as_read()
+                if self.flapwise_bend_mom_offset_crosstalk_corrected
+                else None
+            ),
             position=self.position,
         )
 
@@ -161,14 +184,34 @@ class SensorPositionGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
-            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
-            edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
-            edgewisewise_bend_mom=self.edgewisewise_bend_mom,
-            flapwise_bend_mom=self.flapwise_bend_mom,
-            flapwise_bend_mom_crosstalk_corrected=self.flapwise_bend_mom_crosstalk_corrected,
-            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset,
-            flapwise_bend_mom_offset_crosstalk_corrected=self.flapwise_bend_mom_offset_crosstalk_corrected,
+            edgewise_bend_mom_crosstalk_corrected=(
+                self.edgewise_bend_mom_crosstalk_corrected.as_write()
+                if self.edgewise_bend_mom_crosstalk_corrected
+                else None
+            ),
+            edgewise_bend_mom_offset=(
+                self.edgewise_bend_mom_offset.as_write() if self.edgewise_bend_mom_offset else None
+            ),
+            edgewise_bend_mom_offset_crosstalk_corrected=(
+                self.edgewise_bend_mom_offset_crosstalk_corrected.as_write()
+                if self.edgewise_bend_mom_offset_crosstalk_corrected
+                else None
+            ),
+            edgewisewise_bend_mom=self.edgewisewise_bend_mom.as_write() if self.edgewisewise_bend_mom else None,
+            flapwise_bend_mom=self.flapwise_bend_mom.as_write() if self.flapwise_bend_mom else None,
+            flapwise_bend_mom_crosstalk_corrected=(
+                self.flapwise_bend_mom_crosstalk_corrected.as_write()
+                if self.flapwise_bend_mom_crosstalk_corrected
+                else None
+            ),
+            flapwise_bend_mom_offset=(
+                self.flapwise_bend_mom_offset.as_write() if self.flapwise_bend_mom_offset else None
+            ),
+            flapwise_bend_mom_offset_crosstalk_corrected=(
+                self.flapwise_bend_mom_offset_crosstalk_corrected.as_write()
+                if self.flapwise_bend_mom_offset_crosstalk_corrected
+                else None
+            ),
             position=self.position,
         )
 
@@ -213,14 +256,46 @@ class SensorPosition(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            edgewise_bend_mom_crosstalk_corrected=self.edgewise_bend_mom_crosstalk_corrected,
-            edgewise_bend_mom_offset=self.edgewise_bend_mom_offset,
-            edgewise_bend_mom_offset_crosstalk_corrected=self.edgewise_bend_mom_offset_crosstalk_corrected,
-            edgewisewise_bend_mom=self.edgewisewise_bend_mom,
-            flapwise_bend_mom=self.flapwise_bend_mom,
-            flapwise_bend_mom_crosstalk_corrected=self.flapwise_bend_mom_crosstalk_corrected,
-            flapwise_bend_mom_offset=self.flapwise_bend_mom_offset,
-            flapwise_bend_mom_offset_crosstalk_corrected=self.flapwise_bend_mom_offset_crosstalk_corrected,
+            edgewise_bend_mom_crosstalk_corrected=(
+                self.edgewise_bend_mom_crosstalk_corrected.as_write()
+                if isinstance(self.edgewise_bend_mom_crosstalk_corrected, CogniteTimeSeries)
+                else self.edgewise_bend_mom_crosstalk_corrected
+            ),
+            edgewise_bend_mom_offset=(
+                self.edgewise_bend_mom_offset.as_write()
+                if isinstance(self.edgewise_bend_mom_offset, CogniteTimeSeries)
+                else self.edgewise_bend_mom_offset
+            ),
+            edgewise_bend_mom_offset_crosstalk_corrected=(
+                self.edgewise_bend_mom_offset_crosstalk_corrected.as_write()
+                if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeries)
+                else self.edgewise_bend_mom_offset_crosstalk_corrected
+            ),
+            edgewisewise_bend_mom=(
+                self.edgewisewise_bend_mom.as_write()
+                if isinstance(self.edgewisewise_bend_mom, CogniteTimeSeries)
+                else self.edgewisewise_bend_mom
+            ),
+            flapwise_bend_mom=(
+                self.flapwise_bend_mom.as_write()
+                if isinstance(self.flapwise_bend_mom, CogniteTimeSeries)
+                else self.flapwise_bend_mom
+            ),
+            flapwise_bend_mom_crosstalk_corrected=(
+                self.flapwise_bend_mom_crosstalk_corrected.as_write()
+                if isinstance(self.flapwise_bend_mom_crosstalk_corrected, CogniteTimeSeries)
+                else self.flapwise_bend_mom_crosstalk_corrected
+            ),
+            flapwise_bend_mom_offset=(
+                self.flapwise_bend_mom_offset.as_write()
+                if isinstance(self.flapwise_bend_mom_offset, CogniteTimeSeries)
+                else self.flapwise_bend_mom_offset
+            ),
+            flapwise_bend_mom_offset_crosstalk_corrected=(
+                self.flapwise_bend_mom_offset_crosstalk_corrected.as_write()
+                if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeries)
+                else self.flapwise_bend_mom_offset_crosstalk_corrected
+            ),
             position=self.position,
         )
 
@@ -258,14 +333,14 @@ class SensorPositionWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    edgewise_bend_mom_offset: Union[TimeSeries, str, None] = None
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    edgewisewise_bend_mom: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_offset: Union[TimeSeries, str, None] = None
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeries, str, None] = None
+    edgewise_bend_mom_crosstalk_corrected: Union[TimeSeriesWrite, str, None] = None
+    edgewise_bend_mom_offset: Union[TimeSeriesWrite, str, None] = None
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesWrite, str, None] = None
+    edgewisewise_bend_mom: Union[TimeSeriesWrite, str, None] = None
+    flapwise_bend_mom: Union[TimeSeriesWrite, str, None] = None
+    flapwise_bend_mom_crosstalk_corrected: Union[TimeSeriesWrite, str, None] = None
+    flapwise_bend_mom_offset: Union[TimeSeriesWrite, str, None] = None
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[TimeSeriesWrite, str, None] = None
     position: Optional[float] = None
 
     def _to_instances_write(
@@ -359,28 +434,28 @@ class SensorPositionWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.edgewise_bend_mom_crosstalk_corrected, CogniteTimeSeries):
+        if isinstance(self.edgewise_bend_mom_crosstalk_corrected, CogniteTimeSeriesWrite):
             resources.time_series.append(self.edgewise_bend_mom_crosstalk_corrected)
 
-        if isinstance(self.edgewise_bend_mom_offset, CogniteTimeSeries):
+        if isinstance(self.edgewise_bend_mom_offset, CogniteTimeSeriesWrite):
             resources.time_series.append(self.edgewise_bend_mom_offset)
 
-        if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeries):
+        if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeriesWrite):
             resources.time_series.append(self.edgewise_bend_mom_offset_crosstalk_corrected)
 
-        if isinstance(self.edgewisewise_bend_mom, CogniteTimeSeries):
+        if isinstance(self.edgewisewise_bend_mom, CogniteTimeSeriesWrite):
             resources.time_series.append(self.edgewisewise_bend_mom)
 
-        if isinstance(self.flapwise_bend_mom, CogniteTimeSeries):
+        if isinstance(self.flapwise_bend_mom, CogniteTimeSeriesWrite):
             resources.time_series.append(self.flapwise_bend_mom)
 
-        if isinstance(self.flapwise_bend_mom_crosstalk_corrected, CogniteTimeSeries):
+        if isinstance(self.flapwise_bend_mom_crosstalk_corrected, CogniteTimeSeriesWrite):
             resources.time_series.append(self.flapwise_bend_mom_crosstalk_corrected)
 
-        if isinstance(self.flapwise_bend_mom_offset, CogniteTimeSeries):
+        if isinstance(self.flapwise_bend_mom_offset, CogniteTimeSeriesWrite):
             resources.time_series.append(self.flapwise_bend_mom_offset)
 
-        if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeries):
+        if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, CogniteTimeSeriesWrite):
             resources.time_series.append(self.flapwise_bend_mom_offset_crosstalk_corrected)
 
         return resources
