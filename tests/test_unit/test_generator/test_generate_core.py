@@ -60,6 +60,17 @@ def test_generate_data_class_core_query(omni_multi_api_generator: MultiAPIGenera
     assert actual == expected
 
 
+def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_cdf_external.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_file()
+
+    # Assert
+    assert actual == expected
+
+
 def test_generate_data_class_core_base_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniSubFiles.data_core_base.read_text()

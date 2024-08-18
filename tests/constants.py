@@ -329,6 +329,7 @@ class OmniFiles:
     data_core_init = core_data / "__init__.py"
     data_core_helpers = core_data / "helpers.py"
     data_core_query = core_data / "query.py"
+    data_core_cdf_external = core_data / "cdf_external.py"
     data_init = data_classes / "__init__.py"
     api = client_dir / "_api"
     core_api = api / "_core.py"

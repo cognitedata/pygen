@@ -419,6 +419,7 @@ class MultiAPIGenerator:
         sdk[data_classes_dir / "_core" / "helpers.py"] = self.generate_data_class_core_helpers_file()
         sdk[data_classes_dir / "_core" / "__init__.py"] = self.generate_data_class_core_init_file()
         sdk[data_classes_dir / "_core" / "query.py"] = self.generate_data_class_core_query_file()
+        sdk[data_classes_dir / "_core" / "cdf_external.py"] = self.generate_data_class_core_cdf_external_file()
         return sdk
 
     def generate_api_core_file(self) -> str:
@@ -497,6 +498,11 @@ class MultiAPIGenerator:
             )
             + "\n"
         )
+
+    def generate_data_class_core_cdf_external_file(self) -> str:
+        """Generate the core data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_cdf_external.py.jinja")
+        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
 
     def generate_client_init_file(self) -> str:
         """Generate the __init__.py file for the client.
