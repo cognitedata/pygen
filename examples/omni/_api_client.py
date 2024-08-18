@@ -7,7 +7,6 @@ from typing import Any, Sequence
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
-from cognite.client.exceptions import CogniteAPIError
 
 from ._api import (
     CDFExternalReferencesAPI,
