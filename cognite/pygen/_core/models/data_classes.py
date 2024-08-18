@@ -68,24 +68,29 @@ class DataClass:
 
     @staticmethod
     def to_base_name(view: dm.View) -> str:
+        """Creates Python compatible base name from a view."""
         return view.external_id.replace(" ", "_")
 
     @classmethod
     def to_base_name_with_version(cls, view: dm.View) -> str:
+        """Creates Python compatible base name from a view with version."""
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}".replace(" ", "_")
 
     @classmethod
     def to_base_name_with_space(cls, view: dm.View) -> str:
+        """Creates Python compatible base name from a view with space."""
         return f"{cls.to_base_name(view)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
     def to_base_name_with_space_and_version(cls, view: dm.View) -> str:
+        """Creates Python compatible base name from a view with space and version."""
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
     def from_view(
         cls, view: dm.View, base_name: str, used_for: Literal["node", "edge"], data_class: pygen_config.DataClassNaming
     ) -> DataClass:
+        """Create a DataClass from a view."""
         class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
@@ -143,6 +148,11 @@ class DataClass:
         has_default_instance_space: bool,
         config: pygen_config.PygenConfig,
     ) -> None:
+        """Update the fields of the data class.
+
+        This needs to be called after the data class has been created to update all fields with dependencies
+        on other data classes.
+        """
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
                 prop_name,
@@ -167,17 +177,20 @@ class DataClass:
         self.initialization.add("fields")
 
     def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
+        """Update the implements, is_interface and is_writable attributes of the data class."""
         self.is_interface = is_interface
         self.implements.extend(parents)
         self.is_writable = self.is_writable or self.is_all_fields_of_type(OneToManyConnectionField)
         self.initialization.add("parents")
 
     def update_direct_children(self, children: list[DataClass]):
+        """Update the direct children of the data class."""
         self.direct_children.extend(children)
         self.initialization.add("children")
 
     @property
     def read_base_class(self) -> str:
+        """Parent read classes."""
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
         else:
@@ -185,6 +198,7 @@ class DataClass:
 
     @property
     def write_base_class(self) -> str:
+        """Parent write classes."""
         if self.implements:
             return ", ".join(f"{interface.write_name}" for interface in self.implements)
         else:
@@ -197,24 +211,29 @@ class DataClass:
 
     @property
     def view_id_str(self) -> str:
+        """The view id as a string."""
         return f'dm.ViewId("{self.view_id.space}", "{self.view_id.external_id}", "{self.view_id.version}")'
 
     @property
     def has_filtering_fields(self) -> bool:
+        """Check if the data class has any fields that support filtering."""
         return any(field_.support_filtering for field_ in self.fields_of_type(PrimitiveField))
 
     @property
     def filtering_fields(self) -> Iterable[PrimitiveField]:
+        """Return all fields that support filtering"""
         return (field_ for field_ in self.fields_of_type(PrimitiveField) if field_.support_filtering)
 
     @property
     def filtering_import(self) -> str:
+        """Import the filtering classes used in the data class."""
         return "\n    ".join(
             f"{cls_name}," for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
         )
 
     @property
     def typed_read_bases_classes(self) -> str:
+        """The parent read classes for the typed data class."""
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
         else:
@@ -222,6 +241,7 @@ class DataClass:
 
     @property
     def typed_write_bases_classes(self) -> str:
+        """The parent write classes for the typed data class."""
         if self.implements:
             return ", ".join(f"{interface.read_name}Apply" for interface in self.implements)
         else:
@@ -229,18 +249,24 @@ class DataClass:
 
     @property
     def text_field_names(self) -> str:
+        """The name of the text fields Literal."""
         return f"{self.read_name}TextFields"
 
     @property
     def field_names(self) -> str:
+        """The name of the fields Literal."""
         return f"{self.read_name}Fields"
 
     @property
     def properties_dict_name(self) -> str:
+        """The name of the properties dictionary."""
         return f"_{self.read_name.upper()}_PROPERTIES_BY_FIELD"
 
     @property
     def pydantic_field(self) -> Literal["Field", "pydantic.Field"]:
+        """The name of the pydantic field to use.
+        This is in case we need to use pydantic.Field from pydantic instead of Field.
+        """
         if any(
             name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
         ) or any(
@@ -259,6 +285,7 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
+        """The data class __init__ imports of this data class"""
         import_classes = [self.read_name, self.graphql_name]
         if self.is_writable:
             import_classes.append(self.write_name)
@@ -275,6 +302,7 @@ class DataClass:
         return iter(self.fields)
 
     def non_parent_fields(self, fields: Iterator[Field] | None = None) -> Iterator[Field]:
+        """Return all fields that are not inherited from a parent."""
         parent_fields = {field.prop_name for parent in self.implements for field in parent}
         return (field for field in fields or self if field.prop_name not in parent_fields)
 
@@ -297,12 +325,15 @@ class DataClass:
     def fields_of_type(
         self, field_type: type[T_Field] | tuple[type[Field], ...]
     ) -> Iterator[T_Field] | Iterator[tuple[Field]]:
+        """Return all fields of a specific type."""
         return (field_ for field_ in self if isinstance(field_, field_type))  # type: ignore[return-value]
 
     def has_field_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
+        """Check if the data class has any fields of a specific type."""
         return any(isinstance(field_, type_) for field_ in self)
 
     def is_all_fields_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
+        """Check if all fields are of a specific type."""
         return all(isinstance(field_, type_) for field_ in self)
 
     def primitive_fields_of_type(
