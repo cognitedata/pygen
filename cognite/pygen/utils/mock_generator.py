@@ -177,8 +177,8 @@ class MockGenerator:
 
         self._interfaces = {interface for view in self._views for interface in view.implements or []}
         mock_data = MockData()
-        for components in _connected_views(self._views):
-            data = self._generate_views_mock_data(components, node_count, max_edge_per_type, null_values)
+        for connected_views in _connected_views(self._views):
+            data = self._generate_views_mock_data(connected_views, node_count, max_edge_per_type, null_values)
             mock_data.extend(data)
         return mock_data
 
