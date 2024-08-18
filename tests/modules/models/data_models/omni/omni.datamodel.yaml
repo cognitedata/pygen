@@ -63,3 +63,4 @@ views:
   version: "1"
 - space: {{ pygen_models_space }}
   externalId: SubInterface
+  version: "1"
