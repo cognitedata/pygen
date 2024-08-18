@@ -66,3 +66,15 @@ properties:
       type: container
     containerPropertyIdentifier: edgewise_bend_mom_offset_crosstalk_corrected
     name: edgewise_bend_mom_offset_crosstalk_corrected
+  blade:
+    source:
+      space: {{ pygen_power }}
+      externalId: Blade
+      version: 1
+      type: view
+    container:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      type: container
+    containerPropertyIdentifier: blade
+    name: blade
