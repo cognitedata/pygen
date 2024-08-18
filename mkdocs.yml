@@ -31,13 +31,14 @@ nav:
         - Creating and Deleting: usage/creating_deleting.ipynb
         - Working with Time Series: usage/timeseries.ipynb
         - Working with Edges: usage/edge_properties.ipynb
+    - Cognite Functions: cognite_functions.md
     - Extra:
         - Generating Mock Data: extra/mock_data.ipynb
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md
         - Filtering: config/filtering_methods.md
-    - Example Docs:
+    - Example SDK Docs:
         - Home: example_docs/index.md
         - Omni Client: example_docs/omni_client.md
         - Omni APIs: example_docs/omni_apis.md
@@ -46,7 +47,7 @@ nav:
         - Windmill APIs: example_docs/wind_apis.md
         - Windmill Data Classes: example_docs/wind_data_classes.md
 
-    - API:
+    - Reference - Code API:
         - Pygen: api/api.md
         - Demo: api/demo.md
         - Exceptions: api/exceptions.md
