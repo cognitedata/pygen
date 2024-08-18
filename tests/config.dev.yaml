@@ -3,6 +3,7 @@ environment:
   type: dev
   selected:
     - models
+    - data_testing
 
 variables:
   modules:
@@ -10,3 +11,5 @@ variables:
       pygen_models_space: sp_pygen_models
       pygen_power: sp_pygen_power
       pygen_other_models_space: sp_pygen_models_other
+    data_testing:
+      ds_windturbine_timeseries: ds_windturbine_timeseries
