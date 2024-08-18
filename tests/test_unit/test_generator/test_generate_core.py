@@ -65,7 +65,7 @@ def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAP
     expected = OmniFiles.data_core_cdf_external.read_text()
 
     # Act
-    actual = omni_multi_api_generator.generate_data_class_core_query_file()
+    actual = omni_multi_api_generator.generate_data_class_core_cdf_external_file()
 
     # Assert
     assert actual == expected

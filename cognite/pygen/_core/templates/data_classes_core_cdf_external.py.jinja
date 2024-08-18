@@ -18,7 +18,9 @@ from cognite.client.data_classes import (
     SequenceWrite as CogniteSequenceWrite,
     FileMetadataWrite as CogniteFileMetadataWrite,
 )
-from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% else %}, Extra{% endif %}, Field{% if is_pydantic_v2 %}, model_validator, field_validator{% else %}, root_validator, validator{% endif %}{% if is_pydantic_v2 %}
+from cognite.client.data_classes.sequences import ValueType
+from cognite.client.utils import datetime_to_ms
+from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% else %}, Extra{% endif %}{% if is_pydantic_v2 %}, model_validator, field_validator{% else %}, root_validator, validator{% endif %}{% if is_pydantic_v2 %}
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
 
@@ -87,8 +89,7 @@ FileMetadataWrite = Annotated[
     BeforeValidator(lambda v: CogniteFileMetadataWrite.load(v) if isinstance(v, dict) else v),
 ]{% else %}
 def to_camel(string: str) -> str:
-    return ''.join(word.capitalize() if no > 0 else word.casefold() for no, word in enumerate(string.split('_')))
-{% endif %}
+    return ''.join(word.capitalize() if no > 0 else word.casefold() for no, word in enumerate(string.split('_'))){% endif %}
 
 
 class GraphQLExternal(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel{% endif %}):{% if is_pydantic_v2 %} ...{% else %}
@@ -96,6 +97,7 @@ class GraphQLExternal(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
         alias_generator = to_camel{% endif %}
+
 
 class TimeSeriesGraphQL(GraphQLExternal):
     id: Optional[int] = None
@@ -130,8 +132,7 @@ class TimeSeriesGraphQL(GraphQLExternal):
                 data["data"] = Datapoints.load(data)
         return data
 
-
-   def as_write(self) -> TimeSeriesWrite:
+    def as_write(self) -> TimeSeriesWrite:
         return TimeSeriesWrite(
             external_id=self.external_id,
             name=self.name,
