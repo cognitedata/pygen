@@ -1,0 +1,23 @@
+space: {{ pygen_power }}
+externalId: SolarPanel
+name: SolarPanel
+version: 1
+implements:
+  - space: {{ pygen_power }}
+    externalId: GeneratingUnit
+    version: '1'
+properties:
+  efficiency:
+    container:
+      space: {{ pygen_power }}
+      externalId: SolarPanel
+      type: container
+    containerPropertyIdentifier: efficiency
+    name: efficiency
+  orientation:
+    container:
+      space: {{ pygen_power }}
+      externalId: SolarPanel
+      type: container
+    containerPropertyIdentifier: orientation
+    name: orientation
