@@ -32,7 +32,18 @@ class CDFExternalField(BasePrimitiveField):
             raise ValueError(f"Unknown CDF External Field type: {self.type_}")
 
     @property
-    def _clean_type(self) -> str:
+    def resource_write_name(self) -> str:
+        if isinstance(self.type_, dm.TimeSeriesReference):
+            return "time_series"
+        elif isinstance(self.type_, dm.SequenceReference):
+            return "sequences"
+        elif isinstance(self.type_, dm.FileReference):
+            return "files"
+        else:
+            raise ValueError(f"Unknown CDF External Field type: {self.type_}")
+
+    @property
+    def type_name(self) -> str:
         return self.type_as_string.removesuffix("Read")
 
     @property
@@ -47,14 +58,14 @@ class CDFExternalField(BasePrimitiveField):
         return self._create_type_hint(self.type_as_string)
 
     def as_graphql_type_hint(self) -> str:
-        type_ = f"{self._clean_type}GraphQL"
+        type_ = f"{self.type_name}GraphQL"
         if self.need_alias:
             return f'Optional[{type_}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
             return f"Optional[{type_}] = None"
 
     def as_write_type_hint(self) -> str:
-        type_ = f"{self._clean_type}Write"
+        type_ = f"{self.type_name}Write"
         return self._create_type_hint(type_)
 
     def _create_type_hint(self, type_: str) -> str:
@@ -65,7 +76,7 @@ class CDFExternalField(BasePrimitiveField):
             return f"Union[{type_}, str, None] = None"
 
     def as_write(self) -> str:
-        type_ = self._clean_type
+        type_ = self.type_name
         return f"self.{self.name}.as_write() if isinstance(self.{self.name}, Cognite{type_}) else self.{self.name}"
 
     def as_write_graphql(self) -> str:
@@ -76,8 +87,6 @@ class CDFExternalField(BasePrimitiveField):
         return f"self.{self.name}.as_read() if self.{self.name} else None"
 
     def as_value(self) -> str:
-        if not isinstance(self.type_, dm.TimeSeriesReference):
-            return f"self.{self.name}"
         return (
             f"self.{self.name} if isinstance(self.{self.name}, str) or self.{self.name} is None "
             f"else self.{self.name}.external_id"

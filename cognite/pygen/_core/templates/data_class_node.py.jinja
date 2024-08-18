@@ -424,9 +424,12 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pyda
             if isinstance({{ field.variable }}, DomainModelWrite):
                 other_resources = {{ field.variable }}._to_instances_write(cache)
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
-        if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
-            resources.time_series.append(self.{{ field.name }})
+{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.CDFExternalIdReference) %}{% if field.is_list %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            if isinstance({{ field.variable }}, Cognite{{ field.type_name }}Write):
+                resources.{{ field.resource_write_name }}.append({{ field.variable }}){% else %}
+        if isinstance(self.{{ field.name }}, Cognite{{ field.type_name }}Write):
+            resources.{{ field.resource_write_name }}.append(self.{{ field.name }}){% endif %}
 {% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
         if self.{{field.name}} is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
