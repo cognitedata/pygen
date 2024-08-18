@@ -57,21 +57,24 @@ def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses
 def test_generate_mock_data_multiple_views(
     omni_data_classes: dict[str, OmniClasses], view_external_ids: list[str]
 ) -> None:
+    node_count = 5
+    max_edge_per_type = 3
+
     view_by_id = {omni_data_classes[name].view.as_id(): omni_data_classes[name].view for name in view_external_ids}
 
     generator = MockGenerator(list(view_by_id.values()), "sandbox", seed=42)
 
-    data = generator.generate_mock_data()
+    data = generator.generate_mock_data(node_count=node_count, max_edge_per_type=max_edge_per_type)
 
     assert len(data) == len(view_by_id)
     for view_data in data:
-        assert len(view_data.node) == 5
+        assert len(view_data.node) == node_count
         view = view_by_id[view_data.view_id]
         edge_type_count = sum(1 for prop in view.properties.values() if isinstance(prop, dm.ConnectionDefinition))
         if edge_type_count == 0:
             assert len(view_data.edge) == 0
         else:
-            assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+            assert 0 < len(view_data.edge) <= max_edge_per_type * edge_type_count * len(view_data.node)
 
 
 def test_generate_mock_data_skip_interfaces(omni_data_classes: dict[str, OmniClasses]) -> None:
@@ -161,3 +164,17 @@ def test__to_leaf_children_by_parent(omni_data_classes: dict[str, OmniClasses]) 
     actual = {k.external_id: {vv.external_id for vv in v} for k, v in actual.items()}
 
     assert actual == expected
+
+
+def test_generate_mock_data_seed_per_view(omni_data_classes: dict[str, OmniClasses]) -> None:
+    seed = 42
+    generator1 = MockGenerator([omni_data_classes[OmniView.primitive_required].view], "sandbox", seed=seed)
+    generator2 = MockGenerator(
+        [omni_data_classes[ext_id].view for ext_id in (OmniView.primitive_nullable, OmniView.primitive_required)],
+        "sandbox",
+        seed=seed,
+    )
+    data1 = generator1.generate_mock_data(node_count=1, null_values=0.0)
+    data2 = generator2.generate_mock_data(node_count=1, null_values=0.0)
+
+    assert data1[0].node[0].sources[0].properties == data2[1].node[0].sources[0].properties
