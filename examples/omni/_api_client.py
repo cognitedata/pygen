@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
+from cognite.client.exceptions import CogniteAPIError
 
 from ._api import (
     CDFExternalReferencesAPI,
@@ -118,8 +119,17 @@ class OmniClient:
         time_series = TimeSeriesList([])
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+        files = FileMetadataList([])
+        if instances.files:
+            for file in instances.files:
+                created, _ = self._client.files.create(file, overwrite=True)
+                files.append(created)
 
-        return data_classes.ResourcesWriteResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        sequences = SequenceList([])
+        if instances.sequences:
+            sequences = self._client.sequences.upsert(instances.sequences, mode="patch")
+
+        return data_classes.ResourcesWriteResult(result.nodes, result.edges, time_series, files, sequences)
 
     def _create_instances(
         self,

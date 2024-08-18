@@ -4,6 +4,7 @@ import datetime
 
 import pytest
 from cognite.client import CogniteClient
+from cognite.client.data_classes import FileMetadataWrite, SequenceColumnWrite, SequenceWrite, TimeSeriesWrite
 
 from tests.constants import IS_PYDANTIC_V2
 
@@ -279,3 +280,50 @@ def test_upsert_recursive_with_single_edge(omni_client: OmniClient, cognite_clie
             cognite_client.data_modeling.instances.delete(resources.nodes.as_ids())
         if resources.edges:
             cognite_client.data_modeling.instances.delete(edges=resources.edges.as_ids())
+
+
+def test_upsert_with_cdf_external(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
+    # Arrange
+    test_name = "integration_test:upsert_with_cdf_external"
+    new_item = dc.CDFExternalReferencesWrite(
+        external_id=f"{test_name}:Item1",
+        file=FileMetadataWrite(
+            external_id=f"{test_name}:File1",
+            name="File1",
+        ),
+        sequence=SequenceWrite(
+            external_id=f"{test_name}:Sequence1",
+            name="Sequence1",
+            columns=[
+                SequenceColumnWrite(
+                    external_id=f"{test_name}:Column1",
+                    name="Column1",
+                    value_type="String",
+                )
+            ],
+        ),
+        timeseries=TimeSeriesWrite(
+            external_id=f"{test_name}:TimeSeries1",
+            name="TimeSeries1",
+            metadata={"key": "value"},
+        ),
+    )
+    resources = dc.ResourcesWriteResult()
+    try:
+        # Act
+        resources = omni_client.upsert(new_item)
+
+        # Assert
+        assert len(resources.nodes) == 1
+        assert len(resources.time_series) == 1
+        assert len(resources.files) == 1
+        assert len(resources.sequences) == 1
+    finally:
+        if resources.nodes:
+            cognite_client.data_modeling.instances.delete(resources.nodes.as_ids())
+        if resources.time_series:
+            cognite_client.time_series.delete(external_id=resources.time_series.as_external_ids())
+        if resources.files:
+            cognite_client.files.delete(id=resources.files.as_ids())
+        if resources.sequences:
+            cognite_client.sequences.delete(external_id=resources.sequences.as_external_ids())

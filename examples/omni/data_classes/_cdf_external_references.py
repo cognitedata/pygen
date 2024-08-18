@@ -4,7 +4,14 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+    SequenceWrite as CogniteSequenceWrite,
+    FileMetadataWrite as CogniteFileMetadataWrite,
+    FileMetadata as CogniteFileMetadata,
+    TimeSeries as CogniteTimeSeries,
+    Sequence as CogniteSequence,
+)
 from pydantic import field_validator, model_validator
 
 from ._core import (
@@ -156,9 +163,11 @@ class CDFExternalReferences(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            file=self.file.as_write() if isinstance(self.file, FileMetadata) else self.file,
-            sequence=self.sequence.as_write() if isinstance(self.sequence, SequenceRead) else self.sequence,
-            timeseries=self.timeseries.as_write() if isinstance(self.timeseries, TimeSeries) else self.timeseries,
+            file=self.file.as_write() if isinstance(self.file, CogniteFileMetadata) else self.file,
+            sequence=self.sequence.as_write() if isinstance(self.sequence, CogniteSequence) else self.sequence,
+            timeseries=(
+                self.timeseries.as_write() if isinstance(self.timeseries, CogniteTimeSeries) else self.timeseries
+            ),
         )
 
     def as_apply(self) -> CDFExternalReferencesWrite:
@@ -236,13 +245,13 @@ class CDFExternalReferencesWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.file, FileMetadataWrite):
+        if isinstance(self.file, CogniteFileMetadataWrite):
             resources.files.append(self.file)
 
-        if isinstance(self.sequence, SequenceWrite):
+        if isinstance(self.sequence, CogniteSequenceWrite):
             resources.sequences.append(self.sequence)
 
-        if isinstance(self.timeseries, TimeSeries):
+        if isinstance(self.timeseries, CogniteTimeSeriesWrite):
             resources.time_series.append(self.timeseries)
 
         return resources
