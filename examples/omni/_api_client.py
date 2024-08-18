@@ -95,6 +95,8 @@ class OmniClient:
     ) -> data_classes.ResourcesWriteResult:
         """Add or update (upsert) items.
 
+        This method will create the nodes, edges, timeseries, files and sequences of the supplied items.
+
         Args:
             items: One or more instances of the pygen generated data classes.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
