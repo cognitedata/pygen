@@ -152,9 +152,9 @@ class CDFExternalReferencesListed(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    files: Optional[list[FileMetadata | str]] = None
-    sequences: Optional[list[SequenceRead | str]] = None
-    timeseries: Union[list[TimeSeries | str], None] = None
+    files: Optional[list[Union[FileMetadata, str]]] = None
+    sequences: Optional[list[Union[SequenceRead, str]]] = None
+    timeseries: Optional[list[Union[TimeSeries, str]]] = None
 
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this read version of cdf external references listed to the writing version."""
@@ -203,9 +203,9 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    files: Optional[list[FileMetadataWrite | str]] = None
-    sequences: Optional[list[SequenceWrite | str]] = None
-    timeseries: Optional[list[TimeSeriesWrite | str]] = None
+    files: Optional[list[Union[FileMetadataWrite, str]]] = None
+    sequences: Optional[list[Union[SequenceWrite, str]]] = None
+    timeseries: Optional[list[Union[TimeSeriesWrite, str]]] = None
 
     def _to_instances_write(
         self,

@@ -20,7 +20,7 @@ from cognite.client.data_classes import (
 )
 from cognite.client.data_classes.sequences import ValueType
 from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel, BeforeValidator, model_validator
+from pydantic import BaseModel, BeforeValidator, model_validator, field_validator
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
 
@@ -221,13 +221,21 @@ class SequenceColumnGraphQL(GraphQLExternal):
     external_id: Optional[str] = None
     name: Optional[str] = None
     description: Optional[str] = None
-    value_type: ValueType = "Double"
+    value_type: Optional[ValueType] = None
     metadata: Optional[dict[str, str]] = None
     created_time: Optional[int] = None
     last_updated_time: Optional[int] = None
 
+    @field_validator("value_type", mode="before")
+    def title_value_type(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            return value.title()
+        return value
+
     @no_type_check
     def as_write(self) -> SequenceColumnWrite:
+        if self.value_type is None:
+            raise ValueError("value_type is required")
         return SequenceColumnWrite(
             external_id=self.external_id,
             name=self.name,
@@ -238,6 +246,8 @@ class SequenceColumnGraphQL(GraphQLExternal):
 
     @no_type_check
     def as_read(self) -> SequenceColumn:
+        if self.value_type is None:
+            raise ValueError("value_type is required")
         return SequenceColumn(
             external_id=self.external_id,
             name=self.name,
@@ -269,7 +279,7 @@ class SequenceGraphQL(GraphQLExternal):
             asset_id=self.asset_id,
             external_id=self.external_id,
             metadata=self.metadata,
-            columns=[col.as_write() for col in self.columns] if self.columns else None,
+            columns=[col.as_write() for col in self.columns or []] if self.columns else None,
             data_set_id=self.data_set_id,
         )
 
@@ -282,7 +292,7 @@ class SequenceGraphQL(GraphQLExternal):
             asset_id=self.asset_id,
             external_id=self.external_id,
             metadata=self.metadata,
-            columns=[col.as_read() for col in self.columns] if self.columns else None,
+            columns=[col.as_read() for col in self.columns or []] if self.columns else None,
             created_time=self.created_time,
             last_updated_time=self.last_updated_time,
             data_set_id=self.data_set_id,

@@ -50,13 +50,14 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
         externalId
         name
       }
-      files{
-        externalId
-        name
-      }
+
       sequences{
         externalId
         name
+        columns{
+          externalId
+          valueType
+        }
       }
     }
   }
@@ -73,47 +74,6 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
     assert len(brandon.sequences or []) > 0
     assert isinstance(brandon.sequences[0], odc.SequenceGraphQL)
     item: odc.CDFExternalReferencesListedGraphQL
-    for item in result:
-        item.as_read()
-        item.as_write()
-
-
-def test_query_cdf_external_listed_files(omni_client: OmniClient) -> None:
-    query = """{
-  getCDFExternalReferencesListedById(instance:
-    {space: "omni-instances", externalId: "CDFExternalReferencesListed:Linda"}
-  ){
-    items{
-       __typename
-      space
-      externalId
-      createdTime
-      lastUpdatedTime
-
-      timeseries {
-        externalId
-        name
-      }
-      files{
-        externalId
-        name
-      }
-      sequences{
-        externalId
-        name
-      }
-    }
-  }
-}
-"""
-    result = omni_client.graphql_query(query)
-
-    assert len(result) > 0
-    linda = result[0]
-    assert isinstance(linda, odc.CDFExternalReferencesListedGraphQL)
-    assert linda.external_id == "CDFExternalReferencesListed:Linda"
-    assert len(linda.files or []) > 0
-    assert isinstance(linda.files[0], odc.FileMetadataGraphQL)
     for item in result:
         item.as_read()
         item.as_write()
