@@ -4,7 +4,14 @@ import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import (
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+    SequenceWrite as CogniteSequenceWrite,
+    FileMetadataWrite as CogniteFileMetadataWrite,
+    FileMetadata as CogniteFileMetadata,
+    TimeSeries as CogniteTimeSeries,
+    Sequence as CogniteSequence,
+)
 from pydantic import field_validator, model_validator
 
 from ._core import (
@@ -162,14 +169,15 @@ class CDFExternalReferencesListed(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            files=[file.as_write() if isinstance(file, FileMetadata) else file for file in self.files or []] or None,
+            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []]
+            or None,
             sequences=[
-                sequence.as_write() if isinstance(sequence, SequenceRead) else sequence
+                sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
                 for sequence in self.sequences or []
             ]
             or None,
             timeseries=[
-                timeseries.as_write() if isinstance(timeseries, TimeSeries) else timeseries
+                timeseries.as_write() if isinstance(timeseries, CogniteTimeSeries) else timeseries
                 for timeseries in self.timeseries or []
             ]
             or None,
@@ -220,12 +228,14 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.files is not None or write_none:
-            properties["files"] = [value if isinstance(value, str) else value.external_id for value in self.files or []]
+            properties["files"] = [
+                value if isinstance(value, str) else value.external_id for value in self.files or []
+            ] or None
 
         if self.sequences is not None or write_none:
             properties["sequences"] = [
                 value if isinstance(value, str) else value.external_id for value in self.sequences or []
-            ]
+            ] or None
 
         if self.timeseries is not None or write_none:
             properties["timeseries"] = [
@@ -249,15 +259,15 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
             cache.add(self.as_tuple_id())
 
         for file in self.files or []:
-            if isinstance(file, FileMetadataWrite):
+            if isinstance(file, CogniteFileMetadataWrite):
                 resources.files.append(file)
 
         for sequence in self.sequences or []:
-            if isinstance(sequence, SequenceWrite):
+            if isinstance(sequence, CogniteSequenceWrite):
                 resources.sequences.append(sequence)
 
         for timeseries in self.timeseries or []:
-            if isinstance(timeseries, TimeSeriesWrite):
+            if isinstance(timeseries, CogniteTimeSeriesWrite):
                 resources.time_series.append(timeseries)
 
         return resources

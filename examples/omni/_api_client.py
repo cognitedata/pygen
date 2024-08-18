@@ -160,7 +160,7 @@ class OmniClient:
         replace: bool = False,
         write_none: bool = False,
     ) -> data_classes.ResourcesWriteResult:
-        """Add or update (upsert) items.
+        """[DEPRECATED] Add or update (upsert) items.
 
         Args:
             items: One or more instances of the pygen generated data classes.
