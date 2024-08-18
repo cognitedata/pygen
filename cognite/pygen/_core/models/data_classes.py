@@ -559,14 +559,17 @@ class DataClass:
 
     @property
     def filter_name(self) -> str:
+        """The name of the filter class."""
         return f"_create_{self.variable}_filter"
 
     @property
     def is_edge_class(self) -> bool:
+        """Check if the data class is an edge class."""
         return False
 
     @property
     def connections_docs_write(self) -> str:
+        """Return a string with all connections that are write fields."""
         connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class and f.is_write_field]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
@@ -577,6 +580,7 @@ class DataClass:
 
     @property
     def connections_docs(self) -> str:
+        """Return a string with all connections."""
         connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class]  # type: ignore[type-abstract]
         if len(connections) == 0:
             raise ValueError("No connections found")
@@ -587,6 +591,7 @@ class DataClass:
 
     @property
     def import_pydantic_field(self) -> str:
+        """Import the pydantic field used in the data class."""
         if self.pydantic_field == "Field":
             return "from pydantic import Field"
         else:
@@ -594,10 +599,12 @@ class DataClass:
 
     @property
     def has_any_field_model_prefix(self) -> bool:
+        """Check if any field has a model prefix."""
         return any(field_.name.startswith("model") for field_ in self)
 
     @property
     def has_edges(self) -> bool:
+        """Check if the data class has any edges."""
         return any(isinstance(field_, BaseConnectionField) and field_.is_edge for field_ in self)
 
     @property
@@ -616,6 +623,7 @@ class NodeDataClass(DataClass):
 
     @property
     def typed_properties_name(self) -> str:
+        """The name of the typed properties class."""
         if self.has_edge_class:
             return f"{self.read_name.removesuffix('Node')}Properties"
         else:
@@ -631,6 +639,7 @@ class EdgeDataClass(DataClass):
 
     @property
     def typed_properties_name(self) -> str:
+        """The name of the typed properties class."""
         if self.has_node_class:
             return f"{self.read_name.removesuffix('Edge')}Properties"
         else:
@@ -638,10 +647,12 @@ class EdgeDataClass(DataClass):
 
     @property
     def is_edge_class(self) -> bool:
+        """Check if the data class is an edge class."""
         return True
 
     @property
     def end_node_field(self) -> EndNodeField:
+        """The end node field of the edge class."""
         if self._end_node_field:
             return self._end_node_field
         raise ValueError("EdgeDataClass has not been initialized.")
@@ -655,6 +666,7 @@ class EdgeDataClass(DataClass):
         has_default_instance_space: bool,
         config: pygen_config.PygenConfig,
     ):
+        """Update the fields of the data class."""
         # Find all node views that have an edge with properties in this view
         # and get the node class it is pointing to.
         edge_classes: dict[tuple[str, dm.DirectRelationReference, str], EdgeClass] = {}
