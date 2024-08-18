@@ -12,6 +12,14 @@ from cognite.client.data_classes import (
     Sequence as CogniteSequence,
     SequenceWrite as CogniteSequenceWrite,
 )
+from cognite.client.data_classes import (
+    FileMetadata,
+    FileMetadataWrite,
+    TimeSeries,
+    TimeSeriesWrite,
+    Sequence as SequenceRead,
+    SequenceWrite,
+)
 from pydantic import validator, root_validator
 
 from ._core import (

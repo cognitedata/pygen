@@ -12,7 +12,15 @@ from cognite.client.data_classes import ({% if data_class.has_primitive_field_of
     TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     Sequence as CogniteSequence,
     SequenceWrite as CogniteSequenceWrite,{% endif %}
-){% endif %}{% if data_class.use_pydantic_field %}
+){% if not is_pydantic_v2 %}
+from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
+    FileMetadata,
+    FileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    TimeSeries,
+    TimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    Sequence as SequenceRead,
+    SequenceWrite,{% endif %}
+){% endif %}{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
 

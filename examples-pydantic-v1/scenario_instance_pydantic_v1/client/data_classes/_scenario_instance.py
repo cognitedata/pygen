@@ -9,6 +9,10 @@ from cognite.client.data_classes import (
     TimeSeries as CogniteTimeSeries,
     TimeSeriesWrite as CogniteTimeSeriesWrite,
 )
+from cognite.client.data_classes import (
+    TimeSeries,
+    TimeSeriesWrite,
+)
 from pydantic import Field
 from pydantic import validator, root_validator
 
