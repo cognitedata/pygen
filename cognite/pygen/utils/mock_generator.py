@@ -75,7 +75,8 @@ class MockGenerator:
         default_config (ViewMockConfig): Default configuration for how to generate mock data for the different
             views.
         data_set_id (int): The data set id to use for TimeSeries, Sequences, and FileMetadata.
-        seed (int): The seed to use for the random number generator.
+        seed (int): The seed to use for the random number generator. If provided, it is used to reset the seed for
+            each view to ensure reproducible results.
         skip_interfaces (bool): Whether to skip interfaces when generating mock data. Defaults to False.
     """
 
