@@ -53,3 +53,9 @@ class ReservedWordConflict(PygenException):
             f"Reserved word conflict detected in {self.source}. The following reserved word is used: "
             f"{self.reserved_word}. This is used by the SDK and cannot be used by the user."
         )
+
+
+class PygenModuleNotFoundError(PygenException, ModuleNotFoundError):
+    """Raised when a module is not found."""
+
+    ...

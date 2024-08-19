@@ -1069,6 +1069,7 @@ class ViewMockConfig:
         properties: How to generate mock data for the different
             properties. The keys are the property names, and the values are functions that take the number of nodes
             as input and return a list of property values.
+        reset_seed: Optional function for resetting seed for random generator.
 
     """
 
@@ -1080,6 +1081,7 @@ class ViewMockConfig:
         default_factory=_create_default_property_types
     )
     properties: dict[str, GeneratorFunction] = field(default_factory=dict)
+    reset_seed: Callable[[int], None] | None = None
 
     def __post_init__(self):
         if self.null_values is not None and (self.null_values < 0 or self.null_values > 1):
