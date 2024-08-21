@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from pathlib import Path
 
 from cognite.client.data_classes.data_modeling import ViewId
 
@@ -69,3 +70,13 @@ class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
 
     def __str__(self) -> str:
         return f"Target {self.target} does not exists. Skipping reverse direct relation {self.field}."
+
+
+class InvalidCodeGenerated(PygenWarning, UserWarning):
+
+    def __init__(self, filepath: str | Path, error_message: str) -> None:
+        self.filepath = filepath
+        self.error_message = error_message
+
+    def __str__(self) -> str:
+        return f"Invalid code generated in {self.filepath}. {self.error_message}"
