@@ -20,7 +20,13 @@ class TestDataClasses:
         # Act
         for data_class, view in zip(node_class_by_view_id.values(), views):
             data_class.update_fields(
-                view.properties, node_class_by_view_id, edge_class_by_view_id, list(views), True, pygen_config
+                view.properties,
+                node_class_by_view_id,
+                edge_class_by_view_id,
+                list(views),
+                True,
+                {},
+                pygen_config,
             )
 
         # Assert
@@ -62,6 +68,7 @@ class TestDataClasses:
             {},
             [view],
             True,
+            {},
             pygen_config,
         )
 

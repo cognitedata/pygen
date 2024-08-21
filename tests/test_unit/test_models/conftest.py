@@ -25,12 +25,27 @@ def omni_field_factory(
     pygen_config: PygenConfig,
 ) -> Callable[[str, str], Field]:
     node_class_by_view_id, edge_class_by_view_id = omni_data_classes_by_view_id
+    direct_relations_by_view_id: dict[dm.ViewId, set[str]] = {}
+    for view in omni_views.values():
+        direct_relations_by_view_id[view.as_id()] = {
+            prop_name
+            for prop_name, prop in view.properties.items()
+            if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
+        }
 
     def factory(view_ext_id: str, property_name: str) -> Field:
         view = omni_views[view_ext_id]
         prop = view.properties[property_name]
         return Field.from_property(
-            property_name, prop, node_class_by_view_id, edge_class_by_view_id, pygen_config, view.as_id(), "Field", True
+            property_name,
+            prop,
+            node_class_by_view_id,
+            edge_class_by_view_id,
+            pygen_config,
+            view.as_id(),
+            "Field",
+            True,
+            direct_relations_by_view_id,
         )
 
     return factory
