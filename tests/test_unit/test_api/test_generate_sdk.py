@@ -273,7 +273,7 @@ DATA_MODEL_WITH_REVERSE_DIRECT_RELATION_WITHOUT_TARGET = dm.DataModel(
                 "pointingToNonExisting": dm.MultiReverseDirectRelation(
                     source=dm.ViewId("reverse_direct_relation_space", "ReverseDirectRelationTarget", "1"),
                     through=dm.PropertyId(
-                        source=dm.ViewId("reverse_direct_relation_space", "ReverseDirectRelation", "1"),
+                        source=dm.ViewId("reverse_direct_relation_space", "ReverseDirectRelationTarget", "1"),
                         property="NonExisting",
                     ),
                 ),

@@ -57,6 +57,7 @@ class Field:
         view_id: dm.ViewId,
         pydantic_field: Literal["Field", "pydantic.Field"],
         has_default_instance_space: bool,
+        direct_relations_by_view_id: dict[dm.ViewId, set[str]],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
         from .connections import BaseConnectionField
@@ -86,7 +87,14 @@ class Field:
             isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         ):
             return BaseConnectionField.load(
-                base, prop, variable, node_class_by_view_id, edge_class_by_view_id, has_default_instance_space
+                base,
+                prop,
+                variable,
+                node_class_by_view_id,
+                edge_class_by_view_id,
+                has_default_instance_space,
+                view_id,
+                direct_relations_by_view_id,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
