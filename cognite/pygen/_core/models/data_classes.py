@@ -625,9 +625,9 @@ class NodeDataClass(DataClass):
     def typed_properties_name(self) -> str:
         """The name of the typed properties class."""
         if self.has_edge_class:
-            return f"{self.read_name.removesuffix('Node')}Properties"
+            return f"_{self.read_name.removesuffix('Node')}Properties"
         else:
-            return f"{self.read_name}Properties"
+            return f"_{self.read_name}Properties"
 
 
 @dataclass
@@ -641,9 +641,9 @@ class EdgeDataClass(DataClass):
     def typed_properties_name(self) -> str:
         """The name of the typed properties class."""
         if self.has_node_class:
-            return f"{self.read_name.removesuffix('Edge')}Properties"
+            return f"_{self.read_name.removesuffix('Edge')}Properties"
         else:
-            return f"{self.read_name}Properties"
+            return f"_{self.read_name}Properties"
 
     @property
     def is_edge_class(self) -> bool:
