@@ -28,6 +28,7 @@ Changes are grouped as follows
   SDK.
 - If an input view had a reverse direct relation, that points to a non-existing target, the generated SDK would raise
   a `ValueError`. `pygen` now gracefully handles this case by raising a warning instead.
+- If a view only had a dependency on itself, `pygen` would generate invalid code. This is now fixed.
 
 ## [0.99.32] - 24-08-17
 ### Added
