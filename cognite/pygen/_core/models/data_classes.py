@@ -421,6 +421,11 @@ class DataClass:
         return bool(self.dependencies)
 
     @property
+    def has_dependencies_not_self(self) -> bool:
+        """Check if the data class has any dependencies that are not itself."""
+        return any(dependency != self for dependency in self.dependencies)
+
+    @property
     def has_edges_or_direct_relations(self) -> bool:
         """Whether the data class has any fields that are edges or direct relations."""
         return any(

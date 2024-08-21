@@ -57,7 +57,7 @@ from ._core import ({% if has_default_instance_space %}
     {{ data_class.filtering_import }}{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
-{% if data_class.has_dependencies %}
+{% if data_class.has_dependencies_not_self %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
@@ -193,7 +193,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
         instances: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, {{ data_class.read_name }}],  # type: ignore[override]
         nodes_by_id: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:{% if data_class.has_dependencies %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
+    ) -> None:{% if data_class.has_dependencies_not_self %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
 {% endif %}{% if data_class.has_edges_or_direct_relations %}
         for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
