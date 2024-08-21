@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.33] - 24-08-21
 ### Added
 - Support for `files` and `sequences` in the generated SDK. This includes the ability to create and retrieve
   `files` and `sequences` in the generated SDK.
