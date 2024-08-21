@@ -26,6 +26,8 @@ Changes are grouped as follows
 ### Fixed
 - In the generated SDK, fields of `TimeSeries` as now set to `TimeSeriesWrite` in the write Data Class of the generated
   SDK.
+- If an input view had a reverse direct relation, that points to a non-existing target, the generated SDK would raise
+  a `ValueError`. `pygen` now gracefully handles this case by raising a warning instead.
 
 ## [0.99.32] - 24-08-17
 ### Added
