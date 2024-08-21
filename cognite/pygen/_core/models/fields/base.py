@@ -69,11 +69,17 @@ class Field:
 
         doc_name = to_words(name, singularize=True)
         variable = create_name(prop_name, field_naming.variable)
+        description: str | None = None
+        if hasattr(prop, "description") and isinstance(prop.description, str):
+            # This is a workaround for the fact that the description can contain curly quotes
+            # which is ruff will complain about. (These comes from che Core model)
+            description = prop.description.replace("‘", "'").replace("’", "'")  # noqa: RUF001
+
         base = cls(
             name=name,
             doc_name=doc_name,
             prop_name=prop_name,
-            description=prop.description if hasattr(prop, "description") else None,
+            description=description,
             pydantic_field=pydantic_field,
         )
         if isinstance(prop, dm.ConnectionDefinition) or (
