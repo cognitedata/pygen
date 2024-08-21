@@ -59,3 +59,13 @@ class ParameterNameCollisionWarning(NameCollisionWarning):
             f"Name collision detected. The following filter parameter {self.word!r} name is used by pygen."
             "An underscore will be added to this parameter to avoid name collision."
         )
+
+
+class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
+
+    def __init__(self, target: str, field: str) -> None:
+        self.target = target
+        self.field = field
+
+    def __str__(self) -> str:
+        return f"Target {self.target} does not exists. Skipping reverse direct relation {self.field}."

@@ -16,6 +16,8 @@ from cognite.client.data_classes.data_modeling.views import (
     SingleReverseDirectRelation,
 )
 
+from cognite.pygen.warnings import MissingReverseDirectRelationTargetWarning
+
 from .base import Field
 
 if TYPE_CHECKING:
@@ -246,12 +248,9 @@ class BaseConnectionField(Field, ABC):
             )
             if target is None or prop.through.property not in target:
                 target_str = (
-                    f"{prop.through.source}.{prop.through.property}" if target is not None else prop.through.source
+                    f"{prop.through.source}.{prop.through.property}" if target is not None else str(prop.through.source)
                 )
-                warnings.warn(
-                    f"Target {target_str} does not exists. " f"Skipping reverse direct relation {field_string}",
-                    stacklevel=2,
-                )
+                warnings.warn(MissingReverseDirectRelationTargetWarning(target_str, field_string), stacklevel=2)
                 return None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
         direction: Literal["outwards", "inwards"]
