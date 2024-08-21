@@ -11,14 +11,14 @@ from cognite.client.data_classes.data_modeling.typed_instances import (
 )
 
 
-class CDFExternalReferencesListedProperties:
+class _CDFExternalReferencesListedProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("pygen-models", "CDFExternalReferencesListed", "1")
 
 
-class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, TypedNodeApply):
+class CDFExternalReferencesListedApply(_CDFExternalReferencesListedProperties, TypedNodeApply):
     """This represents the writing format of cdf external references listed.
 
     It is used to when data is written to CDF.
@@ -54,7 +54,7 @@ class CDFExternalReferencesListedApply(CDFExternalReferencesListedProperties, Ty
         self.timeseries = timeseries
 
 
-class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNode):
+class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedNode):
     """This represents the reading format of cdf external references listed.
 
     It is used to when data is read from CDF.
@@ -105,7 +105,7 @@ class CDFExternalReferencesListed(CDFExternalReferencesListedProperties, TypedNo
         )
 
 
-class DependentOnNonWritableProperties:
+class _DependentOnNonWritableProperties:
     a_value = PropertyOptions("aValue")
 
     @classmethod
@@ -113,7 +113,7 @@ class DependentOnNonWritableProperties:
         return ViewId("pygen-models", "DependentOnNonWritable", "1")
 
 
-class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApply):
+class DependentOnNonWritableApply(_DependentOnNonWritableProperties, TypedNodeApply):
     """This represents the writing format of dependent on non writable.
 
     It is used to when data is written to CDF.
@@ -143,7 +143,7 @@ class DependentOnNonWritableApply(DependentOnNonWritableProperties, TypedNodeApp
         self.a_value = a_value
 
 
-class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
+class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
     """This represents the reading format of dependent on non writable.
 
     It is used to when data is read from CDF.
@@ -186,7 +186,7 @@ class DependentOnNonWritable(DependentOnNonWritableProperties, TypedNode):
         )
 
 
-class MainInterfaceProperties:
+class _MainInterfaceProperties:
     main_value = PropertyOptions("mainValue")
 
     @classmethod
@@ -194,7 +194,7 @@ class MainInterfaceProperties:
         return ViewId("pygen-models", "MainInterface", "1")
 
 
-class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
+class MainInterfaceApply(_MainInterfaceProperties, TypedNodeApply):
     """This represents the writing format of main interface.
 
     It is used to when data is written to CDF.
@@ -224,7 +224,7 @@ class MainInterfaceApply(MainInterfaceProperties, TypedNodeApply):
         self.main_value = main_value
 
 
-class MainInterface(MainInterfaceProperties, TypedNode):
+class MainInterface(_MainInterfaceProperties, TypedNode):
     """This represents the reading format of main interface.
 
     It is used to when data is read from CDF.
@@ -267,7 +267,7 @@ class MainInterface(MainInterfaceProperties, TypedNode):
         )
 
 
-class PrimitiveNullableProperties:
+class _PrimitiveNullableProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
     int_32 = PropertyOptions("int32")
@@ -279,7 +279,7 @@ class PrimitiveNullableProperties:
         return ViewId("pygen-models", "PrimitiveNullable", "1")
 
 
-class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
+class PrimitiveNullableApply(_PrimitiveNullableProperties, TypedNodeApply):
     """This represents the writing format of primitive nullable.
 
     It is used to when data is written to CDF.
@@ -333,7 +333,7 @@ class PrimitiveNullableApply(PrimitiveNullableProperties, TypedNodeApply):
         self.timestamp = timestamp
 
 
-class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
+class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
     """This represents the reading format of primitive nullable.
 
     It is used to when data is read from CDF.
@@ -408,7 +408,7 @@ class PrimitiveNullable(PrimitiveNullableProperties, TypedNode):
         )
 
 
-class PrimitiveRequiredListedProperties:
+class _PrimitiveRequiredListedProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
     int_32 = PropertyOptions("int32")
@@ -420,7 +420,7 @@ class PrimitiveRequiredListedProperties:
         return ViewId("pygen-models", "PrimitiveRequiredListed", "1")
 
 
-class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeApply):
+class PrimitiveRequiredListedApply(_PrimitiveRequiredListedProperties, TypedNodeApply):
     """This represents the writing format of primitive required listed.
 
     It is used to when data is written to CDF.
@@ -474,7 +474,7 @@ class PrimitiveRequiredListedApply(PrimitiveRequiredListedProperties, TypedNodeA
         self.timestamp = timestamp
 
 
-class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
+class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
     """This represents the reading format of primitive required listed.
 
     It is used to when data is read from CDF.
@@ -549,7 +549,7 @@ class PrimitiveRequiredListed(PrimitiveRequiredListedProperties, TypedNode):
         )
 
 
-class SubInterfaceProperties:
+class _SubInterfaceProperties:
     sub_value = PropertyOptions("subValue")
 
     @classmethod
@@ -557,7 +557,7 @@ class SubInterfaceProperties:
         return ViewId("pygen-models", "SubInterface", "1")
 
 
-class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
+class SubInterfaceApply(_SubInterfaceProperties, MainInterfaceApply):
     """This represents the writing format of sub interface.
 
     It is used to when data is written to CDF.
@@ -589,7 +589,7 @@ class SubInterfaceApply(SubInterfaceProperties, MainInterfaceApply):
         self.sub_value = sub_value
 
 
-class SubInterface(SubInterfaceProperties, MainInterface):
+class SubInterface(_SubInterfaceProperties, MainInterface):
     """This represents the reading format of sub interface.
 
     It is used to when data is read from CDF.
@@ -644,7 +644,7 @@ class SubInterface(SubInterfaceProperties, MainInterface):
         )
 
 
-class Implementation1Properties:
+class _Implementation1Properties:
     value_2 = PropertyOptions("value2")
     value_1 = PropertyOptions("value1")
 
@@ -653,7 +653,7 @@ class Implementation1Properties:
         return ViewId("pygen-models", "Implementation1", "1")
 
 
-class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
+class Implementation1Apply(_Implementation1Properties, SubInterfaceApply):
     """This represents the writing format of implementation 1.
 
     It is used to when data is written to CDF.
@@ -692,7 +692,7 @@ class Implementation1Apply(Implementation1Properties, SubInterfaceApply):
         self.value_1 = value_1
 
 
-class Implementation1(Implementation1Properties, SubInterface):
+class Implementation1(_Implementation1Properties, SubInterface):
     """This represents the reading format of implementation 1.
 
     It is used to when data is read from CDF.
@@ -755,13 +755,13 @@ class Implementation1(Implementation1Properties, SubInterface):
         )
 
 
-class Implementation2Properties:
+class _Implementation2Properties:
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("pygen-models", "Implementation2", "1")
 
 
-class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
+class Implementation2Apply(_Implementation2Properties, SubInterfaceApply):
     """This represents the writing format of implementation 2.
 
     It is used to when data is written to CDF.
@@ -794,7 +794,7 @@ class Implementation2Apply(Implementation2Properties, SubInterfaceApply):
         )
 
 
-class Implementation2(Implementation2Properties, SubInterface):
+class Implementation2(_Implementation2Properties, SubInterface):
     """This represents the reading format of implementation 2.
 
     It is used to when data is read from CDF.

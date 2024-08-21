@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.33] - 24-08-21
 ### Added
 - Support for `files` and `sequences` in the generated SDK. This includes the ability to create and retrieve
   `files` and `sequences` in the generated SDK.
@@ -26,6 +26,9 @@ Changes are grouped as follows
 ### Fixed
 - In the generated SDK, fields of `TimeSeries` as now set to `TimeSeriesWrite` in the write Data Class of the generated
   SDK.
+- If an input view had a reverse direct relation, that points to a non-existing target, the generated SDK would raise
+  a `ValueError`. `pygen` now gracefully handles this case by raising a warning instead.
+- If a view only had a dependency on itself, `pygen` would generate invalid code. This is now fixed.
 
 ## [0.99.32] - 24-08-17
 ### Added

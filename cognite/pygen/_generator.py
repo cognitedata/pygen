@@ -5,6 +5,7 @@ import re
 import shutil
 import sys
 import tempfile
+import warnings
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Callable, Literal, Optional, Union, cast, overload
@@ -22,6 +23,7 @@ from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.text import to_pascal, to_snake
+from cognite.pygen.warnings import InvalidCodeGenerated
 
 DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
@@ -422,7 +424,11 @@ def write_sdk_to_disk(
             path.unlink()
         path.parent.mkdir(parents=True, exist_ok=True)
         if format_code:
-            file_content = formatter.format_code(file_content)
+            try:
+                file_content = formatter.format_code(file_content)
+            except Exception as e:
+                warnings.warn(InvalidCodeGenerated(file_path, str(e)), stacklevel=2)
+                continue
         # Encoding and newline are set to ensure consistent file writing across platforms
         with path.open("w", encoding="utf-8", newline="\n") as f:
             f.write(file_content)

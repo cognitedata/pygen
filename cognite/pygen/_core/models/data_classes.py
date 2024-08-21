@@ -146,6 +146,7 @@ class DataClass:
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         has_default_instance_space: bool,
+        direct_relations_by_view_id: dict[dm.ViewId, set[str]],
         config: pygen_config.PygenConfig,
     ) -> None:
         """Update the fields of the data class.
@@ -164,6 +165,7 @@ class DataClass:
                 # This is the default value for pydantic_field, it will be updated later
                 pydantic_field=self.pydantic_field,
                 has_default_instance_space=has_default_instance_space,
+                direct_relations_by_view_id=direct_relations_by_view_id,
             )
             if field_ is None:
                 # Reverse direct relations are skipped
@@ -419,6 +421,11 @@ class DataClass:
         return bool(self.dependencies)
 
     @property
+    def has_dependencies_not_self(self) -> bool:
+        """Check if the data class has any dependencies that are not itself."""
+        return any(dependency != self for dependency in self.dependencies)
+
+    @property
     def has_edges_or_direct_relations(self) -> bool:
         """Whether the data class has any fields that are edges or direct relations."""
         return any(
@@ -664,6 +671,7 @@ class EdgeDataClass(DataClass):
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
         views: list[dm.View],
         has_default_instance_space: bool,
+        direct_relations_by_view_id: dict[dm.ViewId, set[str]],
         config: pygen_config.PygenConfig,
     ):
         """Update the fields of the data class."""
@@ -699,5 +707,11 @@ class EdgeDataClass(DataClass):
         )
         self.fields.append(self._end_node_field)
         super().update_fields(
-            properties, node_class_by_view_id, edge_class_by_view_id, views, has_default_instance_space, config
+            properties,
+            node_class_by_view_id,
+            edge_class_by_view_id,
+            views,
+            has_default_instance_space,
+            direct_relations_by_view_id,
+            config,
         )

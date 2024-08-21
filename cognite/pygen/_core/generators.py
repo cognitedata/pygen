@@ -211,12 +211,19 @@ class MultiAPIGenerator:
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
         unique_views: list[dm.View] = []
+        # Used to verify that reverse direct relation's targets exist.
+        direct_relations_by_view_id: dict[dm.ViewId, set[str]] = {}
         for view in itertools.chain.from_iterable(model.views for model in data_models):
             view_id = view.as_id()
             if view_id in seen_views:
                 continue
             unique_views.append(view)
             seen_views.add(view_id)
+            direct_relations_by_view_id[view_id] = {
+                prop_name
+                for prop_name, prop in view.properties.items()
+                if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
+            }
 
         self.api_by_type_by_view_id = self.create_api_by_view_id_type(
             unique_views,
@@ -252,6 +259,7 @@ class MultiAPIGenerator:
                 edge_class_by_view_id,
                 unique_views,
                 self.has_default_instance_space,
+                direct_relations_by_view_id,
                 config,
             )
 
