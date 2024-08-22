@@ -565,7 +565,9 @@ class MultiAPIGenerator:
             + "\n"
         )
 
-    def generate_typed_classes_file(self, include: set[dm.ViewId] | None = None) -> str:
+    def generate_typed_classes_file(
+        self, include: set[dm.ViewId] | None = None, module_by_space: dict[str, str] | None = None
+    ) -> str:
         """Generate the typed classes file for the SDK.
 
         Returns:
@@ -573,25 +575,34 @@ class MultiAPIGenerator:
         """
         typed_classes = self.env.get_template("typed_classes.py.jinja")
         available_dataclasses = self.data_classes_topological_order
-        node_classes = [
-            d
-            for d in available_dataclasses
-            if isinstance(d, NodeDataClass) and (include is None or d.view_id in include)
-        ]
-        edge_classes = [
-            d
-            for d in available_dataclasses
-            if isinstance(d, EdgeDataClass) and (include is None or d.view_id in include)
-        ]
+        node_classes: list[NodeDataClass] = []
+        edge_classes: list[EdgeDataClass] = []
+        module_by_space = module_by_space or {}
+        parent_classes_by_module: dict[str, list[str]] = defaultdict(list)
+        for cls_ in available_dataclasses:
+            if include is not None and cls_.view_id in include:
+                continue
+            if module_ := module_by_space.get(cls_.view_id.space):
+                parent_classes_by_module[module_].append(cls_.read_name)
+                parent_classes_by_module[module_].append(f"{cls_.read_name}Apply")
+                continue
+
+            if isinstance(cls_, NodeDataClass):
+                node_classes.append(cls_)
+            elif isinstance(cls_, EdgeDataClass):
+                edge_classes.append(cls_)
+        for module in list(parent_classes_by_module.keys()):
+            parent_classes_by_module[module] = sorted(parent_classes_by_module[module])
+
         datetime_import: str | None = None
-        relevant_fields = {
+        datetime_fields = {
             {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
             for cls_ in itertools.chain(node_classes, edge_classes)
             for field in cls_.fields_of_type(fields.BasePrimitiveField)
             if isinstance(field.type_, (dm.Timestamp, dm.Date))
         }
-        if relevant_fields:
-            datetime_import = "from datetime import " + ", ".join(sorted(relevant_fields))
+        if datetime_fields:
+            datetime_import = "from datetime import " + ", ".join(sorted(datetime_fields))
         has_literal_import = any(
             1
             for cls_ in itertools.chain(node_classes, edge_classes)
@@ -608,6 +619,7 @@ class MultiAPIGenerator:
                 datetime_import=datetime_import,
                 has_datetime_import=bool(datetime_import),
                 len=len,
+                parent_classes_by_module=parent_classes_by_module,
             )
             + "\n"
         )

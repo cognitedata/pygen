@@ -460,6 +460,7 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    module_by_space: dict[str, str] | None = None,
 ) -> str | None:
     """Generates typed classes for all views in the given data model.
 
@@ -469,6 +470,11 @@ def generate_typed(
         client: The client to use for fetching the data model. Required if model_id is a DataModelId.
         format_code: Whether to format the generated code using black.
         include_views: A set of view IDs to include in the typed classes. If None, all views are included.
+        module_by_space: A dictionary mapping space names to module names. This is used if part of the data model
+            has been generated before and you want to reuse the generated classes. The keys are the space names
+            and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
+            this will import all classes generated from views in the 'cdf_cdm' space from the
+            'cognite.client.data_classes.cdm.v1' module.
 
     Returns:
         If output_file is None, the typed classes as a string. Otherwise, None.
@@ -484,7 +490,7 @@ def generate_typed(
         print,
         PygenConfig(),
     )
-    typed_classes = generator._multi_api_generator.generate_typed_classes_file(include_views)
+    typed_classes = generator._multi_api_generator.generate_typed_classes_file(include_views, module_by_space)
 
     if format_code:
         formatter = CodeFormatter(format_code, print)

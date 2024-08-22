@@ -11,7 +11,11 @@ from cognite.client.data_classes.data_modeling.typed_instances import (
     TypedEdgeApply,{% endif %}{% if has_node_cls %}
     TypedNode,
     TypedNodeApply,{% endif %}
+){% for module, parents in parent_classes_by_module.items() %}
+from {{ module }} import ({% for parent in parents %}
+    {{ parent }},{% endfor %}
 )
+{% endfor %}
 
 {% for cls in node_classes %}{% if cls.has_container_fields %}
 class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
