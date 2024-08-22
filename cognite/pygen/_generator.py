@@ -441,7 +441,7 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
-) -> str: ...
+) -> None: ...
 
 
 @overload
@@ -451,7 +451,7 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
-) -> None: ...
+) -> str: ...
 
 
 def generate_typed(

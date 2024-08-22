@@ -79,7 +79,7 @@ class TestTypedClasses:
 
     @staticmethod
     def create_core_multi_api_generator(client: CogniteClient) -> MultiAPIGenerator:
-        data_model = _get_data_model(("cdf_cdm_experimental", "CogniteCore", "v1"), client, print)
+        data_model = _get_data_model(("cdf_cdm", "CogniteCore", "v1"), client, print)
         # Ensure we have a random order of views
         # This should be sorted before generating the typed classes
         random.shuffle(data_model.views)
