@@ -1,7 +1,4 @@
-"""
-This is a small CLI used for development of Pygen.
-
-"""
+"""This is a small CLI used for Pygen development."""
 
 import re
 from collections import defaultdict
@@ -38,9 +35,6 @@ app = typer.Typer(
 
 @app.command("generate", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
 def generate_sdks(
-    overwrite: bool = typer.Option(
-        False, help="Whether to overwrite the files expected to be manually maintained in the examples"
-    ),
     sdk_name: str = typer.Option(None, "--sdk", help="Generate only the specified SDK"),
 ):
     for example_sdk in EXAMPLE_SDKS:
@@ -68,15 +62,6 @@ def generate_sdks(
         )
 
         sdk = sdk_generator.generate_sdk()
-        manual_files = []
-        if overwrite is not True:
-            for manual_file in example_sdk.manual_files:
-                manual_path = manual_file.relative_to(EXAMPLES_DIR)
-                popped = sdk.pop(manual_path, None)
-                if popped is None:
-                    typer.echo(f"Could not find {manual_path} in generated SDK", err=True, color=True)
-                else:
-                    manual_files.append(manual_path)
         write_sdk_to_disk(
             sdk,
             EXAMPLES_DIR,
@@ -86,12 +71,7 @@ def generate_sdks(
             top_level_package=example_sdk.top_level_package,
         )
         typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
-        if manual_files:
-            typer.echo(
-                f"The following files were not updated, as they are expected to be changed manually: {manual_files}"
-            )
-        else:
-            typer.echo("All files updated! Including files assumed to be manually maintained.")
+        typer.echo("All files updated! Including files assumed to be manually maintained.")
         typer.echo("\n")
 
     typer.echo("All SDKs Created!")
