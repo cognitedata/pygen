@@ -880,12 +880,14 @@ class GeneratorFunction(typing.Protocol, Generic[T_DataType]):
 
     Examples:
 
+        >>> random.seed(42)
         >>> def my_data_generator(count: int) -> list[str]:
         ...     return [
         ...          "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=7))
         ...         for _ in range(count)
         ...     ]
         >>> my_data_generator(5)
+        ['HbolMJU', 'evblAbk', 'HClEQaP', 'KriXref', 'SFPLBYt']
 
     """
 
@@ -901,6 +903,7 @@ class IDGeneratorFunction(typing.Protocol):
         >>> def my_id_generator(view_id: dm.ViewId, count: int) -> list[str]:
         ...     return [f"{view_id.external_id.casefold()}_{no}" for no in range(count)]
         >>> my_id_generator(dm.ViewId("my_space", "MyView", "v1"), 5)
+        ['myview_0', 'myview_1', 'myview_2', 'myview_3', 'myview_4']
     """
 
     def __call__(self, view_id: dm.ViewId, count: int) -> list[str]:
