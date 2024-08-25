@@ -179,3 +179,21 @@ def test_generate_mock_data_seed_per_view(omni_data_classes: dict[str, OmniClass
 
     assert data1[0].node[0].sources[0].properties == data2[1].node[0].sources[0].properties
     assert data2[1].node[0].sources[0].properties != data2[0].node[0].sources[0].properties
+
+
+def test_generate_faker_mock_data_seed_per_view(omni_data_classes: dict[str, OmniClasses]) -> None:
+    seed = 42
+    generator1 = MockGenerator(
+        [omni_data_classes[OmniView.primitive_required].view], "sandbox", seed=seed, default_config="faker"
+    )
+    generator2 = MockGenerator(
+        [omni_data_classes[ext_id].view for ext_id in (OmniView.primitive_nullable, OmniView.primitive_required)],
+        "sandbox",
+        seed=seed,
+        default_config="faker",
+    )
+    data1 = generator1.generate_mock_data(node_count=1, null_values=0.0)
+    data2 = generator2.generate_mock_data(node_count=1, null_values=0.0)
+
+    assert data1[0].node[0].sources[0].properties == data2[1].node[0].sources[0].properties
+    assert data2[1].node[0].sources[0].properties != data2[0].node[0].sources[0].properties

@@ -20,6 +20,7 @@ from pathlib import Path
 from random import choice, choices, randint, uniform
 from typing import Callable, Generic, Literal, cast
 
+import numpy as np
 import pandas as pd
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -43,6 +44,7 @@ from cognite.client.data_classes.data_modeling.views import (
 from cognite.client.exceptions import CogniteNotFoundError
 
 from cognite.pygen._version import __version__
+from cognite.pygen.exceptions import PygenImportError
 from cognite.pygen.utils.cdf import _find_first_node_type
 
 DataType = typing.Union[int, float, bool, str, dict, None]
@@ -73,7 +75,7 @@ class MockGenerator:
         view_configs (dict[ViewId, ViewMockConfig]): Configuration for how to generate mock data for the different
             views. The keys are the view ids, and the values are the configuration for the view.
         default_config (ViewMockConfig): Default configuration for how to generate mock data for the different
-            views.
+            views. Set to 'faker' to use the Python package faker to generate mock data.
         data_set_id (int): The data set id to use for TimeSeries, Sequences, and FileMetadata.
         seed (int): The seed to use for the random number generator. If provided, it is used to reset the seed for
             each view to ensure reproducible results.
@@ -85,7 +87,7 @@ class MockGenerator:
         views: typing.Sequence[dm.View],
         instance_space: str,
         view_configs: dict[dm.ViewId, ViewMockConfig] | None = None,
-        default_config: ViewMockConfig | None = None,
+        default_config: ViewMockConfig | Literal["faker"] | None = None,
         data_set_id: int | None = None,
         seed: int | None = None,
         skip_interfaces: bool = False,
@@ -93,7 +95,10 @@ class MockGenerator:
         self._views = dm.ViewList(views)
         self._instance_space = instance_space
         self._view_configs = view_configs or {}
-        self._default_config = default_config or ViewMockConfig()
+        if default_config == "faker":
+            self._default_config = _create_faker_config()
+        else:
+            self._default_config = default_config or ViewMockConfig()
         self._data_set_id = data_set_id
         self._seed = seed
         self._skip_interfaces = skip_interfaces
@@ -475,6 +480,8 @@ class MockGenerator:
             configs.append(self._view_configs[view_id])
 
         for config in configs:
+            if config.reset_seed is not None:
+                config.reset_seed(view_seed)
             for generator in config.property_types.values():
                 if hasattr(generator, "reset") and isinstance(generator.reset, Callable):  # type: ignore[arg-type]
                     # This is for generators that have a state.
@@ -869,39 +876,38 @@ T_DataType = typing.TypeVar("T_DataType", bound=DataType)
 
 
 class GeneratorFunction(typing.Protocol, Generic[T_DataType]):
-    """Interface for a function that generates mock data."""
+    """Interface for a function that generates mock data.
+
+    Examples:
+
+        >>> random.seed(42)
+        >>> def my_data_generator(count: int) -> list[str]:
+        ...     return [
+        ...          "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=7))
+        ...         for _ in range(count)
+        ...     ]
+        >>> my_data_generator(5)
+        ['HbolMJU', 'evblAbk', 'HClEQaP', 'KriXref', 'SFPLBYt']
+
+    """
 
     def __call__(self, count: int) -> list[T_DataType]:
         raise NotImplementedError()
 
-    @classmethod
-    def _repr_html_(cls) -> str:
-        return """Interface for a function that generates mock data.<br />
-        <br />
-        <strong>Example:</strong><br />
-        <code>
-        def my_data_generator(count: int) -> list[T_DataType]:
-            return ["".join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=7)) for _ in range(count)]
-        </code>
-        """
-
 
 class IDGeneratorFunction(typing.Protocol):
-    """Interface for a function that generates mock data."""
+    """Interface for a function that generates mock data.
+
+    Examples:
+
+        >>> def my_id_generator(view_id: dm.ViewId, count: int) -> list[str]:
+        ...     return [f"{view_id.external_id.casefold()}_{no}" for no in range(count)]
+        >>> my_id_generator(dm.ViewId("my_space", "MyView", "v1"), 5)
+        ['myview_0', 'myview_1', 'myview_2', 'myview_3', 'myview_4']
+    """
 
     def __call__(self, view_id: dm.ViewId, count: int) -> list[str]:
         raise NotImplementedError()
-
-    @classmethod
-    def _repr_html_(cls) -> str:
-        return """Interface for a function that generates NodeIDs<br />
-        <br />
-        <strong>Example:</strong><br />
-        <code>
-        def my_id_generator(view_id: dm.ViewId, count: int) -> list[str]:
-            return [f"{view_id.external_id.casefold()}_{no}" for no in range(count)]
-        </code>
-        """
 
 
 class _RandomGenerator:
@@ -1029,18 +1035,18 @@ class _RandomGenerator:
 
 def _create_default_property_types() -> dict[type[dm.PropertyType], GeneratorFunction]:
     return {
-        dm.Text: cast(GeneratorFunction, _RandomGenerator.text),
-        dm.Int64: cast(GeneratorFunction, _RandomGenerator.int32),
-        dm.Int32: cast(GeneratorFunction, _RandomGenerator.int64),
-        dm.Float64: cast(GeneratorFunction, _RandomGenerator.float64),
-        dm.Float32: cast(GeneratorFunction, _RandomGenerator.float32),
-        dm.Boolean: cast(GeneratorFunction, _RandomGenerator.boolean),
-        dm.Timestamp: cast(GeneratorFunction, _RandomGenerator.timestamp),
-        dm.Date: cast(GeneratorFunction, _RandomGenerator.date),
+        dm.Text: _RandomGenerator.text,
+        dm.Int64: _RandomGenerator.int32,
+        dm.Int32: _RandomGenerator.int64,
+        dm.Float64: _RandomGenerator.float64,
+        dm.Float32: _RandomGenerator.float32,
+        dm.Boolean: _RandomGenerator.boolean,
+        dm.Timestamp: _RandomGenerator.timestamp,
+        dm.Date: _RandomGenerator.date,
         dm.TimeSeriesReference: cast(GeneratorFunction, _RandomGenerator.timeseries_reference()),
         dm.FileReference: cast(GeneratorFunction, _RandomGenerator.file_reference()),
         dm.SequenceReference: cast(GeneratorFunction, _RandomGenerator.sequence_reference()),
-        dm.Json: cast(GeneratorFunction, _RandomGenerator.json),
+        dm.Json: _RandomGenerator.json,
     }
 
 
@@ -1069,6 +1075,7 @@ class ViewMockConfig:
         properties: How to generate mock data for the different
             properties. The keys are the property names, and the values are functions that take the number of nodes
             as input and return a list of property values.
+        reset_seed: Optional function for resetting seed for random generator.
 
     """
 
@@ -1079,7 +1086,8 @@ class ViewMockConfig:
     property_types: dict[type[dm.PropertyType], GeneratorFunction] = field(
         default_factory=_create_default_property_types
     )
-    properties: dict[str, GeneratorFunction] = field(default_factory=lambda: {})
+    properties: dict[str, GeneratorFunction] = field(default_factory=dict)
+    reset_seed: Callable[[int], None] | None = None
 
     def __post_init__(self):
         if self.null_values is not None and (self.null_values < 0 or self.null_values > 1):
@@ -1102,6 +1110,94 @@ class ViewMockConfig:
                     raise ValueError(
                         f"Invalid Custom Random Generator property_types[{k}](5) must return a list of length 5"
                     )
+
+
+def _create_faker_config(seed: int | None = None) -> ViewMockConfig:
+    generator = FakerGenerators(seed)
+    return ViewMockConfig(
+        node_id_generator=generator.id_generator,  # type: ignore[arg-type]
+        property_types={
+            dm.Text: generator.text,
+            dm.Int64: generator.int64,
+            dm.Int32: generator.int32,
+            dm.Float64: generator.float64,
+            dm.Float32: generator.float32,
+            dm.Boolean: generator.boolean,
+            dm.Json: generator.json,
+            dm.Timestamp: generator.timestamp,
+            dm.Date: generator.date,
+            dm.FileReference: generator.file,
+            dm.SequenceReference: generator.sequence,
+            dm.TimeSeriesReference: generator.timeseries,
+        },
+        reset_seed=generator.reset,
+    )
+
+
+class FakerGenerators:
+    def __init__(self, seed: int | None = None):
+        try:
+            from faker import Faker
+        except ImportError as e:
+            raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
+
+        self.faker: Faker = Faker()
+        if seed is not None:
+            self.reset(seed)
+
+    def reset(self, seed: int) -> None:
+        try:
+            from faker import Faker
+        except ImportError as e:
+            raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
+        Faker.seed(seed)
+
+    def id_generator(self, view_id: dm.ViewId, node_count: int) -> list[str]:
+        return [f"{view_id.external_id}:{self.faker.unique.first_name()}" for _ in range(node_count)]
+
+    def text(self, count: int) -> list[str]:
+        return [self.faker.sentence() for _ in range(count)]
+
+    def int64(self, count: int) -> list[int]:
+        info = np.iinfo(np.int64)
+        return [self.faker.random.randint(int(info.min) + 1, int(info.max) - 1) for _ in range(count)]
+
+    def int32(self, count: int) -> list[int]:
+        info = np.iinfo(np.int32)
+        return [self.faker.random.randint(int(info.min) + 1, int(info.max) - 1) for _ in range(count)]
+
+    def float64(self, count: int) -> list[float]:
+        info = np.finfo(np.float64)
+        return [
+            round(self.faker.random.uniform(float(info.min) / 2, float(info.max) / 2), info.precision)
+            for _ in range(count)
+        ]
+
+    def float32(self, count: int) -> list[float]:
+        return [round(float(np.float32(self.faker.random.uniform(-1000, 1000))), 2) for _ in range(count)]
+
+    def boolean(self, count: int) -> list[bool]:
+        return [self.faker.pybool() for _ in range(count)]
+
+    def json(self, count: int) -> list[dict]:
+        return [
+            {self.text(1)[0]: self.text(1)[0] for _ in range(self.faker.random.randint(0, 5))} for _ in range(count)
+        ]
+
+    def timestamp(self, count: int) -> list[datetime]:
+        return [self.faker.date_time_this_year() for _ in range(count)]
+
+    def date(self, count: int) -> list[date]:
+        return [self.faker.date_this_year() for _ in range(count)]
+
+    def file(self, count: int) -> list[str]:
+        return [f"file_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
+
+    def sequence(self, count: int) -> list[str]:
+        return [f"sequence_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
+
+    def timeseries(self, count: int) -> list[str]:
+        return [f"timeseries_{self.faker.unique.first_name().casefold()}" for _ in range(count)]
 
 
 def _connected_views(views: typing.Sequence[dm.View]) -> Iterable[list[dm.View]]:
