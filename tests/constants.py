@@ -112,7 +112,7 @@ class ExampleSDK:
         return dm.DataModelApply(
             space=data_model_id.space,
             external_id=data_model_id.external_id,
-            version=data_model_id.version,
+            version=data_model_id.version or "v1",
             description="",
             name=data_model_id.external_id,
             views=views,
@@ -222,23 +222,6 @@ OMNI_MULTI_SDK = ExampleSDK(
 )
 
 
-# This uses connections that are not supported by the UI, so it will not be shown there.
-OMNIUM_CONNECTION_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("pygen-models", "OmniConnection", "1")],
-    _top_level_package="omni_connection",
-    client_name="OmniConnectionClient",
-    generate_sdk=False,
-    instance_space="omni-instances",
-)
-
-APM_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
-    _top_level_package="tutorial_apm_simple.client",
-    client_name="ApmSimpleClient",
-    generate_sdk=False,
-    instance_space=None,
-)
-
 PUMP_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
     _top_level_package="pump.client",
@@ -253,23 +236,6 @@ SCENARIO_INSTANCE_SDK = ExampleSDK(
     client_name="ScenarioInstanceClient",
     generate_sdk=True,
     instance_space="IntegrationTestsImmutable",
-)
-
-
-APM_APP_DATA_SOURCE = ExampleSDK(
-    data_model_ids=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
-    _top_level_package="apm_domain.client",
-    client_name="ApmClient",
-    generate_sdk=False,
-    instance_space=None,
-)
-
-APM_APP_DATA_SINK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
-    _top_level_package="sysdm_domain.client",
-    client_name="SysDMClient",
-    generate_sdk=False,
-    instance_space=None,
 )
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
