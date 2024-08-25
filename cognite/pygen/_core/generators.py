@@ -580,7 +580,7 @@ class MultiAPIGenerator:
         module_by_space = module_by_space or {}
         parent_classes_by_module: dict[str, list[str]] = defaultdict(list)
         for cls_ in available_dataclasses:
-            if include is not None and cls_.view_id in include:
+            if include is not None and cls_.view_id not in include:
                 continue
             if module_ := module_by_space.get(cls_.view_id.space):
                 parent_classes_by_module[module_].append(cls_.read_name)
