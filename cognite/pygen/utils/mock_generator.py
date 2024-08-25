@@ -73,7 +73,7 @@ class MockGenerator:
         view_configs (dict[ViewId, ViewMockConfig]): Configuration for how to generate mock data for the different
             views. The keys are the view ids, and the values are the configuration for the view.
         default_config (ViewMockConfig): Default configuration for how to generate mock data for the different
-            views.
+            views. Set to 'faker' to use the Python package faker to generate mock data.
         data_set_id (int): The data set id to use for TimeSeries, Sequences, and FileMetadata.
         seed (int): The seed to use for the random number generator. If provided, it is used to reset the seed for
             each view to ensure reproducible results.
@@ -85,7 +85,7 @@ class MockGenerator:
         views: typing.Sequence[dm.View],
         instance_space: str,
         view_configs: dict[dm.ViewId, ViewMockConfig] | None = None,
-        default_config: ViewMockConfig | None = None,
+        default_config: ViewMockConfig | Literal["faker"] | None = None,
         data_set_id: int | None = None,
         seed: int | None = None,
         skip_interfaces: bool = False,
@@ -93,7 +93,10 @@ class MockGenerator:
         self._views = dm.ViewList(views)
         self._instance_space = instance_space
         self._view_configs = view_configs or {}
-        self._default_config = default_config or ViewMockConfig()
+        if default_config == "faker":
+            self._default_config = _create_faker_generator()
+        else:
+            self._default_config = default_config or ViewMockConfig()
         self._data_set_id = data_set_id
         self._seed = seed
         self._skip_interfaces = skip_interfaces
@@ -1104,6 +1107,10 @@ class ViewMockConfig:
                     raise ValueError(
                         f"Invalid Custom Random Generator property_types[{k}](5) must return a list of length 5"
                     )
+
+
+def _create_faker_generator() -> ViewMockConfig:
+    raise NotImplementedError()
 
 
 def _connected_views(views: typing.Sequence[dm.View]) -> Iterable[list[dm.View]]:
