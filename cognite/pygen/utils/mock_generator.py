@@ -1032,18 +1032,18 @@ class _RandomGenerator:
 
 def _create_default_property_types() -> dict[type[dm.PropertyType], GeneratorFunction]:
     return {
-        dm.Text: cast(GeneratorFunction, _RandomGenerator.text),
-        dm.Int64: cast(GeneratorFunction, _RandomGenerator.int32),
-        dm.Int32: cast(GeneratorFunction, _RandomGenerator.int64),
-        dm.Float64: cast(GeneratorFunction, _RandomGenerator.float64),
-        dm.Float32: cast(GeneratorFunction, _RandomGenerator.float32),
-        dm.Boolean: cast(GeneratorFunction, _RandomGenerator.boolean),
-        dm.Timestamp: cast(GeneratorFunction, _RandomGenerator.timestamp),
-        dm.Date: cast(GeneratorFunction, _RandomGenerator.date),
+        dm.Text: _RandomGenerator.text,
+        dm.Int64: _RandomGenerator.int32,
+        dm.Int32: _RandomGenerator.int64,
+        dm.Float64: _RandomGenerator.float64,
+        dm.Float32: _RandomGenerator.float32,
+        dm.Boolean: _RandomGenerator.boolean,
+        dm.Timestamp: _RandomGenerator.timestamp,
+        dm.Date: _RandomGenerator.date,
         dm.TimeSeriesReference: cast(GeneratorFunction, _RandomGenerator.timeseries_reference()),
         dm.FileReference: cast(GeneratorFunction, _RandomGenerator.file_reference()),
         dm.SequenceReference: cast(GeneratorFunction, _RandomGenerator.sequence_reference()),
-        dm.Json: cast(GeneratorFunction, _RandomGenerator.json),
+        dm.Json: _RandomGenerator.json,
     }
 
 
