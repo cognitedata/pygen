@@ -82,7 +82,7 @@ build = {version=">=1.1", optional=true}
 cli = ["packaging", "typer", "toml", "build"]
 format = ["black"]
 all = ["packaging", "typer", "toml", "black", "build"]
-docs = ["mkdocs", "mkdocs-material",  "mkdocs-jupyter", "mkdocs-glightbox", "mkdocstrings-python"]
+
 
 [tool.poetry.dev-dependencies]
 twine = "*"

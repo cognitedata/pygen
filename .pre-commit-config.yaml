@@ -2,36 +2,11 @@
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     hooks:
-      -   id: ruff
-          args:
-            - --exit-non-zero-on-fix
-    rev: v0.5.0
-
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
-    hooks:
-      - id: black
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-      - id: debug-statements
-      - id: trailing-whitespace
-      - id: check-builtin-literals
-      - id: end-of-file-fixer
-      - id: check-ast
-      - id: check-docstring-first
-
-  - repo: https://github.com/frnhr/pre-commit-nocommit
-    rev: 0.0.1
-    hooks:
-      - id: check-nocommit
-
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.30.0
-    hooks:
-      - id: yamllint
-        args: [-d, "{extends: relaxed, rules: {line-length: {max: 120}, new-lines: disable}}"]
+      - id: ruff
+        args:
+          - --exit-non-zero-on-fix
+      - id: ruff-format
+    rev: v0.6.2
 
 # Mypy must be run in the local system environment, not in the pre-commit environment.
   - hooks:

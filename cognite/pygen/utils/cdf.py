@@ -508,7 +508,7 @@ class CogniteResourceDataTypesConverter:
 
     @staticmethod
     def _load_properties(
-        properties: dict[str, MappedProperty] | None = None
+        properties: dict[str, MappedProperty] | None = None,
     ) -> dict[str, tuple[ContainerId, data_types.PropertyType]]:
         if properties is None:
             return {}

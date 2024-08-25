@@ -63,7 +63,6 @@ class ParameterNameCollisionWarning(NameCollisionWarning):
 
 
 class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
-
     def __init__(self, target: str, field: str) -> None:
         self.target = target
         self.field = field
@@ -73,7 +72,6 @@ class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
 
 
 class InvalidCodeGenerated(PygenWarning, UserWarning):
-
     def __init__(self, filepath: str | Path, error_message: str) -> None:
         self.filepath = filepath
         self.error_message = error_message
