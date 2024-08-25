@@ -4819,10 +4819,9 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [extras]
 all = ["black", "build", "packaging", "toml", "typer"]
 cli = ["build", "packaging", "toml", "typer"]
-docs = []
 format = ["black"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "bde4f1bf9830ea7f961fb4ebfb15597fcfede018269e98463725ae6a43869fab"
+content-hash = "32bd012fa731cec2201e71382b04a1a91df0052c65035905c3117b0d473b6e1a"

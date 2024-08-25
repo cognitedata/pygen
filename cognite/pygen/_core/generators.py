@@ -893,18 +893,21 @@ class APIGenerator:
 
         edge_class = self._env.get_template("api_class_edge.py.jinja")
         for edge_api in self.edge_apis:
-            yield edge_api.file_name, (
-                edge_class.render(
-                    top_level_package=top_level_package,
-                    client_name=client_name,
-                    edge_api=edge_api,
-                    api_class=self.api_class,
-                    has_default_instance_space=self.has_default_instance_space,
-                    # ft = field types
-                    ft=fields,
-                    dm=dm,
-                )
-                + "\n"
+            yield (
+                edge_api.file_name,
+                (
+                    edge_class.render(
+                        top_level_package=top_level_package,
+                        client_name=client_name,
+                        edge_api=edge_api,
+                        api_class=self.api_class,
+                        has_default_instance_space=self.has_default_instance_space,
+                        # ft = field types
+                        ft=fields,
+                        dm=dm,
+                    )
+                    + "\n"
+                ),
             )
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
@@ -919,19 +922,22 @@ class APIGenerator:
         """
         timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
         for timeseries in self.timeseries_apis:
-            yield timeseries.file_name, (
-                timeseries_api.render(
-                    top_level_package=top_level_package,
-                    client_name=client_name,
-                    api_class=self.api_class,
-                    data_class=self.data_class,
-                    list_method=self.list_method,
-                    timeseries_api=timeseries,
-                    # ft = field types
-                    ft=fields,
-                    dm=dm,
-                )
-                + "\n"
+            yield (
+                timeseries.file_name,
+                (
+                    timeseries_api.render(
+                        top_level_package=top_level_package,
+                        client_name=client_name,
+                        api_class=self.api_class,
+                        data_class=self.data_class,
+                        list_method=self.list_method,
+                        timeseries_api=timeseries,
+                        # ft = field types
+                        ft=fields,
+                        dm=dm,
+                    )
+                    + "\n"
+                ),
             )
 
 
