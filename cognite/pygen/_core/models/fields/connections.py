@@ -266,7 +266,7 @@ class BaseConnectionField(Field, ABC):
 
         through = prop.through if isinstance(prop, ReverseDirectRelation) else None
 
-        destination_class = node_class_by_view_id[prop.source] if prop.source else None
+        destination_class = node_class_by_view_id.get(prop.source) if prop.source else None
         type_hint_node_reference = ["str", "dm.NodeId"] if has_default_instance_space else ["dm.NodeId"]
         if isinstance(prop, ReverseDirectRelation) or (isinstance(prop, dm.EdgeConnection) and prop.edge_source):
             type_hint_node_reference = []
