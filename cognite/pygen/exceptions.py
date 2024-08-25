@@ -55,7 +55,7 @@ class ReservedWordConflict(PygenException):
         )
 
 
-class PygenModuleNotFoundError(PygenException, ModuleNotFoundError):
+class PygenImportError(PygenException, ModuleNotFoundError):
     """Raised when a module is not found."""
 
     ...
