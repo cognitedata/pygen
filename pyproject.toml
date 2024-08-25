@@ -111,7 +111,7 @@ pytest-icdiff = "^0.8"
 Faker = "*"
 hypothesis = "*"
 jupyterlab = "*"
-cognite-toolkit = "0.2.17"
+cognite-toolkit = "0.2.18"
 
 [tool.pytest.ini_options]
 filterwarnings = [
