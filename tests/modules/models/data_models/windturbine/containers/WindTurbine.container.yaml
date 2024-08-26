@@ -21,14 +21,6 @@ properties:
     autoIncrement: false
     immutable: false
     name: windfarm
-  capacity:
-    type:
-      list: false
-      type: float64
-    nullable: true
-    autoIncrement: false
-    immutable: false
-    name: capacity
   rotor:
     type:
       type: direct
