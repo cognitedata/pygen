@@ -7,4 +7,4 @@ mkdocs-git-authors-plugin==0.9.*
 mkdocs-gitbook==0.0.1
 mkdocs-glightbox==0.4.*
 pymdown-extensions==10.9.*
-mkdocstrings[python]==0.25.*
+mkdocstrings[python]==0.26.*
