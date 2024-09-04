@@ -441,6 +441,8 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> None: ...
 
 
@@ -451,6 +453,8 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> str: ...
 
 
