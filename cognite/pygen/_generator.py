@@ -461,6 +461,7 @@ def generate_typed(
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
     module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> str | None:
     """Generates typed classes for all views in the given data model.
 
@@ -475,6 +476,7 @@ def generate_typed(
             and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
             this will import all classes generated from views in the 'cdf_cdm' space from the
             'cognite.client.data_classes.cdm.v1' module.
+        readonly_properties_by_view: A dictionary mapping view IDs to a set of property names that should be read-only.
 
     Returns:
         If output_file is None, the typed classes as a string. Otherwise, None.
@@ -490,7 +492,9 @@ def generate_typed(
         print,
         PygenConfig(),
     )
-    typed_classes = generator._multi_api_generator.generate_typed_classes_file(include_views, module_by_space)
+    typed_classes = generator._multi_api_generator.generate_typed_classes_file(
+        include_views, module_by_space, readonly_properties_by_view
+    )
 
     if format_code:
         formatter = CodeFormatter(format_code, print)
