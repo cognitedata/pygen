@@ -581,6 +581,7 @@ class MultiAPIGenerator:
                 and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
                 this will import all classes generated from views in the 'cdf_cdm' space from the
                 'cognite.client.data_classes.cdm.v1' module.
+            readonly_properties_by_view: A dictionary mapping view IDs to a set of readonly properties for that view.
 
         Returns:
             The generated typed classes file as a string.
