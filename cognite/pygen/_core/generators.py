@@ -570,6 +570,12 @@ class MultiAPIGenerator:
     ) -> str:
         """Generate the typed classes file for the SDK.
 
+        Args:
+            include: The set of view IDs to include in the generated typed classes file.
+                If None, all views will be included.
+            module_by_space: A dictionary mapping space to module. If this is passed, the views in the given
+                space will be skipped and imported from the given module instead.
+
         Returns:
             The generated typed classes file as a string.
         """
