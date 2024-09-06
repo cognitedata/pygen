@@ -63,6 +63,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
             pydantic_field="Field",
             has_default_instance_space=True,
             direct_relations_by_view_id={},
+            view_by_id={},
         )
 
     # Assert
