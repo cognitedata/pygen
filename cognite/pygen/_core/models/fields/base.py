@@ -67,7 +67,8 @@ class Field:
 
         field_naming = config.naming.field
         name = create_name(prop_id, field_naming.name)
-        if name == "type":
+        if name in {"type", "version"}:
+            # Special handling for reserved words
             prop_view_id = _get_prop_view_id(prop_id, view_id, view_by_id)
             prefix = prop_view_id.external_id.removeprefix("Cognite").removeprefix("3D").lstrip(digits)
             name = create_name(f"{prefix}_{name}", field_naming.name)
