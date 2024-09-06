@@ -73,7 +73,7 @@ def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, wor
 
 
 def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> None:
-    unit_procedures = workorder.unit_procedure(type_="red", limit=3).work_units(limit=5).query()
+    unit_procedures = workorder.unit_procedure(unit_procedure_type="red", limit=3).work_units(limit=5).query()
 
     assert 1 <= len(unit_procedures) <= 3
     assert all(procedure.type_ == "red" for procedure in unit_procedures)
@@ -87,7 +87,7 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
     new_procedure = UnitProcedureWrite(
         external_id="procedure:new_procedure",
         name="New procedure",
-        type_="New type",
+        unit_procedure_type="New type",
         work_units=[
             StartEndTimeWrite(
                 start_time="2021-01-01T00:00:00Z",
@@ -95,7 +95,7 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
                 end_node=EquipmentModuleWrite(
                     external_id="module:new_module",
                     name="New module",
-                    type_="New type",
+                    equipment_module_type="New type",
                     sensor_value=TimeSeriesWrite(
                         external_id="timeseries:123",
                         is_step=True,
