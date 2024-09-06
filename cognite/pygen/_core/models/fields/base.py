@@ -49,7 +49,7 @@ class Field:
     @classmethod
     def from_property(
         cls,
-        prop_name: str,
+        prop_id: str,
         prop: ViewProperty,
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
@@ -64,12 +64,12 @@ class Field:
         from .primitive import BasePrimitiveField
 
         field_naming = config.naming.field
-        name = create_name(prop_name, field_naming.name)
-        if is_reserved_word(name, "field", view_id, prop_name):
+        name = create_name(prop_id, field_naming.name)
+        if is_reserved_word(name, "field", view_id, prop_id):
             name = f"{name}_"
 
         doc_name = to_words(name, singularize=True)
-        variable = create_name(prop_name, field_naming.variable)
+        variable = create_name(prop_id, field_naming.variable)
         description: str | None = None
         if hasattr(prop, "description") and isinstance(prop.description, str):
             # This is a workaround for the fact that the description can contain curly quotes
@@ -79,7 +79,7 @@ class Field:
         base = cls(
             name=name,
             doc_name=doc_name,
-            prop_name=prop_name,
+            prop_name=prop_id,
             description=description,
             pydantic_field=pydantic_field,
         )
@@ -102,7 +102,7 @@ class Field:
             return BasePrimitiveField.load(base, prop, variable)
         else:
             warnings.warn(
-                f"Unsupported property type: {type(prop)}. Skipping field {prop_name}", UserWarning, stacklevel=2
+                f"Unsupported property type: {type(prop)}. Skipping field {prop_id}", UserWarning, stacklevel=2
             )
             return None
 
