@@ -154,6 +154,7 @@ class DataClass:
         This needs to be called after the data class has been created to update all fields with dependencies
         on other data classes.
         """
+        view_by_id = {view.as_id(): view for view in views}
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
                 prop_name,
@@ -166,6 +167,7 @@ class DataClass:
                 pydantic_field=self.pydantic_field,
                 has_default_instance_space=has_default_instance_space,
                 direct_relations_by_view_id=direct_relations_by_view_id,
+                view_by_id=view_by_id,
             )
             if field_ is None:
                 # Reverse direct relations are skipped

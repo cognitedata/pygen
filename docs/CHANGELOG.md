@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.34] - 24-09-06
+### Changed
+- If a view has a property named `type` or `version` this is now prefixed with the view external id instead
+  of being suffixed with underscore. For example, `CogniteAsset.type` is now `CogniteAsset.asset_type`. This is to
+  avoid confusion with the `node_type` and `edge_type` fields in the generated data classes.
+
 ## [0.99.33] - 24-08-21
 ### Added
 - Support for `files` and `sequences` in the generated SDK. This includes the ability to create and retrieve
