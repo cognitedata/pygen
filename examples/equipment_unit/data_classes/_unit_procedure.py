@@ -48,13 +48,13 @@ __all__ = [
 ]
 
 
-UnitProcedureTextFields = Literal["external_id", "name", "type_"]
-UnitProcedureFields = Literal["external_id", "name", "type_"]
+UnitProcedureTextFields = Literal["external_id", "name", "unit_procedure_type"]
+UnitProcedureFields = Literal["external_id", "name", "unit_procedure_type"]
 
 _UNITPROCEDURE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "name": "name",
-    "type_": "type",
+    "unit_procedure_type": "type",
 }
 
 
@@ -69,14 +69,14 @@ class UnitProcedureGraphQL(GraphQLCore):
         external_id: The external id of the unit procedure.
         data_record: The data record of the unit procedure node.
         name: The name field.
-        type_: The type field.
+        unit_procedure_type: The unit procedure type field.
         work_orders: The work order field.
         work_units: The work unit field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
     name: Optional[str] = None
-    type_: Optional[str] = Field(None, alias="type")
+    unit_procedure_type: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTimeGraphQL]] = Field(default=None, repr=False)
 
@@ -114,7 +114,7 @@ class UnitProcedureGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             name=self.name,
-            type_=self.type_,
+            unit_procedure_type=self.unit_procedure_type,
             work_orders=[work_order.as_read() for work_order in self.work_orders or []],
             work_units=[work_unit.as_read() for work_unit in self.work_units or []],
         )
@@ -128,7 +128,7 @@ class UnitProcedureGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             name=self.name,
-            type_=self.type_,
+            unit_procedure_type=self.unit_procedure_type,
             work_orders=[work_order.as_write() for work_order in self.work_orders or []],
             work_units=[work_unit.as_write() for work_unit in self.work_units or []],
         )
@@ -144,7 +144,7 @@ class UnitProcedure(DomainModel):
         external_id: The external id of the unit procedure.
         data_record: The data record of the unit procedure node.
         name: The name field.
-        type_: The type field.
+        unit_procedure_type: The unit procedure type field.
         work_orders: The work order field.
         work_units: The work unit field.
     """
@@ -154,7 +154,7 @@ class UnitProcedure(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
-    type_: Optional[str] = Field(None, alias="type")
+    unit_procedure_type: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTime]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTime]] = Field(default=None, repr=False)
 
@@ -165,7 +165,7 @@ class UnitProcedure(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
-            type_=self.type_,
+            unit_procedure_type=self.unit_procedure_type,
             work_orders=[work_order.as_write() for work_order in self.work_orders or []],
             work_units=[work_unit.as_write() for work_unit in self.work_units or []],
         )
@@ -241,7 +241,7 @@ class UnitProcedureWrite(DomainModelWrite):
         external_id: The external id of the unit procedure.
         data_record: The data record of the unit procedure node.
         name: The name field.
-        type_: The type field.
+        unit_procedure_type: The unit procedure type field.
         work_orders: The work order field.
         work_units: The work unit field.
     """
@@ -251,7 +251,7 @@ class UnitProcedureWrite(DomainModelWrite):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     name: Optional[str] = None
-    type_: Optional[str] = Field(None, alias="type")
+    unit_procedure_type: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
 
@@ -270,8 +270,8 @@ class UnitProcedureWrite(DomainModelWrite):
         if self.name is not None or write_none:
             properties["name"] = self.name
 
-        if self.type_ is not None or write_none:
-            properties["type"] = self.type_
+        if self.unit_procedure_type is not None or write_none:
+            properties["type"] = self.unit_procedure_type
 
         if properties:
             this_node = dm.NodeApply(
@@ -354,8 +354,8 @@ def _create_unit_procedure_filter(
     view_id: dm.ViewId,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    type_: str | list[str] | None = None,
-    type_prefix: str | None = None,
+    unit_procedure_type: str | list[str] | None = None,
+    unit_procedure_type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -367,12 +367,12 @@ def _create_unit_procedure_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if isinstance(type_, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
-    if type_ and isinstance(type_, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
-    if type_prefix is not None:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
+    if isinstance(unit_procedure_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=unit_procedure_type))
+    if unit_procedure_type and isinstance(unit_procedure_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=unit_procedure_type))
+    if unit_procedure_type_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=unit_procedure_type_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -441,11 +441,11 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
+        self.unit_procedure_type = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
                 self.name,
-                self.type_,
+                self.unit_procedure_type,
             ]
         )
 
