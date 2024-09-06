@@ -566,9 +566,22 @@ class MultiAPIGenerator:
         )
 
     def generate_typed_classes_file(
-        self, include: set[dm.ViewId] | None = None, module_by_space: dict[str, str] | None = None
+        self,
+        include: set[dm.ViewId] | None = None,
+        module_by_space: dict[str, str] | None = None,
+        readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
     ) -> str:
         """Generate the typed classes file for the SDK.
+
+        Args:
+            include: The set of view IDs to include in the generated typed classes file.
+                If None, all views will be included.
+            module_by_space: A dictionary mapping space names to module names. This is used if part of the data model
+                has been generated before and you want to reuse the generated classes. The keys are the space names
+                and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
+                this will import all classes generated from views in the 'cdf_cdm' space from the
+                'cognite.client.data_classes.cdm.v1' module.
+            readonly_properties_by_view: A dictionary mapping view IDs to a set of readonly properties for that view.
 
         Returns:
             The generated typed classes file as a string.
@@ -620,6 +633,7 @@ class MultiAPIGenerator:
                 has_datetime_import=bool(datetime_import),
                 len=len,
                 parent_classes_by_module=parent_classes_by_module,
+                readonly_properties_by_view=readonly_properties_by_view or {},
             )
             + "\n"
         )
