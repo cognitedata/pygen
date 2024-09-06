@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from string import digits
 from typing import TYPE_CHECKING, Literal, TypeVar
 
 from cognite.client.data_classes import data_modeling as dm
@@ -65,7 +66,10 @@ class Field:
 
         field_naming = config.naming.field
         name = create_name(prop_id, field_naming.name)
-        if is_reserved_word(name, "field", view_id, prop_id):
+        if name == "type":
+            prefix = view_id.external_id.removeprefix("Cognite").lstrip(digits)
+            name = create_name(f"{prefix}_{name}", field_naming.name)
+        elif is_reserved_word(name, "field", view_id, prop_id):
             name = f"{name}_"
 
         doc_name = to_words(name, singularize=True)
