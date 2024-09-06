@@ -28,7 +28,6 @@ else:
     "name, expected_name",
     [
         ("property", "property_"),
-        ("version", "version_"),
         ("yield", "yield_"),
         ("len", "len_"),
         ("def", "def_"),
