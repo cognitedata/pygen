@@ -76,7 +76,7 @@ def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> N
     unit_procedures = workorder.unit_procedure(unit_procedure_type="red", limit=3).work_units(limit=5).query()
 
     assert 1 <= len(unit_procedures) <= 3
-    assert all(procedure.type_ == "red" for procedure in unit_procedures)
+    assert all(procedure.unit_procedure_type == "red" for procedure in unit_procedures)
     for unit_procedure in unit_procedures:
         for work_unit in unit_procedure.work_units:
             assert isinstance(work_unit, StartEndTime)
