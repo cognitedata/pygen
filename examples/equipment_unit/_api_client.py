@@ -24,8 +24,8 @@ class EquipmentUnitClient:
 
     Generated with:
         pygen = 0.99.34
-        cognite-sdk = 7.54.17
-        pydantic = 2.8.2
+        cognite-sdk = 7.58.8
+        pydantic = 2.9.1
 
     Data Model:
         space: IntegrationTestsImmutable
