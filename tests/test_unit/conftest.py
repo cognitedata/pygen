@@ -46,6 +46,17 @@ def omni_multi_api_generator(omni_data_model: dm.DataModel[dm.View]) -> MultiAPI
 
 
 @pytest.fixture(scope="session")
+def omni_multi_api_generator_composition(omni_data_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
+    return MultiAPIGenerator(
+        OMNI_SDK.top_level_package,
+        OMNI_SDK.client_name,
+        [omni_data_model],
+        OMNI_SDK.instance_space,
+        implements="composition",
+    )
+
+
+@pytest.fixture(scope="session")
 def omnisub_multi_api_generator(omnisub_data_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
     return MultiAPIGenerator(
         OMNI_SUB_SDK.top_level_package,

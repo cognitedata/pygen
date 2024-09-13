@@ -88,6 +88,7 @@ class TestTypedClasses:
             "Typed",
             data_model,
             None,
+            "composition",
             "infer",
             print,
             PygenConfig(),
