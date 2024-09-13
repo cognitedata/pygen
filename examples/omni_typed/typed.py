@@ -462,7 +462,7 @@ class PrimitiveRequiredListedApply(_PrimitiveRequiredListedProperties, TypedNode
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
