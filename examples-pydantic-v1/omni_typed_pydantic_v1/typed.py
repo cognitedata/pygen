@@ -186,6 +186,200 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
         )
 
 
+class _Implementation1Properties:
+    value_2 = PropertyOptions("value2")
+    main_value = PropertyOptions("mainValue")
+    sub_value = PropertyOptions("subValue")
+    value_1 = PropertyOptions("value1")
+
+    @classmethod
+    def get_source(cls) -> ViewId:
+        return ViewId("pygen-models", "Implementation1", "1")
+
+
+class Implementation1Apply(_Implementation1Properties, TypedNodeApply):
+    """This represents the writing format of implementation 1.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 1.
+        value_2: The value 2 field.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        value_1: The value 1 field.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        *,
+        value_2: str,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        value_1: str | None = None,
+        existing_version: int | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+    ) -> None:
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
+        self.value_2 = value_2
+        self.main_value = main_value
+        self.sub_value = sub_value
+        self.value_1 = value_1
+
+
+class Implementation1(_Implementation1Properties, TypedNode):
+    """This represents the reading format of implementation 1.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 1.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        value_2: The value 2 field.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        value_1: The value 1 field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        version: int,
+        last_updated_time: int,
+        created_time: int,
+        *,
+        value_2: str,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        value_1: str | None = None,
+        type: DirectRelationReference | None = None,
+        deleted_time: int | None = None,
+    ) -> None:
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
+        self.value_2 = value_2
+        self.main_value = main_value
+        self.sub_value = sub_value
+        self.value_1 = value_1
+
+    def as_write(self) -> Implementation1Apply:
+        return Implementation1Apply(
+            self.space,
+            self.external_id,
+            value_2=self.value_2,
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            value_1=self.value_1,
+            existing_version=self.version,
+            type=self.type,
+        )
+
+
+class _Implementation2Properties:
+    main_value = PropertyOptions("mainValue")
+    sub_value = PropertyOptions("subValue")
+
+    @classmethod
+    def get_source(cls) -> ViewId:
+        return ViewId("pygen-models", "Implementation2", "1")
+
+
+class Implementation2Apply(_Implementation2Properties, TypedNodeApply):
+    """This represents the writing format of implementation 2.
+
+    It is used to when data is written to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 2.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
+            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
+            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
+            request, then the item will be skipped instead of failing the ingestion request.
+        type: Direct relation pointing to the type node.
+    """
+
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        *,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        existing_version: int | None = None,
+        type: DirectRelationReference | tuple[str, str] | None = None,
+    ) -> None:
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
+        self.main_value = main_value
+        self.sub_value = sub_value
+
+
+class Implementation2(_Implementation2Properties, TypedNode):
+    """This represents the reading format of implementation 2.
+
+    It is used to when data is read from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the implementation 2.
+        version (int): DMS version.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        main_value: The main value field.
+        sub_value: The sub value field.
+        type: Direct relation pointing to the type node.
+        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
+            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
+            are filtered out of query results, but present in sync results
+    """
+
+    def __init__(
+        self,
+        space: str,
+        external_id: str,
+        version: int,
+        last_updated_time: int,
+        created_time: int,
+        *,
+        main_value: str | None = None,
+        sub_value: str | None = None,
+        type: DirectRelationReference | None = None,
+        deleted_time: int | None = None,
+    ) -> None:
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
+        self.main_value = main_value
+        self.sub_value = sub_value
+
+    def as_write(self) -> Implementation2Apply:
+        return Implementation2Apply(
+            self.space,
+            self.external_id,
+            main_value=self.main_value,
+            sub_value=self.sub_value,
+            existing_version=self.version,
+            type=self.type,
+        )
+
+
 class _MainInterfaceProperties:
     main_value = PropertyOptions("mainValue")
 
@@ -550,6 +744,7 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
 
 
 class _SubInterfaceProperties:
+    main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
 
     @classmethod
@@ -557,7 +752,7 @@ class _SubInterfaceProperties:
         return ViewId("pygen-models", "SubInterface", "1")
 
 
-class SubInterfaceApply(_SubInterfaceProperties, MainInterfaceApply):
+class SubInterfaceApply(_SubInterfaceProperties, TypedNodeApply):
     """This represents the writing format of sub interface.
 
     It is used to when data is written to CDF.
@@ -585,11 +780,12 @@ class SubInterfaceApply(_SubInterfaceProperties, MainInterfaceApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        super().__init__(space, external_id, main_value=main_value, existing_version=existing_version, type=type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
+        self.main_value = main_value
         self.sub_value = sub_value
 
 
-class SubInterface(_SubInterfaceProperties, MainInterface):
+class SubInterface(_SubInterfaceProperties, TypedNode):
     """This represents the reading format of sub interface.
 
     It is used to when data is read from CDF.
@@ -621,225 +817,12 @@ class SubInterface(_SubInterfaceProperties, MainInterface):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        super().__init__(
-            space,
-            external_id,
-            version,
-            last_updated_time,
-            created_time,
-            main_value=main_value,
-            type=type,
-            deleted_time=deleted_time,
-        )
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
+        self.main_value = main_value
         self.sub_value = sub_value
 
     def as_write(self) -> SubInterfaceApply:
         return SubInterfaceApply(
-            self.space,
-            self.external_id,
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            existing_version=self.version,
-            type=self.type,
-        )
-
-
-class _Implementation1Properties:
-    value_2 = PropertyOptions("value2")
-    value_1 = PropertyOptions("value1")
-
-    @classmethod
-    def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "Implementation1", "1")
-
-
-class Implementation1Apply(_Implementation1Properties, SubInterfaceApply):
-    """This represents the writing format of implementation 1.
-
-    It is used to when data is written to CDF.
-
-    Args:
-        space: The space where the node is located.
-        external_id: The external id of the implementation 1.
-        value_2: The value 2 field.
-        main_value: The main value field.
-        sub_value: The sub value field.
-        value_1: The value 1 field.
-        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
-            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
-            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
-            request, then the item will be skipped instead of failing the ingestion request.
-        type: Direct relation pointing to the type node.
-    """
-
-    def __init__(
-        self,
-        space: str,
-        external_id: str,
-        *,
-        value_2: str,
-        main_value: str | None = None,
-        sub_value: str | None = None,
-        value_1: str | None = None,
-        existing_version: int | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
-    ) -> None:
-        super().__init__(
-            space, external_id, main_value=main_value, sub_value=sub_value, existing_version=existing_version, type=type
-        )
-        self.value_2 = value_2
-        self.value_1 = value_1
-
-
-class Implementation1(_Implementation1Properties, SubInterface):
-    """This represents the reading format of implementation 1.
-
-    It is used to when data is read from CDF.
-
-    Args:
-        space: The space where the node is located.
-        external_id: The external id of the implementation 1.
-        version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        value_2: The value 2 field.
-        main_value: The main value field.
-        sub_value: The sub value field.
-        value_1: The value 1 field.
-        type: Direct relation pointing to the type node.
-        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
-            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
-            are filtered out of query results, but present in sync results
-    """
-
-    def __init__(
-        self,
-        space: str,
-        external_id: str,
-        version: int,
-        last_updated_time: int,
-        created_time: int,
-        *,
-        value_2: str,
-        main_value: str | None = None,
-        sub_value: str | None = None,
-        value_1: str | None = None,
-        type: DirectRelationReference | None = None,
-        deleted_time: int | None = None,
-    ) -> None:
-        super().__init__(
-            space,
-            external_id,
-            version,
-            last_updated_time,
-            created_time,
-            main_value=main_value,
-            sub_value=sub_value,
-            type=type,
-            deleted_time=deleted_time,
-        )
-        self.value_2 = value_2
-        self.value_1 = value_1
-
-    def as_write(self) -> Implementation1Apply:
-        return Implementation1Apply(
-            self.space,
-            self.external_id,
-            value_2=self.value_2,
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            existing_version=self.version,
-            type=self.type,
-        )
-
-
-class _Implementation2Properties:
-    @classmethod
-    def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "Implementation2", "1")
-
-
-class Implementation2Apply(_Implementation2Properties, SubInterfaceApply):
-    """This represents the writing format of implementation 2.
-
-    It is used to when data is written to CDF.
-
-    Args:
-        space: The space where the node is located.
-        external_id: The external id of the implementation 2.
-        main_value: The main value field.
-        sub_value: The sub value field.
-        existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
-            (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
-            so it will fail the bulk if the item already exists. If skipOnVersionConflict is set on the ingestion
-            request, then the item will be skipped instead of failing the ingestion request.
-        type: Direct relation pointing to the type node.
-    """
-
-    def __init__(
-        self,
-        space: str,
-        external_id: str,
-        *,
-        main_value: str | None = None,
-        sub_value: str | None = None,
-        existing_version: int | None = None,
-        type: DirectRelationReference | tuple[str, str] | None = None,
-    ) -> None:
-        super().__init__(
-            space, external_id, main_value=main_value, sub_value=sub_value, existing_version=existing_version, type=type
-        )
-
-
-class Implementation2(_Implementation2Properties, SubInterface):
-    """This represents the reading format of implementation 2.
-
-    It is used to when data is read from CDF.
-
-    Args:
-        space: The space where the node is located.
-        external_id: The external id of the implementation 2.
-        version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        main_value: The main value field.
-        sub_value: The sub value field.
-        type: Direct relation pointing to the type node.
-        deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
-            (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
-            are filtered out of query results, but present in sync results
-    """
-
-    def __init__(
-        self,
-        space: str,
-        external_id: str,
-        version: int,
-        last_updated_time: int,
-        created_time: int,
-        *,
-        main_value: str | None = None,
-        sub_value: str | None = None,
-        type: DirectRelationReference | None = None,
-        deleted_time: int | None = None,
-    ) -> None:
-        super().__init__(
-            space,
-            external_id,
-            version,
-            last_updated_time,
-            created_time,
-            main_value=main_value,
-            sub_value=sub_value,
-            type=type,
-            deleted_time=deleted_time,
-        )
-
-    def as_write(self) -> Implementation2Apply:
-        return Implementation2Apply(
             self.space,
             self.external_id,
             main_value=self.main_value,
