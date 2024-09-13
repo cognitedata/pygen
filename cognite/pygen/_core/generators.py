@@ -42,6 +42,7 @@ class SDKGenerator:
         data_model: The data model(s) used to generate an SDK.
         default_instance_space: The default instance space to use for the SDK. If None, the first space in the data
                                 model will be used.
+        implements: Whether to use inheritance or composition for views that are implementing other views.
         pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
                           the environment. "v1" will use pydantic v1, while "v2" will use pydantic v2.
         logger: A logger function to use for logging. If None, print will be done.
@@ -53,6 +54,7 @@ class SDKGenerator:
         client_name: str,
         data_model: dm.DataModel | Sequence[dm.DataModel],
         default_instance_space: str | None = None,
+        implements: Literal["inheritance", "composition"] = "inheritance",
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -78,6 +80,7 @@ class SDKGenerator:
             client_name,
             list(self._data_model),
             self.default_instance_space,
+            implements,
             pydantic_version,
             logger,
             config,
@@ -199,6 +202,7 @@ class MultiAPIGenerator:
         client_name: str,
         data_models: list[dm.DataModel[dm.View]],
         default_instance_space: str | None,
+        implements: Literal["inheritance", "composition"] = "inheritance",
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -207,6 +211,7 @@ class MultiAPIGenerator:
         self.top_level_package = top_level_package
         self.client_name = client_name
         self.default_instance_space = default_instance_space
+        self._implements = implements
         self._pydantic_version = pydantic_version
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
@@ -263,15 +268,21 @@ class MultiAPIGenerator:
                 config,
             )
 
-            api.data_class.update_implements_interface_and_writable(
-                [
-                    parent_api.data_class
-                    for parent in parents_by_view_id[api.view_id]
-                    # If the interface is not in the data model, then, we cannot inherit from it.
-                    if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
-                ],
-                api.view_id in parents,
-            )
+            if implements == "inheritance":
+                api.data_class.update_implements_interface_and_writable(
+                    [
+                        parent_api.data_class
+                        for parent in parents_by_view_id[api.view_id]
+                        # If the interface is not in the data model, then, we cannot inherit from it.
+                        if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
+                    ],
+                    api.view_id in parents,
+                )
+            elif implements == "composition":
+                api.data_class.initialization.add("parents")
+            else:
+                raise ValueError(f"Unknown implements value {implements}")
+
             api.data_class.update_direct_children(
                 [
                     child_api.data_class
