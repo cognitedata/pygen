@@ -500,7 +500,7 @@ def generate_typed(
         "Typed",
         data_model,
         None,
-        "inheritance",
+        implements,
         "infer",
         print,
         PygenConfig(),
