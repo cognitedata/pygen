@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId
-from cognite.client.data_classes.data_modeling.typed_instances import (
+from cognite.client.data_classes.data_modeling.instances import (
     PropertyOptions,
     TypedNode,
     TypedNodeApply,
@@ -48,7 +48,7 @@ class CDFExternalReferencesListedApply(_CDFExternalReferencesListedProperties, T
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
         self.files = files
         self.sequences = sequences
         self.timeseries = timeseries
@@ -88,7 +88,7 @@ class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedN
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
         self.files = files
         self.sequences = sequences
         self.timeseries = timeseries
@@ -139,7 +139,7 @@ class DependentOnNonWritableApply(_DependentOnNonWritableProperties, TypedNodeAp
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
         self.a_value = a_value
 
 
@@ -173,7 +173,7 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
         self.a_value = a_value
 
     def as_write(self) -> DependentOnNonWritableApply:
@@ -220,7 +220,7 @@ class MainInterfaceApply(_MainInterfaceProperties, TypedNodeApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
         self.main_value = main_value
 
 
@@ -254,7 +254,7 @@ class MainInterface(_MainInterfaceProperties, TypedNode):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
         self.main_value = main_value
 
     def as_write(self) -> MainInterfaceApply:
@@ -321,7 +321,7 @@ class PrimitiveNullableApply(_PrimitiveNullableProperties, TypedNodeApply):
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type)
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -379,7 +379,7 @@ class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
@@ -520,7 +520,7 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type)
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
         self.boolean = boolean
         self.date = date
         self.float_32 = float_32
