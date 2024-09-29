@@ -17,7 +17,7 @@ Changes are grouped as follows
 ### Added
 - Support for `Enum` in `MockGenerator`.
 
-### Changed
+### Removed
 - Support for Python `3.9` is dropped.
 
 ## [0.99.34] - 24-09-06
