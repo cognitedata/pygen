@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+- Support for `Enum` in `MockGenerator`.
+
 ## [0.99.34] - 24-09-06
 ### Changed
 - If a view has a property named `type` or `version` this is now prefixed with the view external id instead
