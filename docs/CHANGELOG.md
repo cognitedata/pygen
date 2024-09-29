@@ -17,6 +17,9 @@ Changes are grouped as follows
 ### Added
 - Support for `Enum` in `MockGenerator`.
 
+### Removed
+- Support for Python `3.9` is dropped.
+
 ## [0.99.34] - 24-09-06
 ### Changed
 - If a view has a property named `type` or `version` this is now prefixed with the view external id instead
