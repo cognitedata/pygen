@@ -93,6 +93,7 @@ class TestCRUDOperations:
 
         assert 5 >= len(retrieved) >= 3
 
+    @pytest.mark.skip("Unstable endpoints")
     def test_create_retrieve_delete_direct_listable(
         self, omni_client: OmniClient, cognite_client: CogniteClient
     ) -> None:
