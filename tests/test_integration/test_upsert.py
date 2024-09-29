@@ -16,6 +16,7 @@ else:
     from omni_pydantic_v1 import data_classes as dc
 
 
+@pytest.mark.skip("Unstable endpoints")
 def test_node_without_properties(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:NodeWithoutProperties"
@@ -101,6 +102,7 @@ def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: Cogni
         cognite_client.data_modeling.instances.delete(resources.nodes.as_ids(), resources.edges.as_ids())
 
 
+@pytest.mark.skip("Unstable endpoints")
 def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyRecursive"
@@ -180,6 +182,7 @@ def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClie
         cognite_client.data_modeling.instances.delete(nodes=node.as_tuple_id())
 
 
+@pytest.mark.skip("Unstable endpoints")
 def test_update_to_null(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
@@ -211,6 +214,7 @@ def test_update_to_null(
     assert retrieved.json_ is None
 
 
+@pytest.mark.skip("Unstable endpoints")
 def test_set_empty_string(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
