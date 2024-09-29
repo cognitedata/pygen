@@ -45,6 +45,7 @@ class DomainAPI(Protocol):
 
 
 class TestCRUDOperations:
+    @pytest.mark.skip("Unstable endpoints")
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
     def test_create_retrieve_delete(
         self,
