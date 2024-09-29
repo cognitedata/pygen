@@ -42,6 +42,7 @@ class SDKGenerator:
         data_model: The data model(s) used to generate an SDK.
         default_instance_space: The default instance space to use for the SDK. If None, the first space in the data
                                 model will be used.
+        implements: Whether to use inheritance or composition for views that are implementing other views.
         pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
                           the environment. "v1" will use pydantic v1, while "v2" will use pydantic v2.
         logger: A logger function to use for logging. If None, print will be done.
@@ -53,6 +54,7 @@ class SDKGenerator:
         client_name: str,
         data_model: dm.DataModel | Sequence[dm.DataModel],
         default_instance_space: str | None = None,
+        implements: Literal["inheritance", "composition"] = "inheritance",
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -78,6 +80,7 @@ class SDKGenerator:
             client_name,
             list(self._data_model),
             self.default_instance_space,
+            implements,
             pydantic_version,
             logger,
             config,
@@ -199,6 +202,7 @@ class MultiAPIGenerator:
         client_name: str,
         data_models: list[dm.DataModel[dm.View]],
         default_instance_space: str | None,
+        implements: Literal["inheritance", "composition"] = "inheritance",
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -207,6 +211,7 @@ class MultiAPIGenerator:
         self.top_level_package = top_level_package
         self.client_name = client_name
         self.default_instance_space = default_instance_space
+        self._implements = implements
         self._pydantic_version = pydantic_version
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
@@ -263,15 +268,21 @@ class MultiAPIGenerator:
                 config,
             )
 
-            api.data_class.update_implements_interface_and_writable(
-                [
-                    parent_api.data_class
-                    for parent in parents_by_view_id[api.view_id]
-                    # If the interface is not in the data model, then, we cannot inherit from it.
-                    if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
-                ],
-                api.view_id in parents,
-            )
+            if implements == "inheritance":
+                api.data_class.update_implements_interface_and_writable(
+                    [
+                        parent_api.data_class
+                        for parent in parents_by_view_id[api.view_id]
+                        # If the interface is not in the data model, then, we cannot inherit from it.
+                        if (parent_api := self.api_by_type_by_view_id[api.used_for].get(parent))
+                    ],
+                    api.view_id in parents,
+                )
+            elif implements == "composition":
+                api.data_class.initialization.add("parents")
+            else:
+                raise ValueError(f"Unknown implements value {implements}")
+
             api.data_class.update_direct_children(
                 [
                     child_api.data_class
@@ -566,9 +577,22 @@ class MultiAPIGenerator:
         )
 
     def generate_typed_classes_file(
-        self, include: set[dm.ViewId] | None = None, module_by_space: dict[str, str] | None = None
+        self,
+        include: set[dm.ViewId] | None = None,
+        module_by_space: dict[str, str] | None = None,
+        readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
     ) -> str:
         """Generate the typed classes file for the SDK.
+
+        Args:
+            include: The set of view IDs to include in the generated typed classes file.
+                If None, all views will be included.
+            module_by_space: A dictionary mapping space names to module names. This is used if part of the data model
+                has been generated before and you want to reuse the generated classes. The keys are the space names
+                and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
+                this will import all classes generated from views in the 'cdf_cdm' space from the
+                'cognite.client.data_classes.cdm.v1' module.
+            readonly_properties_by_view: A dictionary mapping view IDs to a set of readonly properties for that view.
 
         Returns:
             The generated typed classes file as a string.
@@ -620,6 +644,7 @@ class MultiAPIGenerator:
                 has_datetime_import=bool(datetime_import),
                 len=len,
                 parent_classes_by_module=parent_classes_by_module,
+                readonly_properties_by_view=readonly_properties_by_view or {},
             )
             + "\n"
         )

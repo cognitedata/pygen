@@ -44,6 +44,7 @@ def typed_classe_by_view_id() -> dict[dm.ViewId, tuple[type[TypedNodeApply], typ
 
 
 class TestTypedClasses:
+    @pytest.mark.skip(reason="Missing test data")
     @pytest.mark.parametrize("view", omni_typed_view_ids())
     def test_create_retrieve_delete(
         self,
@@ -88,6 +89,7 @@ class TestTypedClasses:
             "Typed",
             data_model,
             None,
+            "composition",
             "infer",
             print,
             PygenConfig(),

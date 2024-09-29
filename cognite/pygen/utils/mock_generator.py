@@ -34,7 +34,7 @@ from cognite.client.data_classes import (
     TimeSeriesList,
 )
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
+from cognite.client.data_classes.data_modeling.data_types import Enum, ListablePropertyType
 from cognite.client.data_classes.data_modeling.views import (
     EdgeConnection,
     MultiEdgeConnection,
@@ -63,6 +63,10 @@ ListAbleDataType = typing.Union[
 ]
 ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
 _ResourceTypes = set(typing.get_args(ResourceType))
+
+_READONLY_PROPERTIES: dict[dm.ViewId, set[str]] = {
+    dm.ViewId("cdf_cdm", "CogniteAsset", "v1"): {"root", "path", "pathLastUpdatedTime"}
+}
 
 
 class MockGenerator:
@@ -283,6 +287,9 @@ class MockGenerator:
                         )
                         continue
 
+                    if view_id in _READONLY_PROPERTIES and property_name in _READONLY_PROPERTIES[view_id]:
+                        continue
+
                     if isinstance(connection, EdgeConnection):
                         other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
@@ -340,12 +347,24 @@ class MockGenerator:
         external = ViewMockData(view_id, self._instance_space)
         values: typing.Sequence[ListAbleDataType]
         for name, prop in properties.items():
+            if view_id in _READONLY_PROPERTIES and name in _READONLY_PROPERTIES[view_id]:
+                continue
+
             if name in config.properties:
                 generator = config.properties[name]
             elif type(prop.type) in config.property_types:
                 generator = config.property_types[type(prop.type)]
+            elif isinstance(prop.type, Enum):
+                generator = _create_enum_generator(prop.type)
             else:
-                raise ValueError(f"Could not generate mock data for property {name} of type {type(prop.type)}")
+                warnings.warn(
+                    f"Could not generate mock data for property {name} of type {type(prop.type)}", stacklevel=2
+                )
+
+                def _only_null_values(count: int) -> list[None]:
+                    return [None] * count
+
+                generator = _only_null_values
 
             config_node_count = config.node_count or default_node_count
             config_null_values = config.null_values or default_nullable_fraction
@@ -528,6 +547,13 @@ class MockGenerator:
                 leaf_children_by_parent[view_id].update(leaf_children_by_parent[parent])
 
         return {k: sorted(v, key=lambda x: x.as_tuple()) for k, v in leaf_children_by_parent.items()}
+
+
+def _create_enum_generator(enum: Enum) -> GeneratorFunction[str]:
+    def _enum_generator(count: int) -> list[str]:
+        return random.choices(tuple(enum.values.keys()), k=count)
+
+    return _enum_generator
 
 
 @dataclass

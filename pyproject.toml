@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.99.33"
+version = "0.99.34"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -67,7 +67,7 @@ pygen = "cognite.pygen.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-cognite-sdk = {version = "^7.54.3"}
+cognite-sdk = {version = "^7.60.0"}
 pydantic = ">=1.10.7"
 Jinja2 = ">=3.1"
 inflect = ">=6.0"
@@ -111,7 +111,7 @@ pytest-icdiff = "^0.8"
 Faker = "*"
 hypothesis = "*"
 jupyterlab = "*"
-cognite-toolkit = "0.2.19"
+cognite-toolkit = "0.2.20"
 
 [tool.pytest.ini_options]
 filterwarnings = [

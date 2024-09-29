@@ -119,6 +119,7 @@ def generate_sdk(
         client_name,
         data_model,
         default_instance_space,
+        "inheritance",
         pydantic_version,
         logger,
         config or PygenConfig(),
@@ -441,6 +442,9 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    implements: Literal["inheritance", "composition"] = "composition",
+    module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> None: ...
 
 
@@ -451,6 +455,9 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    implements: Literal["inheritance", "composition"] = "composition",
+    module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> str: ...
 
 
@@ -460,7 +467,9 @@ def generate_typed(
     client: Optional[CogniteClient] = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
+    implements: Literal["inheritance", "composition"] = "composition",
     module_by_space: dict[str, str] | None = None,
+    readonly_properties_by_view: dict[dm.ViewId, set[str]] | None = None,
 ) -> str | None:
     """Generates typed classes for all views in the given data model.
 
@@ -470,11 +479,16 @@ def generate_typed(
         client: The client to use for fetching the data model. Required if model_id is a DataModelId.
         format_code: Whether to format the generated code using black.
         include_views: A set of view IDs to include in the typed classes. If None, all views are included.
+        implements: Whether to use inheritance or composition when generating typed classes for views that implements
+            other views. Defaults to 'composition'. Composition means only the properties of the implemented views
+            are included in the generated class. Inheritance means the generated class inherits from the implemented
+            views.
         module_by_space: A dictionary mapping space names to module names. This is used if part of the data model
             has been generated before and you want to reuse the generated classes. The keys are the space names
             and the values are the module names. For example, {"cdf_cdm": "cognite.client.data_classes.cdm.v1"},
             this will import all classes generated from views in the 'cdf_cdm' space from the
             'cognite.client.data_classes.cdm.v1' module.
+        readonly_properties_by_view: A dictionary mapping view IDs to a set of property names that should be read-only.
 
     Returns:
         If output_file is None, the typed classes as a string. Otherwise, None.
@@ -486,11 +500,14 @@ def generate_typed(
         "Typed",
         data_model,
         None,
+        implements,
         "infer",
         print,
         PygenConfig(),
     )
-    typed_classes = generator._multi_api_generator.generate_typed_classes_file(include_views, module_by_space)
+    typed_classes = generator._multi_api_generator.generate_typed_classes_file(
+        include_views, module_by_space, readonly_properties_by_view
+    )
 
     if format_code:
         formatter = CodeFormatter(format_code, print)

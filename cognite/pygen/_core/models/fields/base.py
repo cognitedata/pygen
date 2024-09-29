@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, TypeVar
+from string import digits
+from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import (
@@ -49,7 +50,7 @@ class Field:
     @classmethod
     def from_property(
         cls,
-        prop_name: str,
+        prop_id: str,
         prop: ViewProperty,
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
         edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
@@ -58,18 +59,24 @@ class Field:
         pydantic_field: Literal["Field", "pydantic.Field"],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_by_id: dict[dm.ViewId, dm.View],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
         from .connections import BaseConnectionField
         from .primitive import BasePrimitiveField
 
         field_naming = config.naming.field
-        name = create_name(prop_name, field_naming.name)
-        if is_reserved_word(name, "field", view_id, prop_name):
+        name = create_name(prop_id, field_naming.name)
+        if name in {"type", "version"}:
+            # Special handling for reserved words
+            prop_view_id = _get_prop_view_id(prop_id, view_id, view_by_id)
+            prefix = prop_view_id.external_id.removeprefix("Cognite").removeprefix("3D").lstrip(digits)
+            name = create_name(f"{prefix}_{name}", field_naming.name)
+        elif is_reserved_word(name, "field", view_id, prop_id):
             name = f"{name}_"
 
         doc_name = to_words(name, singularize=True)
-        variable = create_name(prop_name, field_naming.variable)
+        variable = create_name(prop_id, field_naming.variable)
         description: str | None = None
         if hasattr(prop, "description") and isinstance(prop.description, str):
             # This is a workaround for the fact that the description can contain curly quotes
@@ -79,7 +86,7 @@ class Field:
         base = cls(
             name=name,
             doc_name=doc_name,
-            prop_name=prop_name,
+            prop_name=prop_id,
             description=description,
             pydantic_field=pydantic_field,
         )
@@ -102,7 +109,7 @@ class Field:
             return BasePrimitiveField.load(base, prop, variable)
         else:
             warnings.warn(
-                f"Unsupported property type: {type(prop)}. Skipping field {prop_name}", UserWarning, stacklevel=2
+                f"Unsupported property type: {type(prop)}. Skipping field {prop_id}", UserWarning, stacklevel=2
             )
             return None
 
@@ -176,3 +183,34 @@ class Field:
 
 
 T_Field = TypeVar("T_Field", bound=Field)
+
+
+def _get_prop_view_id(prop_id: str, view_id: dm.ViewId, view_by_id: dict[dm.ViewId, dm.View]) -> dm.ViewId:
+    return cast(dm.ViewId, _search_source_view(prop_id, view_by_id[view_id], view_by_id))
+
+
+def _search_source_view(prop_id: str, view: dm.View, view_by_id: dict[dm.ViewId, dm.View]) -> dm.ViewId | None:
+    if prop_id in view.properties and not view.implements:
+        return view.as_id()
+    elif prop_id not in view.properties:
+        return None
+    # In properties, and have parents.
+    candidates = set()
+    for parent_id in view.implements:
+        parent = view_by_id[parent_id]
+        parent_view_id = _search_source_view(prop_id, parent, view_by_id)
+        if parent_view_id:
+            candidates.add(parent_view_id)
+    if len(candidates) == 1:
+        return candidates.pop()
+    elif len(candidates) > 1:
+        used = candidates.pop()
+        warnings.warn(
+            f"Multiple candidates for source view of property {prop_id}. Using {used}",
+            UserWarning,
+            stacklevel=2,
+        )
+        return used
+    else:
+        # Original to this view.
+        return view.as_id()

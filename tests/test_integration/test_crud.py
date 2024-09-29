@@ -45,6 +45,7 @@ class DomainAPI(Protocol):
 
 
 class TestCRUDOperations:
+    @pytest.mark.skip("Unstable endpoints")
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
     def test_create_retrieve_delete(
         self,
@@ -92,6 +93,7 @@ class TestCRUDOperations:
 
         assert 5 >= len(retrieved) >= 3
 
+    @pytest.mark.skip("Unstable endpoints")
     def test_create_retrieve_delete_direct_listable(
         self, omni_client: OmniClient, cognite_client: CogniteClient
     ) -> None:

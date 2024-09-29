@@ -33,6 +33,8 @@ def omni_field_factory(
             if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
         }
 
+    view_by_id = {view.as_id(): view for view in omni_views.values()}
+
     def factory(view_ext_id: str, property_name: str) -> Field:
         view = omni_views[view_ext_id]
         prop = view.properties[property_name]
@@ -46,6 +48,7 @@ def omni_field_factory(
             "Field",
             True,
             direct_relations_by_view_id,
+            view_by_id,
         )
 
     return factory

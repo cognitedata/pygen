@@ -50,7 +50,7 @@ def generate_sdks(
         if example_sdk.is_typed:
             output_file = example_sdk.client_dir / "typed.py"
             include_views = {dm.ViewId(data_models.space, t, "1") for t in example_sdk.typed_classes} or None
-            generate_typed(data_models, output_file, include_views=include_views)
+            generate_typed(data_models, output_file, include_views=include_views, implements="composition")
             continue
 
         sdk_generator = SDKGenerator(

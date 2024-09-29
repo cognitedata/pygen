@@ -21,6 +21,7 @@ FIELD_NAMES = (
         "existing_version",
         "external_id_factory",
         "replace",
+        "type",
     }
     | {f for f in dir(BaseModel)}
     | {

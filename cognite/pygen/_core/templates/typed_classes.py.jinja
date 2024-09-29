@@ -5,7 +5,7 @@ from typing import Literal{% endif %}
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId
-from cognite.client.data_classes.data_modeling.typed_instances import (
+from cognite.client.data_classes.data_modeling.instances import (
     PropertyOptions,{% if has_edge_cls %}
     TypedEdge,
     TypedEdgeApply,{% endif %}{% if has_node_cls %}
@@ -34,8 +34,8 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
     {{ cls.description }}{% endif %}
     Args:
         space: The space where the node is located.
-        external_id: The external id of the {{ cls.doc_name }}.{% for field in cls.container_fields_sorted() %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        external_id: The external id of the {{ cls.doc_name }}.{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
         existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
@@ -47,15 +47,15 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         self,
         space: str,
         external_id: str,
-        *,{% for field in cls.container_fields_sorted() %}
-        {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
+        *,{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        {{field.name}}: {{ field.as_typed_hint() }},{% endif %}{% endfor %}
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
-        TypedNodeApply.__init__(self, space, external_id, existing_version, None, type){% elif len(cls.implements) == 1 %}
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id,{{ cls.implements[0].container_field_variables }}, existing_version=existing_version, type=type){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}Apply.__init__(self, space, external_id, {{ parent.container_field_variables }}, existing_version=existing_version, type=type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
+        {{ parent.read_name }}Apply.__init__(self, space, external_id, {{ parent.container_field_variables }}, existing_version=existing_version, type=type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}{% endif %}{% endfor %}
 
 
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
@@ -88,7 +88,7 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, None, type){% elif len(cls.implements) == 1 %}
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, type=type, deleted_time=deleted_time){% else %}{% for parent in cls.implements %}
         {{ parent.read_name }}.__init__(self, space, external_id, version, last_updated_time, created_time, {{ parent.container_field_variables }}, type=type, deleted_time=deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
         self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
@@ -96,8 +96,8 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
             self.space,
-            self.external_id,{% for field in cls.container_fields_sorted() %}
-            {{field.name}}=self.{{field.name}},{% if field.is_connection and field.is_one_to_many %}  # type: ignore[arg-type]{% endif %}{% endfor %}
+            self.external_id,{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+            {{field.name}}=self.{{field.name}},{% if field.is_connection and field.is_one_to_many %}  # type: ignore[arg-type]{% endif %}{% endif %}{% endfor %}
             existing_version=self.version,
             type=self.type,
         )
@@ -182,7 +182,7 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
         deleted_time: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
-        TypedEdge.__init__(self, space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time, None){% elif len(cls.implements) == 1 %}
+        TypedEdge.__init__(self, space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, deleted_time=deleted_time){% else %}{% for parent in cls.implements %}
         {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time=deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
         self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
