@@ -70,6 +70,7 @@ _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD = {
     "timeseries": "timeseries",
 }
 
+
 class CDFExternalReferencesGraphQL(GraphQLCore):
     """This represents the reading version of cdf external reference, used
     when data is retrieved from CDF using GraphQL.
@@ -84,6 +85,7 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
         sequence: The sequence field.
         timeseries: The timesery field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
     file: Optional[FileMetadataGraphQL] = None
     sequence: Optional[SequenceGraphQL] = None
@@ -119,7 +121,6 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
             timeseries=self.timeseries.as_read() if self.timeseries else None,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
@@ -147,8 +148,9 @@ class CDFExternalReferences(DomainModel):
         sequence: The sequence field.
         timeseries: The timesery field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     file: Union[FileMetadata, str, None] = None
@@ -163,7 +165,9 @@ class CDFExternalReferences(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             file=self.file.as_write() if isinstance(self.file, CogniteFileMetadata) else self.file,
             sequence=self.sequence.as_write() if isinstance(self.sequence, CogniteSequence) else self.sequence,
-            timeseries=self.timeseries.as_write() if isinstance(self.timeseries, CogniteTimeSeries) else self.timeseries,
+            timeseries=(
+                self.timeseries.as_write() if isinstance(self.timeseries, CogniteTimeSeries) else self.timeseries
+            ),
         )
 
     def as_apply(self) -> CDFExternalReferencesWrite:
@@ -189,6 +193,7 @@ class CDFExternalReferencesWrite(DomainModelWrite):
         sequence: The sequence field.
         timeseries: The timesery field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -208,16 +213,21 @@ class CDFExternalReferencesWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.file is not None or write_none:
             properties["file"] = self.file if isinstance(self.file, str) or self.file is None else self.file.external_id
-        
+
         if self.sequence is not None or write_none:
-            properties["sequence"] = self.sequence if isinstance(self.sequence, str) or self.sequence is None else self.sequence.external_id
-        
+            properties["sequence"] = (
+                self.sequence if isinstance(self.sequence, str) or self.sequence is None else self.sequence.external_id
+            )
+
         if self.timeseries is not None or write_none:
-            properties["timeseries"] = self.timeseries if isinstance(self.timeseries, str) or self.timeseries is None else self.timeseries.external_id
-        
+            properties["timeseries"] = (
+                self.timeseries
+                if isinstance(self.timeseries, str) or self.timeseries is None
+                else self.timeseries.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(
@@ -229,12 +239,11 @@ class CDFExternalReferencesWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         if isinstance(self.file, CogniteFileMetadataWrite):
             resources.files.append(self.file)
@@ -284,8 +293,8 @@ class CDFExternalReferencesWriteList(DomainModelWriteList[CDFExternalReferencesW
 
     _INSTANCE = CDFExternalReferencesWrite
 
-class CDFExternalReferencesApplyList(CDFExternalReferencesWriteList): ...
 
+class CDFExternalReferencesApplyList(CDFExternalReferencesWriteList): ...
 
 
 def _create_cdf_external_reference_filter(
@@ -330,7 +339,6 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
-
 
 
 class CDFExternalReferencesQuery(_CDFExternalReferencesQuery[CDFExternalReferencesList]):

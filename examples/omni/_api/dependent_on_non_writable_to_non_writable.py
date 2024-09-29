@@ -9,15 +9,15 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class DependentOnNonWritableToNonWritableAPI(EdgeAPI):
     def list(
-            self,
-            from_dependent_on_non_writable: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            from_dependent_on_non_writable_space: str = DEFAULT_INSTANCE_SPACE,
-            to_implementation_1_non_writeable: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            to_implementation_1_non_writeable_space: str = DEFAULT_INSTANCE_SPACE,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit=DEFAULT_LIMIT_READ,
-    ) ->dm.EdgeList:
+        self,
+        from_dependent_on_non_writable: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_dependent_on_non_writable_space: str = DEFAULT_INSTANCE_SPACE,
+        to_implementation_1_non_writeable: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_implementation_1_non_writeable_space: str = DEFAULT_INSTANCE_SPACE,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+    ) -> dm.EdgeList:
         """List to non writable edges of a dependent on non writable.
 
         Args:
@@ -44,7 +44,6 @@ class DependentOnNonWritableToNonWritableAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "toNonWritable"),
-            
             from_dependent_on_non_writable,
             from_dependent_on_non_writable_space,
             to_implementation_1_non_writeable,

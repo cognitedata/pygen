@@ -16,6 +16,7 @@ from ._core import DEFAULT_LIMIT_READ
 
 ColumnNames = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
 
+
 class PowerInverterActivePowerTotalQuery:
     def __init__(
         self,
@@ -435,7 +436,9 @@ class PowerInverterActivePowerTotalAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_active_power_total(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_active_power_total(
+            self._client, self._view_id, filter_, limit
+        )
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
@@ -480,7 +483,7 @@ def _retrieve_timeseries_external_ids_with_extra_active_power_total(
             continue
         view_prop = node.properties[view_id]
         key = view_prop["active_power_total"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):

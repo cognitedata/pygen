@@ -35,9 +35,7 @@ from ._sub_interface import SubInterface
 
 __all__ = [
     "Implementation1NonWriteable",
-    
     "Implementation1NonWriteableList",
-    
     "Implementation1NonWriteableFields",
     "Implementation1NonWriteableTextFields",
     "Implementation1NonWriteableGraphQL",
@@ -54,6 +52,7 @@ _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD = {
     "value_1": "value1",
 }
 
+
 class Implementation1NonWriteableGraphQL(GraphQLCore):
     """This represents the reading version of implementation 1 non writeable, used
     when data is retrieved from CDF using GraphQL.
@@ -68,6 +67,7 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
         sub_value: The sub value field.
         value_1: The value 1 field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
@@ -104,7 +104,6 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
         )
 
 
-
 class Implementation1NonWriteable(SubInterface):
     """This represents the reading version of implementation 1 non writeable.
 
@@ -118,10 +117,12 @@ class Implementation1NonWriteable(SubInterface):
         sub_value: The sub value field.
         value_1: The value 1 field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
-    
+
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
+
 
 class Implementation1NonWriteableList(DomainModelList[Implementation1NonWriteable]):
     """List of implementation 1 non writeables in the read version."""
@@ -199,11 +200,13 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
-        self._filter_classes.extend([
-            self.main_value,
-            self.sub_value,
-            self.value_1,
-        ])
+        self._filter_classes.extend(
+            [
+                self.main_value,
+                self.sub_value,
+                self.value_1,
+            ]
+        )
 
 
 class Implementation1NonWriteableQuery(_Implementation1NonWriteableQuery[Implementation1NonWriteableList]):

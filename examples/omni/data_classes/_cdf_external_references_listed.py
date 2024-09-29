@@ -70,6 +70,7 @@ _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD = {
     "timeseries": "timeseries",
 }
 
+
 class CDFExternalReferencesListedGraphQL(GraphQLCore):
     """This represents the reading version of cdf external references listed, used
     when data is retrieved from CDF using GraphQL.
@@ -84,6 +85,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         sequences: The sequence field.
         timeseries: The timesery field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
     files: Optional[list[FileMetadataGraphQL]] = None
     sequences: Optional[list[SequenceGraphQL]] = None
@@ -99,12 +101,12 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
     @field_validator("files", "sequences", "timeseries", mode="before")
     def clean_list(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [v for v in value if v is not None] or None
         return value
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -124,7 +126,6 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             sequences=[sequence.as_read() for sequence in self.sequences or []] or None,
             timeseries=[timesery.as_read() for timesery in self.timeseries or []] or None,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -153,8 +154,9 @@ class CDFExternalReferencesListed(DomainModel):
         sequences: The sequence field.
         timeseries: The timesery field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     files: Optional[list[Union[FileMetadata, str]]] = None
@@ -167,9 +169,18 @@ class CDFExternalReferencesListed(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []] or None,
-            sequences=[sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence for sequence in self.sequences or []] or None,
-            timeseries=[timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery for timesery in self.timeseries or []] or None,
+            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []]
+            or None,
+            sequences=[
+                sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
+                for sequence in self.sequences or []
+            ]
+            or None,
+            timeseries=[
+                timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
+                for timesery in self.timeseries or []
+            ]
+            or None,
         )
 
     def as_apply(self) -> CDFExternalReferencesListedWrite:
@@ -195,6 +206,7 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         sequences: The sequence field.
         timeseries: The timesery field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -214,16 +226,21 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.files is not None or write_none:
-            properties["files"] = [file if isinstance(file, str) else file.external_id for file in self.files or []] or None 
-        
+            properties["files"] = [
+                file if isinstance(file, str) else file.external_id for file in self.files or []
+            ] or None
+
         if self.sequences is not None or write_none:
-            properties["sequences"] = [sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []] or None 
-        
+            properties["sequences"] = [
+                sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []
+            ] or None
+
         if self.timeseries is not None or write_none:
-            properties["timeseries"] = [timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []] or None 
-        
+            properties["timeseries"] = [
+                timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []
+            ] or None
 
         if properties:
             this_node = dm.NodeApply(
@@ -235,12 +252,11 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         for file in self.files or []:
             if isinstance(file, CogniteFileMetadataWrite):
@@ -293,8 +309,8 @@ class CDFExternalReferencesListedWriteList(DomainModelWriteList[CDFExternalRefer
 
     _INSTANCE = CDFExternalReferencesListedWrite
 
-class CDFExternalReferencesListedApplyList(CDFExternalReferencesListedWriteList): ...
 
+class CDFExternalReferencesListedApplyList(CDFExternalReferencesListedWriteList): ...
 
 
 def _create_cdf_external_references_listed_filter(
@@ -339,7 +355,6 @@ class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExte
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
-
 
 
 class CDFExternalReferencesListedQuery(_CDFExternalReferencesListedQuery[CDFExternalReferencesListedList]):

@@ -54,6 +54,7 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
     "sub_value": "subValue",
 }
 
+
 class SubInterfaceGraphQL(GraphQLCore):
     """This represents the reading version of sub interface, used
     when data is retrieved from CDF using GraphQL.
@@ -67,6 +68,7 @@ class SubInterfaceGraphQL(GraphQLCore):
         main_value: The main value field.
         sub_value: The sub value field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
@@ -100,7 +102,6 @@ class SubInterfaceGraphQL(GraphQLCore):
             sub_value=self.sub_value,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> SubInterfaceWrite:
@@ -126,8 +127,9 @@ class SubInterface(MainInterface):
         main_value: The main value field.
         sub_value: The sub value field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
-    
+
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
@@ -163,6 +165,7 @@ class SubInterfaceWrite(MainInterfaceWrite):
         main_value: The main value field.
         sub_value: The sub value field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -179,13 +182,12 @@ class SubInterfaceWrite(MainInterfaceWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
-        
+
         if self.sub_value is not None or write_none:
             properties["subValue"] = self.sub_value
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -197,12 +199,11 @@ class SubInterfaceWrite(MainInterfaceWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         return resources
 
@@ -243,8 +244,8 @@ class SubInterfaceWriteList(DomainModelWriteList[SubInterfaceWrite]):
 
     _INSTANCE = SubInterfaceWrite
 
-class SubInterfaceApplyList(SubInterfaceWriteList): ...
 
+class SubInterfaceApplyList(SubInterfaceWriteList): ...
 
 
 def _create_sub_interface_filter(
@@ -308,10 +309,12 @@ class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
-        self._filter_classes.extend([
-            self.main_value,
-            self.sub_value,
-        ])
+        self._filter_classes.extend(
+            [
+                self.main_value,
+                self.sub_value,
+            ]
+        )
 
 
 class SubInterfaceQuery(_SubInterfaceQuery[SubInterfaceList]):

@@ -62,15 +62,15 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         self.work_units_edge = UnitProcedureWorkUnitsAPI(client)
 
     def __call__(
-            self,
-            name: str | list[str] | None = None,
-            name_prefix: str | None = None,
-            unit_procedure_type: str | list[str] | None = None,
-            unit_procedure_type_prefix: str | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        unit_procedure_type: str | list[str] | None = None,
+        unit_procedure_type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> UnitProcedureQueryAPI[UnitProcedureList]:
         """Query starting at unit procedures.
 
@@ -101,7 +101,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         )
         builder = QueryBuilder(UnitProcedureList)
         return UnitProcedureQueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -147,7 +146,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         )
         return self._apply(unit_procedure, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more unit procedure.
 
         Args:
@@ -177,14 +178,14 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | UnitProcedureList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> UnitProcedure | UnitProcedureList | None:
         """Retrieve one or more unit procedures by id(s).
 
         Args:
@@ -222,9 +223,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
                     "outwards",
                     dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
                 ),
-                                               ]
+            ],
         )
-        
 
     def search(
         self,
@@ -309,8 +309,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -328,15 +327,16 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields],
         property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
@@ -349,14 +349,15 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         property: UnitProcedureFields | SequenceNotStr[UnitProcedureFields] | None = None,
         query: str | None = None,
@@ -541,7 +542,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         )
 
         if retrieve_connections == "skip":
-                return self._list(
+            return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]
@@ -590,9 +591,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name( edge_work_orders),
+                    builder.create_name(edge_work_orders),
                     dm.query.NodeResultSetExpression(
-                        from_= edge_work_orders,
+                        from_=edge_work_orders,
                         filter=dm.filters.HasData(views=[WorkOrder._view_id]),
                     ),
                     WorkOrder,
@@ -600,9 +601,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             )
             builder.append(
                 NodeQueryStep(
-                    builder.create_name( edge_work_units),
+                    builder.create_name(edge_work_units),
                     dm.query.NodeResultSetExpression(
-                        from_= edge_work_units,
+                        from_=edge_work_units,
                         filter=dm.filters.HasData(views=[EquipmentModule._view_id]),
                     ),
                     EquipmentModule,

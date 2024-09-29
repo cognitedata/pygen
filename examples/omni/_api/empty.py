@@ -51,28 +51,27 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            boolean: bool | None = None,
-            min_date: datetime.date | None = None,
-            max_date: datetime.date | None = None,
-            min_float_32: float | None = None,
-            max_float_32: float | None = None,
-            min_float_64: float | None = None,
-            max_float_64: float | None = None,
-            min_int_32: int | None = None,
-            max_int_32: int | None = None,
-            min_int_64: int | None = None,
-            max_int_64: int | None = None,
-            text: str | list[str] | None = None,
-            text_prefix: str | None = None,
-            min_timestamp: datetime.datetime | None = None,
-            max_timestamp: datetime.datetime | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> EmptyQueryAPI[EmptyList]:
         """Query starting at empties.
 
@@ -126,7 +125,6 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         builder = QueryBuilder(EmptyList)
         return EmptyQueryAPI(self._client, builder, filter_, limit)
 
-
     def apply(
         self,
         empty: EmptyWrite | Sequence[EmptyWrite],
@@ -167,7 +165,9 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         )
         return self._apply(empty, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more empty.
 
         Args:
@@ -197,14 +197,14 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Empty | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Empty | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> EmptyList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> EmptyList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Empty | EmptyList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Empty | EmptyList | None:
         """Retrieve one or more empties by id(s).
 
         Args:
@@ -352,8 +352,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -382,15 +381,16 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: EmptyFields | SequenceNotStr[EmptyFields],
         property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,
@@ -414,14 +414,15 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         property: EmptyFields | SequenceNotStr[EmptyFields] | None = None,
         query: str | None = None,

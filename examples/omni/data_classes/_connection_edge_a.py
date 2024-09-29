@@ -38,8 +38,16 @@ if TYPE_CHECKING:
     from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 
 
-
-__all__ = ["ConnectionEdgeA", "ConnectionEdgeAWrite", "ConnectionEdgeAApply", "ConnectionEdgeAList", "ConnectionEdgeAWriteList", "ConnectionEdgeAApplyList", "ConnectionEdgeAFields", "ConnectionEdgeATextFields"]
+__all__ = [
+    "ConnectionEdgeA",
+    "ConnectionEdgeAWrite",
+    "ConnectionEdgeAApply",
+    "ConnectionEdgeAList",
+    "ConnectionEdgeAWriteList",
+    "ConnectionEdgeAApplyList",
+    "ConnectionEdgeAFields",
+    "ConnectionEdgeATextFields",
+]
 
 
 ConnectionEdgeATextFields = Literal["external_id", "name"]
@@ -67,6 +75,7 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
         name: The name field.
         start_time: The start time field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
@@ -92,7 +101,6 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
             name=self.name,
             start_time=self.start_time,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -123,6 +131,7 @@ class ConnectionEdgeA(DomainRelation):
         name: The name field.
         start_time: The start time field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId]
@@ -166,6 +175,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         name: The name field.
         start_time: The start time field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
@@ -198,17 +208,16 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties: dict[str, Any]  = {}
-        
+        properties: dict[str, Any] = {}
+
         if self.end_time is not None or write_none:
             properties["endTime"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
-        
+
         if self.name is not None or write_none:
             properties["name"] = self.name
-        
+
         if self.start_time is not None or write_none:
             properties["startTime"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
-        
 
         if properties:
             this_edge = dm.EdgeApply(
@@ -313,9 +322,11 @@ def _create_connection_edge_a_filter(
             dm.filters.In(
                 ["edge", "startNode"],
                 values=[
-                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -331,15 +342,23 @@ def _create_connection_edge_a_filter(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
         )
     if min_end_time is not None or max_end_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("endTime"), gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("endTime"),
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -347,7 +366,13 @@ def _create_connection_edge_a_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if min_start_time is not None or max_start_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("startTime"), gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None, lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("startTime"),
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -367,7 +392,8 @@ _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainM
 
 
 def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
+    start_node: DomainModelWrite,
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
@@ -414,8 +440,10 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         self.end_time = TimestampFilter(self, self._view_id.as_property_ref("endTime"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.start_time = TimestampFilter(self, self._view_id.as_property_ref("startTime"))
-        self._filter_classes.extend([
-            self.end_time,
-            self.name,
-            self.start_time,
-        ])
+        self._filter_classes.extend(
+            [
+                self.end_time,
+                self.name,
+                self.start_time,
+            ]
+        )

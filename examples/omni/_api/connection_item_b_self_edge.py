@@ -9,15 +9,15 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class ConnectionItemBSelfEdgeAPI(EdgeAPI):
     def list(
-            self,
-            from_connection_item_b: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            from_connection_item_b_space: str = DEFAULT_INSTANCE_SPACE,
-            to_connection_item_b: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            to_connection_item_b_space: str = DEFAULT_INSTANCE_SPACE,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit=DEFAULT_LIMIT_READ,
-    ) ->dm.EdgeList:
+        self,
+        from_connection_item_b: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_connection_item_b_space: str = DEFAULT_INSTANCE_SPACE,
+        to_connection_item_b: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_connection_item_b_space: str = DEFAULT_INSTANCE_SPACE,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+    ) -> dm.EdgeList:
         """List self edge edges of a connection item b.
 
         Args:
@@ -44,7 +44,6 @@ class ConnectionItemBSelfEdgeAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "reflexive"),
-            
             from_connection_item_b,
             from_connection_item_b_space,
             to_connection_item_b,

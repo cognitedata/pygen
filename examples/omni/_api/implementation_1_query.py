@@ -20,7 +20,6 @@ from ._core import (
 )
 
 
-
 class Implementation1QueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "Implementation1", "1")
 
@@ -55,4 +54,3 @@ class Implementation1QueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

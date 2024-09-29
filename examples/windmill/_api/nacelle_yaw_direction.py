@@ -14,7 +14,10 @@ from windmill.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
-ColumnNames = Literal["acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"]
+ColumnNames = Literal[
+    "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
+]
+
 
 class NacelleYawDirectionQuery:
     def __init__(
@@ -465,7 +468,9 @@ class NacelleYawDirectionAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_yaw_direction(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_yaw_direction(
+            self._client, self._view_id, filter_, limit
+        )
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
@@ -510,7 +515,7 @@ def _retrieve_timeseries_external_ids_with_extra_yaw_direction(
             continue
         view_prop = node.properties[view_id]
         key = view_prop["yaw_direction"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):

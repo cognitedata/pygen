@@ -8,13 +8,13 @@ from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
 
 class ConnectionItemBSelfEdgeAPI(EdgeAPI):
     def list(
-            self,
-            from_connection_item_b: dm.NodeId | list[dm.NodeId] | None = None,
-            to_connection_item_b: dm.NodeId | list[dm.NodeId] | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit=DEFAULT_LIMIT_READ,
-    ) ->dm.EdgeList:
+        self,
+        from_connection_item_b: dm.NodeId | list[dm.NodeId] | None = None,
+        to_connection_item_b: dm.NodeId | list[dm.NodeId] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+    ) -> dm.EdgeList:
         """List self edge edges of a connection item b.
 
         Args:
@@ -40,7 +40,6 @@ class ConnectionItemBSelfEdgeAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "reflexive"),
-            
             from_connection_item_b,
             to_connection_item_b,
             external_id_prefix,

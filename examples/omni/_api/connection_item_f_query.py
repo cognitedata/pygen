@@ -31,10 +31,10 @@ from ._core import (
 from omni.data_classes._connection_edge_a import (
     _create_connection_edge_a_filter,
 )
+
 if TYPE_CHECKING:
     from .connection_item_g_query import ConnectionItemGQueryAPI
     from .connection_item_e_query import ConnectionItemEQueryAPI
-
 
 
 class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
@@ -125,7 +125,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls= ConnectionEdgeA,
+                result_cls=ConnectionEdgeA,
                 max_retrieve_limit=limit,
             )
         )
@@ -141,7 +141,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemGQueryAPI(self._client, self._builder, node_filer, limit)
-    
+
     def outwards_single(
         self,
         direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -208,7 +208,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls= ConnectionEdgeA,
+                result_cls=ConnectionEdgeA,
                 max_retrieve_limit=limit,
             )
         )
@@ -225,7 +225,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemEQueryAPI(self._client, self._builder, node_filer, limit)
-    
+
     def query(
         self,
     ) -> T_DomainModelList:
@@ -236,4 +236,3 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

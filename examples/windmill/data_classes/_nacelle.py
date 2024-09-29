@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -61,8 +61,12 @@ __all__ = [
 ]
 
 
-NacelleTextFields = Literal["external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"]
-NacelleFields = Literal["external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"]
+NacelleTextFields = Literal[
+    "external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
+]
+NacelleFields = Literal[
+    "external_id", "acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "yaw_direction", "yaw_error"
+]
 
 _NACELLE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -72,6 +76,7 @@ _NACELLE_PROPERTIES_BY_FIELD = {
     "yaw_direction": "yaw_direction",
     "yaw_error": "yaw_error",
 }
+
 
 class NacelleGraphQL(GraphQLCore):
     """This represents the reading version of nacelle, used
@@ -94,6 +99,7 @@ class NacelleGraphQL(GraphQLCore):
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
     acc_from_back_side_x: Optional[TimeSeriesGraphQL] = None
     acc_from_back_side_y: Optional[TimeSeriesGraphQL] = None
@@ -116,6 +122,7 @@ class NacelleGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
     @field_validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -141,25 +148,20 @@ class NacelleGraphQL(GraphQLCore):
             acc_from_back_side_x=self.acc_from_back_side_x.as_read() if self.acc_from_back_side_x else None,
             acc_from_back_side_y=self.acc_from_back_side_y.as_read() if self.acc_from_back_side_y else None,
             acc_from_back_side_z=self.acc_from_back_side_z.as_read() if self.acc_from_back_side_z else None,
-            gearbox=self.gearbox.as_read()
-if isinstance(self.gearbox, GraphQLCore)
-else self.gearbox,
-            generator=self.generator.as_read()
-if isinstance(self.generator, GraphQLCore)
-else self.generator,
-            high_speed_shaft=self.high_speed_shaft.as_read()
-if isinstance(self.high_speed_shaft, GraphQLCore)
-else self.high_speed_shaft,
-            main_shaft=self.main_shaft.as_read()
-if isinstance(self.main_shaft, GraphQLCore)
-else self.main_shaft,
-            power_inverter=self.power_inverter.as_read()
-if isinstance(self.power_inverter, GraphQLCore)
-else self.power_inverter,
+            gearbox=self.gearbox.as_read() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
+            generator=self.generator.as_read() if isinstance(self.generator, GraphQLCore) else self.generator,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_read()
+                if isinstance(self.high_speed_shaft, GraphQLCore)
+                else self.high_speed_shaft
+            ),
+            main_shaft=self.main_shaft.as_read() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
+            power_inverter=(
+                self.power_inverter.as_read() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
+            ),
             yaw_direction=self.yaw_direction.as_read() if self.yaw_direction else None,
             yaw_error=self.yaw_error.as_read() if self.yaw_error else None,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -172,21 +174,17 @@ else self.power_inverter,
             acc_from_back_side_x=self.acc_from_back_side_x.as_write() if self.acc_from_back_side_x else None,
             acc_from_back_side_y=self.acc_from_back_side_y.as_write() if self.acc_from_back_side_y else None,
             acc_from_back_side_z=self.acc_from_back_side_z.as_write() if self.acc_from_back_side_z else None,
-            gearbox=self.gearbox.as_write()
-if isinstance(self.gearbox, GraphQLCore)
-else self.gearbox,
-            generator=self.generator.as_write()
-if isinstance(self.generator, GraphQLCore)
-else self.generator,
-            high_speed_shaft=self.high_speed_shaft.as_write()
-if isinstance(self.high_speed_shaft, GraphQLCore)
-else self.high_speed_shaft,
-            main_shaft=self.main_shaft.as_write()
-if isinstance(self.main_shaft, GraphQLCore)
-else self.main_shaft,
-            power_inverter=self.power_inverter.as_write()
-if isinstance(self.power_inverter, GraphQLCore)
-else self.power_inverter,
+            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
+            generator=self.generator.as_write() if isinstance(self.generator, GraphQLCore) else self.generator,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_write()
+                if isinstance(self.high_speed_shaft, GraphQLCore)
+                else self.high_speed_shaft
+            ),
+            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
+            power_inverter=(
+                self.power_inverter.as_write() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
+            ),
             yaw_direction=self.yaw_direction.as_write() if self.yaw_direction else None,
             yaw_error=self.yaw_error.as_write() if self.yaw_error else None,
         )
@@ -212,8 +210,9 @@ class Nacelle(DomainModel):
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     acc_from_back_side_x: Union[TimeSeries, str, None] = None
@@ -233,25 +232,37 @@ class Nacelle(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            acc_from_back_side_x=self.acc_from_back_side_x.as_write() if isinstance(self.acc_from_back_side_x, CogniteTimeSeries) else self.acc_from_back_side_x,
-            acc_from_back_side_y=self.acc_from_back_side_y.as_write() if isinstance(self.acc_from_back_side_y, CogniteTimeSeries) else self.acc_from_back_side_y,
-            acc_from_back_side_z=self.acc_from_back_side_z.as_write() if isinstance(self.acc_from_back_side_z, CogniteTimeSeries) else self.acc_from_back_side_z,
-            gearbox=self.gearbox.as_write()
-if isinstance(self.gearbox, DomainModel)
-else self.gearbox,
-            generator=self.generator.as_write()
-if isinstance(self.generator, DomainModel)
-else self.generator,
-            high_speed_shaft=self.high_speed_shaft.as_write()
-if isinstance(self.high_speed_shaft, DomainModel)
-else self.high_speed_shaft,
-            main_shaft=self.main_shaft.as_write()
-if isinstance(self.main_shaft, DomainModel)
-else self.main_shaft,
-            power_inverter=self.power_inverter.as_write()
-if isinstance(self.power_inverter, DomainModel)
-else self.power_inverter,
-            yaw_direction=self.yaw_direction.as_write() if isinstance(self.yaw_direction, CogniteTimeSeries) else self.yaw_direction,
+            acc_from_back_side_x=(
+                self.acc_from_back_side_x.as_write()
+                if isinstance(self.acc_from_back_side_x, CogniteTimeSeries)
+                else self.acc_from_back_side_x
+            ),
+            acc_from_back_side_y=(
+                self.acc_from_back_side_y.as_write()
+                if isinstance(self.acc_from_back_side_y, CogniteTimeSeries)
+                else self.acc_from_back_side_y
+            ),
+            acc_from_back_side_z=(
+                self.acc_from_back_side_z.as_write()
+                if isinstance(self.acc_from_back_side_z, CogniteTimeSeries)
+                else self.acc_from_back_side_z
+            ),
+            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
+            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
+            high_speed_shaft=(
+                self.high_speed_shaft.as_write()
+                if isinstance(self.high_speed_shaft, DomainModel)
+                else self.high_speed_shaft
+            ),
+            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
+            power_inverter=(
+                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
+            ),
+            yaw_direction=(
+                self.yaw_direction.as_write()
+                if isinstance(self.yaw_direction, CogniteTimeSeries)
+                else self.yaw_direction
+            ),
             yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, CogniteTimeSeries) else self.yaw_error,
         )
 
@@ -278,27 +289,36 @@ else self.power_inverter,
         from ._power_inverter import PowerInverter
 
         for instance in instances.values():
-            if isinstance(instance.gearbox, (dm.NodeId, str)) and (gearbox := nodes_by_id.get(instance.gearbox)) and isinstance(
-                    gearbox, Gearbox
+            if (
+                isinstance(instance.gearbox, (dm.NodeId, str))
+                and (gearbox := nodes_by_id.get(instance.gearbox))
+                and isinstance(gearbox, Gearbox)
             ):
                 instance.gearbox = gearbox
-            if isinstance(instance.generator, (dm.NodeId, str)) and (generator := nodes_by_id.get(instance.generator)) and isinstance(
-                    generator, Generator
+            if (
+                isinstance(instance.generator, (dm.NodeId, str))
+                and (generator := nodes_by_id.get(instance.generator))
+                and isinstance(generator, Generator)
             ):
                 instance.generator = generator
-            if isinstance(instance.high_speed_shaft, (dm.NodeId, str)) and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft)) and isinstance(
-                    high_speed_shaft, HighSpeedShaft
+            if (
+                isinstance(instance.high_speed_shaft, (dm.NodeId, str))
+                and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft))
+                and isinstance(high_speed_shaft, HighSpeedShaft)
             ):
                 instance.high_speed_shaft = high_speed_shaft
-            if isinstance(instance.main_shaft, (dm.NodeId, str)) and (main_shaft := nodes_by_id.get(instance.main_shaft)) and isinstance(
-                    main_shaft, MainShaft
+            if (
+                isinstance(instance.main_shaft, (dm.NodeId, str))
+                and (main_shaft := nodes_by_id.get(instance.main_shaft))
+                and isinstance(main_shaft, MainShaft)
             ):
                 instance.main_shaft = main_shaft
-            if isinstance(instance.power_inverter, (dm.NodeId, str)) and (power_inverter := nodes_by_id.get(instance.power_inverter)) and isinstance(
-                    power_inverter, PowerInverter
+            if (
+                isinstance(instance.power_inverter, (dm.NodeId, str))
+                and (power_inverter := nodes_by_id.get(instance.power_inverter))
+                and isinstance(power_inverter, PowerInverter)
             ):
                 instance.power_inverter = power_inverter
-
 
 
 class NacelleWrite(DomainModelWrite):
@@ -321,6 +341,7 @@ class NacelleWrite(DomainModelWrite):
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Nacelle", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -347,52 +368,77 @@ class NacelleWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.acc_from_back_side_x is not None or write_none:
-            properties["acc_from_back_side_x"] = self.acc_from_back_side_x if isinstance(self.acc_from_back_side_x, str) or self.acc_from_back_side_x is None else self.acc_from_back_side_x.external_id
-        
+            properties["acc_from_back_side_x"] = (
+                self.acc_from_back_side_x
+                if isinstance(self.acc_from_back_side_x, str) or self.acc_from_back_side_x is None
+                else self.acc_from_back_side_x.external_id
+            )
+
         if self.acc_from_back_side_y is not None or write_none:
-            properties["acc_from_back_side_y"] = self.acc_from_back_side_y if isinstance(self.acc_from_back_side_y, str) or self.acc_from_back_side_y is None else self.acc_from_back_side_y.external_id
-        
+            properties["acc_from_back_side_y"] = (
+                self.acc_from_back_side_y
+                if isinstance(self.acc_from_back_side_y, str) or self.acc_from_back_side_y is None
+                else self.acc_from_back_side_y.external_id
+            )
+
         if self.acc_from_back_side_z is not None or write_none:
-            properties["acc_from_back_side_z"] = self.acc_from_back_side_z if isinstance(self.acc_from_back_side_z, str) or self.acc_from_back_side_z is None else self.acc_from_back_side_z.external_id
-        
+            properties["acc_from_back_side_z"] = (
+                self.acc_from_back_side_z
+                if isinstance(self.acc_from_back_side_z, str) or self.acc_from_back_side_z is None
+                else self.acc_from_back_side_z.external_id
+            )
+
         if self.gearbox is not None:
             properties["gearbox"] = {
-                "space":  self.space if isinstance(self.gearbox, str) else self.gearbox.space,
+                "space": self.space if isinstance(self.gearbox, str) else self.gearbox.space,
                 "externalId": self.gearbox if isinstance(self.gearbox, str) else self.gearbox.external_id,
             }
-        
+
         if self.generator is not None:
             properties["generator"] = {
-                "space":  self.space if isinstance(self.generator, str) else self.generator.space,
+                "space": self.space if isinstance(self.generator, str) else self.generator.space,
                 "externalId": self.generator if isinstance(self.generator, str) else self.generator.external_id,
             }
-        
+
         if self.high_speed_shaft is not None:
             properties["high_speed_shaft"] = {
-                "space":  self.space if isinstance(self.high_speed_shaft, str) else self.high_speed_shaft.space,
-                "externalId": self.high_speed_shaft if isinstance(self.high_speed_shaft, str) else self.high_speed_shaft.external_id,
+                "space": self.space if isinstance(self.high_speed_shaft, str) else self.high_speed_shaft.space,
+                "externalId": (
+                    self.high_speed_shaft
+                    if isinstance(self.high_speed_shaft, str)
+                    else self.high_speed_shaft.external_id
+                ),
             }
-        
+
         if self.main_shaft is not None:
             properties["main_shaft"] = {
-                "space":  self.space if isinstance(self.main_shaft, str) else self.main_shaft.space,
+                "space": self.space if isinstance(self.main_shaft, str) else self.main_shaft.space,
                 "externalId": self.main_shaft if isinstance(self.main_shaft, str) else self.main_shaft.external_id,
             }
-        
+
         if self.power_inverter is not None:
             properties["power_inverter"] = {
-                "space":  self.space if isinstance(self.power_inverter, str) else self.power_inverter.space,
-                "externalId": self.power_inverter if isinstance(self.power_inverter, str) else self.power_inverter.external_id,
+                "space": self.space if isinstance(self.power_inverter, str) else self.power_inverter.space,
+                "externalId": (
+                    self.power_inverter if isinstance(self.power_inverter, str) else self.power_inverter.external_id
+                ),
             }
-        
+
         if self.yaw_direction is not None or write_none:
-            properties["yaw_direction"] = self.yaw_direction if isinstance(self.yaw_direction, str) or self.yaw_direction is None else self.yaw_direction.external_id
-        
+            properties["yaw_direction"] = (
+                self.yaw_direction
+                if isinstance(self.yaw_direction, str) or self.yaw_direction is None
+                else self.yaw_direction.external_id
+            )
+
         if self.yaw_error is not None or write_none:
-            properties["yaw_error"] = self.yaw_error if isinstance(self.yaw_error, str) or self.yaw_error is None else self.yaw_error.external_id
-        
+            properties["yaw_error"] = (
+                self.yaw_error
+                if isinstance(self.yaw_error, str) or self.yaw_error is None
+                else self.yaw_error.external_id
+            )
 
         if properties:
             this_node = dm.NodeApply(
@@ -404,12 +450,11 @@ class NacelleWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         if isinstance(self.gearbox, DomainModelWrite):
             other_resources = self.gearbox._to_instances_write(cache)
@@ -485,8 +530,8 @@ class NacelleWriteList(DomainModelWriteList[NacelleWrite]):
 
     _INSTANCE = NacelleWrite
 
-class NacelleApplyList(NacelleWriteList): ...
 
+class NacelleApplyList(NacelleWriteList): ...
 
 
 def _create_nacelle_filter(
@@ -502,45 +547,137 @@ def _create_nacelle_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if gearbox and isinstance(gearbox, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("gearbox"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": gearbox}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("gearbox"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": gearbox}
+            )
+        )
     if gearbox and isinstance(gearbox, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("gearbox"), value={"space": gearbox[0], "externalId": gearbox[1]}))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("gearbox"), value={"space": gearbox[0], "externalId": gearbox[1]})
+        )
     if gearbox and isinstance(gearbox, list) and isinstance(gearbox[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("gearbox"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in gearbox]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("gearbox"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in gearbox],
+            )
+        )
     if gearbox and isinstance(gearbox, list) and isinstance(gearbox[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("gearbox"), values=[{"space": item[0], "externalId": item[1]} for item in gearbox]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("gearbox"),
+                values=[{"space": item[0], "externalId": item[1]} for item in gearbox],
+            )
+        )
     if generator and isinstance(generator, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("generator"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": generator}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("generator"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": generator}
+            )
+        )
     if generator and isinstance(generator, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("generator"), value={"space": generator[0], "externalId": generator[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("generator"), value={"space": generator[0], "externalId": generator[1]}
+            )
+        )
     if generator and isinstance(generator, list) and isinstance(generator[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("generator"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in generator]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("generator"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in generator],
+            )
+        )
     if generator and isinstance(generator, list) and isinstance(generator[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("generator"), values=[{"space": item[0], "externalId": item[1]} for item in generator]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("generator"),
+                values=[{"space": item[0], "externalId": item[1]} for item in generator],
+            )
+        )
     if high_speed_shaft and isinstance(high_speed_shaft, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": high_speed_shaft}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("high_speed_shaft"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": high_speed_shaft},
+            )
+        )
     if high_speed_shaft and isinstance(high_speed_shaft, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value={"space": high_speed_shaft[0], "externalId": high_speed_shaft[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("high_speed_shaft"),
+                value={"space": high_speed_shaft[0], "externalId": high_speed_shaft[1]},
+            )
+        )
     if high_speed_shaft and isinstance(high_speed_shaft, list) and isinstance(high_speed_shaft[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("high_speed_shaft"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in high_speed_shaft]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("high_speed_shaft"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in high_speed_shaft],
+            )
+        )
     if high_speed_shaft and isinstance(high_speed_shaft, list) and isinstance(high_speed_shaft[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("high_speed_shaft"), values=[{"space": item[0], "externalId": item[1]} for item in high_speed_shaft]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("high_speed_shaft"),
+                values=[{"space": item[0], "externalId": item[1]} for item in high_speed_shaft],
+            )
+        )
     if main_shaft and isinstance(main_shaft, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("main_shaft"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": main_shaft}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("main_shaft"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": main_shaft}
+            )
+        )
     if main_shaft and isinstance(main_shaft, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("main_shaft"), value={"space": main_shaft[0], "externalId": main_shaft[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("main_shaft"), value={"space": main_shaft[0], "externalId": main_shaft[1]}
+            )
+        )
     if main_shaft and isinstance(main_shaft, list) and isinstance(main_shaft[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("main_shaft"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in main_shaft]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("main_shaft"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in main_shaft],
+            )
+        )
     if main_shaft and isinstance(main_shaft, list) and isinstance(main_shaft[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("main_shaft"), values=[{"space": item[0], "externalId": item[1]} for item in main_shaft]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("main_shaft"),
+                values=[{"space": item[0], "externalId": item[1]} for item in main_shaft],
+            )
+        )
     if power_inverter and isinstance(power_inverter, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("power_inverter"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": power_inverter}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("power_inverter"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": power_inverter},
+            )
+        )
     if power_inverter and isinstance(power_inverter, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("power_inverter"), value={"space": power_inverter[0], "externalId": power_inverter[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("power_inverter"),
+                value={"space": power_inverter[0], "externalId": power_inverter[1]},
+            )
+        )
     if power_inverter and isinstance(power_inverter, list) and isinstance(power_inverter[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("power_inverter"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in power_inverter]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("power_inverter"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in power_inverter],
+            )
+        )
     if power_inverter and isinstance(power_inverter, list) and isinstance(power_inverter[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("power_inverter"), values=[{"space": item[0], "externalId": item[1]} for item in power_inverter]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("power_inverter"),
+                values=[{"space": item[0], "externalId": item[1]} for item in power_inverter],
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -646,7 +783,6 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 ),
                 "power_inverter",
             )
-
 
 
 class NacelleQuery(_NacelleQuery[NacelleList]):

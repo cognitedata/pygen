@@ -52,6 +52,7 @@ _MAININTERFACE_PROPERTIES_BY_FIELD = {
     "main_value": "mainValue",
 }
 
+
 class MainInterfaceGraphQL(GraphQLCore):
     """This represents the reading version of main interface, used
     when data is retrieved from CDF using GraphQL.
@@ -64,6 +65,7 @@ class MainInterfaceGraphQL(GraphQLCore):
         data_record: The data record of the main interface node.
         main_value: The main value field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
 
@@ -95,7 +97,6 @@ class MainInterfaceGraphQL(GraphQLCore):
             main_value=self.main_value,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> MainInterfaceWrite:
@@ -119,8 +120,9 @@ class MainInterface(DomainModel):
         data_record: The data record of the main interface node.
         main_value: The main value field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
-    
+
     space: str
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
@@ -155,6 +157,7 @@ class MainInterfaceWrite(DomainModelWrite):
         data_record: The data record of the main interface node.
         main_value: The main value field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
 
     space: str
@@ -172,10 +175,9 @@ class MainInterfaceWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -187,12 +189,11 @@ class MainInterfaceWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         return resources
 
@@ -233,8 +234,8 @@ class MainInterfaceWriteList(DomainModelWriteList[MainInterfaceWrite]):
 
     _INSTANCE = MainInterfaceWrite
 
-class MainInterfaceApplyList(MainInterfaceWriteList): ...
 
+class MainInterfaceApplyList(MainInterfaceWriteList): ...
 
 
 def _create_main_interface_filter(
@@ -289,9 +290,11 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
         )
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
-        self._filter_classes.extend([
-            self.main_value,
-        ])
+        self._filter_classes.extend(
+            [
+                self.main_value,
+            ]
+        )
 
 
 class MainInterfaceQuery(_MainInterfaceQuery[MainInterfaceList]):

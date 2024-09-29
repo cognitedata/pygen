@@ -66,6 +66,7 @@ _EQUIPMENTMODULE_PROPERTIES_BY_FIELD = {
     "equipment_module_type": "type",
 }
 
+
 class EquipmentModuleGraphQL(GraphQLCore):
     """This represents the reading version of equipment module, used
     when data is retrieved from CDF using GraphQL.
@@ -81,6 +82,7 @@ class EquipmentModuleGraphQL(GraphQLCore):
         sensor_value: The sensor value field.
         equipment_module_type: The equipment module type field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
     description: Optional[str] = None
     name: Optional[str] = None
@@ -118,7 +120,6 @@ class EquipmentModuleGraphQL(GraphQLCore):
             equipment_module_type=self.equipment_module_type,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> EquipmentModuleWrite:
@@ -148,8 +149,9 @@ class EquipmentModule(DomainModel):
         sensor_value: The sensor value field.
         equipment_module_type: The equipment module type field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
@@ -165,7 +167,9 @@ class EquipmentModule(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             name=self.name,
-            sensor_value=self.sensor_value.as_write() if isinstance(self.sensor_value, CogniteTimeSeries) else self.sensor_value,
+            sensor_value=(
+                self.sensor_value.as_write() if isinstance(self.sensor_value, CogniteTimeSeries) else self.sensor_value
+            ),
             equipment_module_type=self.equipment_module_type,
         )
 
@@ -193,6 +197,7 @@ class EquipmentModuleWrite(DomainModelWrite):
         sensor_value: The sensor value field.
         equipment_module_type: The equipment module type field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -213,19 +218,22 @@ class EquipmentModuleWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.description is not None or write_none:
             properties["description"] = self.description
-        
+
         if self.name is not None or write_none:
             properties["name"] = self.name
-        
+
         if self.sensor_value is not None or write_none:
-            properties["sensor_value"] = self.sensor_value if isinstance(self.sensor_value, str) or self.sensor_value is None else self.sensor_value.external_id
-        
+            properties["sensor_value"] = (
+                self.sensor_value
+                if isinstance(self.sensor_value, str) or self.sensor_value is None
+                else self.sensor_value.external_id
+            )
+
         if self.equipment_module_type is not None or write_none:
             properties["type"] = self.equipment_module_type
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -237,12 +245,11 @@ class EquipmentModuleWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         if isinstance(self.sensor_value, CogniteTimeSeriesWrite):
             resources.time_series.append(self.sensor_value)
@@ -286,8 +293,8 @@ class EquipmentModuleWriteList(DomainModelWriteList[EquipmentModuleWrite]):
 
     _INSTANCE = EquipmentModuleWrite
 
-class EquipmentModuleApplyList(EquipmentModuleWriteList): ...
 
+class EquipmentModuleApplyList(EquipmentModuleWriteList): ...
 
 
 def _create_equipment_module_filter(
@@ -360,11 +367,13 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.equipment_module_type = StringFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.extend([
-            self.description,
-            self.name,
-            self.equipment_module_type,
-        ])
+        self._filter_classes.extend(
+            [
+                self.description,
+                self.name,
+                self.equipment_module_type,
+            ]
+        )
 
 
 class EquipmentModuleQuery(_EquipmentModuleQuery[EquipmentModuleList]):

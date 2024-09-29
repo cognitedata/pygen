@@ -16,6 +16,7 @@ from ._core import DEFAULT_LIMIT_READ
 
 ColumnNames = Literal["bending_moment_y", "bending_monent_x", "torque"]
 
+
 class HighSpeedShaftTorqueQuery:
     def __init__(
         self,
@@ -480,7 +481,7 @@ def _retrieve_timeseries_external_ids_with_extra_torque(
             continue
         view_prop = node.properties[view_id]
         key = view_prop["torque"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):

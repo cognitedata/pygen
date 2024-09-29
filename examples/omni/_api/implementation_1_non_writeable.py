@@ -31,7 +31,8 @@ from omni.data_classes._implementation_1_non_writeable import (
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
-    Aggregations,NodeReadAPI,
+    Aggregations,
+    NodeReadAPI,
     SequenceNotStr,
 )
 from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
@@ -46,19 +47,18 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            main_value: str | list[str] | None = None,
-            main_value_prefix: str | None = None,
-            sub_value: str | list[str] | None = None,
-            sub_value_prefix: str | None = None,
-            value_1: str | list[str] | None = None,
-            value_1_prefix: str | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
+        value_1: str | list[str] | None = None,
+        value_1_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> Implementation1NonWriteableQueryAPI[Implementation1NonWriteableList]:
         """Query starting at implementation 1 non writeables.
 
@@ -94,8 +94,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         builder = QueryBuilder(Implementation1NonWriteableList)
         return Implementation1NonWriteableQueryAPI(self._client, builder, filter_, limit)
 
-
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more implementation 1 non writeable.
 
         Args:
@@ -125,14 +126,16 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteable | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteable | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteableList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Implementation1NonWriteableList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1NonWriteable | Implementation1NonWriteableList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Implementation1NonWriteable | Implementation1NonWriteableList | None:
         """Retrieve one or more implementation 1 non writeables by id(s).
 
         Args:
@@ -156,7 +159,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     def search(
         self,
         query: str,
-        properties: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        properties: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -233,7 +238,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         group_by: None = None,
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -244,8 +251,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -254,7 +260,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         group_by: None = None,
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -265,19 +273,22 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields],
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -288,18 +299,21 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         property: Implementation1NonWriteableFields | SequenceNotStr[Implementation1NonWriteableFields] | None = None,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -374,7 +388,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         property: Implementation1NonWriteableFields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None = None,
+        search_property: (
+            Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,

@@ -25,7 +25,6 @@ from ._core import (
 )
 
 
-
 class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Nacelle", "1")
 
@@ -153,4 +152,3 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                 result_cls=PowerInverter,
             ),
         )
-

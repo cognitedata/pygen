@@ -20,7 +20,6 @@ from ._core import (
 )
 
 
-
 class RotorQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Rotor", "1")
 
@@ -55,4 +54,3 @@ class RotorQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

@@ -53,15 +53,14 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            main_value: str | list[str] | None = None,
-            main_value_prefix: str | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> MainInterfaceQueryAPI[MainInterfaceList]:
         """Query starting at main interfaces.
 
@@ -88,7 +87,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         )
         builder = QueryBuilder(MainInterfaceList)
         return MainInterfaceQueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -160,14 +158,24 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None) -> MainInterface | None:
-        ...
+    def retrieve(
+        self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None
+    ) -> MainInterface | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None) -> MainInterfaceList:
-        ...
+    def retrieve(
+        self,
+        external_id: SequenceNotStr[str],
+        space: str,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
+    ) -> MainInterfaceList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None) -> MainInterface | MainInterfaceList | None:
+    def retrieve(
+        self,
+        external_id: str | SequenceNotStr[str],
+        space: str,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
+    ) -> MainInterface | MainInterfaceList | None:
         """Retrieve one or more main interfaces by id(s).
 
         Args:
@@ -266,8 +274,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -283,15 +290,16 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields],
         property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,
@@ -302,14 +310,15 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         property: MainInterfaceFields | SequenceNotStr[MainInterfaceFields] | None = None,
         query: str | None = None,

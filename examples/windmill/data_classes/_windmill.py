@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -62,6 +62,7 @@ _WINDMILL_PROPERTIES_BY_FIELD = {
     "windfarm": "windfarm",
 }
 
+
 class WindmillGraphQL(GraphQLCore):
     """This represents the reading version of windmill, used
     when data is retrieved from CDF using GraphQL.
@@ -80,6 +81,7 @@ class WindmillGraphQL(GraphQLCore):
         rotor: The rotor field.
         windfarm: The windfarm field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
     blades: Optional[list[BladeGraphQL]] = Field(default=None, repr=False)
     capacity: Optional[float] = None
@@ -99,6 +101,7 @@ class WindmillGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
     @field_validator("blades", "metmast", "nacelle", "rotor", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -124,16 +127,11 @@ class WindmillGraphQL(GraphQLCore):
             blades=[blade.as_read() for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[metmast.as_read() for metmast in self.metmast or []],
-            nacelle=self.nacelle.as_read()
-if isinstance(self.nacelle, GraphQLCore)
-else self.nacelle,
+            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_read()
-if isinstance(self.rotor, GraphQLCore)
-else self.rotor,
+            rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
             windfarm=self.windfarm,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -146,13 +144,9 @@ else self.rotor,
             blades=[blade.as_write() for blade in self.blades or []],
             capacity=self.capacity,
             metmast=[metmast.as_write() for metmast in self.metmast or []],
-            nacelle=self.nacelle.as_write()
-if isinstance(self.nacelle, GraphQLCore)
-else self.nacelle,
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_write()
-if isinstance(self.rotor, GraphQLCore)
-else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, GraphQLCore) else self.rotor,
             windfarm=self.windfarm,
         )
 
@@ -174,8 +168,9 @@ class Windmill(DomainModel):
         rotor: The rotor field.
         windfarm: The windfarm field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     blades: Optional[list[Union[Blade, str, dm.NodeId]]] = Field(default=None, repr=False)
@@ -194,14 +189,12 @@ class Windmill(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
             capacity=self.capacity,
-            metmast=[metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []],
-            nacelle=self.nacelle.as_write()
-if isinstance(self.nacelle, DomainModel)
-else self.nacelle,
+            metmast=[
+                metmast.as_write() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
+            ],
+            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
             name=self.name,
-            rotor=self.rotor.as_write()
-if isinstance(self.rotor, DomainModel)
-else self.rotor,
+            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
             windfarm=self.windfarm,
         )
 
@@ -227,12 +220,16 @@ else self.rotor,
         from ._rotor import Rotor
 
         for instance in instances.values():
-            if isinstance(instance.nacelle, (dm.NodeId, str)) and (nacelle := nodes_by_id.get(instance.nacelle)) and isinstance(
-                    nacelle, Nacelle
+            if (
+                isinstance(instance.nacelle, (dm.NodeId, str))
+                and (nacelle := nodes_by_id.get(instance.nacelle))
+                and isinstance(nacelle, Nacelle)
             ):
                 instance.nacelle = nacelle
-            if isinstance(instance.rotor, (dm.NodeId, str)) and (rotor := nodes_by_id.get(instance.rotor)) and isinstance(
-                    rotor, Rotor
+            if (
+                isinstance(instance.rotor, (dm.NodeId, str))
+                and (rotor := nodes_by_id.get(instance.rotor))
+                and isinstance(rotor, Rotor)
             ):
                 instance.rotor = rotor
             if edges := edges_by_source_node.get(instance.as_id()):
@@ -273,8 +270,6 @@ else self.rotor,
                 instance.metmast = metmast or None
 
 
-
-
 class WindmillWrite(DomainModelWrite):
     """This represents the writing version of windmill.
 
@@ -292,6 +287,7 @@ class WindmillWrite(DomainModelWrite):
         rotor: The rotor field.
         windfarm: The windfarm field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Windmill", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -315,28 +311,27 @@ class WindmillWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.capacity is not None or write_none:
             properties["capacity"] = self.capacity
-        
+
         if self.nacelle is not None:
             properties["nacelle"] = {
-                "space":  self.space if isinstance(self.nacelle, str) else self.nacelle.space,
+                "space": self.space if isinstance(self.nacelle, str) else self.nacelle.space,
                 "externalId": self.nacelle if isinstance(self.nacelle, str) else self.nacelle.external_id,
             }
-        
+
         if self.name is not None or write_none:
             properties["name"] = self.name
-        
+
         if self.rotor is not None:
             properties["rotor"] = {
-                "space":  self.space if isinstance(self.rotor, str) else self.rotor.space,
+                "space": self.space if isinstance(self.rotor, str) else self.rotor.space,
                 "externalId": self.rotor if isinstance(self.rotor, str) else self.rotor.external_id,
             }
-        
+
         if self.windfarm is not None or write_none:
             properties["windfarm"] = self.windfarm
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -348,12 +343,11 @@ class WindmillWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.blades")
         for blade in self.blades or []:
@@ -426,8 +420,8 @@ class WindmillWriteList(DomainModelWriteList[WindmillWrite]):
 
     _INSTANCE = WindmillWrite
 
-class WindmillApplyList(WindmillWriteList): ...
 
+class WindmillApplyList(WindmillWriteList): ...
 
 
 def _create_windmill_filter(
@@ -448,13 +442,29 @@ def _create_windmill_filter(
     if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if nacelle and isinstance(nacelle, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("nacelle"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": nacelle}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("nacelle"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": nacelle}
+            )
+        )
     if nacelle and isinstance(nacelle, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("nacelle"), value={"space": nacelle[0], "externalId": nacelle[1]}))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("nacelle"), value={"space": nacelle[0], "externalId": nacelle[1]})
+        )
     if nacelle and isinstance(nacelle, list) and isinstance(nacelle[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("nacelle"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in nacelle]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("nacelle"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in nacelle],
+            )
+        )
     if nacelle and isinstance(nacelle, list) and isinstance(nacelle[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("nacelle"), values=[{"space": item[0], "externalId": item[1]} for item in nacelle]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("nacelle"),
+                values=[{"space": item[0], "externalId": item[1]} for item in nacelle],
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -462,13 +472,28 @@ def _create_windmill_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if rotor and isinstance(rotor, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": rotor}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("rotor"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": rotor}
+            )
+        )
     if rotor and isinstance(rotor, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": rotor[0], "externalId": rotor[1]}))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": rotor[0], "externalId": rotor[1]})
+        )
     if rotor and isinstance(rotor, list) and isinstance(rotor[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("rotor"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in rotor]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rotor"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in rotor],
+            )
+        )
     if rotor and isinstance(rotor, list) and isinstance(rotor[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]
+            )
+        )
     if isinstance(windfarm, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))
     if windfarm and isinstance(windfarm, list):
@@ -570,11 +595,13 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.windfarm = StringFilter(self, self._view_id.as_property_ref("windfarm"))
-        self._filter_classes.extend([
-            self.capacity,
-            self.name,
-            self.windfarm,
-        ])
+        self._filter_classes.extend(
+            [
+                self.capacity,
+                self.name,
+                self.windfarm,
+            ]
+        )
 
 
 class WindmillQuery(_WindmillQuery[WindmillList]):

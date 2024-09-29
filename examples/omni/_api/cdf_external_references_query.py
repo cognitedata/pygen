@@ -20,7 +20,6 @@ from ._core import (
 )
 
 
-
 class CDFExternalReferencesQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
 
@@ -55,4 +54,3 @@ class CDFExternalReferencesQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

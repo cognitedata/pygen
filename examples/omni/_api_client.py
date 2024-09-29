@@ -62,7 +62,7 @@ class OmniClient:
         client.config.client_name = "CognitePygen:0.99.34"
 
         self._client = client
-        
+
         self.cdf_external_references = CDFExternalReferencesAPI(client)
         self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client)
         self.connection_item_a = ConnectionItemAAPI(client)
@@ -231,9 +231,9 @@ class OmniClient:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the Omni data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("pygen-models", "Omni", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)

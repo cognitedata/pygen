@@ -20,7 +20,6 @@ from ._core import (
 )
 
 
-
 class PrimitiveWithDefaultsQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
 
@@ -55,4 +54,3 @@ class PrimitiveWithDefaultsQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

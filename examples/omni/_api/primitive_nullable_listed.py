@@ -41,7 +41,14 @@ from ._core import (
 from .primitive_nullable_listed_query import PrimitiveNullableListedQueryAPI
 
 
-class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedWrite, PrimitiveNullableListedList, PrimitiveNullableListedWriteList]):
+class PrimitiveNullableListedAPI(
+    NodeAPI[
+        PrimitiveNullableListed,
+        PrimitiveNullableListedWrite,
+        PrimitiveNullableListedList,
+        PrimitiveNullableListedWriteList,
+    ]
+):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
     _properties_by_field = _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveNullableListed
@@ -51,13 +58,12 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> PrimitiveNullableListedQueryAPI[PrimitiveNullableListedList]:
         """Query starting at primitive nullable listeds.
 
@@ -80,7 +86,6 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         )
         builder = QueryBuilder(PrimitiveNullableListedList)
         return PrimitiveNullableListedQueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -122,7 +127,9 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         )
         return self._apply(primitive_nullable_listed, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more primitive nullable listed.
 
         Args:
@@ -152,14 +159,16 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListed | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListed | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListedList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveNullableListedList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableListed | PrimitiveNullableListedList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveNullableListed | PrimitiveNullableListedList | None:
         """Retrieve one or more primitive nullable listeds by id(s).
 
         Args:
@@ -242,13 +251,14 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         group_by: None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -257,40 +267,48 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         group_by: None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields],
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         property: PrimitiveNullableListedFields | SequenceNotStr[PrimitiveNullableListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -347,7 +365,9 @@ class PrimitiveNullableListedAPI(NodeAPI[PrimitiveNullableListed, PrimitiveNulla
         property: PrimitiveNullableListedFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None = None,
+        search_property: (
+            PrimitiveNullableListedTextFields | SequenceNotStr[PrimitiveNullableListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,

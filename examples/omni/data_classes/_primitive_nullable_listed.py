@@ -46,7 +46,9 @@ __all__ = [
 
 
 PrimitiveNullableListedTextFields = Literal["external_id", "text"]
-PrimitiveNullableListedFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+PrimitiveNullableListedFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -60,6 +62,7 @@ _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD = {
     "text": "text",
     "timestamp": "timestamp",
 }
+
 
 class PrimitiveNullableListedGraphQL(GraphQLCore):
     """This represents the reading version of primitive nullable listed, used
@@ -81,6 +84,7 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
     boolean: Optional[list[bool]] = None
     date: Optional[list[datetime.date]] = None
@@ -128,7 +132,6 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> PrimitiveNullableListedWrite:
@@ -168,8 +171,9 @@ class PrimitiveNullableListed(DomainModel):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[list[bool]] = None
@@ -228,6 +232,7 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -253,34 +258,35 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.boolean is not None or write_none:
             properties["boolean"] = self.boolean
-        
+
         if self.date is not None or write_none:
             properties["date"] = [date.isoformat() for date in self.date or []]
-        
+
         if self.float_32 is not None or write_none:
             properties["float32"] = self.float_32
-        
+
         if self.float_64 is not None or write_none:
             properties["float64"] = self.float_64
-        
+
         if self.int_32 is not None or write_none:
             properties["int32"] = self.int_32
-        
+
         if self.int_64 is not None or write_none:
             properties["int64"] = self.int_64
-        
+
         if self.json_ is not None or write_none:
             properties["json"] = self.json_
-        
+
         if self.text is not None or write_none:
             properties["text"] = self.text
-        
+
         if self.timestamp is not None or write_none:
-            properties["timestamp"] = [timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []]
-        
+            properties["timestamp"] = [
+                timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp or []
+            ]
 
         if properties:
             this_node = dm.NodeApply(
@@ -292,12 +298,11 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         return resources
 
@@ -338,8 +343,8 @@ class PrimitiveNullableListedWriteList(DomainModelWriteList[PrimitiveNullableLis
 
     _INSTANCE = PrimitiveNullableListedWrite
 
-class PrimitiveNullableListedApplyList(PrimitiveNullableListedWriteList): ...
 
+class PrimitiveNullableListedApplyList(PrimitiveNullableListedWriteList): ...
 
 
 def _create_primitive_nullable_listed_filter(
@@ -384,7 +389,6 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
-
 
 
 class PrimitiveNullableListedQuery(_PrimitiveNullableListedQuery[PrimitiveNullableListedList]):

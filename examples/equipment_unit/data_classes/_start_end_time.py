@@ -35,11 +35,18 @@ if TYPE_CHECKING:
     from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
 
 
+__all__ = [
+    "StartEndTime",
+    "StartEndTimeWrite",
+    "StartEndTimeApply",
+    "StartEndTimeList",
+    "StartEndTimeWriteList",
+    "StartEndTimeApplyList",
+    "StartEndTimeFields",
+]
 
-__all__ = ["StartEndTime", "StartEndTimeWrite", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeWriteList", "StartEndTimeApplyList", "StartEndTimeFields"]
 
-
-StartEndTimeTextFields = Literal["external_id", ]
+StartEndTimeTextFields = Literal["external_id",]
 StartEndTimeFields = Literal["external_id", "end_time", "start_time"]
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -62,6 +69,7 @@ class StartEndTimeGraphQL(GraphQLCore):
         end_time: The end time field.
         start_time: The start time field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     end_node: Union[EquipmentModuleGraphQL, WorkOrderGraphQL, None] = None
     end_time: Optional[datetime.datetime] = None
@@ -85,7 +93,6 @@ class StartEndTimeGraphQL(GraphQLCore):
             end_time=self.end_time,
             start_time=self.start_time,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -114,6 +121,7 @@ class StartEndTime(DomainRelation):
         end_time: The end time field.
         start_time: The start time field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId]
@@ -154,6 +162,7 @@ class StartEndTimeWrite(DomainRelationWrite):
         end_time: The end time field.
         start_time: The start time field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[EquipmentModuleWrite, WorkOrderWrite, str, dm.NodeId]
@@ -185,14 +194,13 @@ class StartEndTimeWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties: dict[str, Any]  = {}
-        
+        properties: dict[str, Any] = {}
+
         if self.end_time is not None or write_none:
             properties["end_time"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
-        
+
         if self.start_time is not None or write_none:
             properties["start_time"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
-        
 
         if properties:
             this_edge = dm.EdgeApply(
@@ -295,9 +303,11 @@ def _create_start_end_time_filter(
             dm.filters.In(
                 ["edge", "startNode"],
                 values=[
-                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -313,17 +323,31 @@ def _create_start_end_time_filter(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
         )
     if min_end_time is not None or max_end_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("end_time"), gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("end_time"),
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
+            )
+        )
     if min_start_time is not None or max_start_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("start_time"), gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None, lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("start_time"),
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -387,7 +411,9 @@ class _StartEndTimeQuery(EdgeQueryCore[T_DomainList, StartEndTimeList]):
 
         self.end_time = TimestampFilter(self, self._view_id.as_property_ref("end_time"))
         self.start_time = TimestampFilter(self, self._view_id.as_property_ref("start_time"))
-        self._filter_classes.extend([
-            self.end_time,
-            self.start_time,
-        ])
+        self._filter_classes.extend(
+            [
+                self.end_time,
+                self.start_time,
+            ]
+        )

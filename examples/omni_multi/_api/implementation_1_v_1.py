@@ -39,7 +39,9 @@ from ._core import (
 from .implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
-class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List, Implementation1v1WriteList]):
+class Implementation1v1API(
+    NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List, Implementation1v1WriteList]
+):
     _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
     _properties_by_field = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
     _class_type = Implementation1v1
@@ -49,19 +51,18 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            main_value: str | list[str] | None = None,
-            main_value_prefix: str | None = None,
-            value_1: str | list[str] | None = None,
-            value_1_prefix: str | None = None,
-            value_2: str | list[str] | None = None,
-            value_2_prefix: str | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        value_1: str | list[str] | None = None,
+        value_1_prefix: str | None = None,
+        value_2: str | list[str] | None = None,
+        value_2_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> Implementation1v1QueryAPI[Implementation1v1List]:
         """Query starting at implementation 1 v 1.
 
@@ -96,7 +97,6 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         )
         builder = QueryBuilder(Implementation1v1List)
         return Implementation1v1QueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -168,14 +168,14 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str) -> Implementation1v1 | None:
-        ...
+    def retrieve(self, external_id: str, space: str) -> Implementation1v1 | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> Implementation1v1List:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> Implementation1v1List: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str) -> Implementation1v1 | Implementation1v1List | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str
+    ) -> Implementation1v1 | Implementation1v1List | None:
         """Retrieve one or more implementation 1 v 1 by id(s).
 
         Args:
@@ -287,8 +287,7 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -308,15 +307,16 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields],
         property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         query: str | None = None,
@@ -331,14 +331,15 @@ class Implementation1v1API(NodeAPI[Implementation1v1, Implementation1v1Write, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
         query: str | None = None,

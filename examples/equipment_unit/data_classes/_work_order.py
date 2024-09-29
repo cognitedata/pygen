@@ -55,6 +55,7 @@ _WORKORDER_PROPERTIES_BY_FIELD = {
     "work_order_type": "type",
 }
 
+
 class WorkOrderGraphQL(GraphQLCore):
     """This represents the reading version of work order, used
     when data is retrieved from CDF using GraphQL.
@@ -69,6 +70,7 @@ class WorkOrderGraphQL(GraphQLCore):
         performed_by: The performed by field.
         work_order_type: The work order type field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
@@ -104,7 +106,6 @@ class WorkOrderGraphQL(GraphQLCore):
             work_order_type=self.work_order_type,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> WorkOrderWrite:
@@ -132,8 +133,9 @@ class WorkOrder(DomainModel):
         performed_by: The performed by field.
         work_order_type: The work order type field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
@@ -174,6 +176,7 @@ class WorkOrderWrite(DomainModelWrite):
         performed_by: The performed by field.
         work_order_type: The work order type field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -193,16 +196,15 @@ class WorkOrderWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.description is not None or write_none:
             properties["description"] = self.description
-        
+
         if self.performed_by is not None or write_none:
             properties["performedBy"] = self.performed_by
-        
+
         if self.work_order_type is not None or write_none:
             properties["type"] = self.work_order_type
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -214,12 +216,11 @@ class WorkOrderWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         return resources
 
@@ -260,8 +261,8 @@ class WorkOrderWriteList(DomainModelWriteList[WorkOrderWrite]):
 
     _INSTANCE = WorkOrderWrite
 
-class WorkOrderApplyList(WorkOrderWriteList): ...
 
+class WorkOrderApplyList(WorkOrderWriteList): ...
 
 
 def _create_work_order_filter(
@@ -334,11 +335,13 @@ class _WorkOrderQuery(NodeQueryCore[T_DomainModelList, WorkOrderList]):
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.performed_by = StringFilter(self, self._view_id.as_property_ref("performedBy"))
         self.work_order_type = StringFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.extend([
-            self.description,
-            self.performed_by,
-            self.work_order_type,
-        ])
+        self._filter_classes.extend(
+            [
+                self.description,
+                self.performed_by,
+                self.work_order_type,
+            ]
+        )
 
 
 class WorkOrderQuery(_WorkOrderQuery[WorkOrderList]):

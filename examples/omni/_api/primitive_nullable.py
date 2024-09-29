@@ -41,7 +41,9 @@ from ._core import (
 from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
-class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList, PrimitiveNullableWriteList]):
+class PrimitiveNullableAPI(
+    NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList, PrimitiveNullableWriteList]
+):
     _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
     _properties_by_field = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
     _class_type = PrimitiveNullable
@@ -51,28 +53,27 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            boolean: bool | None = None,
-            min_date: datetime.date | None = None,
-            max_date: datetime.date | None = None,
-            min_float_32: float | None = None,
-            max_float_32: float | None = None,
-            min_float_64: float | None = None,
-            max_float_64: float | None = None,
-            min_int_32: int | None = None,
-            max_int_32: int | None = None,
-            min_int_64: int | None = None,
-            max_int_64: int | None = None,
-            text: str | list[str] | None = None,
-            text_prefix: str | None = None,
-            min_timestamp: datetime.datetime | None = None,
-            max_timestamp: datetime.datetime | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> PrimitiveNullableQueryAPI[PrimitiveNullableList]:
         """Query starting at primitive nullables.
 
@@ -126,7 +127,6 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         builder = QueryBuilder(PrimitiveNullableList)
         return PrimitiveNullableQueryAPI(self._client, builder, filter_, limit)
 
-
     def apply(
         self,
         primitive_nullable: PrimitiveNullableWrite | Sequence[PrimitiveNullableWrite],
@@ -167,7 +167,9 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         )
         return self._apply(primitive_nullable, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more primitive nullable.
 
         Args:
@@ -197,14 +199,16 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullable | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullable | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullableList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveNullableList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveNullable | PrimitiveNullableList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveNullable | PrimitiveNullableList | None:
         """Retrieve one or more primitive nullables by id(s).
 
         Args:
@@ -352,8 +356,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -382,15 +385,16 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields],
         property: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         query: str | None = None,
@@ -414,14 +418,15 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         property: PrimitiveNullableFields | SequenceNotStr[PrimitiveNullableFields] | None = None,
         query: str | None = None,

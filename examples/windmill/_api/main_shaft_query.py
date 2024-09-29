@@ -20,7 +20,6 @@ from ._core import (
 )
 
 
-
 class MainShaftQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "MainShaft", "1")
 
@@ -55,4 +54,3 @@ class MainShaftQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

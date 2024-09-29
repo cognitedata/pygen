@@ -67,16 +67,16 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         self.yaw_error = NacelleYawErrorAPI(client, self._view_id)
 
     def __call__(
-            self,
-            gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-            generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-            high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-            main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-            power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> NacelleQueryAPI[NacelleList]:
         """Query starting at nacelles.
 
@@ -109,7 +109,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         )
         builder = QueryBuilder(NacelleList)
         return NacelleQueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -151,7 +150,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         )
         return self._apply(nacelle, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more nacelle.
 
         Args:
@@ -181,14 +182,14 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Nacelle | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Nacelle | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> NacelleList:
-        ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> NacelleList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Nacelle | NacelleList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Nacelle | NacelleList | None:
         """Retrieve one or more nacelles by id(s).
 
         Args:
@@ -294,8 +295,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -312,15 +312,16 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: NacelleFields | SequenceNotStr[NacelleFields],
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -332,14 +333,15 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -525,7 +527,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         )
 
         if retrieve_connections == "skip":
-                return self._list(
+            return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]

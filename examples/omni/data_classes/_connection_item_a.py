@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -57,6 +57,7 @@ _CONNECTIONITEMA_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
+
 class ConnectionItemAGraphQL(GraphQLCore):
     """This represents the reading version of connection item a, used
     when data is retrieved from CDF using GraphQL.
@@ -72,6 +73,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
         outwards: The outward field.
         self_direct: The self direct field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
     name: Optional[str] = None
     other_direct: Optional[ConnectionItemCNodeGraphQL] = Field(default=None, repr=False, alias="otherDirect")
@@ -88,6 +90,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
     @field_validator("other_direct", "outwards", "self_direct", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -111,15 +114,12 @@ class ConnectionItemAGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             name=self.name,
-            other_direct=self.other_direct.as_read()
-if isinstance(self.other_direct, GraphQLCore)
-else self.other_direct,
+            other_direct=(
+                self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
+            ),
             outwards=[outward.as_read() for outward in self.outwards or []],
-            self_direct=self.self_direct.as_read()
-if isinstance(self.self_direct, GraphQLCore)
-else self.self_direct,
+            self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
-
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -130,13 +130,11 @@ else self.self_direct,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             name=self.name,
-            other_direct=self.other_direct.as_write()
-if isinstance(self.other_direct, GraphQLCore)
-else self.other_direct,
+            other_direct=(
+                self.other_direct.as_write() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
+            ),
             outwards=[outward.as_write() for outward in self.outwards or []],
-            self_direct=self.self_direct.as_write()
-if isinstance(self.self_direct, GraphQLCore)
-else self.self_direct,
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
 
@@ -154,12 +152,15 @@ class ConnectionItemA(DomainModel):
         outwards: The outward field.
         self_direct: The self direct field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemCNode, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
+    other_direct: Union[ConnectionItemCNode, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="otherDirect"
+    )
     outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
@@ -170,13 +171,13 @@ class ConnectionItemA(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             name=self.name,
-            other_direct=self.other_direct.as_write()
-if isinstance(self.other_direct, DomainModel)
-else self.other_direct,
-            outwards=[outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []],
-            self_direct=self.self_direct.as_write()
-if isinstance(self.self_direct, DomainModel)
-else self.self_direct,
+            other_direct=(
+                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
+            ),
+            outwards=[
+                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
+            ],
+            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
         )
 
     def as_apply(self) -> ConnectionItemAWrite:
@@ -199,12 +200,16 @@ else self.self_direct,
         from ._connection_item_c_node import ConnectionItemCNode
 
         for instance in instances.values():
-            if isinstance(instance.other_direct, (dm.NodeId, str)) and (other_direct := nodes_by_id.get(instance.other_direct)) and isinstance(
-                    other_direct, ConnectionItemCNode
+            if (
+                isinstance(instance.other_direct, (dm.NodeId, str))
+                and (other_direct := nodes_by_id.get(instance.other_direct))
+                and isinstance(other_direct, ConnectionItemCNode)
             ):
                 instance.other_direct = other_direct
-            if isinstance(instance.self_direct, (dm.NodeId, str)) and (self_direct := nodes_by_id.get(instance.self_direct)) and isinstance(
-                    self_direct, ConnectionItemA
+            if (
+                isinstance(instance.self_direct, (dm.NodeId, str))
+                and (self_direct := nodes_by_id.get(instance.self_direct))
+                and isinstance(self_direct, ConnectionItemA)
             ):
                 instance.self_direct = self_direct
             if edges := edges_by_source_node.get(instance.as_id()):
@@ -239,8 +244,6 @@ else self.self_direct,
                 instance.outwards = outwards or None
 
 
-
-
 class ConnectionItemAWrite(DomainModelWrite):
     """This represents the writing version of connection item a.
 
@@ -255,12 +258,17 @@ class ConnectionItemAWrite(DomainModelWrite):
         outwards: The outward field.
         self_direct: The self direct field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "pygen-models", "ConnectionItemA"
+    )
     name: Optional[str] = None
-    other_direct: Union[ConnectionItemCNodeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
+    other_direct: Union[ConnectionItemCNodeWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="otherDirect"
+    )
     outwards: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
@@ -275,22 +283,23 @@ class ConnectionItemAWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.name is not None or write_none:
             properties["name"] = self.name
-        
+
         if self.other_direct is not None:
             properties["otherDirect"] = {
-                "space":  self.space if isinstance(self.other_direct, str) else self.other_direct.space,
-                "externalId": self.other_direct if isinstance(self.other_direct, str) else self.other_direct.external_id,
+                "space": self.space if isinstance(self.other_direct, str) else self.other_direct.space,
+                "externalId": (
+                    self.other_direct if isinstance(self.other_direct, str) else self.other_direct.external_id
+                ),
             }
-        
+
         if self.self_direct is not None:
             properties["selfDirect"] = {
-                "space":  self.space if isinstance(self.self_direct, str) else self.self_direct.space,
+                "space": self.space if isinstance(self.self_direct, str) else self.self_direct.space,
                 "externalId": self.self_direct if isinstance(self.self_direct, str) else self.self_direct.external_id,
             }
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -302,12 +311,11 @@ class ConnectionItemAWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for outward in self.outwards or []:
@@ -368,8 +376,8 @@ class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
 
     _INSTANCE = ConnectionItemAWrite
 
-class ConnectionItemAApplyList(ConnectionItemAWriteList): ...
 
+class ConnectionItemAApplyList(ConnectionItemAWriteList): ...
 
 
 def _create_connection_item_a_filter(
@@ -390,21 +398,59 @@ def _create_connection_item_a_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if other_direct and isinstance(other_direct, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("otherDirect"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": other_direct}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("otherDirect"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": other_direct},
+            )
+        )
     if other_direct and isinstance(other_direct, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("otherDirect"), value={"space": other_direct[0], "externalId": other_direct[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("otherDirect"), value={"space": other_direct[0], "externalId": other_direct[1]}
+            )
+        )
     if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("otherDirect"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in other_direct]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("otherDirect"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in other_direct],
+            )
+        )
     if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("otherDirect"), values=[{"space": item[0], "externalId": item[1]} for item in other_direct]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("otherDirect"),
+                values=[{"space": item[0], "externalId": item[1]} for item in other_direct],
+            )
+        )
     if self_direct and isinstance(self_direct, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("selfDirect"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": self_direct}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("selfDirect"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": self_direct},
+            )
+        )
     if self_direct and isinstance(self_direct, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("selfDirect"), value={"space": self_direct[0], "externalId": self_direct[1]}))
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("selfDirect"), value={"space": self_direct[0], "externalId": self_direct[1]}
+            )
+        )
     if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], str):
-        filters.append(dm.filters.In(view_id.as_property_ref("selfDirect"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in self_direct]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("selfDirect"),
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in self_direct],
+            )
+        )
     if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], tuple):
-        filters.append(dm.filters.In(view_id.as_property_ref("selfDirect"), values=[{"space": item[0], "externalId": item[1]} for item in self_direct]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("selfDirect"),
+                values=[{"space": item[0], "externalId": item[1]} for item in self_direct],
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -483,9 +529,11 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.name,
+            ]
+        )
 
 
 class ConnectionItemAQuery(_ConnectionItemAQuery[ConnectionItemAList]):

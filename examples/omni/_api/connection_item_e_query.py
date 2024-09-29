@@ -31,10 +31,10 @@ from ._core import (
 from omni.data_classes._connection_edge_a import (
     _create_connection_edge_a_filter,
 )
+
 if TYPE_CHECKING:
     from .connection_item_d_query import ConnectionItemDQueryAPI
     from .connection_item_f_query import ConnectionItemFQueryAPI
-
 
 
 class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
@@ -98,7 +98,6 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
-            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -127,7 +126,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemDQueryAPI(self._client, self._builder, node_filer, limit)
-    
+
     def inwards_single_property(
         self,
         direct_list: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -194,7 +193,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     direction="inwards",
                 ),
-                result_cls= ConnectionEdgeA,
+                result_cls=ConnectionEdgeA,
                 max_retrieve_limit=limit,
             )
         )
@@ -211,7 +210,7 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemFQueryAPI(self._client, self._builder, node_filer, limit)
-    
+
     def query(
         self,
     ) -> T_DomainModelList:
@@ -222,4 +221,3 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
-

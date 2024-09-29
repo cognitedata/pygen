@@ -22,19 +22,19 @@ class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
     _class_list = StartEndTimeList
 
     def list(
-            self,
-            from_unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            from_unit_procedure_space: str = DEFAULT_INSTANCE_SPACE,
-            to_equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-            to_equipment_module_space: str = DEFAULT_INSTANCE_SPACE,
-            min_end_time: datetime.datetime | None = None,
-            max_end_time: datetime.datetime | None = None,
-            min_start_time: datetime.datetime | None = None,
-            max_start_time: datetime.datetime | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit=DEFAULT_LIMIT_READ,
-    ) ->StartEndTimeList:
+        self,
+        from_unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_unit_procedure_space: str = DEFAULT_INSTANCE_SPACE,
+        to_equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_equipment_module_space: str = DEFAULT_INSTANCE_SPACE,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+    ) -> StartEndTimeList:
         """List work unit edges of a unit procedure.
 
         Args:

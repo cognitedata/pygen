@@ -42,7 +42,9 @@ from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
 from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 
-class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList, ScenarioInstanceWriteList]):
+class ScenarioInstanceAPI(
+    NodeAPI[ScenarioInstance, ScenarioInstanceWrite, ScenarioInstanceList, ScenarioInstanceWriteList]
+):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
     _properties_by_field = _SCENARIOINSTANCE_PROPERTIES_BY_FIELD
     _class_type = ScenarioInstance
@@ -55,25 +57,25 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         self.price_forecast = ScenarioInstancePriceForecastAPI(client, self._view_id)
 
     def __call__(
-            self,
-            aggregation: str | list[str] | None = None,
-            aggregation_prefix: str | None = None,
-            country: str | list[str] | None = None,
-            country_prefix: str | None = None,
-            min_instance: datetime.datetime | None = None,
-            max_instance: datetime.datetime | None = None,
-            market: str | list[str] | None = None,
-            market_prefix: str | None = None,
-            price_area: str | list[str] | None = None,
-            price_area_prefix: str | None = None,
-            scenario: str | list[str] | None = None,
-            scenario_prefix: str | None = None,
-            min_start: datetime.datetime | None = None,
-            max_start: datetime.datetime | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> ScenarioInstanceQueryAPI[ScenarioInstanceList]:
         """Query starting at scenario instances.
 
@@ -125,7 +127,6 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         builder = QueryBuilder(ScenarioInstanceList)
         return ScenarioInstanceQueryAPI(self._client, builder, filter_, limit)
 
-
     def apply(
         self,
         scenario_instance: ScenarioInstanceWrite | Sequence[ScenarioInstanceWrite],
@@ -166,7 +167,9 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         )
         return self._apply(scenario_instance, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more scenario instance.
 
         Args:
@@ -196,14 +199,16 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstance | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstance | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstanceList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ScenarioInstanceList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstance | ScenarioInstanceList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ScenarioInstance | ScenarioInstanceList | None:
         """Retrieve one or more scenario instances by id(s).
 
         Args:
@@ -347,8 +352,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -376,15 +380,16 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields],
         property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,
@@ -407,14 +412,15 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceWrite, Scena
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         property: ScenarioInstanceFields | SequenceNotStr[ScenarioInstanceFields] | None = None,
         query: str | None = None,

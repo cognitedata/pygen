@@ -42,7 +42,7 @@ class ScenarioInstanceClient:
         client.config.client_name = "CognitePygen:0.99.34"
 
         self._client = client
-        
+
         self.scenario_instance = ScenarioInstanceAPI(client)
 
     def upsert(
@@ -191,9 +191,9 @@ class ScenarioInstanceClient:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the ScenarioInstance data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)

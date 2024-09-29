@@ -50,21 +50,20 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            main_value: str | list[str] | None = None,
-            main_value_prefix: str | None = None,
-            sub_value: str | list[str] | None = None,
-            sub_value_prefix: str | None = None,
-            value_1: str | list[str] | None = None,
-            value_1_prefix: str | None = None,
-            value_2: str | list[str] | None = None,
-            value_2_prefix: str | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
+        value_1: str | list[str] | None = None,
+        value_1_prefix: str | None = None,
+        value_2: str | list[str] | None = None,
+        value_2_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> Implementation1QueryAPI[Implementation1List]:
         """Query starting at implementation 1.
 
@@ -103,7 +102,6 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         )
         builder = QueryBuilder(Implementation1List)
         return Implementation1QueryAPI(self._client, builder, filter_, limit)
-
 
     def apply(
         self,
@@ -145,7 +143,9 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         )
         return self._apply(implementation_1, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more implementation 1.
 
         Args:
@@ -175,14 +175,16 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1 | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1 | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1List:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Implementation1List: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Implementation1 | Implementation1List | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Implementation1 | Implementation1List | None:
         """Retrieve one or more implementation 1 by id(s).
 
         Args:
@@ -302,8 +304,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -325,15 +326,16 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1Fields | SequenceNotStr[Implementation1Fields],
         property: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         query: str | None = None,
@@ -350,14 +352,15 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         property: Implementation1Fields | SequenceNotStr[Implementation1Fields] | None = None,
         query: str | None = None,

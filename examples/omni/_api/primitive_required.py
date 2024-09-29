@@ -41,7 +41,9 @@ from ._core import (
 from .primitive_required_query import PrimitiveRequiredQueryAPI
 
 
-class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList, PrimitiveRequiredWriteList]):
+class PrimitiveRequiredAPI(
+    NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList, PrimitiveRequiredWriteList]
+):
     _view_id = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
     _properties_by_field = _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequired
@@ -51,28 +53,27 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
-            self,
-            boolean: bool | None = None,
-            min_date: datetime.date | None = None,
-            max_date: datetime.date | None = None,
-            min_float_32: float | None = None,
-            max_float_32: float | None = None,
-            min_float_64: float | None = None,
-            max_float_64: float | None = None,
-            min_int_32: int | None = None,
-            max_int_32: int | None = None,
-            min_int_64: int | None = None,
-            max_int_64: int | None = None,
-            text: str | list[str] | None = None,
-            text_prefix: str | None = None,
-            min_timestamp: datetime.datetime | None = None,
-            max_timestamp: datetime.datetime | None = None,
-            external_id_prefix: str | None = None,
-            space: str | list[str] | None = None,
-            limit: int = DEFAULT_QUERY_LIMIT,
-            filter: dm.Filter | None = None,
+        self,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
     ) -> PrimitiveRequiredQueryAPI[PrimitiveRequiredList]:
         """Query starting at primitive requireds.
 
@@ -126,7 +127,6 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         builder = QueryBuilder(PrimitiveRequiredList)
         return PrimitiveRequiredQueryAPI(self._client, builder, filter_, limit)
 
-
     def apply(
         self,
         primitive_required: PrimitiveRequiredWrite | Sequence[PrimitiveRequiredWrite],
@@ -167,7 +167,9 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         )
         return self._apply(primitive_required, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more primitive required.
 
         Args:
@@ -197,14 +199,16 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequired | None:
-        ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequired | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequiredList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveRequiredList: ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequired | PrimitiveRequiredList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveRequired | PrimitiveRequiredList | None:
         """Retrieve one or more primitive requireds by id(s).
 
         Args:
@@ -352,8 +356,7 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
-        ...
+    ) -> dm.aggregations.AggregatedNumberedValue: ...
 
     @overload
     def aggregate(
@@ -382,15 +385,16 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
 
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields],
         property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,
@@ -414,14 +418,15 @@ class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, Pr
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
+    ) -> InstanceAggregationResultList: ...
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         property: PrimitiveRequiredFields | SequenceNotStr[PrimitiveRequiredFields] | None = None,
         query: str | None = None,

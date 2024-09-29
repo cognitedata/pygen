@@ -52,7 +52,9 @@ __all__ = [
 
 
 PrimitiveRequiredTextFields = Literal["external_id", "text"]
-PrimitiveRequiredFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+PrimitiveRequiredFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -66,6 +68,7 @@ _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD = {
     "text": "text",
     "timestamp": "timestamp",
 }
+
 
 class PrimitiveRequiredGraphQL(GraphQLCore):
     """This represents the reading version of primitive required, used
@@ -87,6 +90,7 @@ class PrimitiveRequiredGraphQL(GraphQLCore):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
@@ -134,7 +138,6 @@ class PrimitiveRequiredGraphQL(GraphQLCore):
             timestamp=self.timestamp,
         )
 
-
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> PrimitiveRequiredWrite:
@@ -174,8 +177,9 @@ class PrimitiveRequired(DomainModel):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
-    
+
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     boolean: bool
@@ -234,6 +238,7 @@ class PrimitiveRequiredWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -259,34 +264,33 @@ class PrimitiveRequiredWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-        
+
         if self.boolean is not None:
             properties["boolean"] = self.boolean
-        
+
         if self.date is not None:
             properties["date"] = self.date.isoformat() if self.date else None
-        
+
         if self.float_32 is not None:
             properties["float32"] = self.float_32
-        
+
         if self.float_64 is not None:
             properties["float64"] = self.float_64
-        
+
         if self.int_32 is not None:
             properties["int32"] = self.int_32
-        
+
         if self.int_64 is not None:
             properties["int64"] = self.int_64
-        
+
         if self.json_ is not None:
             properties["json"] = self.json_
-        
+
         if self.text is not None:
             properties["text"] = self.text
-        
+
         if self.timestamp is not None:
             properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds") if self.timestamp else None
-        
 
         if properties:
             this_node = dm.NodeApply(
@@ -298,12 +302,11 @@ class PrimitiveRequiredWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                )],
+                    )
+                ],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-        
-
 
         return resources
 
@@ -344,8 +347,8 @@ class PrimitiveRequiredWriteList(DomainModelWriteList[PrimitiveRequiredWrite]):
 
     _INSTANCE = PrimitiveRequiredWrite
 
-class PrimitiveRequiredApplyList(PrimitiveRequiredWriteList): ...
 
+class PrimitiveRequiredApplyList(PrimitiveRequiredWriteList): ...
 
 
 def _create_primitive_required_filter(
@@ -373,7 +376,13 @@ def _create_primitive_required_filter(
     if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
     if min_date is not None or max_date is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("date"), gte=min_date.isoformat() if min_date else None, lte=max_date.isoformat() if max_date else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("date"),
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
+            )
+        )
     if min_float_32 is not None or max_float_32 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("float32"), gte=min_float_32, lte=max_float_32))
     if min_float_64 is not None or max_float_64 is not None:
@@ -389,7 +398,13 @@ def _create_primitive_required_filter(
     if text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("text"), value=text_prefix))
     if min_timestamp is not None or max_timestamp is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("timestamp"), gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None, lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("timestamp"),
+                gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None,
+                lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -434,16 +449,18 @@ class _PrimitiveRequiredQuery(NodeQueryCore[T_DomainModelList, PrimitiveRequired
         self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
         self.text = StringFilter(self, self._view_id.as_property_ref("text"))
         self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
-        self._filter_classes.extend([
-            self.boolean,
-            self.date,
-            self.float_32,
-            self.float_64,
-            self.int_32,
-            self.int_64,
-            self.text,
-            self.timestamp,
-        ])
+        self._filter_classes.extend(
+            [
+                self.boolean,
+                self.date,
+                self.float_32,
+                self.float_64,
+                self.int_32,
+                self.int_64,
+                self.text,
+                self.timestamp,
+            ]
+        )
 
 
 class PrimitiveRequiredQuery(_PrimitiveRequiredQuery[PrimitiveRequiredList]):

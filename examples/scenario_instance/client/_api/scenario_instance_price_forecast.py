@@ -16,6 +16,7 @@ from ._core import DEFAULT_LIMIT_READ
 
 ColumnNames = Literal["aggregation", "country", "instance", "market", "priceArea", "priceForecast", "scenario", "start"]
 
+
 class ScenarioInstancePriceForecastQuery:
     def __init__(
         self,
@@ -519,7 +520,9 @@ class ScenarioInstancePriceForecastAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_price_forecast(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_price_forecast(
+            self._client, self._view_id, filter_, limit
+        )
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
@@ -564,7 +567,7 @@ def _retrieve_timeseries_external_ids_with_extra_price_forecast(
             continue
         view_prop = node.properties[view_id]
         key = view_prop["priceForecast"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):
