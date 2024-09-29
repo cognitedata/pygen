@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from .metmast_query import MetmastQueryAPI
 
 
+
 class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Windmill", "1")
 
@@ -97,6 +98,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.blades"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -128,7 +130,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         if retrieve_rotor:
             self._query_append_rotor(from_)
         return BladeQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def metmast(
         self,
         min_position: float | None = None,
@@ -166,6 +168,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.metmast"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -196,7 +199,7 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         if retrieve_rotor:
             self._query_append_rotor(from_)
         return MetmastQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def query(
         self,
         retrieve_nacelle: bool = False,
@@ -246,3 +249,4 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
                 result_cls=Rotor,
             ),
         )
+

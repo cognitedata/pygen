@@ -49,9 +49,7 @@ __all__ = [
 
 
 PrimitiveWithDefaultsTextFields = Literal["external_id", "default_string"]
-PrimitiveWithDefaultsFields = Literal[
-    "external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"
-]
+PrimitiveWithDefaultsFields = Literal["external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"]
 
 _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -61,7 +59,6 @@ _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
     "default_object": "defaultObject",
     "default_string": "defaultString",
 }
-
 
 class PrimitiveWithDefaultsGraphQL(GraphQLCore):
     """This represents the reading version of primitive with default, used
@@ -79,7 +76,6 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         default_object: The default object field.
         default_string: The default string field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
     auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
@@ -119,6 +115,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
             default_string=self.default_string,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> PrimitiveWithDefaultsWrite:
@@ -150,9 +147,8 @@ class PrimitiveWithDefaults(DomainModel):
         default_object: The default object field.
         default_string: The default string field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
@@ -199,7 +195,6 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_object: The default object field.
         default_string: The default string field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -207,7 +202,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(True, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(0.42, alias="defaultFloat32")
-    default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
+    default_object: Optional[dict] = Field({'foo': 'bar'}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
 
     def _to_instances_write(
@@ -221,21 +216,22 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.auto_increment_int_32 is not None:
             properties["autoIncrementInt32"] = self.auto_increment_int_32
-
+        
         if self.default_boolean is not None or write_none:
             properties["defaultBoolean"] = self.default_boolean
-
+        
         if self.default_float_32 is not None or write_none:
             properties["defaultFloat32"] = self.default_float_32
-
+        
         if self.default_object is not None or write_none:
             properties["defaultObject"] = self.default_object
-
+        
         if self.default_string is not None or write_none:
             properties["defaultString"] = self.default_string
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -247,11 +243,12 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         return resources
 
@@ -292,8 +289,8 @@ class PrimitiveWithDefaultsWriteList(DomainModelWriteList[PrimitiveWithDefaultsW
 
     _INSTANCE = PrimitiveWithDefaultsWrite
 
-
 class PrimitiveWithDefaultsApplyList(PrimitiveWithDefaultsWriteList): ...
+
 
 
 def _create_primitive_with_default_filter(
@@ -311,21 +308,11 @@ def _create_primitive_with_default_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if min_auto_increment_int_32 is not None or max_auto_increment_int_32 is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("autoIncrementInt32"),
-                gte=min_auto_increment_int_32,
-                lte=max_auto_increment_int_32,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("autoIncrementInt32"), gte=min_auto_increment_int_32, lte=max_auto_increment_int_32))
     if isinstance(default_boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultBoolean"), value=default_boolean))
     if min_default_float_32 is not None or max_default_float_32 is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("defaultFloat32"), gte=min_default_float_32, lte=max_default_float_32
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("defaultFloat32"), gte=min_default_float_32, lte=max_default_float_32))
     if isinstance(default_string, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultString"), value=default_string))
     if default_string and isinstance(default_string, list):
@@ -372,14 +359,12 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
         self.default_boolean = BooleanFilter(self, self._view_id.as_property_ref("defaultBoolean"))
         self.default_float_32 = FloatFilter(self, self._view_id.as_property_ref("defaultFloat32"))
         self.default_string = StringFilter(self, self._view_id.as_property_ref("defaultString"))
-        self._filter_classes.extend(
-            [
-                self.auto_increment_int_32,
-                self.default_boolean,
-                self.default_float_32,
-                self.default_string,
-            ]
-        )
+        self._filter_classes.extend([
+            self.auto_increment_int_32,
+            self.default_boolean,
+            self.default_float_32,
+            self.default_string,
+        ])
 
 
 class PrimitiveWithDefaultsQuery(_PrimitiveWithDefaultsQuery[PrimitiveWithDefaultsList]):

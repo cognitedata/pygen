@@ -62,7 +62,6 @@ _GENERATOR_PROPERTIES_BY_FIELD = {
     "generator_speed_controller_reference": "generator_speed_controller_reference",
 }
 
-
 class GeneratorGraphQL(GraphQLCore):
     """This represents the reading version of generator, used
     when data is retrieved from CDF using GraphQL.
@@ -76,7 +75,6 @@ class GeneratorGraphQL(GraphQLCore):
         generator_speed_controller: The generator speed controller field.
         generator_speed_controller_reference: The generator speed controller reference field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
     generator_speed_controller: Optional[TimeSeriesGraphQL] = None
     generator_speed_controller_reference: Optional[TimeSeriesGraphQL] = None
@@ -106,15 +104,10 @@ class GeneratorGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            generator_speed_controller=(
-                self.generator_speed_controller.as_read() if self.generator_speed_controller else None
-            ),
-            generator_speed_controller_reference=(
-                self.generator_speed_controller_reference.as_read()
-                if self.generator_speed_controller_reference
-                else None
-            ),
+            generator_speed_controller=self.generator_speed_controller.as_read() if self.generator_speed_controller else None,
+            generator_speed_controller_reference=self.generator_speed_controller_reference.as_read() if self.generator_speed_controller_reference else None,
         )
+
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -124,14 +117,8 @@ class GeneratorGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            generator_speed_controller=(
-                self.generator_speed_controller.as_write() if self.generator_speed_controller else None
-            ),
-            generator_speed_controller_reference=(
-                self.generator_speed_controller_reference.as_write()
-                if self.generator_speed_controller_reference
-                else None
-            ),
+            generator_speed_controller=self.generator_speed_controller.as_write() if self.generator_speed_controller else None,
+            generator_speed_controller_reference=self.generator_speed_controller_reference.as_write() if self.generator_speed_controller_reference else None,
         )
 
 
@@ -147,9 +134,8 @@ class Generator(DomainModel):
         generator_speed_controller: The generator speed controller field.
         generator_speed_controller_reference: The generator speed controller reference field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     generator_speed_controller: Union[TimeSeries, str, None] = None
@@ -161,16 +147,8 @@ class Generator(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            generator_speed_controller=(
-                self.generator_speed_controller.as_write()
-                if isinstance(self.generator_speed_controller, CogniteTimeSeries)
-                else self.generator_speed_controller
-            ),
-            generator_speed_controller_reference=(
-                self.generator_speed_controller_reference.as_write()
-                if isinstance(self.generator_speed_controller_reference, CogniteTimeSeries)
-                else self.generator_speed_controller_reference
-            ),
+            generator_speed_controller=self.generator_speed_controller.as_write() if isinstance(self.generator_speed_controller, CogniteTimeSeries) else self.generator_speed_controller,
+            generator_speed_controller_reference=self.generator_speed_controller_reference.as_write() if isinstance(self.generator_speed_controller_reference, CogniteTimeSeries) else self.generator_speed_controller_reference,
         )
 
     def as_apply(self) -> GeneratorWrite:
@@ -195,7 +173,6 @@ class GeneratorWrite(DomainModelWrite):
         generator_speed_controller: The generator speed controller field.
         generator_speed_controller_reference: The generator speed controller reference field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Generator", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -214,21 +191,13 @@ class GeneratorWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.generator_speed_controller is not None or write_none:
-            properties["generator_speed_controller"] = (
-                self.generator_speed_controller
-                if isinstance(self.generator_speed_controller, str) or self.generator_speed_controller is None
-                else self.generator_speed_controller.external_id
-            )
-
+            properties["generator_speed_controller"] = self.generator_speed_controller if isinstance(self.generator_speed_controller, str) or self.generator_speed_controller is None else self.generator_speed_controller.external_id
+        
         if self.generator_speed_controller_reference is not None or write_none:
-            properties["generator_speed_controller_reference"] = (
-                self.generator_speed_controller_reference
-                if isinstance(self.generator_speed_controller_reference, str)
-                or self.generator_speed_controller_reference is None
-                else self.generator_speed_controller_reference.external_id
-            )
+            properties["generator_speed_controller_reference"] = self.generator_speed_controller_reference if isinstance(self.generator_speed_controller_reference, str) or self.generator_speed_controller_reference is None else self.generator_speed_controller_reference.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -240,11 +209,12 @@ class GeneratorWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.generator_speed_controller, CogniteTimeSeriesWrite):
             resources.time_series.append(self.generator_speed_controller)
@@ -291,8 +261,8 @@ class GeneratorWriteList(DomainModelWriteList[GeneratorWrite]):
 
     _INSTANCE = GeneratorWrite
 
-
 class GeneratorApplyList(GeneratorWriteList): ...
+
 
 
 def _create_generator_filter(
@@ -337,6 +307,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class GeneratorQuery(_GeneratorQuery[GeneratorList]):

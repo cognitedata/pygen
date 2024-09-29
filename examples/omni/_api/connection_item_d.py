@@ -55,15 +55,15 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         self.outwards_single_edge = ConnectionItemDOutwardsSingleAPI(client)
 
     def __call__(
-        self,
-        direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+            direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+            name: str | list[str] | None = None,
+            name_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> ConnectionItemDQueryAPI[ConnectionItemDList]:
         """Query starting at connection item ds.
 
@@ -94,6 +94,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         )
         builder = QueryBuilder(ConnectionItemDList)
         return ConnectionItemDQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -135,9 +136,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         )
         return self._apply(connection_item_d, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more connection item d.
 
         Args:
@@ -167,16 +166,14 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemD | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemD | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemDList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemDList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemD | ConnectionItemDList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemD | ConnectionItemDList | None:
         """Retrieve one or more connection item ds by id(s).
 
         Args:
@@ -280,7 +277,8 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -298,16 +296,15 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields],
         property: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         query: str | None = None,
@@ -320,15 +317,14 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         property: ConnectionItemDFields | SequenceNotStr[ConnectionItemDFields] | None = None,
         query: str | None = None,
@@ -513,7 +509,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         )
 
         if retrieve_connections == "skip":
-            return self._list(
+                return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]
@@ -549,9 +545,9 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_outwards_single),
+                    builder.create_name( edge_outwards_single),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_outwards_single,
+                        from_= edge_outwards_single,
                         filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                     ),
                     ConnectionItemE,

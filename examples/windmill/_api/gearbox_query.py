@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class GearboxQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Gearbox", "1")
 
@@ -54,3 +55,4 @@ class GearboxQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

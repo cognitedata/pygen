@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from .sensor_position_query import SensorPositionQueryAPI
 
 
+
 class BladeQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Blade", "1")
 
@@ -84,6 +85,7 @@ class BladeQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Blade.sensor_positions"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -110,7 +112,7 @@ class BladeQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return SensorPositionQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def query(
         self,
     ) -> T_DomainModelList:
@@ -121,3 +123,4 @@ class BladeQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

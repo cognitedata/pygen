@@ -55,7 +55,6 @@ _IMPLEMENTATION1V2_PROPERTIES_BY_FIELD = {
     "value_2": "value2",
 }
 
-
 class Implementation1v2GraphQL(GraphQLCore):
     """This represents the reading version of implementation 1 v 2, used
     when data is retrieved from CDF using GraphQL.
@@ -70,7 +69,6 @@ class Implementation1v2GraphQL(GraphQLCore):
         sub_value: The sub value field.
         value_2: The value 2 field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "2")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
@@ -106,6 +104,7 @@ class Implementation1v2GraphQL(GraphQLCore):
             value_2=self.value_2,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> Implementation1v2Write:
@@ -133,9 +132,8 @@ class Implementation1v2(SubInterface):
         sub_value: The sub value field.
         value_2: The value 2 field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "2")
-
+    
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_2: str = Field(alias="value2")
 
@@ -173,12 +171,9 @@ class Implementation1v2Write(SubInterfaceWrite):
         sub_value: The sub value field.
         value_2: The value 2 field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "2")
 
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation1"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_2: str = Field(alias="value2")
 
     def _to_instances_write(
@@ -192,15 +187,16 @@ class Implementation1v2Write(SubInterfaceWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
-
+        
         if self.sub_value is not None or write_none:
             properties["subValue"] = self.sub_value
-
+        
         if self.value_2 is not None:
             properties["value2"] = self.value_2
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -212,11 +208,12 @@ class Implementation1v2Write(SubInterfaceWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         return resources
 
@@ -257,8 +254,8 @@ class Implementation1v2WriteList(DomainModelWriteList[Implementation1v2Write]):
 
     _INSTANCE = Implementation1v2Write
 
-
 class Implementation1v2ApplyList(Implementation1v2WriteList): ...
+
 
 
 def _create_implementation_1_v_2_filter(
@@ -331,13 +328,11 @@ class _Implementation1v2Query(NodeQueryCore[T_DomainModelList, Implementation1v2
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
-        self._filter_classes.extend(
-            [
-                self.main_value,
-                self.sub_value,
-                self.value_2,
-            ]
-        )
+        self._filter_classes.extend([
+            self.main_value,
+            self.sub_value,
+            self.value_2,
+        ])
 
 
 class Implementation1v2Query(_Implementation1v2Query[Implementation1v2List]):

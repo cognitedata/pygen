@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -57,7 +57,6 @@ _CONNECTIONITEMF_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
-
 class ConnectionItemFGraphQL(GraphQLCore):
     """This represents the reading version of connection item f, used
     when data is retrieved from CDF using GraphQL.
@@ -73,7 +72,6 @@ class ConnectionItemFGraphQL(GraphQLCore):
         outwards_multi: The outwards multi field.
         outwards_single: The outwards single field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
     direct_list: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
@@ -90,7 +88,6 @@ class ConnectionItemFGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("direct_list", "outwards_multi", "outwards_single", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -116,12 +113,11 @@ class ConnectionItemFGraphQL(GraphQLCore):
             direct_list=[direct_list.as_read() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
-            outwards_single=(
-                self.outwards_single.as_read()
-                if isinstance(self.outwards_single, GraphQLCore)
-                else self.outwards_single
-            ),
+            outwards_single=self.outwards_single.as_read()
+if isinstance(self.outwards_single, GraphQLCore)
+else self.outwards_single,
         )
+
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -134,11 +130,9 @@ class ConnectionItemFGraphQL(GraphQLCore):
             direct_list=[direct_list.as_write() for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
-            outwards_single=(
-                self.outwards_single.as_write()
-                if isinstance(self.outwards_single, GraphQLCore)
-                else self.outwards_single
-            ),
+            outwards_single=self.outwards_single.as_write()
+if isinstance(self.outwards_single, GraphQLCore)
+else self.outwards_single,
         )
 
 
@@ -156,14 +150,11 @@ class ConnectionItemF(DomainModel):
         outwards_multi: The outwards multi field.
         outwards_single: The outwards single field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
-    direct_list: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="directList"
-    )
+    direct_list: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
     outwards_single: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="outwardsSingle")
@@ -174,17 +165,12 @@ class ConnectionItemF(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list=[
-                direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
-                for direct_list in self.direct_list or []
-            ],
+            direct_list=[direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list for direct_list in self.direct_list or []],
             name=self.name,
             outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
-            outwards_single=(
-                self.outwards_single.as_write()
-                if isinstance(self.outwards_single, DomainRelation)
-                else self.outwards_single
-            ),
+            outwards_single=self.outwards_single.as_write()
+if isinstance(self.outwards_single, DomainRelation)
+else self.outwards_single,
         )
 
     def as_apply(self) -> ConnectionItemFWrite:
@@ -212,7 +198,9 @@ class ConnectionItemF(DomainModel):
                 for relation in instance.direct_list:
                     if isinstance(relation, ConnectionItemD):
                         new_direct_list.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
+                    elif (other := nodes_by_id.get(relation)) and isinstance(
+                        other, ConnectionItemD
+                    ):
                         new_direct_list.append(other)
                     else:
                         new_direct_list.append(relation)
@@ -267,6 +255,8 @@ class ConnectionItemF(DomainModel):
                 instance.outwards_multi = outwards_multi
 
 
+
+
 class ConnectionItemFWrite(DomainModelWrite):
     """This represents the writing version of connection item f.
 
@@ -281,16 +271,11 @@ class ConnectionItemFWrite(DomainModelWrite):
         outwards_multi: The outwards multi field.
         outwards_single: The outwards single field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemF"
-    )
-    direct_list: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="directList"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
+    direct_list: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
     outwards_single: Optional[ConnectionEdgeAWrite] = Field(default=None, repr=False, alias="outwardsSingle")
@@ -306,18 +291,19 @@ class ConnectionItemFWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.direct_list is not None:
             properties["directList"] = [
                 {
-                    "space": self.space if isinstance(direct_list, str) else direct_list.space,
-                    "externalId": direct_list if isinstance(direct_list, str) else direct_list.external_id,
+                "space": self.space if isinstance(direct_list, str) else direct_list.space,
+                "externalId": direct_list if isinstance(direct_list, str) else direct_list.external_id,
                 }
                 for direct_list in self.direct_list or []
             ]
-
+        
         if self.name is not None or write_none:
             properties["name"] = self.name
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -329,11 +315,12 @@ class ConnectionItemFWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         for outwards_multi in self.outwards_multi or []:
             if isinstance(outwards_multi, DomainRelationWrite):
@@ -341,7 +328,7 @@ class ConnectionItemFWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
-                )
+)
                 resources.extend(other_resources)
 
         if self.outwards_single is not None:
@@ -396,8 +383,8 @@ class ConnectionItemFWriteList(DomainModelWriteList[ConnectionItemFWrite]):
 
     _INSTANCE = ConnectionItemFWrite
 
-
 class ConnectionItemFApplyList(ConnectionItemFWriteList): ...
+
 
 
 def _create_connection_item_f_filter(
@@ -411,32 +398,13 @@ def _create_connection_item_f_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if direct_list and isinstance(direct_list, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directList"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_list},
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("directList"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_list}))
     if direct_list and isinstance(direct_list, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directList"), value={"space": direct_list[0], "externalId": direct_list[1]}
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("directList"), value={"space": direct_list[0], "externalId": direct_list[1]}))
     if direct_list and isinstance(direct_list, list) and isinstance(direct_list[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directList"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_list],
-            )
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("directList"), values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_list]))
     if direct_list and isinstance(direct_list, list) and isinstance(direct_list[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directList"),
-                values=[{"space": item[0], "externalId": item[1]} for item in direct_list],
-            )
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("directList"), values=[{"space": item[0], "externalId": item[1]} for item in direct_list]))
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -525,11 +493,9 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend(
-            [
-                self.name,
-            ]
-        )
+        self._filter_classes.extend([
+            self.name,
+        ])
 
 
 class ConnectionItemFQuery(_ConnectionItemFQuery[ConnectionItemFList]):

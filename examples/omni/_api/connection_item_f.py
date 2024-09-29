@@ -63,14 +63,14 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         self.outwards_single_edge = ConnectionItemFOutwardsSingleAPI(client)
 
     def __call__(
-        self,
-        direct_list: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            direct_list: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+            name: str | list[str] | None = None,
+            name_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> ConnectionItemFQueryAPI[ConnectionItemFList]:
         """Query starting at connection item fs.
 
@@ -99,6 +99,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         )
         builder = QueryBuilder(ConnectionItemFList)
         return ConnectionItemFQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -144,9 +145,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         )
         return self._apply(connection_item_f, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more connection item f.
 
         Args:
@@ -176,16 +175,14 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemF | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemF | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemFList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemFList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemF | ConnectionItemFList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemF | ConnectionItemFList | None:
         """Retrieve one or more connection item fs by id(s).
 
         Args:
@@ -223,8 +220,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     "outwards",
                     dm.ViewId("pygen-models", "ConnectionItemE", "1"),
                 ),
-            ],
+                                               ]
         )
+        
 
     def search(
         self,
@@ -305,7 +303,8 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -322,16 +321,15 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemFFields | SequenceNotStr[ConnectionItemFFields],
         property: ConnectionItemFFields | SequenceNotStr[ConnectionItemFFields] | None = None,
         query: str | None = None,
@@ -343,15 +341,14 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemFFields | SequenceNotStr[ConnectionItemFFields] | None = None,
         property: ConnectionItemFFields | SequenceNotStr[ConnectionItemFFields] | None = None,
         query: str | None = None,
@@ -527,7 +524,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         )
 
         if retrieve_connections == "skip":
-            return self._list(
+                return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]
@@ -576,9 +573,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_outwards_multi),
+                    builder.create_name( edge_outwards_multi),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_outwards_multi,
+                        from_= edge_outwards_multi,
                         filter=dm.filters.HasData(views=[ConnectionItemG._view_id]),
                     ),
                     ConnectionItemG,
@@ -586,9 +583,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             )
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_outwards_single),
+                    builder.create_name( edge_outwards_single),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_outwards_single,
+                        from_= edge_outwards_single,
                         filter=dm.filters.HasData(views=[ConnectionItemE._view_id]),
                     ),
                     ConnectionItemE,

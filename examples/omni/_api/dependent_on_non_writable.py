@@ -42,11 +42,7 @@ from .dependent_on_non_writable_to_non_writable import DependentOnNonWritableToN
 from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
-class DependentOnNonWritableAPI(
-    NodeAPI[
-        DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList
-    ]
-):
+class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList]):
     _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
     _properties_by_field = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
     _class_type = DependentOnNonWritable
@@ -59,13 +55,13 @@ class DependentOnNonWritableAPI(
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
 
     def __call__(
-        self,
-        a_value: str | list[str] | None = None,
-        a_value_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            a_value: str | list[str] | None = None,
+            a_value_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> DependentOnNonWritableQueryAPI[DependentOnNonWritableList]:
         """Query starting at dependent on non writables.
 
@@ -92,6 +88,7 @@ class DependentOnNonWritableAPI(
         )
         builder = QueryBuilder(DependentOnNonWritableList)
         return DependentOnNonWritableQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -137,9 +134,7 @@ class DependentOnNonWritableAPI(
         )
         return self._apply(dependent_on_non_writable, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more dependent on non writable.
 
         Args:
@@ -169,16 +164,14 @@ class DependentOnNonWritableAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> DependentOnNonWritableList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritableList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> DependentOnNonWritable | DependentOnNonWritableList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | DependentOnNonWritableList | None:
         """Retrieve one or more dependent on non writables by id(s).
 
         Args:
@@ -209,8 +202,9 @@ class DependentOnNonWritableAPI(
                     "outwards",
                     dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
                 ),
-            ],
+                                               ]
         )
+        
 
     def search(
         self,
@@ -280,16 +274,15 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -298,52 +291,44 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields],
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -406,9 +391,7 @@ class DependentOnNonWritableAPI(
         property: DependentOnNonWritableFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -508,7 +491,7 @@ class DependentOnNonWritableAPI(
         )
 
         if retrieve_connections == "skip":
-            return self._list(
+                return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]
@@ -544,9 +527,9 @@ class DependentOnNonWritableAPI(
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_to_non_writable),
+                    builder.create_name( edge_to_non_writable),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_to_non_writable,
+                        from_= edge_to_non_writable,
                         filter=dm.filters.HasData(views=[Implementation1NonWriteable._view_id]),
                     ),
                     Implementation1NonWriteable,

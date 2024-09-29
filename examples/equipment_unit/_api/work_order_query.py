@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
 
@@ -54,3 +55,4 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

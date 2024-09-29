@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class EmptyQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "Empty", "1")
 
@@ -54,3 +55,4 @@ class EmptyQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

@@ -60,19 +60,19 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         self.metmast_edge = WindmillMetmastAPI(client)
 
     def __call__(
-        self,
-        min_capacity: float | None = None,
-        max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            min_capacity: float | None = None,
+            max_capacity: float | None = None,
+            nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+            name: str | list[str] | None = None,
+            name_prefix: str | None = None,
+            rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+            windfarm: str | list[str] | None = None,
+            windfarm_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> WindmillQueryAPI[WindmillList]:
         """Query starting at windmills.
 
@@ -111,6 +111,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         )
         builder = QueryBuilder(WindmillList)
         return WindmillQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -156,9 +157,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         )
         return self._apply(windmill, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more windmill.
 
         Args:
@@ -188,14 +187,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Windmill | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Windmill | None:
+        ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> WindmillList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> WindmillList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Windmill | WindmillList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Windmill | WindmillList | None:
         """Retrieve one or more windmills by id(s).
 
         Args:
@@ -233,8 +232,9 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
                     "outwards",
                     dm.ViewId("power-models", "Metmast", "1"),
                 ),
-            ],
+                                               ]
         )
+        
 
     def search(
         self,
@@ -335,7 +335,8 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -357,16 +358,15 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: WindmillFields | SequenceNotStr[WindmillFields],
         property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
@@ -383,15 +383,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         property: WindmillFields | SequenceNotStr[WindmillFields] | None = None,
         query: str | None = None,
@@ -612,7 +611,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         )
 
         if retrieve_connections == "skip":
-            return self._list(
+                return self._list(
                 limit=limit,
                 filter=filter_,
                 sort_by=sort_by,  # type: ignore[arg-type]
@@ -659,9 +658,9 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_blades),
+                    builder.create_name( edge_blades),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_blades,
+                        from_= edge_blades,
                         filter=dm.filters.HasData(views=[Blade._view_id]),
                     ),
                     Blade,
@@ -669,9 +668,9 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             )
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_metmast),
+                    builder.create_name( edge_metmast),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_metmast,
+                        from_= edge_metmast,
                         filter=dm.filters.HasData(views=[Metmast._view_id]),
                     ),
                     Metmast,

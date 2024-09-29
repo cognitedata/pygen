@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class PowerInverterQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "PowerInverter", "1")
 
@@ -54,3 +55,4 @@ class PowerInverterQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

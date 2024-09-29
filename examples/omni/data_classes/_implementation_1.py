@@ -57,7 +57,6 @@ _IMPLEMENTATION1_PROPERTIES_BY_FIELD = {
     "value_2": "value2",
 }
 
-
 class Implementation1GraphQL(GraphQLCore):
     """This represents the reading version of implementation 1, used
     when data is retrieved from CDF using GraphQL.
@@ -73,7 +72,6 @@ class Implementation1GraphQL(GraphQLCore):
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
@@ -111,6 +109,7 @@ class Implementation1GraphQL(GraphQLCore):
             value_2=self.value_2,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> Implementation1Write:
@@ -140,9 +139,8 @@ class Implementation1(SubInterface):
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
-
+    
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
@@ -183,12 +181,9 @@ class Implementation1Write(SubInterfaceWrite):
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
 
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation1"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
@@ -203,18 +198,19 @@ class Implementation1Write(SubInterfaceWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
-
+        
         if self.sub_value is not None or write_none:
             properties["subValue"] = self.sub_value
-
+        
         if self.value_1 is not None or write_none:
             properties["value1"] = self.value_1
-
+        
         if self.value_2 is not None:
             properties["value2"] = self.value_2
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -226,11 +222,12 @@ class Implementation1Write(SubInterfaceWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         return resources
 
@@ -271,8 +268,8 @@ class Implementation1WriteList(DomainModelWriteList[Implementation1Write]):
 
     _INSTANCE = Implementation1Write
 
-
 class Implementation1ApplyList(Implementation1WriteList): ...
+
 
 
 def _create_implementation_1_filter(
@@ -354,14 +351,12 @@ class _Implementation1Query(NodeQueryCore[T_DomainModelList, Implementation1List
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
-        self._filter_classes.extend(
-            [
-                self.main_value,
-                self.sub_value,
-                self.value_1,
-                self.value_2,
-            ]
-        )
+        self._filter_classes.extend([
+            self.main_value,
+            self.sub_value,
+            self.value_1,
+            self.value_2,
+        ])
 
 
 class Implementation1Query(_Implementation1Query[Implementation1List]):

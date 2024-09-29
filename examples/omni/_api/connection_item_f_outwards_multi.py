@@ -22,21 +22,21 @@ class ConnectionItemFOutwardsMultiAPI(EdgePropertyAPI):
     _class_list = ConnectionEdgeAList
 
     def list(
-        self,
-        from_connection_item_f: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        from_connection_item_f_space: str = DEFAULT_INSTANCE_SPACE,
-        to_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_connection_item_g_space: str = DEFAULT_INSTANCE_SPACE,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-    ) -> ConnectionEdgeAList:
+            self,
+            from_connection_item_f: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            from_connection_item_f_space: str = DEFAULT_INSTANCE_SPACE,
+            to_connection_item_g: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            to_connection_item_g_space: str = DEFAULT_INSTANCE_SPACE,
+            min_end_time: datetime.datetime | None = None,
+            max_end_time: datetime.datetime | None = None,
+            name: str | list[str] | None = None,
+            name_prefix: str | None = None,
+            min_start_time: datetime.datetime | None = None,
+            max_start_time: datetime.datetime | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit=DEFAULT_LIMIT_READ,
+    ) ->ConnectionEdgeAList:
         """List outwards multi edges of a connection item f.
 
         Args:

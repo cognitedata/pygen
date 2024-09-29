@@ -17,22 +17,13 @@ from ._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-from ._scenario_instance import (
-    ScenarioInstance,
-    ScenarioInstanceApply,
-    ScenarioInstanceApplyList,
-    ScenarioInstanceFields,
-    ScenarioInstanceGraphQL,
-    ScenarioInstanceList,
-    ScenarioInstanceTextFields,
-    ScenarioInstanceWrite,
-    ScenarioInstanceWriteList,
-)
+from ._scenario_instance import ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceApplyList, ScenarioInstanceFields, ScenarioInstanceGraphQL, ScenarioInstanceList, ScenarioInstanceTextFields, ScenarioInstanceWrite, ScenarioInstanceWriteList
 
 ScenarioInstance.model_rebuild()
 ScenarioInstanceGraphQL.model_rebuild()
 ScenarioInstanceWrite.model_rebuild()
 ScenarioInstanceApply.model_rebuild()
+
 
 
 __all__ = [

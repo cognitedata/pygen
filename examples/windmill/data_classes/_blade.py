@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -58,7 +58,6 @@ _BLADE_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
-
 class BladeGraphQL(GraphQLCore):
     """This represents the reading version of blade, used
     when data is retrieved from CDF using GraphQL.
@@ -73,7 +72,6 @@ class BladeGraphQL(GraphQLCore):
         name: The name field.
         sensor_positions: The sensor position field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
@@ -89,7 +87,6 @@ class BladeGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("sensor_positions", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -116,6 +113,7 @@ class BladeGraphQL(GraphQLCore):
             name=self.name,
             sensor_positions=[sensor_position.as_read() for sensor_position in self.sensor_positions or []],
         )
+
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -144,9 +142,8 @@ class Blade(DomainModel):
         name: The name field.
         sensor_positions: The sensor position field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
@@ -161,10 +158,7 @@ class Blade(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             is_damaged=self.is_damaged,
             name=self.name,
-            sensor_positions=[
-                sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position
-                for sensor_position in self.sensor_positions or []
-            ],
+            sensor_positions=[sensor_position.as_write() if isinstance(sensor_position, DomainModel) else sensor_position for sensor_position in self.sensor_positions or []],
         )
 
     def as_apply(self) -> BladeWrite:
@@ -218,6 +212,8 @@ class Blade(DomainModel):
                 instance.sensor_positions = sensor_positions or None
 
 
+
+
 class BladeWrite(DomainModelWrite):
     """This represents the writing version of blade.
 
@@ -231,7 +227,6 @@ class BladeWrite(DomainModelWrite):
         name: The name field.
         sensor_positions: The sensor position field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Blade", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -251,12 +246,13 @@ class BladeWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.is_damaged is not None or write_none:
             properties["is_damaged"] = self.is_damaged
-
+        
         if self.name is not None or write_none:
             properties["name"] = self.name
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -268,11 +264,12 @@ class BladeWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         edge_type = dm.DirectRelationReference("power-models", "Blade.sensor_positions")
         for sensor_position in self.sensor_positions or []:
@@ -325,8 +322,8 @@ class BladeWriteList(DomainModelWriteList[BladeWrite]):
 
     _INSTANCE = BladeWrite
 
-
 class BladeApplyList(BladeWriteList): ...
+
 
 
 def _create_blade_filter(
@@ -399,12 +396,10 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
 
         self.is_damaged = BooleanFilter(self, self._view_id.as_property_ref("is_damaged"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend(
-            [
-                self.is_damaged,
-                self.name,
-            ]
-        )
+        self._filter_classes.extend([
+            self.is_damaged,
+            self.name,
+        ])
 
 
 class BladeQuery(_BladeQuery[BladeList]):

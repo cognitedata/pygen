@@ -65,7 +65,6 @@ _METMAST_PROPERTIES_BY_FIELD = {
     "wind_speed": "wind_speed",
 }
 
-
 class MetmastGraphQL(GraphQLCore):
     """This represents the reading version of metmast, used
     when data is retrieved from CDF using GraphQL.
@@ -81,7 +80,6 @@ class MetmastGraphQL(GraphQLCore):
         tilt_angle: The tilt angle field.
         wind_speed: The wind speed field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
     position: Optional[float] = None
     temperature: Optional[TimeSeriesGraphQL] = None
@@ -119,6 +117,7 @@ class MetmastGraphQL(GraphQLCore):
             wind_speed=self.wind_speed.as_read() if self.wind_speed else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> MetmastWrite:
@@ -148,9 +147,8 @@ class Metmast(DomainModel):
         tilt_angle: The tilt angle field.
         wind_speed: The wind speed field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     position: Optional[float] = None
@@ -165,15 +163,9 @@ class Metmast(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             position=self.position,
-            temperature=(
-                self.temperature.as_write() if isinstance(self.temperature, CogniteTimeSeries) else self.temperature
-            ),
-            tilt_angle=(
-                self.tilt_angle.as_write() if isinstance(self.tilt_angle, CogniteTimeSeries) else self.tilt_angle
-            ),
-            wind_speed=(
-                self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed
-            ),
+            temperature=self.temperature.as_write() if isinstance(self.temperature, CogniteTimeSeries) else self.temperature,
+            tilt_angle=self.tilt_angle.as_write() if isinstance(self.tilt_angle, CogniteTimeSeries) else self.tilt_angle,
+            wind_speed=self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed,
         )
 
     def as_apply(self) -> MetmastWrite:
@@ -200,7 +192,6 @@ class MetmastWrite(DomainModelWrite):
         tilt_angle: The tilt angle field.
         wind_speed: The wind speed field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Metmast", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -221,30 +212,19 @@ class MetmastWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.position is not None or write_none:
             properties["position"] = self.position
-
+        
         if self.temperature is not None or write_none:
-            properties["temperature"] = (
-                self.temperature
-                if isinstance(self.temperature, str) or self.temperature is None
-                else self.temperature.external_id
-            )
-
+            properties["temperature"] = self.temperature if isinstance(self.temperature, str) or self.temperature is None else self.temperature.external_id
+        
         if self.tilt_angle is not None or write_none:
-            properties["tilt_angle"] = (
-                self.tilt_angle
-                if isinstance(self.tilt_angle, str) or self.tilt_angle is None
-                else self.tilt_angle.external_id
-            )
-
+            properties["tilt_angle"] = self.tilt_angle if isinstance(self.tilt_angle, str) or self.tilt_angle is None else self.tilt_angle.external_id
+        
         if self.wind_speed is not None or write_none:
-            properties["wind_speed"] = (
-                self.wind_speed
-                if isinstance(self.wind_speed, str) or self.wind_speed is None
-                else self.wind_speed.external_id
-            )
+            properties["wind_speed"] = self.wind_speed if isinstance(self.wind_speed, str) or self.wind_speed is None else self.wind_speed.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -256,11 +236,12 @@ class MetmastWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.temperature, CogniteTimeSeriesWrite):
             resources.time_series.append(self.temperature)
@@ -310,8 +291,8 @@ class MetmastWriteList(DomainModelWriteList[MetmastWrite]):
 
     _INSTANCE = MetmastWrite
 
-
 class MetmastApplyList(MetmastWriteList): ...
+
 
 
 def _create_metmast_filter(
@@ -362,11 +343,9 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
         )
 
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))
-        self._filter_classes.extend(
-            [
-                self.position,
-            ]
-        )
+        self._filter_classes.extend([
+            self.position,
+        ])
 
 
 class MetmastQuery(_MetmastQuery[MetmastList]):

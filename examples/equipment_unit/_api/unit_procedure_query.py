@@ -31,10 +31,10 @@ from ._core import (
 from equipment_unit.data_classes._start_end_time import (
     _create_start_end_time_filter,
 )
-
 if TYPE_CHECKING:
     from .work_order_query import WorkOrderQueryAPI
     from .equipment_module_query import EquipmentModuleQueryAPI
+
 
 
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
@@ -127,7 +127,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls=StartEndTime,
+                result_cls= StartEndTime,
                 max_retrieve_limit=limit,
             )
         )
@@ -147,7 +147,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return WorkOrderQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def work_units(
         self,
         description: str | list[str] | None = None,
@@ -214,7 +214,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls=StartEndTime,
+                result_cls= StartEndTime,
                 max_retrieve_limit=limit,
             )
         )
@@ -234,7 +234,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return EquipmentModuleQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def query(
         self,
     ) -> T_DomainModelList:
@@ -245,3 +245,4 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

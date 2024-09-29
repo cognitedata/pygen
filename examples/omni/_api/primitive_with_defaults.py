@@ -40,11 +40,7 @@ from ._core import (
 from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
-class PrimitiveWithDefaultsAPI(
-    NodeAPI[
-        PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList, PrimitiveWithDefaultsWriteList
-    ]
-):
+class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList, PrimitiveWithDefaultsWriteList]):
     _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
     _properties_by_field = _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD
     _class_type = PrimitiveWithDefaults
@@ -54,19 +50,20 @@ class PrimitiveWithDefaultsAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
+
     def __call__(
-        self,
-        min_auto_increment_int_32: int | None = None,
-        max_auto_increment_int_32: int | None = None,
-        default_boolean: bool | None = None,
-        min_default_float_32: float | None = None,
-        max_default_float_32: float | None = None,
-        default_string: str | list[str] | None = None,
-        default_string_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            min_auto_increment_int_32: int | None = None,
+            max_auto_increment_int_32: int | None = None,
+            default_boolean: bool | None = None,
+            min_default_float_32: float | None = None,
+            max_default_float_32: float | None = None,
+            default_string: str | list[str] | None = None,
+            default_string_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> PrimitiveWithDefaultsQueryAPI[PrimitiveWithDefaultsList]:
         """Query starting at primitive with defaults.
 
@@ -103,6 +100,7 @@ class PrimitiveWithDefaultsAPI(
         )
         builder = QueryBuilder(PrimitiveWithDefaultsList)
         return PrimitiveWithDefaultsQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -144,9 +142,7 @@ class PrimitiveWithDefaultsAPI(
         )
         return self._apply(primitive_with_default, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more primitive with default.
 
         Args:
@@ -176,16 +172,14 @@ class PrimitiveWithDefaultsAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveWithDefaults | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveWithDefaults | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveWithDefaultsList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveWithDefaultsList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveWithDefaults | PrimitiveWithDefaultsList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveWithDefaults | PrimitiveWithDefaultsList | None:
         """Retrieve one or more primitive with defaults by id(s).
 
         Args:
@@ -289,9 +283,7 @@ class PrimitiveWithDefaultsAPI(
         group_by: None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_property: (
-            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
-        ) = None,
+        search_property: PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -303,7 +295,8 @@ class PrimitiveWithDefaultsAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -312,9 +305,7 @@ class PrimitiveWithDefaultsAPI(
         group_by: None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_property: (
-            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
-        ) = None,
+        search_property: PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -326,22 +317,19 @@ class PrimitiveWithDefaultsAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields],
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_property: (
-            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
-        ) = None,
+        search_property: PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -353,21 +341,18 @@ class PrimitiveWithDefaultsAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         property: PrimitiveWithDefaultsFields | SequenceNotStr[PrimitiveWithDefaultsFields] | None = None,
         query: str | None = None,
-        search_property: (
-            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
-        ) = None,
+        search_property: PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,
@@ -445,9 +430,7 @@ class PrimitiveWithDefaultsAPI(
         property: PrimitiveWithDefaultsFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None
-        ) = None,
+        search_property: PrimitiveWithDefaultsTextFields | SequenceNotStr[PrimitiveWithDefaultsTextFields] | None = None,
         min_auto_increment_int_32: int | None = None,
         max_auto_increment_int_32: int | None = None,
         default_boolean: bool | None = None,

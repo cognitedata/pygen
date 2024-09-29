@@ -9,15 +9,15 @@ from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class BladeSensorPositionsAPI(EdgeAPI):
     def list(
-        self,
-        from_blade: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        from_blade_space: str = DEFAULT_INSTANCE_SPACE,
-        to_sensor_position: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_sensor_position_space: str = DEFAULT_INSTANCE_SPACE,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-    ) -> dm.EdgeList:
+            self,
+            from_blade: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            from_blade_space: str = DEFAULT_INSTANCE_SPACE,
+            to_sensor_position: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            to_sensor_position_space: str = DEFAULT_INSTANCE_SPACE,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit=DEFAULT_LIMIT_READ,
+    ) ->dm.EdgeList:
         """List sensor position edges of a blade.
 
         Args:
@@ -44,6 +44,7 @@ class BladeSensorPositionsAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Blade.sensor_positions"),
+            
             from_blade,
             from_blade_space,
             to_sensor_position,

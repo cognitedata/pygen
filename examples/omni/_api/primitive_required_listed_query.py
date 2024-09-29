@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class PrimitiveRequiredListedQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
 
@@ -54,3 +55,4 @@ class PrimitiveRequiredListedQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

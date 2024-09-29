@@ -14,18 +14,7 @@ from windmill.data_classes._core import QueryStep, QueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
-ColumnNames = Literal[
-    "edgewise_bend_mom_crosstalk_corrected",
-    "edgewise_bend_mom_offset",
-    "edgewise_bend_mom_offset_crosstalk_corrected",
-    "edgewisewise_bend_mom",
-    "flapwise_bend_mom",
-    "flapwise_bend_mom_crosstalk_corrected",
-    "flapwise_bend_mom_offset",
-    "flapwise_bend_mom_offset_crosstalk_corrected",
-    "position",
-]
-
+ColumnNames = Literal["edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected", "position"]
 
 class SensorPositionEdgewiseBendMomCrosstalkCorrectedQuery:
     def __init__(
@@ -458,9 +447,7 @@ class SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_edgewise_bend_mom_crosstalk_corrected(
-            self._client, self._view_id, filter_, limit
-        )
+        external_ids = _retrieve_timeseries_external_ids_with_extra_edgewise_bend_mom_crosstalk_corrected(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
@@ -505,7 +492,7 @@ def _retrieve_timeseries_external_ids_with_extra_edgewise_bend_mom_crosstalk_cor
             continue
         view_prop = node.properties[view_id]
         key = view_prop["edgewise_bend_mom_crosstalk_corrected"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):

@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class ScenarioInstanceQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
 
@@ -54,3 +55,4 @@ class ScenarioInstanceQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

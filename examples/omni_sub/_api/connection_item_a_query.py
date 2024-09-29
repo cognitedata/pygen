@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
+
 class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
 
@@ -90,6 +91,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "bidirectional"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -120,7 +122,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         if retrieve_self_direct:
             self._query_append_self_direct(from_)
         return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def query(
         self,
         retrieve_other_direct: bool = False,
@@ -169,3 +171,4 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                 result_cls=ConnectionItemA,
             ),
         )
+

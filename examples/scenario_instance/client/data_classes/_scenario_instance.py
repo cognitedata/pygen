@@ -57,12 +57,8 @@ __all__ = [
 ]
 
 
-ScenarioInstanceTextFields = Literal[
-    "external_id", "aggregation", "country", "market", "price_area", "price_forecast", "scenario"
-]
-ScenarioInstanceFields = Literal[
-    "external_id", "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
-]
+ScenarioInstanceTextFields = Literal["external_id", "aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
+ScenarioInstanceFields = Literal["external_id", "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"]
 
 _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -75,7 +71,6 @@ _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
     "scenario": "scenario",
     "start": "start",
 }
-
 
 class ScenarioInstanceGraphQL(GraphQLCore):
     """This represents the reading version of scenario instance, used
@@ -96,7 +91,6 @@ class ScenarioInstanceGraphQL(GraphQLCore):
         scenario: The scenario field.
         start: The start field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
     aggregation: Optional[str] = None
     country: Optional[str] = None
@@ -142,6 +136,7 @@ class ScenarioInstanceGraphQL(GraphQLCore):
             start=self.start,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> ScenarioInstanceWrite:
@@ -179,9 +174,8 @@ class ScenarioInstance(DomainModel):
         scenario: The scenario field.
         start: The start field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     aggregation: Optional[str] = None
@@ -204,11 +198,7 @@ class ScenarioInstance(DomainModel):
             instance=self.instance,
             market=self.market,
             price_area=self.price_area,
-            price_forecast=(
-                self.price_forecast.as_write()
-                if isinstance(self.price_forecast, CogniteTimeSeries)
-                else self.price_forecast
-            ),
+            price_forecast=self.price_forecast.as_write() if isinstance(self.price_forecast, CogniteTimeSeries) else self.price_forecast,
             scenario=self.scenario,
             start=self.start,
         )
@@ -241,7 +231,6 @@ class ScenarioInstanceWrite(DomainModelWrite):
         scenario: The scenario field.
         start: The start field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -266,34 +255,31 @@ class ScenarioInstanceWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.aggregation is not None or write_none:
             properties["aggregation"] = self.aggregation
-
+        
         if self.country is not None or write_none:
             properties["country"] = self.country
-
+        
         if self.instance is not None or write_none:
             properties["instance"] = self.instance.isoformat(timespec="milliseconds") if self.instance else None
-
+        
         if self.market is not None or write_none:
             properties["market"] = self.market
-
+        
         if self.price_area is not None or write_none:
             properties["priceArea"] = self.price_area
-
+        
         if self.price_forecast is not None or write_none:
-            properties["priceForecast"] = (
-                self.price_forecast
-                if isinstance(self.price_forecast, str) or self.price_forecast is None
-                else self.price_forecast.external_id
-            )
-
+            properties["priceForecast"] = self.price_forecast if isinstance(self.price_forecast, str) or self.price_forecast is None else self.price_forecast.external_id
+        
         if self.scenario is not None or write_none:
             properties["scenario"] = self.scenario
-
+        
         if self.start is not None or write_none:
             properties["start"] = self.start.isoformat(timespec="milliseconds") if self.start else None
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -305,11 +291,12 @@ class ScenarioInstanceWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.price_forecast, CogniteTimeSeriesWrite):
             resources.time_series.append(self.price_forecast)
@@ -353,8 +340,8 @@ class ScenarioInstanceWriteList(DomainModelWriteList[ScenarioInstanceWrite]):
 
     _INSTANCE = ScenarioInstanceWrite
 
-
 class ScenarioInstanceApplyList(ScenarioInstanceWriteList): ...
+
 
 
 def _create_scenario_instance_filter(
@@ -391,13 +378,7 @@ def _create_scenario_instance_filter(
     if country_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
     if min_instance is not None or max_instance is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("instance"),
-                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
-                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("instance"), gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None, lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None))
     if isinstance(market, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
     if market and isinstance(market, list):
@@ -417,13 +398,7 @@ def _create_scenario_instance_filter(
     if scenario_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
     if min_start is not None or max_start is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("start"),
-                gte=min_start.isoformat(timespec="milliseconds") if min_start else None,
-                lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("start"), gte=min_start.isoformat(timespec="milliseconds") if min_start else None, lte=max_start.isoformat(timespec="milliseconds") if max_start else None))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -467,17 +442,15 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
         self.price_area = StringFilter(self, self._view_id.as_property_ref("priceArea"))
         self.scenario = StringFilter(self, self._view_id.as_property_ref("scenario"))
         self.start = TimestampFilter(self, self._view_id.as_property_ref("start"))
-        self._filter_classes.extend(
-            [
-                self.aggregation,
-                self.country,
-                self.instance,
-                self.market,
-                self.price_area,
-                self.scenario,
-                self.start,
-            ]
-        )
+        self._filter_classes.extend([
+            self.aggregation,
+            self.country,
+            self.instance,
+            self.market,
+            self.price_area,
+            self.scenario,
+            self.start,
+        ])
 
 
 class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):

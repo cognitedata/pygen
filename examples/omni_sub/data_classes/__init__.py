@@ -17,46 +17,10 @@ from ._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-from ._connection_item_a import (
-    ConnectionItemA,
-    ConnectionItemAApply,
-    ConnectionItemAApplyList,
-    ConnectionItemAFields,
-    ConnectionItemAGraphQL,
-    ConnectionItemAList,
-    ConnectionItemATextFields,
-    ConnectionItemAWrite,
-    ConnectionItemAWriteList,
-)
-from ._connection_item_b import (
-    ConnectionItemB,
-    ConnectionItemBApply,
-    ConnectionItemBApplyList,
-    ConnectionItemBFields,
-    ConnectionItemBGraphQL,
-    ConnectionItemBList,
-    ConnectionItemBTextFields,
-    ConnectionItemBWrite,
-    ConnectionItemBWriteList,
-)
-from ._connection_item_c_edge import (
-    ConnectionItemCEdge,
-    ConnectionItemCEdgeFields,
-    ConnectionItemCEdgeGraphQL,
-    ConnectionItemCEdgeList,
-    ConnectionItemCEdgeTextFields,
-)
-from ._connection_item_c_node import (
-    ConnectionItemCNode,
-    ConnectionItemCNodeApply,
-    ConnectionItemCNodeApplyList,
-    ConnectionItemCNodeFields,
-    ConnectionItemCNodeGraphQL,
-    ConnectionItemCNodeList,
-    ConnectionItemCNodeTextFields,
-    ConnectionItemCNodeWrite,
-    ConnectionItemCNodeWriteList,
-)
+from ._connection_item_a import ConnectionItemA, ConnectionItemAApply, ConnectionItemAApplyList, ConnectionItemAFields, ConnectionItemAGraphQL, ConnectionItemAList, ConnectionItemATextFields, ConnectionItemAWrite, ConnectionItemAWriteList
+from ._connection_item_b import ConnectionItemB, ConnectionItemBApply, ConnectionItemBApplyList, ConnectionItemBFields, ConnectionItemBGraphQL, ConnectionItemBList, ConnectionItemBTextFields, ConnectionItemBWrite, ConnectionItemBWriteList
+from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeFields, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList, ConnectionItemCEdgeTextFields
+from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeApply, ConnectionItemCNodeApplyList, ConnectionItemCNodeFields, ConnectionItemCNodeGraphQL, ConnectionItemCNodeList, ConnectionItemCNodeTextFields, ConnectionItemCNodeWrite, ConnectionItemCNodeWriteList
 
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
@@ -72,6 +36,7 @@ ConnectionItemCNodeWrite.model_rebuild()
 ConnectionItemCNodeApply.model_rebuild()
 ConnectionItemCEdge.model_rebuild()
 ConnectionItemCEdgeGraphQL.model_rebuild()
+
 
 
 __all__ = [

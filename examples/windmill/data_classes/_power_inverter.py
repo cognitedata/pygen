@@ -63,7 +63,6 @@ _POWERINVERTER_PROPERTIES_BY_FIELD = {
     "reactive_power_total": "reactive_power_total",
 }
 
-
 class PowerInverterGraphQL(GraphQLCore):
     """This represents the reading version of power inverter, used
     when data is retrieved from CDF using GraphQL.
@@ -78,7 +77,6 @@ class PowerInverterGraphQL(GraphQLCore):
         apparent_power_total: The apparent power total field.
         reactive_power_total: The reactive power total field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
     active_power_total: Optional[TimeSeriesGraphQL] = None
     apparent_power_total: Optional[TimeSeriesGraphQL] = None
@@ -114,6 +112,7 @@ class PowerInverterGraphQL(GraphQLCore):
             reactive_power_total=self.reactive_power_total.as_read() if self.reactive_power_total else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> PowerInverterWrite:
@@ -141,9 +140,8 @@ class PowerInverter(DomainModel):
         apparent_power_total: The apparent power total field.
         reactive_power_total: The reactive power total field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     active_power_total: Union[TimeSeries, str, None] = None
@@ -156,21 +154,9 @@ class PowerInverter(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            active_power_total=(
-                self.active_power_total.as_write()
-                if isinstance(self.active_power_total, CogniteTimeSeries)
-                else self.active_power_total
-            ),
-            apparent_power_total=(
-                self.apparent_power_total.as_write()
-                if isinstance(self.apparent_power_total, CogniteTimeSeries)
-                else self.apparent_power_total
-            ),
-            reactive_power_total=(
-                self.reactive_power_total.as_write()
-                if isinstance(self.reactive_power_total, CogniteTimeSeries)
-                else self.reactive_power_total
-            ),
+            active_power_total=self.active_power_total.as_write() if isinstance(self.active_power_total, CogniteTimeSeries) else self.active_power_total,
+            apparent_power_total=self.apparent_power_total.as_write() if isinstance(self.apparent_power_total, CogniteTimeSeries) else self.apparent_power_total,
+            reactive_power_total=self.reactive_power_total.as_write() if isinstance(self.reactive_power_total, CogniteTimeSeries) else self.reactive_power_total,
         )
 
     def as_apply(self) -> PowerInverterWrite:
@@ -196,7 +182,6 @@ class PowerInverterWrite(DomainModelWrite):
         apparent_power_total: The apparent power total field.
         reactive_power_total: The reactive power total field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "PowerInverter", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -216,27 +201,16 @@ class PowerInverterWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.active_power_total is not None or write_none:
-            properties["active_power_total"] = (
-                self.active_power_total
-                if isinstance(self.active_power_total, str) or self.active_power_total is None
-                else self.active_power_total.external_id
-            )
-
+            properties["active_power_total"] = self.active_power_total if isinstance(self.active_power_total, str) or self.active_power_total is None else self.active_power_total.external_id
+        
         if self.apparent_power_total is not None or write_none:
-            properties["apparent_power_total"] = (
-                self.apparent_power_total
-                if isinstance(self.apparent_power_total, str) or self.apparent_power_total is None
-                else self.apparent_power_total.external_id
-            )
-
+            properties["apparent_power_total"] = self.apparent_power_total if isinstance(self.apparent_power_total, str) or self.apparent_power_total is None else self.apparent_power_total.external_id
+        
         if self.reactive_power_total is not None or write_none:
-            properties["reactive_power_total"] = (
-                self.reactive_power_total
-                if isinstance(self.reactive_power_total, str) or self.reactive_power_total is None
-                else self.reactive_power_total.external_id
-            )
+            properties["reactive_power_total"] = self.reactive_power_total if isinstance(self.reactive_power_total, str) or self.reactive_power_total is None else self.reactive_power_total.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -248,11 +222,12 @@ class PowerInverterWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.active_power_total, CogniteTimeSeriesWrite):
             resources.time_series.append(self.active_power_total)
@@ -302,8 +277,8 @@ class PowerInverterWriteList(DomainModelWriteList[PowerInverterWrite]):
 
     _INSTANCE = PowerInverterWrite
 
-
 class PowerInverterApplyList(PowerInverterWriteList): ...
+
 
 
 def _create_power_inverter_filter(
@@ -348,6 +323,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class PowerInverterQuery(_PowerInverterQuery[PowerInverterList]):

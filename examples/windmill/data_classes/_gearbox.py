@@ -63,7 +63,6 @@ _GEARBOX_PROPERTIES_BY_FIELD = {
     "displacement_z": "displacement_z",
 }
 
-
 class GearboxGraphQL(GraphQLCore):
     """This represents the reading version of gearbox, used
     when data is retrieved from CDF using GraphQL.
@@ -78,7 +77,6 @@ class GearboxGraphQL(GraphQLCore):
         displacement_y: The displacement y field.
         displacement_z: The displacement z field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
     displacement_x: Optional[TimeSeriesGraphQL] = None
     displacement_y: Optional[TimeSeriesGraphQL] = None
@@ -114,6 +112,7 @@ class GearboxGraphQL(GraphQLCore):
             displacement_z=self.displacement_z.as_read() if self.displacement_z else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> GearboxWrite:
@@ -141,9 +140,8 @@ class Gearbox(DomainModel):
         displacement_y: The displacement y field.
         displacement_z: The displacement z field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     displacement_x: Union[TimeSeries, str, None] = None
@@ -156,21 +154,9 @@ class Gearbox(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            displacement_x=(
-                self.displacement_x.as_write()
-                if isinstance(self.displacement_x, CogniteTimeSeries)
-                else self.displacement_x
-            ),
-            displacement_y=(
-                self.displacement_y.as_write()
-                if isinstance(self.displacement_y, CogniteTimeSeries)
-                else self.displacement_y
-            ),
-            displacement_z=(
-                self.displacement_z.as_write()
-                if isinstance(self.displacement_z, CogniteTimeSeries)
-                else self.displacement_z
-            ),
+            displacement_x=self.displacement_x.as_write() if isinstance(self.displacement_x, CogniteTimeSeries) else self.displacement_x,
+            displacement_y=self.displacement_y.as_write() if isinstance(self.displacement_y, CogniteTimeSeries) else self.displacement_y,
+            displacement_z=self.displacement_z.as_write() if isinstance(self.displacement_z, CogniteTimeSeries) else self.displacement_z,
         )
 
     def as_apply(self) -> GearboxWrite:
@@ -196,7 +182,6 @@ class GearboxWrite(DomainModelWrite):
         displacement_y: The displacement y field.
         displacement_z: The displacement z field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Gearbox", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -216,27 +201,16 @@ class GearboxWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.displacement_x is not None or write_none:
-            properties["displacement_x"] = (
-                self.displacement_x
-                if isinstance(self.displacement_x, str) or self.displacement_x is None
-                else self.displacement_x.external_id
-            )
-
+            properties["displacement_x"] = self.displacement_x if isinstance(self.displacement_x, str) or self.displacement_x is None else self.displacement_x.external_id
+        
         if self.displacement_y is not None or write_none:
-            properties["displacement_y"] = (
-                self.displacement_y
-                if isinstance(self.displacement_y, str) or self.displacement_y is None
-                else self.displacement_y.external_id
-            )
-
+            properties["displacement_y"] = self.displacement_y if isinstance(self.displacement_y, str) or self.displacement_y is None else self.displacement_y.external_id
+        
         if self.displacement_z is not None or write_none:
-            properties["displacement_z"] = (
-                self.displacement_z
-                if isinstance(self.displacement_z, str) or self.displacement_z is None
-                else self.displacement_z.external_id
-            )
+            properties["displacement_z"] = self.displacement_z if isinstance(self.displacement_z, str) or self.displacement_z is None else self.displacement_z.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -248,11 +222,12 @@ class GearboxWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.displacement_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.displacement_x)
@@ -302,8 +277,8 @@ class GearboxWriteList(DomainModelWriteList[GearboxWrite]):
 
     _INSTANCE = GearboxWrite
 
-
 class GearboxApplyList(GearboxWriteList): ...
+
 
 
 def _create_gearbox_filter(
@@ -348,6 +323,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class GearboxQuery(_GearboxQuery[GearboxList]):

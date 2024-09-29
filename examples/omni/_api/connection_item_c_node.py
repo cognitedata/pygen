@@ -43,9 +43,7 @@ from .connection_item_c_node_connection_item_b import ConnectionItemCNodeConnect
 from .connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 
 
-class ConnectionItemCNodeAPI(
-    NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
-):
+class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     _properties_by_field = {}
     _class_type = ConnectionItemCNode
@@ -59,11 +57,11 @@ class ConnectionItemCNodeAPI(
         self.connection_item_b_edge = ConnectionItemCNodeConnectionItemBAPI(client)
 
     def __call__(
-        self,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> ConnectionItemCNodeQueryAPI[ConnectionItemCNodeList]:
         """Query starting at connection item c nodes.
 
@@ -86,6 +84,7 @@ class ConnectionItemCNodeAPI(
         )
         builder = QueryBuilder(ConnectionItemCNodeList)
         return ConnectionItemCNodeQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -131,9 +130,7 @@ class ConnectionItemCNodeAPI(
         )
         return self._apply(connection_item_c_node, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more connection item c node.
 
         Args:
@@ -163,16 +160,14 @@ class ConnectionItemCNodeAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemCNode | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemCNode | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemCNodeList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemCNodeList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
         """Retrieve one or more connection item c nodes by id(s).
 
         Args:
@@ -210,8 +205,9 @@ class ConnectionItemCNodeAPI(
                     "outwards",
                     dm.ViewId("pygen-models", "ConnectionItemB", "1"),
                 ),
-            ],
+                                               ]
         )
+        
 
     def search(
         self,
@@ -278,7 +274,8 @@ class ConnectionItemCNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -290,31 +287,29 @@ class ConnectionItemCNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields],
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
@@ -447,7 +442,7 @@ class ConnectionItemCNodeAPI(
         )
 
         if retrieve_connections == "skip":
-            return self._list(
+                return self._list(
                 limit=limit,
                 filter=filter_,
             )
@@ -456,8 +451,7 @@ class ConnectionItemCNodeAPI(
         builder.append(
             NodeQueryStep(
                 builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=filter_,
+                dm.query.NodeResultSetExpression(filter=filter_,
                 ),
                 ConnectionItemCNode,
                 max_retrieve_limit=limit,
@@ -489,9 +483,9 @@ class ConnectionItemCNodeAPI(
         if retrieve_connections == "full":
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_connection_item_a),
+                    builder.create_name( edge_connection_item_a),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_connection_item_a,
+                        from_= edge_connection_item_a,
                         filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
                     ),
                     ConnectionItemA,
@@ -499,9 +493,9 @@ class ConnectionItemCNodeAPI(
             )
             builder.append(
                 NodeQueryStep(
-                    builder.create_name(edge_connection_item_b),
+                    builder.create_name( edge_connection_item_b),
                     dm.query.NodeResultSetExpression(
-                        from_=edge_connection_item_b,
+                        from_= edge_connection_item_b,
                         filter=dm.filters.HasData(views=[ConnectionItemB._view_id]),
                     ),
                     ConnectionItemB,

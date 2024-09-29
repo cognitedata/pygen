@@ -9,15 +9,15 @@ from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 class WindmillBladesAPI(EdgeAPI):
     def list(
-        self,
-        from_windmill: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        from_windmill_space: str = DEFAULT_INSTANCE_SPACE,
-        to_blade: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_blade_space: str = DEFAULT_INSTANCE_SPACE,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-    ) -> dm.EdgeList:
+            self,
+            from_windmill: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            from_windmill_space: str = DEFAULT_INSTANCE_SPACE,
+            to_blade: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            to_blade_space: str = DEFAULT_INSTANCE_SPACE,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit=DEFAULT_LIMIT_READ,
+    ) ->dm.EdgeList:
         """List blade edges of a windmill.
 
         Args:
@@ -44,6 +44,7 @@ class WindmillBladesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("power-models", "Windmill.blades"),
+            
             from_windmill,
             from_windmill_space,
             to_blade,

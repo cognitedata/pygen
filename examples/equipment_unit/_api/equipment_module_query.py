@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
 
@@ -54,3 +55,4 @@ class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

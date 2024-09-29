@@ -53,12 +53,8 @@ __all__ = [
 ]
 
 
-MainShaftTextFields = Literal[
-    "external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"
-]
-MainShaftFields = Literal[
-    "external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"
-]
+MainShaftTextFields = Literal["external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
+MainShaftFields = Literal["external_id", "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
 
 _MAINSHAFT_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -68,7 +64,6 @@ _MAINSHAFT_PROPERTIES_BY_FIELD = {
     "calculated_yaw_moment": "calculated_yaw_moment",
     "torque": "torque",
 }
-
 
 class MainShaftGraphQL(GraphQLCore):
     """This represents the reading version of main shaft, used
@@ -86,7 +81,6 @@ class MainShaftGraphQL(GraphQLCore):
         calculated_yaw_moment: The calculated yaw moment field.
         torque: The torque field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
     bending_x: Optional[TimeSeriesGraphQL] = None
     bending_y: Optional[TimeSeriesGraphQL] = None
@@ -126,6 +120,7 @@ class MainShaftGraphQL(GraphQLCore):
             torque=self.torque.as_read() if self.torque else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> MainShaftWrite:
@@ -157,9 +152,8 @@ class MainShaft(DomainModel):
         calculated_yaw_moment: The calculated yaw moment field.
         torque: The torque field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     bending_x: Union[TimeSeries, str, None] = None
@@ -176,16 +170,8 @@ class MainShaft(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             bending_x=self.bending_x.as_write() if isinstance(self.bending_x, CogniteTimeSeries) else self.bending_x,
             bending_y=self.bending_y.as_write() if isinstance(self.bending_y, CogniteTimeSeries) else self.bending_y,
-            calculated_tilt_moment=(
-                self.calculated_tilt_moment.as_write()
-                if isinstance(self.calculated_tilt_moment, CogniteTimeSeries)
-                else self.calculated_tilt_moment
-            ),
-            calculated_yaw_moment=(
-                self.calculated_yaw_moment.as_write()
-                if isinstance(self.calculated_yaw_moment, CogniteTimeSeries)
-                else self.calculated_yaw_moment
-            ),
+            calculated_tilt_moment=self.calculated_tilt_moment.as_write() if isinstance(self.calculated_tilt_moment, CogniteTimeSeries) else self.calculated_tilt_moment,
+            calculated_yaw_moment=self.calculated_yaw_moment.as_write() if isinstance(self.calculated_yaw_moment, CogniteTimeSeries) else self.calculated_yaw_moment,
             torque=self.torque.as_write() if isinstance(self.torque, CogniteTimeSeries) else self.torque,
         )
 
@@ -214,7 +200,6 @@ class MainShaftWrite(DomainModelWrite):
         calculated_yaw_moment: The calculated yaw moment field.
         torque: The torque field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "MainShaft", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -236,39 +221,22 @@ class MainShaftWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.bending_x is not None or write_none:
-            properties["bending_x"] = (
-                self.bending_x
-                if isinstance(self.bending_x, str) or self.bending_x is None
-                else self.bending_x.external_id
-            )
-
+            properties["bending_x"] = self.bending_x if isinstance(self.bending_x, str) or self.bending_x is None else self.bending_x.external_id
+        
         if self.bending_y is not None or write_none:
-            properties["bending_y"] = (
-                self.bending_y
-                if isinstance(self.bending_y, str) or self.bending_y is None
-                else self.bending_y.external_id
-            )
-
+            properties["bending_y"] = self.bending_y if isinstance(self.bending_y, str) or self.bending_y is None else self.bending_y.external_id
+        
         if self.calculated_tilt_moment is not None or write_none:
-            properties["calculated_tilt_moment"] = (
-                self.calculated_tilt_moment
-                if isinstance(self.calculated_tilt_moment, str) or self.calculated_tilt_moment is None
-                else self.calculated_tilt_moment.external_id
-            )
-
+            properties["calculated_tilt_moment"] = self.calculated_tilt_moment if isinstance(self.calculated_tilt_moment, str) or self.calculated_tilt_moment is None else self.calculated_tilt_moment.external_id
+        
         if self.calculated_yaw_moment is not None or write_none:
-            properties["calculated_yaw_moment"] = (
-                self.calculated_yaw_moment
-                if isinstance(self.calculated_yaw_moment, str) or self.calculated_yaw_moment is None
-                else self.calculated_yaw_moment.external_id
-            )
-
+            properties["calculated_yaw_moment"] = self.calculated_yaw_moment if isinstance(self.calculated_yaw_moment, str) or self.calculated_yaw_moment is None else self.calculated_yaw_moment.external_id
+        
         if self.torque is not None or write_none:
-            properties["torque"] = (
-                self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
-            )
+            properties["torque"] = self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -280,11 +248,12 @@ class MainShaftWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.bending_x, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_x)
@@ -340,8 +309,8 @@ class MainShaftWriteList(DomainModelWriteList[MainShaftWrite]):
 
     _INSTANCE = MainShaftWrite
 
-
 class MainShaftApplyList(MainShaftWriteList): ...
+
 
 
 def _create_main_shaft_filter(
@@ -386,6 +355,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class MainShaftQuery(_MainShaftQuery[MainShaftList]):

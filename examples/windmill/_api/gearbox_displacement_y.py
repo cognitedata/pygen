@@ -16,7 +16,6 @@ from ._core import DEFAULT_LIMIT_READ
 
 ColumnNames = Literal["displacement_x", "displacement_y", "displacement_z"]
 
-
 class GearboxDisplacementYQuery:
     def __init__(
         self,
@@ -436,9 +435,7 @@ class GearboxDisplacementYAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_displacement_y(
-            self._client, self._view_id, filter_, limit
-        )
+        external_ids = _retrieve_timeseries_external_ids_with_extra_displacement_y(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
@@ -483,7 +480,7 @@ def _retrieve_timeseries_external_ids_with_extra_displacement_y(
             continue
         view_prop = node.properties[view_id]
         key = view_prop["displacement_y"]
-        values = [prop_ for prop in extra_properties_list if isinstance(prop_ := view_prop.get(prop, "MISSING"), str)]
+        values = [prop_ for prop in extra_properties_list if isinstance(prop_:= view_prop.get(prop, "MISSING"), str)]
         if isinstance(key, str):
             output[key] = values
         elif isinstance(key, list):

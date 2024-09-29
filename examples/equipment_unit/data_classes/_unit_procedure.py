@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -57,7 +57,6 @@ _UNITPROCEDURE_PROPERTIES_BY_FIELD = {
     "unit_procedure_type": "type",
 }
 
-
 class UnitProcedureGraphQL(GraphQLCore):
     """This represents the reading version of unit procedure, used
     when data is retrieved from CDF using GraphQL.
@@ -73,7 +72,6 @@ class UnitProcedureGraphQL(GraphQLCore):
         work_orders: The work order field.
         work_units: The work unit field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
     name: Optional[str] = None
     unit_procedure_type: Optional[str] = Field(None, alias="type")
@@ -90,7 +88,6 @@ class UnitProcedureGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("work_orders", "work_units", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -118,6 +115,7 @@ class UnitProcedureGraphQL(GraphQLCore):
             work_orders=[work_order.as_read() for work_order in self.work_orders or []],
             work_units=[work_unit.as_read() for work_unit in self.work_units or []],
         )
+
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -148,9 +146,8 @@ class UnitProcedure(DomainModel):
         work_orders: The work order field.
         work_units: The work unit field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
@@ -214,21 +211,23 @@ class UnitProcedure(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference(
-                        "IntegrationTestsImmutable", "UnitProcedure.work_order"
-                    ) and isinstance(value, StartEndTime):
+                    if edge_type == dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order") and isinstance(
+                        value, StartEndTime
+                    ):
                         work_orders.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]
-                    if edge_type == dm.DirectRelationReference(
-                        "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
-                    ) and isinstance(value, StartEndTime):
+                    if edge_type == dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module") and isinstance(
+                        value, StartEndTime
+                    ):
                         work_units.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]
 
                 instance.work_orders = work_orders
                 instance.work_units = work_units
+
+
 
 
 class UnitProcedureWrite(DomainModelWrite):
@@ -245,7 +244,6 @@ class UnitProcedureWrite(DomainModelWrite):
         work_orders: The work order field.
         work_units: The work unit field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -266,12 +264,13 @@ class UnitProcedureWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.name is not None or write_none:
             properties["name"] = self.name
-
+        
         if self.unit_procedure_type is not None or write_none:
             properties["type"] = self.unit_procedure_type
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -283,11 +282,12 @@ class UnitProcedureWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         for work_order in self.work_orders or []:
             if isinstance(work_order, DomainRelationWrite):
@@ -295,7 +295,7 @@ class UnitProcedureWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
-                )
+)
                 resources.extend(other_resources)
 
         for work_unit in self.work_units or []:
@@ -304,7 +304,7 @@ class UnitProcedureWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
-                )
+)
                 resources.extend(other_resources)
 
         return resources
@@ -346,8 +346,8 @@ class UnitProcedureWriteList(DomainModelWriteList[UnitProcedureWrite]):
 
     _INSTANCE = UnitProcedureWrite
 
-
 class UnitProcedureApplyList(UnitProcedureWriteList): ...
+
 
 
 def _create_unit_procedure_filter(
@@ -442,12 +442,10 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.unit_procedure_type = StringFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.extend(
-            [
-                self.name,
-                self.unit_procedure_type,
-            ]
-        )
+        self._filter_classes.extend([
+            self.name,
+            self.unit_procedure_type,
+        ])
 
 
 class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):

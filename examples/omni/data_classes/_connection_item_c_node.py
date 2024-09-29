@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -42,17 +42,18 @@ __all__ = [
     "ConnectionItemCNodeList",
     "ConnectionItemCNodeWriteList",
     "ConnectionItemCNodeApplyList",
+    
+    
     "ConnectionItemCNodeGraphQL",
 ]
 
 
-ConnectionItemCNodeTextFields = Literal["external_id",]
-ConnectionItemCNodeFields = Literal["external_id",]
+ConnectionItemCNodeTextFields = Literal["external_id", ]
+ConnectionItemCNodeFields = Literal["external_id", ]
 
 _CONNECTIONITEMCNODE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
 }
-
 
 class ConnectionItemCNodeGraphQL(GraphQLCore):
     """This represents the reading version of connection item c node, used
@@ -67,7 +68,6 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
     connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
@@ -82,7 +82,6 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("connection_item_a", "connection_item_b", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -109,6 +108,7 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
             connection_item_b=[connection_item_b.as_read() for connection_item_b in self.connection_item_b or []],
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> ConnectionItemCNodeWrite:
@@ -134,17 +134,12 @@ class ConnectionItemCNode(DomainModel):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemA"
-    )
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemB"
-    )
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
 
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this read version of connection item c node to the writing version."""
@@ -152,14 +147,8 @@ class ConnectionItemCNode(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            connection_item_a=[
-                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
-                for connection_item_a in self.connection_item_a or []
-            ],
-            connection_item_b=[
-                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
-                for connection_item_b in self.connection_item_b or []
-            ],
+            connection_item_a=[connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a for connection_item_a in self.connection_item_a or []],
+            connection_item_b=[connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b for connection_item_b in self.connection_item_b or []],
         )
 
     def as_apply(self) -> ConnectionItemCNodeWrite:
@@ -220,6 +209,8 @@ class ConnectionItemCNode(DomainModel):
                 instance.connection_item_b = connection_item_b or None
 
 
+
+
 class ConnectionItemCNodeWrite(DomainModelWrite):
     """This represents the writing version of connection item c node.
 
@@ -232,19 +223,12 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemC"
-    )
-    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemA"
-    )
-    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemB"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
 
     def _to_instances_write(
         self,
@@ -265,6 +249,9 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
             sources=None,
         )
         resources.nodes.append(this_node)
+        
+
+
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_a in self.connection_item_a or []:
@@ -329,8 +316,8 @@ class ConnectionItemCNodeWriteList(DomainModelWriteList[ConnectionItemCNodeWrite
 
     _INSTANCE = ConnectionItemCNodeWrite
 
-
 class ConnectionItemCNodeApplyList(ConnectionItemCNodeWriteList): ...
+
 
 
 def _create_connection_item_c_node_filter(
@@ -403,6 +390,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
                 ),
                 "connection_item_b",
             )
+
 
 
 class ConnectionItemCNodeQuery(_ConnectionItemCNodeQuery[ConnectionItemCNodeList]):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -56,7 +56,6 @@ _CONNECTIONITEMG_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
-
 class ConnectionItemGGraphQL(GraphQLCore):
     """This represents the reading version of connection item g, used
     when data is retrieved from CDF using GraphQL.
@@ -70,11 +69,8 @@ class ConnectionItemGGraphQL(GraphQLCore):
         inwards_multi_property: The inwards multi property field.
         name: The name field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
-    inwards_multi_property: Optional[list[ConnectionEdgeAGraphQL]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    inwards_multi_property: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     @model_validator(mode="before")
@@ -87,7 +83,6 @@ class ConnectionItemGGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("inwards_multi_property", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -110,11 +105,10 @@ class ConnectionItemGGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            inwards_multi_property=[
-                inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=[inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property or []],
             name=self.name,
         )
+
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -124,9 +118,7 @@ class ConnectionItemGGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            inwards_multi_property=[
-                inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []],
             name=self.name,
         )
 
@@ -143,14 +135,11 @@ class ConnectionItemG(DomainModel):
         inwards_multi_property: The inwards multi property field.
         name: The name field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemG")
-    inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     def as_write(self) -> ConnectionItemGWrite:
@@ -159,9 +148,7 @@ class ConnectionItemG(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            inwards_multi_property=[
-                inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []],
             name=self.name,
         )
 
@@ -218,6 +205,8 @@ class ConnectionItemG(DomainModel):
                 instance.inwards_multi_property = inwards_multi_property
 
 
+
+
 class ConnectionItemGWrite(DomainModelWrite):
     """This represents the writing version of connection item g.
 
@@ -230,16 +219,11 @@ class ConnectionItemGWrite(DomainModelWrite):
         inwards_multi_property: The inwards multi property field.
         name: The name field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemG"
-    )
-    inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "ConnectionItemG")
+    inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     def _to_instances_write(
@@ -253,9 +237,10 @@ class ConnectionItemGWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.name is not None or write_none:
             properties["name"] = self.name
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -267,11 +252,12 @@ class ConnectionItemGWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         for inwards_multi_property in self.inwards_multi_property or []:
             if isinstance(inwards_multi_property, DomainRelationWrite):
@@ -279,7 +265,7 @@ class ConnectionItemGWrite(DomainModelWrite):
                     cache,
                     self,
                     dm.DirectRelationReference("pygen-models", "multiProperty"),
-                )
+)
                 resources.extend(other_resources)
 
         return resources
@@ -321,8 +307,8 @@ class ConnectionItemGWriteList(DomainModelWriteList[ConnectionItemGWrite]):
 
     _INSTANCE = ConnectionItemGWrite
 
-
 class ConnectionItemGApplyList(ConnectionItemGWriteList): ...
+
 
 
 def _create_connection_item_g_filter(
@@ -393,11 +379,9 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend(
-            [
-                self.name,
-            ]
-        )
+        self._filter_classes.extend([
+            self.name,
+        ])
 
 
 class ConnectionItemGQuery(_ConnectionItemGQuery[ConnectionItemGList]):

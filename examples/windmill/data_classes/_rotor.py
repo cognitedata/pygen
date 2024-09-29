@@ -62,7 +62,6 @@ _ROTOR_PROPERTIES_BY_FIELD = {
     "rpm_low_speed_shaft": "rpm_low_speed_shaft",
 }
 
-
 class RotorGraphQL(GraphQLCore):
     """This represents the reading version of rotor, used
     when data is retrieved from CDF using GraphQL.
@@ -76,7 +75,6 @@ class RotorGraphQL(GraphQLCore):
         rotor_speed_controller: The rotor speed controller field.
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
     rotor_speed_controller: Optional[TimeSeriesGraphQL] = None
     rpm_low_speed_shaft: Optional[TimeSeriesGraphQL] = None
@@ -110,6 +108,7 @@ class RotorGraphQL(GraphQLCore):
             rpm_low_speed_shaft=self.rpm_low_speed_shaft.as_read() if self.rpm_low_speed_shaft else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> RotorWrite:
@@ -135,9 +134,8 @@ class Rotor(DomainModel):
         rotor_speed_controller: The rotor speed controller field.
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     rotor_speed_controller: Union[TimeSeries, str, None] = None
@@ -149,16 +147,8 @@ class Rotor(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_write()
-                if isinstance(self.rotor_speed_controller, CogniteTimeSeries)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_write()
-                if isinstance(self.rpm_low_speed_shaft, CogniteTimeSeries)
-                else self.rpm_low_speed_shaft
-            ),
+            rotor_speed_controller=self.rotor_speed_controller.as_write() if isinstance(self.rotor_speed_controller, CogniteTimeSeries) else self.rotor_speed_controller,
+            rpm_low_speed_shaft=self.rpm_low_speed_shaft.as_write() if isinstance(self.rpm_low_speed_shaft, CogniteTimeSeries) else self.rpm_low_speed_shaft,
         )
 
     def as_apply(self) -> RotorWrite:
@@ -183,7 +173,6 @@ class RotorWrite(DomainModelWrite):
         rotor_speed_controller: The rotor speed controller field.
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "Rotor", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -202,20 +191,13 @@ class RotorWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.rotor_speed_controller is not None or write_none:
-            properties["rotor_speed_controller"] = (
-                self.rotor_speed_controller
-                if isinstance(self.rotor_speed_controller, str) or self.rotor_speed_controller is None
-                else self.rotor_speed_controller.external_id
-            )
-
+            properties["rotor_speed_controller"] = self.rotor_speed_controller if isinstance(self.rotor_speed_controller, str) or self.rotor_speed_controller is None else self.rotor_speed_controller.external_id
+        
         if self.rpm_low_speed_shaft is not None or write_none:
-            properties["rpm_low_speed_shaft"] = (
-                self.rpm_low_speed_shaft
-                if isinstance(self.rpm_low_speed_shaft, str) or self.rpm_low_speed_shaft is None
-                else self.rpm_low_speed_shaft.external_id
-            )
+            properties["rpm_low_speed_shaft"] = self.rpm_low_speed_shaft if isinstance(self.rpm_low_speed_shaft, str) or self.rpm_low_speed_shaft is None else self.rpm_low_speed_shaft.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -227,11 +209,12 @@ class RotorWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.rotor_speed_controller, CogniteTimeSeriesWrite):
             resources.time_series.append(self.rotor_speed_controller)
@@ -278,8 +261,8 @@ class RotorWriteList(DomainModelWriteList[RotorWrite]):
 
     _INSTANCE = RotorWrite
 
-
 class RotorApplyList(RotorWriteList): ...
+
 
 
 def _create_rotor_filter(
@@ -324,6 +307,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class RotorQuery(_RotorQuery[RotorList]):

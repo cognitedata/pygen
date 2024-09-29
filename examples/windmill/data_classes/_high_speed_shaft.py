@@ -63,7 +63,6 @@ _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD = {
     "torque": "torque",
 }
 
-
 class HighSpeedShaftGraphQL(GraphQLCore):
     """This represents the reading version of high speed shaft, used
     when data is retrieved from CDF using GraphQL.
@@ -78,7 +77,6 @@ class HighSpeedShaftGraphQL(GraphQLCore):
         bending_monent_x: The bending monent x field.
         torque: The torque field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
     bending_moment_y: Optional[TimeSeriesGraphQL] = None
     bending_monent_x: Optional[TimeSeriesGraphQL] = None
@@ -114,6 +112,7 @@ class HighSpeedShaftGraphQL(GraphQLCore):
             torque=self.torque.as_read() if self.torque else None,
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> HighSpeedShaftWrite:
@@ -141,9 +140,8 @@ class HighSpeedShaft(DomainModel):
         bending_monent_x: The bending monent x field.
         torque: The torque field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     bending_moment_y: Union[TimeSeries, str, None] = None
@@ -156,16 +154,8 @@ class HighSpeedShaft(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_moment_y=(
-                self.bending_moment_y.as_write()
-                if isinstance(self.bending_moment_y, CogniteTimeSeries)
-                else self.bending_moment_y
-            ),
-            bending_monent_x=(
-                self.bending_monent_x.as_write()
-                if isinstance(self.bending_monent_x, CogniteTimeSeries)
-                else self.bending_monent_x
-            ),
+            bending_moment_y=self.bending_moment_y.as_write() if isinstance(self.bending_moment_y, CogniteTimeSeries) else self.bending_moment_y,
+            bending_monent_x=self.bending_monent_x.as_write() if isinstance(self.bending_monent_x, CogniteTimeSeries) else self.bending_monent_x,
             torque=self.torque.as_write() if isinstance(self.torque, CogniteTimeSeries) else self.torque,
         )
 
@@ -192,7 +182,6 @@ class HighSpeedShaftWrite(DomainModelWrite):
         bending_monent_x: The bending monent x field.
         torque: The torque field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("power-models", "HighSpeedShaft", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -212,25 +201,16 @@ class HighSpeedShaftWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.bending_moment_y is not None or write_none:
-            properties["bending_moment_y"] = (
-                self.bending_moment_y
-                if isinstance(self.bending_moment_y, str) or self.bending_moment_y is None
-                else self.bending_moment_y.external_id
-            )
-
+            properties["bending_moment_y"] = self.bending_moment_y if isinstance(self.bending_moment_y, str) or self.bending_moment_y is None else self.bending_moment_y.external_id
+        
         if self.bending_monent_x is not None or write_none:
-            properties["bending_monent_x"] = (
-                self.bending_monent_x
-                if isinstance(self.bending_monent_x, str) or self.bending_monent_x is None
-                else self.bending_monent_x.external_id
-            )
-
+            properties["bending_monent_x"] = self.bending_monent_x if isinstance(self.bending_monent_x, str) or self.bending_monent_x is None else self.bending_monent_x.external_id
+        
         if self.torque is not None or write_none:
-            properties["torque"] = (
-                self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
-            )
+            properties["torque"] = self.torque if isinstance(self.torque, str) or self.torque is None else self.torque.external_id
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -242,11 +222,12 @@ class HighSpeedShaftWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         if isinstance(self.bending_moment_y, CogniteTimeSeriesWrite):
             resources.time_series.append(self.bending_moment_y)
@@ -296,8 +277,8 @@ class HighSpeedShaftWriteList(DomainModelWriteList[HighSpeedShaftWrite]):
 
     _INSTANCE = HighSpeedShaftWrite
 
-
 class HighSpeedShaftApplyList(HighSpeedShaftWriteList): ...
+
 
 
 def _create_high_speed_shaft_filter(
@@ -342,6 +323,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
         )
+
 
 
 class HighSpeedShaftQuery(_HighSpeedShaftQuery[HighSpeedShaftList]):

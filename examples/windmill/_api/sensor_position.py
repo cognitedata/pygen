@@ -39,16 +39,12 @@ from ._core import (
 )
 from .sensor_position_edgewise_bend_mom_crosstalk_corrected import SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI
 from .sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
-from .sensor_position_edgewise_bend_mom_offset_crosstalk_corrected import (
-    SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI,
-)
+from .sensor_position_edgewise_bend_mom_offset_crosstalk_corrected import SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI
 from .sensor_position_edgewisewise_bend_mom import SensorPositionEdgewisewiseBendMomAPI
 from .sensor_position_flapwise_bend_mom import SensorPositionFlapwiseBendMomAPI
 from .sensor_position_flapwise_bend_mom_crosstalk_corrected import SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI
 from .sensor_position_flapwise_bend_mom_offset import SensorPositionFlapwiseBendMomOffsetAPI
-from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
-    SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI,
-)
+from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI
 from .sensor_position_query import SensorPositionQueryAPI
 
 
@@ -62,31 +58,23 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(
-            client, self._view_id
-        )
+        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, self._view_id)
         self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, self._view_id)
-        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, self._view_id
-        )
+        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(client, self._view_id)
         self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, self._view_id)
         self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, self._view_id)
-        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(
-            client, self._view_id
-        )
+        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(client, self._view_id)
         self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, self._view_id)
-        self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(
-            client, self._view_id
-        )
+        self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(client, self._view_id)
 
     def __call__(
-        self,
-        min_position: float | None = None,
-        max_position: float | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
+            self,
+            min_position: float | None = None,
+            max_position: float | None = None,
+            external_id_prefix: str | None = None,
+            space: str | list[str] | None = None,
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
     ) -> SensorPositionQueryAPI[SensorPositionList]:
         """Query starting at sensor positions.
 
@@ -113,6 +101,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         )
         builder = QueryBuilder(SensorPositionList)
         return SensorPositionQueryAPI(self._client, builder, filter_, limit)
+
 
     def apply(
         self,
@@ -154,9 +143,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         )
         return self._apply(sensor_position, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more sensor position.
 
         Args:
@@ -186,14 +173,14 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> SensorPosition | None: ...
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> SensorPosition | None:
+        ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> SensorPositionList: ...
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> SensorPositionList:
+        ...
 
-    def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> SensorPosition | SensorPositionList | None:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> SensorPosition | SensorPositionList | None:
         """Retrieve one or more sensor positions by id(s).
 
         Args:
@@ -287,7 +274,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue: ...
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
 
     @overload
     def aggregate(
@@ -301,16 +289,15 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]: ...
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: SensorPositionFields | SequenceNotStr[SensorPositionFields],
         property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         min_position: float | None = None,
@@ -319,15 +306,14 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList: ...
+    ) -> InstanceAggregationResultList:
+        ...
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         property: SensorPositionFields | SequenceNotStr[SensorPositionFields] | None = None,
         min_position: float | None = None,

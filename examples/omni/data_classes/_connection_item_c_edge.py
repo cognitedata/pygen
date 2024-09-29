@@ -31,18 +31,12 @@ if TYPE_CHECKING:
     from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
-__all__ = [
-    "ConnectionItemCEdge",
-    "ConnectionItemCEdgeWrite",
-    "ConnectionItemCEdgeApply",
-    "ConnectionItemCEdgeList",
-    "ConnectionItemCEdgeWriteList",
-    "ConnectionItemCEdgeApplyList",
-]
+
+__all__ = ["ConnectionItemCEdge", "ConnectionItemCEdgeWrite", "ConnectionItemCEdgeApply", "ConnectionItemCEdgeList", "ConnectionItemCEdgeWriteList", "ConnectionItemCEdgeApplyList"]
 
 
-ConnectionItemCEdgeTextFields = Literal["external_id",]
-ConnectionItemCEdgeFields = Literal["external_id",]
+ConnectionItemCEdgeTextFields = Literal["external_id", ]
+ConnectionItemCEdgeFields = Literal["external_id", ]
 _CONNECTIONITEMCEDGE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
 }
@@ -62,7 +56,6 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     end_node: Union[dm.NodeId, None] = None
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
@@ -88,6 +81,7 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
         )
 
 
+
 class ConnectionItemCEdge(DomainRelation):
     """This represents the reading version of connection item c edge.
 
@@ -101,16 +95,11 @@ class ConnectionItemCEdge(DomainRelation):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemA"
-    )
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemB"
-    )
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
 
     def as_write(self) -> ConnectionItemCEdgeWrite:
         """Convert this read version of connection item c edge to the writing version."""
@@ -119,14 +108,8 @@ class ConnectionItemCEdge(DomainRelation):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             end_node=self.end_node,
-            connection_item_a=[
-                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
-                for connection_item_a in self.connection_item_a or []
-            ],
-            connection_item_b=[
-                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
-                for connection_item_b in self.connection_item_b or []
-            ],
+            connection_item_a=[connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a for connection_item_a in self.connection_item_a or []],
+            connection_item_b=[connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b for connection_item_b in self.connection_item_b or []],
         )
 
     def as_apply(self) -> ConnectionItemCEdgeWrite:
@@ -152,16 +135,11 @@ class ConnectionItemCEdgeWrite(DomainRelationWrite):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
-    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemA"
-    )
-    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="connectionItemB"
-    )
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
 
     def _to_instances_write(
         self,
@@ -188,7 +166,8 @@ class ConnectionItemCEdgeWrite(DomainRelationWrite):
 
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
-        properties: dict[str, Any] = {}
+        properties: dict[str, Any]  = {}
+        
 
         if properties:
             this_edge = dm.EdgeApply(
@@ -287,11 +266,9 @@ def _create_connection_item_c_edge_filter(
             dm.filters.In(
                 ["edge", "startNode"],
                 values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
@@ -307,11 +284,9 @@ def _create_connection_item_c_edge_filter(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )
@@ -327,10 +302,13 @@ def _create_connection_item_c_edge_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+}
 
 
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]
+) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
         return
@@ -397,3 +375,4 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                 ),
                 "connection_item_b",
             )
+

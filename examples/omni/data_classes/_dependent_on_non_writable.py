@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -56,7 +56,6 @@ _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD = {
     "a_value": "aValue",
 }
 
-
 class DependentOnNonWritableGraphQL(GraphQLCore):
     """This represents the reading version of dependent on non writable, used
     when data is retrieved from CDF using GraphQL.
@@ -70,12 +69,9 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
         a_value: The a value field.
         to_non_writable: The to non writable field.
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
-        default=None, repr=False, alias="toNonWritable"
-    )
+    to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(default=None, repr=False, alias="toNonWritable")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -87,7 +83,6 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
     @field_validator("to_non_writable", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -114,6 +109,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             to_non_writable=[to_non_writable.as_read() for to_non_writable in self.to_non_writable or []],
         )
 
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
@@ -139,17 +135,12 @@ class DependentOnNonWritable(DomainModel):
         a_value: The a value field.
         to_non_writable: The to non writable field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
-
+    
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
-        "pygen-models", "DependentOnNonWritable"
-    )
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "DependentOnNonWritable")
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(
-        default=None, repr=False, alias="toNonWritable"
-    )
+    to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(default=None, repr=False, alias="toNonWritable")
 
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
@@ -158,10 +149,7 @@ class DependentOnNonWritable(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
-            to_non_writable=[
-                to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
-                for to_non_writable in self.to_non_writable or []
-            ],
+            to_non_writable=[to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable for to_non_writable in self.to_non_writable or []],
         )
 
     def as_apply(self) -> DependentOnNonWritableWrite:
@@ -215,6 +203,8 @@ class DependentOnNonWritable(DomainModel):
                 instance.to_non_writable = to_non_writable or None
 
 
+
+
 class DependentOnNonWritableWrite(DomainModelWrite):
     """This represents the writing version of dependent on non writable.
 
@@ -227,13 +217,10 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         a_value: The a value field.
         to_non_writable: The to non writable field.
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "DependentOnNonWritable"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "DependentOnNonWritable")
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="toNonWritable")
 
@@ -248,9 +235,10 @@ class DependentOnNonWritableWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
-
+        
         if self.a_value is not None or write_none:
             properties["aValue"] = self.a_value
+        
 
         if properties:
             this_node = dm.NodeApply(
@@ -262,11 +250,12 @@ class DependentOnNonWritableWrite(DomainModelWrite):
                     dm.NodeOrEdgeData(
                         source=self._view_id,
                         properties=properties,
-                    )
-                ],
+                )],
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+        
+
 
         edge_type = dm.DirectRelationReference("pygen-models", "toNonWritable")
         for to_non_writable in self.to_non_writable or []:
@@ -319,8 +308,8 @@ class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritabl
 
     _INSTANCE = DependentOnNonWritableWrite
 
-
 class DependentOnNonWritableApplyList(DependentOnNonWritableWriteList): ...
+
 
 
 def _create_dependent_on_non_writable_filter(
@@ -389,11 +378,9 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             )
 
         self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
-        self._filter_classes.extend(
-            [
-                self.a_value,
-            ]
-        )
+        self._filter_classes.extend([
+            self.a_value,
+        ])
 
 
 class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):

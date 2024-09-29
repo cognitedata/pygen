@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
+
 class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
 
@@ -93,6 +94,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "unidirectional"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -121,7 +123,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemAQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def connection_item_b(
         self,
         name: str | list[str] | None = None,
@@ -155,6 +157,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("pygen-models", "unidirectional"),
+            
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -181,7 +184,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
-
+    
     def query(
         self,
     ) -> T_DomainModelList:
@@ -192,3 +195,4 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+

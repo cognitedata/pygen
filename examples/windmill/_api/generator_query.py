@@ -20,6 +20,7 @@ from ._core import (
 )
 
 
+
 class GeneratorQueryAPI(QueryAPI[T_DomainModelList]):
     _view_id = dm.ViewId("power-models", "Generator", "1")
 
@@ -54,3 +55,4 @@ class GeneratorQueryAPI(QueryAPI[T_DomainModelList]):
 
         """
         return self._query()
+
