@@ -2,7 +2,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
-from cognite.pygen._core.models import NodeDataClass
+from cognite.pygen._core.models import EdgeDataClass, NodeDataClass
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ViewNameCollisionWarning,
@@ -144,6 +144,29 @@ class TestDataClasses:
             )
         # Assert
         assert actual.file_name == expected_name
+
+    def test_edge_class_init_import(self) -> None:
+        # Arrange
+        view = dm.View.load(_CDF3D_ENTITY_YAML)
+        expected = [
+            "Cdf3dEntityEdge",
+            "Cdf3dEntityEdgeFields",
+            "Cdf3dEntityEdgeGraphQL",
+            "Cdf3dEntityEdgeWrite",
+            "Cdf3dEntityEdgeApply",
+            "Cdf3dEntityEdgeWriteList",
+            "Cdf3dEntityEdgeApplyList",
+            "Cdf3dEntityEdgeList",
+            "Cdf3dEntityEdgeTextFields",
+        ]
+
+        # Act
+        data_class = EdgeDataClass.from_view(
+            view, NodeDataClass.to_base_name(view), "edge", PygenConfig().naming.data_class
+        )
+
+        # Assert
+        assert data_class.init_import == f"from .{data_class.file_name} import {', '.join(sorted(expected))}"
 
 
 _DEPENDENCY_NAMED_FIELD = """
@@ -292,3 +315,34 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
     "lastUpdatedTime": 1692020117686,
     "createdTime": 1692020117686,
 }
+
+
+_CDF3D_ENTITY_YAML = """space: cdf_3d_schema
+externalId: Cdf3dEntity
+implements: []
+version: '1'
+writable: false
+usedFor: all
+isGlobal: true
+properties:
+  inModel3d:
+    type:
+      space: cdf_3d_schema
+      externalId: cdf3dEntityConnection
+    source:
+      space: cdf_3d_schema
+      externalId: Cdf3dModel
+      version: '1'
+      type: view
+    name: null
+    description: Cdf3dModel the Cdf3dEntity is part of
+    edgeSource:
+      space: cdf_3d_schema
+      externalId: Cdf3dConnectionProperties
+      version: '1'
+      type: view
+    direction: outwards
+    connectionType: multi_edge_connection
+lastUpdatedTime: 1720165928804
+createdTime: 1690467703871
+"""
