@@ -20,6 +20,8 @@ Changes are grouped as follows
 ### Fixed
 - Generating an SDK from a Data Model with a view with only primitive properties and reverse direct relations no
   longer raises a `ValueError`.
+- Generating an SDK from a Data Model with a view for edges that is not writable but used in an implements, no longer
+  raises an `ImportError`.
 
 ### Removed
 - Support for Python `3.9` is dropped.
