@@ -103,6 +103,10 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item ds.
 
+        Note: This method iterates through all nodes and timeseries linked to connection_item_d and creates them including the edges
+        between the nodes. For example, if any of `direct_multi`, `direct_single` or `outwards_single` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
         Args:
             connection_item_d: Connection item d or sequence of connection item ds to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?

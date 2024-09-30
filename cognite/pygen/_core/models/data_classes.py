@@ -291,11 +291,11 @@ class DataClass:
     def init_import(self) -> str:
         """The data class __init__ imports of this data class"""
         import_classes = [self.read_name, self.graphql_name]
-        if self.is_writable:
+        if self.is_writable or self.is_interface:
             import_classes.append(self.write_name)
             import_classes.append(f"{self.read_name}Apply")
         import_classes.append(self.read_list_name)
-        if self.is_writable:
+        if self.is_writable or self.is_interface:
             import_classes.append(self.write_list_name)
             import_classes.append(f"{self.read_name}ApplyList")
         import_classes.append(self.field_names)
@@ -575,6 +575,13 @@ class DataClass:
     def is_edge_class(self) -> bool:
         """Check if the data class is an edge class."""
         return False
+
+    @property
+    def has_writable_connection_fields(self) -> bool:
+        return any(
+            isinstance(field_, BaseConnectionField) and field_.destination_class and field_.is_write_field
+            for field_ in self
+        )
 
     @property
     def connections_docs_write(self) -> str:

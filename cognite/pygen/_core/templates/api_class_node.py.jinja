@@ -97,7 +97,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         replace: bool = False,
         write_none: bool = False,
     ) -> ResourcesWriteResult:
-        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
+        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_writable_connection_fields %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
         between the nodes. For example, if any of {{ data_class.connections_docs_write }} are set, then these

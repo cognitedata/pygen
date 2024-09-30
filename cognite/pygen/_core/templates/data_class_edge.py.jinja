@@ -106,6 +106,8 @@ class {{ data_class.read_name }}(DomainRelation{% if is_pydantic_v2 and data_cla
     space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
+
+{% if data_class.is_writable or data_class.is_interface %}
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
@@ -207,12 +209,12 @@ class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
         )
         return super().__new__(cls)
 
-
+{% endif %}
 class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the reading version."""
 
     _INSTANCE = {{ data_class.read_name }}
-
+{% if data_class.is_writable or data_class.is_interface %}
     def as_write(self) -> {{ data_class.write_list_name }}:
         """Convert this read version of {{ data_class.doc_name }} list to the writing version."""
         return {{ data_class.write_list_name }}([edge.as_write() for edge in self])
@@ -235,7 +237,7 @@ class {{ data_class.write_list_name }}(DomainRelationWriteList[{{ data_class.wri
 
 class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
-
+{% endif %}
 def {{ data_class.filter_name }}(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,{% if has_default_instance_space %}
