@@ -118,6 +118,10 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
     ) -> ResourcesWriteResult:
         """Add or update (upsert) nacelles.
 
+        Note: This method iterates through all nodes and timeseries linked to nacelle and creates them including the edges
+        between the nodes. For example, if any of `gearbox`, `generator`, `high_speed_shaft`, `main_shaft` or `power_inverter` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
         Args:
             nacelle: Nacelle or sequence of nacelles to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
