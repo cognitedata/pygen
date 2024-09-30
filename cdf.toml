@@ -12,3 +12,6 @@ version = "0.3.0b3"
 run = false
 pull = false
 dump = false
+
+[feature_flags]
+graphql = true

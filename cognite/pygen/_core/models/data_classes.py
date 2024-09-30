@@ -577,6 +577,13 @@ class DataClass:
         return False
 
     @property
+    def has_writable_connection_fields(self) -> bool:
+        return any(
+            isinstance(field_, BaseConnectionField) and field_.destination_class and field_.is_write_field
+            for field_ in self
+        )
+
+    @property
     def connections_docs_write(self) -> str:
         """Return a string with all connections that are write fields."""
         connections = [f for f in self.fields_of_type(BaseConnectionField) if f.destination_class and f.is_write_field]  # type: ignore[type-abstract]

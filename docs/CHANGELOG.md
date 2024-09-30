@@ -17,6 +17,10 @@ Changes are grouped as follows
 ### Added
 - Support for `Enum` in `MockGenerator`.
 
+### Fixed
+- Generating an SDK from a Data Model with a view with only primitive properties and reverse direct relations no
+  longer raises a `ValueError`.
+
 ### Removed
 - Support for Python `3.9` is dropped.
 
