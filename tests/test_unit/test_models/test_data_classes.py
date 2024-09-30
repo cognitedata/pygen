@@ -152,17 +152,13 @@ class TestDataClasses:
             "Cdf3dEntityEdge",
             "Cdf3dEntityEdgeFields",
             "Cdf3dEntityEdgeGraphQL",
-            "Cdf3dEntityEdgeWrite",
-            "Cdf3dEntityEdgeApply",
-            "Cdf3dEntityEdgeWriteList",
-            "Cdf3dEntityEdgeApplyList",
             "Cdf3dEntityEdgeList",
             "Cdf3dEntityEdgeTextFields",
         ]
 
         # Act
         data_class = EdgeDataClass.from_view(
-            view, NodeDataClass.to_base_name(view), "edge", PygenConfig().naming.data_class
+            view, f"{NodeDataClass.to_base_name(view)}Edge", "edge", PygenConfig().naming.data_class
         )
 
         # Assert
