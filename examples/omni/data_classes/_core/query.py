@@ -146,7 +146,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, self._result_list_cls)
         return builder.execute(self._client)
 
-    def _dump_query_yaml(self) -> str:
+    def _dump_yaml(self) -> str:
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
     def list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
