@@ -151,6 +151,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             step.select = None
         return builder.execute(self._client)
 
+    def _dump_yaml(self) -> str:
+        return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
+
     def _create_query(self, limit: int, result_list_cls: type[DomainModelList]) -> QueryBuilder:
         builder = QueryBuilder(result_list_cls)
         from_: str | None = None
@@ -339,6 +342,9 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         cursors = self._cursors
 
         return dm.query.Query(with_=with_, select=select, cursors=cursors)
+
+    def _dump_yaml(self) -> str:
+        return self._build().dump_yaml()
 
     @property
     def _cursors(self) -> dict[str, str | None]:
