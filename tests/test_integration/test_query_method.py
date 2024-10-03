@@ -34,6 +34,26 @@ def test_query_list_method(omni_client: OmniClient) -> None:
     assert isinstance(items, dc.ConnectionItemCNodeList)
 
 
+def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemBList)
+    for item in items:
+        assert item.name.startswith("T")
+
+
+def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.query().outwards.name.prefix("T").execute(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemAList)
+    for item in items:
+        for subitem in item.outwards or []:
+            if isinstance(subitem, dc.ConnectionItemB):
+                assert subitem.name.startswith("T")
+
+
 def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.query().outwards.execute(limit=5)
 
