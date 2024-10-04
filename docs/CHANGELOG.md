@@ -15,7 +15,7 @@ Changes are grouped as follows
 
 ## TBD
 ### Changed
-- In the experimental query method, the `.execute(...)` has been renamed to `.list_full(...)`, and 
+- [BREAKING] In the experimental query method, the `.execute(...)` has been renamed to `.list_full(...)`, and 
   `.list(...)` has been renamed to `.list_<name of type>(...)`. This is to make it more intuitive to understand
   what the methods do.
 

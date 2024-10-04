@@ -15,7 +15,7 @@ else:
 
 
 def test_query_across_direct_relation(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().other_direct.execute(limit=5)
+    items = omni_client.connection_item_a.query().other_direct.list_full(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
@@ -44,7 +44,7 @@ def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
 
 
 def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().outwards.name.prefix("T").execute(limit=5)
+    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list_full(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
@@ -55,7 +55,7 @@ def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
 
 
 def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().outwards.execute(limit=5)
+    items = omni_client.connection_item_a.query().outwards.list_full(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
@@ -65,7 +65,7 @@ def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
 
 @pytest.mark.skip("Missing test data")
 def test_query_across_edge_properties(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_f.query().outwards_multi.end_node.execute(limit=5)
+    items = omni_client.connection_item_f.query().outwards_multi.end_node.list_full(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemFList)
@@ -75,7 +75,7 @@ def test_query_across_edge_properties(omni_client: OmniClient) -> None:
 
 def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
     with pytest.raises(ValueError) as e:
-        omni_client.connection_item_a.query().outwards.inwards.outwards.execute(limit=5)
+        omni_client.connection_item_a.query().outwards.inwards.outwards.list_full(limit=5)
 
     assert "Circular" in str(e.value)
 

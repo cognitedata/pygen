@@ -22,6 +22,7 @@ FIELD_NAMES = (
         "external_id_factory",
         "replace",
         "type",
+        "list_full",
     }
     | {f for f in dir(BaseModel)}
     | {
