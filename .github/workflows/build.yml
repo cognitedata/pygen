@@ -98,7 +98,7 @@ jobs:
           poetry config virtualenvs.create false
           poetry install -E all
           # This version is supported by Pyodide
-          pip install pydantic==1.10.7
+          pip install pydantic==1.10.13
 
       - name: Test
         run: pytest cognite tests/test_unit -v
