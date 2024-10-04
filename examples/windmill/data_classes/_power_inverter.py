@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -353,3 +354,6 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
 class PowerInverterQuery(_PowerInverterQuery[PowerInverterList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, PowerInverterList)
+
+    def list_power_inverter(self, limit: int = DEFAULT_QUERY_LIMIT) -> PowerInverterList:
+        return self._list(limit=limit)

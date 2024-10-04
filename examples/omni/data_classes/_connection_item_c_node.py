@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -408,3 +409,6 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
 class ConnectionItemCNodeQuery(_ConnectionItemCNodeQuery[ConnectionItemCNodeList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, ConnectionItemCNodeList)
+
+    def list_connection_item_c_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemCNodeList:
+        return self._list(limit=limit)

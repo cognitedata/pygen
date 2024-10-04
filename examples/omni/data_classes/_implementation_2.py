@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -321,3 +322,6 @@ class _Implementation2Query(NodeQueryCore[T_DomainModelList, Implementation2List
 class Implementation2Query(_Implementation2Query[Implementation2List]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, Implementation2List)
+
+    def list_implementation_2(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation2List:
+        return self._list(limit=limit)

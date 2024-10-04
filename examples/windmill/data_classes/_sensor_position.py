@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -559,3 +560,6 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
 class SensorPositionQuery(_SensorPositionQuery[SensorPositionList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, SensorPositionList)
+
+    def list_sensor_position(self, limit: int = DEFAULT_QUERY_LIMIT) -> SensorPositionList:
+        return self._list(limit=limit)

@@ -13,6 +13,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -379,3 +380,6 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
 class EquipmentModuleQuery(_EquipmentModuleQuery[EquipmentModuleList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, EquipmentModuleList)
+
+    def list_equipment_module(self, limit: int = DEFAULT_QUERY_LIMIT) -> EquipmentModuleList:
+        return self._list(limit=limit)

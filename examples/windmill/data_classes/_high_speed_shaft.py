@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -347,3 +348,6 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
 class HighSpeedShaftQuery(_HighSpeedShaftQuery[HighSpeedShaftList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, HighSpeedShaftList)
+
+    def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:
+        return self._list(limit=limit)

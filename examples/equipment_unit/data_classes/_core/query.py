@@ -146,7 +146,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, self._result_list_cls)
         return builder.execute(self._client)
 
-    def list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
+    def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end))
         for step in builder[:-1]:
             step.select = None

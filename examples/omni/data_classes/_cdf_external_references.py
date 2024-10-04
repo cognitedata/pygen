@@ -16,6 +16,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -344,3 +345,6 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
 class CDFExternalReferencesQuery(_CDFExternalReferencesQuery[CDFExternalReferencesList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, CDFExternalReferencesList)
+
+    def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
+        return self._list(limit=limit)

@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -385,3 +386,6 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
 class PrimitiveWithDefaultsQuery(_PrimitiveWithDefaultsQuery[PrimitiveWithDefaultsList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, PrimitiveWithDefaultsList)
+
+    def list_primitive_with_default(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveWithDefaultsList:
+        return self._list(limit=limit)

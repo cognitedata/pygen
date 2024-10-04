@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -212,3 +213,6 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
 class Implementation1NonWriteableQuery(_Implementation1NonWriteableQuery[Implementation1NonWriteableList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, Implementation1NonWriteableList)
+
+    def list_implementation_1_non_writeable(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1NonWriteableList:
+        return self._list(limit=limit)

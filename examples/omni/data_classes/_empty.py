@@ -10,6 +10,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -468,3 +469,6 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
 class EmptyQuery(_EmptyQuery[EmptyList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, EmptyList)
+
+    def list_empty(self, limit: int = DEFAULT_QUERY_LIMIT) -> EmptyList:
+        return self._list(limit=limit)
