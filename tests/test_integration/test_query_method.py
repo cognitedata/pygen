@@ -28,7 +28,7 @@ def test_query_across_direct_relation(omni_client: OmniClient) -> None:
 
 
 def test_query_list_method(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().other_direct.list(limit=5)
+    items = omni_client.connection_item_a.query().other_direct.list_connection_item_c_node(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemCNodeList)
@@ -81,6 +81,6 @@ def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
 
 
 def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
-    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list_full()
+    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
 
     assert len(items) > 0
