@@ -30,7 +30,6 @@ from ._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-
 )
 
 if TYPE_CHECKING:
