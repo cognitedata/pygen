@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -448,6 +449,9 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 self.unit_procedure_type,
             ]
         )
+
+    def list_unit_procedure(self, limit: int = DEFAULT_QUERY_LIMIT) -> UnitProcedureList:
+        return self._list(limit=limit)
 
 
 class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):

@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -342,6 +343,9 @@ class _WorkOrderQuery(NodeQueryCore[T_DomainModelList, WorkOrderList]):
                 self.work_order_type,
             ]
         )
+
+    def list_work_order(self, limit: int = DEFAULT_QUERY_LIMIT) -> WorkOrderList:
+        return self._list(limit=limit)
 
 
 class WorkOrderQuery(_WorkOrderQuery[WorkOrderList]):

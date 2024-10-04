@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.36] - 24-10-04
+### Changed
+- [BREAKING] In the experimental query method, the `.execute(...)` has been renamed to `.list_full(...)`, and 
+  `.list(...)` has been renamed to `.list_<name of type>(...)`. This is to make it more intuitive to understand
+  what the methods do.
+
 ### Removed
 - `pydantic` `v1` is no longer supported. This is because `pyodide` now supports `pydantic` `2.7`.
 

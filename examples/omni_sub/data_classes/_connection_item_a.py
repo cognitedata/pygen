@@ -8,6 +8,7 @@ from pydantic import Field
 from pydantic import field_validator, model_validator
 
 from ._core import (
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -499,6 +500,9 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 self.name,
             ]
         )
+
+    def list_connection_item_a(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemAList:
+        return self._list(limit=limit)
 
 
 class ConnectionItemAQuery(_ConnectionItemAQuery[ConnectionItemAList]):

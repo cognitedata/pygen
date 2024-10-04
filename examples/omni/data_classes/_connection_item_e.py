@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -594,6 +595,9 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 self.name,
             ]
         )
+
+    def list_connection_item_e(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemEList:
+        return self._list(limit=limit)
 
 
 class ConnectionItemEQuery(_ConnectionItemEQuery[ConnectionItemEList]):

@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -394,6 +395,9 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                 self.a_value,
             ]
         )
+
+    def list_dependent_on_non_writable(self, limit: int = DEFAULT_QUERY_LIMIT) -> DependentOnNonWritableList:
+        return self._list(limit=limit)
 
 
 class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):

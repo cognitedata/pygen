@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -367,6 +368,9 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
                 self.position,
             ]
         )
+
+    def list_metmast(self, limit: int = DEFAULT_QUERY_LIMIT) -> MetmastList:
+        return self._list(limit=limit)
 
 
 class MetmastQuery(_MetmastQuery[MetmastList]):

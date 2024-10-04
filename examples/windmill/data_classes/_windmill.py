@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -602,6 +603,9 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 self.windfarm,
             ]
         )
+
+    def list_windmill(self, limit: int = DEFAULT_QUERY_LIMIT) -> WindmillList:
+        return self._list(limit=limit)
 
 
 class WindmillQuery(_WindmillQuery[WindmillList]):

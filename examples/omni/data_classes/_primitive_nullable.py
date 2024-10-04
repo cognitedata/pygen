@@ -10,6 +10,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -461,6 +462,9 @@ class _PrimitiveNullableQuery(NodeQueryCore[T_DomainModelList, PrimitiveNullable
                 self.timestamp,
             ]
         )
+
+    def list_primitive_nullable(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableList:
+        return self._list(limit=limit)
 
 
 class PrimitiveNullableQuery(_PrimitiveNullableQuery[PrimitiveNullableList]):

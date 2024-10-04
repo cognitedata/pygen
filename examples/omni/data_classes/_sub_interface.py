@@ -9,6 +9,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -316,6 +317,9 @@ class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
                 self.sub_value,
             ]
         )
+
+    def list_sub_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> SubInterfaceList:
+        return self._list(limit=limit)
 
 
 class SubInterfaceQuery(_SubInterfaceQuery[SubInterfaceList]):

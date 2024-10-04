@@ -13,6 +13,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -783,6 +784,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 ),
                 "power_inverter",
             )
+
+    def list_nacelle(self, limit: int = DEFAULT_QUERY_LIMIT) -> NacelleList:
+        return self._list(limit=limit)
 
 
 class NacelleQuery(_NacelleQuery[NacelleList]):

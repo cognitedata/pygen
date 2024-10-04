@@ -14,6 +14,7 @@ from pydantic import field_validator, model_validator
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -478,6 +479,9 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
                 self.start,
             ]
         )
+
+    def list_scenario_instance(self, limit: int = DEFAULT_QUERY_LIMIT) -> ScenarioInstanceList:
+        return self._list(limit=limit)
 
 
 class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):
