@@ -25,7 +25,7 @@ class OmniSubClient:
     Generated with:
         pygen = 0.99.35
         cognite-sdk = 7.62.5
-        pydantic = 1.10.7
+        pydantic = 1.10.13
 
     Data Model:
         space: pygen-models

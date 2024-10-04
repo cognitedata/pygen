@@ -291,7 +291,7 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
             content = content.replace(current_version, new_version)
         content = re.sub(r"cognite-sdk = \d+.\d+.\d+", f"cognite-sdk = {cognite_sdk_version}", content)
         if file not in api_client_files_v1:
-            # pydantic v1 is frozen at 1.10.7
+            # pydantic v1 is frozen at 1.10.13
             content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
         file.write_text(content)
         typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
