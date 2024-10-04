@@ -39,7 +39,6 @@ def generate_sdk(  # type: ignore[overload-overlap, misc]
     default_instance_space: str | None = None,
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
-    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
@@ -56,7 +55,6 @@ def generate_sdk(
     default_instance_space: str | None = None,
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
-    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
@@ -72,7 +70,6 @@ def generate_sdk(
     default_instance_space: str | None = None,
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
-    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
@@ -96,8 +93,6 @@ def generate_sdk(
             the space must be specified when creating, deleting, and retrieving nodes and edges.
         output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
-        pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
-            the environment to detect the installed version of pydantic.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
@@ -120,7 +115,7 @@ def generate_sdk(
         data_model,
         default_instance_space,
         "inheritance",
-        pydantic_version,
+        "v2",
         logger,
         config or PygenConfig(),
     )
