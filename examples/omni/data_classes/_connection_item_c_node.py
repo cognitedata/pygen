@@ -405,10 +405,10 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
                 "connection_item_b",
             )
 
+    def list_connection_item_c_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemCNodeList:
+        return self._list(limit=limit)
+
 
 class ConnectionItemCNodeQuery(_ConnectionItemCNodeQuery[ConnectionItemCNodeList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, ConnectionItemCNodeList)
-
-    def list_connection_item_c_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemCNodeList:
-        return self._list(limit=limit)

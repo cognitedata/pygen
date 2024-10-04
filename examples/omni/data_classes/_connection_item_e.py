@@ -596,10 +596,10 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             ]
         )
 
+    def list_connection_item_e(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemEList:
+        return self._list(limit=limit)
+
 
 class ConnectionItemEQuery(_ConnectionItemEQuery[ConnectionItemEList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, ConnectionItemEList)
-
-    def list_connection_item_e(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemEList:
-        return self._list(limit=limit)

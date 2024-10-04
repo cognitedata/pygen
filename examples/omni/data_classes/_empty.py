@@ -465,10 +465,10 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
             ]
         )
 
+    def list_empty(self, limit: int = DEFAULT_QUERY_LIMIT) -> EmptyList:
+        return self._list(limit=limit)
+
 
 class EmptyQuery(_EmptyQuery[EmptyList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, EmptyList)
-
-    def list_empty(self, limit: int = DEFAULT_QUERY_LIMIT) -> EmptyList:
-        return self._list(limit=limit)

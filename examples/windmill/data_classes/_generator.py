@@ -339,10 +339,10 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             connection_name,
         )
 
+    def list_generator(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratorList:
+        return self._list(limit=limit)
+
 
 class GeneratorQuery(_GeneratorQuery[GeneratorList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, GeneratorList)
-
-    def list_generator(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratorList:
-        return self._list(limit=limit)

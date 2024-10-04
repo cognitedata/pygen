@@ -391,10 +391,10 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
             connection_name,
         )
 
+    def list_primitive_nullable_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableListedList:
+        return self._list(limit=limit)
+
 
 class PrimitiveNullableListedQuery(_PrimitiveNullableListedQuery[PrimitiveNullableListedList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, PrimitiveNullableListedList)
-
-    def list_primitive_nullable_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableListedList:
-        return self._list(limit=limit)

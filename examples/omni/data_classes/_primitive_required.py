@@ -463,10 +463,10 @@ class _PrimitiveRequiredQuery(NodeQueryCore[T_DomainModelList, PrimitiveRequired
             ]
         )
 
+    def list_primitive_required(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveRequiredList:
+        return self._list(limit=limit)
+
 
 class PrimitiveRequiredQuery(_PrimitiveRequiredQuery[PrimitiveRequiredList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, PrimitiveRequiredList)
-
-    def list_primitive_required(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveRequiredList:
-        return self._list(limit=limit)

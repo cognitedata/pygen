@@ -344,10 +344,10 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             connection_name,
         )
 
+    def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:
+        return self._list(limit=limit)
+
 
 class HighSpeedShaftQuery(_HighSpeedShaftQuery[HighSpeedShaftList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, HighSpeedShaftList)
-
-    def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:
-        return self._list(limit=limit)

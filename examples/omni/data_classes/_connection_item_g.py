@@ -400,10 +400,10 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             ]
         )
 
+    def list_connection_item_g(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemGList:
+        return self._list(limit=limit)
+
 
 class ConnectionItemGQuery(_ConnectionItemGQuery[ConnectionItemGList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, ConnectionItemGList)
-
-    def list_connection_item_g(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemGList:
-        return self._list(limit=limit)

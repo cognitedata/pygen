@@ -298,10 +298,10 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
             ]
         )
 
+    def list_main_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainInterfaceList:
+        return self._list(limit=limit)
+
 
 class MainInterfaceQuery(_MainInterfaceQuery[MainInterfaceList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, MainInterfaceList)
-
-    def list_main_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainInterfaceList:
-        return self._list(limit=limit)

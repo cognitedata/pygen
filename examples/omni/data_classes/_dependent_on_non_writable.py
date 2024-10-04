@@ -396,10 +396,10 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             ]
         )
 
+    def list_dependent_on_non_writable(self, limit: int = DEFAULT_QUERY_LIMIT) -> DependentOnNonWritableList:
+        return self._list(limit=limit)
+
 
 class DependentOnNonWritableQuery(_DependentOnNonWritableQuery[DependentOnNonWritableList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, DependentOnNonWritableList)
-
-    def list_dependent_on_non_writable(self, limit: int = DEFAULT_QUERY_LIMIT) -> DependentOnNonWritableList:
-        return self._list(limit=limit)

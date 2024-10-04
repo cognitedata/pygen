@@ -340,10 +340,10 @@ class _Implementation1v2Query(NodeQueryCore[T_DomainModelList, Implementation1v2
             ]
         )
 
+    def list_implementation_1_v_2(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1v2List:
+        return self._list(limit=limit)
+
 
 class Implementation1v2Query(_Implementation1v2Query[Implementation1v2List]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, Implementation1v2List)
-
-    def list_implementation_1_v_2(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1v2List:
-        return self._list(limit=limit)

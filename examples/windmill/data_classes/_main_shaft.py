@@ -388,10 +388,10 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             connection_name,
         )
 
+    def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
+        return self._list(limit=limit)
+
 
 class MainShaftQuery(_MainShaftQuery[MainShaftList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, MainShaftList)
-
-    def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
-        return self._list(limit=limit)

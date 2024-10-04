@@ -785,10 +785,10 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 "power_inverter",
             )
 
+    def list_nacelle(self, limit: int = DEFAULT_QUERY_LIMIT) -> NacelleList:
+        return self._list(limit=limit)
+
 
 class NacelleQuery(_NacelleQuery[NacelleList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, NacelleList)
-
-    def list_nacelle(self, limit: int = DEFAULT_QUERY_LIMIT) -> NacelleList:
-        return self._list(limit=limit)

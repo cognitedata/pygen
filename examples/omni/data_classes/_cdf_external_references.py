@@ -341,10 +341,10 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
             connection_name,
         )
 
+    def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
+        return self._list(limit=limit)
+
 
 class CDFExternalReferencesQuery(_CDFExternalReferencesQuery[CDFExternalReferencesList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, CDFExternalReferencesList)
-
-    def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
-        return self._list(limit=limit)

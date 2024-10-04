@@ -480,10 +480,10 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
             ]
         )
 
+    def list_scenario_instance(self, limit: int = DEFAULT_QUERY_LIMIT) -> ScenarioInstanceList:
+        return self._list(limit=limit)
+
 
 class ScenarioInstanceQuery(_ScenarioInstanceQuery[ScenarioInstanceList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, ScenarioInstanceList)
-
-    def list_scenario_instance(self, limit: int = DEFAULT_QUERY_LIMIT) -> ScenarioInstanceList:
-        return self._list(limit=limit)

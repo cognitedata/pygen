@@ -350,10 +350,10 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
             connection_name,
         )
 
+    def list_power_inverter(self, limit: int = DEFAULT_QUERY_LIMIT) -> PowerInverterList:
+        return self._list(limit=limit)
+
 
 class PowerInverterQuery(_PowerInverterQuery[PowerInverterList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, PowerInverterList)
-
-    def list_power_inverter(self, limit: int = DEFAULT_QUERY_LIMIT) -> PowerInverterList:
-        return self._list(limit=limit)

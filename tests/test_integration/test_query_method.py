@@ -35,7 +35,7 @@ def test_query_list_method(omni_client: OmniClient) -> None:
 
 
 def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list_connectoin_item_b(limit=5)
+    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list_connection_item_b(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemBList)

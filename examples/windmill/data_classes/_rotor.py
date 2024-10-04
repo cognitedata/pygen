@@ -326,10 +326,10 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             connection_name,
         )
 
+    def list_rotor(self, limit: int = DEFAULT_QUERY_LIMIT) -> RotorList:
+        return self._list(limit=limit)
+
 
 class RotorQuery(_RotorQuery[RotorList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, RotorList)
-
-    def list_rotor(self, limit: int = DEFAULT_QUERY_LIMIT) -> RotorList:
-        return self._list(limit=limit)

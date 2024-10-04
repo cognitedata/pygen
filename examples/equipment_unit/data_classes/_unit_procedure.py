@@ -450,10 +450,10 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             ]
         )
 
+    def list_unit_procedure(self, limit: int = DEFAULT_QUERY_LIMIT) -> UnitProcedureList:
+        return self._list(limit=limit)
+
 
 class UnitProcedureQuery(_UnitProcedureQuery[UnitProcedureList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, UnitProcedureList)
-
-    def list_unit_procedure(self, limit: int = DEFAULT_QUERY_LIMIT) -> UnitProcedureList:
-        return self._list(limit=limit)

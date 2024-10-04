@@ -350,10 +350,10 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             connection_name,
         )
 
+    def list_gearbox(self, limit: int = DEFAULT_QUERY_LIMIT) -> GearboxList:
+        return self._list(limit=limit)
+
 
 class GearboxQuery(_GearboxQuery[GearboxList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, GearboxList)
-
-    def list_gearbox(self, limit: int = DEFAULT_QUERY_LIMIT) -> GearboxList:
-        return self._list(limit=limit)

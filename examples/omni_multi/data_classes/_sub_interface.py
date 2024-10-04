@@ -317,10 +317,10 @@ class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
             ]
         )
 
+    def list_sub_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> SubInterfaceList:
+        return self._list(limit=limit)
+
 
 class SubInterfaceQuery(_SubInterfaceQuery[SubInterfaceList]):
     def __init__(self, client: CogniteClient):
         super().__init__(set(), [], client, SubInterfaceList)
-
-    def list_sub_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> SubInterfaceList:
-        return self._list(limit=limit)
