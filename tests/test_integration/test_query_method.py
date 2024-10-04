@@ -35,7 +35,7 @@ def test_query_list_method(omni_client: OmniClient) -> None:
 
 
 def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list(limit=5)
+    items = omni_client.connection_item_a.query().outwards.name.prefix("T").list_connectoin_item_b(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemBList)
@@ -81,6 +81,6 @@ def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
 
 
 def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
-    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list()
+    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list_full()
 
     assert len(items) > 0
