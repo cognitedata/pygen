@@ -6,16 +6,9 @@ from typing import Optional
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
+from omni import data_classes as dc
+from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
 from pydantic import Field
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import data_classes as dc
-    from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
-else:
-    from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1.data_classes._core import DataRecord, DomainModel, unpack_properties
 
 
 class TestDomainModel:

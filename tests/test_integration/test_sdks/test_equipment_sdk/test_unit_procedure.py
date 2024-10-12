@@ -1,32 +1,17 @@
 import pytest
 from cognite.client import CogniteClient
 from cognite.client.data_classes import TimeSeriesWrite
+from equipment_unit.data_classes import (
+    EquipmentModule,
+    EquipmentModuleWrite,
+    StartEndTime,
+    StartEndTimeList,
+    StartEndTimeWrite,
+    UnitProcedureList,
+    UnitProcedureWrite,
+)
 
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from equipment_unit.data_classes import (
-        EquipmentModule,
-        EquipmentModuleWrite,
-        StartEndTime,
-        StartEndTimeList,
-        StartEndTimeWrite,
-        UnitProcedureList,
-        UnitProcedureWrite,
-    )
-
-    from examples.equipment_unit import EquipmentUnitClient
-else:
-    from equipment_unit_pydantic_v1 import EquipmentUnitClient
-    from equipment_unit_pydantic_v1.data_classes import (
-        EquipmentModule,
-        EquipmentModuleWrite,
-        StartEndTime,
-        StartEndTimeList,
-        StartEndTimeWrite,
-        UnitProcedureList,
-        UnitProcedureWrite,
-    )
+from examples.equipment_unit import EquipmentUnitClient
 
 
 @pytest.fixture

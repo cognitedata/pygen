@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
+from omni.data_classes import DomainModel, DomainModelWrite
 
 from cognite.pygen._core.models import (
     EndNodeField,
@@ -16,12 +17,6 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ViewPropertyNameCollisionWarning,
 )
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni.data_classes import DomainModel, DomainModelWrite
-else:
-    from omni_pydantic_v1.data_classes import DomainModel, DomainModelWrite
 
 
 @pytest.mark.parametrize(

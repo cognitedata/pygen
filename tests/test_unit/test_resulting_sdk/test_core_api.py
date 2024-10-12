@@ -2,15 +2,8 @@ from typing import Any
 
 import pytest
 from cognite.client import data_modeling as dm
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from windmill import data_classes as wdc
-    from windmill._api._core import GraphQLQueryResponse
-else:
-    from windmill_pydantic_v1 import data_classes as wdc
-    from windmill_pydantic_v1._api._core import GraphQLQueryResponse
+from windmill import data_classes as wdc
+from windmill._api._core import GraphQLQueryResponse
 
 
 def parse_graphql_query():
