@@ -8,21 +8,12 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
 
-from cognite.pygen.utils.helper import get_pydantic_version
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data_models"
 
-_pydantic_version = get_pydantic_version()
-IS_PYDANTIC_V1 = _pydantic_version == "v1"
-IS_PYDANTIC_V2 = _pydantic_version == "v2"
+IS_PYDANTIC_V2 = True
 
-EXAMPLES_DIR = {
-    "v1": REPO_ROOT / "examples-pydantic-v1",
-    "v2": REPO_ROOT / "examples",
-}[_pydantic_version]
-
-_EXAMPLES_DIR_V2 = REPO_ROOT / "examples"
+EXAMPLES_DIR = REPO_ROOT / "examples"
 
 
 @dataclass
@@ -39,12 +30,6 @@ class ExampleSDK:
 
     @property
     def top_level_package(self) -> str:
-        if IS_PYDANTIC_V1:
-            if "." in self._top_level_package:
-                first, *rest = self._top_level_package.split(".")
-                return f"{first}_pydantic_v1." + ".".join(rest)
-            else:
-                return f"{self._top_level_package}_pydantic_v1"
         return self._top_level_package
 
     @property
