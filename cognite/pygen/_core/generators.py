@@ -42,8 +42,6 @@ class SDKGenerator:
         default_instance_space: The default instance space to use for the SDK. If None, the first space in the data
                                 model will be used.
         implements: Whether to use inheritance or composition for views that are implementing other views.
-        pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
-                          the environment. "v1" will use pydantic v1, while "v2" will use pydantic v2.
         logger: A logger function to use for logging. If None, print will be done.
     """
 
@@ -383,11 +381,6 @@ class MultiAPIGenerator:
 
         return api_by_view_id
 
-    @property
-    def pydantic_version(self) -> Literal["v1", "v2"]:
-        """The version of Pydantic to use."""
-        return "v2"
-
     def generate_apis(self, client_dir: Path) -> dict[Path, str]:
         """Generate the APIs for the SDK.
 
@@ -494,7 +487,7 @@ class MultiAPIGenerator:
     def generate_data_class_core_cdf_external_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_cdf_external.py.jinja")
-        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
+        return data_class_core.render() + "\n"
 
     def generate_client_init_file(self) -> str:
         """Generate the __init__.py file for the client.
@@ -541,7 +534,6 @@ class MultiAPIGenerator:
         return (
             data_class_init.render(
                 classes=sorted([api.data_class for api in self.apis]),
-                is_pydantic_v2=self.pydantic_version == "v2",
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
