@@ -84,31 +84,6 @@ jobs:
       - name: Build package
         run: poetry build
 
-  tests-pydantic-v1:
-    runs-on: ubuntu-latest
-    # We do not run this job as Pydantic v1 is no longer supported
-    # However, we keep it in case we need to revert this decision.
-    if: false
-    steps:
-      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-          poetry install -E all
-          # This version is supported by Pyodide
-          pip install pydantic==1.10.13
-
-      - name: Test
-        run: pytest cognite tests/test_unit -v
-
-      - name: Test CLI
-        run: pygen --help
-
   coverage:
     runs-on: ubuntu-latest
     environment: dev
