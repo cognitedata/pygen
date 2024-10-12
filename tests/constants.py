@@ -11,8 +11,6 @@ from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, S
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data_models"
 
-IS_PYDANTIC_V2 = True
-
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
 

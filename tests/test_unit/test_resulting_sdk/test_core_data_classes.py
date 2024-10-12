@@ -22,16 +22,8 @@ class TestDomainModel:
             space: str = "BarSpace"
             foo: Optional[Foo] = Field(None, repr=False)
 
-        try:
-            Foo.model_rebuild()
-            Bar.model_rebuild()
-        except AttributeError as e:
-            if "has no attribute 'model_rebuild" in str(e):
-                # is pydantic v1
-                Foo.update_forward_refs(Bar=Bar)
-                Bar.update_forward_refs(Foo=Foo)
-            else:
-                raise e
+        Foo.model_rebuild()
+        Bar.model_rebuild()
 
         foo = Foo(
             external_id="foo",
