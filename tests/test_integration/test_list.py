@@ -5,19 +5,10 @@ import sys
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import InstanceSort
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as dc
-    from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
-    from omni_sub import OmniSubClient
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
-    from omni_sub_pydantic_v1 import OmniSubClient
+from omni import OmniClient
+from omni import data_classes as dc
+from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_sub import OmniSubClient
 
 
 @pytest.fixture(scope="session")
@@ -49,11 +40,8 @@ def test_list_empty_to_pandas(omni_client: OmniClient) -> None:
 
     # Assert
     assert empty_df.empty
-    if IS_PYDANTIC_V2:
-        assert sorted(empty_df.columns) == sorted(set(dc.Empty.model_fields) | (set(dc.DomainModel.model_fields)))
 
-    else:
-        assert sorted(empty_df.columns) == sorted(set(dc.Empty.__fields__) | (set(dc.DomainModel.__fields__)))
+    assert sorted(empty_df.columns) == sorted(set(dc.Empty.model_fields) | (set(dc.DomainModel.model_fields)))
 
 
 def test_filter_on_boolean(omni_client: OmniClient) -> None:

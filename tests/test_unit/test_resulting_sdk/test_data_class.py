@@ -3,28 +3,16 @@ from typing import Callable, cast
 
 import pytest
 from cognite.client import data_modeling as dm
+from omni import data_classes as dc
+from pydantic import TypeAdapter
+from windmill.data_classes import DomainModelWrite as WindmillDomainModelWrite
+from windmill.data_classes import ResourcesWrite, WindmillWrite
 
 from cognite.pygen.utils.external_id_factories import (
     ExternalIdFactory,
 )
-from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
+from tests.constants import OMNI_SDK, WindMillFiles
 from tests.omni_constants import OmniClasses
-
-if IS_PYDANTIC_V2:
-    from omni import data_classes as dc
-    from pydantic import TypeAdapter
-    from windmill.data_classes import DomainModelWrite as WindmillDomainModelWrite
-    from windmill.data_classes import ResourcesWrite, WindmillWrite
-else:
-    from omni_pydantic_v1 import data_classes as dc
-    from pydantic import parse_obj_as
-    from windmill_pydantic_v1.data_classes import (
-        DomainModelWrite as WindmillDomainModelWrite,
-    )
-    from windmill_pydantic_v1.data_classes import (
-        ResourcesWrite,
-        WindmillWrite,
-    )
 
 
 def omni_nodes_with_view():
@@ -151,10 +139,8 @@ def test_load_windmills_from_json(
         loaded_json = json.loads(raw_json)
 
         # Act
-        if IS_PYDANTIC_V2:
-            windmills = TypeAdapter(list[WindmillWrite]).validate_json(raw_json)
-        else:
-            windmills = parse_obj_as(list[WindmillWrite], loaded_json)
+        windmills = TypeAdapter(list[WindmillWrite]).validate_json(raw_json)
+
         created = ResourcesWrite()
         for item in windmills:
             created.extend(item.to_instances_write())
@@ -162,14 +148,10 @@ def test_load_windmills_from_json(
         # Assert
         exclude = {"external_id", "space", "data_record", "externalId"}
         for windmill, json_item in zip(windmills, loaded_json):
-            if IS_PYDANTIC_V2:
-                dumped_windmill = json.loads(
-                    windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
-                )
-            else:
-                dumped_windmill = json.loads(
-                    windmill.json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
-                )
+            dumped_windmill = json.loads(
+                windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
+            )
+
             # The exclude=True is not recursive in pydantic, so we need to do it manually
             _recursive_exclude(dumped_windmill, exclude)
             assert dumped_windmill == json_item

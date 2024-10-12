@@ -1,19 +1,10 @@
-from __future__ import annotations
-
 import datetime
 
 import pytest
 from cognite.client import CogniteClient
 from cognite.client.data_classes import FileMetadataWrite, SequenceColumnWrite, SequenceWrite, TimeSeriesWrite
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as dc
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as dc
+from omni import OmniClient
+from omni import data_classes as dc
 
 
 @pytest.mark.skip("Unstable endpoints")
@@ -186,10 +177,8 @@ def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClie
 def test_update_to_null(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
-    if IS_PYDANTIC_V2:
-        update = primitive_nullable_node.model_copy()
-    else:
-        update = primitive_nullable_node.copy()
+    update = primitive_nullable_node.model_copy()
+
     update.text = None
     update.int_32 = None
     update.int_64 = None
@@ -218,10 +207,8 @@ def test_update_to_null(
 def test_set_empty_string(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
-    if IS_PYDANTIC_V2:
-        update = primitive_nullable_node.model_copy()
-    else:
-        update = primitive_nullable_node.copy()
+    update = primitive_nullable_node.model_copy()
+
     update.text = ""
     omni_client.upsert(update, write_none=True)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)

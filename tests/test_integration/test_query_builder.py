@@ -1,18 +1,9 @@
-from __future__ import annotations
-
 import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import data_classes as dc
-    from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
-else:
-    from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
+from omni import data_classes as dc
+from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 
 
 class TestQueryBuilder:

@@ -12,17 +12,9 @@ from cognite.client.data_classes import ({% if data_class.has_primitive_field_of
     TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     Sequence as CogniteSequence,
     SequenceWrite as CogniteSequenceWrite,{% endif %}
-){% if not is_pydantic_v2 %}
-from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
-    FileMetadata,
-    FileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
-    TimeSeries,
-    TimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
-    Sequence as SequenceRead,
-    SequenceWrite,{% endif %}
-){% endif %}{% endif %}{% if data_class.use_pydantic_field %}
+){% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
-from pydantic import {% if is_pydantic_v2 %}field_validator, model_validator{% else %}validator, root_validator{% endif %}
+from pydantic import field_validator, model_validator
 
 from ._core import ({% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,{% endif %}
@@ -37,15 +29,15 @@ from ._core import ({% if has_default_instance_space %}
     DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
-    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}{% if is_pydantic_v2 %}
+    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
     FileMetadata,
-    FileMetadataWrite,{% endif %}
-    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}{% if is_pydantic_v2 %}
+    FileMetadataWrite,
+    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
     TimeSeries,
-    TimeSeriesWrite,{% endif %}
-    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}{% if is_pydantic_v2 %}
+    TimeSeriesWrite,
+    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     SequenceRead,
-    SequenceWrite,{% endif %}
+    SequenceWrite,
     SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
@@ -84,7 +76,7 @@ __all__ = [
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}
 
-class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}, used
     when data is retrieved from CDF using GraphQL.
 
@@ -99,7 +91,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
     view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
     {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
 
-    @{% if is_pydantic_v2 %}model_validator{% else %}root_validator{% endif %}({% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
         if not isinstance(values, dict):
             return values
@@ -109,13 +101,13 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values{% if data_class.has_field_of_type(ft.CDFExternalListField) %}
-    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.CDFExternalListField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    @field_validator({% for field in data_class.fields_of_type(ft.CDFExternalListField) %}"{{ field.name }}", {% endfor %}mode="before")
     def clean_list(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [v for v in value if v is not None] or None
         return value
 {% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
-    @{% if is_pydantic_v2 %}field_validator{% else %}validator{% endif %}({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}{% if is_pydantic_v2 %}mode="before"{% else %}pre=True{% endif %})
+    @field_validator({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -153,7 +145,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if is_pydantic_v2 and data_cla
         )
 {% endif %}
 
-class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -317,7 +309,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if is_pydant
 {% endif %}
 
 
-class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if is_pydantic_v2 and data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.

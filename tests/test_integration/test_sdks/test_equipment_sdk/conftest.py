@@ -1,11 +1,5 @@
 import pytest
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from equipment_unit import EquipmentUnitClient
-else:
-    from equipment_unit_pydantic_v1 import EquipmentUnitClient
+from equipment_unit import EquipmentUnitClient
 
 
 @pytest.fixture()

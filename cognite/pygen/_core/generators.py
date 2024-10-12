@@ -24,7 +24,6 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
-from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
@@ -43,8 +42,6 @@ class SDKGenerator:
         default_instance_space: The default instance space to use for the SDK. If None, the first space in the data
                                 model will be used.
         implements: Whether to use inheritance or composition for views that are implementing other views.
-        pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
-                          the environment. "v1" will use pydantic v1, while "v2" will use pydantic v2.
         logger: A logger function to use for logging. If None, print will be done.
     """
 
@@ -55,7 +52,6 @@ class SDKGenerator:
         data_model: dm.DataModel | Sequence[dm.DataModel],
         default_instance_space: str | None = None,
         implements: Literal["inheritance", "composition"] = "inheritance",
-        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
@@ -81,7 +77,6 @@ class SDKGenerator:
             list(self._data_model),
             self.default_instance_space,
             implements,
-            pydantic_version,
             logger,
             config,
         )
@@ -203,7 +198,6 @@ class MultiAPIGenerator:
         data_models: list[dm.DataModel[dm.View]],
         default_instance_space: str | None,
         implements: Literal["inheritance", "composition"] = "inheritance",
-        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
@@ -212,7 +206,6 @@ class MultiAPIGenerator:
         self.client_name = client_name
         self.default_instance_space = default_instance_space
         self._implements = implements
-        self._pydantic_version = pydantic_version
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
         unique_views: list[dm.View] = []
@@ -388,16 +381,6 @@ class MultiAPIGenerator:
 
         return api_by_view_id
 
-    @property
-    def pydantic_version(self) -> Literal["v1", "v2"]:
-        """The version of Pydantic to use."""
-        if self._pydantic_version == "infer":
-            return get_pydantic_version()
-        elif self._pydantic_version in ["v1", "v2"]:
-            return self._pydantic_version
-        else:
-            raise ValueError(f"Unknown pydantic version {self._pydantic_version}")
-
     def generate_apis(self, client_dir: Path) -> dict[Path, str]:
         """Generate the APIs for the SDK.
 
@@ -413,7 +396,7 @@ class MultiAPIGenerator:
         sdk: dict[Path, str] = {}
         for api in self.apis:
             file_name = api.api_class.file_name
-            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
+            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             if isinstance(api.data_class, EdgeDataClass):
                 continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
@@ -449,7 +432,6 @@ class MultiAPIGenerator:
             api_core.render(
                 top_level_package=self.top_level_package,
                 data_class_by_data_model_by_type=self._data_class_by_data_model_by_type,
-                is_pydantic_v2=self.pydantic_version == "v2",
                 has_default_instance_space=self.has_default_instance_space,
             )
             + "\n"
@@ -474,19 +456,13 @@ class MultiAPIGenerator:
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_base.py.jinja")
-        return (
-            data_class_core.render(
-                is_pydantic_v2=self.pydantic_version == "v2", has_default_instance_space=self.has_default_instance_space
-            )
-            + "\n"
-        )
+        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
 
     def generate_data_class_core_constants_file(self) -> str:
         """Generate the core/constants data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_constants.py.jinja")
         return (
             data_class_core.render(
-                is_pydantic_v2=self.pydantic_version == "v2",
                 default_instance_space=self.default_instance_space,
                 has_default_instance_space=self.has_default_instance_space,
             )
@@ -496,32 +472,22 @@ class MultiAPIGenerator:
     def generate_data_class_core_helpers_file(self) -> str:
         """Generate the core/helpers data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_helpers.py.jinja")
-        return (
-            data_class_core.render(
-                is_pydantic_v2=self.pydantic_version == "v2", has_default_instance_space=self.has_default_instance_space
-            )
-            + "\n"
-        )
+        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
 
     def generate_data_class_core_init_file(self) -> str:
         """Generate the core/__init__ data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_init.py.jinja")
-        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
+        return data_class_core.render() + "\n"
 
     def generate_data_class_core_query_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_query.py.jinja")
-        return (
-            data_class_core.render(
-                is_pydantic_v2=self.pydantic_version == "v2", has_default_instance_space=self.has_default_instance_space
-            )
-            + "\n"
-        )
+        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
 
     def generate_data_class_core_cdf_external_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_cdf_external.py.jinja")
-        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
+        return data_class_core.render() + "\n"
 
     def generate_client_init_file(self) -> str:
         """Generate the __init__.py file for the client.
@@ -568,7 +534,6 @@ class MultiAPIGenerator:
         return (
             data_class_init.render(
                 classes=sorted([api.data_class for api in self.apis]),
-                is_pydantic_v2=self.pydantic_version == "v2",
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
@@ -777,11 +742,8 @@ class APIGenerator:
         """Whether the view has edge API dependencies."""
         return any(True for api in self.edge_apis if api.end_view_id != self.api_class.view_id)
 
-    def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
+    def generate_data_class_file(self) -> str:
         """Generate the data class file for the view.
-
-        Args:
-            is_pydantic_v2: Whether to generate the data class file for Pydantic v2 or v1.
 
         Returns:
             The generated data class file as a string.
@@ -810,7 +772,7 @@ class APIGenerator:
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
-        if is_pydantic_v2 and self.data_class.has_any_field_model_prefix:
+        if self.data_class.has_any_field_model_prefix:
             names = ", ".join(field.name for field in self.data_class.fields if field.name.startswith("name"))
             warnings.warn(
                 f"Field(s) {names} in view {self.view_id} has potential conflict with protected Pydantic "
@@ -823,7 +785,6 @@ class APIGenerator:
             type_data.render(
                 data_class=self.data_class,
                 list_method=self.list_method,
-                is_pydantic_v2=is_pydantic_v2,
                 # ft = field types
                 ft=fields,
                 dm=dm,

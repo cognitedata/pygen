@@ -2,7 +2,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import IS_PYDANTIC_V2, OmniFiles, OmniSubFiles
+from tests.constants import OmniFiles, OmniSubFiles
 
 
 def test_generate_connection_edge_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
@@ -13,7 +13,7 @@ def test_generate_connection_edge_a(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_edge_a.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -28,7 +28,7 @@ def test_generate_connection_item_c_edge(omni_multi_api_generator: MultiAPIGener
     expected = OmniFiles.connection_item_c_edge_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -45,7 +45,7 @@ def test_generate_connection_item_c_edge_no_default_space(
     expected = OmniSubFiles.connection_item_c_edge_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert

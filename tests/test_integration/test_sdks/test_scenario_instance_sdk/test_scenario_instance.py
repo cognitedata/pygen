@@ -2,13 +2,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pandas as pd
-
-from tests.constants import IS_PYDANTIC_V1
-
-if IS_PYDANTIC_V1:
-    from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
-else:
-    from scenario_instance.client import ScenarioInstanceClient
+from scenario_instance.client import ScenarioInstanceClient
 
 
 def test_scenario_instance_list_timeseries(client: ScenarioInstanceClient) -> None:

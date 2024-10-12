@@ -44,17 +44,6 @@ You can also manually trigger the static checks with:
 pre-commit run --all-files
 ```
 
-### Installation `pydantic` `v1`
-
-`pygen` is supporting `pydantic` `v1` and `v2`. It is recommended that you have two virtual environments, one for each version of `pydantic`.
-To create a virtual environment for `pydantic` `v1` follow the steps above and then run the following command:
-
-```bash
-pip install pydantic==1.10.7
-```
-**Note** IDEs such as PyCharm supports multiple virtual environments, so you can have one project with two virtual environments, one for each version of `pydantic`.
-See [PyCharm docs](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html) for more information on how to create virtual environments in PyCharm.
-
 ### Testing
 
 There are two set categories of tests in `pygen`, the `tests` folder structure reflects this:

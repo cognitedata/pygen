@@ -6,16 +6,9 @@ from typing import Optional
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
+from omni import data_classes as dc
+from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
 from pydantic import Field
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import data_classes as dc
-    from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
-else:
-    from omni_pydantic_v1 import data_classes as dc
-    from omni_pydantic_v1.data_classes._core import DataRecord, DomainModel, unpack_properties
 
 
 class TestDomainModel:
@@ -29,16 +22,8 @@ class TestDomainModel:
             space: str = "BarSpace"
             foo: Optional[Foo] = Field(None, repr=False)
 
-        try:
-            Foo.model_rebuild()
-            Bar.model_rebuild()
-        except AttributeError as e:
-            if "has no attribute 'model_rebuild" in str(e):
-                # is pydantic v1
-                Foo.update_forward_refs(Bar=Bar)
-                Bar.update_forward_refs(Foo=Foo)
-            else:
-                raise e
+        Foo.model_rebuild()
+        Bar.model_rebuild()
 
         foo = Foo(
             external_id="foo",

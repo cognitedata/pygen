@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 import pytest
+from windmill.data_classes import DomainModelWrite, RotorWrite, WindmillWrite
 
 from cognite.pygen.utils.external_id_factories import (
     ExternalIdFactory,
@@ -17,16 +18,6 @@ from cognite.pygen.utils.external_id_factories import (
     uuid,
     uuid_factory,
 )
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from windmill.data_classes import DomainModelWrite, RotorWrite, WindmillWrite
-else:
-    from windmill_pydantic_v1.data_classes import (
-        DomainModelWrite,
-        RotorWrite,
-        WindmillWrite,
-    )
 
 
 @dataclass

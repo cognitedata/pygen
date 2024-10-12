@@ -1,13 +1,5 @@
-from __future__ import annotations
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as dc
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as dc
+from omni import OmniClient
+from omni import data_classes as dc
 
 
 def test_query_with_direct_relation(omni_client: OmniClient) -> None:

@@ -19,26 +19,11 @@ from ._core import (
 )
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
-{% if is_pydantic_v2 %}{% for (read_name, graphql_name, write_name, has_write_class, has_timeseries_fields) in dependencies_by_names %}{{ read_name }}.model_rebuild()
+{% for (read_name, graphql_name, write_name, has_write_class, has_timeseries_fields) in dependencies_by_names %}{{ read_name }}.model_rebuild()
 {{ graphql_name }}.model_rebuild(){% if has_write_class %}
 {{ write_name }}.model_rebuild()
 {{ read_name }}Apply.model_rebuild(){% endif %}
-{% endfor %}{% else %}{% for (read_name, graphql_name, write_name, has_write_class, has_timeseries_fields), dependencies in dependencies_by_names.items() %}{% if dependencies %}
-{{ read_name }}.update_forward_refs({% for dependency in dependencies %}
-    {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
-){% endif %}
-{{ graphql_name }}.update_forward_refs({% for dependency in dependencies %}
-    {{ dependency.graphql_name }}={{ dependency.graphql_name }},{%  endfor %}{% if has_timeseries_fields %}
-    TimeSeriesGraphQL=TimeSeriesGraphQL,{% endif %}
-){% if has_write_class and dependencies %}
-{{ write_name }}.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
-    {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
-)
-{{ read_name }}Apply.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
-    {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
-){% endif %}
-{% endfor %}{% endif %}
-
+{% endfor %}
 
 __all__ = [
     "DataRecord",

@@ -1,16 +1,7 @@
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any, Union
 
-try:
-    from pydantic import BaseModel, Field, ValidationInfo, field_validator
-
-    is_pydantic_v2 = True
-except ImportError:
-    from pydantic import BaseModel, Field, validator
-
-    is_pydantic_v2 = False
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class Argument(BaseModel):
@@ -49,22 +40,12 @@ class PygenSettings(BaseModel):
         json_schema_extra={"help": "Data models to generate SDK for."},
     )
 
-    if is_pydantic_v2:
-
-        @field_validator("*", mode="before")
-        def parse_string(cls, value, info: ValidationInfo) -> Argument:  # type: ignore[valid-type]
-            if info.field_name == "data_models":  # type: ignore[index]
-                return value
-            field = cls.model_fields[info.field_name]  # type: ignore[index]
-            return _parse_string(value, field)
-
-    else:
-
-        @validator("*", pre=True)  # type: ignore[type-var]
-        def parse_string(cls, value, field) -> Argument:
-            if field.name == "data_models":
-                return value
-            return _parse_string(value, field)
+    @field_validator("*", mode="before")
+    def parse_string(cls, value, info: ValidationInfo) -> Argument:  # type: ignore[valid-type]
+        if info.field_name == "data_models":  # type: ignore[index]
+            return value
+        field = cls.model_fields[info.field_name]  # type: ignore[index]
+        return _parse_string(value, field)
 
 
 def _load_pyproject_toml(pyproject_toml_path: Path | None = None) -> dict[str, Any]:

@@ -1,21 +1,11 @@
 from __future__ import annotations
 
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as odc
-    from scenario_instance.client import ScenarioInstanceClient
-    from scenario_instance.client import data_classes as sidc
-    from windmill import WindmillClient
-    from windmill import data_classes as wdc
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as odc
-    from scenario_instance_pydantic_v1.client import ScenarioInstanceClient
-    from scenario_instance_pydantic_v1.client import data_classes as sidc
-    from windmill_pydantic_v1 import WindmillClient
-    from windmill_pydantic_v1 import data_classes as wdc
+from omni import OmniClient
+from omni import data_classes as odc
+from scenario_instance.client import ScenarioInstanceClient
+from scenario_instance.client import data_classes as sidc
+from windmill import WindmillClient
+from windmill import data_classes as wdc
 
 
 def test_graphql_query(wind_client: WindmillClient) -> None:
