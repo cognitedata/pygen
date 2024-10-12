@@ -1,17 +1,7 @@
-from __future__ import annotations
-
 import pytest
-
-from tests.constants import IS_PYDANTIC_V2
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as dc
-    from windmill import WindmillClient
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as dc
-    from windmill_pydantic_v1 import WindmillClient
+from omni import OmniClient
+from omni import data_classes as dc
+from windmill import WindmillClient
 
 
 def test_query_across_direct_relation(omni_client: OmniClient) -> None:

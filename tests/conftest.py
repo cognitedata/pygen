@@ -1,14 +1,10 @@
 import pytest
 from cognite.client import data_modeling as dm
+from omni import data_classes as omni_classes
 
 from cognite.pygen.utils.text import to_pascal, to_snake
-from tests.constants import IS_PYDANTIC_V2, OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK
+from tests.constants import OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK
 from tests.omni_constants import OmniClasses
-
-if IS_PYDANTIC_V2:
-    from omni import data_classes as omni_classes
-else:
-    from omni_pydantic_v1 import data_classes as omni_classes
 
 
 @pytest.fixture(scope="session")

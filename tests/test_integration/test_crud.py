@@ -7,20 +7,14 @@ import pytest
 from _pytest.mark import ParameterSet
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from omni import OmniClient
+from omni import data_classes as odc
+from omni._api._core import SequenceNotStr
+from omni.data_classes import DomainModelWrite, ResourcesWriteResult
 
 from cognite.pygen.utils.mock_generator import MockGenerator, _connected_views
-from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
+from tests.constants import OMNI_SDK
 from tests.omni_constants import OmniClasses
-
-if IS_PYDANTIC_V2:
-    from omni import OmniClient
-    from omni import data_classes as odc
-    from omni._api._core import SequenceNotStr
-    from omni.data_classes import DomainModelWrite, ResourcesWriteResult
-else:
-    from omni_pydantic_v1 import OmniClient
-    from omni_pydantic_v1 import data_classes as odc
-    from omni_pydantic_v1._api._core import SequenceNotStr
 
 
 def omni_independent_view_ids() -> list[ParameterSet]:
