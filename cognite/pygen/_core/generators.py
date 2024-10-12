@@ -55,7 +55,6 @@ class SDKGenerator:
         data_model: dm.DataModel | Sequence[dm.DataModel],
         default_instance_space: str | None = None,
         implements: Literal["inheritance", "composition"] = "inheritance",
-        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
@@ -81,7 +80,6 @@ class SDKGenerator:
             list(self._data_model),
             self.default_instance_space,
             implements,
-            pydantic_version,
             logger,
             config,
         )
@@ -203,7 +201,6 @@ class MultiAPIGenerator:
         data_models: list[dm.DataModel[dm.View]],
         default_instance_space: str | None,
         implements: Literal["inheritance", "composition"] = "inheritance",
-        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
@@ -212,7 +209,7 @@ class MultiAPIGenerator:
         self.client_name = client_name
         self.default_instance_space = default_instance_space
         self._implements = implements
-        self._pydantic_version = pydantic_version
+        self._pydantic_version = "v2"
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
         unique_views: list[dm.View] = []
@@ -394,7 +391,7 @@ class MultiAPIGenerator:
         if self._pydantic_version == "infer":
             return get_pydantic_version()
         elif self._pydantic_version in ["v1", "v2"]:
-            return self._pydantic_version
+            return self._pydantic_version  # type: ignore[return-value]
         else:
             raise ValueError(f"Unknown pydantic version {self._pydantic_version}")
 
@@ -413,7 +410,7 @@ class MultiAPIGenerator:
         sdk: dict[Path, str] = {}
         for api in self.apis:
             file_name = api.api_class.file_name
-            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
+            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             if isinstance(api.data_class, EdgeDataClass):
                 continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
@@ -777,11 +774,8 @@ class APIGenerator:
         """Whether the view has edge API dependencies."""
         return any(True for api in self.edge_apis if api.end_view_id != self.api_class.view_id)
 
-    def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
+    def generate_data_class_file(self) -> str:
         """Generate the data class file for the view.
-
-        Args:
-            is_pydantic_v2: Whether to generate the data class file for Pydantic v2 or v1.
 
         Returns:
             The generated data class file as a string.
@@ -810,7 +804,7 @@ class APIGenerator:
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
-        if is_pydantic_v2 and self.data_class.has_any_field_model_prefix:
+        if self.data_class.has_any_field_model_prefix:
             names = ", ".join(field.name for field in self.data_class.fields if field.name.startswith("name"))
             warnings.warn(
                 f"Field(s) {names} in view {self.view_id} has potential conflict with protected Pydantic "
@@ -823,7 +817,6 @@ class APIGenerator:
             type_data.render(
                 data_class=self.data_class,
                 list_method=self.list_method,
-                is_pydantic_v2=is_pydantic_v2,
                 # ft = field types
                 ft=fields,
                 dm=dm,

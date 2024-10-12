@@ -2,7 +2,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import IS_PYDANTIC_V2, OmniFiles, OmniSubFiles
+from tests.constants import OmniFiles, OmniSubFiles
 
 
 def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
@@ -13,7 +13,7 @@ def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator
     expected = OmniFiles.primitive_nullable_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -28,7 +28,7 @@ def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator
     expected = OmniFiles.primitive_required_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -43,7 +43,7 @@ def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_nullable_list_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -58,7 +58,7 @@ def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_required_list_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -73,7 +73,7 @@ def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_with_defaults_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -88,7 +88,7 @@ def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.cdf_external_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -105,7 +105,7 @@ def test_generate_cdf_external_references_list(
     expected = OmniFiles.cdf_external_list_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -120,7 +120,7 @@ def test_generate_implementation1(omni_multi_api_generator: MultiAPIGenerator, c
     expected = OmniFiles.implementation_1_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -137,7 +137,7 @@ def test_generate_implementation1_non_writable(
     expected = OmniFiles.implementation_1_non_writeable_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -152,7 +152,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_a_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -167,7 +167,7 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_c_node_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -182,7 +182,7 @@ def test_generate_connection_item_d(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_d_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -197,7 +197,7 @@ def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_e_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -212,7 +212,7 @@ def test_generate_connection_item_f(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_f_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -229,7 +229,7 @@ def test_generate_connection_item_a_no_default_space(
     expected = OmniSubFiles.connection_item_a_data.read_text()
 
     # Act
-    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = api_generator.generate_data_class_file()
     actual = code_formatter.format_code(actual)
 
     # Assert

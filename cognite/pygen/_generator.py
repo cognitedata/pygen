@@ -115,7 +115,6 @@ def generate_sdk(
         data_model,
         default_instance_space,
         "inheritance",
-        "v2",
         logger,
         config or PygenConfig(),
     )
@@ -496,7 +495,6 @@ def generate_typed(
         data_model,
         None,
         implements,
-        "infer",
         print,
         PygenConfig(),
     )

@@ -42,7 +42,6 @@ jobs:
         run: |
           mkdocs build
 
-
   test-core:
     name: Test without optional dependencies.
     runs-on: ubuntu-latest
