@@ -463,12 +463,7 @@ class MultiAPIGenerator:
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_base.py.jinja")
-        return (
-            data_class_core.render(
-                is_pydantic_v2=self.pydantic_version == "v2", has_default_instance_space=self.has_default_instance_space
-            )
-            + "\n"
-        )
+        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
 
     def generate_data_class_core_constants_file(self) -> str:
         """Generate the core/constants data classes file for the SDK."""
