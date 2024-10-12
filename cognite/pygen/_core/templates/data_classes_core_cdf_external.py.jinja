@@ -17,10 +17,10 @@ from cognite.client.data_classes import (
     TimeSeriesWrite as CogniteTimeSeriesWrite,
     SequenceWrite as CogniteSequenceWrite,
     FileMetadataWrite as CogniteFileMetadataWrite,
-){% if is_pydantic_v2 %}
-from cognite.client.data_classes.sequences import ValueType{% endif %}
+)
+from cognite.client.data_classes.sequences import ValueType
 from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel{% if is_pydantic_v2 %}, BeforeValidator{% else %}, Extra{% endif %}{% if is_pydantic_v2 %}, model_validator, field_validator{% else %}, root_validator, validator{% endif %}{% if is_pydantic_v2 %}
+from pydantic import BaseModel, BeforeValidator, model_validator, field_validator
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
 
@@ -87,18 +87,10 @@ FileMetadataWrite = Annotated[
         when_used="unless-none",
     ),
     BeforeValidator(lambda v: CogniteFileMetadataWrite.load(v) if isinstance(v, dict) else v),
-]{% else %}
+]
 
 
-def to_camel(string: str) -> str:
-    return "".join(word.capitalize() if no > 0 else word.casefold() for no, word in enumerate(string.split("_"))){% endif %}
-
-
-class GraphQLExternal(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel{% endif %}):{% if is_pydantic_v2 %} ...{% else %}
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
-        alias_generator = to_camel{% endif %}
+class GraphQLExternal(BaseModel, arbitrary_types_allowed=True, populate_by_name=True, alias_generator=to_camel): ...
 
 
 class TimeSeriesGraphQL(GraphQLExternal):
@@ -118,9 +110,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
     created_time: Optional[int] = None
     last_updated_time: Optional[int] = None
     data: Optional[Datapoints] = None
-{% if is_pydantic_v2 %}
-    @model_validator(mode="before"){% else %}
-    @root_validator(pre=True, allow_reuse=True){% endif %}
+
+    @model_validator(mode="before")
     def parse_datapoints(cls, data: Any) -> Any:
         if isinstance(data, dict) and "getDataPoints" in data:
             datapoints = data.pop("getDataPoints")
@@ -230,12 +221,12 @@ class SequenceColumnGraphQL(GraphQLExternal):
     external_id: Optional[str] = None
     name: Optional[str] = None
     description: Optional[str] = None
-    value_type: Optional[{% if is_pydantic_v2 %}ValueType{% else %}str{% endif %}] = None
+    value_type: Optional[ValueType] = None
     metadata: Optional[dict[str, str]] = None
     created_time: Optional[int] = None
     last_updated_time: Optional[int] = None
 
-    @{% if is_pydantic_v2 %}field_validator("value_type", mode="before"){% else %}validator("value_type", pre=True, allow_reuse=True){% endif %}
+    @field_validator("value_type", mode="before")
     def title_value_type(cls, value: Any) -> Any:
         if isinstance(value, str):
             return value.title()
