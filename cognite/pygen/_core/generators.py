@@ -24,7 +24,6 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
-from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
@@ -209,7 +208,6 @@ class MultiAPIGenerator:
         self.client_name = client_name
         self.default_instance_space = default_instance_space
         self._implements = implements
-        self._pydantic_version = "v2"
         self._logger = logger or print
         seen_views: set[dm.ViewId] = set()
         unique_views: list[dm.View] = []
@@ -388,12 +386,7 @@ class MultiAPIGenerator:
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
         """The version of Pydantic to use."""
-        if self._pydantic_version == "infer":
-            return get_pydantic_version()
-        elif self._pydantic_version in ["v1", "v2"]:
-            return self._pydantic_version  # type: ignore[return-value]
-        else:
-            raise ValueError(f"Unknown pydantic version {self._pydantic_version}")
+        return "v2"
 
     def generate_apis(self, client_dir: Path) -> dict[Path, str]:
         """Generate the APIs for the SDK.
