@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from collections.abc import Sequence
 from typing import Protocol
 
@@ -63,6 +64,7 @@ class TestCRUDOperations:
             created = omni_client.upsert(domain_nodes)
 
             assert len(created.nodes) == 2
+            time.sleep(1)
 
             retrieved = api.retrieve(external_ids, space=omni_tmp_space.space)
 
