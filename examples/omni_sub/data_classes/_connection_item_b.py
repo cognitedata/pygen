@@ -244,6 +244,16 @@ class ConnectionItemBWrite(DomainModelWrite):
         default=None, repr=False, alias="selfEdge"
     )
 
+    @field_validator("inwards", "self_edge", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
+
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
