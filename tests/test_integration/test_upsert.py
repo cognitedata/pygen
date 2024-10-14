@@ -7,6 +7,8 @@ from omni import OmniClient
 from omni import data_classes as dc
 
 
+# The retrieve node frequently fails, likely due to eventual consistency.
+@pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
 def test_node_without_properties(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:NodeWithoutProperties"

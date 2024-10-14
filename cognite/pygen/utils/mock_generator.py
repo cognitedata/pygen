@@ -1214,7 +1214,7 @@ class FakerGenerators:
         return [self.faker.date_time_this_year() for _ in range(count)]
 
     def date(self, count: int) -> list[date]:
-        return [self.faker.date_this_year() for _ in range(count)]
+        return [cast(date, self.faker.date_this_year()) for _ in range(count)]
 
     def file(self, count: int) -> list[str]:
         return [f"file_{self.faker.unique.first_name().casefold()}" for _ in range(count)]

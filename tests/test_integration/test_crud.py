@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 from collections.abc import Sequence
 from typing import Protocol
 
@@ -40,7 +39,9 @@ class DomainAPI(Protocol):
 
 
 class TestCRUDOperations:
+    # The retrieve call fails frequently which is why the flaky decorator is used.
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
+    @pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
     def test_create_retrieve_delete(
         self,
         view_id: dm.ViewId,
@@ -64,7 +65,6 @@ class TestCRUDOperations:
             created = omni_client.upsert(domain_nodes)
 
             assert len(created.nodes) == 2
-            time.sleep(1)
 
             retrieved = api.retrieve(external_ids, space=omni_tmp_space.space)
 
@@ -88,6 +88,8 @@ class TestCRUDOperations:
 
         assert 5 >= len(retrieved) >= 3
 
+    # The retrieve node frequently fails, likely due to eventual consistency.
+    @pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
     def test_create_retrieve_delete_direct_listable(
         self, omni_client: OmniClient, cognite_client: CogniteClient
     ) -> None:
@@ -112,6 +114,7 @@ class TestCRUDOperations:
             assert len(created.edges) == 0
 
             retrieved = omni_client.connection_item_f.retrieve(item.external_id)
+            assert retrieved is not None
             assert set(retrieved.direct_list or []) == {
                 "tmp_create_retrieve_delete_direct_listable_e",
                 "tmp_create_retrieve_delete_direct_listable_e2",
