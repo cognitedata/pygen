@@ -101,6 +101,19 @@ class TestToInstancesWrite:
         assert len(resources.nodes) == 2
         assert len(resources.edges) == 1
 
+    def test_create_connection_with_direct_relation_and_tuple(self) -> None:
+        connection = dc.ConnectionItemAWrite(
+            external_id="test_create_connection_with_direct_relation_and_tuple",
+            name="connectionA",
+            other_direct=("my_space", "my_external_id"),
+            outwards=dm.DirectRelationReference(space="my_space", external_id="my_external_id2"),
+            self_direct=dm.NodeId(space="my_space", external_id="my_external_id3"),
+        )
+
+        assert connection.other_direct == dm.NodeId(space="my_space", external_id="my_external_id")
+        assert connection.outwards == dm.NodeId(space="my_space", external_id="my_external_id2")
+        assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
+
 
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
