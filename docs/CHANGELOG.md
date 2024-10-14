@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+
+- Support for deleting by `NodeId` in generated SDK.
+
 ## [0.99.36] - 24-10-04
 ### Changed
 - [BREAKING] In the experimental query method, the `.execute(...)` has been renamed to `.list_full(...)`, and 
