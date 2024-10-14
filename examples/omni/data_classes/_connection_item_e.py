@@ -351,7 +351,7 @@ class ConnectionItemEWrite(DomainModelWrite):
     name: Optional[str] = None
 
     @field_validator(
-        "direct_reverse_multi", "direct_reverse_single", "inwards_single", "inwards_single_property", mode="before"
+        "inwards_single", "inwards_single_property", mode="before"
     )
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):

@@ -325,8 +325,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
-{% if data_class.has_dependencies %}
-    @field_validator({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}"{{ field.name }}", {% endif %}{% endfor %}mode="before")
+{% if data_class.has_write_connection_fields %}
+    @field_validator({% for field in data_class.write_connection_fields %}"{{ field.name }}", {% endfor %}mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)

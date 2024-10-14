@@ -320,6 +320,20 @@ class DataClass:
         """These fields are used when creating the write data class."""
         return (field for field in self.non_parent_fields() if field.is_write_field)
 
+    @property
+    def write_connection_fields(self) -> Iterator[BaseConnectionField]:
+        """These fields are used when creating the write data class."""
+        return (
+            field
+            for field in self.write_fields
+            if isinstance(field, BaseConnectionField) and field.is_direct_relation_no_source
+        )
+
+    @property
+    def has_write_connection_fields(self) -> bool:
+        """Check if the data class has any write connection fields."""
+        return any(self.write_connection_fields)
+
     @overload
     def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]: ...
 
