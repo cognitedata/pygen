@@ -147,7 +147,10 @@ class OmniSubClient:
     def delete(
         self,
         external_id: (
-            str | SequenceNotStr[str] | data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite]
+            str
+            | dm.NodeId
+            | data_classes.DomainModelWrite
+            | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
         ),
         space: str | None = None,
     ) -> dm.InstancesDeleteResult:
@@ -157,7 +160,7 @@ class OmniSubClient:
         will be deleted as well.
 
         Args:
-            external_id: The external id or items(s) to delete.
+            external_id: The external id or items(s) to delete. Can also be a list of NodeId(s) or DomainModelWrite(s).
             space: The space where all the item(s) are located.
 
         Returns:
@@ -173,28 +176,39 @@ class OmniSubClient:
         """
         if space is None and (
             isinstance(external_id, str)
-            or (isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id))
+            or (isinstance(external_id, Sequence) and any(isinstance(item, str) for item in external_id))
         ):
             raise ValueError("Expected space to be set when deleting by external_id")
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))  # type: ignore[arg-type]
-        elif isinstance(external_id, Sequence) and all(isinstance(item, str) for item in external_id):
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id_) for id_ in external_id if isinstance(id_, str)],  # type: ignore[arg-type]
-            )
-        elif isinstance(external_id, data_classes.DomainModelWrite) or (
-            isinstance(external_id, Sequence)
-            and not isinstance(external_id, str)
-            and all(isinstance(item, data_classes.DomainModelWrite) for item in external_id)
-        ):
+        elif isinstance(external_id, dm.NodeId):
+            return self._client.data_modeling.instances.delete(nodes=external_id)
+        elif isinstance(external_id, data_classes.DomainModelWrite):
             resources = self._create_instances(external_id, False, False)
             return self._client.data_modeling.instances.delete(
                 nodes=resources.nodes.as_ids(),
                 edges=resources.edges.as_ids(),
             )
+        elif isinstance(external_id, Sequence):
+            node_ids: list[dm.NodeId] = []
+            edge_ids: list[dm.EdgeId] = []
+            for item in external_id:
+                if isinstance(item, str):
+                    node_ids.append(dm.NodeId(space, item))  # type: ignore[arg-type]
+                elif isinstance(item, dm.NodeId):
+                    node_ids.append(item)
+                elif isinstance(item, data_classes.DomainModelWrite):
+                    resources = self._create_instances(item, False, False)
+                    node_ids.extend(resources.nodes.as_ids())
+                    edge_ids.extend(resources.edges.as_ids())
+                else:
+                    raise ValueError(
+                        f"Expected str, NodeId, or DomainModelWrite, Sequence of these types. Got {type(external_id)}"
+                    )
+            return self._client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
         else:
             raise ValueError(
-                "Expected str, list of str, or DomainModelWrite, list of DomainModelWrite," f"got {type(external_id)}"
+                f"Expected str, NodeId, or DomainModelWrite, Sequence of these types. Got {type(external_id)}"
             )
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
