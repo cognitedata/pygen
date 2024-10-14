@@ -183,7 +183,10 @@ class OmniClient:
     def delete(
         self,
         external_id: (
-            str | dm.NodeId | data_classes.DomainModelWrite | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
+            str
+            | dm.NodeId
+            | data_classes.DomainModelWrite
+            | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
         ),
         space: str = DEFAULT_INSTANCE_SPACE,
     ) -> dm.InstancesDeleteResult:
@@ -231,12 +234,12 @@ class OmniClient:
                     edge_ids.extend(resources.edges.as_ids())
                 else:
                     raise ValueError(
-                         f"Expected str, NodeId, or DomainModelWrite, Sequence of these types got {type(external_id)}"
+                        f"Expected str, NodeId, or DomainModelWrite, Sequence of these types. Got {type(external_id)}"
                     )
             return self._client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
         else:
             raise ValueError(
-                 f"Expected str, NodeId, or DomainModelWrite, Sequence of these types got {type(external_id)}"
+                f"Expected str, NodeId, or DomainModelWrite, Sequence of these types. Got {type(external_id)}"
             )
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:

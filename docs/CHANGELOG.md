@@ -16,7 +16,7 @@ Changes are grouped as follows
 ## TBD
 ### Added
 
-- Support for deleting by `NodeId`. 
+- Support for deleting by `NodeId` in generated SDK.
 
 ## [0.99.36] - 24-10-04
 ### Changed
