@@ -350,9 +350,7 @@ class ConnectionItemEWrite(DomainModelWrite):
     )
     name: Optional[str] = None
 
-    @field_validator(
-        "inwards_single", "inwards_single_property", mode="before"
-    )
+    @field_validator("inwards_single", "inwards_single_property", mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)

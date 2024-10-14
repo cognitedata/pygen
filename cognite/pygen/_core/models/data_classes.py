@@ -326,7 +326,7 @@ class DataClass:
         return (
             field
             for field in self.write_fields
-            if isinstance(field, BaseConnectionField) and field.is_direct_relation_no_source
+            if isinstance(field, BaseConnectionField) and not field.is_direct_relation_no_source
         )
 
     @property
