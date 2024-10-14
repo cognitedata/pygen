@@ -358,6 +358,16 @@ class NacelleWrite(DomainModelWrite):
     yaw_direction: Union[TimeSeriesWrite, str, None] = None
     yaw_error: Union[TimeSeriesWrite, str, None] = None
 
+    @field_validator("gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
+
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
