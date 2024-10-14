@@ -106,12 +106,12 @@ class TestToInstancesWrite:
             external_id="test_create_connection_with_direct_relation_and_tuple",
             name="connectionA",
             other_direct=("my_space", "my_external_id"),
-            outwards=dm.DirectRelationReference(space="my_space", external_id="my_external_id2"),
+            outwards=[dm.DirectRelationReference(space="my_space", external_id="my_external_id2")],
             self_direct=dm.NodeId(space="my_space", external_id="my_external_id3"),
         )
 
         assert connection.other_direct == dm.NodeId(space="my_space", external_id="my_external_id")
-        assert connection.outwards == dm.NodeId(space="my_space", external_id="my_external_id2")
+        assert connection.outwards == [dm.NodeId(space="my_space", external_id="my_external_id2")]
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
 
