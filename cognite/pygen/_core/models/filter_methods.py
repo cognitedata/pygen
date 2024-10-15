@@ -269,7 +269,9 @@ class FilterMethod:
             elif isinstance(field_, (OneToOneConnectionField, OneToManyConnectionField)) and field_.is_direct_relation:
                 for selected_filter in config.get(dm.DirectRelation(), field_.prop_name):
                     if selected_filter is dm.filters.Equals:
-                        type_ = "str | tuple[str, str]" if has_default_instance_space else "tuple[str, str]"
+                        type_ = "tuple[str, str] | dm.NodeId | dm.DirectRelationReference"
+                        if has_default_instance_space:
+                            type_ = f"str | {type_}"
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
                                 name=field_.name,
@@ -296,11 +298,11 @@ class FilterMethod:
                             ]
                         )
                     elif selected_filter is dm.filters.In:
-                        type_ = (
-                            "list[str] | list[tuple[str, str]]"
-                            if has_default_instance_space
-                            else "list[tuple[str, str]]"
-                        )
+                        type_ = "tuple[str, str] | dm.NodeId | dm.DirectRelationReference"
+                        if has_default_instance_space:
+                            type_ = f"str | {type_}"
+                        type_ = f"Sequence[{type_}]"
+
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
                                 name=field_.name,

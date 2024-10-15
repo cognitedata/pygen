@@ -2,6 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
+from collections.abc import Sequence
 {% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
@@ -41,9 +42,11 @@ from ._core import ({% if has_default_instance_space %}
     SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,{% if data_class.has_filtering_fields %}
