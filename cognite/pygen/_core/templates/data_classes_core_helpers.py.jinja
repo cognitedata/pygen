@@ -24,7 +24,7 @@ def as_direct_relation_reference(
 
 
 # Any is to make mypy happy, while the rest is a hint of what the function expects
-def as_instance_dict_id(value:{% if has_default_instance_space %} str | {% endif %}dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:{% if has_default_instance_space %}
+def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif %} dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:{% if has_default_instance_space %}
     if isinstance(value, str):
         return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}{% endif %}
     if isinstance(value, dm.NodeId):
