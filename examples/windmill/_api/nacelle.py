@@ -68,11 +68,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
     def __call__(
         self,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -218,11 +253,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         self,
         query: str,
         properties: NacelleTextFields | SequenceNotStr[NacelleTextFields] | None = None,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -290,11 +360,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -307,11 +412,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -328,11 +468,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         ),
         group_by: NacelleFields | SequenceNotStr[NacelleFields],
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -348,11 +523,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         ),
         group_by: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
         property: NacelleFields | SequenceNotStr[NacelleFields] | None = None,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -416,11 +626,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         self,
         property: NacelleFields,
         interval: float,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -472,11 +717,46 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
     def list(
         self,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
