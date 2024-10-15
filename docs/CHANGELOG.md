@@ -13,11 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.37] - 24-10-15
 ### Added
 - Support for deleting by `NodeId` in generated SDK.
 - You can now use `DirectRelationReference` and `tuple[str, str]` as node identifiers in the Write classes
   of the generated SDK.
+- In the `.list` method, `NodeId` and `DirectRelationReference` can now be used when filtering on direct relations
+  (in addition to `tuple[str, str]` and `str`).
 
 ## [0.99.36] - 24-10-04
 ### Changed

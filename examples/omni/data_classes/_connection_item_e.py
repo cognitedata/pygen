@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -23,9 +24,11 @@ from ._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -465,7 +468,14 @@ class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
 
 def _create_connection_item_e_filter(
     view_id: dm.ViewId,
-    direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    direct_no_source: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -473,32 +483,20 @@ def _create_connection_item_e_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if direct_no_source and isinstance(direct_no_source, str):
+    if isinstance(direct_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_no_source):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directNoSource"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_no_source},
-            )
+            dm.filters.Equals(view_id.as_property_ref("directNoSource"), value=as_instance_dict_id(direct_no_source))
         )
-    if direct_no_source and isinstance(direct_no_source, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directNoSource"),
-                value={"space": direct_no_source[0], "externalId": direct_no_source[1]},
-            )
-        )
-    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], str):
+    if (
+        direct_no_source
+        and isinstance(direct_no_source, Sequence)
+        and not isinstance(direct_no_source, str)
+        and not is_tuple_id(direct_no_source)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("directNoSource"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_no_source],
-            )
-        )
-    if direct_no_source and isinstance(direct_no_source, list) and isinstance(direct_no_source[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directNoSource"),
-                values=[{"space": item[0], "externalId": item[1]} for item in direct_no_source],
+                values=[as_instance_dict_id(item) for item in direct_no_source],
             )
         )
     if isinstance(name, str):

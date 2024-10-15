@@ -6,7 +6,6 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._core.models import (
     FilterImplementation,
-    FilterImplementationOnetoOneEdge,
     FilterMethod,
     FilterParameter,
 )
@@ -74,118 +73,6 @@ def test_create_list_method_primitive_nullable(
             FilterImplementation(dm.filters.Prefix, "externalId", dict(value=parameters[15]), is_edge_class=False),
             FilterImplementation(dm.filters.Equals, "space", dict(value=parameters[16]), is_edge_class=False),
             FilterImplementation(dm.filters.In, "space", dict(values=parameters[16]), is_edge_class=False),
-        ],
-    )
-
-    # Act
-    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering, has_default_instance_space=True)
-
-    # Assert
-    assert actual.parameters == expected.parameters
-    for act, exp in zip(actual.implementations, expected.implementations):
-        assert act.filter == exp.filter
-        assert act.prop_name == exp.prop_name
-        assert act.keyword_arguments == exp.keyword_arguments
-        assert act == exp
-    assert actual == expected
-
-
-def test_create_list_method_connection_item_a(
-    omni_multi_api_generator: MultiAPIGenerator, pygen_config: PygenConfig
-) -> None:
-    # Arrange
-    data_class = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "ConnectionItemA", "1")
-    ].data_class
-    parameters = [
-        FilterParameter("name", "str | list[str]", description="The name to filter on."),
-        FilterParameter("name_prefix", "str", description="The prefix of the name to filter on."),
-        FilterParameter(
-            "other_direct",
-            "str | tuple[str, str] | list[str] | list[tuple[str, str]]",
-            description="The other direct to filter on.",
-        ),
-        FilterParameter(
-            "self_direct",
-            "str | tuple[str, str] | list[str] | list[tuple[str, str]]",
-            description="The self direct to filter on.",
-        ),
-        FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
-        FilterParameter("space", "str | list[str]", description="The space to filter on."),
-    ]
-    expected = FilterMethod(
-        parameters=parameters,
-        implementations=[
-            FilterImplementation(dm.filters.Equals, "name", dict(value=parameters[0]), is_edge_class=False),
-            FilterImplementation(dm.filters.In, "name", dict(values=parameters[0]), is_edge_class=False),
-            FilterImplementation(dm.filters.Prefix, "name", dict(value=parameters[1]), is_edge_class=False),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.Equals,
-                "otherDirect",
-                dict(value=parameters[2]),
-                is_edge_class=False,
-                instance_type=str,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.Equals,
-                "otherDirect",
-                dict(value=parameters[2]),
-                is_edge_class=False,
-                instance_type=tuple,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.In,
-                "otherDirect",
-                dict(values=parameters[2]),
-                is_edge_class=False,
-                instance_type=str,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.In,
-                "otherDirect",
-                dict(values=parameters[2]),
-                is_edge_class=False,
-                instance_type=tuple,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.Equals,
-                "selfDirect",
-                dict(value=parameters[3]),
-                is_edge_class=False,
-                instance_type=str,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.Equals,
-                "selfDirect",
-                dict(value=parameters[3]),
-                is_edge_class=False,
-                instance_type=tuple,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.In,
-                "selfDirect",
-                dict(values=parameters[3]),
-                is_edge_class=False,
-                instance_type=str,
-                has_default_instance_space=True,
-            ),
-            FilterImplementationOnetoOneEdge(
-                dm.filters.In,
-                "selfDirect",
-                dict(values=parameters[3]),
-                is_edge_class=False,
-                instance_type=tuple,
-                has_default_instance_space=True,
-            ),
-            FilterImplementation(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
-            FilterImplementation(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
-            FilterImplementation(dm.filters.In, "space", dict(values=parameters[5]), is_edge_class=False),
         ],
     )
 

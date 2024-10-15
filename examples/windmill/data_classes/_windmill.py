@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -23,9 +24,11 @@ from ._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -439,10 +442,24 @@ def _create_windmill_filter(
     view_id: dm.ViewId,
     min_capacity: float | None = None,
     max_capacity: float | None = None,
-    nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    nacelle: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    rotor: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     windfarm: str | list[str] | None = None,
     windfarm_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -452,29 +469,11 @@ def _create_windmill_filter(
     filters: list[dm.Filter] = []
     if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
-    if nacelle and isinstance(nacelle, str):
+    if isinstance(nacelle, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(nacelle):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("nacelle"), value=as_instance_dict_id(nacelle)))
+    if nacelle and isinstance(nacelle, Sequence) and not isinstance(nacelle, str) and not is_tuple_id(nacelle):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("nacelle"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": nacelle}
-            )
-        )
-    if nacelle and isinstance(nacelle, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("nacelle"), value={"space": nacelle[0], "externalId": nacelle[1]})
-        )
-    if nacelle and isinstance(nacelle, list) and isinstance(nacelle[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("nacelle"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in nacelle],
-            )
-        )
-    if nacelle and isinstance(nacelle, list) and isinstance(nacelle[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("nacelle"),
-                values=[{"space": item[0], "externalId": item[1]} for item in nacelle],
-            )
+            dm.filters.In(view_id.as_property_ref("nacelle"), values=[as_instance_dict_id(item) for item in nacelle])
         )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
@@ -482,28 +481,11 @@ def _create_windmill_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if rotor and isinstance(rotor, str):
+    if isinstance(rotor, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(rotor):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("rotor"), value=as_instance_dict_id(rotor)))
+    if rotor and isinstance(rotor, Sequence) and not isinstance(rotor, str) and not is_tuple_id(rotor):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("rotor"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": rotor}
-            )
-        )
-    if rotor and isinstance(rotor, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": rotor[0], "externalId": rotor[1]})
-        )
-    if rotor and isinstance(rotor, list) and isinstance(rotor[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("rotor"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in rotor],
-            )
-        )
-    if rotor and isinstance(rotor, list) and isinstance(rotor[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]
-            )
+            dm.filters.In(view_id.as_property_ref("rotor"), values=[as_instance_dict_id(item) for item in rotor])
         )
     if isinstance(windfarm, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))

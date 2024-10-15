@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -33,9 +34,11 @@ from ._core import (
     TimeSeriesGraphQL,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -547,146 +550,107 @@ class NacelleApplyList(NacelleWriteList): ...
 
 def _create_nacelle_filter(
     view_id: dm.ViewId,
-    gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    gearbox: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    generator: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    high_speed_shaft: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    main_shaft: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    power_inverter: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if gearbox and isinstance(gearbox, str):
+    if isinstance(gearbox, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(gearbox):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("gearbox"), value=as_instance_dict_id(gearbox)))
+    if gearbox and isinstance(gearbox, Sequence) and not isinstance(gearbox, str) and not is_tuple_id(gearbox):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("gearbox"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": gearbox}
-            )
+            dm.filters.In(view_id.as_property_ref("gearbox"), values=[as_instance_dict_id(item) for item in gearbox])
         )
-    if gearbox and isinstance(gearbox, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("gearbox"), value={"space": gearbox[0], "externalId": gearbox[1]})
-        )
-    if gearbox and isinstance(gearbox, list) and isinstance(gearbox[0], str):
+    if isinstance(generator, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(generator):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("generator"), value=as_instance_dict_id(generator)))
+    if generator and isinstance(generator, Sequence) and not isinstance(generator, str) and not is_tuple_id(generator):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("gearbox"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in gearbox],
+                view_id.as_property_ref("generator"), values=[as_instance_dict_id(item) for item in generator]
             )
         )
-    if gearbox and isinstance(gearbox, list) and isinstance(gearbox[0], tuple):
+    if isinstance(high_speed_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(high_speed_shaft):
         filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("gearbox"),
-                values=[{"space": item[0], "externalId": item[1]} for item in gearbox],
-            )
+            dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value=as_instance_dict_id(high_speed_shaft))
         )
-    if generator and isinstance(generator, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("generator"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": generator}
-            )
-        )
-    if generator and isinstance(generator, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("generator"), value={"space": generator[0], "externalId": generator[1]}
-            )
-        )
-    if generator and isinstance(generator, list) and isinstance(generator[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("generator"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in generator],
-            )
-        )
-    if generator and isinstance(generator, list) and isinstance(generator[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("generator"),
-                values=[{"space": item[0], "externalId": item[1]} for item in generator],
-            )
-        )
-    if high_speed_shaft and isinstance(high_speed_shaft, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("high_speed_shaft"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": high_speed_shaft},
-            )
-        )
-    if high_speed_shaft and isinstance(high_speed_shaft, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("high_speed_shaft"),
-                value={"space": high_speed_shaft[0], "externalId": high_speed_shaft[1]},
-            )
-        )
-    if high_speed_shaft and isinstance(high_speed_shaft, list) and isinstance(high_speed_shaft[0], str):
+    if (
+        high_speed_shaft
+        and isinstance(high_speed_shaft, Sequence)
+        and not isinstance(high_speed_shaft, str)
+        and not is_tuple_id(high_speed_shaft)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("high_speed_shaft"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in high_speed_shaft],
+                values=[as_instance_dict_id(item) for item in high_speed_shaft],
             )
         )
-    if high_speed_shaft and isinstance(high_speed_shaft, list) and isinstance(high_speed_shaft[0], tuple):
+    if isinstance(main_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(main_shaft):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("main_shaft"), value=as_instance_dict_id(main_shaft)))
+    if (
+        main_shaft
+        and isinstance(main_shaft, Sequence)
+        and not isinstance(main_shaft, str)
+        and not is_tuple_id(main_shaft)
+    ):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("high_speed_shaft"),
-                values=[{"space": item[0], "externalId": item[1]} for item in high_speed_shaft],
+                view_id.as_property_ref("main_shaft"), values=[as_instance_dict_id(item) for item in main_shaft]
             )
         )
-    if main_shaft and isinstance(main_shaft, str):
+    if isinstance(power_inverter, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(power_inverter):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("main_shaft"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": main_shaft}
-            )
+            dm.filters.Equals(view_id.as_property_ref("power_inverter"), value=as_instance_dict_id(power_inverter))
         )
-    if main_shaft and isinstance(main_shaft, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("main_shaft"), value={"space": main_shaft[0], "externalId": main_shaft[1]}
-            )
-        )
-    if main_shaft and isinstance(main_shaft, list) and isinstance(main_shaft[0], str):
+    if (
+        power_inverter
+        and isinstance(power_inverter, Sequence)
+        and not isinstance(power_inverter, str)
+        and not is_tuple_id(power_inverter)
+    ):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("main_shaft"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in main_shaft],
-            )
-        )
-    if main_shaft and isinstance(main_shaft, list) and isinstance(main_shaft[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("main_shaft"),
-                values=[{"space": item[0], "externalId": item[1]} for item in main_shaft],
-            )
-        )
-    if power_inverter and isinstance(power_inverter, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("power_inverter"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": power_inverter},
-            )
-        )
-    if power_inverter and isinstance(power_inverter, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("power_inverter"),
-                value={"space": power_inverter[0], "externalId": power_inverter[1]},
-            )
-        )
-    if power_inverter and isinstance(power_inverter, list) and isinstance(power_inverter[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("power_inverter"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in power_inverter],
-            )
-        )
-    if power_inverter and isinstance(power_inverter, list) and isinstance(power_inverter[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("power_inverter"),
-                values=[{"space": item[0], "externalId": item[1]} for item in power_inverter],
+                view_id.as_property_ref("power_inverter"), values=[as_instance_dict_id(item) for item in power_inverter]
             )
         )
     if external_id_prefix is not None:

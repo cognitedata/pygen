@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -63,8 +64,22 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
 
     def inwards_single(
         self,
-        direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_multi: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        direct_single: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -129,7 +144,14 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
 
     def inwards_single_property(
         self,
-        direct_list: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_list: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,

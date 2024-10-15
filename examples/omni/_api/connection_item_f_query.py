@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -144,7 +145,14 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
 
     def outwards_single(
         self,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,

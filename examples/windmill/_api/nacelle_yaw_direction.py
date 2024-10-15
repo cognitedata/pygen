@@ -365,11 +365,46 @@ class NacelleYawDirectionAPI:
 
     def __call__(
         self,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -422,11 +457,46 @@ class NacelleYawDirectionAPI:
 
     def list(
         self,
-        gearbox: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        generator: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        high_speed_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        main_shaft: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        power_inverter: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        gearbox: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        generator: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        high_speed_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        main_shaft: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        power_inverter: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
