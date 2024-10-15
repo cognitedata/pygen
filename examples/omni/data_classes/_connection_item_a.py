@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -29,7 +30,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
-    StringFilter,
+    StringFilter, as_instance_dict_id, is_tuple_id,
 )
 
 if TYPE_CHECKING:
@@ -395,8 +396,8 @@ def _create_connection_item_a_filter(
     view_id: dm.ViewId,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    other_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    self_direct: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    other_direct: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    self_direct: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -408,58 +409,32 @@ def _create_connection_item_a_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if other_direct and isinstance(other_direct, str):
+    if isinstance(other_direct, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(other_direct):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("otherDirect"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": other_direct},
+                value=as_instance_dict_id(other_direct),
             )
         )
-    if other_direct and isinstance(other_direct, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("otherDirect"), value={"space": other_direct[0], "externalId": other_direct[1]}
-            )
-        )
-    if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], str):
+    if other_direct and isinstance(other_direct, Sequence):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("otherDirect"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in other_direct],
+                values=[as_instance_dict_id(item) for item in other_direct],
             )
         )
-    if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("otherDirect"),
-                values=[{"space": item[0], "externalId": item[1]} for item in other_direct],
-            )
-        )
-    if self_direct and isinstance(self_direct, str):
+    if isinstance(other_direct, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(other_direct):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("selfDirect"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": self_direct},
+                value=as_instance_dict_id(other_direct),
             )
         )
-    if self_direct and isinstance(self_direct, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("selfDirect"), value={"space": self_direct[0], "externalId": self_direct[1]}
-            )
-        )
-    if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], str):
+    if self_direct and isinstance(self_direct, Sequence):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("selfDirect"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in self_direct],
-            )
-        )
-    if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("selfDirect"),
-                values=[{"space": item[0], "externalId": item[1]} for item in self_direct],
+                values=[as_instance_dict_id(item) for item in self_direct],
             )
         )
     if external_id_prefix is not None:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from cognite.client import data_modeling as dm
 from .base import DomainModel, T_DomainModel
 from .constants import DEFAULT_INSTANCE_SPACE
@@ -29,6 +31,22 @@ def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
     elif isinstance(value, dm.NodeId):
         return value
     return value.as_id()
+
+
+def as_instance_dict_id(value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
+    if isinstance(value, str):
+        return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
+    if isinstance(value, dm.NodeId):
+        return {"space": value.space, "externalId": value.external_id}
+    if isinstance(value, tuple) and is_tuple_id(value):
+        return {"space": value[0], "externalId": value[1]}
+    if isinstance(value, dm.DirectRelationReference):
+        return {"space": value.space, "externalId": value.external_id}
+    raise TypeError(f"Expected str, NodeId, tuple or DirectRelationReference, got {type(value)}")
+
+
+def is_tuple_id(value: Any) -> bool:
+    return isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], str) and isinstance(value[1], str)
 
 
 def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
