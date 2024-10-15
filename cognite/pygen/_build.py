@@ -61,10 +61,8 @@ def build_wheel(
     try:
         from build import ProjectBuilder  # type: ignore[import]
     except ImportError:
-        raise ImportError(
-            "'build' is required to build wheel. Install pygen with `pip install pygen[cli] or "
-            "install build directly `pip install build`."
-        ) from None
+        import subprocess
+        import sys
 
     data_model = _get_data_model(model_id, client, print)
     folder_name = _create_folder_name(
@@ -97,7 +95,10 @@ def build_wheel(
     generate_pyproject_toml(build_dir, top_level_package)
 
     output_dir.mkdir(exist_ok=True, parents=True)
-    ProjectBuilder(build_dir).build(distribution="wheel", output_directory=str(output_dir))
+    if "build" in sys.modules:
+        ProjectBuilder(build_dir).build(distribution="wheel", output_directory=str(output_dir))
+    else:
+        subprocess.run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '-w', output_dir, build_dir], check=True)
 
     print(f"Generated SDK wheel at {output_dir}")
 
