@@ -420,7 +420,12 @@ def _create_connection_item_a_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("otherDirect"), value=as_instance_dict_id(other_direct))
         )
-    if other_direct and isinstance(other_direct, Sequence):
+    if (
+        other_direct
+        and isinstance(other_direct, Sequence)
+        and not isinstance(other_direct, str)
+        and not is_tuple_id(other_direct)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("otherDirect"), values=[as_instance_dict_id(item) for item in other_direct]
@@ -428,7 +433,12 @@ def _create_connection_item_a_filter(
         )
     if isinstance(self_direct, dm.NodeId | dm.DirectRelationReference) or is_tuple_id(self_direct):
         filters.append(dm.filters.Equals(view_id.as_property_ref("selfDirect"), value=as_instance_dict_id(self_direct)))
-    if self_direct and isinstance(self_direct, Sequence):
+    if (
+        self_direct
+        and isinstance(self_direct, Sequence)
+        and not isinstance(self_direct, str)
+        and not is_tuple_id(self_direct)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("selfDirect"), values=[as_instance_dict_id(item) for item in self_direct]

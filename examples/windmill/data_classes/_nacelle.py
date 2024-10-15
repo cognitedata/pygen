@@ -597,13 +597,13 @@ def _create_nacelle_filter(
     filters: list[dm.Filter] = []
     if isinstance(gearbox, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(gearbox):
         filters.append(dm.filters.Equals(view_id.as_property_ref("gearbox"), value=as_instance_dict_id(gearbox)))
-    if gearbox and isinstance(gearbox, Sequence):
+    if gearbox and isinstance(gearbox, Sequence) and not isinstance(gearbox, str) and not is_tuple_id(gearbox):
         filters.append(
             dm.filters.In(view_id.as_property_ref("gearbox"), values=[as_instance_dict_id(item) for item in gearbox])
         )
     if isinstance(generator, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(generator):
         filters.append(dm.filters.Equals(view_id.as_property_ref("generator"), value=as_instance_dict_id(generator)))
-    if generator and isinstance(generator, Sequence):
+    if generator and isinstance(generator, Sequence) and not isinstance(generator, str) and not is_tuple_id(generator):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("generator"), values=[as_instance_dict_id(item) for item in generator]
@@ -613,7 +613,12 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value=as_instance_dict_id(high_speed_shaft))
         )
-    if high_speed_shaft and isinstance(high_speed_shaft, Sequence):
+    if (
+        high_speed_shaft
+        and isinstance(high_speed_shaft, Sequence)
+        and not isinstance(high_speed_shaft, str)
+        and not is_tuple_id(high_speed_shaft)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("high_speed_shaft"),
@@ -622,7 +627,12 @@ def _create_nacelle_filter(
         )
     if isinstance(main_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(main_shaft):
         filters.append(dm.filters.Equals(view_id.as_property_ref("main_shaft"), value=as_instance_dict_id(main_shaft)))
-    if main_shaft and isinstance(main_shaft, Sequence):
+    if (
+        main_shaft
+        and isinstance(main_shaft, Sequence)
+        and not isinstance(main_shaft, str)
+        and not is_tuple_id(main_shaft)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("main_shaft"), values=[as_instance_dict_id(item) for item in main_shaft]
@@ -632,7 +642,12 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("power_inverter"), value=as_instance_dict_id(power_inverter))
         )
-    if power_inverter and isinstance(power_inverter, Sequence):
+    if (
+        power_inverter
+        and isinstance(power_inverter, Sequence)
+        and not isinstance(power_inverter, str)
+        and not is_tuple_id(power_inverter)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("power_inverter"), values=[as_instance_dict_id(item) for item in power_inverter]

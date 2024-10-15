@@ -471,7 +471,7 @@ def _create_windmill_filter(
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if isinstance(nacelle, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(nacelle):
         filters.append(dm.filters.Equals(view_id.as_property_ref("nacelle"), value=as_instance_dict_id(nacelle)))
-    if nacelle and isinstance(nacelle, Sequence):
+    if nacelle and isinstance(nacelle, Sequence) and not isinstance(nacelle, str) and not is_tuple_id(nacelle):
         filters.append(
             dm.filters.In(view_id.as_property_ref("nacelle"), values=[as_instance_dict_id(item) for item in nacelle])
         )
@@ -483,7 +483,7 @@ def _create_windmill_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if isinstance(rotor, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(rotor):
         filters.append(dm.filters.Equals(view_id.as_property_ref("rotor"), value=as_instance_dict_id(rotor)))
-    if rotor and isinstance(rotor, Sequence):
+    if rotor and isinstance(rotor, Sequence) and not isinstance(rotor, str) and not is_tuple_id(rotor):
         filters.append(
             dm.filters.In(view_id.as_property_ref("rotor"), values=[as_instance_dict_id(item) for item in rotor])
         )

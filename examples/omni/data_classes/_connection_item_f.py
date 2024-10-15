@@ -433,7 +433,12 @@ def _create_connection_item_f_filter(
     filters: list[dm.Filter] = []
     if isinstance(direct_list, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_list):
         filters.append(dm.filters.Equals(view_id.as_property_ref("directList"), value=as_instance_dict_id(direct_list)))
-    if direct_list and isinstance(direct_list, Sequence):
+    if (
+        direct_list
+        and isinstance(direct_list, Sequence)
+        and not isinstance(direct_list, str)
+        and not is_tuple_id(direct_list)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("directList"), values=[as_instance_dict_id(item) for item in direct_list]

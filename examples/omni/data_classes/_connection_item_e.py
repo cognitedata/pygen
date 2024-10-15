@@ -487,7 +487,12 @@ def _create_connection_item_e_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("directNoSource"), value=as_instance_dict_id(direct_no_source))
         )
-    if direct_no_source and isinstance(direct_no_source, Sequence):
+    if (
+        direct_no_source
+        and isinstance(direct_no_source, Sequence)
+        and not isinstance(direct_no_source, str)
+        and not is_tuple_id(direct_no_source)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("directNoSource"),

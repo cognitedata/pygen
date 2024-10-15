@@ -129,7 +129,10 @@ class FilterImplementationOnetoOneEdge(FilterImplementation):
     def condition(self) -> str:
         if self.filter is dm.filters.In:
             parameter = next(iter(self.keyword_arguments.values())).name
-            return f"{parameter} and isinstance({parameter}, Sequence)"
+            return (
+                f"{parameter} and isinstance({parameter}, Sequence) "
+                f"and not isinstance({parameter}, str) and not is_tuple_id({parameter})"
+            )
         elif self.filter is dm.filters.Equals:
             parameter = next(iter(self.keyword_arguments.values())).name
             return f"isinstance({parameter}, {self.instance_type}) or is_tuple_id({parameter})"

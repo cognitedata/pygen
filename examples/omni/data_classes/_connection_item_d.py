@@ -447,7 +447,12 @@ def _create_connection_item_d_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("directMulti"), value=as_instance_dict_id(direct_multi))
         )
-    if direct_multi and isinstance(direct_multi, Sequence):
+    if (
+        direct_multi
+        and isinstance(direct_multi, Sequence)
+        and not isinstance(direct_multi, str)
+        and not is_tuple_id(direct_multi)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("directMulti"), values=[as_instance_dict_id(item) for item in direct_multi]
@@ -457,7 +462,12 @@ def _create_connection_item_d_filter(
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("directSingle"), value=as_instance_dict_id(direct_single))
         )
-    if direct_single and isinstance(direct_single, Sequence):
+    if (
+        direct_single
+        and isinstance(direct_single, Sequence)
+        and not isinstance(direct_single, str)
+        and not is_tuple_id(direct_single)
+    ):
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("directSingle"), values=[as_instance_dict_id(item) for item in direct_single]
