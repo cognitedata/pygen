@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import itertools
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
@@ -129,10 +129,7 @@ class FilterImplementationOnetoOneEdge(FilterImplementation):
     def condition(self) -> str:
         if self.filter is dm.filters.In:
             parameter = next(iter(self.keyword_arguments.values())).name
-            output = f"{parameter} and isinstance({parameter}, list)"
-            if self.has_default_instance_space:
-                output += f" and isinstance({parameter}[0], {self.instance_type.__name__})"
-            return output
+            return f"{parameter} and isinstance({parameter}, Sequence)"
         elif self.filter is dm.filters.Equals:
             parameter = next(iter(self.keyword_arguments.values())).name
             return f"{parameter} and isinstance({parameter}, {self.instance_type.__name__})"
@@ -151,6 +148,8 @@ class FilterImplementationOnetoOneEdge(FilterImplementation):
                 )
             elif self.instance_type is tuple and self.filter is dm.filters.In:
                 filter_args.append(f'{keyword}=[{{"space": item[0], "externalId": item[1]}} for item in {arg.name}]')
+            elif self.instance_type is Sequence and self.filter is dm.filters.In:
+                filter_args.append(f"{keyword}=[as_instance_dict_id(item) for item in {arg.name}]")
             else:
                 raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
         return filter_args
@@ -314,19 +313,15 @@ class FilterMethod:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
                             parameter.type_ = f"{parameter.type_} | {type_}"
-                        list_filters.extend(
-                            [
-                                FilterImplementationOnetoOneEdge(
-                                    filter=selected_filter,
-                                    prop_name=field_.prop_name,
-                                    keyword_arguments=dict(values=parameter),
-                                    instance_type=condition_type,
-                                    is_edge_class=is_edge_class,
-                                    has_default_instance_space=has_default_instance_space,
-                                )
-                                for condition_type in (str, tuple)
-                                if has_default_instance_space or condition_type is tuple
-                            ]
+                        list_filters.append(
+                            FilterImplementationOnetoOneEdge(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(values=parameter),
+                                instance_type=Sequence,
+                                is_edge_class=is_edge_class,
+                                has_default_instance_space=has_default_instance_space,
+                            )
                         )
                     else:
                         # This is a filter not supported.

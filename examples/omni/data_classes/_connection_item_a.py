@@ -399,20 +399,20 @@ def _create_connection_item_a_filter(
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     other_direct: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
     ) = None,
     self_direct: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
     ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -435,8 +435,7 @@ def _create_connection_item_a_filter(
     if other_direct and isinstance(other_direct, Sequence):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("otherDirect"),
-                values=[as_instance_dict_id(item) for item in other_direct],
+                view_id.as_property_ref("otherDirect"), values=[as_instance_dict_id(item) for item in other_direct]
             )
         )
     if isinstance(other_direct, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(other_direct):
@@ -449,8 +448,7 @@ def _create_connection_item_a_filter(
     if self_direct and isinstance(self_direct, Sequence):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("selfDirect"),
-                values=[as_instance_dict_id(item) for item in self_direct],
+                view_id.as_property_ref("selfDirect"), values=[as_instance_dict_id(item) for item in self_direct]
             )
         )
     if external_id_prefix is not None:
