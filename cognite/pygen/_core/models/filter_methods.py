@@ -122,7 +122,7 @@ class FilterImplementation:
 
 @dataclass
 class FilterImplementationOnetoOneEdge(FilterImplementation):
-    instance_type: type
+    instance_type: str
     has_default_instance_space: bool
 
     @property
@@ -132,26 +132,16 @@ class FilterImplementationOnetoOneEdge(FilterImplementation):
             return f"{parameter} and isinstance({parameter}, Sequence)"
         elif self.filter is dm.filters.Equals:
             parameter = next(iter(self.keyword_arguments.values())).name
-            return f"{parameter} and isinstance({parameter}, {self.instance_type.__name__})"
+            return f"isinstance({parameter}, {self.instance_type}) or is_tuple_id({parameter})"
         raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
 
     def _create_filter_args(self) -> list[str]:
         filter_args: list[str] = []
         for keyword, arg in self.keyword_arguments.items():
-            if self.instance_type is str and self.filter is dm.filters.Equals:
-                filter_args.append(f'{keyword}={{"space": DEFAULT_INSTANCE_SPACE, "externalId": {arg.name}}}')
-            elif self.instance_type is tuple and self.filter is dm.filters.Equals:
-                filter_args.append(f'{keyword}={{"space": {arg.name}[0], "externalId": {arg.name}[1]}}')
-            elif self.instance_type is str and self.filter is dm.filters.In:
-                filter_args.append(
-                    f'{keyword}=[{{"space": DEFAULT_INSTANCE_SPACE, "externalId": item}} for item in {arg.name}]'
-                )
-            elif self.instance_type is tuple and self.filter is dm.filters.In:
-                filter_args.append(f'{keyword}=[{{"space": item[0], "externalId": item[1]}} for item in {arg.name}]')
-            elif self.instance_type is Sequence and self.filter is dm.filters.In:
+            if self.instance_type == Sequence.__name__ and self.filter is dm.filters.In:
                 filter_args.append(f"{keyword}=[as_instance_dict_id(item) for item in {arg.name}]")
             else:
-                raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
+                filter_args.append(f"{keyword}=as_instance_dict_id({arg.name})")
         return filter_args
 
 
@@ -282,19 +272,19 @@ class FilterMethod:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
                             parameter.type_ = f"{type_} | {parameter.type_}"
-                        list_filters.extend(
-                            [
-                                FilterImplementationOnetoOneEdge(
-                                    filter=selected_filter,
-                                    prop_name=field_.prop_name,
-                                    keyword_arguments=dict(value=parameter),
-                                    instance_type=condition_type,
-                                    is_edge_class=is_edge_class,
-                                    has_default_instance_space=has_default_instance_space,
-                                )
-                                for condition_type in (str, tuple)
-                                if has_default_instance_space or condition_type is tuple
-                            ]
+                        instance_type = "dm.NodeId | dm.DirectRelationReference"
+                        if has_default_instance_space:
+                            instance_type = f"str | {instance_type}"
+
+                        list_filters.append(
+                            FilterImplementationOnetoOneEdge(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(value=parameter),
+                                instance_type=instance_type,
+                                is_edge_class=is_edge_class,
+                                has_default_instance_space=has_default_instance_space,
+                            )
                         )
                     elif selected_filter is dm.filters.In:
                         type_ = "tuple[str, str] | dm.NodeId | dm.DirectRelationReference"
@@ -318,7 +308,7 @@ class FilterMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(values=parameter),
-                                instance_type=Sequence,
+                                instance_type=Sequence.__name__,
                                 is_edge_class=is_edge_class,
                                 has_default_instance_space=has_default_instance_space,
                             )
