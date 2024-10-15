@@ -23,16 +23,7 @@ def as_direct_relation_reference(
     raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
 
 
-def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
-    if isinstance(value, str):
-        return value
-    elif value.space == DEFAULT_INSTANCE_SPACE:
-        return value.external_id
-    elif isinstance(value, dm.NodeId):
-        return value
-    return value.as_id()
-
-
+# Any is to make mypy happy, while the rest is a hint of what the function expects
 def as_instance_dict_id(value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
     if isinstance(value, str):
         return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
@@ -47,6 +38,16 @@ def as_instance_dict_id(value: str | dm.NodeId | tuple[str, str] | dm.DirectRela
 
 def is_tuple_id(value: Any) -> bool:
     return isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], str) and isinstance(value[1], str)
+
+
+def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
+    if isinstance(value, str):
+        return value
+    elif value.space == DEFAULT_INSTANCE_SPACE:
+        return value.external_id
+    elif isinstance(value, dm.NodeId):
+        return value
+    return value.as_id()
 
 
 def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
