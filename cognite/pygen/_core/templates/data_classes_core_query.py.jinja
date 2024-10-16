@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import math
+import warnings
 from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection
@@ -22,6 +23,7 @@ from typing import (
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
+from cognite.client.exceptions import CogniteAPIError
 
 from .base import (
     DomainModelList,
@@ -43,6 +45,11 @@ from .helpers import as_node_id
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
+
+
+class QueryReducingBatchSize(UserWarning):
+    """Raised when a query is too large and the batch size must be reduced."""
+    ...
 
 
 class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
@@ -229,6 +236,7 @@ class QueryStep:
                 raise ValueError(f"You need to provide a select to instantiate a {type(self).__name__}") from None
         else:
             self.select = select  # type: ignore[assignment]
+        self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
         self.last_batch_count: int = 0
@@ -247,9 +255,13 @@ class QueryStep:
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
-            self.expression.limit = ACTUAL_INSTANCE_QUERY_LIMIT
+            self.expression.limit = self._max_retrieve_batch_limit
         else:
             self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
+
+    def reduce_max_batch_limit(self) -> bool:
+        self._max_retrieve_batch_limit = max(1, self._max_retrieve_batch_limit // 2)
+        return self._max_retrieve_batch_limit > 1
 
     @property
     def is_unlimited(self) -> bool:
@@ -368,6 +380,12 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
     def _is_finished(self):
         return all(expression.is_finished for expression in self)
 
+    def _reduce_max_batch_limit(self) -> bool:
+        for expression in self:
+            if not expression.reduce_max_batch_limit():
+                return False
+        return True
+
     def _unpack(self) -> T_DomainModelList:
         if self._result_list_cls is None:
             raise ValueError("No result class set, unable to unpack results")
@@ -425,7 +443,22 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
-            batch = client.data_modeling.instances.query(query)
+            try:
+                batch = client.data_modeling.instances.query(query)
+            except CogniteAPIError as e:
+                if e.code == 408:
+                    # Too big query, try to reduce the limit
+                    if self._reduce_max_batch_limit():
+                        continue
+                    new_limit = self[0]._max_retrieve_batch_limit
+                    warnings.warn(
+                        QueryReducingBatchSize(
+                            f"Query is too large, reducing batch size to {new_limit:,}, and trying again"
+                        ), QueryReducingBatchSize
+                    )
+
+                raise e
+
             self._update(batch)
             if self._is_finished:
                 break
