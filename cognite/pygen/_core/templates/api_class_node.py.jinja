@@ -475,6 +475,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ),
                 {{ data_class.read_name }},
                 max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
         from_root = builder.get_from(){% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_edge %}

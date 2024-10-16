@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.38] - 24-10-16
+### Added
+- When calling `.list(...)` with `retrieve_connections="full"` `pygen` will no longer raise
+  the `CogniteAPIError: Graph query timed out.` error, but instead dynamically adjust the
+  `limit` to ensure that all nodes are retrieved.
+- If the `.list(...)` with `retrieve_connections="full"` `pygen` will now automatically detect large queries
+  and print the progress with estimated time left.
+
 ## [0.99.37] - 24-10-15
 ### Added
 - Support for deleting by `NodeId` in generated SDK.
