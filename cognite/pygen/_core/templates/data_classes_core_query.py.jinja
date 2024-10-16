@@ -460,7 +460,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         if not self:
             raise ValueError("No query steps to execute")
 
-        count: float | None
+        count: float | None = None
         with suppress(ValueError, CogniteAPIError):
             count = self[0].count_total(client)
 
