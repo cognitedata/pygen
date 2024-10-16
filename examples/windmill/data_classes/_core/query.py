@@ -496,10 +496,10 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 continue
             # Estimate the number of nodes per second using exponential moving average
             last_batch_nodes_per_second = len(batch[self[0].name]) / last_execution_time
-            if nodes_per_second == 0:
+            if nodes_per_second == 0.0:
                 nodes_per_second = last_batch_nodes_per_second
             else:
-                nodes_per_second = 0.1 * last_batch_nodes_per_second + nodes_per_second * 0.9
+                nodes_per_second = 0.1 * last_batch_nodes_per_second + 0.9 * nodes_per_second
             # Estimate the time to completion
             remaining_nodes = count - self[0].total_retrieved
             remaining_time = remaining_nodes / nodes_per_second
