@@ -517,6 +517,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                 ),
                 ConnectionItemG,
                 max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
         from_root = builder.get_from()

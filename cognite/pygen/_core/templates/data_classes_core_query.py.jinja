@@ -285,13 +285,13 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
-    def count_total(self, cognite_client: CogniteClient) -> int:
+    def count_total(self, cognite_client: CogniteClient) -> float:
         if self.select is None:
             raise ValueError("Cannot count total if select is not set")
 
         return cognite_client.data_modeling.instances.aggregate(
             self.select.sources[0].source, Count("externalId"), filter=self.raw_filter
-        )
+        ).value
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
@@ -458,9 +458,9 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         query = self._build()
 
         if not self:
-            return self._result_list_cls([])
+            raise ValueError("No query steps to execute")
 
-        count: int | None
+        count: float | None
         with suppress(ValueError, CogniteAPIError):
             count = self[0].count_total(client)
 

@@ -648,6 +648,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 ),
                 ConnectionItemD,
                 max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
         from_root = builder.get_from()

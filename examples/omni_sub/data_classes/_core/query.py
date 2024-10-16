@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import datetime
 import math
+import time
+import warnings
 from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection
 from collections.abc import MutableSequence, Iterable
+from contextlib import suppress
 from typing import (
     cast,
     ClassVar,
@@ -21,7 +24,9 @@ from typing import (
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
+from cognite.client.exceptions import CogniteAPIError
 
 from .base import (
     DomainModelList,
@@ -37,11 +42,19 @@ from .constants import (
     DEFAULT_QUERY_LIMIT,
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
+    MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
+    PRINT_PROGRESS_PER_N_NODES,
 )
 from .helpers import as_node_id
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
+
+
+class QueryReducingBatchSize(UserWarning):
+    """Raised when a query is too large and the batch size must be reduced."""
+
+    ...
 
 
 class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
@@ -216,6 +229,7 @@ class QueryStep:
         expression: dm.query.ResultSetExpression,
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -228,6 +242,8 @@ class QueryStep:
                 raise ValueError(f"You need to provide a select to instantiate a {type(self).__name__}") from None
         else:
             self.select = select  # type: ignore[assignment]
+        self.raw_filter = raw_filter
+        self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
         self.last_batch_count: int = 0
@@ -246,9 +262,13 @@ class QueryStep:
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
-            self.expression.limit = ACTUAL_INSTANCE_QUERY_LIMIT
+            self.expression.limit = self._max_retrieve_batch_limit
         else:
             self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
+
+    def reduce_max_batch_limit(self) -> bool:
+        self._max_retrieve_batch_limit = max(1, self._max_retrieve_batch_limit // 2)
+        return self._max_retrieve_batch_limit > 1
 
     @property
     def is_unlimited(self) -> bool:
@@ -265,6 +285,14 @@ class QueryStep:
             or self.is_single_direct_relation
         )
 
+    def count_total(self, cognite_client: CogniteClient) -> float:
+        if self.select is None:
+            raise ValueError("Cannot count total if select is not set")
+
+        return cognite_client.data_modeling.instances.aggregate(
+            self.select.sources[0].source, Count("externalId"), filter=self.raw_filter
+        ).value
+
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
 
@@ -277,9 +305,10 @@ class NodeQueryStep(QueryStep):
         result_cls: type[DomainModel],
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
 
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
@@ -298,9 +327,10 @@ class EdgeQueryStep(QueryStep):
         result_cls: type[DomainRelation] | None = None,
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
 
     def _default_select(self) -> dm.query.Select:
         if self.result_cls is None:
@@ -363,6 +393,12 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
     def _is_finished(self):
         return all(expression.is_finished for expression in self)
 
+    def _reduce_max_batch_limit(self) -> bool:
+        for expression in self:
+            if not expression.reduce_max_batch_limit():
+                return False
+        return True
+
     def _unpack(self) -> T_DomainModelList:
         if self._result_list_cls is None:
             raise ValueError("No result class set, unable to unpack results")
@@ -417,13 +453,65 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         self._reset()
         query = self._build()
 
+        if not self:
+            raise ValueError("No query steps to execute")
+
+        count: float | None
+        with suppress(ValueError, CogniteAPIError):
+            count = self[0].count_total(client)
+
+        is_large_query = False
+        last_progress_print = 0
+        nodes_per_second = 0.0
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
-            batch = client.data_modeling.instances.query(query)
+            t0 = time.time()
+            try:
+                batch = client.data_modeling.instances.query(query)
+            except CogniteAPIError as e:
+                if e.code == 408:
+                    # Too big query, try to reduce the limit
+                    if self._reduce_max_batch_limit():
+                        continue
+                    new_limit = self[0]._max_retrieve_batch_limit
+                    warnings.warn(
+                        f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
+                        QueryReducingBatchSize,
+                        stacklevel=2,
+                    )
+
+                raise e
+            last_execution_time = time.time() - t0
+
             self._update(batch)
             if self._is_finished:
                 break
+
+            if count is None:
+                continue
+            # Estimate the number of nodes per second using exponential moving average
+            last_batch_nodes_per_second = len(batch[self[0].name]) / last_execution_time
+            if nodes_per_second == 0:
+                nodes_per_second = last_batch_nodes_per_second
+            else:
+                nodes_per_second = 0.1 * last_batch_nodes_per_second + nodes_per_second * 0.9
+            # Estimate the time to completion
+            remaining_nodes = count - self[0].total_retrieved
+            remaining_time = remaining_nodes / nodes_per_second
+
+            if is_large_query and (self[0].total_retrieved - last_progress_print) > PRINT_PROGRESS_PER_N_NODES:
+                estimate = datetime.timedelta(seconds=round(remaining_time, 0))
+                print(
+                    f"Progress: {self[0].total_retrieved:,}/{count:,} nodes retrieved. "
+                    f"Estimated time to completion: {estimate}"
+                )
+                last_progress_print = self[0].total_retrieved
+
+            if is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
+                is_large_query = True
+                print(f"Large query detected. Will print progress.")
+
         if not unpack:
             return None
         return self._unpack()
