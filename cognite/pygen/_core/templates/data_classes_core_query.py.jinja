@@ -229,6 +229,7 @@ class QueryStep:
         expression: dm.query.ResultSetExpression,
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -241,6 +242,7 @@ class QueryStep:
                 raise ValueError(f"You need to provide a select to instantiate a {type(self).__name__}") from None
         else:
             self.select = select  # type: ignore[assignment]
+        self.raw_filter = raw_filter
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
@@ -288,7 +290,7 @@ class QueryStep:
             raise ValueError("Cannot count total if select is not set")
 
         return cognite_client.data_modeling.instances.aggregate(
-            self.select.sources[0].source, Count("externalId"), filter=self.expression.filter
+            self.select.sources[0].source, Count("externalId"), filter=self.raw_filter
         )
 
     def __repr__(self) -> str:
@@ -303,9 +305,10 @@ class NodeQueryStep(QueryStep):
         result_cls: type[DomainModel],
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
 
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
@@ -328,9 +331,10 @@ class EdgeQueryStep(QueryStep):
         result_cls: type[DomainRelation] | None = None,
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
 
     def _default_select(self) -> dm.query.Select:
         if self.result_cls is None:
