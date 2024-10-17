@@ -39,8 +39,9 @@ class DomainAPI(Protocol):
 
 
 class TestCRUDOperations:
-    @pytest.mark.skip("Unstable endpoints")
+    # The retrieve call fails frequently which is why the flaky decorator is used.
     @pytest.mark.parametrize("view_id", omni_independent_view_ids())
+    @pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
     def test_create_retrieve_delete(
         self,
         view_id: dm.ViewId,
@@ -87,7 +88,8 @@ class TestCRUDOperations:
 
         assert 5 >= len(retrieved) >= 3
 
-    @pytest.mark.skip("Unstable endpoints")
+    # The retrieve node frequently fails, likely due to eventual consistency.
+    @pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
     def test_create_retrieve_delete_direct_listable(
         self, omni_client: OmniClient, cognite_client: CogniteClient
     ) -> None:
@@ -112,6 +114,7 @@ class TestCRUDOperations:
             assert len(created.edges) == 0
 
             retrieved = omni_client.connection_item_f.retrieve(item.external_id)
+            assert retrieved is not None
             assert set(retrieved.direct_list or []) == {
                 "tmp_create_retrieve_delete_direct_listable_e",
                 "tmp_create_retrieve_delete_direct_listable_e2",
