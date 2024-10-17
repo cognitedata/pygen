@@ -2,6 +2,7 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 import warnings
+from collections.abc import Sequence
 {% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
@@ -41,9 +42,11 @@ from ._core import ({% if has_default_instance_space %}
     SequenceGraphQL,{% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,{% if data_class.has_filtering_fields %}
@@ -325,7 +328,16 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
-
+{% if data_class.has_write_connection_fields %}
+    @field_validator({% for field in data_class.write_connection_fields %}"{{ field.name }}", {% endfor %}mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value{% endif %}
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],

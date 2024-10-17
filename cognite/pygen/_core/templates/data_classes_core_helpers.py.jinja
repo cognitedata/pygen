@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from cognite.client import data_modeling as dm
 from .base import DomainModel, T_DomainModel{% if has_default_instance_space %}
 from .constants import DEFAULT_INSTANCE_SPACE{% endif %}
@@ -19,6 +21,23 @@ def as_direct_relation_reference(
     if isinstance(value, tuple):
         return dm.DirectRelationReference(space=value[0], external_id=value[1])
     raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
+
+
+# Any is to make mypy happy, while the rest is a hint of what the function expects
+def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif %} dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:{% if has_default_instance_space %}
+    if isinstance(value, str):
+        return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}{% endif %}
+    if isinstance(value, dm.NodeId):
+        return {"space": value.space, "externalId": value.external_id}
+    if isinstance(value, tuple) and is_tuple_id(value):
+        return {"space": value[0], "externalId": value[1]}
+    if isinstance(value, dm.DirectRelationReference):
+        return {"space": value.space, "externalId": value.external_id}
+    raise TypeError(f"Expected str, NodeId, tuple or DirectRelationReference, got {type(value)}")
+
+
+def is_tuple_id(value: Any) -> bool:
+    return isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], str) and isinstance(value[1], str)
 
 {% if has_default_instance_space %}
 def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:

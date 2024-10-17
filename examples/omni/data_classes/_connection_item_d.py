@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -23,9 +24,11 @@ from ._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -296,6 +299,16 @@ class ConnectionItemDWrite(DomainModelWrite):
         default=None, repr=False, alias="outwardsSingle"
     )
 
+    @field_validator("direct_multi", "direct_single", "outwards_single", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
+
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
@@ -407,8 +420,22 @@ class ConnectionItemDApplyList(ConnectionItemDWriteList): ...
 
 def _create_connection_item_d_filter(
     view_id: dm.ViewId,
-    direct_multi: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    direct_single: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    direct_multi: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    direct_single: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -416,59 +443,34 @@ def _create_connection_item_d_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if direct_multi and isinstance(direct_multi, str):
+    if isinstance(direct_multi, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_multi):
         filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directMulti"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_multi},
-            )
+            dm.filters.Equals(view_id.as_property_ref("directMulti"), value=as_instance_dict_id(direct_multi))
         )
-    if direct_multi and isinstance(direct_multi, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directMulti"), value={"space": direct_multi[0], "externalId": direct_multi[1]}
-            )
-        )
-    if direct_multi and isinstance(direct_multi, list) and isinstance(direct_multi[0], str):
+    if (
+        direct_multi
+        and isinstance(direct_multi, Sequence)
+        and not isinstance(direct_multi, str)
+        and not is_tuple_id(direct_multi)
+    ):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("directMulti"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_multi],
+                view_id.as_property_ref("directMulti"), values=[as_instance_dict_id(item) for item in direct_multi]
             )
         )
-    if direct_multi and isinstance(direct_multi, list) and isinstance(direct_multi[0], tuple):
+    if isinstance(direct_single, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_single):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("directSingle"), value=as_instance_dict_id(direct_single))
+        )
+    if (
+        direct_single
+        and isinstance(direct_single, Sequence)
+        and not isinstance(direct_single, str)
+        and not is_tuple_id(direct_single)
+    ):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("directMulti"),
-                values=[{"space": item[0], "externalId": item[1]} for item in direct_multi],
-            )
-        )
-    if direct_single and isinstance(direct_single, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directSingle"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_single},
-            )
-        )
-    if direct_single and isinstance(direct_single, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directSingle"),
-                value={"space": direct_single[0], "externalId": direct_single[1]},
-            )
-        )
-    if direct_single and isinstance(direct_single, list) and isinstance(direct_single[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directSingle"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_single],
-            )
-        )
-    if direct_single and isinstance(direct_single, list) and isinstance(direct_single[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directSingle"),
-                values=[{"space": item[0], "externalId": item[1]} for item in direct_single],
+                view_id.as_property_ref("directSingle"), values=[as_instance_dict_id(item) for item in direct_single]
             )
         )
     if isinstance(name, str):

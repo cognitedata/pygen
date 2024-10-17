@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -23,9 +24,11 @@ from ._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -296,6 +299,16 @@ class ConnectionItemFWrite(DomainModelWrite):
     outwards_multi: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="outwardsMulti")
     outwards_single: Optional[ConnectionEdgeAWrite] = Field(default=None, repr=False, alias="outwardsSingle")
 
+    @field_validator("direct_list", "outwards_multi", "outwards_single", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
+
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
@@ -403,7 +416,14 @@ class ConnectionItemFApplyList(ConnectionItemFWriteList): ...
 
 def _create_connection_item_f_filter(
     view_id: dm.ViewId,
-    direct_list: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    direct_list: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -411,31 +431,17 @@ def _create_connection_item_f_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if direct_list and isinstance(direct_list, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directList"),
-                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": direct_list},
-            )
-        )
-    if direct_list and isinstance(direct_list, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("directList"), value={"space": direct_list[0], "externalId": direct_list[1]}
-            )
-        )
-    if direct_list and isinstance(direct_list, list) and isinstance(direct_list[0], str):
+    if isinstance(direct_list, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_list):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("directList"), value=as_instance_dict_id(direct_list)))
+    if (
+        direct_list
+        and isinstance(direct_list, Sequence)
+        and not isinstance(direct_list, str)
+        and not is_tuple_id(direct_list)
+    ):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("directList"),
-                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in direct_list],
-            )
-        )
-    if direct_list and isinstance(direct_list, list) and isinstance(direct_list[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("directList"),
-                values=[{"space": item[0], "externalId": item[1]} for item in direct_list],
+                view_id.as_property_ref("directList"), values=[as_instance_dict_id(item) for item in direct_list]
             )
         )
     if isinstance(name, str):

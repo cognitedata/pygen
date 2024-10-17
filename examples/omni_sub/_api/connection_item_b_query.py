@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -59,8 +60,20 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: tuple[str, str] | list[tuple[str, str]] | None = None,
-        self_direct: tuple[str, str] | list[tuple[str, str]] | None = None,
+        other_direct: (
+            tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        self_direct: (
+            tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         external_id_prefix_edge: str | None = None,

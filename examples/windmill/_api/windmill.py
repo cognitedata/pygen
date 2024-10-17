@@ -63,10 +63,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         self,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -242,10 +256,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         properties: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -325,10 +353,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -347,10 +389,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -373,10 +429,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -398,10 +468,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -479,10 +563,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         search_property: WindmillTextFields | SequenceNotStr[WindmillTextFields] | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -546,10 +644,24 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
         self,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        nacelle: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        rotor: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         windfarm: str | list[str] | None = None,
         windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -631,6 +743,7 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
                 ),
                 Windmill,
                 max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
         from_root = builder.get_from()

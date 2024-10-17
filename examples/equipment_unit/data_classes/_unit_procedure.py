@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -23,9 +24,11 @@ from ._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    is_tuple_id,
     select_best_node,
     QueryCore,
     NodeQueryCore,
@@ -255,6 +258,16 @@ class UnitProcedureWrite(DomainModelWrite):
     unit_procedure_type: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTimeWrite]] = Field(default=None, repr=False)
+
+    @field_validator("work_orders", "work_units", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
 
     def _to_instances_write(
         self,

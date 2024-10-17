@@ -63,7 +63,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def __call__(
         self,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -229,7 +236,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         self,
         query: str,
         properties: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -297,7 +311,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -314,7 +335,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -335,7 +363,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -355,7 +390,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -421,7 +463,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         interval: float,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -473,7 +522,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def list(
         self,
-        direct_no_source: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        direct_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -545,6 +601,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 ),
                 ConnectionItemE,
                 max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
         from_root = builder.get_from()
