@@ -199,7 +199,9 @@ class PrimitiveRequiredAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequired | None: ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> PrimitiveRequired | None: ...
 
     @overload
     def retrieve(
@@ -207,7 +209,9 @@ class PrimitiveRequiredAPI(
     ) -> PrimitiveRequiredList: ...
 
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str]| SequenceNotStr[str| dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
     ) -> PrimitiveRequired | PrimitiveRequiredList | None:
         """Retrieve one or more primitive requireds by id(s).
 

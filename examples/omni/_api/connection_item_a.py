@@ -186,15 +186,19 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemA | None: ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ConnectionItemA | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
     ) -> ConnectionItemAList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
     ) -> ConnectionItemA | ConnectionItemAList | None:
         """Retrieve one or more connection item as by id(s).
 

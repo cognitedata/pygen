@@ -160,13 +160,17 @@ class ConnectionItemCNodeAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str) -> ConnectionItemCNode | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str) -> ConnectionItemCNode | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> ConnectionItemCNodeList: ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str
+    ) -> ConnectionItemCNodeList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str,
     ) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
         """Retrieve one or more connection item c nodes by id(s).
 

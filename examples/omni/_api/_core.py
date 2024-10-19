@@ -113,7 +113,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def _retrieve(
         self,
-        external_id: str | dm.NodeId | tuple[str, str]| SequenceNotStr[str| dm.NodeId | tuple[str, str]],
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
         retrieve_edges: bool = False,
         edge_api_name_type_direction_view_id_penta: (
@@ -121,7 +121,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         ) = None,
         as_child_class: SequenceNotStr[str] | None = None,
     ) -> T_DomainModel | T_DomainModelList | None:
-        if isinstance(external_id, str | dm.NodeId ) or (isinstance(external_id, tuple) and len(external_id) == 2 and all(isinstance(i, str) for i in external_id)):
+        if isinstance(external_id, str | dm.NodeId) or (
+            isinstance(external_id, tuple) and len(external_id) == 2 and all(isinstance(i, str) for i in external_id)
+        ):
             node_ids = [_as_node_id(external_id, space)]
             is_multiple = False
         else:

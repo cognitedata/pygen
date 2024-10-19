@@ -168,13 +168,17 @@ class Implementation1v1API(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str) -> Implementation1v1 | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str) -> Implementation1v1 | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> Implementation1v1List: ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str
+    ) -> Implementation1v1List: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str,
     ) -> Implementation1v1 | Implementation1v1List | None:
         """Retrieve one or more implementation 1 v 1 by id(s).
 

@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Added
+- Support for using `NodeId` and `tuple[str, str]` as well as sequences of these in the `.retrieve`
+  method of the generated SDK.
+
 ## [0.99.39] - 24-10-19
 ### Fixed
 - In `.list` setting `retrieve_connections="full"` no longer raises 
