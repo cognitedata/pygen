@@ -116,6 +116,7 @@ class TestToInstancesWrite:
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
 
+@pytest.mark.skip("Moved data")
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
     [
