@@ -7,7 +7,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DATA_MODELS = REPO_ROOT / "tests" / "data_models"
+DATA_MODELS = REPO_ROOT / "tests" / "data" / "models"
 
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
@@ -74,7 +74,7 @@ WINDMILL_SDK = ExampleSDK(
 )
 
 OMNI_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
+    data_model_ids=[DataModelId("sp_pygen_models", "Omni", "1")],
     _top_level_package="omni",
     client_name="OmniClient",
     generate_sdk=True,
@@ -83,7 +83,7 @@ OMNI_SDK = ExampleSDK(
 )
 
 OMNI_SUB_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("pygen-models", "OmniSub", "1")],
+    data_model_ids=[DataModelId("sp_pygen_models", "OmniSub", "1")],
     _top_level_package="omni_sub",
     client_name="OmniSubClient",
     generate_sdk=True,
@@ -91,7 +91,7 @@ OMNI_SUB_SDK = ExampleSDK(
 )
 
 OMNI_TYPED = ExampleSDK(
-    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
+    data_model_ids=[DataModelId("sp_pygen_models", "Omni", "1")],
     _top_level_package="omni_typed",
     client_name="DoesNotMatter",
     instance_space="omni-instances",

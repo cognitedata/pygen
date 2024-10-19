@@ -1,0 +1,76 @@
+space: pygen-models
+externalId: OmniMultiC
+name: OmniMultiC
+description: ''
+version: '1'
+views:
+- space: pygen-models-other
+  externalId: Implementation1
+  name: Implementation1
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: Implementation1
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    mainValue:
+      container:
+        space: pygen-models
+        externalId: MainInterface
+      containerPropertyIdentifier: mainValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: mainValue
+      description: null
+    value1:
+      container:
+        space: pygen-models
+        externalId: Implementation1
+      containerPropertyIdentifier: implementation1Value
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Value1
+      description: null
+    value2:
+      container:
+        space: pygen-models
+        externalId: Implementation1
+      containerPropertyIdentifier: requiredImplementation1Value
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: false
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Value2
+      description: null
+  lastUpdatedTime: 1704113811088
+  createdTime: 1704113811088
+isGlobal: false
+lastUpdatedTime: 1704114825424
+createdTime: 1704114714727

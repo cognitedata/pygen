@@ -1,0 +1,145 @@
+space: IntegrationTestsImmutable
+externalId: ScenarioInstance
+name: ScenarioInstance
+description: ''
+version: '1'
+views:
+- space: IntegrationTestsImmutable
+  externalId: ScenarioInstance
+  name: ScenarioInstance
+  implements: []
+  version: ee2b79fd98b5bb
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    aggregation:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: aggregation
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: aggregation
+      description: null
+    country:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: country
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: country
+      description: null
+    instance:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: instance
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: instance
+      description: null
+    market:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: market
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: market
+      description: null
+    priceArea:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: priceArea
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: priceArea
+      description: null
+    priceForecast:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: priceForecast
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: priceForecast
+      description: null
+    scenario:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: scenario
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: scenario
+      description: null
+    start:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: start
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: start
+      description: null
+  lastUpdatedTime: 1695443620025
+  createdTime: 1695443620025
+isGlobal: false
+lastUpdatedTime: 1695443621156
+createdTime: 1695443606683

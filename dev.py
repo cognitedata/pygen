@@ -83,10 +83,13 @@ def download():
             latest.views = sorted(latest.views, key=lambda v: v.external_id)
             for view in latest.views:
                 view.properties = dict(sorted(view.properties.items()))
+            file_path.parent.mkdir(exist_ok=True, parents=True)
             file_path.write_text(latest.dump_yaml())
             typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
 
             if not example_sdk.download_nodes:
+                continue
+            else:
                 continue
 
             is_space: dm.filters.Filter | None = None

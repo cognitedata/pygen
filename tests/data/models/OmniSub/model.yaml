@@ -1,0 +1,205 @@
+space: sp_pygen_models
+externalId: OmniSub
+name: OmniSub
+description: This is a small subset of the Omni data model. It is used to test the
+  generation of SDKs for a subset of the model where the instance space is not set.
+version: '1'
+views:
+- space: sp_pygen_models
+  externalId: ConnectionItemA
+  name: ConnectionItemA
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: sp_pygen_models
+        externalId: ConnectionItemA
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    name:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    otherDirect:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: direct2
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: ConnectionItemC
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: otherDirect
+      description: null
+    outwards:
+      type:
+        space: sp_pygen_models
+        externalId: bidirectional
+      source:
+        space: sp_pygen_models
+        externalId: ConnectionItemB
+        version: '1'
+        type: view
+      name: outwards
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    selfDirect:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: direct1
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: ConnectionItemA
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: selfDirect
+      description: null
+  lastUpdatedTime: 1729345477397
+  createdTime: 1729345477397
+- space: sp_pygen_models
+  externalId: ConnectionItemB
+  name: ConnectionItemB
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: sp_pygen_models
+        externalId: ConnectionItemB
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    inwards:
+      type:
+        space: sp_pygen_models
+        externalId: bidirectional
+      source:
+        space: sp_pygen_models
+        externalId: ConnectionItemA
+        version: '1'
+        type: view
+      name: inwards
+      description: null
+      edgeSource: null
+      direction: inwards
+      connectionType: multi_edge_connection
+    name:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    selfEdge:
+      type:
+        space: sp_pygen_models
+        externalId: reflexive
+      source:
+        space: sp_pygen_models
+        externalId: ConnectionItemB
+        version: '1'
+        type: view
+      name: selfEdge
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+  lastUpdatedTime: 1729345477397
+  createdTime: 1729345477397
+- space: sp_pygen_models
+  externalId: ConnectionItemC
+  name: ConnectionItemC
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: sp_pygen_models
+        externalId: ConnectionItemC
+  implements: []
+  version: '1'
+  writable: false
+  usedFor: all
+  isGlobal: false
+  properties:
+    connectionItemA:
+      type:
+        space: sp_pygen_models
+        externalId: unidirectional
+      source:
+        space: sp_pygen_models
+        externalId: ConnectionItemA
+        version: '1'
+        type: view
+      name: connectionItemA
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    connectionItemB:
+      type:
+        space: sp_pygen_models
+        externalId: unidirectional
+      source:
+        space: sp_pygen_models
+        externalId: ConnectionItemB
+        version: '1'
+        type: view
+      name: connectionItemB
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+  lastUpdatedTime: 1729345477397
+  createdTime: 1729345477397
+isGlobal: false
+lastUpdatedTime: 1729345479132
+createdTime: 1729345479132
