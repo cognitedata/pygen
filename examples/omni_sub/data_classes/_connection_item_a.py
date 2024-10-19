@@ -159,7 +159,9 @@ class ConnectionItemA(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     space: str
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemA")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemA"
+    )
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCNode, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False)

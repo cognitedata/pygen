@@ -22,7 +22,7 @@ from ._core import (
 
 
 class Implementation1v1QueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("sp_pygen_models-other", "Implementation1", "1")
+    _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
 
     def __init__(
         self,

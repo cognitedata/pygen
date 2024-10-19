@@ -151,7 +151,9 @@ class ConnectionItemG(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemG")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemG"
+    )
     inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(
         default=None, repr=False, alias="inwardsMultiProperty"
     )

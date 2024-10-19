@@ -41,7 +41,7 @@ from .sub_interface_query import SubInterfaceQueryAPI
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
-    _view_id = dm.ViewId("sp_pygen_models", "SubInterface", "1")
+    _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
     _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id = {
         "Implementation1": Implementation1v2,

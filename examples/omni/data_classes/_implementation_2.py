@@ -135,7 +135,9 @@ class Implementation2(SubInterface):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation2", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation2")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation2"
+    )
 
     def as_write(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""

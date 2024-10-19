@@ -213,7 +213,20 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 >>> connection_item_d = client.connection_item_d.retrieve("my_connection_item_d")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.outwards_single_edge,
+                    "outwards_single",
+                    dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
+                    "outwards",
+                    dm.ViewId("sp_pygen_models", "ConnectionItemE", "1"),
+                ),
+            ],
+        )
 
     def search(
         self,

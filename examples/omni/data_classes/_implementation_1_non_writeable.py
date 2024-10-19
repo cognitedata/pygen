@@ -124,7 +124,9 @@ class Implementation1NonWriteable(SubInterface):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
 
 

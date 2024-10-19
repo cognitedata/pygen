@@ -73,7 +73,7 @@ class SubInterfaceGraphQL(GraphQLCore):
         sub_value: The sub value field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "SubInterface", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
@@ -132,7 +132,7 @@ class SubInterface(MainInterface):
         sub_value: The sub value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "SubInterface", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
@@ -170,7 +170,7 @@ class SubInterfaceWrite(MainInterfaceWrite):
         sub_value: The sub value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "SubInterface", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")

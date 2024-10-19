@@ -24,7 +24,7 @@ class OmniMultiAAPIs:
     OmniMultiAAPIs
 
     Data Model:
-        space: sp_pygen_models
+        space: pygen-models
         externalId: OmniMultiA
         version: 1
 
@@ -43,7 +43,7 @@ class OmniMultiAAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiA", "1")
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 
@@ -53,7 +53,7 @@ class OmniMultiBAPIs:
     OmniMultiBAPIs
 
     Data Model:
-        space: sp_pygen_models
+        space: pygen-models
         externalId: OmniMultiB
         version: 1
 
@@ -73,7 +73,7 @@ class OmniMultiBAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiB", "1")
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiB", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 
@@ -83,7 +83,7 @@ class OmniMultiCAPIs:
     OmniMultiCAPIs
 
     Data Model:
-        space: sp_pygen_models
+        space: pygen-models
         externalId: OmniMultiC
         version: 1
 
@@ -101,7 +101,7 @@ class OmniMultiCAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiC", "1")
+        data_model_id = dm.DataModelId("pygen-models", "OmniMultiC", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 

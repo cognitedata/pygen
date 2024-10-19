@@ -78,7 +78,7 @@ class ConnectionItemDGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemD", "1")
-    direct_multi: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directMulti")
+    direct_multi: Optional[list[ConnectionItemEGraphQL]] = Field(default=None, repr=False, alias="directMulti")
     direct_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
     outwards_single: Optional[ConnectionItemEGraphQL] = Field(default=None, repr=False, alias="outwardsSingle")
@@ -116,9 +116,7 @@ class ConnectionItemDGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_multi=(
-                self.direct_multi.as_read() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
-            ),
+            direct_multi=[direct_multi.as_read() for direct_multi in self.direct_multi or []],
             direct_single=(
                 self.direct_single.as_read() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -138,9 +136,7 @@ class ConnectionItemDGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, GraphQLCore) else self.direct_multi
-            ),
+            direct_multi=[direct_multi.as_write() for direct_multi in self.direct_multi or []],
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -171,8 +167,12 @@ class ConnectionItemD(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemD", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemD")
-    direct_multi: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directMulti")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemD"
+    )
+    direct_multi: Optional[list[Union[ConnectionItemE, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="directMulti"
+    )
     direct_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(default=None, repr=False, alias="directSingle")
     name: Optional[str] = None
     outwards_single: Union[ConnectionItemE, str, dm.NodeId, None] = Field(
@@ -185,9 +185,10 @@ class ConnectionItemD(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_multi=(
-                self.direct_multi.as_write() if isinstance(self.direct_multi, DomainModel) else self.direct_multi
-            ),
+            direct_multi=[
+                direct_multi.as_write() if isinstance(direct_multi, DomainModel) else direct_multi
+                for direct_multi in self.direct_multi or []
+            ],
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
             ),
@@ -219,17 +220,21 @@ class ConnectionItemD(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.direct_multi, (dm.NodeId, str))
-                and (direct_multi := nodes_by_id.get(instance.direct_multi))
-                and isinstance(direct_multi, ConnectionItemE)
-            ):
-                instance.direct_multi = direct_multi
-            if (
                 isinstance(instance.direct_single, (dm.NodeId, str))
                 and (direct_single := nodes_by_id.get(instance.direct_single))
                 and isinstance(direct_single, ConnectionItemE)
             ):
                 instance.direct_single = direct_single
+            if instance.direct_multi:
+                new_direct_multi: list[ConnectionItemE | str | dm.NodeId] = []
+                for relation in instance.direct_multi:
+                    if isinstance(relation, ConnectionItemE):
+                        new_direct_multi.append(relation)
+                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemE):
+                        new_direct_multi.append(other)
+                    else:
+                        new_direct_multi.append(relation)
+                instance.direct_multi = new_direct_multi
             if edges := edges_by_source_node.get(instance.as_id()):
                 for edge in edges:
                     value: DomainModel | DomainRelation | str | dm.NodeId
@@ -288,7 +293,7 @@ class ConnectionItemDWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
         "sp_pygen_models", "ConnectionItemD"
     )
-    direct_multi: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
+    direct_multi: Optional[list[Union[ConnectionItemEWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directMulti"
     )
     direct_single: Union[ConnectionItemEWrite, str, dm.NodeId, None] = Field(
@@ -322,12 +327,13 @@ class ConnectionItemDWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.direct_multi is not None:
-            properties["directMulti"] = {
-                "space": self.space if isinstance(self.direct_multi, str) else self.direct_multi.space,
-                "externalId": (
-                    self.direct_multi if isinstance(self.direct_multi, str) else self.direct_multi.external_id
-                ),
-            }
+            properties["directMulti"] = [
+                {
+                    "space": self.space if isinstance(direct_multi, str) else direct_multi.space,
+                    "externalId": direct_multi if isinstance(direct_multi, str) else direct_multi.external_id,
+                }
+                for direct_multi in self.direct_multi or []
+            ]
 
         if self.direct_single is not None:
             properties["directSingle"] = {
@@ -356,13 +362,14 @@ class ConnectionItemDWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.direct_multi, DomainModelWrite):
-            other_resources = self.direct_multi._to_instances_write(cache)
-            resources.extend(other_resources)
-
         if isinstance(self.direct_single, DomainModelWrite):
             other_resources = self.direct_single._to_instances_write(cache)
             resources.extend(other_resources)
+
+        for direct_multi in self.direct_multi or []:
+            if isinstance(direct_multi, DomainModelWrite):
+                other_resources = direct_multi._to_instances_write(cache)
+                resources.extend(other_resources)
 
         if self.outwards_single is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(

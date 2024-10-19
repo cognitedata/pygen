@@ -549,16 +549,16 @@ class GraphQLQueryResponse:
 
 
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[GraphQLCore]]] = {
-    dm.DataModelId("sp_pygen_models", "OmniMultiA", "1"): {
+    dm.DataModelId("pygen-models", "OmniMultiA", "1"): {
         "MainInterface": data_classes.MainInterfaceGraphQL,
         "SubInterface": data_classes.SubInterfaceGraphQL,
     },
-    dm.DataModelId("sp_pygen_models", "OmniMultiB", "1"): {
+    dm.DataModelId("pygen-models", "OmniMultiB", "1"): {
         "Implementation1": data_classes.Implementation1v2GraphQL,
         "MainInterface": data_classes.MainInterfaceGraphQL,
         "SubInterface": data_classes.SubInterfaceGraphQL,
     },
-    dm.DataModelId("sp_pygen_models", "OmniMultiC", "1"): {
+    dm.DataModelId("pygen-models", "OmniMultiC", "1"): {
         "Implementation1": data_classes.Implementation1v1GraphQL,
     },
 }

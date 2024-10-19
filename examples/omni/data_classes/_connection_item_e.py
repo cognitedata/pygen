@@ -195,7 +195,9 @@ class ConnectionItemE(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemE")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemE"
+    )
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
     direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
@@ -317,7 +319,9 @@ class ConnectionItemE(DomainModel):
                 and node.direct_multi is not None
                 and (direct_multi := instances.get(as_pygen_node_id(node.direct_multi)))
             ):
-                node.direct_multi = direct_multi
+                if node.direct_multi is None:
+                    node.direct_multi = []
+                node.direct_multi.append(direct_multi)
                 if direct_multi.direct_reverse_multi is None:
                     direct_multi.direct_reverse_multi = []
                 direct_multi.direct_reverse_multi.append(node)

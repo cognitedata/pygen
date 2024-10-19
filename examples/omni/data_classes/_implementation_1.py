@@ -147,7 +147,9 @@ class Implementation1(SubInterface):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
