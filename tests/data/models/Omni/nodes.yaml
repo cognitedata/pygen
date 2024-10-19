@@ -1,4 +1,146 @@
 - space: sp_omni_instances
+  externalId: CDFExternalReferences:Austin
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferences/1:
+        file: file_katelyn
+        sequence: sequence_kayla
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Christopher
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferences/1:
+        file: file_martha
+        timeseries: timeseries_jacob
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Colleen
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferences/1:
+        file: file_matthew
+        sequence: sequence_jeffrey
+        timeseries: timeseries_michelle
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Daniel
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferences/1:
+        file: file_angela
+        sequence: sequence_john
+        timeseries: timeseries_chloe
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Joel
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferences/1:
+        sequence: sequence_timothy
+        timeseries: timeseries_jonathan
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Jeffrey
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferencesListed/1:
+        files:
+        - file_kenneth
+        sequences:
+        - sequence_leslie
+        - sequence_jason
+        - sequence_olivia
+        - sequence_kristy
+        timeseries: []
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Kyle
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferencesListed/1:
+        timeseries:
+        - timeseries_michael
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Rebecca
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferencesListed/1:
+        files:
+        - file_john
+        sequences:
+        - sequence_chelsea
+        - sequence_scott
+        - sequence_adrian
+        - sequence_richard
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Steven
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferencesListed/1:
+        files:
+        - file_william
+        - file_christopher
+        - file_sarah
+        - file_jacob
+        sequences:
+        - sequence_chad
+        - sequence_melvin
+        timeseries:
+        - timeseries_stephen
+        - timeseries_david
+        - timeseries_kelly
+        - timeseries_dean
+        - timeseries_alyssa
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Teresa
+  version: 1
+  lastUpdatedTime: 1729356272492
+  createdTime: 1729356272492
+  instanceType: node
+  properties:
+    sp_pygen_models:
+      CDFExternalReferencesListed/1:
+        files: []
+        sequences:
+        - sequence_joanne
+        timeseries:
+        - timeseries_dillon
+        - timeseries_dalton
+        - timeseries_julie
+        - timeseries_brittany
+        - timeseries_susan
+- space: sp_omni_instances
   externalId: ConnectionItemA:Alexander
   version: 1
   lastUpdatedTime: 1729354706630
