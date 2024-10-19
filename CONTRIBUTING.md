@@ -143,5 +143,30 @@ The documentation is kept in the `docs` folder, while the `mkdocs.yml` file cont
 
 See https://semver.org/
 
-### Test Data
+### Test Data and Model
 
+The test models are managed by `Cognite Toolkit` with the modules located in the `tests/modules` folder.
+
+To deploy the test models to CDF, run the following command:
+```bash
+cdf build
+```
+
+and
+```bash 
+cdf deploy
+```
+
+To generate mock data for the test model `Omni`, run the following command:
+```bash
+python dev.py mock
+```
+You can also deploy to CDF by adding the `--deploy` flag:
+```bash
+python dev.py mock --deploy
+```
+
+Finally, downloading read version of models and data can be done with:
+```bash
+python dev.py download
+```
