@@ -146,6 +146,7 @@ class MockGenerator:
             client: An instance of the CogniteClient class.
             data_set_id: The data set id to use for TimeSeries, Sequences, and FileMetadata.
             seed: The seed to use for the random number generator.
+            default_config:
 
         Returns:
             MockGenerator: The mock generator.

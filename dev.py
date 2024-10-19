@@ -103,6 +103,15 @@ def download():
             typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
 
 
+@app.command("mock", help="Generate mock data for all example SDKs")
+def mock():
+    for example_sdk in EXAMPLE_SDKS:
+        if not example_sdk.download_nodes:
+            typer.echo(f"Skipping {example_sdk.client_name} as it does not download nodes")
+            continue
+        typer.echo(f"Generating mock data for {example_sdk.client_name}...")
+
+
 @app.command(
     "bump", help="Bump the version of Pygen. This also updates the cognite-sdk and pydantic version in all examples"
 )
