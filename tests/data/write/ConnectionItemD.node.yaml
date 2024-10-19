@@ -83,7 +83,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemD
 - space: sp_omni_instances
-  externalId: ConnectionItemD:Thomas
+  externalId: ConnectionItemD:Robert
   instanceType: node
   sources:
   - properties:

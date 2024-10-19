@@ -54,7 +54,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveWithDefaults:Debra
+  externalId: PrimitiveWithDefaults:Thomas
   instanceType: node
   sources:
   - properties:
@@ -69,7 +69,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveWithDefaults:Megan
+  externalId: PrimitiveWithDefaults:Debra
   instanceType: node
   sources:
   - properties:

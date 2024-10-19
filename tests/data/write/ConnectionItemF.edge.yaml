@@ -1,29 +1,53 @@
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Courtney
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Courtney
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Kendra
+    externalId: ConnectionItemF:Andrew
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemG:Courtney
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Christina
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Christina
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Kendra
+    externalId: ConnectionItemF:Andrew
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemE:Stephanie
+  externalId: ConnectionItemF:Andrew:ConnectionItemE:Stephanie
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: singleProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Andrew
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemE:Stephanie
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Lindsay
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Kendra
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Lindsay
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Kendra:ConnectionItemE:Brent
   instanceType: edge
   type:
     space: sp_pygen_models
@@ -33,43 +57,31 @@
     externalId: ConnectionItemF:Kendra
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemE:Stephanie
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemG:Jeffrey
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: multiProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Stanley
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemG:Jeffrey
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemE:Brent
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: singleProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Stanley
-  endNode:
-    space: sp_omni_instances
     externalId: ConnectionItemE:Brent
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Cindy:ConnectionItemG:Jeffrey
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Lindsay
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Cindy
+    externalId: ConnectionItemF:Stanley
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Jeffrey
+    externalId: ConnectionItemG:Lindsay
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Courtney
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Stanley
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Courtney
 - space: sp_omni_instances
   externalId: ConnectionItemF:Cindy:ConnectionItemG:Courtney
   instanceType: edge
@@ -83,50 +95,38 @@
     space: sp_omni_instances
     externalId: ConnectionItemG:Courtney
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Katherine:ConnectionItemG:Courtney
+  externalId: ConnectionItemF:Cindy:ConnectionItemG:Christina
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Katherine
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemG:Courtney
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Katherine:ConnectionItemG:Christina
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: multiProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Katherine
+    externalId: ConnectionItemF:Cindy
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Katherine:ConnectionItemG:Lawrence
+  externalId: ConnectionItemF:Cindy:ConnectionItemG:Lawrence
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Katherine
+    externalId: ConnectionItemF:Cindy
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemG:Lawrence
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Samuel:ConnectionItemE:Pamela
+  externalId: ConnectionItemF:Katherine:ConnectionItemE:Pamela
   instanceType: edge
   type:
     space: sp_pygen_models
     externalId: singleProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Samuel
+    externalId: ConnectionItemF:Katherine
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemE:Pamela

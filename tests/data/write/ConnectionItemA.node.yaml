@@ -6,7 +6,7 @@
       name: Sport something fly.
       selfDirect:
         space: sp_omni_instances
-        externalId: ConnectionItemA:Alexander
+        externalId: ConnectionItemA:Jonathan
     source:
       space: sp_pygen_models
       externalId: ConnectionItemA
@@ -16,7 +16,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemA
 - space: sp_omni_instances
-  externalId: ConnectionItemA:Jason
+  externalId: ConnectionItemA:Phillip
   instanceType: node
   sources:
   - properties:
@@ -36,7 +36,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemA
 - space: sp_omni_instances
-  externalId: ConnectionItemA:Phillip
+  externalId: ConnectionItemA:Alexander
   instanceType: node
   sources:
   - properties:
@@ -53,7 +53,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemA
 - space: sp_omni_instances
-  externalId: ConnectionItemA:Alexander
+  externalId: ConnectionItemA:Jonathan
   instanceType: node
   sources:
   - properties:
@@ -63,7 +63,7 @@
         externalId: ConnectionItemC:Sarah
       selfDirect:
         space: sp_omni_instances
-        externalId: ConnectionItemA:Phillip
+        externalId: ConnectionItemA:Alexander
     source:
       space: sp_pygen_models
       externalId: ConnectionItemA
@@ -73,14 +73,14 @@
     space: sp_pygen_models
     externalId: ConnectionItemA
 - space: sp_omni_instances
-  externalId: ConnectionItemA:Jonathan
+  externalId: ConnectionItemA:Vickie
   instanceType: node
   sources:
   - properties:
       name: The much understand sing.
       selfDirect:
         space: sp_omni_instances
-        externalId: ConnectionItemA:Phillip
+        externalId: ConnectionItemA:Alexander
     source:
       space: sp_pygen_models
       externalId: ConnectionItemA

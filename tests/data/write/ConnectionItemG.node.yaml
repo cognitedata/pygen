@@ -55,7 +55,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemG
 - space: sp_omni_instances
-  externalId: ConnectionItemG:Jeffrey
+  externalId: ConnectionItemG:Lindsay
   instanceType: node
   sources:
   - properties:

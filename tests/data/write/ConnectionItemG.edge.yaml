@@ -1,29 +1,5 @@
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Cindy:ConnectionItemG:Christina
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: multiProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Cindy
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemG:Christina
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Christina
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: multiProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Kendra
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemG:Christina
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemG:Jeffrey
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Christina
   instanceType: edge
   type:
     space: sp_pygen_models
@@ -33,9 +9,21 @@
     externalId: ConnectionItemF:Stanley
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Jeffrey
+    externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Jeffrey
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Christina
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Andrew
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Christina
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Lindsay
   instanceType: edge
   type:
     space: sp_pygen_models
@@ -45,4 +33,16 @@
     externalId: ConnectionItemF:Kendra
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Jeffrey
+    externalId: ConnectionItemG:Lindsay
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Lindsay
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Andrew
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Lindsay

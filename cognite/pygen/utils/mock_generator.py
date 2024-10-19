@@ -1168,9 +1168,9 @@ class FakerGenerators:
         except ImportError as e:
             raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
 
-        self.faker: Faker = Faker()
         if seed is not None:
             self.reset(seed)
+        self.faker: Faker = Faker()
 
     def reset(self, seed: int) -> None:
         try:
@@ -1178,6 +1178,7 @@ class FakerGenerators:
         except ImportError as e:
             raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
         Faker.seed(seed)
+        self.faker = Faker()
 
     def id_generator(self, view_id: dm.ViewId, node_count: int) -> list[str]:
         return [f"{view_id.external_id}:{self.faker.unique.first_name()}" for _ in range(node_count)]

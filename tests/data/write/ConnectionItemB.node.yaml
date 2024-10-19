@@ -13,7 +13,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemB
 - space: sp_omni_instances
-  externalId: ConnectionItemB:Mark
+  externalId: ConnectionItemB:Brenda
   instanceType: node
   sources:
   - properties:
@@ -27,7 +27,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemB
 - space: sp_omni_instances
-  externalId: ConnectionItemB:Amanda
+  externalId: ConnectionItemB:Mark
   instanceType: node
   sources:
   - properties:
@@ -41,7 +41,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemB
 - space: sp_omni_instances
-  externalId: ConnectionItemB:Charles
+  externalId: ConnectionItemB:Amanda
   instanceType: node
   sources:
   - properties:
@@ -55,7 +55,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemB
 - space: sp_omni_instances
-  externalId: ConnectionItemB:Bryan
+  externalId: ConnectionItemB:Charles
   instanceType: node
   sources:
   - properties:

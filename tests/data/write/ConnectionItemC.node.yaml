@@ -23,7 +23,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemC
 - space: sp_omni_instances
-  externalId: ConnectionItemC:Allen
+  externalId: ConnectionItemC:Karen
   instanceType: node
   type:
     space: sp_pygen_models
