@@ -301,30 +301,35 @@ class ConnectionItemE(DomainModel):
             if (
                 isinstance(node, ConnectionItemD)
                 and node.direct_single is not None
-                and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
+                and (this_instance := instances.get(as_pygen_node_id(node.direct_single)))
             ):
-                node.direct_single = direct_single
-                if direct_single.direct_reverse_single is None:
-                    direct_single.direct_reverse_single = node
-                elif are_nodes_equal(node, direct_single.direct_reverse_single):
+                node.direct_single = this_instance
+
+                if this_instance.direct_reverse_single is None:
+                    this_instance.direct_reverse_single = node
+                elif are_nodes_equal(node, this_instance.direct_reverse_single):
                     # This is the same node, so we don't need to do anything...
                     ...
                 else:
                     warnings.warn(
-                        f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}."
+                        f"Expected one direct relation for 'direct_reverse_single' in {this_instance.as_id()}."
+                        f"Ignoring new relation {node!s} in favor of {this_instance.direct_reverse_single!s}."
                     )
             if (
                 isinstance(node, ConnectionItemD)
                 and node.direct_multi is not None
-                and (direct_multi := instances.get(as_pygen_node_id(node.direct_multi)))
             ):
-                if node.direct_multi is None:
-                    node.direct_multi = []
-                node.direct_multi.append(direct_multi)
-                if direct_multi.direct_reverse_multi is None:
-                    direct_multi.direct_reverse_multi = []
-                direct_multi.direct_reverse_multi.append(node)
+                for direct_multi in node.direct_multi:
+                    if this_instance := instances.get(as_pygen_node_id(direct_multi)):
+                        if this_instance.direct_reverse_multi is None:
+                            this_instance.direct_reverse_multi = [node]
+                        else:
+                            this_instance.direct_reverse_multi.append(node)
+
+                node.direct_multi = [
+                    instances.get(as_pygen_node_id(direct_multi)) or direct_multi
+                    for direct_multi in node.direct_multi
+                ]
 
 
 class ConnectionItemEWrite(DomainModelWrite):
