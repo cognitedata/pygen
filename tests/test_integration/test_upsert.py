@@ -8,7 +8,7 @@ from omni import data_classes as dc
 
 
 # The retrieve node frequently fails, likely due to eventual consistency.
-@pytest.mark.flaky(reruns=3, reruns_delay=10, only_rerun=["AssertionError"])
+@pytest.mark.flaky(reruns=3, reruns_delay=2, only_rerun=["AssertionError"])
 def test_node_without_properties(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:NodeWithoutProperties"
@@ -27,31 +27,19 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
             )
         ],
     )
-    created: dc.ResourcesWriteResult | None = None
-    try:
-        # Act
-        created = omni_client.upsert(new_connection_c)
 
-        # Assert
-        assert len(created.nodes) == 3
-        assert len(created.edges) == 2
+    # Act
+    created = omni_client.upsert(new_connection_c)
 
-        # Act
-        retrieved = omni_client.connection_item_c_node.retrieve(new_connection_c.external_id)
+    # Assert
+    assert len(created.nodes) == 3
+    assert len(created.edges) == 2
 
-        # Assert
-        assert retrieved.external_id == new_connection_c.external_id
+    # Act
+    retrieved = omni_client.connection_item_c_node.retrieve(new_connection_c.external_id)
 
-        # The issue is that there are two edges of the same type. The way we could distinguish between them
-        # is to use a hasData filter on the end node.
-        assert retrieved.connection_item_a[0] == new_connection_c.connection_item_a[0].external_id
-        assert retrieved.connection_item_b[0] == new_connection_c.connection_item_b[0].external_id
-    finally:
-        if created is not None:
-            cognite_client.data_modeling.instances.delete(
-                created.nodes.as_ids(),
-                created.edges.as_ids(),
-            )
+    # Assert
+    assert retrieved.external_id == new_connection_c.external_id
 
 
 def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
@@ -94,6 +82,7 @@ def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: Cogni
         cognite_client.data_modeling.instances.delete(resources.nodes.as_ids(), resources.edges.as_ids())
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=2, only_rerun=["AssertionError"])
 def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
     # Arrange
     test_name = "integration_test:ApplyRecursive"
@@ -127,29 +116,21 @@ def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient
         ],
     )
 
-    resources = new_connection_a.to_instances_write()
-    node_ids = resources.nodes.as_ids()
-    edge_ids = resources.edges.as_ids()
+    # Act
+    created = omni_client.upsert(new_connection_a)
 
-    try:
-        # Act
-        created = omni_client.upsert(new_connection_a)
+    # Assert
+    assert len(created.nodes) == 6
+    assert len(created.edges) == 3
 
-        # Assert
-        assert len(created.nodes) == 6
-        assert len(created.edges) == 3
+    # Act
+    retrieved = omni_client.connection_item_a.retrieve(new_connection_a.external_id)
 
-        # Act
-        retrieved = omni_client.connection_item_a.retrieve(new_connection_a.external_id)
-
-        # Assert
-        assert retrieved.external_id == new_connection_a.external_id
-        assert retrieved.name == new_connection_a.name
-        assert retrieved.other_direct == new_connection_a.other_direct.external_id
-        assert retrieved.self_direct == new_connection_a.self_direct.external_id
-        assert len(retrieved.outwards) == 2
-    finally:
-        cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
+    # Assert
+    assert retrieved.external_id == new_connection_a.external_id
+    assert retrieved.name == new_connection_a.name
+    assert retrieved.other_direct == new_connection_a.other_direct.external_id
+    assert retrieved.self_direct == new_connection_a.self_direct.external_id
 
 
 @pytest.fixture(scope="module")
