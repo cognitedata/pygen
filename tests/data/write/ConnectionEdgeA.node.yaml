@@ -12,7 +12,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: ConnectionEdgeA:Logan
+  externalId: ConnectionEdgeA:Lisa
   instanceType: node
   sources:
   - properties:
@@ -25,7 +25,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: ConnectionEdgeA:Jessica
+  externalId: ConnectionEdgeA:Michael
   instanceType: node
   sources:
   - properties:
@@ -38,7 +38,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: ConnectionEdgeA:Kevin
+  externalId: ConnectionEdgeA:Logan
   instanceType: node
   sources:
   - properties:
@@ -51,7 +51,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: ConnectionEdgeA:Kara
+  externalId: ConnectionEdgeA:Jessica
   instanceType: node
   sources:
   - properties:

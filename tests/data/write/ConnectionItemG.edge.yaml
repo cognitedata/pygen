@@ -23,7 +23,7 @@
     space: sp_omni_instances
     externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Lindsay
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Mark
   instanceType: edge
   type:
     space: sp_pygen_models
@@ -33,9 +33,9 @@
     externalId: ConnectionItemF:Kendra
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Lindsay
+    externalId: ConnectionItemG:Mark
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Andrew:ConnectionItemG:Lindsay
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Mark
   instanceType: edge
   type:
     space: sp_pygen_models
@@ -45,4 +45,4 @@
     externalId: ConnectionItemF:Andrew
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Lindsay
+    externalId: ConnectionItemG:Mark

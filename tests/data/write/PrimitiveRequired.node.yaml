@@ -1,5 +1,5 @@
 - space: sp_omni_instances
-  externalId: PrimitiveRequired:Louis
+  externalId: PrimitiveRequired:Karen
   instanceType: node
   sources:
   - properties:
@@ -23,7 +23,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveRequired:Sue
+  externalId: PrimitiveRequired:Louis
   instanceType: node
   sources:
   - properties:
@@ -43,7 +43,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveRequired:Timothy
+  externalId: PrimitiveRequired:Sue
   instanceType: node
   sources:
   - properties:
@@ -68,7 +68,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveRequired:Nathan
+  externalId: PrimitiveRequired:Timothy
   instanceType: node
   sources:
   - properties:
@@ -87,7 +87,7 @@
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: PrimitiveRequired:Richard
+  externalId: PrimitiveRequired:Nathan
   instanceType: node
   sources:
   - properties:

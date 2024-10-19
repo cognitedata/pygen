@@ -48,7 +48,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemF
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Cindy
+  externalId: ConnectionItemF:Christopher
   instanceType: node
   sources:
   - properties:
@@ -69,7 +69,7 @@
     space: sp_pygen_models
     externalId: ConnectionItemF
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Katherine
+  externalId: ConnectionItemF:Cindy
   instanceType: node
   sources:
   - properties:
