@@ -176,3 +176,12 @@ def test_list_without_default_space(omnisub_client: OmniSubClient) -> None:
     # Assert
     assert len(items) > 0
     assert isinstance(items[0].space, str)
+
+
+def test_list_with_reversed_direct_relation_of_list(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_e.list(limit=5, retrieve_connections="full")
+
+    assert len(items) > 0
+    for item in items:
+        assert item.direct_reverse_single is not None
+        assert item.direct_reverse_multi is not None
