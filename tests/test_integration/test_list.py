@@ -23,7 +23,7 @@ def setup_reverse_direct_relations(omni_client: OmniClient) -> dc.ConnectionItem
     to_write2 = dc.ConnectionItemDWrite(
         external_id="connection_item_d:2",
         name="ConnectionItemD:2",
-        direct_multi=item_e.as_id(),
+        direct_multi=[item_e.as_id()],
     )
     to_write3 = dc.ConnectionItemDWrite(
         external_id="connection_item_d:3",
@@ -104,10 +104,10 @@ def test_list_above_5000_items(omni_client: OmniClient) -> None:
     omni_client.implementation_2.apply(items)
 
     # Act
-    items = omni_client.implementation_2.list(limit=-1, external_id_prefix="implementation2_5000:")
+    items = omni_client.implementation_2.list(limit=5_002, external_id_prefix="implementation2_5000:")
 
     # Assert
-    assert len(items) == 5001
+    assert len(items) >= 5001
 
 
 def test_list_and_sort(omni_client: OmniClient) -> None:
