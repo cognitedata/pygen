@@ -19,6 +19,9 @@ from tests.omni_constants import OmniClasses
 def omni_nodes_with_view():
     nodes = OMNI_SDK.load_read_nodes(OMNI_SDK.data_model_ids[0])
     for node in nodes:
+        if node.external_id.startswith("Implementation1NonWriteable"):
+            # Hacky way to skip non-writeable nodes
+            continue
         node: dm.Node
         view_id = cast(dm.ViewId, next(iter(node.properties)))
         yield pytest.param(node, view_id, id=node.external_id)
