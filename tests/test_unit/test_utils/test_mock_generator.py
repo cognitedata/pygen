@@ -88,11 +88,14 @@ def test_generate_mock_data_skip_interfaces(omni_data_classes: dict[str, OmniCla
     ]
     interface_count = 2
 
-    view_by_id = {omni_data_classes[name].view.as_id(): omni_data_classes[name].view for name in view_external_ids}
+    view_by_id = {
+        omni_data_classes[external_id].view.as_id(): omni_data_classes[external_id].view
+        for external_id in view_external_ids
+    }
 
     generator = MockGenerator(list(view_by_id.values()), "sandbox", seed=42, skip_interfaces=True)
 
-    data = generator.generate_mock_data()
+    data = generator.generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
 
     assert len(data) == len(view_by_id) - interface_count
     for view_data in data:
@@ -102,11 +105,13 @@ def test_generate_mock_data_skip_interfaces(omni_data_classes: dict[str, OmniCla
         if edge_type_count == 0:
             assert len(view_data.edge) == 0
         else:
-            assert 0 < len(view_data.edge) <= 3 * edge_type_count * len(view_data.node)
+            max_edge_count = 3 * edge_type_count * len(view_data.node)
+            assert 0 < len(view_data.edge)
+            assert len(view_data.edge) <= max_edge_count
 
 
 def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]) -> None:
-    views = [class_.view for class_ in omni_data_classes.values()]
+    views = [class_.view for class_ in omni_data_classes.values() if class_.view.used_for != "edge"]
     primitive_required = omni_data_classes[OmniView.primitive_required].view
     node_count = 3
     default_config = ViewMockConfig(
@@ -124,7 +129,7 @@ def test_generate_mock_data_customized(omni_data_classes: dict[str, OmniClasses]
     }
     generator = MockGenerator(views, "sandbox", view_configs=view_configs, default_config=default_config, seed=42)
 
-    data = generator.generate_mock_data(node_count=10)
+    data = generator.generate_mock_data(node_count=node_count, max_edge_per_type=3)
 
     assert len(data.nodes) == len(views) * node_count
     primitive_required_data = next(d for d in data if d.view_id == primitive_required.as_id())
