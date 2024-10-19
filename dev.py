@@ -12,6 +12,7 @@ from cognite.client._version import __version__ as cognite_sdk_version
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
+from cognite.pygen.utils import MockGenerator
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
@@ -89,8 +90,6 @@ def download():
 
             if not example_sdk.download_nodes:
                 continue
-            else:
-                continue
 
             is_space: dm.filters.Filter | None = None
             if example_sdk.instance_space:
@@ -113,6 +112,12 @@ def mock():
             typer.echo(f"Skipping {example_sdk.client_name} as it does not download nodes")
             continue
         typer.echo(f"Generating mock data for {example_sdk.client_name}...")
+        model = example_sdk.load_data_model()
+        MockGenerator(
+            model.views,
+            example_sdk.instance_space,
+            default_config="faker",
+        )
 
 
 @app.command(

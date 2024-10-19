@@ -21,6 +21,7 @@ class ExampleSDK:
     instance_space: str | None
     download_nodes: bool = False
     is_typed: bool = False
+    dataset_external_id: str | None = None
     typed_classes: set[str] = field(default_factory=set)
     manual_files: list[Path] = field(default_factory=list, init=False)
 
@@ -78,8 +79,9 @@ OMNI_SDK = ExampleSDK(
     _top_level_package="omni",
     client_name="OmniClient",
     generate_sdk=True,
-    instance_space="omni-instances",
+    instance_space="sp_omni_instances",
     download_nodes=True,
+    dataset_external_id="ds_omni_data",
 )
 
 OMNI_SUB_SDK = ExampleSDK(
