@@ -3,6 +3,7 @@ environment:
   type: dev
   selected:
     - models
+    - data_testing
 
 variables:
   modules:

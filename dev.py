@@ -14,7 +14,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
 from cognite.pygen.utils import MockGenerator
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
+from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
 app = typer.Typer(
     add_completion=False,
@@ -106,18 +106,36 @@ def download():
 
 
 @app.command("mock", help="Generate mock data for all example SDKs")
-def mock():
+def mock(deploy: bool = False):
+    client = load_cognite_client_from_toml("config.toml")
     for example_sdk in EXAMPLE_SDKS:
         if not example_sdk.download_nodes:
             typer.echo(f"Skipping {example_sdk.client_name} as it does not download nodes")
             continue
         typer.echo(f"Generating mock data for {example_sdk.client_name}...")
         model = example_sdk.load_data_model()
-        MockGenerator(
-            model.views,
+        dataset = client.data_sets.retrieve(external_id=example_sdk.dataset_external_id)
+        if dataset is None:
+            raise typer.BadParameter(
+                f"Dataset {example_sdk.dataset_external_id} not found. Please deploy it first `cdf deploy`"
+            )
+        # Special case for Omni were we have a view with external_id "Empty" that should not have mock data
+        views = [view for view in model.views if view.external_id != "Empty"]
+
+        generator = MockGenerator(
+            views,
             example_sdk.instance_space,
             default_config="faker",
+            data_set_id=dataset.id,
+            seed=42,
+            skip_interfaces=True,
         )
+        data = generator.generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
+
+        data.dump_yaml(DATA_WRITE_DIR, exclude={("Implementation1NonWriteable", "node")})
+        typer.echo(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)}")
+        if deploy:
+            data.deploy(client, exclude={("Implementation1NonWriteable", "node")}, verbose=True)
 
 
 @app.command(

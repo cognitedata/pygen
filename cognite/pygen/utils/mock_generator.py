@@ -292,7 +292,7 @@ class MockGenerator:
                         continue
 
                     if isinstance(connection, EdgeConnection):
-                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+                        other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
                             max_edge_count = 1
                         else:  # MultiEdgeConnection
@@ -308,7 +308,7 @@ class MockGenerator:
                                 stacklevel=2,
                             )
                             continue
-                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+                        other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
 
                         # If the connection is nullable, we randomly decide if we should create the relation
                         create_relation = not connection.nullable or random.random() < (
@@ -450,7 +450,7 @@ class MockGenerator:
         return output, external
 
     @staticmethod
-    def get_other_nodes(
+    def _get_other_nodes(
         connection: dm.ViewId,
         outputs: dict[dm.ViewId, ViewMockData],
         leaf_children_by_parent: dict[dm.ViewId, list[dm.ViewId]],
@@ -769,7 +769,7 @@ class MockData(UserList[ViewMockData]):
     def deploy(
         self,
         client: CogniteClient,
-        exclude: set[Literal["timeseries", "files", "sequences"]] | None = None,
+        exclude: set[ResourceType | tuple[str, ResourceType] | str] | None = None,
         verbose: bool = False,
     ) -> None:
         """Deploys the mock data to CDF.

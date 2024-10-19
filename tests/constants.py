@@ -8,7 +8,7 @@ from cognite.client.data_classes.data_modeling import DataModelId
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data" / "models"
-
+DATA_WRITE_DIR = REPO_ROOT / "tests" / "data" / "write"
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
 
