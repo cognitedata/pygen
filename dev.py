@@ -133,7 +133,7 @@ def mock(deploy: bool = False):
         data = generator.generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
 
         data.dump_yaml(DATA_WRITE_DIR, exclude={("Implementation1NonWriteable", "node")})
-        typer.echo(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)}")
+        typer.echo(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)} views")
         if deploy:
             data.deploy(client, exclude={("Implementation1NonWriteable", "node")}, verbose=True)
 

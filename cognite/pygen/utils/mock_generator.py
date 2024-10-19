@@ -198,6 +198,8 @@ class MockGenerator:
         for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
+            if view.used_for == "edge":
+                continue
             mapped_properties = {
                 name: prop
                 for name, prop in view.properties.items()
