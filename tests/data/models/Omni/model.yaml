@@ -5,6 +5,118 @@ description: This data model is designed to test all functionality of CDF data m
 version: '1'
 views:
 - space: sp_pygen_models
+  externalId: CDFExternalReferences
+  name: CDFExternalReferences
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    file:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferences
+      containerPropertyIdentifier: file
+      type:
+        list: false
+        type: file
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: file
+      description: null
+    sequence:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferences
+      containerPropertyIdentifier: sequence
+      type:
+        list: false
+        type: sequence
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: sequence
+      description: null
+    timeseries:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferences
+      containerPropertyIdentifier: timeseries
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: timeseries
+      description: null
+  lastUpdatedTime: 1729345477397
+  createdTime: 1729345477397
+- space: sp_pygen_models
+  externalId: CDFExternalReferencesListed
+  name: CDFExternalReferencesListed
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    files:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferencesListed
+      containerPropertyIdentifier: files
+      type:
+        list: true
+        type: file
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: files
+      description: null
+    sequences:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferencesListed
+      containerPropertyIdentifier: sequences
+      type:
+        list: true
+        type: sequence
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: sequences
+      description: null
+    timeseries:
+      container:
+        space: sp_pygen_models
+        externalId: CDFExternalReferencesListed
+      containerPropertyIdentifier: timeseries
+      type:
+        list: true
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: timeseries
+      description: null
+  lastUpdatedTime: 1729345477397
+  createdTime: 1729345477397
+- space: sp_pygen_models
   externalId: ConnectionEdgeA
   name: ConnectionEdgeA
   implements: []
