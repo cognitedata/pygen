@@ -159,20 +159,23 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
     @overload
     def retrieve(
-        self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str,
+        as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterface | None: ...
 
     @overload
     def retrieve(
         self,
-        external_id: SequenceNotStr[str],
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
         as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterfaceList: ...
 
     def retrieve(
         self,
-        external_id: str | SequenceNotStr[str],
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
         as_child_class: SequenceNotStr[Literal["SubInterface"]] | None = None,
     ) -> MainInterface | MainInterfaceList | None:

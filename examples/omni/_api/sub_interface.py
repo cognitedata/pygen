@@ -173,7 +173,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     @overload
     def retrieve(
         self,
-        external_id: str,
+        external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
@@ -183,7 +183,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     @overload
     def retrieve(
         self,
-        external_id: SequenceNotStr[str],
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
@@ -192,7 +192,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     def retrieve(
         self,
-        external_id: str | SequenceNotStr[str],
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None

@@ -164,13 +164,17 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str) -> ConnectionItemB | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str) -> ConnectionItemB | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str) -> ConnectionItemBList: ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str
+    ) -> ConnectionItemBList: ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str,
     ) -> ConnectionItemB | ConnectionItemBList | None:
         """Retrieve one or more connection item bs by id(s).
 

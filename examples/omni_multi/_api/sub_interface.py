@@ -165,20 +165,23 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     @overload
     def retrieve(
-        self, external_id: str, space: str, as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str,
+        as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
     ) -> SubInterface | None: ...
 
     @overload
     def retrieve(
         self,
-        external_id: SequenceNotStr[str],
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
         as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
     ) -> SubInterfaceList: ...
 
     def retrieve(
         self,
-        external_id: str | SequenceNotStr[str],
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
         as_child_class: SequenceNotStr[Literal["Implementation1"]] | None = None,
     ) -> SubInterface | SubInterfaceList | None:
