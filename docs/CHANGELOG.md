@@ -13,8 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.39] - 24-10-19
 ### Fixed
+- In `.list` setting `retrieve_connections="full"` no longer raises 
+  `CogniteAPIError: Cannot traverse lists of direct relations inwards.`. However, reverse direct relations pointing
+  to list direct relations are not supported.
 - When using the config `faker` in the `MockGenerator`, setting the `seed` now produces the same data for each view.
 
 ## [0.99.38] - 24-10-16
