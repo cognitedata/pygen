@@ -157,18 +157,24 @@ class CDFExternalListField(PrimitiveListField, CDFExternalField):
         return (
             f"[{self.variable}.as_write() if isinstance({self.variable}, {self.cognite_type_name('read')}) "
             f"else {self.variable}"
-            f" for {self.variable} in self.{self.name} or []] or None"
+            f" for {self.variable} in self.{self.name}] if self.{self.name} is not None else None"
         )
 
     def as_write_graphql(self) -> str:
-        return f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []] or None"
+        return (
+            f"[{self.variable}.as_write() for {self.variable} in self.{self.name} or []]"
+            f" if self.{self.name} is not None else None"
+        )
 
     def as_read_graphql(self) -> str:
         # Read is only used in graphql
-        return f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []] or None"
+        return (
+            f"[{self.variable}.as_read() for {self.variable} in self.{self.name} or []]"
+            f" if self.{self.name} is not None else None"
+        )
 
     def as_value(self) -> str:
         return (
             f"[{self.variable} if isinstance({self.variable}, str) else {self.variable}.external_id "
-            f"for {self.variable} in self.{self.name} or []] or None "
+            f"for {self.variable} in self.{self.name} or []] if self.{self.name} is not None else None"
         )

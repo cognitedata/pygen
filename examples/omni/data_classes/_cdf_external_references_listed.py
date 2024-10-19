@@ -173,18 +173,15 @@ class CDFExternalReferencesListed(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []]
-            or None,
+            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []] if self.files is not None else None,
             sequences=[
                 sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
                 for sequence in self.sequences or []
-            ]
-            or None,
+            ] if self.sequences is not None else None,
             timeseries=[
                 timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
                 for timesery in self.timeseries or []
-            ]
-            or None,
+            ] if self.timeseries is not None else None,
         )
 
     def as_apply(self) -> CDFExternalReferencesListedWrite:
@@ -234,17 +231,17 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         if self.files is not None or write_none:
             properties["files"] = [
                 file if isinstance(file, str) else file.external_id for file in self.files or []
-            ] or None
+            ]
 
         if self.sequences is not None or write_none:
             properties["sequences"] = [
                 sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []
-            ] or None
+            ]
 
         if self.timeseries is not None or write_none:
             properties["timeseries"] = [
                 timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []
-            ] or None
+            ]
 
         if properties:
             this_node = dm.NodeApply(
