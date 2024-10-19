@@ -11,7 +11,7 @@ version = "0.3.4"
 [plugins]
 run = false
 pull = false
-dump = false
+dump = true
 
 [feature_flags]
 graphql = true
