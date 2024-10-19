@@ -11,14 +11,14 @@ import string
 import typing
 import warnings
 from collections import UserList, defaultdict
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from graphlib import TopologicalSorter
 from pathlib import Path
 from random import choice, choices, randint, uniform
-from typing import Callable, Generic, Literal, cast
+from typing import Generic, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -230,14 +230,14 @@ class MockGenerator:
                         [
                             dm.NodeOrEdgeData(
                                 source=view.as_id(),
-                                properties=dict(zip(properties.keys(), props)),
+                                properties=dict(zip(properties.keys(), props, strict=False)),
                             )
                         ]
                         if props
                         else None
                     ),
                 )
-                for node_id, *props in zip(node_ids, *properties.values())
+                for node_id, *props in zip(node_ids, *properties.values(), strict=False)
             ]
             output[view.as_id()] = ViewMockData(
                 view.as_id(),
@@ -278,7 +278,7 @@ class MockGenerator:
             for this_node in outputs[view_id].node:
                 for property_name, connection in connection_properties.items():
                     if (
-                        isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
+                        isinstance(connection, MultiEdgeConnection | dm.MappedProperty)
                         and connection.source is not None
                         and connection.source not in outputs
                         and connection.source not in leaf_children_by_parent
@@ -1052,6 +1052,7 @@ class _RandomGenerator:
                 for key, value in zip(
                     cls.text(3),
                     [cls.text(1)[0], cls.int32(1)[0], cls.float32(1)[0]],
+                    strict=False,
                 )
             }
             for _ in range(count)

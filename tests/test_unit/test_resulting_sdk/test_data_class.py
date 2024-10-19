@@ -1,5 +1,6 @@
 import json
-from typing import Callable, cast
+from collections.abc import Callable
+from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -160,7 +161,7 @@ def test_load_windmills_from_json(
 
         # Assert
         exclude = {"external_id", "space", "data_record", "externalId"}
-        for windmill, json_item in zip(windmills, loaded_json):
+        for windmill, json_item in zip(windmills, loaded_json, strict=False):
             dumped_windmill = json.loads(
                 windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
             )

@@ -150,9 +150,9 @@ def test_list_with_full_connections(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.list(limit=5, retrieve_connections="full")
 
     assert len(items) > 0
-    missing_other_direct = [item.as_id() for item in items if isinstance(item.other_direct, (str, dm.NodeId))]
+    missing_other_direct = [item.as_id() for item in items if isinstance(item.other_direct, str | dm.NodeId)]
     assert not missing_other_direct, f"Missing {len(missing_other_direct)} other_direct: {missing_other_direct}"
-    missing_self_direct = [item.as_id() for item in items if isinstance(item.self_direct, (str, dm.NodeId))]
+    missing_self_direct = [item.as_id() for item in items if isinstance(item.self_direct, str | dm.NodeId)]
     assert not missing_self_direct, f"Missing {len(missing_self_direct)} self_direct: {missing_self_direct}"
     outwards_edges = [edge for item in items if item.outwards for edge in item.outwards or []]
     assert outwards_edges, f"Missing outwards edges: {outwards_edges}"
@@ -164,7 +164,7 @@ def test_list_with_identifier_connections(omni_client: OmniClient) -> None:
     assert len(items) > 0
     edges = [edge for item in items if item.outwards for edge in item.outwards or []]
     assert len(edges) > 0
-    full_edges = [edge for edge in edges if not isinstance(edge, (str, dm.NodeId))]
+    full_edges = [edge for edge in edges if not isinstance(edge, str | dm.NodeId)]
     assert not full_edges, f"Expect only identifier. Found full outwards edges: {full_edges}"
 
 

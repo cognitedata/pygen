@@ -6,9 +6,9 @@ import shutil
 import sys
 import tempfile
 import warnings
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional, Union, cast, overload
+from typing import Any, Literal, Optional, Union, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -258,8 +258,8 @@ def _get_data_model(model_id, client, logger) -> dm.DataModel | dm.DataModelList
         return model_id
     elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
         return dm.DataModelList(model_id)
-    elif isinstance(model_id, (dm.DataModelId, tuple)) or (
-        isinstance(model_id, Sequence) and all(isinstance(model, (dm.DataModelId, tuple)) for model in model_id)
+    elif isinstance(model_id, dm.DataModelId | tuple) or (
+        isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModelId | tuple) for model in model_id)
     ):
         if client is None:
             raise ValueError("client must be provided when passing in DataModelId")

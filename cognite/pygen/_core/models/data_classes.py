@@ -555,7 +555,7 @@ class DataClass:
     def primitive_fields_literal(self) -> str:
         """Return a literal with all primitive fields."""
         return ", ".join(
-            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
+            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, PrimitiveField | CDFExternalField)
         )
 
     @property

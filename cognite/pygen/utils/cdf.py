@@ -3,12 +3,12 @@ from __future__ import annotations
 import csv
 import pathlib
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from time import sleep
-from typing import Any, Callable, Optional, Protocol, Union, get_args, get_origin, get_type_hints
+from typing import Any, Optional, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -412,7 +412,7 @@ class CSVLoader:
 
             rows = []
             for raw_row in reader:
-                row = converter.convert_dtypes(dict(zip(columns, raw_row)))
+                row = converter.convert_dtypes(dict(zip(columns, raw_row, strict=False)))
                 rows.append(row)
         return rows
 
@@ -569,9 +569,9 @@ class CogniteResourceDataTypesConverter:
     def _convert_property(cls, value: Any, property_type: data_types.PropertyType, container_id: ContainerId) -> Any:
         if isinstance(property_type, data_types.Boolean):
             return value.lower() == "true"
-        elif isinstance(property_type, (data_types.Int32, data_types.Int64)):
+        elif isinstance(property_type, data_types.Int32 | data_types.Int64):
             return int(value)
-        elif isinstance(property_type, (data_types.Float32, data_types.Float64)):
+        elif isinstance(property_type, data_types.Float32 | data_types.Float64):
             return float(value)
         elif isinstance(property_type, data_types.Text):
             return str(value)

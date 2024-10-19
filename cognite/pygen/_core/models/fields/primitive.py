@@ -26,7 +26,7 @@ class BasePrimitiveField(Field, ABC):
 
     @property
     def is_time_field(self) -> bool:
-        return isinstance(self.type_, (dm.Timestamp, dm.Date))
+        return isinstance(self.type_, dm.Timestamp | dm.Date)
 
     @property
     def is_timestamp(self) -> bool:
@@ -91,14 +91,14 @@ class PrimitiveField(BasePrimitiveField):
     @property
     def support_filtering(self) -> bool:
         return isinstance(
-            self.type_, (dm.Int32, dm.Int64, dm.Float32, dm.Float64, dm.Boolean, dm.Text, dm.Date, dm.Timestamp)
+            self.type_, dm.Int32 | dm.Int64 | dm.Float32 | dm.Float64 | dm.Boolean | dm.Text | dm.Date | dm.Timestamp
         )
 
     @property
     def filtering_cls(self) -> str:
-        if isinstance(self.type_, (dm.Int32, dm.Int64)):
+        if isinstance(self.type_, dm.Int32 | dm.Int64):
             return "IntFilter"
-        elif isinstance(self.type_, (dm.Float32, dm.Float64)):
+        elif isinstance(self.type_, dm.Float32 | dm.Float64):
             return "FloatFilter"
         elif isinstance(self.type_, dm.Boolean):
             return "BooleanFilter"
@@ -211,11 +211,11 @@ def _to_python_type(
     typed: bool = False,
     operation: Literal["read", "write"] = "write",
 ) -> str:
-    if isinstance(type_, (dm.Int32, dm.Int64)):
+    if isinstance(type_, dm.Int32 | dm.Int64):
         out_type = "int"
     elif isinstance(type_, dm.Boolean):
         out_type = "bool"
-    elif isinstance(type_, (dm.Float32, dm.Float64)):
+    elif isinstance(type_, dm.Float32 | dm.Float64):
         out_type = "float"
     elif isinstance(type_, dm.Date):
         if typed:
@@ -234,8 +234,8 @@ def _to_python_type(
             out_type = "str"
         else:
             out_type = "TimeSeries"
-    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
-        if typed and isinstance(type_, (dm.DirectRelation, dm.DirectRelationReference)):
+    elif isinstance(type_, dm.Text | dm.DirectRelation | dm.CDFExternalIdReference | dm.DirectRelationReference):
+        if typed and isinstance(type_, dm.DirectRelation | dm.DirectRelationReference):
             if operation == "write":
                 out_type = "DirectRelationReference | tuple[str, str]"
             else:

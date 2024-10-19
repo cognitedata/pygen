@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Any, Callable, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import DataSet

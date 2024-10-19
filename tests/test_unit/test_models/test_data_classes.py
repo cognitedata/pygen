@@ -19,7 +19,7 @@ class TestDataClasses:
         node_class_by_view_id, edge_class_by_view_id = to_data_class_by_view_id(views, pygen_config)
 
         # Act
-        for data_class, view in zip(node_class_by_view_id.values(), views):
+        for data_class, view in zip(node_class_by_view_id.values(), views, strict=False):
             data_class.update_fields(
                 view.properties,
                 node_class_by_view_id,

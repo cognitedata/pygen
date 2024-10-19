@@ -60,11 +60,11 @@ class Filtering:
         if prop_name is not None and prop_name in self.by_name:
             return self.by_name[prop_name]
 
-        if isinstance(type_, (dm.Int32, dm.Int64)):
+        if isinstance(type_, dm.Int32 | dm.Int64):
             return self.integer
         elif isinstance(type_, dm.Boolean):
             return self.boolean
-        elif isinstance(type_, (dm.Float32, dm.Float64)):
+        elif isinstance(type_, dm.Float32 | dm.Float64):
             return self.float
         elif isinstance(type_, dm.Date):
             return self.date

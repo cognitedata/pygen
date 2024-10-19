@@ -1,6 +1,6 @@
 import uuid as uuid_
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import pytest
 from windmill.data_classes import DomainModelWrite, RotorWrite, WindmillWrite

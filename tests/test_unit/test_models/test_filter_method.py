@@ -82,7 +82,7 @@ def test_create_list_method_primitive_nullable(
 
     # Assert
     assert actual.parameters == expected.parameters
-    for act, exp in zip(actual.implementations, expected.implementations):
+    for act, exp in zip(actual.implementations, expected.implementations, strict=False):
         assert act.filter == exp.filter
         assert act.prop_name == exp.prop_name
         assert act.keyword_arguments == exp.keyword_arguments
