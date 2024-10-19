@@ -29,7 +29,7 @@ def test_query_limit_with_direct_relations(omni_client: OmniClient) -> None:
 def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
     items = (
         omni_client.connection_item_c_node(limit=-1)
-        .connection_item_a(external_id_prefix="ConnectionItemA:Joseph")
+        .connection_item_a(external_id_prefix="ConnectionItemA:Jennifer")
         .query()
     )
 
@@ -38,7 +38,7 @@ def test_query_filer_on_subsequent_node(omni_client: OmniClient) -> None:
     for item in items:
         for a_item in item.connection_item_a or []:
             if isinstance(a_item, dc.ConnectionItemA):
-                assert a_item.external_id.startswith("ConnectionItemA:Joseph")
+                assert a_item.external_id.startswith("ConnectionItemA:Jennifer")
                 has_retrieved_a = True
     assert has_retrieved_a, "No ConnectionItemA items were retrieved"
 
@@ -66,11 +66,11 @@ def test_query_limit(omni_client: OmniClient) -> None:
 def test_query_direct_relation_to_self(omni_client: OmniClient) -> None:
     # Selecting a specific item to ensure that the self direct relation is set
     items = (
-        omni_client.connection_item_b(external_id_prefix="ConnectionItemB:John", limit=1)
-        .inwards(external_id_prefix="ConnectionItemA:Erin", limit=1)
+        omni_client.connection_item_b(external_id_prefix="ConnectionItemB:Brenda", limit=1)
+        .inwards(external_id_prefix="ConnectionItemA:Jennifer", limit=1)
         .query(retrieve_self_direct=True)
     )
-    # Nodes are connected: John [inwards] -> Erin [selfDirect] -> Joseph
+    # Nodes are connected: Brenda [inwards] <- Jennifer [selfDirect] -> Alexander
 
     assert len(items) == 1
     john = items[0]
@@ -78,4 +78,4 @@ def test_query_direct_relation_to_self(omni_client: OmniClient) -> None:
     erin = john.inwards[0]
     assert isinstance(erin, dc.ConnectionItemA)
     assert isinstance(erin.self_direct, dc.ConnectionItemA)
-    assert erin.self_direct.external_id == "ConnectionItemA:Joseph"
+    assert erin.self_direct.external_id == "ConnectionItemA:Alexander"
