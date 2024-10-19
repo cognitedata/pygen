@@ -94,15 +94,29 @@ def download():
             is_space: dm.filters.Filter | None = None
             if example_sdk.instance_space:
                 is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
-            nodes = dm.NodeList([])
+
+            parent_views = {parent for view in latest.views for parent in view.implements or []}
+            nodes_by_id: dict[dm.NodeId, list] = defaultdict(list)
             for view in latest.views:
-                nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
-            nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
-            nodes = _remove_duplicate_nodes(nodes)
-            _isoformat_timestamps(nodes)
+                if view.used_for == "edge" or view.as_id() in parent_views:
+                    continue
+                view_nodes = client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view])
+                for node in view_nodes:
+                    nodes_by_id[node.as_id()].append(node)
+            node_list = dm.NodeList([])
+            for nodes in nodes_by_id.values():
+                if len(nodes) == 1:
+                    node_list.append(nodes[0])
+                    continue
+                # The node with the most properties is the child node that has implemented all interfaces
+                # (and thus have all values of their parent interfaces).
+                keep: dm.Node = max(nodes, key=lambda n: sum(len(props) for props in n.properties.values()))
+                node_list.append(keep)
+            node_list = dm.NodeList(sorted(node_list, key=lambda n: n.external_id))
+            _isoformat_timestamps(node_list)
             file_path = example_sdk.read_node_path(data_model_id)
-            file_path.write_text(nodes.dump_yaml())
-            typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
+            file_path.write_text(node_list.dump_yaml())
+            typer.echo(f"Downloaded {len(node_list)} nodes to {file_path.relative_to(REPO_ROOT)}")
 
 
 @app.command("mock", help="Generate mock data for all example SDKs")
