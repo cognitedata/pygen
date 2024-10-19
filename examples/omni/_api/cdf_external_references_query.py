@@ -22,7 +22,7 @@ from ._core import (
 
 
 class CDFExternalReferencesQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
 
     def __init__(
         self,

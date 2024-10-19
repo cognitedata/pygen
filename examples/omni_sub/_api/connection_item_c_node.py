@@ -45,7 +45,7 @@ from .connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 class ConnectionItemCNodeAPI(
     NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
 ):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     _properties_by_field = {}
     _class_type = ConnectionItemCNode
     _class_list = ConnectionItemCNodeList
@@ -194,16 +194,16 @@ class ConnectionItemCNodeAPI(
                 (
                     self.connection_item_a_edge,
                     "connection_item_a",
-                    dm.DirectRelationReference("pygen-models", "unidirectional"),
+                    dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemA", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemA", "1"),
                 ),
                 (
                     self.connection_item_b_edge,
                     "connection_item_b",
-                    dm.DirectRelationReference("pygen-models", "unidirectional"),
+                    dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemB", "1"),
                 ),
             ],
         )

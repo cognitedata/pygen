@@ -72,7 +72,7 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
         value_1: The value 1 field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
@@ -122,9 +122,9 @@ class Implementation1NonWriteable(SubInterface):
         value_1: The value 1 field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
 
 

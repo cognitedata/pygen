@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     def __init__(
         self,
@@ -111,7 +111,7 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = cast(str, self._builder.get_from())
         edge_view = ConnectionEdgeA._view_id
         edge_filter = _create_connection_edge_a_filter(
-            dm.DirectRelationReference("pygen-models", "multiProperty"),
+            dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
             edge_view,
             min_end_time=min_end_time_edge,
             max_end_time=max_end_time_edge,

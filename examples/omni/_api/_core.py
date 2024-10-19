@@ -572,7 +572,7 @@ class GraphQLQueryResponse:
 
 
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[GraphQLCore]]] = {
-    dm.DataModelId("pygen-models", "Omni", "1"): {
+    dm.DataModelId("sp_pygen_models", "Omni", "1"): {
         "CDFExternalReferences": data_classes.CDFExternalReferencesGraphQL,
         "CDFExternalReferencesListed": data_classes.CDFExternalReferencesListedGraphQL,
         "ConnectionEdgeA": data_classes.ConnectionEdgeAGraphQL,

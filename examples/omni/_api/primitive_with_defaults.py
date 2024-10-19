@@ -45,7 +45,7 @@ class PrimitiveWithDefaultsAPI(
         PrimitiveWithDefaults, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsList, PrimitiveWithDefaultsWriteList
     ]
 ):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
     _properties_by_field = _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD
     _class_type = PrimitiveWithDefaults
     _class_list = PrimitiveWithDefaultsList

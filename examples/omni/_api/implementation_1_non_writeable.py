@@ -39,7 +39,7 @@ from .implementation_1_non_writeable_query import Implementation1NonWriteableQue
 
 
 class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):
-    _view_id = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
     _properties_by_field = _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD
     _class_type = Implementation1NonWriteable
     _class_list = Implementation1NonWriteableList

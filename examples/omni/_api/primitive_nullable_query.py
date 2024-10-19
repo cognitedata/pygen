@@ -22,7 +22,7 @@ from ._core import (
 
 
 class PrimitiveNullableQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveNullable", "1")
 
     def __init__(
         self,

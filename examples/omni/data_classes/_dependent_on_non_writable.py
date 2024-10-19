@@ -75,7 +75,7 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
         to_non_writable: The to non writable field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
         default=None, repr=False, alias="toNonWritable"
@@ -144,11 +144,11 @@ class DependentOnNonWritable(DomainModel):
         to_non_writable: The to non writable field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
-        "pygen-models", "DependentOnNonWritable"
+        "sp_pygen_models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(
@@ -211,7 +211,7 @@ class DependentOnNonWritable(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "toNonWritable") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "toNonWritable") and isinstance(
                         value, (Implementation1NonWriteable, str, dm.NodeId)
                     ):
                         to_non_writable.append(value)
@@ -232,11 +232,11 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         to_non_writable: The to non writable field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "DependentOnNonWritable"
+        "sp_pygen_models", "DependentOnNonWritable"
     )
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="toNonWritable")
@@ -282,7 +282,7 @@ class DependentOnNonWritableWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        edge_type = dm.DirectRelationReference("pygen-models", "toNonWritable")
+        edge_type = dm.DirectRelationReference("sp_pygen_models", "toNonWritable")
         for to_non_writable in self.to_non_writable or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,

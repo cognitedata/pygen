@@ -22,7 +22,7 @@ from ._core import (
 
 
 class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "Implementation1NonWriteable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
 
     def __init__(
         self,

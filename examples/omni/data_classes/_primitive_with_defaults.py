@@ -84,7 +84,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         default_string: The default string field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
     auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
@@ -155,7 +155,7 @@ class PrimitiveWithDefaults(DomainModel):
         default_string: The default string field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
@@ -204,7 +204,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_string: The default string field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

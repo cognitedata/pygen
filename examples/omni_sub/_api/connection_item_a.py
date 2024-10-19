@@ -43,7 +43,7 @@ from .connection_item_a_query import ConnectionItemAQueryAPI
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
     _properties_by_field = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemA
     _class_list = ConnectionItemAList
@@ -215,9 +215,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 (
                     self.outwards_edge,
                     "outwards",
-                    dm.DirectRelationReference("pygen-models", "bidirectional"),
+                    dm.DirectRelationReference("sp_pygen_models", "bidirectional"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemB", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemB", "1"),
                 ),
             ],
         )

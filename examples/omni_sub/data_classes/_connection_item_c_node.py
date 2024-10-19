@@ -71,7 +71,7 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
         connection_item_b: The connection item b field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
     connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
 
@@ -138,10 +138,10 @@ class ConnectionItemCNode(DomainModel):
         connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemC")
     connection_item_a: Optional[list[Union[ConnectionItemA, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
@@ -206,11 +206,11 @@ class ConnectionItemCNode(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
                         value, (ConnectionItemA, dm.NodeId)
                     ):
                         connection_item_a.append(value)
-                    if edge_type == dm.DirectRelationReference("pygen-models", "unidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
                         value, (ConnectionItemB, dm.NodeId)
                     ):
                         connection_item_b.append(value)
@@ -232,11 +232,11 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         connection_item_b: The connection item b field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemC"
+        "sp_pygen_models", "ConnectionItemC"
     )
     connection_item_a: Optional[list[Union[ConnectionItemAWrite, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
@@ -275,7 +275,7 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         )
         resources.nodes.append(this_node)
 
-        edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
+        edge_type = dm.DirectRelationReference("sp_pygen_models", "unidirectional")
         for connection_item_a in self.connection_item_a or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
@@ -287,7 +287,7 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
             )
             resources.extend(other_resources)
 
-        edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
+        edge_type = dm.DirectRelationReference("sp_pygen_models", "unidirectional")
         for connection_item_b in self.connection_item_b or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,

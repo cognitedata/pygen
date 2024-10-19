@@ -50,7 +50,7 @@ from .connection_item_f_query import ConnectionItemFQueryAPI
 
 
 class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList, ConnectionItemFWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
     _properties_by_field = _CONNECTIONITEMF_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemF
     _class_list = ConnectionItemFList
@@ -219,16 +219,16 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                 (
                     self.outwards_multi_edge,
                     "outwards_multi",
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemG", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemG", "1"),
                 ),
                 (
                     self.outwards_single_edge,
                     "outwards_single",
-                    dm.DirectRelationReference("pygen-models", "singleProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "singleProperty"),
                     "outwards",
-                    dm.ViewId("pygen-models", "ConnectionItemE", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemE", "1"),
                 ),
             ],
         )

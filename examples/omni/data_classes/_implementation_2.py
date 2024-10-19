@@ -74,7 +74,7 @@ class Implementation2GraphQL(GraphQLCore):
         sub_value: The sub value field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation2", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation2", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
@@ -133,9 +133,9 @@ class Implementation2(SubInterface):
         sub_value: The sub value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation2", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation2", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation2")
 
     def as_write(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""
@@ -170,10 +170,10 @@ class Implementation2Write(SubInterfaceWrite):
         sub_value: The sub value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation2", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation2", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation2"
+        "sp_pygen_models", "Implementation2"
     )
 
     def _to_instances_write(

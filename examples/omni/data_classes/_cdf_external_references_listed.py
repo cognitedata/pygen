@@ -90,7 +90,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         timeseries: The timesery field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
     files: Optional[list[FileMetadataGraphQL]] = None
     sequences: Optional[list[SequenceGraphQL]] = None
     timeseries: Optional[list[TimeSeriesGraphQL]] = None
@@ -159,7 +159,7 @@ class CDFExternalReferencesListed(DomainModel):
         timeseries: The timesery field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
@@ -211,7 +211,7 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         timeseries: The timesery field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

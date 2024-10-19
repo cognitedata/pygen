@@ -43,7 +43,7 @@ from .connection_item_d_query import ConnectionItemDQueryAPI
 
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemD", "1")
     _properties_by_field = _CONNECTIONITEMD_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemD
     _class_list = ConnectionItemDList

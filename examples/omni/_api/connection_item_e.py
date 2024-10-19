@@ -49,7 +49,7 @@ from .connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, ConnectionItemEList, ConnectionItemEWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
     _properties_by_field = _CONNECTIONITEME_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemE
     _class_list = ConnectionItemEList
@@ -218,16 +218,16 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 (
                     self.inwards_single_edge,
                     "inwards_single",
-                    dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                    dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
                     "inwards",
-                    dm.ViewId("pygen-models", "ConnectionItemD", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"),
                 ),
                 (
                     self.inwards_single_property_edge,
                     "inwards_single_property",
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
                     "inwards",
-                    dm.ViewId("pygen-models", "ConnectionItemF", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemF", "1"),
                 ),
             ],
         )

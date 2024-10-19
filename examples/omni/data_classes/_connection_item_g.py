@@ -75,7 +75,7 @@ class ConnectionItemGGraphQL(GraphQLCore):
         name: The name field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
     inwards_multi_property: Optional[list[ConnectionEdgeAGraphQL]] = Field(
         default=None, repr=False, alias="inwardsMultiProperty"
     )
@@ -148,10 +148,10 @@ class ConnectionItemG(DomainModel):
         name: The name field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemG")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemG")
     inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(
         default=None, repr=False, alias="inwardsMultiProperty"
     )
@@ -212,7 +212,7 @@ class ConnectionItemG(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "multiProperty") and isinstance(
                         value, ConnectionEdgeA
                     ):
                         inwards_multi_property.append(value)
@@ -235,11 +235,11 @@ class ConnectionItemGWrite(DomainModelWrite):
         name: The name field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemG"
+        "sp_pygen_models", "ConnectionItemG"
     )
     inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(
         default=None, repr=False, alias="inwardsMultiProperty"
@@ -292,7 +292,7 @@ class ConnectionItemGWrite(DomainModelWrite):
                 other_resources = inwards_multi_property._to_instances_write(
                     cache,
                     self,
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
                 )
                 resources.extend(other_resources)
 

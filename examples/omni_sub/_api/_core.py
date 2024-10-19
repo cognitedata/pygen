@@ -549,7 +549,7 @@ class GraphQLQueryResponse:
 
 
 _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[GraphQLCore]]] = {
-    dm.DataModelId("pygen-models", "OmniSub", "1"): {
+    dm.DataModelId("sp_pygen_models", "OmniSub", "1"): {
         "ConnectionItemA": data_classes.ConnectionItemAGraphQL,
         "ConnectionItemB": data_classes.ConnectionItemBGraphQL,
         "ConnectionItemC": data_classes.ConnectionItemCNodeGraphQL,

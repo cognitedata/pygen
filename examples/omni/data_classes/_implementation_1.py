@@ -78,7 +78,7 @@ class Implementation1GraphQL(GraphQLCore):
         value_2: The value 2 field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
@@ -145,9 +145,9 @@ class Implementation1(SubInterface):
         value_2: The value 2 field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
@@ -188,10 +188,10 @@ class Implementation1Write(SubInterfaceWrite):
         value_2: The value 2 field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation1"
+        "sp_pygen_models", "Implementation1"
     )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")

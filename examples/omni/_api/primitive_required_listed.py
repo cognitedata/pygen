@@ -49,7 +49,7 @@ class PrimitiveRequiredListedAPI(
         PrimitiveRequiredListedWriteList,
     ]
 ):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
     _properties_by_field = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequiredListed
     _class_list = PrimitiveRequiredListedList

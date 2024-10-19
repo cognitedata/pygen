@@ -78,7 +78,7 @@ class ConnectionItemFGraphQL(GraphQLCore):
         outwards_single: The outwards single field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
     direct_list: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="directList")
     name: Optional[str] = None
     outwards_multi: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="outwardsMulti")
@@ -161,10 +161,10 @@ class ConnectionItemF(DomainModel):
         outwards_single: The outwards single field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemF")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemF")
     direct_list: Optional[list[Union[ConnectionItemD, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
     )
@@ -245,13 +245,13 @@ class ConnectionItemF(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "multiProperty") and isinstance(
                         value, ConnectionEdgeA
                     ):
                         outwards_multi.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
                             value.end_node = end_node  # type: ignore[assignment]
-                    if edge_type == dm.DirectRelationReference("pygen-models", "singleProperty") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "singleProperty") and isinstance(
                         value, ConnectionEdgeA
                     ):
                         if instance.outwards_single is None:
@@ -286,11 +286,11 @@ class ConnectionItemFWrite(DomainModelWrite):
         outwards_single: The outwards single field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemF", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemF"
+        "sp_pygen_models", "ConnectionItemF"
     )
     direct_list: Optional[list[Union[ConnectionItemDWrite, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="directList"
@@ -354,7 +354,7 @@ class ConnectionItemFWrite(DomainModelWrite):
                 other_resources = outwards_multi._to_instances_write(
                     cache,
                     self,
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
                 )
                 resources.extend(other_resources)
 
@@ -362,7 +362,7 @@ class ConnectionItemFWrite(DomainModelWrite):
             other_resources = self.outwards_single._to_instances_write(
                 cache,
                 self,
-                dm.DirectRelationReference("pygen-models", "singleProperty"),
+                dm.DirectRelationReference("sp_pygen_models", "singleProperty"),
             )
             resources.extend(other_resources)
 

@@ -46,7 +46,7 @@ class CDFExternalReferencesAPI(
         CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList, CDFExternalReferencesWriteList
     ]
 ):
-    _view_id = dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
     _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferences
     _class_list = CDFExternalReferencesList

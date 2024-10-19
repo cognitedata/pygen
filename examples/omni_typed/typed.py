@@ -15,7 +15,7 @@ class _CDFExternalReferencesListedProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+        return ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
 
 class CDFExternalReferencesListedApply(_CDFExternalReferencesListedProperties, TypedNodeApply):
@@ -110,7 +110,7 @@ class _DependentOnNonWritableProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "DependentOnNonWritable", "1")
+        return ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
 
 class DependentOnNonWritableApply(_DependentOnNonWritableProperties, TypedNodeApply):
@@ -194,7 +194,7 @@ class _Implementation1Properties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "Implementation1", "1")
+        return ViewId("sp_pygen_models", "Implementation1", "1")
 
 
 class Implementation1Apply(_Implementation1Properties, TypedNodeApply):
@@ -297,7 +297,7 @@ class _Implementation2Properties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "Implementation2", "1")
+        return ViewId("sp_pygen_models", "Implementation2", "1")
 
 
 class Implementation2Apply(_Implementation2Properties, TypedNodeApply):
@@ -385,7 +385,7 @@ class _MainInterfaceProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "MainInterface", "1")
+        return ViewId("sp_pygen_models", "MainInterface", "1")
 
 
 class MainInterfaceApply(_MainInterfaceProperties, TypedNodeApply):
@@ -470,7 +470,7 @@ class _PrimitiveNullableProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "PrimitiveNullable", "1")
+        return ViewId("sp_pygen_models", "PrimitiveNullable", "1")
 
 
 class PrimitiveNullableApply(_PrimitiveNullableProperties, TypedNodeApply):
@@ -611,7 +611,7 @@ class _PrimitiveRequiredListedProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+        return ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
 
 
 class PrimitiveRequiredListedApply(_PrimitiveRequiredListedProperties, TypedNodeApply):
@@ -749,7 +749,7 @@ class _SubInterfaceProperties:
 
     @classmethod
     def get_source(cls) -> ViewId:
-        return ViewId("pygen-models", "SubInterface", "1")
+        return ViewId("sp_pygen_models", "SubInterface", "1")
 
 
 class SubInterfaceApply(_SubInterfaceProperties, TypedNodeApply):

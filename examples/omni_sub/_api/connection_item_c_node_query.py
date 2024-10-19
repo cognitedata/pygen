@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemC", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     def __init__(
         self,
@@ -105,7 +105,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
         # from is a string as we added a node query step in the __init__ method
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "unidirectional"),
+            dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
@@ -167,7 +167,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
         # from is a string as we added a node query step in the __init__ method
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "unidirectional"),
+            dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )
