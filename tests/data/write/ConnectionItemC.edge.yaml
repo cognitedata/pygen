@@ -1,0 +1,276 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Victor:ConnectionItemA:Alexander
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Victor
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Alexander
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Victor:ConnectionItemA:Jennifer
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Victor
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jennifer
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Victor:ConnectionItemA:Phillip
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Victor
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Phillip
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemA:Alexander
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Alexander
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemA:Jennifer
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jennifer
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemA:Jason
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jason
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemB:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Mark
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemB:Amanda
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Amanda
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth:ConnectionItemB:Charles
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Beth
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Charles
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Chad:ConnectionItemB:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Chad
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Mark
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Chad:ConnectionItemB:Bryan
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Chad
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Bryan
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemA:Jennifer
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jennifer
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemA:Alexander
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Alexander
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemA:Phillip
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Phillip
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemB:Amanda
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Amanda
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemB:Charles
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Charles
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah:ConnectionItemB:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Sarah
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Mark
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemA:Jason
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jason
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemA:Alexander
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Alexander
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemA:Jonathan
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemA:Jonathan
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemB:Nancy
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Nancy
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemB:Charles
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Charles
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Allen:ConnectionItemB:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: unidirectional
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemC:Allen
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemB:Mark

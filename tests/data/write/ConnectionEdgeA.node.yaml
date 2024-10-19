@@ -1,0 +1,65 @@
+- space: sp_omni_instances
+  externalId: ConnectionEdgeA:Lauren
+  instanceType: node
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: null
+      startTime: '2024-08-06T00:11:21.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: ConnectionEdgeA:Lisa
+  instanceType: node
+  sources:
+  - properties:
+      endTime: '2024-10-03T03:33:15.000'
+      name: Voice rate imagine.
+      startTime: '2024-03-04T02:58:13.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: ConnectionEdgeA:Michael
+  instanceType: node
+  sources:
+  - properties:
+      endTime: '2024-02-29T06:25:18.000'
+      name: Local represent spend after property.
+      startTime: null
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: ConnectionEdgeA:Logan
+  instanceType: node
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Forward light onto act citizen instead.
+      startTime: '2024-03-15T05:54:38.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: ConnectionEdgeA:Jessica
+  instanceType: node
+  sources:
+  - properties:
+      endTime: null
+      name: Yourself middle from firm establish various.
+      startTime: '2024-07-11T18:32:00.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view

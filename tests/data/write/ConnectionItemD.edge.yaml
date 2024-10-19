@@ -1,0 +1,12 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Kristin:ConnectionItemE:Pamela
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: bidirectionalSingle
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemD:Kristin
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemE:Pamela

@@ -1,0 +1,91 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemA:Jennifer
+  instanceType: node
+  sources:
+  - properties:
+      name: Sport something fly.
+      selfDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemA:Alexander
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemA
+- space: sp_omni_instances
+  externalId: ConnectionItemA:Jason
+  instanceType: node
+  sources:
+  - properties:
+      name: Pick grow strategy into send manage religious.
+      otherDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemC:Sarah
+      selfDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemA:Jennifer
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemA
+- space: sp_omni_instances
+  externalId: ConnectionItemA:Phillip
+  instanceType: node
+  sources:
+  - properties:
+      name: Movie yet no wonder computer across Mrs.
+      selfDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemA:Jennifer
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemA
+- space: sp_omni_instances
+  externalId: ConnectionItemA:Alexander
+  instanceType: node
+  sources:
+  - properties:
+      name: null
+      otherDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemC:Sarah
+      selfDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemA:Phillip
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemA
+- space: sp_omni_instances
+  externalId: ConnectionItemA:Jonathan
+  instanceType: node
+  sources:
+  - properties:
+      name: The much understand sing.
+      selfDirect:
+        space: sp_omni_instances
+        externalId: ConnectionItemA:Phillip
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemA

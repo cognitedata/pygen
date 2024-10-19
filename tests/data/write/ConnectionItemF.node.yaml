@@ -1,0 +1,89 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Kendra
+  instanceType: node
+  sources:
+  - properties:
+      name: Plan brother sell.
+      directList:
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Kristin
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christian
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christine
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemF
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Stanley
+  instanceType: node
+  sources:
+  - properties:
+      name: Investment up data three mission talk.
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemF
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Cindy
+  instanceType: node
+  sources:
+  - properties:
+      name: null
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemF
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Katherine
+  instanceType: node
+  sources:
+  - properties:
+      name: Town child commercial house four scientist radio between.
+      directList:
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christian
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christine
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Daniel
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemF
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Samuel
+  instanceType: node
+  sources:
+  - properties:
+      name: Knowledge similar source table where rather wish.
+      directList:
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christian
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Daniel
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemF
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemF

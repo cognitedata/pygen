@@ -1,0 +1,96 @@
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:William:Implementation1NonWriteable:Kevin
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:William
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Kevin
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:William:Implementation1NonWriteable:Mary
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:William
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Mary
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Tammy:Implementation1NonWriteable:Dennis
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Tammy
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Dennis
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Tammy:Implementation1NonWriteable:Brandon
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Tammy
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Brandon
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Paul:Implementation1NonWriteable:Dennis
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Paul
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Dennis
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Paul:Implementation1NonWriteable:Mary
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Paul
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Mary
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Johnathan:Implementation1NonWriteable:Kevin
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Johnathan
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Kevin
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Johnathan:Implementation1NonWriteable:Brandon
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: toNonWritable
+  startNode:
+    space: sp_omni_instances
+    externalId: DependentOnNonWritable:Johnathan
+  endNode:
+    space: sp_omni_instances
+    externalId: Implementation1NonWriteable:Brandon
