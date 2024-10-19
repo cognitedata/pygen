@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
-from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
+from cognite.client.data_classes.data_modeling import DataModelId
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data_models"
@@ -62,82 +60,6 @@ class ExampleSDK:
         if len(models) == 1:
             return models[0]
         raise ValueError(f"Expected exactly one data model, got {len(models)}")
-
-    def append_manual_files(self, manual_files_cls: type):
-        for var in vars(manual_files_cls).values():
-            if isinstance(var, Path) and var.is_file():
-                self.manual_files.append(var)
-
-    def load_spaces(self) -> SpaceApplyList:
-        spaces = {model.space for model in self.data_model_ids}
-        for model in self.data_model_ids:
-            views = self.load_views(model)
-            spaces |= {view.space for view in views}
-
-        if self.instance_space and self.instance_space not in spaces:
-            spaces.add(self.instance_space)
-        return SpaceApplyList([SpaceApply(space) for space in spaces])
-
-    @classmethod
-    def load_views(cls, data_model_id: dm.DataModelId) -> dm.ViewApplyList:
-        view_files = list((cls.model_dir(data_model_id) / "views").glob("*.view.yaml"))
-        return dm.ViewApplyList([dm.ViewApply.load(view_file.read_text()) for view_file in view_files])
-
-    @classmethod
-    def load_containers(cls, data_model_id: dm.DataModelId) -> dm.ContainerApplyList:
-        container_files = list((cls.model_dir(data_model_id) / "containers").glob("*.container.yaml"))
-        return dm.ContainerApplyList(
-            [dm.ContainerApply.load(container_file.read_text()) for container_file in container_files]
-        )
-
-    def load_write_model(self, data_model_id: dm.DataModelId) -> dm.DataModelApply:
-        views = self.load_views(data_model_id).as_ids()
-        return dm.DataModelApply(
-            space=data_model_id.space,
-            external_id=data_model_id.external_id,
-            version=data_model_id.version or "v1",
-            description="",
-            name=data_model_id.external_id,
-            views=views,
-        )
-
-    def load_timeseries(self, data_model_id: dm.DataModelId) -> TimeSeriesList:
-        timeseries_files = list(self.model_dir(data_model_id).glob("**/*timeseries.yaml"))
-        return TimeSeriesList([ts for filepath in timeseries_files for ts in TimeSeriesList.load(filepath.read_text())])
-
-    def load_sequences(self, data_model_id: dm.DataModelId) -> SequenceList:
-        sequence_files = list(self.model_dir(data_model_id).glob("**/*sequence.yaml"))
-        return SequenceList([seq for filepath in sequence_files for seq in SequenceList.load(filepath.read_text())])
-
-    def load_filemetadata(self, data_model_id: dm.DataModelId) -> FileMetadataList:
-        filemetadata_files = list(self.model_dir(data_model_id).glob("**/*file.yaml"))
-        return FileMetadataList(
-            [f for filepath in filemetadata_files for f in FileMetadataList.load(filepath.read_text())]
-        )
-
-    def load_nodes(self, data_model_id: dm.DataModelId, isoformat_dates: bool = False) -> dm.NodeApplyList:
-        node_files = list(self.model_dir(data_model_id).glob("**/*node.yaml"))
-        nodes = dm.NodeApplyList([n for filepath in node_files for n in dm.NodeApplyList.load(filepath.read_text())])
-        if not isoformat_dates:
-            return nodes
-        for node in nodes:
-            for source in node.sources or []:
-                for name in list(source.properties):
-                    if isinstance(source.properties[name], date):
-                        source.properties[name] = source.properties[name].isoformat()
-                    elif isinstance(source.properties[name], datetime):
-                        source.properties[name] = source.properties[name].isoformat(timespec="milliseconds")
-                    if isinstance(source.properties[name], list):
-                        for i, value in enumerate(source.properties[name]):
-                            if isinstance(value, date):
-                                source.properties[name][i] = value.isoformat()
-                            elif isinstance(value, datetime):
-                                source.properties[name][i] = value.isoformat(timespec="milliseconds")
-        return nodes
-
-    def load_edges(self, data_model_id: dm.DataModelId) -> dm.EdgeApplyList:
-        edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))
-        return dm.EdgeApplyList([e for filepath in edge_files for e in dm.EdgeApplyList.load(filepath.read_text())])
 
     def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
         return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
@@ -230,10 +152,6 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
 )
 
 
-# The following files are manually maintained (they are used to implement new functionality,
-# and are thus nod overwritten by the `python dev.py generate` command)
-
-
 class EquipmentSDKFiles:
     client_dir = EQUIPMENT_UNIT_SDK.client_dir
     client = client_dir / "_api_client.py"
@@ -255,17 +173,11 @@ class EquipmentSDKFiles:
     data_init = data_classes / "__init__.py"
 
 
-EQUIPMENT_UNIT_SDK.append_manual_files(EquipmentSDKFiles)
-
-
 class ScenarioInstanceFiles:
     client_dir = SCENARIO_INSTANCE_SDK.client_dir
 
     api = client_dir / "_api"
     scenario_instance_api = api / "scenario_instance.py"
-
-
-SCENARIO_INSTANCE_SDK.append_manual_files(ScenarioInstanceFiles)
 
 
 class OmniFiles:
@@ -334,15 +246,9 @@ class OmniFiles:
     connection_item_g_query = api / "connection_item_g_query.py"
 
 
-OMNI_SDK.append_manual_files(OmniFiles)
-
-
 class OmniTypedFiles:
     client_dir = OMNI_TYPED.client_dir
     typed = client_dir / "typed.py"
-
-
-OMNI_TYPED.append_manual_files(OmniTypedFiles)
 
 
 class OmniSubFiles:
@@ -366,15 +272,9 @@ class OmniSubFiles:
     api_client = client_dir / "_api_client.py"
 
 
-OMNI_SUB_SDK.append_manual_files(OmniSubFiles)
-
-
 class OmniMultiFiles:
     client_dir = OMNI_MULTI_SDK.client_dir
     api_client = client_dir / "_api_client.py"
-
-
-OMNI_MULTI_SDK.append_manual_files(OmniMultiFiles)
 
 
 class WindMillFiles:
