@@ -116,9 +116,9 @@ OMNI_TYPED = ExampleSDK(
 
 OMNI_MULTI_SDK = ExampleSDK(
     data_model_ids=[
-        DataModelId("pygen-models", "OmniMultiA", "1"),
-        DataModelId("pygen-models", "OmniMultiB", "1"),
-        DataModelId("pygen-models", "OmniMultiC", "1"),
+        DataModelId("sp_pygen_models", "OmniMultiA", "1"),
+        DataModelId("sp_pygen_models", "OmniMultiB", "1"),
+        DataModelId("sp_pygen_models", "OmniMultiC", "1"),
     ],
     _top_level_package="omni_multi",
     client_name="OmniMultiClient",
