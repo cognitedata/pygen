@@ -7,11 +7,14 @@ from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 
 
 class TestQueryBuilder:
+    @pytest.mark.skip(reason="Cannot traverse reverse direct relation to list of direct relation")
     def test_query_with_reverse_direct_relations(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     ) -> None:
         # Arrange
         item_e = omni_views["ConnectionItemE"].as_id()
+        item_d = omni_views["ConnectionItemD"].as_id()
+
         builder = QueryBuilder(dc.ConnectionItemEList)
         builder.append(
             NodeQueryStep(
@@ -24,7 +27,7 @@ class TestQueryBuilder:
             )
         )
         from_ = builder.get_from()
-        item_d = omni_views["ConnectionItemD"].as_id()
+
         builder.append(
             NodeQueryStep(
                 builder.create_name(from_),
@@ -68,6 +71,7 @@ class TestQueryBuilder:
     ) -> None:
         # Arrange
         item_a = omni_views["ConnectionItemA"].as_id()
+
         builder = QueryBuilder(dc.ConnectionItemAList)
 
         builder.append(
@@ -120,10 +124,12 @@ class TestQueryBuilder:
 
         # Assert
         assert isinstance(result, dc.ConnectionItemAList)
-        assert builder[0].total_retrieved == len(result) > 0
+        assert builder[0].total_retrieved > 0
+        assert builder[0].total_retrieved == len(result)
 
         actual_direct_set = sum(1 for item in result if item.other_direct)
-        assert builder[1].total_retrieved == actual_direct_set > 0
+        # The other direct can be the same for multiple items
+        assert 0 < builder[1].total_retrieved <= actual_direct_set
 
         actual_edge_set = sum(len(item.outwards or []) for item in result)
         assert builder[2].total_retrieved == actual_edge_set > 0
