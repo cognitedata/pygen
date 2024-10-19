@@ -121,7 +121,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         ) = None,
         as_child_class: SequenceNotStr[str] | None = None,
     ) -> T_DomainModel | T_DomainModelList | None:
-        if isinstance(external_id, str | dm.NodeId ) or (isinstance(external_id, tuple) and len(external_id) == 2 and all(isinstance(i, str) for i in external_id)):
+        if isinstance(external_id, str | dm.NodeId) or (
+            isinstance(external_id, tuple) and len(external_id) == 2 and all(isinstance(i, str) for i in external_id)
+        ):
             node_ids = [_as_node_id(external_id, space)]
             is_multiple = False
         else:
