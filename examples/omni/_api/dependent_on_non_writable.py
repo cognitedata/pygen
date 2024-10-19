@@ -47,7 +47,7 @@ class DependentOnNonWritableAPI(
         DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList
     ]
 ):
-    _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
     _properties_by_field = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
     _class_type = DependentOnNonWritable
     _class_list = DependentOnNonWritableList
@@ -205,9 +205,9 @@ class DependentOnNonWritableAPI(
                 (
                     self.to_non_writable_edge,
                     "to_non_writable",
-                    dm.DirectRelationReference("pygen-models", "toNonWritable"),
+                    dm.DirectRelationReference("sp_pygen_models", "toNonWritable"),
                     "outwards",
-                    dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
+                    dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1"),
                 ),
             ],
         )

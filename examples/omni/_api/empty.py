@@ -42,7 +42,7 @@ from .empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
-    _view_id = dm.ViewId("pygen-models", "Empty", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "Empty", "1")
     _properties_by_field = _EMPTY_PROPERTIES_BY_FIELD
     _class_type = Empty
     _class_list = EmptyList

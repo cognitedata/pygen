@@ -1,0 +1,30 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Victor
+  instanceType: node
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemC
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Beth
+  instanceType: node
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemC
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Chad
+  instanceType: node
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemC
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Sarah
+  instanceType: node
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemC
+- space: sp_omni_instances
+  externalId: ConnectionItemC:Karen
+  instanceType: node
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemC

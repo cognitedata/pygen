@@ -10,11 +10,11 @@ from __future__ import annotations
 import itertools
 import warnings
 from collections import defaultdict
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from functools import total_ordering
 from graphlib import TopologicalSorter
 from pathlib import Path
-from typing import Any, Callable, Literal, cast
+from typing import Any, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -588,7 +588,7 @@ class MultiAPIGenerator:
             {dm.Timestamp: "datetime", dm.Date: "date"}[type(field.type_)]
             for cls_ in itertools.chain(node_classes, edge_classes)
             for field in cls_.fields_of_type(fields.BasePrimitiveField)
-            if isinstance(field.type_, (dm.Timestamp, dm.Date))
+            if isinstance(field.type_, dm.Timestamp | dm.Date)
         }
         if datetime_fields:
             datetime_import = "from datetime import " + ", ".join(sorted(datetime_fields))

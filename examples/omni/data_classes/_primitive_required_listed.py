@@ -89,7 +89,7 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
         timestamp: The timestamp field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
     boolean: Optional[list[bool]] = None
     date: Optional[list[datetime.date]] = None
     float_32: Optional[list[float]] = Field(None, alias="float32")
@@ -176,7 +176,7 @@ class PrimitiveRequiredListed(DomainModel):
         timestamp: The timestamp field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
@@ -237,7 +237,7 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
         timestamp: The timestamp field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

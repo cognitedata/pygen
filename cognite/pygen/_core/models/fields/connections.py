@@ -237,7 +237,7 @@ class BaseConnectionField(Field, ABC):
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
     ) -> Field | None:
         """Load a connection field from a property"""
-        if not isinstance(prop, (dm.EdgeConnection, dm.MappedProperty, ReverseDirectRelation)):
+        if not isinstance(prop, dm.EdgeConnection | dm.MappedProperty | ReverseDirectRelation):
             return None
         if isinstance(prop, ReverseDirectRelation):
             field_string = f"{view_id}.{base.prop_name}"

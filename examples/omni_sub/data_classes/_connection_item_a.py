@@ -77,7 +77,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
         self_direct: The self direct field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
     name: Optional[str] = None
     other_direct: Optional[ConnectionItemCNodeGraphQL] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
@@ -156,10 +156,12 @@ class ConnectionItemA(DomainModel):
         self_direct: The self direct field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     space: str
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemA"
+    )
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCNode, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False)
@@ -233,7 +235,7 @@ class ConnectionItemA(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectional") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectional") and isinstance(
                         value, (ConnectionItemB, dm.NodeId)
                     ):
                         outwards.append(value)
@@ -256,11 +258,11 @@ class ConnectionItemAWrite(DomainModelWrite):
         self_direct: The self direct field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemA", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemA"
+        "sp_pygen_models", "ConnectionItemA"
     )
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCNodeWrite, dm.NodeId, None] = Field(
@@ -324,7 +326,7 @@ class ConnectionItemAWrite(DomainModelWrite):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
+        edge_type = dm.DirectRelationReference("sp_pygen_models", "bidirectional")
         for outward in self.outwards or []:
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,

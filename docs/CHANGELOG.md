@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- When using the config `faker` in the `MockGenerator`, setting the `seed` now produces the same data for each view.
+
 ## [0.99.38] - 24-10-16
 ### Added
 - When calling `.list(...)` with `retrieve_connections="full"` `pygen` will no longer raise

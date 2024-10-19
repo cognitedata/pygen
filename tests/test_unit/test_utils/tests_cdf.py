@@ -58,7 +58,7 @@ def test__unpack_filter(filter_: dm.Filter, expected) -> None:
     actual = _unpack_filter(filter_)
 
     assert len(actual) == len(expected)
-    for actual_item, expected_item in zip(actual, expected):
+    for actual_item, expected_item in zip(actual, expected, strict=False):
         assert actual_item[0] == expected_item[0]
         assert actual_item[1].dump() == expected_item[1].dump()
 

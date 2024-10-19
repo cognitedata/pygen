@@ -90,7 +90,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
         timeseries: The timesery field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
     files: Optional[list[FileMetadataGraphQL]] = None
     sequences: Optional[list[SequenceGraphQL]] = None
     timeseries: Optional[list[TimeSeriesGraphQL]] = None
@@ -126,9 +126,11 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            files=[file.as_read() for file in self.files or []] or None,
-            sequences=[sequence.as_read() for sequence in self.sequences or []] or None,
-            timeseries=[timesery.as_read() for timesery in self.timeseries or []] or None,
+            files=[file.as_read() for file in self.files or []] if self.files is not None else None,
+            sequences=[sequence.as_read() for sequence in self.sequences or []] if self.sequences is not None else None,
+            timeseries=(
+                [timesery.as_read() for timesery in self.timeseries or []] if self.timeseries is not None else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -139,9 +141,13 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            files=[file.as_write() for file in self.files or []] or None,
-            sequences=[sequence.as_write() for sequence in self.sequences or []] or None,
-            timeseries=[timesery.as_write() for timesery in self.timeseries or []] or None,
+            files=[file.as_write() for file in self.files or []] if self.files is not None else None,
+            sequences=(
+                [sequence.as_write() for sequence in self.sequences or []] if self.sequences is not None else None
+            ),
+            timeseries=(
+                [timesery.as_write() for timesery in self.timeseries or []] if self.timeseries is not None else None
+            ),
         )
 
 
@@ -159,7 +165,7 @@ class CDFExternalReferencesListed(DomainModel):
         timeseries: The timesery field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
@@ -173,18 +179,27 @@ class CDFExternalReferencesListed(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            files=[file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files or []]
-            or None,
-            sequences=[
-                sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
-                for sequence in self.sequences or []
-            ]
-            or None,
-            timeseries=[
-                timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
-                for timesery in self.timeseries or []
-            ]
-            or None,
+            files=(
+                [file.as_write() if isinstance(file, CogniteFileMetadata) else file for file in self.files]
+                if self.files is not None
+                else None
+            ),
+            sequences=(
+                [
+                    sequence.as_write() if isinstance(sequence, CogniteSequence) else sequence
+                    for sequence in self.sequences
+                ]
+                if self.sequences is not None
+                else None
+            ),
+            timeseries=(
+                [
+                    timesery.as_write() if isinstance(timesery, CogniteTimeSeries) else timesery
+                    for timesery in self.timeseries
+                ]
+                if self.timeseries is not None
+                else None
+            ),
         )
 
     def as_apply(self) -> CDFExternalReferencesListedWrite:
@@ -211,7 +226,7 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         timeseries: The timesery field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -232,19 +247,25 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         properties: dict[str, Any] = {}
 
         if self.files is not None or write_none:
-            properties["files"] = [
-                file if isinstance(file, str) else file.external_id for file in self.files or []
-            ] or None
+            properties["files"] = (
+                [file if isinstance(file, str) else file.external_id for file in self.files or []]
+                if self.files is not None
+                else None
+            )
 
         if self.sequences is not None or write_none:
-            properties["sequences"] = [
-                sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []
-            ] or None
+            properties["sequences"] = (
+                [sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []]
+                if self.sequences is not None
+                else None
+            )
 
         if self.timeseries is not None or write_none:
-            properties["timeseries"] = [
-                timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []
-            ] or None
+            properties["timeseries"] = (
+                [timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []]
+                if self.timeseries is not None
+                else None
+            )
 
         if properties:
             this_node = dm.NodeApply(

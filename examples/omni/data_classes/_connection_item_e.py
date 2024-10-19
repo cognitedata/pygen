@@ -80,7 +80,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         name: The name field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
     direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(
         default=None, repr=False, alias="directReverseMulti"
@@ -192,10 +192,12 @@ class ConnectionItemE(DomainModel):
         name: The name field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemE")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemE"
+    )
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
     direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
@@ -266,7 +268,7 @@ class ConnectionItemE(DomainModel):
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
-                    if edge_type == dm.DirectRelationReference("pygen-models", "bidirectionalSingle") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle") and isinstance(
                         value, (ConnectionItemD, str, dm.NodeId)
                     ):
                         if instance.inwards_single is None:
@@ -278,7 +280,7 @@ class ConnectionItemE(DomainModel):
                                 f"Expected one edge for 'inwards_single' in {instance.as_id()}."
                                 f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}."
                             )
-                    if edge_type == dm.DirectRelationReference("pygen-models", "multiProperty") and isinstance(
+                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "multiProperty") and isinstance(
                         value, ConnectionEdgeA
                     ):
                         if instance.inwards_single_property is None:
@@ -302,6 +304,7 @@ class ConnectionItemE(DomainModel):
                 and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
             ):
                 node.direct_single = direct_single
+
                 if direct_single.direct_reverse_single is None:
                     direct_single.direct_reverse_single = node
                 elif are_nodes_equal(node, direct_single.direct_reverse_single):
@@ -312,15 +315,17 @@ class ConnectionItemE(DomainModel):
                         f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
                         f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}."
                     )
-            if (
-                isinstance(node, ConnectionItemD)
-                and node.direct_multi is not None
-                and (direct_multi := instances.get(as_pygen_node_id(node.direct_multi)))
-            ):
-                node.direct_multi = direct_multi
-                if direct_multi.direct_reverse_multi is None:
-                    direct_multi.direct_reverse_multi = []
-                direct_multi.direct_reverse_multi.append(node)
+            if isinstance(node, ConnectionItemD) and node.direct_multi is not None:
+                for direct_multi in node.direct_multi:
+                    if this_instance := instances.get(as_pygen_node_id(direct_multi)):
+                        if this_instance.direct_reverse_multi is None:
+                            this_instance.direct_reverse_multi = [node]
+                        else:
+                            this_instance.direct_reverse_multi.append(node)
+
+                node.direct_multi = [
+                    instances.get(as_pygen_node_id(direct_multi)) or direct_multi for direct_multi in node.direct_multi
+                ]
 
 
 class ConnectionItemEWrite(DomainModelWrite):
@@ -338,11 +343,11 @@ class ConnectionItemEWrite(DomainModelWrite):
         name: The name field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "ConnectionItemE", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "ConnectionItemE"
+        "sp_pygen_models", "ConnectionItemE"
     )
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(
@@ -408,7 +413,7 @@ class ConnectionItemEWrite(DomainModelWrite):
             other_resources = self.inwards_single_property._to_instances_write(
                 cache,
                 self,
-                dm.DirectRelationReference("pygen-models", "multiProperty"),
+                dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
             )
             resources.extend(other_resources)
 
@@ -417,7 +422,7 @@ class ConnectionItemEWrite(DomainModelWrite):
                 cache,
                 start_node=self.inwards_single,
                 end_node=self,
-                edge_type=dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+                edge_type=dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
@@ -551,7 +556,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("pygen-models", "ConnectionItemE", "1").as_property_ref("directReverseMulti"),
+                    through=dm.ViewId("sp_pygen_models", "ConnectionItemE", "1").as_property_ref("directReverseMulti"),
                     direction="inwards",
                 ),
                 "direct_reverse_multi",
@@ -564,7 +569,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("pygen-models", "ConnectionItemE", "1").as_property_ref("directReverseSingle"),
+                    through=dm.ViewId("sp_pygen_models", "ConnectionItemE", "1").as_property_ref("directReverseSingle"),
                     direction="inwards",
                 ),
                 "direct_reverse_single",

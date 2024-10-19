@@ -1,0 +1,42 @@
+- externalId: file_kenneth
+  name: file_kenneth
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_william
+  name: file_william
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_christopher
+  name: file_christopher
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_sarah
+  name: file_sarah
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_jacob
+  name: file_jacob
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_john
+  name: file_john
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196

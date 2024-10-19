@@ -3,12 +3,13 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import OmniFiles, OmniSubFiles
+from tests.omni_constants import OMNI_SPACE
 
 
 def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "ConnectionItemA", "1")
+        dm.ViewId(OMNI_SPACE, "ConnectionItemA", "1")
     ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_a_edge_apis}
 
@@ -25,7 +26,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
 def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "ConnectionItemB", "1")
+        dm.ViewId(OMNI_SPACE, "ConnectionItemB", "1")
     ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_b_edge_apis}
 
@@ -42,7 +43,7 @@ def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator,
 def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "ConnectionItemC", "1")
+        dm.ViewId(OMNI_SPACE, "ConnectionItemC", "1")
     ]
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_c_edge_apis}
 
@@ -61,7 +62,7 @@ def test_generate_connection_item_a_no_default_space(
 ):
     # Arrange
     api_generator = omnisub_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "ConnectionItemA", "1")
+        dm.ViewId(OMNI_SPACE, "ConnectionItemA", "1")
     ]
     filepath_by_name = {f.stem: f for f in OmniSubFiles.connection_item_a_edge_apis}
 

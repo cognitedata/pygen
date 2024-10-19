@@ -1,0 +1,70 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemB:Nancy
+  instanceType: node
+  sources:
+  - properties:
+      name: Edge head commercial power paper reveal decision.
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemB
+- space: sp_omni_instances
+  externalId: ConnectionItemB:Brenda
+  instanceType: node
+  sources:
+  - properties:
+      name: Provide major full great three start half.
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemB
+- space: sp_omni_instances
+  externalId: ConnectionItemB:Michael
+  instanceType: node
+  sources:
+  - properties:
+      name: Appear customer enjoy wish best difficult.
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemB
+- space: sp_omni_instances
+  externalId: ConnectionItemB:Mark
+  instanceType: node
+  sources:
+  - properties:
+      name: Spend themselves rest trial law social quality more.
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemB
+- space: sp_omni_instances
+  externalId: ConnectionItemB:Amanda
+  instanceType: node
+  sources:
+  - properties:
+      name: null
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemB

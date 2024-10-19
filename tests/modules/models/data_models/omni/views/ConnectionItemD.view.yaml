@@ -14,7 +14,7 @@ properties:
   name:
     container:
       space: {{ pygen_models_space }}
-      externalId: ConnectionBase
+      externalId: ConnectionDirectList
       type: container
     containerPropertyIdentifier: name
     name: name
@@ -33,10 +33,10 @@ properties:
   directMulti:
     container:
       space: {{ pygen_models_space }}
-      externalId: ConnectionBase
+      externalId: ConnectionDirectList
       type: container
-    containerPropertyIdentifier: direct1
-    name: selfDirect
+    containerPropertyIdentifier: directList
+    name: directMulti
     source:
       space: {{ pygen_models_space }}
       externalId: ConnectionItemE
@@ -45,10 +45,10 @@ properties:
   directSingle:
     container:
       space: {{ pygen_models_space }}
-      externalId: ConnectionBase
+      externalId: ConnectionDirectList
       type: container
-    containerPropertyIdentifier: direct2
-    name: otherDirect
+    containerPropertyIdentifier: directNoList
+    name: directSingle
     source:
       space: {{ pygen_models_space }}
       externalId: ConnectionItemE

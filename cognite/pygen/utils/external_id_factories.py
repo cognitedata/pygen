@@ -73,8 +73,9 @@ import logging
 import uuid as uuid_
 import warnings
 from collections import defaultdict
+from collections.abc import Callable
 from hashlib import sha256 as sha256_
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 

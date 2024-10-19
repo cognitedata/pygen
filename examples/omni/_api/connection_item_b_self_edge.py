@@ -43,7 +43,7 @@ class ConnectionItemBSelfEdgeAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "reflexive"),
+            dm.DirectRelationReference("sp_pygen_models", "reflexive"),
             from_connection_item_b,
             from_connection_item_b_space,
             to_connection_item_b,

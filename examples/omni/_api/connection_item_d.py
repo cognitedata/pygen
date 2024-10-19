@@ -43,7 +43,7 @@ from .connection_item_d_query import ConnectionItemDQueryAPI
 
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemD", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemD", "1")
     _properties_by_field = _CONNECTIONITEMD_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemD
     _class_list = ConnectionItemDList
@@ -213,7 +213,20 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 >>> connection_item_d = client.connection_item_d.retrieve("my_connection_item_d")
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                (
+                    self.outwards_single_edge,
+                    "outwards_single",
+                    dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
+                    "outwards",
+                    dm.ViewId("sp_pygen_models", "ConnectionItemE", "1"),
+                ),
+            ],
+        )
 
     def search(
         self,

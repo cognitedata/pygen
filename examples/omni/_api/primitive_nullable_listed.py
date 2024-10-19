@@ -49,7 +49,7 @@ class PrimitiveNullableListedAPI(
         PrimitiveNullableListedWriteList,
     ]
 ):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveNullableListed", "1")
     _properties_by_field = _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveNullableListed
     _class_list = PrimitiveNullableListedList

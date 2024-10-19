@@ -44,7 +44,7 @@ from .primitive_required_query import PrimitiveRequiredQueryAPI
 class PrimitiveRequiredAPI(
     NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList, PrimitiveRequiredWriteList]
 ):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequired", "1")
     _properties_by_field = _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequired
     _class_list = PrimitiveRequiredList

@@ -1,6 +1,0 @@
-- externalId: file_teresa
-  name: file_teresa
-  source: omni-instances
-  mimeType: text/plain
-  metadata:
-    source: PygenMockGenerator

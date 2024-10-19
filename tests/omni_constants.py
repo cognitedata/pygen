@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from cognite.client import data_modeling as dm
 from omni.data_classes import DomainModel, DomainModelWrite
 
+OMNI_SPACE = "sp_pygen_models"
+
 
 @dataclass
 class OmniClasses:

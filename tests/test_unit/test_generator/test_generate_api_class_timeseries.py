@@ -5,12 +5,13 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import OmniFiles
+from tests.omni_constants import OMNI_SPACE
 
 
 def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "CDFExternalReferences", "1")
+        dm.ViewId(OMNI_SPACE, "CDFExternalReferences", "1")
     ]
     expected = OmniFiles.cdf_external_timeseries_api.read_text()
 

@@ -43,7 +43,7 @@ class DependentOnNonWritableToNonWritableAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "toNonWritable"),
+            dm.DirectRelationReference("sp_pygen_models", "toNonWritable"),
             from_dependent_on_non_writable,
             from_dependent_on_non_writable_space,
             to_implementation_1_non_writeable,

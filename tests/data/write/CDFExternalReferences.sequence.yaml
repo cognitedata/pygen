@@ -1,0 +1,40 @@
+- name: sequence_timothy
+  externalId: sequence_timothy
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+  columns:
+  - externalId: value
+    valueType: DOUBLE
+    metadata:
+      source: PygenMockGenerator
+- name: sequence_jeffrey
+  externalId: sequence_jeffrey
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+  columns:
+  - externalId: value
+    valueType: DOUBLE
+    metadata:
+      source: PygenMockGenerator
+- name: sequence_kayla
+  externalId: sequence_kayla
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+  columns:
+  - externalId: value
+    valueType: DOUBLE
+    metadata:
+      source: PygenMockGenerator
+- name: sequence_john
+  externalId: sequence_john
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+  columns:
+  - externalId: value
+    valueType: DOUBLE
+    metadata:
+      source: PygenMockGenerator

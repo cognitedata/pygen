@@ -47,7 +47,7 @@ from .connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList, ConnectionItemGWriteList]):
-    _view_id = dm.ViewId("pygen-models", "ConnectionItemG", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
     _properties_by_field = _CONNECTIONITEMG_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemG
     _class_list = ConnectionItemGList
@@ -205,9 +205,9 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                 (
                     self.inwards_multi_property_edge,
                     "inwards_multi_property",
-                    dm.DirectRelationReference("pygen-models", "multiProperty"),
+                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
                     "inwards",
-                    dm.ViewId("pygen-models", "ConnectionItemF", "1"),
+                    dm.ViewId("sp_pygen_models", "ConnectionItemF", "1"),
                 ),
             ],
         )

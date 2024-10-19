@@ -13,6 +13,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ParameterNameCollisionWarning,
 )
+from tests.omni_constants import OMNI_SPACE
 
 
 def test_create_list_method_primitive_nullable(
@@ -20,7 +21,7 @@ def test_create_list_method_primitive_nullable(
 ) -> None:
     # Arrange
     data_class = omni_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+        dm.ViewId(OMNI_SPACE, "PrimitiveNullable", "1")
     ].data_class
     parameters = [
         FilterParameter("boolean", "bool", description="The boolean to filter on."),
@@ -81,7 +82,7 @@ def test_create_list_method_primitive_nullable(
 
     # Assert
     assert actual.parameters == expected.parameters
-    for act, exp in zip(actual.implementations, expected.implementations):
+    for act, exp in zip(actual.implementations, expected.implementations, strict=False):
         assert act.filter == exp.filter
         assert act.prop_name == exp.prop_name
         assert act.keyword_arguments == exp.keyword_arguments

@@ -1,0 +1,48 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Christina
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Stanley
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Christina
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Christina
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Andrew
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Christina
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Kendra
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Mark
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Andrew:ConnectionItemG:Mark
+  instanceType: edge
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Andrew
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Mark

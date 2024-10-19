@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
-    _view_id = dm.ViewId("pygen-models", "DependentOnNonWritable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     def __init__(
         self,
@@ -92,7 +92,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         # from is a string as we added a node query step in the __init__ method
         from_ = cast(str, self._builder.get_from())
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "toNonWritable"),
+            dm.DirectRelationReference("sp_pygen_models", "toNonWritable"),
             external_id_prefix=external_id_prefix_edge,
             space=space_edge,
         )

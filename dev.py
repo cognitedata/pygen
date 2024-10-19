@@ -9,20 +9,12 @@ import toml
 import typer
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
-from cognite.client.data_classes import (
-    FileMetadata,
-    FileMetadataList,
-    Sequence,
-    SequenceList,
-    TimeSeries,
-    TimeSeriesList,
-)
-from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
-from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
-from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
+from cognite.pygen.utils import MockGenerator
+from cognite.pygen.utils.cdf import load_cognite_client_from_toml
+from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
 app = typer.Typer(
     add_completion=False,
@@ -92,6 +84,7 @@ def download():
             latest.views = sorted(latest.views, key=lambda v: v.external_id)
             for view in latest.views:
                 view.properties = dict(sorted(view.properties.items()))
+            file_path.parent.mkdir(exist_ok=True, parents=True)
             file_path.write_text(latest.dump_yaml())
             typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
 
@@ -101,151 +94,62 @@ def download():
             is_space: dm.filters.Filter | None = None
             if example_sdk.instance_space:
                 is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
-            nodes = dm.NodeList([])
+
+            parent_views = {parent for view in latest.views for parent in view.implements or []}
+            nodes_by_id: dict[dm.NodeId, list] = defaultdict(list)
             for view in latest.views:
-                nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
-            nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
-            nodes = _remove_duplicate_nodes(nodes)
-            _isoformat_timestamps(nodes)
+                if view.used_for == "edge" or view.as_id() in parent_views:
+                    continue
+                view_nodes = client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view])
+                for node in view_nodes:
+                    nodes_by_id[node.as_id()].append(node)
+            node_list = dm.NodeList([])
+            for nodes in nodes_by_id.values():
+                if len(nodes) == 1:
+                    node_list.append(nodes[0])
+                    continue
+                # The node with the most properties is the child node that has implemented all interfaces
+                # (and thus have all values of their parent interfaces).
+                keep: dm.Node = max(nodes, key=lambda n: sum(len(props) for props in n.properties.values()))
+                node_list.append(keep)
+            node_list = dm.NodeList(sorted(node_list, key=lambda n: n.external_id))
+            _isoformat_timestamps(node_list)
             file_path = example_sdk.read_node_path(data_model_id)
-            file_path.write_text(nodes.dump_yaml())
-            typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
+            file_path.write_text(node_list.dump_yaml())
+            typer.echo(f"Downloaded {len(node_list)} nodes to {file_path.relative_to(REPO_ROOT)}")
 
 
-@app.command("deploy", help="Deploy all example SDKs to CDF")
-def deploy():
+@app.command("mock", help="Generate mock data for all example SDKs")
+def mock(deploy: bool = False):
     client = load_cognite_client_from_toml("config.toml")
-    index = _user_options([", ".join(map(str, example.data_model_ids)) for example in EXAMPLE_SDKS])
-    example_sdk = EXAMPLE_SDKS[index]
-    spaces = example_sdk.load_spaces()
-    client.data_modeling.spaces.apply(spaces)
-    for data_model_id in example_sdk.data_model_ids:
-        # Containers
-        containers = example_sdk.load_containers(data_model_id)
-        existing_containers = client.data_modeling.containers.retrieve(containers.as_ids())
-        new, changed, unchanged = _difference(existing_containers.as_write(), containers)
-        if changed:
-            raise ValueError(f"Containers {changed.as_ids()} require data migration")
-        new_containers = client.data_modeling.containers.apply(new)
-        for container in new_containers:
-            typer.echo(f"Created container {container.external_id} in space {container.space}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} containers are unchanged")
-
-        # Views
-        views = example_sdk.load_views(data_model_id)
-        existing_views = client.data_modeling.views.retrieve(views.as_ids())
-        new, changed, unchanged = _difference(existing_views.as_write(), views)
-        is_views_changed = bool(changed or new)
-        if changed:
-            client.data_modeling.views.delete(changed.as_ids())
-        new_views = client.data_modeling.views.apply(new + changed)
-        for view in new_views:
-            typer.echo(f"Created view {view.external_id} in space {view.space}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} views are unchanged")
-
-        # Data Model
-        data_model = example_sdk.load_write_model(data_model_id)
-        existing_data_models = client.data_modeling.data_models.retrieve(data_model_id)
-        if not existing_data_models:
-            is_changed = True
-        else:
-            is_changed = existing_data_models.latest_version().as_write() != data_model
-        if is_changed or is_views_changed:
-            client.data_modeling.data_models.delete(data_model_id)
-            new_model = client.data_modeling.data_models.apply(data_model)
-            typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
-        else:
-            typer.echo(f"Data model {data_model_id} is unchanged")
-
-        # TimeSeries
-        timeseries = example_sdk.load_timeseries(data_model_id)
-        existing = client.time_series.retrieve_multiple(
-            external_ids=timeseries.as_external_ids(), ignore_unknown_ids=True
-        )
-        new, changed, unchanged = _difference(existing, timeseries)
-        if new:
-            created = client.time_series.create(new)
-            for ts in created:
-                typer.echo(f"Created timeseries {ts.external_id}")
-        if changed:
-            client.time_series.update(changed)
-            for ts in changed:
-                typer.echo(f"Updated timeseries {ts.external_id}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} timeseries are unchanged")
-
-        # Sequences
-        sequences = example_sdk.load_sequences(data_model_id)
-        existing = client.sequences.retrieve_multiple(external_ids=sequences.as_external_ids(), ignore_unknown_ids=True)
-        new, changed, unchanged = _difference(existing, sequences)
-        if new:
-            created = client.sequences.create(new)
-            for seq in created:
-                typer.echo(f"Created sequence {seq.external_id}")
-        if changed:
-            client.sequences.update(changed)
-            for seq in changed:
-                typer.echo(f"Updated sequence {seq.external_id}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} sequences are unchanged")
-
-        # Files
-        files = example_sdk.load_filemetadata(data_model_id)
-        existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
-        new, changed, unchanged = _difference(existing, files)
-        if new:
-            for n in new:
-                created, _ = client.files.create(n)
-                typer.echo(f"Created file {created.external_id}")
-        if changed:
-            client.files.update(changed)
-            for file in changed:
-                typer.echo(f"Updated file {file.external_id}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} files are unchanged")
-
-        # Nodes
-        nodes = example_sdk.load_nodes(data_model_id, isoformat_dates=True)
-        for node in nodes:
-            # Bug in SDK. Should not be necessary to set to None
-            node.sources = node.sources or None
-        result = client.data_modeling.instances.apply(nodes=nodes)
-        changed = [node for node in result.nodes if node.was_modified]
-        unchanged = [node for node in result.nodes if not node.was_modified]
-        for node in changed:
-            typer.echo(f"Created node {node.as_id()}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} nodes are unchanged")
-
-        # Edges
-        edges = example_sdk.load_edges(data_model_id)
-        for edge in edges:
-            # Bug in SDK. Should not be necessary to set to None
-            edge.sources = edge.sources or None
-        result = client.data_modeling.instances.apply(
-            edges=edges, auto_create_start_nodes=True, auto_create_end_nodes=True
-        )
-        changed = [edge for edge in result.edges if edge.was_modified]
-        unchanged = [edge for edge in result.edges if not edge.was_modified]
-        for edge in changed:
-            typer.echo(f"Created edge {edge.as_id()}")
-        if unchanged:
-            typer.echo(f"{len(unchanged)} edges are unchanged")
-
-    # After deployment, we should download the read version of the data model
-    download()
-
-
-@app.command("list", help="List all example files which are expected to be changed manually")
-def list_manual_files():
     for example_sdk in EXAMPLE_SDKS:
-        if not example_sdk.generate_sdk:
+        if not example_sdk.download_nodes:
+            typer.echo(f"Skipping {example_sdk.client_name} as it does not download nodes")
             continue
-        typer.echo(f"{example_sdk.client_name} SDK:")
-        for manual_file in example_sdk.manual_files:
-            typer.echo(f" - {manual_file.relative_to(EXAMPLES_DIR)}")
+        typer.echo(f"Generating mock data for {example_sdk.client_name}...")
+        model = example_sdk.load_data_model()
+        dataset = client.data_sets.retrieve(external_id=example_sdk.dataset_external_id)
+        if dataset is None:
+            raise typer.BadParameter(
+                f"Dataset {example_sdk.dataset_external_id} not found. Please deploy it first `cdf deploy`"
+            )
+        # Special case for Omni were we have a view with external_id "Empty" that should not have mock data
+        views = [view for view in model.views if view.external_id != "Empty"]
+
+        generator = MockGenerator(
+            views,
+            example_sdk.instance_space,
+            default_config="faker",
+            data_set_id=dataset.id,
+            seed=42,
+            skip_interfaces=True,
+        )
+        data = generator.generate_mock_data(node_count=5, max_edge_per_type=3, null_values=0.25)
+
+        data.dump_yaml(DATA_WRITE_DIR, exclude={("Implementation1NonWriteable", "node")})
+        typer.echo(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)} views")
+        if deploy:
+            data.deploy(client, exclude={("Implementation1NonWriteable", "node")}, verbose=True)
 
 
 @app.command(
@@ -319,88 +223,6 @@ def _remove_top_lines(text: str, lines: int) -> str:
 
 
 T_DataModeling = TypeVar("T_DataModeling")
-
-
-def _difference(
-    cdf_resources: T_DataModeling, local_resources: T_DataModeling
-) -> tuple[T_DataModeling, T_DataModeling, T_DataModeling]:
-    """Return new, changed, unchanged"""
-    resource_cls_list = type(cdf_resources)
-    cdf_resources = {r.as_id() if hasattr(r, "as_id") else r.external_id: r for r in cdf_resources}
-    local_resources = {r.as_id() if hasattr(r, "as_id") else r.external_id: r for r in local_resources}
-
-    _clean_cdf_resources(cdf_resources, resource_cls_list)
-
-    new = resource_cls_list([])
-    changed = resource_cls_list([])
-    unchanged = resource_cls_list([])
-    for id_, resource in local_resources.items():
-        if id_ not in cdf_resources:
-            new.append(resource)
-        elif resource != cdf_resources[id_]:
-            changed.append(resource)
-        else:
-            unchanged.append(resource)
-    return new, changed, unchanged
-
-
-def _clean_cdf_resources(cdf_resources: dict, resource_cls_list: type) -> None:
-    """Custom cleaning of CDF resources to make them comparable to local resources.
-
-    Args:
-        cdf_resources:
-        resource_cls_list:
-
-    Returns:
-
-    """
-    if resource_cls_list is ViewApplyList:
-        # The read version of views includes all properties from the interfaces, but the write version does not.
-        # This removes all properties from the write version which are inherited from an interface, so
-        # that the comparison is correct.
-        interfaces = {parent for view in cdf_resources.values() for parent in view.implements or []}
-        property_by_interface = {}
-        for view in cdf_resources.values():
-            if view.as_id() in interfaces:
-                property_by_interface[view.as_id()] = set(view.properties)
-        for view in cdf_resources.values():
-            for parent in view.implements or []:
-                for property_ in property_by_interface[parent]:
-                    view.properties.pop(property_, None)
-
-    if resource_cls_list is TimeSeriesList:
-        for ts in cdf_resources.values():
-            ts: TimeSeries
-            ts.created_time = None
-            ts.last_updated_time = None
-            ts.id = None
-            if not ts.metadata:
-                ts.metadata = None
-            if not ts.security_categories:
-                ts.security_categories = None
-    if resource_cls_list is SequenceList:
-        for seq in cdf_resources.values():
-            seq: Sequence
-            seq.id = None
-            seq.created_time = None
-            seq.last_updated_time = None
-            if not seq.metadata:
-                seq.metadata = None
-            for column in seq.columns:
-                column.id = None
-                column.created_time = None
-                column.last_updated_time = None
-                if not column.metadata:
-                    column.metadata = None
-    if resource_cls_list is FileMetadataList:
-        for file in cdf_resources.values():
-            file: FileMetadata
-            file.id = None
-            file.created_time = None
-            file.last_updated_time = None
-            file.uploaded = None
-            if not file.metadata:
-                file.metadata = None
 
 
 def _remove_duplicate_nodes(nodes: dm.NodeList) -> dm.NodeList:

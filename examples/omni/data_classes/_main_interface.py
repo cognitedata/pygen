@@ -71,7 +71,7 @@ class MainInterfaceGraphQL(GraphQLCore):
         main_value: The main value field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "MainInterface", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     @model_validator(mode="before")
@@ -126,7 +126,7 @@ class MainInterface(DomainModel):
         main_value: The main value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "MainInterface", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
@@ -163,7 +163,7 @@ class MainInterfaceWrite(DomainModelWrite):
         main_value: The main value field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "MainInterface", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

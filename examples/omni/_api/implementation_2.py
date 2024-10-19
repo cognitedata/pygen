@@ -41,7 +41,7 @@ from .implementation_2_query import Implementation2QueryAPI
 
 
 class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List, Implementation2WriteList]):
-    _view_id = dm.ViewId("pygen-models", "Implementation2", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "Implementation2", "1")
     _properties_by_field = _IMPLEMENTATION2_PROPERTIES_BY_FIELD
     _class_type = Implementation2
     _class_list = Implementation2List

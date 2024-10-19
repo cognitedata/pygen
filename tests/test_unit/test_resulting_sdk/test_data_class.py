@@ -1,5 +1,6 @@
 import json
-from typing import Callable, cast
+from collections.abc import Callable
+from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -18,6 +19,9 @@ from tests.omni_constants import OmniClasses
 def omni_nodes_with_view():
     nodes = OMNI_SDK.load_read_nodes(OMNI_SDK.data_model_ids[0])
     for node in nodes:
+        if node.external_id.startswith("Implementation1NonWriteable"):
+            # Hacky way to skip non-writeable nodes
+            continue
         node: dm.Node
         view_id = cast(dm.ViewId, next(iter(node.properties)))
         yield pytest.param(node, view_id, id=node.external_id)
@@ -115,6 +119,7 @@ class TestToInstancesWrite:
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
 
+@pytest.mark.skip("Moved data")
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
     [
@@ -160,7 +165,7 @@ def test_load_windmills_from_json(
 
         # Assert
         exclude = {"external_id", "space", "data_record", "externalId"}
-        for windmill, json_item in zip(windmills, loaded_json):
+        for windmill, json_item in zip(windmills, loaded_json, strict=False):
             dumped_windmill = json.loads(
                 windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
             )

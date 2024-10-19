@@ -1,0 +1,70 @@
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Daniel
+  instanceType: node
+  sources:
+  - properties:
+      aValue: Natural scene table great feel.
+    source:
+      space: sp_pygen_models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: DependentOnNonWritable
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:William
+  instanceType: node
+  sources:
+  - properties:
+      aValue: Red position believe final final near offer school.
+    source:
+      space: sp_pygen_models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: DependentOnNonWritable
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Tammy
+  instanceType: node
+  sources:
+  - properties:
+      aValue: null
+    source:
+      space: sp_pygen_models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: DependentOnNonWritable
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Spencer
+  instanceType: node
+  sources:
+  - properties:
+      aValue: Test office parent arrive doctor suggest east.
+    source:
+      space: sp_pygen_models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: DependentOnNonWritable
+- space: sp_omni_instances
+  externalId: DependentOnNonWritable:Paul
+  instanceType: node
+  sources:
+  - properties:
+      aValue: Help move hot response about prove thus explain.
+    source:
+      space: sp_pygen_models
+      externalId: DependentOnNonWritable
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: DependentOnNonWritable

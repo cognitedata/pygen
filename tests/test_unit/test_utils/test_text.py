@@ -12,7 +12,7 @@ from cognite.pygen.utils.text import to_pascal, to_snake
         ("Implementation1", False, False, "Implementation1"),
         ("Implementation1", False, True, "Implementations1"),
         ("Implementations1", True, False, "Implementation1"),
-        ("pygen-models", True, False, "PygenModel"),
+        ("pygen_model", True, False, "PygenModel"),
         ("pygen_models", False, False, "PygenModels"),
         ("pygen_model-power", False, False, "PygenModelPower"),
         ("pygen-model_power", False, False, "PygenModelPower"),

@@ -1,0 +1,103 @@
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Daniel
+  instanceType: node
+  sources:
+  - properties:
+      name: Manager else film.
+      directMulti:
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Pamela
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Stephanie
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Alexis
+      directSingle:
+        space: sp_omni_instances
+        externalId: ConnectionItemE:Stephanie
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemD
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Kristin
+  instanceType: node
+  sources:
+  - properties:
+      name: null
+      directMulti:
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Ana
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Pamela
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemD
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Christine
+  instanceType: node
+  sources:
+  - properties:
+      name: Property cold maybe west still cover.
+      directMulti:
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Alexis
+      directSingle:
+        space: sp_omni_instances
+        externalId: ConnectionItemE:Brent
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemD
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Christian
+  instanceType: node
+  sources:
+  - properties:
+      name: By sea quality and room.
+      directMulti:
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Pamela
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Brent
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Stephanie
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemD
+- space: sp_omni_instances
+  externalId: ConnectionItemD:Robert
+  instanceType: node
+  sources:
+  - properties:
+      name: Cover woman very.
+      directMulti:
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Ana
+      - space: sp_omni_instances
+        externalId: ConnectionItemE:Alexis
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: ConnectionItemD

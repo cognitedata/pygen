@@ -16,7 +16,7 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class ConnectionItemFOutwardsSingleAPI(EdgePropertyAPI):
-    _view_id = dm.ViewId("pygen-models", "ConnectionEdgeA", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     _class_type = ConnectionEdgeA
     _class_write_type = ConnectionEdgeAWrite
     _class_list = ConnectionEdgeAList
@@ -68,7 +68,7 @@ class ConnectionItemFOutwardsSingleAPI(EdgePropertyAPI):
 
         """
         filter_ = _create_connection_edge_a_filter(
-            dm.DirectRelationReference("pygen-models", "singleProperty"),
+            dm.DirectRelationReference("sp_pygen_models", "singleProperty"),
             self._view_id,
             from_connection_item_f,
             from_connection_item_f_space,

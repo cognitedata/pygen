@@ -43,7 +43,7 @@ class ConnectionItemDOutwardsSingleAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "bidirectionalSingle"),
+            dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
             from_connection_item_d,
             from_connection_item_d_space,
             to_connection_item_e,

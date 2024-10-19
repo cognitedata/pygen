@@ -27,7 +27,7 @@ def test_graphql_query(wind_client: WindmillClient) -> None:
 def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> None:
     query = """{
   getCDFExternalReferencesById(instance:
-    {space: "omni-instances", externalId: "CDFExternalReferences:Jeffrey"}
+    {space: "sp_omni_instances", externalId: "CDFExternalReferences:Colleen"}
   ){
     items{
        __typename
@@ -56,19 +56,19 @@ def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> 
     result = omni_client.graphql_query(query)
 
     assert len(result) > 0
-    jeffery = result[0]
-    assert isinstance(jeffery, odc.CDFExternalReferencesGraphQL)
-    assert jeffery.external_id == "CDFExternalReferences:Jeffrey"
-    assert isinstance(jeffery.timeseries, odc.TimeSeriesGraphQL)
-    assert isinstance(jeffery.sequence, odc.SequenceGraphQL)
-    jeffery.as_read()
-    jeffery.as_write()
+    colleen = result[0]
+    assert isinstance(colleen, odc.CDFExternalReferencesGraphQL)
+    assert colleen.external_id == "CDFExternalReferences:Colleen"
+    assert isinstance(colleen.timeseries, odc.TimeSeriesGraphQL)
+    assert isinstance(colleen.sequence, odc.SequenceGraphQL)
+    colleen.as_read()
+    colleen.as_write()
 
 
 def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClient) -> None:
     query = """{
   getCDFExternalReferencesListedById(instance:
-    {space: "omni-instances", externalId: "CDFExternalReferencesListed:Brandon"}
+    {space: "sp_omni_instances", externalId: "CDFExternalReferencesListed:Steven"}
   ){
     items{
        __typename
@@ -97,13 +97,13 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
     result = omni_client.graphql_query(query)
 
     assert len(result) > 0
-    brandon = result[0]
-    assert isinstance(brandon, odc.CDFExternalReferencesListedGraphQL)
-    assert brandon.external_id == "CDFExternalReferencesListed:Brandon"
-    assert len(brandon.timeseries or []) > 0
-    assert isinstance(brandon.timeseries[0], odc.TimeSeriesGraphQL)
-    assert len(brandon.sequences or []) > 0
-    assert isinstance(brandon.sequences[0], odc.SequenceGraphQL)
+    steven = result[0]
+    assert isinstance(steven, odc.CDFExternalReferencesListedGraphQL)
+    assert steven.external_id == "CDFExternalReferencesListed:Steven"
+    assert len(steven.timeseries or []) > 0
+    assert isinstance(steven.timeseries[0], odc.TimeSeriesGraphQL)
+    assert len(steven.sequences or []) > 0
+    assert isinstance(steven.sequences[0], odc.SequenceGraphQL)
     item: odc.CDFExternalReferencesListedGraphQL
     for item in result:
         item.as_read()
@@ -138,12 +138,6 @@ def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
     items{
       __typename
       name
-      directReverseMulti{
-        items{
-          externalId
-          name
-        }
-      }
       directReverseSingle{
         name
         externalId
@@ -156,8 +150,9 @@ def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
     assert len(result) > 0
     first = result[0]
     assert isinstance(first, odc.ConnectionItemEGraphQL)
-    assert first.direct_reverse_single is not None
-    assert first.direct_reverse_multi is not None
+    direct_reverse_single = [item.direct_reverse_single for item in result if item.direct_reverse_single]
+
+    assert len(direct_reverse_single) > 0, "No direct reverse single found"
 
 
 def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient) -> None:

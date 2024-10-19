@@ -11,14 +11,14 @@ import string
 import typing
 import warnings
 from collections import UserList, defaultdict
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from graphlib import TopologicalSorter
 from pathlib import Path
 from random import choice, choices, randint, uniform
-from typing import Callable, Generic, Literal, cast
+from typing import Generic, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -146,6 +146,7 @@ class MockGenerator:
             client: An instance of the CogniteClient class.
             data_set_id: The data set id to use for TimeSeries, Sequences, and FileMetadata.
             seed: The seed to use for the random number generator.
+            default_config:
 
         Returns:
             MockGenerator: The mock generator.
@@ -197,6 +198,8 @@ class MockGenerator:
         for view in sorted(views, key=lambda v: v.as_id().as_tuple()):
             if self._skip_interfaces and view.as_id() in self._interfaces:
                 continue
+            if view.used_for == "edge":
+                continue
             mapped_properties = {
                 name: prop
                 for name, prop in view.properties.items()
@@ -227,14 +230,14 @@ class MockGenerator:
                         [
                             dm.NodeOrEdgeData(
                                 source=view.as_id(),
-                                properties=dict(zip(properties.keys(), props)),
+                                properties=dict(zip(properties.keys(), props, strict=False)),
                             )
                         ]
                         if props
                         else None
                     ),
                 )
-                for node_id, *props in zip(node_ids, *properties.values())
+                for node_id, *props in zip(node_ids, *properties.values(), strict=False)
             ]
             output[view.as_id()] = ViewMockData(
                 view.as_id(),
@@ -275,7 +278,7 @@ class MockGenerator:
             for this_node in outputs[view_id].node:
                 for property_name, connection in connection_properties.items():
                     if (
-                        isinstance(connection, (MultiEdgeConnection, dm.MappedProperty))
+                        isinstance(connection, MultiEdgeConnection | dm.MappedProperty)
                         and connection.source is not None
                         and connection.source not in outputs
                         and connection.source not in leaf_children_by_parent
@@ -291,7 +294,7 @@ class MockGenerator:
                         continue
 
                     if isinstance(connection, EdgeConnection):
-                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+                        other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
                             max_edge_count = 1
                         else:  # MultiEdgeConnection
@@ -307,7 +310,7 @@ class MockGenerator:
                                 stacklevel=2,
                             )
                             continue
-                        other_nodes = self.get_other_nodes(connection.source, outputs, leaf_children_by_parent)
+                        other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
 
                         # If the connection is nullable, we randomly decide if we should create the relation
                         create_relation = not connection.nullable or random.random() < (
@@ -449,7 +452,7 @@ class MockGenerator:
         return output, external
 
     @staticmethod
-    def get_other_nodes(
+    def _get_other_nodes(
         connection: dm.ViewId,
         outputs: dict[dm.ViewId, ViewMockData],
         leaf_children_by_parent: dict[dm.ViewId, list[dm.ViewId]],
@@ -768,7 +771,7 @@ class MockData(UserList[ViewMockData]):
     def deploy(
         self,
         client: CogniteClient,
-        exclude: set[Literal["timeseries", "files", "sequences"]] | None = None,
+        exclude: set[ResourceType | tuple[str, ResourceType] | str] | None = None,
         verbose: bool = False,
     ) -> None:
         """Deploys the mock data to CDF.
@@ -1049,6 +1052,7 @@ class _RandomGenerator:
                 for key, value in zip(
                     cls.text(3),
                     [cls.text(1)[0], cls.int32(1)[0], cls.float32(1)[0]],
+                    strict=False,
                 )
             }
             for _ in range(count)
@@ -1167,9 +1171,9 @@ class FakerGenerators:
         except ImportError as e:
             raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
 
-        self.faker: Faker = Faker()
         if seed is not None:
             self.reset(seed)
+        self.faker: Faker = Faker()
 
     def reset(self, seed: int) -> None:
         try:
@@ -1177,6 +1181,7 @@ class FakerGenerators:
         except ImportError as e:
             raise PygenImportError("Faker is required for this feature. Install it with 'pip install faker'") from e
         Faker.seed(seed)
+        self.faker = Faker()
 
     def id_generator(self, view_id: dm.ViewId, node_count: int) -> list[str]:
         return [f"{view_id.external_id}:{self.faker.unique.first_name()}" for _ in range(node_count)]

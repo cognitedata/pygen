@@ -84,3 +84,11 @@ views:
   externalId: SubInterface
   version: "1"
   type: view
+- space: {{ pygen_models_space }}
+  externalId: CDFExternalReferences
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: CDFExternalReferencesListed
+  version: "1"
+  type: view

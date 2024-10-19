@@ -95,7 +95,7 @@ class EmptyGraphQL(GraphQLCore):
         timestamp: The timestamp field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Empty", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Empty", "1")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -182,10 +182,10 @@ class Empty(DomainModel):
         timestamp: The timestamp field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Empty", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Empty", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Empty")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -243,11 +243,11 @@ class EmptyWrite(DomainModelWrite):
         timestamp: The timestamp field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Empty", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Empty", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Empty"
+        "sp_pygen_models", "Empty"
     )
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None

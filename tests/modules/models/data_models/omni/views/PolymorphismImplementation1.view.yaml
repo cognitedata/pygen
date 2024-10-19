@@ -25,10 +25,15 @@ properties:
     containerPropertyIdentifier: requiredImplementation1Value
     name: Value2
 filter:
-  equals:
-    property:
-      - node
-      - type
-    value:
-      space: {{ pygen_models_space }}
-      externalId: Implementation1
+  and:
+    - equals:
+        property:
+          - node
+          - type
+        value:
+          space: {{ pygen_models_space }}
+          externalId: Implementation1
+    - hasData:
+        - type: container
+          space: {{ pygen_models_space }}
+          externalId: Implementation1

@@ -7,6 +7,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ViewNameCollisionWarning,
 )
+from tests.omni_constants import OMNI_SPACE
 from tests.utils import to_data_class_by_view_id
 
 
@@ -18,7 +19,7 @@ class TestDataClasses:
         node_class_by_view_id, edge_class_by_view_id = to_data_class_by_view_id(views, pygen_config)
 
         # Act
-        for data_class, view in zip(node_class_by_view_id.values(), views):
+        for data_class, view in zip(node_class_by_view_id.values(), views, strict=False):
             data_class.update_fields(
                 view.properties,
                 node_class_by_view_id,
@@ -39,7 +40,7 @@ class TestDataClasses:
     def test_has_date_field(self, omni_multi_api_generator: MultiAPIGenerator) -> None:
         # Arrange
         api_generator = omni_multi_api_generator.api_by_type_by_view_id["node"][
-            dm.ViewId("pygen-models", "PrimitiveRequired", "1")
+            dm.ViewId(OMNI_SPACE, "PrimitiveRequired", "1")
         ]
 
         # Assert

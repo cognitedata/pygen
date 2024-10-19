@@ -1,0 +1,93 @@
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Jeffrey
+  instanceType: node
+  sources:
+  - properties:
+      files:
+      - file_kenneth
+      sequences:
+      - sequence_leslie
+      - sequence_jason
+      - sequence_olivia
+      - sequence_kristy
+      timeseries: []
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Teresa
+  instanceType: node
+  sources:
+  - properties:
+      files: []
+      sequences:
+      - sequence_joanne
+      timeseries:
+      - timeseries_dillon
+      - timeseries_dalton
+      - timeseries_julie
+      - timeseries_brittany
+      - timeseries_susan
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Kyle
+  instanceType: node
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries:
+      - timeseries_michael
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Steven
+  instanceType: node
+  sources:
+  - properties:
+      files:
+      - file_william
+      - file_christopher
+      - file_sarah
+      - file_jacob
+      sequences:
+      - sequence_chad
+      - sequence_melvin
+      timeseries:
+      - timeseries_stephen
+      - timeseries_david
+      - timeseries_kelly
+      - timeseries_dean
+      - timeseries_alyssa
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferencesListed:Rebecca
+  instanceType: node
+  sources:
+  - properties:
+      files:
+      - file_john
+      sequences:
+      - sequence_chelsea
+      - sequence_scott
+      - sequence_adrian
+      - sequence_richard
+      timeseries: null
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view

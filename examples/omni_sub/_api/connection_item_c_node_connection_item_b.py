@@ -39,7 +39,7 @@ class ConnectionItemCNodeConnectionItemBAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("pygen-models", "unidirectional"),
+            dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
             from_connection_item_c_node,
             to_connection_item_b,
             external_id_prefix,

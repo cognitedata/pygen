@@ -44,7 +44,7 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 class PrimitiveNullableAPI(
     NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList, PrimitiveNullableWriteList]
 ):
-    _view_id = dm.ViewId("pygen-models", "PrimitiveNullable", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "PrimitiveNullable", "1")
     _properties_by_field = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
     _class_type = PrimitiveNullable
     _class_list = PrimitiveNullableList

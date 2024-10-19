@@ -24,11 +24,11 @@ class OmniSubClient:
 
     Generated with:
         pygen = 0.99.38
-        cognite-sdk = 7.63.5
+        cognite-sdk = 7.63.6
         pydantic = 2.9.2
 
     Data Model:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: OmniSub
         version: 1
     """
@@ -218,7 +218,7 @@ class OmniSubClient:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("pygen-models", "OmniSub", "1")
+        data_model_id = dm.DataModelId("sp_pygen_models", "OmniSub", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 
@@ -245,7 +245,7 @@ class OmniSubClient:
         return cls.azure_project(**toml_content)
 
     def _repr_html_(self) -> str:
-        return """<strong>OmniSubClient</strong> generated from data model ("pygen-models", "OmniSub", "1")<br />
+        return """<strong>OmniSubClient</strong> generated from data model ("sp_pygen_models", "OmniSub", "1")<br />
 with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
