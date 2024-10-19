@@ -1,0 +1,77 @@
+- externalId: timeseries_dillon
+  name: timeseries_dillon
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_dalton
+  name: timeseries_dalton
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_julie
+  name: timeseries_julie
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_brittany
+  name: timeseries_brittany
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_susan
+  name: timeseries_susan
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_michael
+  name: timeseries_michael
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_stephen
+  name: timeseries_stephen
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_david
+  name: timeseries_david
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_kelly
+  name: timeseries_kelly
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_dean
+  name: timeseries_dean
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_alyssa
+  name: timeseries_alyssa
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196

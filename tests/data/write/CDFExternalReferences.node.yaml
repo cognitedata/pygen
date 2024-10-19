@@ -1,0 +1,65 @@
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Joel
+  instanceType: node
+  sources:
+  - properties:
+      file: null
+      sequence: sequence_timothy
+      timeseries: timeseries_jonathan
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Colleen
+  instanceType: node
+  sources:
+  - properties:
+      file: file_matthew
+      sequence: sequence_jeffrey
+      timeseries: timeseries_michelle
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Christopher
+  instanceType: node
+  sources:
+  - properties:
+      file: file_martha
+      sequence: null
+      timeseries: timeseries_jacob
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Austin
+  instanceType: node
+  sources:
+  - properties:
+      file: file_katelyn
+      sequence: sequence_kayla
+      timeseries: null
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: CDFExternalReferences:Daniel
+  instanceType: node
+  sources:
+  - properties:
+      file: file_angela
+      sequence: sequence_john
+      timeseries: timeseries_chloe
+    source:
+      space: sp_pygen_models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view

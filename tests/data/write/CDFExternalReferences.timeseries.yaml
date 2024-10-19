@@ -1,0 +1,28 @@
+- externalId: timeseries_jonathan
+  name: timeseries_jonathan
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_michelle
+  name: timeseries_michelle
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_jacob
+  name: timeseries_jacob
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196
+- externalId: timeseries_chloe
+  name: timeseries_chloe
+  isString: false
+  metadata:
+    source: PygenMockGenerator
+  isStep: false
+  dataSetId: 5472779523460196

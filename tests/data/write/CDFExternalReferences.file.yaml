@@ -1,0 +1,28 @@
+- externalId: file_matthew
+  name: file_matthew
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_martha
+  name: file_martha
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_katelyn
+  name: file_katelyn
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
+- externalId: file_angela
+  name: file_angela
+  source: sp_omni_instances
+  mimeType: text/plain
+  metadata:
+    source: PygenMockGenerator
+  dataSetId: 5472779523460196
