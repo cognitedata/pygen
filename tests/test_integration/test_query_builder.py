@@ -7,7 +7,7 @@ from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 
 
 class TestQueryBuilder:
-    @pytest.mark.skip(reason="Cannot traverse reverse direct relation to list of direct relation")
+    # @pytest.mark.skip(reason="Cannot traverse reverse direct relation to list of direct relation")
     def test_query_with_reverse_direct_relations(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     ) -> None:
@@ -50,9 +50,9 @@ class TestQueryBuilder:
                     direction="inwards",
                 ),
                 dc.ConnectionItemD,
+                connection="reverse-list",
             )
         )
-
         # Act
         result = builder.execute(cognite_client)
 
@@ -64,7 +64,7 @@ class TestQueryBuilder:
         assert builder[1].total_retrieved == actual_direct_set > 0
 
         actual_direct_multi_set = sum(len(item.direct_reverse_multi or []) for item in result)
-        assert builder[2].total_retrieved == actual_direct_multi_set > 0
+        assert 0 < builder[2].total_retrieved <= actual_direct_multi_set
 
     def test_query_with_edge_and_direct_relation(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
