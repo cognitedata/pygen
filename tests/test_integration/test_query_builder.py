@@ -7,7 +7,6 @@ from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
 
 
 class TestQueryBuilder:
-    # @pytest.mark.skip(reason="Cannot traverse reverse direct relation to list of direct relation")
     def test_query_with_reverse_direct_relations(
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     ) -> None:
