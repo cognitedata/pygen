@@ -663,7 +663,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                         through=ConnectionItemD._view_id.as_property_ref("directMulti"),
                     ),
                     ConnectionItemD,
-                    connection="reverse-list",
+                    connection_type="reverse-list",
                 )
             )
             builder.append(

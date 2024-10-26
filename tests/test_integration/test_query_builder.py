@@ -49,7 +49,7 @@ class TestQueryBuilder:
                     direction="inwards",
                 ),
                 dc.ConnectionItemD,
-                connection="reverse-list",
+                connection_type="reverse-list",
             )
         )
         # Act

@@ -315,10 +315,10 @@ class NodeQueryStep(QueryStep):
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
         raw_filter: dm.Filter | None = None,
-        connection: Literal["reverse-list"] | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select, raw_filter, connection)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter, connection_type)
 
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
