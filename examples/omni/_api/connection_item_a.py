@@ -716,5 +716,5 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                     ConnectionItemA,
                 )
             )
-
+        # We know that that all nodes are connected as it is not possible to filter on connections
         return builder.execute(self._client, remove_not_connected=False)

@@ -528,7 +528,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     {{field.destination_class.read_name }},
                 )
             ){% endif %}{% endfor %}
-
+        # We know that that all nodes are connected as it is not possible to filter on connections
         return builder.execute(self._client, remove_not_connected=False){% else %}
         return self._list(
             limit=limit,

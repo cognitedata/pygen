@@ -549,5 +549,5 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                     ConnectionItemF,
                 )
             )
-
-        return builder.execute(self._client)
+        # We know that that all nodes are connected as it is not possible to filter on connections
+        return builder.execute(self._client, remove_not_connected=False)
