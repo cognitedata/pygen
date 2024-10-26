@@ -742,6 +742,7 @@ class _QueryResultCleaner:
             return [cls.as_node_id(value)]
         return []
 
+
 class Filtering(Generic[T_QueryCore], ABC):
     def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]):
         self._query = query
