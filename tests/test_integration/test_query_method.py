@@ -35,9 +35,14 @@ def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
 
 def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.query().outwards.name.prefix("A").list_full(limit=5)
+    items_reversed = omni_client.connection_item_b.query().name.prefix("A").inwards.list_connection_item_a(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
+    assert len(items_reversed) > 0
+    assert isinstance(items_reversed, dc.ConnectionItemAList)
+    assert set(items.as_external_ids()) == set(items_reversed.as_external_ids())
+
     invalid_outwards = {
         item.external_id: subitems
         for item in items
