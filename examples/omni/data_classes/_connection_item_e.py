@@ -534,6 +534,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
@@ -547,35 +548,37 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
             self.direct_reverse_multi = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("sp_pygen_models", "ConnectionItemE", "1").as_property_ref("directReverseMulti"),
+                    through=dm.ViewId("sp_pygen_models", "ConnectionItemD", "1").as_property_ref("directMulti"),
                     direction="inwards",
                 ),
                 "direct_reverse_multi",
+                connection_type="reverse-list",
             )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
             self.direct_reverse_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("sp_pygen_models", "ConnectionItemE", "1").as_property_ref("directReverseSingle"),
+                    through=dm.ViewId("sp_pygen_models", "ConnectionItemD", "1").as_property_ref("directSingle"),
                     direction="inwards",
                 ),
                 "direct_reverse_single",
             )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
             self.inwards_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -588,7 +591,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 "inwards_single",
             )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
             self.inwards_single_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

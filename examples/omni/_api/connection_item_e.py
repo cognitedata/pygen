@@ -660,6 +660,19 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                         from_=from_root,
                         filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
                         direction="inwards",
+                        through=ConnectionItemD._view_id.as_property_ref("directMulti"),
+                    ),
+                    ConnectionItemD,
+                    connection_type="reverse-list",
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[ConnectionItemD._view_id]),
+                        direction="inwards",
                         through=ConnectionItemD._view_id.as_property_ref("directSingle"),
                     ),
                     ConnectionItemD,

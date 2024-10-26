@@ -44,6 +44,7 @@ from .constants import (
     INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
+    SEARCH_LIMIT,
 )
 from .helpers import as_node_id
 
@@ -71,6 +72,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         expression: dm.query.ResultSetExpression | None = None,
         view_filter: dm.filters.Filter | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
@@ -79,6 +81,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
         self._connection_name = connection_name
+        self._connection_type = connection_type
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.space = StringFilter(self, ["node", "space"])
         self._filter_classes: list[Filtering] = [self.external_id, self.space]
@@ -181,6 +184,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     expression=item._expression,
                     result_cls=item._result_cls,
                     max_retrieve_limit=max_retrieve_limit,
+                    connection_type=item._connection_type,
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
@@ -230,6 +234,7 @@ class QueryStep:
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
         raw_filter: dm.Filter | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -243,6 +248,7 @@ class QueryStep:
         else:
             self.select = select  # type: ignore[assignment]
         self.raw_filter = raw_filter
+        self.connection_type = connection_type
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
@@ -251,6 +257,11 @@ class QueryStep:
 
     def _default_select(self) -> dm.query.Select:
         raise NotImplementedError()
+
+    @property
+    def is_queryable(self) -> bool:
+        # We cannot query across reverse-list connections
+        return self.connection_type != "reverse-list"
 
     @property
     def from_(self) -> str | None:
@@ -306,9 +317,10 @@ class NodeQueryStep(QueryStep):
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
         raw_filter: dm.Filter | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter, connection_type)
 
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
@@ -330,7 +342,7 @@ class EdgeQueryStep(QueryStep):
         raw_filter: dm.Filter | None = None,
     ):
         self.result_cls = result_cls
-        super().__init__(name, expression, max_retrieve_limit, select, raw_filter)
+        super().__init__(name, expression, max_retrieve_limit, select, raw_filter, None)
 
     def _default_select(self) -> dm.query.Select:
         if self.result_cls is None:
@@ -366,19 +378,20 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         for expression in self:
             expression.update_expression_limit()
 
-    def _build(self) -> dm.query.Query:
-        with_ = {expression.name: expression.expression for expression in self}
-        select = {expression.name: expression.select for expression in self if expression.select is not None}
+    def _build(self) -> tuple[dm.query.Query, list[NodeQueryStep]]:
+        with_ = {step.name: step.expression for step in self if step.is_queryable}
+        select = {step.name: step.select for step in self if step.select is not None and step.is_queryable}
         cursors = self._cursors
+        search = [step for step in self if isinstance(step, NodeQueryStep) and not step.is_queryable]
 
-        return dm.query.Query(with_=with_, select=select, cursors=cursors)
+        return dm.query.Query(with_=with_, select=select, cursors=cursors), search
 
     def _dump_yaml(self) -> str:
-        return self._build().dump_yaml()
+        return self._build()[0].dump_yaml()
 
     @property
     def _cursors(self) -> dict[str, str | None]:
-        return {expression.name: expression.cursor for expression in self}
+        return {expression.name: expression.cursor for expression in self if expression.is_queryable}
 
     def _update(self, batch: dm.query.QueryResult):
         for expression in self:
@@ -390,8 +403,8 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             expression.results.extend(batch[expression.name].data)
 
     @property
-    def _is_finished(self):
-        return all(expression.is_finished for expression in self)
+    def _is_finished(self) -> bool:
+        return self[0].is_finished
 
     def _reduce_max_batch_limit(self) -> bool:
         for expression in self:
@@ -451,7 +464,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
     def execute(self, client: CogniteClient, unpack: bool = True) -> T_DomainModelList | None:
         self._reset()
-        query = self._build()
+        query, to_search = self._build()
 
         if not self:
             raise ValueError("No query steps to execute")
@@ -482,6 +495,29 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                     )
 
                 raise e
+
+            for step in to_search:
+                if step.from_ is None or step.from_ not in batch:
+                    continue
+                item_ids = [node.as_id() for node in batch[step.from_].data]
+                if not item_ids:
+                    continue
+
+                view_id = step.result_cls._view_id
+                expression = cast(dm.query.NodeResultSetExpression, step.expression)
+                if expression.through is None:
+                    raise ValueError("Missing through set in a reverse-list query")
+                is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
+                is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
+                limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
+                properties = None if step.select is None else step.select.sources[0].properties
+                if properties == ["*"]:
+                    properties = None
+                step_result = client.data_modeling.instances.search(
+                    step.result_cls._view_id, properties=properties, filter=is_selected, limit=limit
+                )
+                batch[step.name] = dm.NodeListWithCursor(step_result, None)
+
             last_execution_time = time.time() - t0
 
             self._update(batch)

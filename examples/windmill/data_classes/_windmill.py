@@ -517,6 +517,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._blade import _BladeQuery
         from ._metmast import _MetmastQuery
@@ -531,9 +532,10 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
-        if _BladeQuery not in created_types:
+        if _BladeQuery not in created_types and connection_type != "reverse-list":
             self.blades = _BladeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -546,7 +548,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 "blades",
             )
 
-        if _MetmastQuery not in created_types:
+        if _MetmastQuery not in created_types and connection_type != "reverse-list":
             self.metmast = _MetmastQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -559,7 +561,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 "metmast",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_types and connection_type != "reverse-list":
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -572,7 +574,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 "nacelle",
             )
 
-        if _RotorQuery not in created_types:
+        if _RotorQuery not in created_types and connection_type != "reverse-list":
             self.rotor = _RotorQuery(
                 created_types.copy(),
                 self._creation_path,

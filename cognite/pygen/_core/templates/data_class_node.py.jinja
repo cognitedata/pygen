@@ -534,6 +534,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):{% for dependency_class in data_class.dependencies_with_edge_destinations %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
@@ -545,9 +546,10 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
-        if _{{ field.linked_class.query_cls_name }} not in created_types:
+        if _{{ field.linked_class.query_cls_name }} not in created_types and connection_type != "reverse-list":
             self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
@@ -559,14 +561,15 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                     direction="outwards",
                 ),{% elif field.is_reverse_direct_relation %}
                 dm.query.NodeResultSetExpression(
-                    through={{ field.reverse_property.destination_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
+                    through={{ field.through_str }},
                     direction="inwards",
                 ),{% else %}
                 dm.query.EdgeResultSetExpression(
                     direction="{{ field.edge_direction }}",
                     chain_to="destination",
                 ),{% endif %}
-                "{{ field.name }}",
+                "{{ field.name }}",{% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
+                connection_type="reverse-list",{% endif %}
             ){% endif %}
 {% endfor %}{% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
         self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}

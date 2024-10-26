@@ -411,6 +411,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._equipment_module import _EquipmentModuleQuery
         from ._start_end_time import _StartEndTimeQuery
@@ -424,9 +425,10 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
-        if _StartEndTimeQuery not in created_types:
+        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
             self.work_orders = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -440,7 +442,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 "work_orders",
             )
 
-        if _StartEndTimeQuery not in created_types:
+        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
             self.work_units = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,

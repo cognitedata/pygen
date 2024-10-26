@@ -136,12 +136,13 @@ def test_list_advanced_sort(omni_client: OmniClient) -> None:
     assert list(sorted_items) == sorted(sorted_items, key=key)
 
 
-@pytest.mark.skip(reason="Cannot traverse reverse direct relation to list of direct relation")
 @pytest.mark.usefixtures("setup_reverse_direct_relations")
 def test_list_with_reverse_direct_relations(omni_client: OmniClient) -> None:
-    connections = omni_client.connection_item_e.list(limit=1, retrieve_connections="full")
+    connections = omni_client.connection_item_e.list(
+        limit=1, retrieve_connections="full", external_id_prefix="connection_item_e"
+    )
 
-    assert len(connections) > 0
+    assert len(connections) == 1
     first = connections[0]
     assert first.direct_reverse_single is not None
     assert first.direct_reverse_multi is not None

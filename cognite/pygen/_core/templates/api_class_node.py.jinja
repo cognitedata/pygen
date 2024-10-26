@@ -501,7 +501,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                     ),
                     {{ field.destination_class.read_name }},
                 )
-            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_one %}
+            ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_reverse_direct_relation %}
             builder.append(
                 NodeQueryStep(
                     builder.create_name(from_root),
@@ -511,7 +511,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                         direction="inwards",
                         through={{field.destination_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
                     ),
-                    {{field.destination_class.read_name }},
+                    {{field.destination_class.read_name }},{% if field.reverse_property.is_one_to_many %}
+                    connection_type="reverse-list",{% endif %}
                 )
             ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_direct_relation and field.destination_class %}
             builder.append(

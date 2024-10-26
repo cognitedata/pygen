@@ -77,3 +77,9 @@ def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
     items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
 
     assert len(items) > 0
+
+
+def test_query_across_reverse_direct_relation_to_list_full(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_e.query().direct_reverse_multi.list_full(limit=5)
+
+    assert len(items) > 0
