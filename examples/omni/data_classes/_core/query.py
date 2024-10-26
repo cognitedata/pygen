@@ -27,6 +27,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
+from cognite.client.utils._identifier import InstanceId
 
 from .base import (
     DomainModelList,
@@ -343,6 +344,14 @@ class NodeQueryStep(QueryStep):
             for instance in cast(list[dm.Node], self.results)
         }
 
+    @property
+    def node_results(self) -> list[dm.Node]:
+        return cast(list[dm.Node], self.results)
+
+    @property
+    def node_expression(self) -> dm.query.NodeResultSetExpression:
+        return cast(dm.query.NodeResultSetExpression, self.expression)
+
 
 class EdgeQueryStep(QueryStep):
     def __init__(
@@ -370,6 +379,14 @@ class EdgeQueryStep(QueryStep):
             value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
             output[as_node_id(edge_source)].append(value)  # type: ignore[arg-type]
         return output
+
+    @property
+    def edge_results(self) -> list[dm.Edge]:
+        return cast(list[dm.Edge], self.results)
+
+    @property
+    def edge_expression(self) -> dm.query.EdgeResultSetExpression:
+        return cast(dm.query.EdgeResultSetExpression, self.expression)
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
@@ -425,6 +442,11 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 return False
         return True
 
+    def _remove_not_connected(self) -> None:
+        if len(self) == 1:
+            return
+        _CleanQueryResults(self).clean()
+
     def _unpack(self) -> T_DomainModelList:
         if self._result_list_cls is None:
             raise ValueError("No result class set, unable to unpack results")
@@ -470,12 +492,12 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[True] = True) -> T_DomainModelList: ...
+    def execute(self, client: CogniteClient, unpack: Literal[True] = True, remove_not_connected: bool = True) -> T_DomainModelList: ...
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[False]) -> None: ...
+    def execute(self, client: CogniteClient, unpack: Literal[False],remove_not_connected: bool = True) -> None: ...
 
-    def execute(self, client: CogniteClient, unpack: bool = True) -> T_DomainModelList | None:
+    def execute(self, client: CogniteClient, unpack: bool = True, remove_not_connected: bool = True) -> T_DomainModelList | None:
         self._reset()
         query, to_search = self._build()
 
@@ -561,6 +583,9 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 is_large_query = True
                 print(f"Large query detected. Will print progress.")
 
+        if remove_not_connected:
+            self._remove_not_connected()
+
         if not unpack:
             return None
         return self._unpack()
@@ -620,6 +645,53 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
 
 T_QueryCore = TypeVar("T_QueryCore")
+
+
+class _CleanQueryResults:
+    """Remove nodes and edges that are not connected through the entire query"""
+    def __init__(self, steps: list[QueryStep]):
+        self._tree = self._create_tree(steps)
+        self._root = steps[0]
+
+    @classmethod
+    def _create_tree(cls, steps: list[QueryStep]) -> dict[str, list[QueryStep]]:
+        tree: dict[str, list[QueryStep]] = defaultdict(list)
+        for step in steps:
+            if step.from_ is None:
+                continue
+            tree[step.from_].append(step)
+        return dict(tree)
+
+    def clean(self) -> None:
+        self._clean(self._root)
+
+    @staticmethod
+    def as_node_id(direct_relation: dm.DirectRelationReference) -> dm.NodeId:
+        return dm.NodeId(direct_relation.space, direct_relation.external_id)
+
+    def _clean(self, step: QueryStep) -> set[InstanceId]:
+        if step.name not in self._tree:
+            # Lead Node
+            return {item.as_id() for item in step.results}  # type: ignore[attr-defined]
+
+        expected_ids: set[InstanceId] = set()
+        for child in self._tree[step.name]:
+            expected_ids |= self._clean(child)
+
+        if isinstance(step, NodeQueryStep) and step.node_expression.through is None:
+            step.results = [node for node in step.node_results if node.as_id() in expected_ids]
+            return {node.as_id() for node in step.node_results}
+        elif isinstance(step, NodeQueryStep) and step.node_expression.through is not None:
+            raise NotImplementedError("Through is not implemented")
+        elif isinstance(step, EdgeQueryStep):
+            if step.edge_expression.direction == "outwards":
+                step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
+                return {self.as_node_id(edge.start_node) for edge in step.edge_results}
+            else:  # inwards
+                step.results = [edge for edge in step.edge_results if self.as_node_id(edge.start_node) in expected_ids]
+                return {self.as_node_id(edge.end_node) for edge in step.edge_results}
+
+        raise TypeError(f"Unsupported query step type: {type(step)}")
 
 
 class Filtering(Generic[T_QueryCore], ABC):

@@ -717,4 +717,4 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 )
             )
 
-        return builder.execute(self._client)
+        return builder.execute(self._client, remove_not_connected=False)
