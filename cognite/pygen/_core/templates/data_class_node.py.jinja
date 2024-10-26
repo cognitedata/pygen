@@ -49,7 +49,8 @@ from ._core import ({% if has_default_instance_space %}
     is_tuple_id,
     select_best_node,
     QueryCore,
-    NodeQueryCore,{% if data_class.has_filtering_fields %}
+    NodeQueryCore,
+    StringFilter,{% if data_class.has_filtering_fields %}
     {{ data_class.filtering_import }}{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
 from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
@@ -573,9 +574,13 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                 connection_name="{{ field.name }}",{% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
                 connection_type="reverse-list",{% endif %}
             ){% endif %}
-{% endfor %}{% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
+{% endfor %}{% if data_class.has_filtering_fields %}
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"]){% for field in data_class.filtering_fields %}
         self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
-        self._filter_classes.extend([{% for field in data_class.filtering_fields %}
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,{% for field in data_class.filtering_fields %}
             self.{{ field.name }},{% endfor %}
         ]){% endif %}
 
