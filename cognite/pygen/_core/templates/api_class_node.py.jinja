@@ -509,10 +509,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                         from_=from_root,{% if field.destination_class.has_container_fields %}
                         filter=dm.filters.HasData(views=[{{field.destination_class.read_name }}._view_id]),{% endif %}
                         direction="inwards",
-                        through={{field.destination_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),{% if field.reverse_property.is_one_to_many %}
-                        connection="reverse-list",{% endif %}
+                        through={{field.destination_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
                     ),
-                    {{field.destination_class.read_name }},
+                    {{field.destination_class.read_name }},{% if field.reverse_property.is_one_to_many %}
+                    connection="reverse-list",{% endif %}
                 )
             ){% endif %}{% endfor %}{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if field.is_direct_relation and field.destination_class %}
             builder.append(
