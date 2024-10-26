@@ -27,7 +27,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
-from cognite.client.utils._identifier import InstanceId
 
 from .base import (
     DomainModelList,

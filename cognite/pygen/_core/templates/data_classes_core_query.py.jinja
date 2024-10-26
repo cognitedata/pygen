@@ -179,7 +179,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
     def _create_query(
-            self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False
+        self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False
     ) -> QueryBuilder:
         builder = QueryBuilder(result_list_cls)
         from_: str | None = None
@@ -344,6 +344,14 @@ class NodeQueryStep(QueryStep):
             {% else %} {% endif %}for instance in cast(list[dm.Node], self.results)
         }
 
+    @property
+    def node_results(self) -> list[dm.Node]:
+        return cast(list[dm.Node], self.results)
+
+    @property
+    def node_expression(self) -> dm.query.NodeResultSetExpression:
+        return cast(dm.query.NodeResultSetExpression, self.expression)
+
 
 class EdgeQueryStep(QueryStep):
     def __init__(
@@ -371,6 +379,14 @@ class EdgeQueryStep(QueryStep):
             value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
             output[as_node_id(edge_source)].append(value)  # type: ignore[arg-type]
         return output
+
+    @property
+    def edge_results(self) -> list[dm.Edge]:
+        return cast(list[dm.Edge], self.results)
+
+    @property
+    def edge_expression(self) -> dm.query.EdgeResultSetExpression:
+        return cast(dm.query.EdgeResultSetExpression, self.expression)
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
