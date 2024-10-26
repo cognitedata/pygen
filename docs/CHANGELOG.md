@@ -20,6 +20,10 @@ Changes are grouped as follows
 - In the `.list` method with `retrieve_connections="full"`, reverse direct relations pointing to list direct relations
   are now supported.
 
+### Fixed
+- The results of `client.node_type.query.....list_full()` is now filtered no the client side to ensure that only
+  nodes that are connected to the starting node are returned.
+
 ### Changed
 - [Experimental - Breaking] The `.query()` method is now a property `query`. Instead of `client.asset.query()`
   you now do `client.asset.query`. This is to make it more intuitive to use the query method.
