@@ -166,7 +166,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
     def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
-        builder = self._create_query(limit, self._result_list_cls, reverse=True)
+        builder = self._create_query(limit, self._result_list_cls, try_reverse=True)
         return builder.execute(self._client)
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
@@ -178,7 +178,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     def _dump_yaml(self) -> str:
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
-    def _create_query(self, limit: int, result_list_cls: type[DomainModelList], reverse: bool = False) -> QueryBuilder:
+    def _create_query(self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False) -> QueryBuilder:
         builder = QueryBuilder(result_list_cls)
         from_: str | None = None
         first: bool = True
