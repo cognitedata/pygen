@@ -561,7 +561,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     through=dm.ViewId("sp_pygen_models", "ConnectionItemD", "1").as_property_ref("directMulti"),
                     direction="inwards",
                 ),
-                connection_name="direct_reverse_multi",
+                "direct_reverse_multi",
                 connection_type="reverse-list",
             )
 

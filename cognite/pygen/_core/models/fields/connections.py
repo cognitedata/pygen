@@ -7,7 +7,7 @@ import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import TYPE_CHECKING, ClassVar, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import (
@@ -213,6 +213,17 @@ class BaseConnectionField(Field, ABC):
         if self.edge_type is None:
             raise ValueError("Bug in Pygen: Missing edge type")
         return f'dm.DirectRelationReference("{ self.edge_type.space }", "{ self.edge_type.external_id }")'
+
+    @property
+    def through_str(self) -> str:
+        """Returns the through property as a string."""
+        if self.through is None:
+            raise ValueError("Bug in Pygen: Missing through property")
+        view_id = cast(dm.ViewId, self.through.source)
+        return (
+            f'dm.ViewId("{view_id.space}", "{view_id.external_id}", '
+            f'"{view_id.version}").as_property_ref("{self.through.property}")'
+        )
 
     @property
     def is_one_to_many(self) -> bool:
