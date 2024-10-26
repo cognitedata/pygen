@@ -207,11 +207,15 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.main_value,
                 self.sub_value,
                 self.value_1,

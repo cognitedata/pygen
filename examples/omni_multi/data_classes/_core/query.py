@@ -84,16 +84,14 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._reverse_expression = reverse_expression
         self._connection_name = connection_name
         self._connection_type = connection_type
-        self.external_id = StringFilter(self, ["node", "externalId"])
-        self.space = StringFilter(self, ["node", "space"])
-        self._filter_classes: list[Filtering] = [self.external_id, self.space]
+        self._filter_classes: list[Filtering] = []
 
     @property
     def _connection_names(self) -> set[str]:
         return {step._connection_name for step in self._creation_path if step._connection_name}
 
     @property
-    def is_reverseable(self) -> bool:
+    def _is_reverseable(self) -> bool:
         return self._reverse_expression is not None
 
     def __getattr__(self, item: str) -> Any:

@@ -372,11 +372,15 @@ class _EquipmentModuleQuery(NodeQueryCore[T_DomainModelList, EquipmentModuleList
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.equipment_module_type = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.description,
                 self.name,
                 self.equipment_module_type,

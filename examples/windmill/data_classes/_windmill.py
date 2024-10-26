@@ -32,8 +32,8 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
-    FloatFilter,
     StringFilter,
+    FloatFilter,
 )
 
 if TYPE_CHECKING:
@@ -589,11 +589,15 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 connection_name="rotor",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.windfarm = StringFilter(self, self._view_id.as_property_ref("windfarm"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.capacity,
                 self.name,
                 self.windfarm,

@@ -468,6 +468,8 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.aggregation = StringFilter(self, self._view_id.as_property_ref("aggregation"))
         self.country = StringFilter(self, self._view_id.as_property_ref("country"))
         self.instance = TimestampFilter(self, self._view_id.as_property_ref("instance"))
@@ -477,6 +479,8 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
         self.start = TimestampFilter(self, self._view_id.as_property_ref("start"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.aggregation,
                 self.country,
                 self.instance,

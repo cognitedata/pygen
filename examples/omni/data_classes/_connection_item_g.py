@@ -412,9 +412,13 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
                 connection_name="inwards_multi_property",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.name,
             ]
         )

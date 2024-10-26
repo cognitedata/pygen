@@ -24,6 +24,7 @@ from ._core import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
+    StringFilter,
     TimestampFilter,
 )
 from ._unit_procedure import UnitProcedureWrite
@@ -409,10 +410,14 @@ class _StartEndTimeQuery(EdgeQueryCore[T_DomainList, StartEndTimeList]):
                 expression=dm.query.NodeResultSetExpression(),
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.end_time = TimestampFilter(self, self._view_id.as_property_ref("end_time"))
         self.start_time = TimestampFilter(self, self._view_id.as_property_ref("start_time"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.end_time,
                 self.start_time,
             ]
