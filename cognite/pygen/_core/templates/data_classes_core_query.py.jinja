@@ -101,6 +101,8 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         if item in self._connection_names:
             nodes = [step._result_cls.__name__ for step in self._creation_path]
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
+        elif self._connection_type == "reverse-list":
+            raise ValueError(f"Cannot query across a reverse-list connection.")
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
     def _assemble_filter(self) -> dm.filters.Filter:

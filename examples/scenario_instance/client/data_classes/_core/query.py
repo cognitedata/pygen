@@ -101,6 +101,8 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         if item in self._connection_names:
             nodes = [step._result_cls.__name__ for step in self._creation_path]
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
+        elif self._connection_type == "reverse-list":
+            raise ValueError(f"Cannot query across a reverse-list connection.")
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
     def _assemble_filter(self) -> dm.filters.Filter:
@@ -407,13 +409,26 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         for expression in self:
             expression.update_expression_limit()
 
-    def _build(self) -> tuple[dm.query.Query, list[NodeQueryStep]]:
+    def _build(self) -> tuple[dm.query.Query, list[NodeQueryStep], set[str]]:
         with_ = {step.name: step.expression for step in self if step.is_queryable}
         select = {step.name: step.select for step in self if step.select is not None and step.is_queryable}
         cursors = self._cursors
-        search = [step for step in self if isinstance(step, NodeQueryStep) and not step.is_queryable]
 
-        return dm.query.Query(with_=with_, select=select, cursors=cursors), search
+        step_by_name = {step.name: step for step in self}
+        search: list[NodeQueryStep] = []
+        temporary_select: set[str] = set()
+        for step in self:
+            if step.is_queryable:
+                continue
+            if isinstance(step, NodeQueryStep):
+                search.append(step)
+                # Ensure that select is set for the parent
+                if step.from_ in select or step.from_ is None:
+                    continue
+                view_id = step_by_name[step.from_].result_cls._view_id  # type: ignore[attr-defined]
+                select[step.from_] = dm.query.Select([dm.query.SourceSelector(view_id, ["*"])])
+                temporary_select.add(step.from_)
+        return dm.query.Query(with_=with_, select=select, cursors=cursors), search, temporary_select
 
     def _dump_yaml(self) -> str:
         return self._build()[0].dump_yaml()
@@ -497,7 +512,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
         self, client: CogniteClient, unpack: bool = True, remove_not_connected: bool = True
     ) -> T_DomainModelList | None:
         self._reset()
-        query, to_search = self._build()
+        query, to_search, temp_select = self._build()
 
         if not self:
             raise ValueError("No query steps to execute")
@@ -550,6 +565,9 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                     step.result_cls._view_id, properties=properties, filter=is_selected, limit=limit
                 )
                 batch[step.name] = dm.NodeListWithCursor(step_result, None)
+
+            for name in temp_select:
+                batch.pop(name, None)
 
             last_execution_time = time.time() - t0
 
