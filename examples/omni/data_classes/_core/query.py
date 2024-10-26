@@ -442,11 +442,6 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 return False
         return True
 
-    def _remove_not_connected(self) -> None:
-        if len(self) == 1:
-            return
-        _QueryResultCleaner(self).clean()
-
     def _unpack(self) -> T_DomainModelList:
         if self._result_list_cls is None:
             raise ValueError("No result class set, unable to unpack results")
@@ -583,8 +578,8 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 is_large_query = True
                 print(f"Large query detected. Will print progress.")
 
-        if remove_not_connected:
-            self._remove_not_connected()
+        if remove_not_connected and len(self) > 1:
+            _QueryResultCleaner(self).clean()
 
         if not unpack:
             return None
@@ -676,8 +671,10 @@ class _QueryResultCleaner:
         if step.name not in self._tree:
             # Leaf Node
             direct_relation: str | None = None
-            if isinstance(step, NodeQueryStep) and step.node_expression.through is not None:
-                direct_relation = step.node_expression.through.property
+            if isinstance(step, NodeQueryStep) and (through := step.node_expression.through) is not None:
+                direct_relation = through.property
+                if step.node_expression.direction == "inwards":
+                    return {node_id for item in step.node_results for node_id in self._get_relations(item, direct_relation)}, None
 
             return {item.as_id() for item in step.results}, direct_relation  # type: ignore[attr-defined]
 
@@ -700,7 +697,7 @@ class _QueryResultCleaner:
 
         if isinstance(step, EdgeQueryStep):
             if len(expected_ids_by_property) > 1 or None not in expected_ids_by_property:
-                raise ValueError(f"Invalid state of {type(self).__name__}")
+                raise RuntimeError(f"Invalid state of {type(self).__name__}")
             expected_ids = expected_ids_by_property[None]
             if step.edge_expression.direction == "outwards":
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
@@ -734,6 +731,16 @@ class _QueryResultCleaner:
                 return True
         return False
 
+    @classmethod
+    def _get_relations(cls, node: dm.Node, property_id: str) -> Iterable[dm.NodeId]:
+        if property_id is None:
+            return {node.as_id()}
+        value = next(iter(node.properties.values())).get(property_id)
+        if isinstance(value, list):
+            return [cls.as_node_id(item) for item in value if isinstance(item, dict)]
+        elif isinstance(value, dict):
+            return [cls.as_node_id(value)]
+        return []
 
 class Filtering(Generic[T_QueryCore], ABC):
     def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]):
