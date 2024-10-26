@@ -434,6 +434,7 @@ class _PrimitiveNullableQuery(NodeQueryCore[T_DomainModelList, PrimitiveNullable
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -445,6 +446,7 @@ class _PrimitiveNullableQuery(NodeQueryCore[T_DomainModelList, PrimitiveNullable
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         self.boolean = BooleanFilter(self, self._view_id.as_property_ref("boolean"))

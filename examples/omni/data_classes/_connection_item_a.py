@@ -507,7 +507,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
-                "other_direct",
+                connection_name="other_direct",
             )
 
         if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
@@ -520,7 +520,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "outwards",
+                connection_name="outwards",
             )
 
         if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
@@ -533,7 +533,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     through=self._view_id.as_property_ref("selfDirect"),
                     direction="outwards",
                 ),
-                "self_direct",
+                connection_name="self_direct",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

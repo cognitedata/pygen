@@ -377,6 +377,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery
 
@@ -389,6 +390,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _Implementation1NonWriteableQuery not in created_types and connection_type != "reverse-list":
@@ -401,7 +403,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "to_non_writable",
+                connection_name="to_non_writable",
             )
 
         self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))

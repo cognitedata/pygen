@@ -430,7 +430,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="inwards",
                     chain_to="destination",
                 ),
-                "inwards",
+                connection_name="inwards",
             )
 
         if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
@@ -443,7 +443,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "self_edge",
+                connection_name="self_edge",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

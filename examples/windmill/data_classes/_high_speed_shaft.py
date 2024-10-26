@@ -336,6 +336,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -347,6 +348,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
     def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:

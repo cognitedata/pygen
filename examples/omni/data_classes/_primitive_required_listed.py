@@ -383,6 +383,7 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -394,6 +395,7 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
     def list_primitive_required_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveRequiredListedList:
