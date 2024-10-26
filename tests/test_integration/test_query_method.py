@@ -38,13 +38,18 @@ def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
-    found_one = False
-    for item in items:
-        for subitem in item.outwards or []:
-            if isinstance(subitem, dc.ConnectionItemB):
-                assert subitem.name.startswith("A")
-                found_one = True
-    assert found_one, "No items found with name starting with 'A'"
+    invalid_outwards = {
+        item.external_id: subitems
+        for item in items
+        if (
+            subitems := [
+                subitem
+                for subitem in item.outwards or []
+                if not isinstance(subitem, dc.ConnectionItemB) or not subitem.name.startswith("A")
+            ]
+        )
+    }
+    assert not invalid_outwards, "Some outwards are not ConnectionItemB or do not start with 'A'"
 
 
 def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
