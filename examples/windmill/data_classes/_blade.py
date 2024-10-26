@@ -385,6 +385,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._sensor_position import _SensorPositionQuery
 
@@ -396,6 +397,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         if _SensorPositionQuery not in created_types:

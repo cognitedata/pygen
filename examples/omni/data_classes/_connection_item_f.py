@@ -476,6 +476,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
@@ -490,6 +491,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         if _ConnectionItemDQuery not in created_types:

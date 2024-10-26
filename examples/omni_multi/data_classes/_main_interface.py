@@ -281,6 +281,7 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
 
         super().__init__(
@@ -291,6 +292,7 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))

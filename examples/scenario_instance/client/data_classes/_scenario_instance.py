@@ -452,6 +452,7 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
 
         super().__init__(
@@ -462,6 +463,7 @@ class _ScenarioInstanceQuery(NodeQueryCore[T_DomainModelList, ScenarioInstanceLi
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         self.aggregation = StringFilter(self, self._view_id.as_property_ref("aggregation"))

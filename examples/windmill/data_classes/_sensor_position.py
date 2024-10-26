@@ -540,6 +540,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
 
         super().__init__(
@@ -550,6 +551,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))

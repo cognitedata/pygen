@@ -72,6 +72,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         expression: dm.query.ResultSetExpression | None = None,
         view_filter: dm.filters.Filter | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
@@ -80,6 +81,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
         self._connection_name = connection_name
+        self._connection_type = connection_type
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.space = StringFilter(self, ["node", "space"])
         self._filter_classes: list[Filtering] = [self.external_id, self.space]
@@ -182,6 +184,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     expression=item._expression,
                     result_cls=item._result_cls,
                     max_retrieve_limit=max_retrieve_limit,
+                    connection_type=item._connection_type,
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()

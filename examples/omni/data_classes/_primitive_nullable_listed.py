@@ -382,6 +382,7 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
 
         super().__init__(
@@ -392,6 +393,7 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
     def list_primitive_nullable_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableListedList:

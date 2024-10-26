@@ -517,6 +517,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         from ._blade import _BladeQuery
         from ._metmast import _MetmastQuery
@@ -531,6 +532,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_type,
         )
 
         if _BladeQuery not in created_types:

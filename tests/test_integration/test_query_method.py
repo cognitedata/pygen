@@ -79,7 +79,7 @@ def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
     assert len(items) > 0
 
 
-def test_query_across_reverse_direct_relation_to_list(omni_client: OmniClient) -> None:
+def test_query_across_reverse_direct_relation_to_list_full(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_e.query().direct_reverse_multi.list_full(limit=5)
 
     assert len(items) > 0
