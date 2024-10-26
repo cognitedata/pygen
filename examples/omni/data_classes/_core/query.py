@@ -232,7 +232,7 @@ class QueryStep:
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
         raw_filter: dm.Filter | None = None,
-        connection: Literal["reverse-list"] | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -246,7 +246,7 @@ class QueryStep:
         else:
             self.select = select  # type: ignore[assignment]
         self.raw_filter = raw_filter
-        self.connection = connection
+        self.connection_type = connection_type
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
@@ -259,7 +259,7 @@ class QueryStep:
     @property
     def is_queryable(self) -> bool:
         # We cannot query across reverse-list connections
-        return self.connection != "reverse-list"
+        return self.connection_type != "reverse-list"
 
     @property
     def from_(self) -> str | None:
