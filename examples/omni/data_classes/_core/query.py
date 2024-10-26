@@ -320,7 +320,6 @@ class NodeQueryStep(QueryStep):
         self.result_cls = result_cls
         super().__init__(name, expression, max_retrieve_limit, select, raw_filter, connection)
 
-
     def _default_select(self) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(self.result_cls._view_id, ["*"])])
 
