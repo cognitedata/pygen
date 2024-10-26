@@ -118,6 +118,13 @@ def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
     assert "Circular" in str(e.value)
 
 
+def test_query_passer_reversed_list_value_error(omni_client: OmniClient) -> None:
+    with pytest.raises(ValueError) as e:
+        omni_client.connection_item_e.query.direct_reverse_multi.outwards_single.list_full(limit=5)
+
+    assert "Cannot query across a reverse-list connection." in str(e.value)
+
+
 def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
     items = wind_client.windmill.query.name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
 
