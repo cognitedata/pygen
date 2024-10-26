@@ -17,6 +17,8 @@ Changes are grouped as follows
 ### Added
 - Support for using `NodeId` and `tuple[str, str]` as well as sequences of these in the `.retrieve`
   method of the generated SDK.
+- In the `.list` method with `retrieve_connections="full"`, reverse direct relations pointing to list direct relations
+  are now supported.
 
 ## [0.99.39] - 24-10-19
 ### Fixed
