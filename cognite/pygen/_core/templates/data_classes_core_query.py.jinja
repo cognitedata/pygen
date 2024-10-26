@@ -178,7 +178,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     def _dump_yaml(self) -> str:
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
-    def _create_query(self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False) -> QueryBuilder:
+    def _create_query(
+            self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False
+    ) -> QueryBuilder:
         builder = QueryBuilder(result_list_cls)
         from_: str | None = None
         first: bool = True
