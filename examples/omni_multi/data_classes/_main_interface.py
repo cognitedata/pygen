@@ -297,9 +297,13 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.main_value,
             ]
         )

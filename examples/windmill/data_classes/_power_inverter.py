@@ -41,6 +41,7 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
 )
 
 

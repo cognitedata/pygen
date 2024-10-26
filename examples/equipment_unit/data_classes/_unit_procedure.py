@@ -458,10 +458,14 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 connection_name="work_units",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.unit_procedure_type = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.name,
                 self.unit_procedure_type,
             ]

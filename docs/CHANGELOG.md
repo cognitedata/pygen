@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.40] - 24-10-26
 ### Added
 - Support for using `NodeId` and `tuple[str, str]` as well as sequences of these in the `.retrieve`
   method of the generated SDK.

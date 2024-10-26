@@ -439,9 +439,13 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                 connection_name="self_edge",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.name,
             ]
         )

@@ -232,7 +232,10 @@ class DataClass:
     def filtering_import(self) -> str:
         """Import the filtering classes used in the data class."""
         return "\n    ".join(
-            f"{cls_name}," for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
+            # The string filter is always included, and is thus part of the jinja template
+            f"{cls_name},"
+            for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
+            if cls_name != "StringFilter"
         )
 
     @property

@@ -340,11 +340,15 @@ class _WorkOrderQuery(NodeQueryCore[T_DomainModelList, WorkOrderList]):
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.performed_by = StringFilter(self, self._view_id.as_property_ref("performedBy"))
         self.work_order_type = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.description,
                 self.performed_by,
                 self.work_order_type,

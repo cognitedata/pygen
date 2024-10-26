@@ -341,11 +341,15 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.main_value,
                 self.value_1,
                 self.value_2,

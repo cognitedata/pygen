@@ -406,9 +406,13 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                 connection_name="to_non_writable",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.a_value,
             ]
         )

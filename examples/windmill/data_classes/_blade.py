@@ -32,8 +32,8 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
-    BooleanFilter,
     StringFilter,
+    BooleanFilter,
 )
 
 if TYPE_CHECKING:
@@ -415,10 +415,14 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
                 connection_name="sensor_positions",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.is_damaged = BooleanFilter(self, self._view_id.as_property_ref("is_damaged"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.is_damaged,
                 self.name,
             ]

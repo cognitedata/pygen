@@ -33,11 +33,11 @@ from ._core import (
     select_best_node,
     QueryCore,
     NodeQueryCore,
+    StringFilter,
     BooleanFilter,
     DateFilter,
     FloatFilter,
     IntFilter,
-    StringFilter,
     TimestampFilter,
 )
 
@@ -449,6 +449,8 @@ class _PrimitiveRequiredQuery(NodeQueryCore[T_DomainModelList, PrimitiveRequired
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
         self.boolean = BooleanFilter(self, self._view_id.as_property_ref("boolean"))
         self.date = DateFilter(self, self._view_id.as_property_ref("date"))
         self.float_32 = FloatFilter(self, self._view_id.as_property_ref("float32"))
@@ -459,6 +461,8 @@ class _PrimitiveRequiredQuery(NodeQueryCore[T_DomainModelList, PrimitiveRequired
         self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
         self._filter_classes.extend(
             [
+                self.space,
+                self.external_id,
                 self.boolean,
                 self.date,
                 self.float_32,

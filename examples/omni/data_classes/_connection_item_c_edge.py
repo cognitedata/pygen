@@ -24,6 +24,7 @@ from ._core import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
