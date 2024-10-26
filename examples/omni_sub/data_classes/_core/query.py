@@ -400,8 +400,8 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             expression.results.extend(batch[expression.name].data)
 
     @property
-    def _is_finished(self):
-        return all(expression.is_finished for expression in self)
+    def _is_finished(self) -> bool:
+        return self[0].is_finished
 
     def _reduce_max_batch_limit(self) -> bool:
         for expression in self:
