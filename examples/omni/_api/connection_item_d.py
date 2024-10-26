@@ -569,6 +569,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemDQuery:
         """Start a query for connection item ds."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

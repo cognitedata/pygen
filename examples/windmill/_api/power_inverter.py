@@ -383,6 +383,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             filter_,
         )
 
+    @property
     def query(self) -> PowerInverterQuery:
         """Start a query for power inverters."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

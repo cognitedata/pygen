@@ -509,6 +509,7 @@ class PrimitiveWithDefaultsAPI(
             filter_,
         )
 
+    @property
     def query(self) -> PrimitiveWithDefaultsQuery:
         """Start a query for primitive with defaults."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -381,6 +381,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             filter_,
         )
 
+    @property
     def query(self) -> RotorQuery:
         """Start a query for rotors."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -606,6 +606,7 @@ class ScenarioInstanceAPI(
             filter_,
         )
 
+    @property
     def query(self) -> ScenarioInstanceQuery:
         """Start a query for scenario instances."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

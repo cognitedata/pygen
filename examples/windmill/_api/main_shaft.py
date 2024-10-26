@@ -387,6 +387,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
             filter_,
         )
 
+    @property
     def query(self) -> MainShaftQuery:
         """Start a query for main shafts."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

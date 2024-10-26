@@ -510,6 +510,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             filter_,
         )
 
+    @property
     def query(self) -> Implementation1Query:
         """Start a query for implementation 1."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

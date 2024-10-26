@@ -456,6 +456,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             filter_,
         )
 
+    @property
     def query(self) -> BladeQuery:
         """Start a query for blades."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

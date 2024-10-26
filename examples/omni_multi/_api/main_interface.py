@@ -431,6 +431,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             filter_,
         )
 
+    @property
     def query(self) -> MainInterfaceQuery:
         """Start a query for main interfaces."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

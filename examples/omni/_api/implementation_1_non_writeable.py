@@ -449,6 +449,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter_,
         )
 
+    @property
     def query(self) -> Implementation1NonWriteableQuery:
         """Start a query for implementation 1 non writeables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

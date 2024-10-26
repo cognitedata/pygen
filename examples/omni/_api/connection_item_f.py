@@ -520,6 +520,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemFQuery:
         """Start a query for connection item fs."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -408,6 +408,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             filter_,
         )
 
+    @property
     def query(self) -> {{ data_class.query_cls_name }}:
         """Start a query for {{ data_class.doc_list_name}}."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

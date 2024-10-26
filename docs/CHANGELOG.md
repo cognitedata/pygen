@@ -20,6 +20,10 @@ Changes are grouped as follows
 - In the `.list` method with `retrieve_connections="full"`, reverse direct relations pointing to list direct relations
   are now supported.
 
+### Changed
+- [Experimental - Breaking] The `.query()` method is now a property `query`. Instead of `client.asset.query()`
+  you now do `client.asset.query`. This is to make it more intuitive to use the query method.
+
 ## [0.99.39] - 24-10-19
 ### Fixed
 - In `.list` setting `retrieve_connections="full"` no longer raises 

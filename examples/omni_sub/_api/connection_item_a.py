@@ -551,6 +551,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemAQuery:
         """Start a query for connection item as."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
