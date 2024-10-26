@@ -70,6 +70,17 @@ def test_query_list_full_across_direct_relation(omni_client: OmniClient) -> None
     assert set(items.as_external_ids()) == set(items_reversed.as_external_ids())
 
 
+def test_query_list_full_across_reverse_direct_relation(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_e.query.direct_reverse_single.name.prefix("M").list_full(limit=5)
+    items_reversed = omni_client.connection_item_d.query.name.prefix("M").direct_single.list_connection_item_e(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemEList)
+    assert len(items_reversed) > 0
+    assert isinstance(items_reversed, dc.ConnectionItemEList)
+    assert set(items.as_external_ids()) == set(items_reversed.as_external_ids())
+
+
 def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.query.outwards.list_full(limit=5)
 
