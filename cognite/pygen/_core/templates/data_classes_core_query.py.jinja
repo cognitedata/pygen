@@ -487,12 +487,16 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[True] = True, remove_not_connected: bool = True) -> T_DomainModelList: ...
+    def execute(
+        self, client: CogniteClient, unpack: Literal[True] = True, remove_not_connected: bool = True
+    ) -> T_DomainModelList: ...
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[False],remove_not_connected: bool = True) -> None: ...
+    def execute(self, client: CogniteClient, unpack: Literal[False], remove_not_connected: bool = True) -> None: ...
 
-    def execute(self, client: CogniteClient, unpack: bool = True, remove_not_connected: bool = True) -> T_DomainModelList | None:
+    def execute(
+        self, client: CogniteClient, unpack: bool = True, remove_not_connected: bool = True
+    ) -> T_DomainModelList | None:
         self._reset()
         query, to_search = self._build()
 
@@ -644,6 +648,7 @@ T_QueryCore = TypeVar("T_QueryCore")
 
 class _QueryResultCleaner:
     """Remove nodes and edges that are not connected through the entire query"""
+
     def __init__(self, steps: list[QueryStep]):
         self._tree = self._create_tree(steps)
         self._root = steps[0]
@@ -674,7 +679,9 @@ class _QueryResultCleaner:
             if isinstance(step, NodeQueryStep) and (through := step.node_expression.through) is not None:
                 direct_relation = through.property
                 if step.node_expression.direction == "inwards":
-                    return {node_id for item in step.node_results for node_id in self._get_relations(item, direct_relation)}, None
+                    return {
+                        node_id for item in step.node_results for node_id in self._get_relations(item, direct_relation)
+                    }, None
 
             return {item.as_id() for item in step.results}, direct_relation  # type: ignore[attr-defined]
 
@@ -702,7 +709,7 @@ class _QueryResultCleaner:
             if step.edge_expression.direction == "outwards":
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
                 return {self.as_node_id(edge.start_node) for edge in step.edge_results}, None
-            else: # inwards
+            else:  # inwards
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.start_node) in expected_ids]
                 return {self.as_node_id(edge.end_node) for edge in step.edge_results}, None
 
