@@ -494,7 +494,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             connection_type,
         )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
             self.direct_list = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -507,7 +507,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 "direct_list",
             )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
             self.outwards_multi = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -521,7 +521,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 "outwards_multi",
             )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
             self.outwards_single = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

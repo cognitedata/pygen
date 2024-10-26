@@ -418,7 +418,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
             connection_type,
         )
 
-        if _ConnectionItemAQuery not in created_types:
+        if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
             self.inwards = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -431,7 +431,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                 "inwards",
             )
 
-        if _ConnectionItemBQuery not in created_types:
+        if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
             self.self_edge = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,

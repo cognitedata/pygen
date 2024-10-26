@@ -696,7 +696,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             connection_type,
         )
 
-        if _GearboxQuery not in created_types:
+        if _GearboxQuery not in created_types and connection_type != "reverse-list":
             self.gearbox = _GearboxQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -709,7 +709,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 "gearbox",
             )
 
-        if _GeneratorQuery not in created_types:
+        if _GeneratorQuery not in created_types and connection_type != "reverse-list":
             self.generator = _GeneratorQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -722,7 +722,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 "generator",
             )
 
-        if _HighSpeedShaftQuery not in created_types:
+        if _HighSpeedShaftQuery not in created_types and connection_type != "reverse-list":
             self.high_speed_shaft = _HighSpeedShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -735,7 +735,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 "high_speed_shaft",
             )
 
-        if _MainShaftQuery not in created_types:
+        if _MainShaftQuery not in created_types and connection_type != "reverse-list":
             self.main_shaft = _MainShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -748,7 +748,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 "main_shaft",
             )
 
-        if _PowerInverterQuery not in created_types:
+        if _PowerInverterQuery not in created_types and connection_type != "reverse-list":
             self.power_inverter = _PowerInverterQuery(
                 created_types.copy(),
                 self._creation_path,

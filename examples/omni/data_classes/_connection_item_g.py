@@ -396,7 +396,7 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             connection_type,
         )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
             self.inwards_multi_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

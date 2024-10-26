@@ -486,7 +486,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
             connection_type,
         )
 
-        if _ConnectionItemCNodeQuery not in created_types:
+        if _ConnectionItemCNodeQuery not in created_types and connection_type != "reverse-list":
             self.other_direct = _ConnectionItemCNodeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -499,7 +499,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 "other_direct",
             )
 
-        if _ConnectionItemBQuery not in created_types:
+        if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
             self.outwards = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -512,7 +512,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 "outwards",
             )
 
-        if _ConnectionItemAQuery not in created_types:
+        if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
             self.self_direct = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
