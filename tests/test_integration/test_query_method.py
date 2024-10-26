@@ -57,6 +57,17 @@ def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
     assert not invalid_outwards, "Some outwards are not ConnectionItemB or do not start with 'A'"
 
 
+def test_query_list_full_inwards_edge(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_b.query.inwards.name.prefix("M").list_full(limit=5)
+    items_reversed = omni_client.connection_item_a.query.name.prefix("M").outwards.list_connection_item_b(limit=5)
+
+    assert len(items) > 0
+    assert isinstance(items, dc.ConnectionItemBList)
+    assert len(items_reversed) > 0
+    assert isinstance(items_reversed, dc.ConnectionItemBList)
+    assert set(items.as_external_ids()) == set(items_reversed.as_external_ids())
+
+
 def test_query_list_full_across_direct_relation(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_d.query.direct_single.name.prefix("E").list_full(limit=5)
     items_reversed = omni_client.connection_item_e.query.name.prefix("E").direct_reverse_single.list_connection_item_d(
