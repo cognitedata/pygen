@@ -45,6 +45,7 @@ from .constants import (
     INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
+    SEARCH_LIMIT,
 )
 from .helpers import as_node_id
 
@@ -510,7 +511,7 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                     raise ValueError("Missing through set in a reverse-list query")
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
-                limit = 1000 if step.is_unlimited else min(step.max_retrieve_limit, 1000)
+                limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
                 properties = None if step.select is None else step.select.sources[0].properties
                 if properties == ["*"]:
                     properties = None
