@@ -403,6 +403,7 @@ class ConnectionItemCNodeAPI(
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemCNodeQuery:
         """Start a query for connection item c nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
@@ -507,5 +508,5 @@ class ConnectionItemCNodeAPI(
                     ConnectionItemB,
                 )
             )
-
-        return builder.execute(self._client)
+        # We know that that all nodes are connected as it is not possible to filter on connections
+        return builder.execute(self._client, remove_not_connected=False)

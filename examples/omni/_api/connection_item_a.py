@@ -570,6 +570,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemAQuery:
         """Start a query for connection item as."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
@@ -715,5 +716,5 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                     ConnectionItemA,
                 )
             )
-
-        return builder.execute(self._client)
+        # We know that that all nodes are connected as it is not possible to filter on connections
+        return builder.execute(self._client, remove_not_connected=False)

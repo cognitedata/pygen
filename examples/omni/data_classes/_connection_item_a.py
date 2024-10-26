@@ -480,6 +480,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_b import _ConnectionItemBQuery
         from ._connection_item_c_node import _ConnectionItemCNodeQuery
@@ -493,6 +494,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _ConnectionItemCNodeQuery not in created_types and connection_type != "reverse-list":
@@ -505,7 +507,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
-                "other_direct",
+                connection_name="other_direct",
             )
 
         if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
@@ -518,7 +520,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "outwards",
+                connection_name="outwards",
             )
 
         if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
@@ -531,7 +533,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     through=self._view_id.as_property_ref("selfDirect"),
                     direction="outwards",
                 ),
-                "self_direct",
+                connection_name="self_direct",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

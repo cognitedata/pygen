@@ -73,6 +73,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         view_filter: dm.filters.Filter | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]
@@ -80,6 +81,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         self._result_list_cls = result_list_cls
         self._view_filter = view_filter
         self._expression = expression or dm.query.NodeResultSetExpression()
+        self._reverse_expression = reverse_expression
         self._connection_name = connection_name
         self._connection_type = connection_type
         self.external_id = StringFilter(self, ["node", "externalId"])
@@ -89,6 +91,10 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
     @property
     def _connection_names(self) -> set[str]:
         return {step._connection_name for step in self._creation_path if step._connection_name}
+
+    @property
+    def is_reverseable(self) -> bool:
+        return self._reverse_expression is not None
 
     def __getattr__(self, item: str) -> Any:
         if item in self._connection_names:
@@ -106,6 +112,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]
         edges = [step._connection_name or "missing" for step in self._creation_path[1:]]
+        last_connection_name = self._connection_name or "missing"
         w = 120
         h = 40
         circles = "    \n".join(f'<circle cx="{i * w + 40}" cy="{h}" r="2" />' for i in range(len(nodes)))
@@ -149,8 +156,8 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
 </g>
 </svg>
 </div>
-<p>Call <em>.execute()</em> to return a list of {nodes[0].title()} and
-<em>.list()</em> to return a list of {nodes[-1].title()}.</p>
+<p>Call <em>.list_full()</em> to return a list of {nodes[0].title()} and
+<em>.list_{last_connection_name}()</em> to return a list of {nodes[-1].title()}.</p>
 """
 
 
@@ -158,7 +165,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
     def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
-        builder = self._create_query(limit, self._result_list_cls)
+        builder = self._create_query(limit, self._result_list_cls, try_reverse=True)
         return builder.execute(self._client)
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
@@ -170,7 +177,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     def _dump_yaml(self) -> str:
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
-    def _create_query(self, limit: int, result_list_cls: type[DomainModelList]) -> QueryBuilder:
+    def _create_query(
+        self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False
+    ) -> QueryBuilder:
         builder = QueryBuilder(result_list_cls)
         from_: str | None = None
         first: bool = True
@@ -330,6 +339,14 @@ class NodeQueryStep(QueryStep):
             instance.as_id(): self.result_cls.from_instance(instance) for instance in cast(list[dm.Node], self.results)
         }
 
+    @property
+    def node_results(self) -> list[dm.Node]:
+        return cast(list[dm.Node], self.results)
+
+    @property
+    def node_expression(self) -> dm.query.NodeResultSetExpression:
+        return cast(dm.query.NodeResultSetExpression, self.expression)
+
 
 class EdgeQueryStep(QueryStep):
     def __init__(
@@ -357,6 +374,14 @@ class EdgeQueryStep(QueryStep):
             value = self.result_cls.from_instance(edge) if self.result_cls is not None else edge
             output[as_node_id(edge_source)].append(value)  # type: ignore[arg-type]
         return output
+
+    @property
+    def edge_results(self) -> list[dm.Edge]:
+        return cast(list[dm.Edge], self.results)
+
+    @property
+    def edge_expression(self) -> dm.query.EdgeResultSetExpression:
+        return cast(dm.query.EdgeResultSetExpression, self.expression)
 
 
 class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList]):
@@ -457,12 +482,16 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[True] = True) -> T_DomainModelList: ...
+    def execute(
+        self, client: CogniteClient, unpack: Literal[True] = True, remove_not_connected: bool = True
+    ) -> T_DomainModelList: ...
 
     @overload
-    def execute(self, client: CogniteClient, unpack: Literal[False]) -> None: ...
+    def execute(self, client: CogniteClient, unpack: Literal[False], remove_not_connected: bool = True) -> None: ...
 
-    def execute(self, client: CogniteClient, unpack: bool = True) -> T_DomainModelList | None:
+    def execute(
+        self, client: CogniteClient, unpack: bool = True, remove_not_connected: bool = True
+    ) -> T_DomainModelList | None:
         self._reset()
         query, to_search = self._build()
 
@@ -548,6 +577,9 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
                 is_large_query = True
                 print(f"Large query detected. Will print progress.")
 
+        if remove_not_connected and len(self) > 1:
+            _QueryResultCleaner(self).clean()
+
         if not unpack:
             return None
         return self._unpack()
@@ -607,6 +639,110 @@ class QueryBuilder(list, MutableSequence[QueryStep], Generic[T_DomainModelList])
 
 
 T_QueryCore = TypeVar("T_QueryCore")
+
+
+class _QueryResultCleaner:
+    """Remove nodes and edges that are not connected through the entire query"""
+
+    def __init__(self, steps: list[QueryStep]):
+        self._tree = self._create_tree(steps)
+        self._root = steps[0]
+
+    @classmethod
+    def _create_tree(cls, steps: list[QueryStep]) -> dict[str, list[QueryStep]]:
+        tree: dict[str, list[QueryStep]] = defaultdict(list)
+        for step in steps:
+            if step.from_ is None:
+                continue
+            tree[step.from_].append(step)
+        return dict(tree)
+
+    def clean(self) -> None:
+        self._clean(self._root)
+
+    @staticmethod
+    def as_node_id(direct_relation: dm.DirectRelationReference | dict[str, str]) -> dm.NodeId:
+        if isinstance(direct_relation, dict):
+            return dm.NodeId(direct_relation["space"], direct_relation["externalId"])
+
+        return dm.NodeId(direct_relation.space, direct_relation.external_id)
+
+    def _clean(self, step: QueryStep) -> tuple[set[dm.NodeId], str | None]:
+        if step.name not in self._tree:
+            # Leaf Node
+            direct_relation: str | None = None
+            if isinstance(step, NodeQueryStep) and (through := step.node_expression.through) is not None:
+                direct_relation = through.property
+                if step.node_expression.direction == "inwards":
+                    return {
+                        node_id for item in step.node_results for node_id in self._get_relations(item, direct_relation)
+                    }, None
+
+            return {item.as_id() for item in step.results}, direct_relation  # type: ignore[attr-defined]
+
+        expected_ids_by_property: dict[str | None, set[dm.NodeId]] = {}
+        for child in self._tree[step.name]:
+            child_ids, property_id = self._clean(child)
+            if property_id not in expected_ids_by_property:
+                expected_ids_by_property[property_id] = child_ids
+            else:
+                expected_ids_by_property[property_id] |= child_ids
+
+        if isinstance(step, NodeQueryStep):
+            filtered_results: list[Instance] = []
+            for node in step.node_results:
+                if self._is_connected_node(node, expected_ids_by_property):
+                    filtered_results.append(node)
+            step.results = filtered_results
+            direct_relation = None if step.node_expression.through is None else step.node_expression.through.property
+            return {node.as_id() for node in step.node_results}, direct_relation
+
+        if isinstance(step, EdgeQueryStep):
+            if len(expected_ids_by_property) > 1 or None not in expected_ids_by_property:
+                raise RuntimeError(f"Invalid state of {type(self).__name__}")
+            expected_ids = expected_ids_by_property[None]
+            if step.edge_expression.direction == "outwards":
+                step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
+                return {self.as_node_id(edge.start_node) for edge in step.edge_results}, None
+            else:  # inwards
+                step.results = [edge for edge in step.edge_results if self.as_node_id(edge.start_node) in expected_ids]
+                return {self.as_node_id(edge.end_node) for edge in step.edge_results}, None
+
+        raise TypeError(f"Unsupported query step type: {type(step)}")
+
+    @classmethod
+    def _is_connected_node(cls, node: dm.Node, expected_ids_by_property: dict[str | None, set[dm.NodeId]]) -> bool:
+        if not expected_ids_by_property:
+            return True
+        if None in expected_ids_by_property:
+            if node.as_id() in expected_ids_by_property[None]:
+                return True
+            if len(expected_ids_by_property) == 1:
+                return False
+        node_properties = next(iter(node.properties.values()))
+        for property_id, expected_ids in expected_ids_by_property.items():
+            if property_id is None:
+                continue
+            value = node_properties.get(property_id)
+            if value is None:
+                continue
+            elif isinstance(value, list):
+                if {cls.as_node_id(item) for item in value if isinstance(item, dict)} & expected_ids:
+                    return True
+            elif isinstance(value, dict) and cls.as_node_id(value) in expected_ids:
+                return True
+        return False
+
+    @classmethod
+    def _get_relations(cls, node: dm.Node, property_id: str) -> Iterable[dm.NodeId]:
+        if property_id is None:
+            return {node.as_id()}
+        value = next(iter(node.properties.values())).get(property_id)
+        if isinstance(value, list):
+            return [cls.as_node_id(item) for item in value if isinstance(item, dict)]
+        elif isinstance(value, dict):
+            return [cls.as_node_id(value)]
+        return []
 
 
 class Filtering(Generic[T_QueryCore], ABC):

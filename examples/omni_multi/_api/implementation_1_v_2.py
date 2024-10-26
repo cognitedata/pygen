@@ -477,6 +477,7 @@ class Implementation1v2API(
             filter_,
         )
 
+    @property
     def query(self) -> Implementation1v2Query:
         """Start a query for implementation 1 v 2."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

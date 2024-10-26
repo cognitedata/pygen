@@ -569,6 +569,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             filter_,
         )
 
+    @property
     def query(self) -> ConnectionItemDQuery:
         """Start a query for connection item ds."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
@@ -715,5 +716,5 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                     ConnectionItemE,
                 )
             )
-
-        return builder.execute(self._client)
+        # We know that that all nodes are connected as it is not possible to filter on connections
+        return builder.execute(self._client, remove_not_connected=False)

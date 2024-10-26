@@ -535,6 +535,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
@@ -549,6 +550,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
@@ -561,7 +563,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     through=dm.ViewId("sp_pygen_models", "ConnectionItemD", "1").as_property_ref("directMulti"),
                     direction="inwards",
                 ),
-                "direct_reverse_multi",
+                connection_name="direct_reverse_multi",
                 connection_type="reverse-list",
             )
 
@@ -575,7 +577,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     through=dm.ViewId("sp_pygen_models", "ConnectionItemD", "1").as_property_ref("directSingle"),
                     direction="inwards",
                 ),
-                "direct_reverse_single",
+                connection_name="direct_reverse_single",
             )
 
         if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
@@ -588,7 +590,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                     chain_to="destination",
                 ),
-                "inwards_single",
+                connection_name="inwards_single",
             )
 
         if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
@@ -602,7 +604,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                     chain_to="destination",
                 ),
-                "inwards_single_property",
+                connection_name="inwards_single_property",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

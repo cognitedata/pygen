@@ -477,6 +477,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
@@ -492,6 +493,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
@@ -504,7 +506,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                     through=self._view_id.as_property_ref("directList"),
                     direction="outwards",
                 ),
-                "direct_list",
+                connection_name="direct_list",
             )
 
         if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
@@ -518,7 +520,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "outwards_multi",
+                connection_name="outwards_multi",
             )
 
         if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
@@ -532,7 +534,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "outwards_single",
+                connection_name="outwards_single",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))

@@ -518,6 +518,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._blade import _BladeQuery
         from ._metmast import _MetmastQuery
@@ -533,6 +534,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _BladeQuery not in created_types and connection_type != "reverse-list":
@@ -545,7 +547,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "blades",
+                connection_name="blades",
             )
 
         if _MetmastQuery not in created_types and connection_type != "reverse-list":
@@ -558,7 +560,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "metmast",
+                connection_name="metmast",
             )
 
         if _NacelleQuery not in created_types and connection_type != "reverse-list":
@@ -571,7 +573,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     through=self._view_id.as_property_ref("nacelle"),
                     direction="outwards",
                 ),
-                "nacelle",
+                connection_name="nacelle",
             )
 
         if _RotorQuery not in created_types and connection_type != "reverse-list":
@@ -584,7 +586,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                     through=self._view_id.as_property_ref("rotor"),
                     direction="outwards",
                 ),
-                "rotor",
+                connection_name="rotor",
             )
 
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))

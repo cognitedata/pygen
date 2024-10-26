@@ -404,6 +404,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
 
@@ -416,6 +417,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
             connection_type,
+            reverse_expression,
         )
 
         if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
@@ -428,7 +430,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="inwards",
                     chain_to="destination",
                 ),
-                "inwards",
+                connection_name="inwards",
             )
 
         if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
@@ -441,7 +443,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "self_edge",
+                connection_name="self_edge",
             )
 
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
