@@ -17,6 +17,10 @@ Changes are grouped as follows
 ### Added
 - The `cognite.pygen.utils.MockGenerator` now generate properties for edges that have properties.
 
+### Fixed
+- The `cognite.pygen.utils.MockGenerator` now checks readonly properties on container level and not on view level.
+  This is to ensure that readonly properties are not set on nodes that are not writable.
+
 ## [0.99.40] - 24-10-26
 ### Added
 - Support for using `NodeId` and `tuple[str, str]` as well as sequences of these in the `.retrieve`
