@@ -148,8 +148,10 @@ def mock(deploy: bool = False):
 
         data.dump_yaml(DATA_WRITE_DIR, exclude={("Implementation1NonWriteable", "node")})
         typer.echo(f"Generated {len(data.nodes)} nodes and {len(data.edges)} edges for {len(data)} views")
+        typer.echo(f"Mock data saved to {DATA_WRITE_DIR.relative_to(REPO_ROOT)}")
         if deploy:
             data.deploy(client, exclude={("Implementation1NonWriteable", "node")}, verbose=True)
+            typer.echo("Mock data deployed to CDF")
 
 
 @app.command(

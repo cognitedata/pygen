@@ -35,6 +35,22 @@ def test_generate_mock_data_single_view(omni_data_classes: dict[str, OmniClasses
     assert view_data.node.dump() == view_data2.node.dump(), "Same seed should produce same data"
 
 
+def test_generate_mock_data_edge_view(omni_data_classes: dict[str, OmniClasses]) -> None:
+    start_node = omni_data_classes[OmniView.connection_item_f].view
+    other_view = omni_data_classes[OmniView.connection_item_d].view
+    edge_view = omni_data_classes[OmniView.connection_edge_a].view
+    end_node = omni_data_classes[OmniView.connection_item_g].view
+    alt_end_node = omni_data_classes[OmniView.connection_item_e].view
+
+    generator = MockGenerator([start_node, end_node, edge_view, alt_end_node, other_view], "sandbox", seed=42)
+
+    data = generator.generate_mock_data()
+
+    assert len(data) == 4
+    edges_with_data = [edge for edge in data.edges if edge.sources]
+    assert edges_with_data, "At least one edge should have data"
+
+
 @pytest.mark.parametrize(
     "view_external_ids",
     [

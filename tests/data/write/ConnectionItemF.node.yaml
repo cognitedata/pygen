@@ -25,6 +25,13 @@
   sources:
   - properties:
       name: Investment up data three mission talk.
+      directList:
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Kristin
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christine
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Robert
     source:
       space: sp_pygen_models
       externalId: ConnectionItemF
@@ -39,6 +46,13 @@
   sources:
   - properties:
       name: null
+      directList:
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Kristin
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Christine
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Robert
     source:
       space: sp_pygen_models
       externalId: ConnectionItemF
@@ -55,11 +69,11 @@
       name: Town child commercial house four scientist radio between.
       directList:
       - space: sp_omni_instances
-        externalId: ConnectionItemD:Christian
+        externalId: ConnectionItemD:Kristin
       - space: sp_omni_instances
         externalId: ConnectionItemD:Christine
       - space: sp_omni_instances
-        externalId: ConnectionItemD:Daniel
+        externalId: ConnectionItemD:Robert
     source:
       space: sp_pygen_models
       externalId: ConnectionItemF
@@ -76,9 +90,11 @@
       name: Knowledge similar source table where rather wish.
       directList:
       - space: sp_omni_instances
-        externalId: ConnectionItemD:Christian
+        externalId: ConnectionItemD:Kristin
       - space: sp_omni_instances
-        externalId: ConnectionItemD:Daniel
+        externalId: ConnectionItemD:Christine
+      - space: sp_omni_instances
+        externalId: ConnectionItemD:Robert
     source:
       space: sp_pygen_models
       externalId: ConnectionItemF

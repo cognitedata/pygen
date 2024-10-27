@@ -1,6 +1,16 @@
 - space: sp_omni_instances
   externalId: ConnectionItemF:Andrew:ConnectionItemG:Michael
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-07-01T07:43:44.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -13,6 +23,16 @@
 - space: sp_omni_instances
   externalId: ConnectionItemF:Andrew:ConnectionItemG:Christina
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Catch citizen fire.
+      startTime: '2024-08-16T01:03:38.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -23,20 +43,18 @@
     space: sp_omni_instances
     externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Andrew:ConnectionItemE:Stephanie
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Jessica
   instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: singleProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Andrew
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemE:Stephanie
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemG:Mark
-  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-06-07T08:10:35.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -45,22 +63,64 @@
     externalId: ConnectionItemF:Kendra
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Mark
+    externalId: ConnectionItemG:Jessica
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Kendra:ConnectionItemE:Brent
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Christina
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Catch citizen fire.
+      startTime: '2024-08-29T04:04:25.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
-    externalId: singleProperty
+    externalId: multiProperty
   startNode:
     space: sp_omni_instances
     externalId: ConnectionItemF:Kendra
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemE:Brent
+    externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemG:Mark
+  externalId: ConnectionItemF:Kendra:ConnectionItemG:Kathryn
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-10-03T03:33:15.000'
+      name: Time program military believe involve voice rate.
+      startTime: '2024-10-05T23:24:41.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Kendra
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Kathryn
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Jessica
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-06-07T08:10:35.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -69,10 +129,20 @@
     externalId: ConnectionItemF:Stanley
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Mark
+    externalId: ConnectionItemG:Jessica
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemG:Michael
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Christina
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Catch citizen fire.
+      startTime: '2024-08-29T04:04:25.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -81,10 +151,42 @@
     externalId: ConnectionItemF:Stanley
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Michael
+    externalId: ConnectionItemG:Christina
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Christopher:ConnectionItemG:Michael
+  externalId: ConnectionItemF:Stanley:ConnectionItemG:Kathryn
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-10-03T03:33:15.000'
+      name: Time program military believe involve voice rate.
+      startTime: '2024-10-05T23:24:41.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Stanley
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Kathryn
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Christopher:ConnectionItemG:Jessica
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-06-07T08:10:35.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -93,10 +195,20 @@
     externalId: ConnectionItemF:Christopher
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemG:Michael
+    externalId: ConnectionItemG:Jessica
 - space: sp_omni_instances
   externalId: ConnectionItemF:Christopher:ConnectionItemG:Christina
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Catch citizen fire.
+      startTime: '2024-08-29T04:04:25.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -109,6 +221,16 @@
 - space: sp_omni_instances
   externalId: ConnectionItemF:Christopher:ConnectionItemG:Kathryn
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-10-03T03:33:15.000'
+      name: Time program military believe involve voice rate.
+      startTime: '2024-10-05T23:24:41.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -119,14 +241,68 @@
     space: sp_omni_instances
     externalId: ConnectionItemG:Kathryn
 - space: sp_omni_instances
-  externalId: ConnectionItemF:Cindy:ConnectionItemE:Pamela
+  externalId: ConnectionItemF:Cindy:ConnectionItemG:Jessica
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-06-07T08:10:35.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
-    externalId: singleProperty
+    externalId: multiProperty
   startNode:
     space: sp_omni_instances
     externalId: ConnectionItemF:Cindy
   endNode:
     space: sp_omni_instances
-    externalId: ConnectionItemE:Pamela
+    externalId: ConnectionItemG:Jessica
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Cindy:ConnectionItemG:Christina
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-09-28T19:23:47.000'
+      name: Catch citizen fire.
+      startTime: '2024-08-29T04:04:25.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Cindy
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Christina
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Cindy:ConnectionItemG:Kathryn
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-10-03T03:33:15.000'
+      name: Time program military believe involve voice rate.
+      startTime: '2024-10-05T23:24:41.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Cindy
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemG:Kathryn

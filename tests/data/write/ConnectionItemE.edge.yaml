@@ -1,6 +1,16 @@
 - space: sp_omni_instances
   externalId: ConnectionItemF:Kendra:ConnectionItemE:Stephanie
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-01-08T16:51:30.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
@@ -11,50 +21,90 @@
     space: sp_omni_instances
     externalId: ConnectionItemE:Stephanie
 - space: sp_omni_instances
-  externalId: ConnectionItemD:Christine:ConnectionItemE:Ana
+  externalId: ConnectionItemF:Christopher:ConnectionItemE:Ana
   instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-01-08T16:51:30.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
-    externalId: bidirectionalSingle
+    externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemD:Christine
+    externalId: ConnectionItemF:Christopher
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemE:Ana
 - space: sp_omni_instances
-  externalId: ConnectionItemD:Christian:ConnectionItemE:Alexis
+  externalId: ConnectionItemF:Christopher:ConnectionItemE:Brent
   instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: bidirectionalSingle
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemD:Christian
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemE:Alexis
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Stanley:ConnectionItemE:Alexis
-  instanceType: edge
-  type:
-    space: sp_pygen_models
-    externalId: multiProperty
-  startNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemF:Stanley
-  endNode:
-    space: sp_omni_instances
-    externalId: ConnectionItemE:Alexis
-- space: sp_omni_instances
-  externalId: ConnectionItemF:Andrew:ConnectionItemE:Pamela
-  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-01-08T16:51:30.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
   type:
     space: sp_pygen_models
     externalId: multiProperty
   startNode:
     space: sp_omni_instances
-    externalId: ConnectionItemF:Andrew
+    externalId: ConnectionItemF:Christopher
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemE:Brent
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Christopher:ConnectionItemE:Alexis
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-01-08T16:51:30.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Christopher
+  endNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemE:Alexis
+- space: sp_omni_instances
+  externalId: ConnectionItemF:Christopher:ConnectionItemE:Pamela
+  instanceType: edge
+  sources:
+  - properties:
+      endTime: '2024-08-10T00:40:20.000'
+      name: Tend local represent spend.
+      startTime: '2024-01-08T16:51:30.000'
+    source:
+      space: sp_pygen_models
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+  type:
+    space: sp_pygen_models
+    externalId: multiProperty
+  startNode:
+    space: sp_omni_instances
+    externalId: ConnectionItemF:Christopher
   endNode:
     space: sp_omni_instances
     externalId: ConnectionItemE:Pamela

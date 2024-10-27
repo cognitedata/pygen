@@ -43,6 +43,7 @@ from cognite.client.data_classes.data_modeling.views import (
 )
 from cognite.client.exceptions import CogniteNotFoundError
 
+from cognite.pygen._constants import is_readonly_property
 from cognite.pygen._version import __version__
 from cognite.pygen.exceptions import PygenImportError
 from cognite.pygen.utils.cdf import _find_first_node_type
@@ -63,10 +64,6 @@ ListAbleDataType = typing.Union[
 ]
 ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
 _ResourceTypes = set(typing.get_args(ResourceType))
-
-_READONLY_PROPERTIES: dict[dm.ViewId, set[str]] = {
-    dm.ViewId("cdf_cdm", "CogniteAsset", "v1"): {"root", "path", "pathLastUpdatedTime"}
-}
 
 
 class MockGenerator:
@@ -96,7 +93,7 @@ class MockGenerator:
         seed: int | None = None,
         skip_interfaces: bool = False,
     ):
-        self._views = dm.ViewList(views)
+        self._view_by_id = {view.as_id(): view for view in views}
         self._instance_space = instance_space
         self._view_configs = view_configs or {}
         if default_config == "faker":
@@ -107,6 +104,10 @@ class MockGenerator:
         self._seed = seed
         self._skip_interfaces = skip_interfaces
         self._interfaces: set[dm.ViewId] = set()
+
+    @property
+    def _views(self) -> dm.ViewList:
+        return dm.ViewList(self._view_by_id.values())
 
     def __str__(self):
         args = [
@@ -186,7 +187,9 @@ class MockGenerator:
             mock_data.extend(data)
         return mock_data
 
-    def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
+    def _generate_views_mock_data(
+        self, views: list[dm.View], node_count: int, max_edge_per_type: int, null_values: float
+    ) -> MockData:
         outputs = self._generate_mock_nodes(views, node_count, null_values)
         self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
@@ -200,24 +203,20 @@ class MockGenerator:
                 continue
             if view.used_for == "edge":
                 continue
-            mapped_properties = {
-                name: prop
-                for name, prop in view.properties.items()
-                if isinstance(prop, dm.MappedProperty) and not isinstance(prop.type, dm.DirectRelation)
-            }
 
             node_type = _find_first_node_type(view.filter)
             view_id = view.as_id()
             if self._seed:
                 self._reset_seed(view_id)
 
+            mapped_properties = self._get_mapped_properties(view)
             config = self._view_configs.get(view_id, self._default_config)
-            properties, external = self._generate_mock_values(
+            properties, cdf_ref_external = self._generate_mock_values(
                 mapped_properties,
                 config,
                 view.as_id(),
-                default_node_count,
-                default_nullable_fraction,
+                config.node_count or default_node_count,
+                config.null_values or default_nullable_fraction,
             )
             node_ids = config.node_id_generator(view_id, config.node_count or default_node_count)
 
@@ -244,11 +243,19 @@ class MockGenerator:
                 instance_space=self._instance_space,
                 is_writeable=view.writable,
                 node=dm.NodeApplyList(nodes),
-                timeseries=TimeSeriesList(external.timeseries),
-                sequence=SequenceList(external.sequence),
-                file=FileMetadataList(external.file),
+                timeseries=TimeSeriesList(cdf_ref_external.timeseries),
+                sequence=SequenceList(cdf_ref_external.sequence),
+                file=FileMetadataList(cdf_ref_external.file),
             )
         return output
+
+    @staticmethod
+    def _get_mapped_properties(view: dm.View) -> dict[str, dm.MappedProperty]:
+        return {
+            name: prop
+            for name, prop in view.properties.items()
+            if isinstance(prop, dm.MappedProperty) and not isinstance(prop.type, dm.DirectRelation)
+        }
 
     def _generate_mock_connections(
         self,
@@ -290,9 +297,6 @@ class MockGenerator:
                         )
                         continue
 
-                    if view_id in _READONLY_PROPERTIES and property_name in _READONLY_PROPERTIES[view_id]:
-                        continue
-
                     if isinstance(connection, EdgeConnection):
                         other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
@@ -300,7 +304,9 @@ class MockGenerator:
                         else:  # MultiEdgeConnection
                             max_edge_count = config.max_edge_per_type or default_max_edge_count
                         max_edge_count = min(max_edge_count, len(other_nodes))
-                        edges = self._create_edges(connection, this_node.as_id(), other_nodes, max_edge_count)
+                        edges = self._create_edges(
+                            connection, this_node.as_id(), other_nodes, max_edge_count, default_nullable_fraction
+                        )
                         outputs[view_id].edge.extend(edges)
                     elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
                         if not connection.source:
@@ -343,14 +349,14 @@ class MockGenerator:
         properties: dict[str, dm.MappedProperty],
         config: ViewMockConfig,
         view_id: dm.ViewId,
-        default_node_count: int,
-        default_nullable_fraction: float,
+        count: int,
+        nullable_fraction: float,
     ) -> tuple[dict[str, typing.Sequence[ListAbleDataType]], ViewMockData]:
         output: dict[str, typing.Sequence[ListAbleDataType]] = {}
         external = ViewMockData(view_id, self._instance_space)
         values: typing.Sequence[ListAbleDataType]
         for name, prop in properties.items():
-            if view_id in _READONLY_PROPERTIES and name in _READONLY_PROPERTIES[view_id]:
+            if is_readonly_property(prop):
                 continue
 
             if name in config.properties:
@@ -369,15 +375,12 @@ class MockGenerator:
 
                 generator = _only_null_values
 
-            config_node_count = config.node_count or default_node_count
-            config_null_values = config.null_values or default_nullable_fraction
-
-            null_values = int(prop.nullable and config_node_count * config_null_values)
-            node_count = config_node_count - null_values
+            null_values = int(prop.nullable and count * nullable_fraction)
+            node_count = count - null_values
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 values = [generator(random.randint(0, 5)) for _ in range(node_count)] + [None] * null_values
             else:
-                values = generator(config_node_count - null_values) + [None] * null_values
+                values = generator(count - null_values) + [None] * null_values
 
             if null_values and isinstance(values, list):
                 random.shuffle(values)
@@ -466,7 +469,12 @@ class MockGenerator:
         return sources
 
     def _create_edges(
-        self, connection: EdgeConnection, this_node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
+        self,
+        connection: EdgeConnection,
+        this_node: dm.NodeId,
+        sources: list[dm.NodeId],
+        max_edge_count: int,
+        default_nullable_fraction: float,
     ) -> list[dm.EdgeApply]:
         end_nodes = random.sample(sources, k=randint(0, max_edge_count))
 
@@ -484,6 +492,31 @@ class MockGenerator:
                 end_node=(end_node.space, end_node.external_id),
             )
             edges.append(edge)
+
+        if connection.edge_source is None or connection.edge_source not in self._view_by_id:
+            return edges
+        edge_view = self._view_by_id[connection.edge_source]
+        view_id = edge_view.as_id()
+        if self._seed:
+            self._reset_seed(view_id)
+
+        mapped_properties = self._get_mapped_properties(edge_view)
+        config = self._view_configs.get(view_id, self._default_config)
+        properties, _ = self._generate_mock_values(
+            mapped_properties,
+            config,
+            view_id,
+            len(edges),
+            config.null_values or default_nullable_fraction,
+        )
+
+        for edge, props in zip(edges, zip(*properties.values(), strict=False), strict=False):
+            edge.sources.append(
+                dm.NodeOrEdgeData(
+                    source=view_id,
+                    properties=dict(zip(properties.keys(), props, strict=False)),
+                )
+            )
         return edges
 
     def _reset_seed(self, view_id: dm.ViewId) -> None:
