@@ -23,6 +23,8 @@ class OmniView:
     connection_item_d: str = "ConnectionItemD"
     connection_item_e: str = "ConnectionItemE"
 
+    connection_edge_a: str = "ConnectionEdgeA"
+
     primitive_nullable: str = "PrimitiveNullable"
     primitive_nullable_listed: str = "PrimitiveNullableListed"
     primitive_required: str = "PrimitiveRequired"

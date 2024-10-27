@@ -187,11 +187,11 @@ class MockGenerator:
         return mock_data
 
     def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
-        outputs = self._generate_mock_nodes(views, node_count, null_values)
+        outputs = self._generate_mock_properties(views, node_count, null_values)
         self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
 
-    def _generate_mock_nodes(
+    def _generate_mock_properties(
         self, views: list[dm.View], default_node_count: int, default_nullable_fraction: float
     ) -> dict[dm.ViewId, ViewMockData]:
         output: dict[dm.ViewId, ViewMockData] = {}
