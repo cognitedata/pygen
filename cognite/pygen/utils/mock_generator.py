@@ -190,7 +190,9 @@ class MockGenerator:
             mock_data.extend(data)
         return mock_data
 
-    def _generate_views_mock_data(self, views: list[dm.View], node_count, max_edge_per_type, null_values) -> MockData:
+    def _generate_views_mock_data(
+        self, views: list[dm.View], node_count: int, max_edge_per_type: int, null_values: float
+    ) -> MockData:
         outputs = self._generate_mock_nodes(views, node_count, null_values)
         self._generate_mock_connections(views, outputs, max_edge_per_type, null_values)
         return MockData(outputs.values())
@@ -308,7 +310,9 @@ class MockGenerator:
                         else:  # MultiEdgeConnection
                             max_edge_count = config.max_edge_per_type or default_max_edge_count
                         max_edge_count = min(max_edge_count, len(other_nodes))
-                        edges = self._create_edges(connection, this_node.as_id(), other_nodes, max_edge_count)
+                        edges = self._create_edges(
+                            connection, this_node.as_id(), other_nodes, max_edge_count, default_nullable_fraction
+                        )
                         outputs[view_id].edge.extend(edges)
                     elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
                         if not connection.source:
@@ -471,7 +475,12 @@ class MockGenerator:
         return sources
 
     def _create_edges(
-        self, connection: EdgeConnection, this_node: dm.NodeId, sources: list[dm.NodeId], max_edge_count: int
+        self,
+        connection: EdgeConnection,
+        this_node: dm.NodeId,
+        sources: list[dm.NodeId],
+        max_edge_count: int,
+        default_nullable_fraction: float,
     ) -> list[dm.EdgeApply]:
         end_nodes = random.sample(sources, k=randint(0, max_edge_count))
 
@@ -489,6 +498,31 @@ class MockGenerator:
                 end_node=(end_node.space, end_node.external_id),
             )
             edges.append(edge)
+
+        if connection.edge_source is None or connection.edge_source not in self._view_by_id:
+            return edges
+        edge_view = self._view_by_id[connection.edge_source]
+        view_id = edge_view.as_id()
+        if self._seed:
+            self._reset_seed(view_id)
+
+        mapped_properties = self._get_mapped_properties(edge_view)
+        config = self._view_configs.get(view_id, self._default_config)
+        properties, _ = self._generate_mock_values(
+            mapped_properties,
+            config,
+            view_id,
+            len(edges),
+            config.null_values or default_nullable_fraction,
+        )
+
+        for edge, props in zip(edges, zip(*properties.values(), strict=False), strict=False):
+            edge.sources.append(
+                dm.NodeOrEdgeData(
+                    source=view_id,
+                    properties=dict(zip(properties.keys(), props, strict=False)),
+                )
+            )
         return edges
 
     def _reset_seed(self, view_id: dm.ViewId) -> None:
