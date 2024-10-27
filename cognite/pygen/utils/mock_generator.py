@@ -43,6 +43,7 @@ from cognite.client.data_classes.data_modeling.views import (
 )
 from cognite.client.exceptions import CogniteNotFoundError
 
+from cognite.pygen._constants import is_readonly_property
 from cognite.pygen._version import __version__
 from cognite.pygen.exceptions import PygenImportError
 from cognite.pygen.utils.cdf import _find_first_node_type
@@ -63,10 +64,6 @@ ListAbleDataType = typing.Union[
 ]
 ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
 _ResourceTypes = set(typing.get_args(ResourceType))
-
-_READONLY_PROPERTIES: dict[dm.ViewId, set[str]] = {
-    dm.ViewId("cdf_cdm", "CogniteAsset", "v1"): {"root", "path", "pathLastUpdatedTime"}
-}
 
 
 class MockGenerator:
@@ -300,9 +297,6 @@ class MockGenerator:
                         )
                         continue
 
-                    if view_id in _READONLY_PROPERTIES and property_name in _READONLY_PROPERTIES[view_id]:
-                        continue
-
                     if isinstance(connection, EdgeConnection):
                         other_nodes = self._get_other_nodes(connection.source, outputs, leaf_children_by_parent)
                         if isinstance(connection, SingleEdgeConnection):
@@ -362,7 +356,7 @@ class MockGenerator:
         external = ViewMockData(view_id, self._instance_space)
         values: typing.Sequence[ListAbleDataType]
         for name, prop in properties.items():
-            if view_id in _READONLY_PROPERTIES and name in _READONLY_PROPERTIES[view_id]:
+            if is_readonly_property(prop):
                 continue
 
             if name in config.properties:
