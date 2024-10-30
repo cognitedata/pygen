@@ -13,7 +13,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -91,7 +91,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(Implementation1NonWriteableList)
+        builder = DataClassQueryBuilder(Implementation1NonWriteableList)
         return Implementation1NonWriteableQueryAPI(self._client, builder, filter_, limit)
 
     def delete(

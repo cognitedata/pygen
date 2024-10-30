@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from scenario_instance.client.data_classes._scenario_instance import _create_scenario_instance_filter
-from scenario_instance.client.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from scenario_instance.client.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
@@ -550,7 +550,7 @@ def _retrieve_timeseries_external_ids_with_extra_price_forecast(
     has_property = dm.filters.Exists(property=view_id.as_property_ref("priceForecast"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    builder = QueryBuilder[DomainModelList](None)
+    builder = DataClassQueryBuilder[DomainModelList](None)
     builder.append(
         QueryStep(
             name="nodes",
@@ -559,7 +559,7 @@ def _retrieve_timeseries_external_ids_with_extra_price_forecast(
             select=dm.query.Select([dm.query.SourceSelector(view_id, list(properties))]),
         )
     )
-    builder.execute(client, unpack=False)
+    builder.execute_query(client)
 
     output: dict[str, list[str]] = {}
     for node in builder[0].results:

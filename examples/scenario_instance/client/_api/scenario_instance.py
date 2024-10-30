@@ -14,7 +14,7 @@ from scenario_instance.client.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from scenario_instance.client.data_classes import (
     DomainModelCore,
@@ -124,7 +124,7 @@ class ScenarioInstanceAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(ScenarioInstanceList)
+        builder = DataClassQueryBuilder(ScenarioInstanceList)
         return ScenarioInstanceQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

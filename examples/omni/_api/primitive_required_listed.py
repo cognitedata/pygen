@@ -14,7 +14,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -84,7 +84,7 @@ class PrimitiveRequiredListedAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(PrimitiveRequiredListedList)
+        builder = DataClassQueryBuilder(PrimitiveRequiredListedList)
         return PrimitiveRequiredListedQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

@@ -3,7 +3,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import data_classes as dc
-from omni._api._core import EdgeQueryStep, NodeQueryStep, QueryBuilder
+from omni._api._core import DataClassQueryBuilder, EdgeQueryStep, NodeQueryStep
 
 
 class TestQueryBuilder:
@@ -14,7 +14,7 @@ class TestQueryBuilder:
         item_e = omni_views["ConnectionItemE"].as_id()
         item_d = omni_views["ConnectionItemD"].as_id()
 
-        builder = QueryBuilder(dc.ConnectionItemEList)
+        builder = DataClassQueryBuilder(dc.ConnectionItemEList)
         builder.append(
             NodeQueryStep(
                 builder.create_name(None),
@@ -53,7 +53,8 @@ class TestQueryBuilder:
             )
         )
         # Act
-        result = builder.execute(cognite_client)
+        builder.execute_query(cognite_client)
+        result = builder.unpack()
 
         # Assert
         assert isinstance(result, dc.ConnectionItemEList)
@@ -71,7 +72,7 @@ class TestQueryBuilder:
         # Arrange
         item_a = omni_views["ConnectionItemA"].as_id()
 
-        builder = QueryBuilder(dc.ConnectionItemAList)
+        builder = DataClassQueryBuilder(dc.ConnectionItemAList)
 
         builder.append(
             NodeQueryStep(
@@ -119,7 +120,8 @@ class TestQueryBuilder:
         )
 
         # Act
-        result = builder.execute(cognite_client)
+        builder.execute_query(cognite_client)
+        result = builder.unpack()
 
         # Assert
         assert isinstance(result, dc.ConnectionItemAList)
@@ -146,7 +148,7 @@ class TestQueryBuilder:
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client
     ) -> None:
         item_f = omni_views["ConnectionItemF"].as_id()
-        builder = QueryBuilder(dc.ConnectionItemFList)
+        builder = DataClassQueryBuilder(dc.ConnectionItemFList)
         builder.append(
             NodeQueryStep(
                 builder.create_name(None),
@@ -184,7 +186,8 @@ class TestQueryBuilder:
             )
         )
 
-        result = builder.execute(cognite_client)
+        builder.execute_query(cognite_client)
+        result = builder.unpack()
 
         assert isinstance(result, dc.ConnectionItemFList)
         assert builder[0].total_retrieved == len(result) > 0

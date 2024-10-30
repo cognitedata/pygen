@@ -20,7 +20,7 @@ from ._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
     QueryAPI,
     T_DomainModelList,
     _create_edge_filter,
@@ -36,7 +36,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        builder: QueryBuilder[T_DomainModelList],
+        builder: DataClassQueryBuilder[T_DomainModelList],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):

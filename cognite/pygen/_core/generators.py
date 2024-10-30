@@ -26,6 +26,7 @@ from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
 
 from . import validation
+from .extract_query_code import get_classes_code
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
 from .models.api_classes import APIClass, EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
@@ -482,7 +483,16 @@ class MultiAPIGenerator:
     def generate_data_class_core_query_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_query.py.jinja")
-        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
+        query_builder = get_classes_code(
+            frozenset({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})
+        )
+
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space, query_builder=query_builder
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_cdf_external_file(self) -> str:
         """Generate the core data classes file for the SDK."""
