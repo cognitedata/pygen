@@ -397,9 +397,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 return False
         return True
 
-    def execute_query(
-        self, client: CogniteClient, remove_not_connected: bool = False
-    ) -> dict[str, Any]:
+    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, Any]:
         self._reset()
         query, to_search, temp_select = self._build()
 
@@ -445,7 +443,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 if view_id is None or expression is None:
                     raise ValueError(
                         "Invalid state of the query. Search should always be a node expression with view properties"
-                )
+                    )
                 if expression.through is None:
                     raise ValueError("Missing through set in a reverse-list query")
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
@@ -495,10 +493,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         if remove_not_connected and len(self) > 1:
             _QueryResultCleaner(self).clean()
 
-        return {
-            step.name: step.results
-            for step in self
-        }
+        return {step.name: step.results for step in self}
 
     def get_from(self) -> str | None:
         if len(self) == 0:
@@ -745,11 +740,11 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
                     del nodes_by_from[step.name]
             elif isinstance(step, NodeQueryStep):
                 unpacked = step.unpack()
-                nodes_by_from[from_].update(unpacked) # type: ignore[arg-type]
+                nodes_by_from[from_].update(unpacked)  # type: ignore[arg-type]
                 if step.name in nodes_by_from or step.name in edges_by_from:
                     step.result_cls._update_connections(
                         unpacked,  # type: ignore[arg-type]
-                        nodes_by_from.get(step.name, {}), # type: ignore[arg-type]
+                        nodes_by_from.get(step.name, {}),  # type: ignore[arg-type]
                         edges_by_from.get(step.name, {}),
                     )
         if self._return_step == "first":

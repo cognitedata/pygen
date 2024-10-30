@@ -735,11 +735,11 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
                     del nodes_by_from[step.name]
             elif isinstance(step, NodeQueryStep):
                 unpacked = step.unpack()
-                nodes_by_from[from_].update(unpacked)
+                nodes_by_from[from_].update(unpacked)  # type: ignore[arg-type]
                 if step.name in nodes_by_from or step.name in edges_by_from:
                     step.result_cls._update_connections(
                         unpacked,  # type: ignore[arg-type]
-                        nodes_by_from.get(step.name, {}),
+                        nodes_by_from.get(step.name, {}),  # type: ignore[arg-type]
                         edges_by_from.get(step.name, {}),
                     )
         if self._return_step == "first":
