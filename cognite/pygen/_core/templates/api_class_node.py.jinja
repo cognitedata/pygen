@@ -47,7 +47,7 @@ from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% f
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
 from semantic_kernel.functions import kernel_function
-from tpying import Any
+from typing import Any
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
