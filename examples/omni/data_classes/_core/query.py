@@ -53,9 +53,6 @@ from .helpers import as_node_id
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
-
-
-
 class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
     _view_id: ClassVar[dm.ViewId]
     _result_list_cls_end: type[T_DomainListEnd]
@@ -239,6 +236,7 @@ class QueryReducingBatchSize(UserWarning):
     """Raised when a query is too large and the batch size must be reduced."""
 
     ...
+
 
 class QueryStep:
     def __init__(
