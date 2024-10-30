@@ -480,7 +480,7 @@ class QueryAPI(Generic[T_DomainModelList]):
         self._builder = builder
 
     def _query(self) -> T_DomainModelList:
-        self._builder.execute_query(self._client)
+        self._builder.execute_query(self._client, remove_not_connected=True)
         return self._builder.unpack()
 
 
