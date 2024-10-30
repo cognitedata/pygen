@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 
+import pandas as pd
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import InstanceSort
@@ -185,3 +186,5 @@ def test_list_with_reversed_direct_relation_of_list(omni_client: OmniClient) -> 
     assert len(items) > 0
     reverse_direct_relations = [item.direct_reverse_single for item in items if item.direct_reverse_single]
     assert reverse_direct_relations, f"Missing reverse_direct_single: {reverse_direct_relations}"
+    df = items.to_pandas()
+    assert isinstance(df, pd.DataFrame)
