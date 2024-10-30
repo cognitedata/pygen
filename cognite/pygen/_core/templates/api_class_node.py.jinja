@@ -207,7 +207,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def search(
         self,
         query: str,
-        properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -296,8 +296,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         group_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
         property: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        search_property: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,{% endif %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> Any:
@@ -379,8 +378,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
     @kernel_function
     def list(
-        self,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        self,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
         sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
