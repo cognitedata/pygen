@@ -1,0 +1,32 @@
+"""This module extracts code from the query builder module such that it can be
+included in the jinja template."""
+
+import ast
+from functools import lru_cache
+from pathlib import Path
+
+QUERY_BUILDER_FILE = Path(__file__).resolve().parent / "query_builder.py"
+
+
+@lru_cache(maxsize=1)
+def _load_query_builder_file() -> str:
+    return QUERY_BUILDER_FILE.read_text()
+
+
+def get_classes_code(class_names: set[str]) -> str:
+    source_file = _load_query_builder_file()
+    source_lines = source_file.splitlines()
+    tree = ast.parse(source_file)
+
+    class_code: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name in class_names:
+            start_lineno = node.lineno - 1
+            end_lineno = node.end_lineno
+            class_code.append("\n".join(source_lines[start_lineno:end_lineno]))
+
+    return "\n\n".join(class_code)
+
+
+if __name__ == "__main__":
+    print(get_classes_code({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"}))
