@@ -14,7 +14,7 @@ from {{ top_level_package }}.data_classes._core import ({% if has_default_instan
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from {{ top_level_package }}.data_classes import (
     DomainModelCore,
@@ -87,7 +87,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ parm.name }},{% endfor %}
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder({{ data_class.read_list_name }})
+        builder = DataClassQueryBuilder({{ data_class.read_list_name }})
         return {{ query_api.name }}(self._client, builder, filter_, limit)
 
 {% if data_class.is_writable %}
@@ -465,7 +465,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 sort=sort,{% endif %}
             )
 
-        builder = QueryBuilder({{ data_class.read_list_name }}){% if data_class.has_container_fields %}
+        builder = DataClassQueryBuilder({{ data_class.read_list_name }}){% if data_class.has_container_fields %}
         has_data = dm.filters.HasData(views=[self._view_id]){% endif %}
         builder.append(
             NodeQueryStep(
@@ -529,7 +529,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 )
             ){% endif %}{% endfor %}
         # We know that that all nodes are connected as it is not possible to filter on connections
-        return builder.execute(self._client, remove_not_connected=False){% else %}
+        builder.execute_query(self._client, remove_not_connected=False)
+        return builder.unpack(){% else %}
         return self._list(
             limit=limit,
             filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
