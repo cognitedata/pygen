@@ -282,12 +282,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                 isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{ field.reverse_property.name }} is not None
                 and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{ field.reverse_property.name }})))
-            ):{% if field.reverse_property.is_one_to_one %}
-                node.{{  field.reverse_property.name }} = {{  field.reverse_property.name }}{% else %}
-                if node.{{  field.reverse_property.name }} is None:
-                    node.{{  field.reverse_property.name }} = []
-                node.{{  field.reverse_property.name }}.append({{  field.reverse_property.name }}){% endif %}
-
+            ):
                 if {{  field.reverse_property.name }}.{{ field.name }} is None:
                     {{  field.reverse_property.name }}.{{ field.name }} = node
                 elif are_nodes_equal(node, {{  field.reverse_property.name }}.{{ field.name }}):
@@ -303,7 +298,6 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                 and node.{{  field.reverse_property.name }} is not None
                 and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{  field.reverse_property.name }})))
             ):
-                node.{{  field.reverse_property.name }} = {{ field.reverse_property.name }}
                 if {{  field.reverse_property.name }}.{{ field.name }} is None:
                     {{  field.reverse_property.name }}.{{ field.name }} = []
                 {{ field.reverse_property.name }}.{{ field.name }}.append(node){% else %}
@@ -317,11 +311,6 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                             this_instance.{{ field.name }} = [node]
                         else:
                             this_instance.{{ field.name }}.append(node)
-
-                node.{{  field.reverse_property.name }} = [
-                    instances.get(as_pygen_node_id({{  field.reverse_property.name }})) or {{ field.reverse_property.name }}
-                    for {{  field.reverse_property.name }} in node.{{  field.reverse_property.name }}
-                ]
 
                 {% endif %}
                 {% endfor %}
