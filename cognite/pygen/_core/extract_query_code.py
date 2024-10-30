@@ -13,7 +13,8 @@ def _load_query_builder_file() -> str:
     return QUERY_BUILDER_FILE.read_text()
 
 
-def get_classes_code(class_names: set[str]) -> str:
+@lru_cache(maxsize=1)
+def get_classes_code(class_names: frozenset[str]) -> str:
     source_file = _load_query_builder_file()
     source_lines = source_file.splitlines()
     tree = ast.parse(source_file)
@@ -25,8 +26,8 @@ def get_classes_code(class_names: set[str]) -> str:
             end_lineno = node.end_lineno
             class_code.append("\n".join(source_lines[start_lineno:end_lineno]))
 
-    return "\n\n".join(class_code)
+    return "\n\n\n".join(class_code)
 
 
 if __name__ == "__main__":
-    print(get_classes_code({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"}))
+    print(get_classes_code(frozenset({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})))
