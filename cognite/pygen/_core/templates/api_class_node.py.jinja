@@ -381,7 +381,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
         sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",{% endif %}
     ) -> Any:
