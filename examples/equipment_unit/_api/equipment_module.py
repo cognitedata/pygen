@@ -13,7 +13,7 @@ from equipment_unit.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from equipment_unit.data_classes import (
     DomainModelCore,
@@ -97,7 +97,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(EquipmentModuleList)
+        builder = DataClassQueryBuilder(EquipmentModuleList)
         return EquipmentModuleQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

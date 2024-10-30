@@ -397,9 +397,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 return False
         return True
 
-    def execute_query(
-        self, client: CogniteClient, remove_not_connected: bool = False
-    ) -> dict[str, Any]:
+    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, Any]:
         self._reset()
         query, to_search, temp_select = self._build()
 
@@ -445,7 +443,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 if view_id is None or expression is None:
                     raise ValueError(
                         "Invalid state of the query. Search should always be a node expression with view properties"
-                )
+                    )
                 if expression.through is None:
                     raise ValueError("Missing through set in a reverse-list query")
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
@@ -495,10 +493,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         if remove_not_connected and len(self) > 1:
             _QueryResultCleaner(self).clean()
 
-        return {
-            step.name: step.results
-            for step in self
-        }
+        return {step.name: step.results for step in self}
 
     def get_from(self) -> str | None:
         if len(self) == 0:

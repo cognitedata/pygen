@@ -13,7 +13,7 @@ from windmill.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from windmill.data_classes import (
     DomainModelCore,
@@ -89,7 +89,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(MetmastList)
+        builder = DataClassQueryBuilder(MetmastList)
         return MetmastQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

@@ -13,7 +13,7 @@ from windmill.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from windmill.data_classes import (
     DomainModelCore,
@@ -89,7 +89,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(BladeList)
+        builder = DataClassQueryBuilder(BladeList)
         return BladeQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
@@ -525,7 +525,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 sort=sort,
             )
 
-        builder = QueryBuilder(BladeList)
+        builder = DataClassQueryBuilder(BladeList)
         has_data = dm.filters.HasData(views=[self._view_id])
         builder.append(
             NodeQueryStep(
@@ -563,4 +563,5 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
-        return builder.execute(self._client, remove_not_connected=False)
+        builder.execute_query(self._client, remove_not_connected=False)
+        return builder.unpack()

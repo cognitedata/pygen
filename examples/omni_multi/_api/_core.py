@@ -36,7 +36,7 @@ from omni_multi.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
-    QueryBuilder,
+    DataClassQueryBuilder,
     NodeQueryStep,
     EdgeQueryStep,
 )
@@ -473,13 +473,14 @@ class QueryAPI(Generic[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        builder: QueryBuilder[T_DomainModelList],
+        builder: DataClassQueryBuilder[T_DomainModelList],
     ):
         self._client = client
         self._builder = builder
 
     def _query(self) -> T_DomainModelList:
-        return self._builder.execute(self._client)
+        self._builder.execute_query(self._client, remove_not_connected=True)
+        return self._builder.unpack()
 
 
 def _create_edge_filter(

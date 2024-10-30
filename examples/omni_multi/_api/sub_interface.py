@@ -12,7 +12,7 @@ from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni_multi.data_classes import (
     DomainModelCore,
@@ -91,7 +91,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(SubInterfaceList)
+        builder = DataClassQueryBuilder(SubInterfaceList)
         return SubInterfaceQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

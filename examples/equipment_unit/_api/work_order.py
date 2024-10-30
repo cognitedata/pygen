@@ -13,7 +13,7 @@ from equipment_unit.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from equipment_unit.data_classes import (
     DomainModelCore,
@@ -94,7 +94,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(WorkOrderList)
+        builder = DataClassQueryBuilder(WorkOrderList)
         return WorkOrderQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

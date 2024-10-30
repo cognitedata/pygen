@@ -13,7 +13,7 @@ from windmill.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from windmill.data_classes import (
     DomainModelCore,
@@ -111,7 +111,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(SensorPositionList)
+        builder = DataClassQueryBuilder(SensorPositionList)
         return SensorPositionQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

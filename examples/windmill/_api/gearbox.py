@@ -13,7 +13,7 @@ from windmill.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from windmill.data_classes import (
     DomainModelCore,
@@ -83,7 +83,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(GearboxList)
+        builder = DataClassQueryBuilder(GearboxList)
         return GearboxQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

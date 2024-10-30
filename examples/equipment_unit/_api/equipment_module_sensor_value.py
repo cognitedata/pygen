@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from equipment_unit.data_classes._equipment_module import _create_equipment_module_filter
-from equipment_unit.data_classes._core import QueryStep, QueryBuilder, DomainModelList
+from equipment_unit.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
@@ -502,7 +502,7 @@ def _retrieve_timeseries_external_ids_with_extra_sensor_value(
     has_property = dm.filters.Exists(property=view_id.as_property_ref("sensor_value"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    builder = QueryBuilder[DomainModelList](None)
+    builder = DataClassQueryBuilder[DomainModelList](None)
     builder.append(
         QueryStep(
             name="nodes",
@@ -511,7 +511,7 @@ def _retrieve_timeseries_external_ids_with_extra_sensor_value(
             select=dm.query.Select([dm.query.SourceSelector(view_id, list(properties))]),
         )
     )
-    builder.execute(client, unpack=False)
+    builder.execute_query(client)
 
     output: dict[str, list[str]] = {}
     for node in builder[0].results:

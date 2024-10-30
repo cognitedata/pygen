@@ -13,7 +13,7 @@ from windmill.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from windmill.data_classes import (
     DomainModelCore,
@@ -81,7 +81,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(RotorList)
+        builder = DataClassQueryBuilder(RotorList)
         return RotorQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
