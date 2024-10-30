@@ -46,7 +46,8 @@ from ._core import (
 from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
-
+from semantic_kernel.functions import kernel_function
+from tpying import Any
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
@@ -172,6 +173,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_list_name }}:
         ...
 
+    @kernel_function
     def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
@@ -181,18 +183,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             as_child_class: If you want to retrieve the {{ data_class.doc_list_name }} as a child class,
                 you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.{% endif %}
-
-        Returns:
-            The requested {{ data_class.doc_list_name }}.
-
-        Examples:
-
-            Retrieve {{ data_class.variable }} by id:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
-
         """{% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
         return self._retrieve(
             external_id,
@@ -212,6 +202,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% else %}
         return self._retrieve(external_id, space{% if data_class.direct_children %}, as_child_class=as_child_class{% endif %}){% endif %}
 
+
+    @kernel_function
     def search(
         self,
         query: str,
@@ -228,7 +220,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.{% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
@@ -236,18 +227,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-
-        Returns:
-            Search results {{ data_class.doc_list_name}} matching the query.
-
-        Examples:
-
-           Search for 'my_{{ data_class.variable }}' in all text properties:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search('my_{{ data_class.variable }}')
-
         """
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
@@ -308,6 +287,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     ) -> InstanceAggregationResultList:
         ...
 
+    @kernel_function
     def aggregate(
         self,
         aggregate: Aggregations
@@ -333,21 +313,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             property: The property to perform aggregation on.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            Aggregation results.
-
-        Examples:
-
-            Count {{ data_class.doc_list_name }} in space `my_space`:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> result = client.{{ api_class.parent_attribute }}.aggregate("count", space="my_space")
-
         """
 
         filter_ = {{ data_class.filter_name }}(
@@ -414,6 +381,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
         return {{ data_class.query_cls_name }}(self._client)
 
+    @kernel_function
     def list(
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
@@ -427,28 +395,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         """List/filter {{ data_class.doc_list_name }}
 
         Args:{% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
-            retrieve_connections: Whether to retrieve {{ data_class.connections_docs }} for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.{% endif %}
-
-        Returns:
-            List of requested {{ data_class.doc_list_name}}
-
-        Examples:
-
-            List {{ data_class.doc_list_name }} and limit to 5:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.list(limit=5)
-
         """
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
