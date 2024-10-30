@@ -174,7 +174,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         ...
 
     @kernel_function
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> Any:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
@@ -214,7 +214,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         sort_by: {{ data_class.field_names }} | SequenceNotStr[{{ data_class.field_names }}] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> {{ data_class.read_list_name }}:
+    ) -> Any:
         """Search {{ data_class.doc_list_name }}
 
         Args:
@@ -300,11 +300,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> (
-        dm.aggregations.AggregatedNumberedValue
-        | list[dm.aggregations.AggregatedNumberedValue]
-        | InstanceAggregationResultList
-    ):
+    ) -> Any:
         """Aggregate data across {{ data_class.doc_list_name }}
 
         Args:
@@ -391,7 +387,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",{% endif %}
-    ) -> {{ data_class.read_list_name }}:
+    ) -> Any:
         """List/filter {{ data_class.doc_list_name }}
 
         Args:{% for parm in list_method.parameters %}
