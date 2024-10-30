@@ -219,7 +219,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
         Args:
             query: The search query,
-            properties: The property to search, if nothing is passed all text fields will be searched.{% for parm in list_method.parameters %}
+            properties: The property to search, if nothing is passed all text fields will be searched.
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
@@ -307,7 +307,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             group_by: The property to group by when doing the aggregation.
             property: The property to perform aggregation on.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
-            search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
+            search_property: The text field to search in.{% endif %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
         """
@@ -388,7 +388,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     ) -> Any:
         """List/filter {{ data_class.doc_list_name }}
 
-        Args:{% for parm in list_method.parameters %}
+        Args:
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
             sort_by: The property to sort by.
