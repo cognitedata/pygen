@@ -303,8 +303,6 @@ class ConnectionItemE(DomainModel):
                 and node.direct_single is not None
                 and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
             ):
-                node.direct_single = direct_single
-
                 if direct_single.direct_reverse_single is None:
                     direct_single.direct_reverse_single = node
                 elif are_nodes_equal(node, direct_single.direct_reverse_single):
@@ -322,10 +320,6 @@ class ConnectionItemE(DomainModel):
                             this_instance.direct_reverse_multi = [node]
                         else:
                             this_instance.direct_reverse_multi.append(node)
-
-                node.direct_multi = [
-                    instances.get(as_pygen_node_id(direct_multi)) or direct_multi for direct_multi in node.direct_multi
-                ]
 
 
 class ConnectionItemEWrite(DomainModelWrite):
