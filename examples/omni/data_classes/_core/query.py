@@ -366,7 +366,9 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 # Ensure that select is set for the parent
                 if step.from_ in select or step.from_ is None:
                     continue
-                view_id = step_by_name[step.from_].view_id  # type: ignore[attr-defined]
+                view_id = step_by_name[step.from_].view_id
+                if view_id is None:
+                    continue
                 select[step.from_] = dm.query.Select([dm.query.SourceSelector(view_id, ["*"])])
                 temporary_select.add(step.from_)
         return dm.query.Query(with_=with_, select=select, cursors=cursors), search, temporary_select
@@ -455,7 +457,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 if properties == ["*"]:
                     properties = None
                 step_result = client.data_modeling.instances.search(
-                    step.view_id, properties=properties, filter=is_selected, limit=limit
+                    view_id, properties=properties, filter=is_selected, limit=limit
                 )
                 batch[step.name] = dm.NodeListWithCursor(step_result, None)
 

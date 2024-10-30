@@ -13,7 +13,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -86,7 +86,7 @@ class CDFExternalReferencesListedAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(CDFExternalReferencesListedList)
+        builder = DataClassQueryBuilder(CDFExternalReferencesListedList)
         return CDFExternalReferencesListedQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

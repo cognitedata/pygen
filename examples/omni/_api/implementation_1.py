@@ -13,7 +13,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -100,7 +100,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(Implementation1List)
+        builder = DataClassQueryBuilder(Implementation1List)
         return Implementation1QueryAPI(self._client, builder, filter_, limit)
 
     def apply(

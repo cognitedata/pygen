@@ -14,7 +14,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -122,7 +122,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(EmptyList)
+        builder = DataClassQueryBuilder(EmptyList)
         return EmptyQueryAPI(self._client, builder, filter_, limit)
 
     def apply(

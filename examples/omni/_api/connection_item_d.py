@@ -13,7 +13,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
-    QueryBuilder,
+    DataClassQueryBuilder,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -106,7 +106,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(ConnectionItemDList)
+        builder = DataClassQueryBuilder(ConnectionItemDList)
         return ConnectionItemDQueryAPI(self._client, builder, filter_, limit)
 
     def apply(
@@ -655,7 +655,7 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 sort=sort,
             )
 
-        builder = QueryBuilder(ConnectionItemDList)
+        builder = DataClassQueryBuilder(ConnectionItemDList)
         has_data = dm.filters.HasData(views=[self._view_id])
         builder.append(
             NodeQueryStep(
@@ -717,4 +717,5 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
-        return builder.execute(self._client, remove_not_connected=False)
+        builder.execute_query(self._client, remove_not_connected=False)
+        return builder.unpack()
