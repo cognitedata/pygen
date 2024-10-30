@@ -294,6 +294,20 @@ class QueryStep:
             return self.expression
         return None
 
+    @property
+    def edge_expression(self) -> dm.query.EdgeResultSetExpression | None:
+        if isinstance(self.expression, dm.query.EdgeResultSetExpression):
+            return self.expression
+        return None
+
+    @property
+    def node_results(self) -> Iterable[dm.Node]:
+        return (item for item in self.results if isinstance(item, dm.Node))
+
+    @property
+    def edge_results(self) -> Iterable[dm.Edge]:
+        return (item for item in self.results if isinstance(item, dm.Edge))
+
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
             self.expression.limit = self._max_retrieve_batch_limit
@@ -488,7 +502,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
 
             if is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
                 is_large_query = True
-                print(f"Large query detected. Will print progress.")
+                print("Large query detected. Will print progress.")
 
         if remove_not_connected and len(self) > 1:
             _QueryResultCleaner(self).clean()
@@ -527,9 +541,9 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
     def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
 
     @overload
-    def __getitem__(self, item: slice) -> QueryBuilder: ...
+    def __getitem__(self, item: slice) -> "QueryBuilder": ...
 
-    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | QueryBuilder:
+    def __getitem__(self, item: SupportsIndex | slice) -> "QueryStep | QueryBuilder":
         value = super().__getitem__(item)
         if isinstance(item, slice):
             return QueryBuilder(value)  # type: ignore[arg-type]
@@ -566,7 +580,7 @@ class _QueryResultCleaner:
         if step.name not in self._tree:
             # Leaf Node
             direct_relation: str | None = None
-            if isinstance(step, NodeQueryStep) and (through := step.node_expression.through) is not None:
+            if step.node_expression and (through := step.node_expression.through) is not None:
                 direct_relation = through.property
                 if step.node_expression.direction == "inwards":
                     return {
@@ -583,7 +597,7 @@ class _QueryResultCleaner:
             else:
                 expected_ids_by_property[property_id] |= child_ids
 
-        if isinstance(step, NodeQueryStep):
+        if step.node_expression is not None:
             filtered_results: list[Instance] = []
             for node in step.node_results:
                 if self._is_connected_node(node, expected_ids_by_property):
@@ -592,7 +606,7 @@ class _QueryResultCleaner:
             direct_relation = None if step.node_expression.through is None else step.node_expression.through.property
             return {node.as_id() for node in step.node_results}, direct_relation
 
-        if isinstance(step, EdgeQueryStep):
+        if step.edge_expression:
             if len(expected_ids_by_property) > 1 or None not in expected_ids_by_property:
                 raise RuntimeError(f"Invalid state of {type(self).__name__}")
             expected_ids = expected_ids_by_property[None]
