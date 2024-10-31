@@ -1,13 +1,14 @@
-import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from cognite.pygen import _execute_query
+from cognite.pygen import _QueryExecutor
 
 
-@pytest.mark.skip("In progress")
 def test_query_reverse_direct_relation_list(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_e = omni_views["ConnectionItemE"]
-    result = _execute_query(cognite_client, item_e, "list", ["name", "directReverseMulti"])
+    item_d = omni_views["ConnectionItemD"]
+    executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
+
+    result = executor.execute_query(item_e.as_id(), "list", ["name", "directReverseMulti"])
 
     assert result
