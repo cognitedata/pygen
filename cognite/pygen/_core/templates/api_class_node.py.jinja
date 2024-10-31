@@ -394,13 +394,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         """
         {% for parm in list_method.parameters %}
         if isinstance({{ parm }}, str): 
-            if len({{ parm }}.split(":")) == 2: 
-                {{ parm }} = tuple({{ parm }}.split(":"))
+            if len({{ parm }}.split(":::")) == 2: 
+                {{ parm }} = tuple({{ parm }}.split(":::"))
         elif isinstance({{ parm }}, list): 
             for i in range(len({{ parm }})):
                 item = {{ parm }}[i]
-                if len(item.split(":")) == 2: 
-                    {{ parm }}[i] = tuple(item.split(":"))
+                if len(item.split(":::")) == 2: 
+                    {{ parm }}[i] = tuple(item.split(":::"))
         {% endfor %}
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
