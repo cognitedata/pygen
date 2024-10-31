@@ -309,7 +309,17 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
         """
-
+        {% for parm in list_method.parameters %}
+        if isinstance({{ parm.name }}, str): 
+            if len({{ parm.name }}.split(":::")) == 2: 
+                {{ parm.name }} = tuple({{ parm.name }}.split(":::"))
+                print("pygen: hanged the value of {{ parm.name }} into:", {{ parm.name }})
+        elif isinstance({{ parm.name }}, list): 
+            for i in range(len({{ parm.name }})):
+                item = {{ parm.name }}[i]
+                if len(item.split(":::")) == 2: 
+                    {{ parm.name }}[i] = tuple(item.split(":::"))
+        {% endfor %}
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
@@ -393,15 +403,15 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             direction: The direction to sort by, either 'ascending' or 'descending'.
         """
         {% for parm in list_method.parameters %}
-        if isinstance({{ parm }}, str): 
-            if len({{ parm }}.split(":::")) == 2: 
-                {{ parm }} = tuple({{ parm }}.split(":::"))
-                print("pygen: hanged the value of {{ parm }} into:", {{ parm }})
-        elif isinstance({{ parm }}, list): 
-            for i in range(len({{ parm }})):
-                item = {{ parm }}[i]
+        if isinstance({{ parm.name }}, str): 
+            if len({{ parm.name }}.split(":::")) == 2: 
+                {{ parm.name }} = tuple({{ parm.name }}.split(":::"))
+                print("pygen: hanged the value of {{ parm.name }} into:", {{ parm.name }})
+        elif isinstance({{ parm.name }}, list): 
+            for i in range(len({{ parm.name }})):
+                item = {{ parm.name }}[i]
                 if len(item.split(":::")) == 2: 
-                    {{ parm }}[i] = tuple(item.split(":::"))
+                    {{ parm.name }}[i] = tuple(item.split(":::"))
         {% endfor %}
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
