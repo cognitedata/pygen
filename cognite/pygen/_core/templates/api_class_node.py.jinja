@@ -396,6 +396,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         if isinstance({{ parm }}, str): 
             if len({{ parm }}.split(":::")) == 2: 
                 {{ parm }} = tuple({{ parm }}.split(":::"))
+                print("pygen: hanged the value of {{ parm }} into:", {{ parm }})
         elif isinstance({{ parm }}, list): 
             for i in range(len({{ parm }})):
                 item = {{ parm }}[i]
