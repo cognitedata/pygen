@@ -18,7 +18,7 @@ Changes are grouped as follows
 - The `cognite.pygen.utils.MockGenerator` now generate properties for edges that have properties.
 
 ### Fixed
-- When retriving reverse direct relations in the generated SDK, you no longer get a `ValueError` with
+- When retrieving reverse direct relations in the generated SDK, you no longer get a `ValueError` with
   `Circular reference...`.
 - The `cognite.pygen.utils.MockGenerator` now checks readonly properties on container level and not on view level.
   This is to ensure that readonly properties are not set on nodes that are not writable.
