@@ -4,30 +4,17 @@ from typing import Any, Literal
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
+from cognite.client.data_classes.aggregations import MetricAggregation
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
-from .query_builder import QueryBuilder, QueryStep
+from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep
 
 
 class QueryExecutor:
     def __init__(self, client: CogniteClient, views: Sequence[dm.View] | None = None):
         self._client = client
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
-
-    def execute_query(
-        self,
-        view: dm.ViewId,
-        operation: Literal["list", "aggregate", "search"],
-        properties: list[str],
-        filter: filters.Filter | None = None,
-        groupby: str | None = None,
-        limit: int | None = None,
-    ) -> dict[str, Any]:
-        if operation == "list":
-            return self._execute_list(view, properties, filter, limit)
-        else:
-            raise NotImplementedError(f"Operation {operation} is not supported")
 
     def _get_view(self, view_id: dm.ViewId) -> dm.View:
         if view_id not in self._view_by_id:
@@ -37,8 +24,46 @@ class QueryExecutor:
             self._view_by_id[view_id] = view[0]
         return self._view_by_id[view_id]
 
+    def execute_query(
+        self,
+        view: dm.ViewId,
+        operation: Literal["list", "aggregate", "search"],
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        groupby: str | None = None,
+        aggregates: MetricAggregation | Sequence[MetricAggregation] | None = None,
+        sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        if operation == "list":
+            return self._execute_list(view, properties, filter, sort, limit)
+        elif operation == "aggregate":
+            aggregate_result = self._client.data_modeling.instances.aggregate(  # type: ignore[misc]
+                view,
+                aggregates=aggregates,  # type: ignore[arg-type]
+                group_by=groupby,  # type: ignore[arg-type]
+                query=query,
+                properties=properties,
+                filter=filter,
+                limit=limit,  # type: ignore[arg-type]
+            )
+            return {"items": aggregate_result.dump()}
+        elif operation == "search":
+            search_result = self._client.data_modeling.instances.search(
+                view, query, properties=properties, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
+            )
+            return {"items": search_result.dump()}
+        else:
+            raise NotImplementedError(f"Operation {operation} is not supported")
+
     def _execute_list(
-        self, view_id: dm.ViewId, properties: list[str], filter: filters.Filter | None = None, limit: int | None = None
+        self,
+        view_id: dm.ViewId,
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
     ) -> dict[str, Any]:
         view = self._get_view(view_id)
         connection_properties = self._get_connection_properties(view.properties, properties)
@@ -49,8 +74,8 @@ class QueryExecutor:
                 sources=[view_id],
                 filter=filter,
                 limit=limit,
+                sort=sort,
             )
-            # Todo: How to return the results?
             return {"items": result.dump()}
 
         builder = QueryBuilder()
