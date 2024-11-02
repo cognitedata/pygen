@@ -1,3 +1,5 @@
+import copy
+from collections import defaultdict
 from collections.abc import Sequence
 from typing import Any, Literal
 
@@ -183,8 +185,8 @@ class QueryExecutor:
                         connection_type=connection_type,
                     )
                 )
-        query_result = builder.execute_query(self._client, remove_not_connected=False)
-        return self._prepare_query_result(query_result)
+        _ = builder.execute_query(self._client, remove_not_connected=False)
+        return self._prepare_query_result(builder)
 
     @classmethod
     def _get_connection_properties(
@@ -221,23 +223,77 @@ class QueryExecutor:
         else:
             raise NotImplementedError(f"Property {property.source=} is not supported")
 
-    def _prepare_list_result(self, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
+    @classmethod
+    def _prepare_list_result(cls, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
         output: list[dict[str, Any]] = []
         for node in result:
-            dumped = node.dump()
-            dumped_properties = dumped.pop("properties", {})
-            item = {key: value for key, value in dumped.items() if key in selected_properties}
-            for _, props_by_view_id in dumped_properties.items():
-                for __, props in props_by_view_id.items():
-                    for key, value in props.items():
-                        if key in selected_properties:
-                            item[key] = value
+            item = cls._flatten_dump(node, selected_properties)
             if item:
                 output.append(item)
         return output
 
-    def _prepare_query_result(self, result: Any) -> list[dict[str, Any]]:
-        raise NotImplementedError()
+    @classmethod
+    def _flatten_dump(
+        cls, node: dm.Node, selected_properties: set[str], connection_property: str | None = None
+    ) -> dict[str, Any]:
+        dumped = node.dump()
+        dumped_properties = dumped.pop("properties", {})
+        item = {key: value for key, value in dumped.items() if key in selected_properties}
+        for _, props_by_view_id in dumped_properties.items():
+            for __, props in props_by_view_id.items():
+                for key, value in props.items():
+                    if key in selected_properties:
+                        item[key] = value
+                    elif key == connection_property:
+                        if isinstance(value, dict):
+                            item[key] = dm.NodeId.load(value)
+                        elif isinstance(value, list):
+                            item[key] = [dm.NodeId.load(item) for item in value]
+                        else:
+                            raise TypeError(f"Unexpected connection property value: {value}")
+        return item
+
+    def _prepare_query_result(self, builder: QueryBuilder) -> list[dict[str, Any]]:
+        output: list[dict[str, Any]] = []
+        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(
+            list
+        )
+        for step in reversed(builder):
+            step_properties = set(step.selected_properties)
+            if node_expression := step.node_expression:
+                connection_property: str | None = None
+                property_ = node_expression.through and node_expression.through.property
+                if node_expression.through and node_expression.direction == "inwards":
+                    connection_property = node_expression.through.property
+                unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+                for node in step.node_results:
+                    node_id = node.as_id()
+                    dumped = self._flatten_dump(node, step_properties, connection_property)
+                    if step.name in results_by_from:
+                        for nested_prop, nested_by_id in results_by_from[step.name]:
+                            if nested_prop is None:
+                                # Edge
+                                raise NotImplementedError()
+                            else:
+                                if neste_item := nested_by_id.get(node_id):
+                                    dumped[nested_prop] = neste_item
+
+                    if connection_property is None:
+                        unpacked[node_id].append(dumped)
+                    else:
+                        reverse = dumped.pop(connection_property)
+                        if isinstance(reverse, dm.NodeId):
+                            unpacked[reverse].append(dumped)
+                        elif isinstance(reverse, list):
+                            for item in reverse:
+                                unpacked[item].append(copy.deepcopy(dumped))
+
+                results_by_from[step.from_].append((property_, unpacked))
+            elif edge_expression := step.edge_expression:
+                raise NotImplementedError()
+            else:
+                raise TypeError("Unexpected step")
+        return output
 
     def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
         raise NotImplementedError()

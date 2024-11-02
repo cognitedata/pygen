@@ -113,6 +113,12 @@ class QueryStep:
     def edge_results(self) -> Iterable[dm.Edge]:
         return (item for item in self.results if isinstance(item, dm.Edge))
 
+    @property
+    def selected_properties(self) -> list[str]:
+        if self.select is None:
+            return []
+        return [prop for source in self.select.sources for prop in source.properties]
+
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
             self.expression.limit = self._max_retrieve_batch_limit
