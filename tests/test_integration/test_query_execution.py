@@ -8,10 +8,22 @@ def test_query_reverse_direct_relation_list(cognite_client: CogniteClient, omni_
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
     executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
+    result = executor.execute_query(
+        item_e.as_id(), "list", ["name", {"directReverseMulti": ["name"]}, "directNoSource"], limit=5
+    )
 
-    result = executor.execute_query(item_e.as_id(), "list", ["name", "directReverseMulti"])
-
-    assert result
+    assert isinstance(result, dict)
+    assert "listConnectionItemE" in result
+    assert isinstance(result["listConnectionItemE"], list)
+    assert len(result["listConnectionItemE"]) > 0
+    for item in result["listConnectionItemE"]:
+        assert isinstance(item, dict)
+        assert "name" in item
+        assert "directReverseMulti" in item
+        assert isinstance(item["directReverseMulti"], list)
+        for reverse_item in item["directReverseMulti"]:
+            assert isinstance(reverse_item, dict)
+            assert "name" in reverse_item
 
 
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:

@@ -6,7 +6,6 @@ from collections import defaultdict
 from collections.abc import Collection, Iterable, Iterator, MutableSequence
 from contextlib import suppress
 from typing import (
-    Any,
     Literal,
     SupportsIndex,
     cast,
@@ -217,7 +216,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 return False
         return True
 
-    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, Any]:
+    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, list[Instance]]:
         self._reset()
         query, to_search, temp_select = self._build()
 

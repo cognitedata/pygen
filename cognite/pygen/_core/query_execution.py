@@ -24,11 +24,28 @@ class QueryExecutor:
             self._view_by_id[view_id] = view[0]
         return self._view_by_id[view_id]
 
+    def _flatten_properties(self, properties: list[str | dict[str, list[str]]], operation: str) -> list[str]:
+        output = []
+        is_nested_supported = operation == "list"
+        for prop in properties:
+            if isinstance(prop, str):
+                output.append(prop)
+            elif isinstance(prop, dict) and is_nested_supported:
+                if len(prop) != 1:
+                    raise ValueError(f"Unexpected nested property: {prop}")
+                key = next(iter(prop.keys()))
+                output.append(key)
+            elif isinstance(prop, dict):
+                raise ValueError(f"Nested properties are not supported for operation {operation}")
+            else:
+                raise ValueError(f"Unexpected property type: {type(prop)}")
+        return output
+
     def execute_query(
         self,
         view: dm.ViewId,
         operation: Literal["list", "aggregate", "search"],
-        properties: list[str],
+        properties: list[str | dict[str, list[str]]],
         filter: filters.Filter | None = None,
         query: str | None = None,
         groupby: str | Sequence[str] | None = None,
@@ -44,16 +61,17 @@ class QueryExecutor:
                 aggregates=aggregates,  # type: ignore[arg-type]
                 group_by=groupby,  # type: ignore[arg-type]
                 query=query,
-                properties=properties,
+                properties=self._flatten_properties(properties, operation),
                 filter=filter,
                 limit=limit,  # type: ignore[arg-type]
             )
             dumped = self._prepare_aggregate_result(aggregate_result)
         elif operation == "search":
+            flatten_props = self._flatten_properties(properties, operation)
             search_result = self._client.data_modeling.instances.search(
-                view, query, properties=properties, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
+                view, query, properties=flatten_props, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
             )
-            dumped = self._prepare_list_result(search_result, set(properties))
+            dumped = self._prepare_list_result(search_result, set(flatten_props))
         else:
             raise NotImplementedError(f"Operation {operation} is not supported")
         return {f"{operation}{view.external_id}": dumped}
@@ -61,13 +79,14 @@ class QueryExecutor:
     def _execute_list(
         self,
         view_id: dm.ViewId,
-        properties: list[str],
+        properties: list[str | dict[str, list[str]]],
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
-        connection_properties = self._get_connection_properties(view.properties, properties)
+        flatten_properties = self._flatten_properties(properties, "list")
+        connection_properties = self._get_connection_properties(view.properties, flatten_properties)
 
         if not connection_properties:
             result = self._client.data_modeling.instances.list(
@@ -77,7 +96,12 @@ class QueryExecutor:
                 limit=limit,
                 sort=sort,
             )
-            return self._prepare_list_result(result, set(properties))
+            return self._prepare_list_result(result, set(flatten_properties))
+        nested_properties_by_property: dict[str, list[str]] = {}
+        for prop in properties:
+            if isinstance(prop, dict):
+                key, value = next(iter(prop.items()))
+                nested_properties_by_property[key] = value
 
         builder = QueryBuilder()
         has_data = dm.filters.HasData(views=[view_id])
@@ -87,6 +111,9 @@ class QueryExecutor:
                 root_name,
                 dm.query.NodeResultSetExpression(
                     filter=dm.filters.And(filter, has_data) if filter else has_data,
+                ),
+                select=self._create_select(
+                    [prop for prop in flatten_properties if prop not in nested_properties_by_property], view_id
                 ),
                 view_id=view.as_id(),
                 max_retrieve_limit=-1 if limit is None else limit,
@@ -117,7 +144,11 @@ class QueryExecutor:
                         view_id=target_view,
                     )
                 )
-            elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+            elif (
+                isinstance(connection, dm.MappedProperty)
+                and isinstance(connection.type, dm.DirectRelation)
+                and connection.source
+            ):
                 builder.append(
                     QueryStep(
                         builder.create_name(root_name),
@@ -125,6 +156,9 @@ class QueryExecutor:
                             from_=root_name,
                             direction="outwards",
                             through=view_id.as_property_ref(connection_id),
+                        ),
+                        select=self._create_select(
+                            nested_properties_by_property.get(connection_id, ["*"]), connection.source
                         ),
                         view_id=connection.source,
                     )
@@ -141,6 +175,9 @@ class QueryExecutor:
                             from_=root_name,
                             direction="inwards",
                             through=other_view.as_property_ref(connection.through.property),
+                        ),
+                        select=self._create_select(
+                            nested_properties_by_property.get(connection_id, ["*"]), other_view.as_id()
                         ),
                         view_id=connection.source,
                         connection_type=connection_type,
@@ -167,6 +204,10 @@ class QueryExecutor:
         return isinstance(definition, dm.ConnectionDefinition) or (
             isinstance(definition, dm.MappedProperty) and isinstance(definition.type, dm.DirectRelation)
         )
+
+    @staticmethod
+    def _create_select(properties: list[str], view_id: dm.ViewId) -> dm.query.Select:
+        return dm.query.Select([dm.query.SourceSelector(view_id, properties)])
 
     def _is_listable(self, property: dm.PropertyId) -> bool:
         if isinstance(property.source, dm.ViewId):
