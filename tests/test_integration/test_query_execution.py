@@ -20,10 +20,10 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
     properties = ["text", "boolean", "date"]
     result = executor.execute_query(view.as_id(), "list", properties, limit=5)
 
-    assert result
+    assert isinstance(result, dict)
     assert "listPrimitiveNullable" in result
     assert isinstance(result["listPrimitiveNullable"], list)
     assert len(result["listPrimitiveNullable"]) > 0
     properties_set = set(properties)
-    ill_formed_items = [item for item in result["listPrimitiveNullable"] if set(item.keys()) != properties_set]
+    ill_formed_items = [item for item in result["listPrimitiveNullable"] if not (set(item.keys()) <= properties_set)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"

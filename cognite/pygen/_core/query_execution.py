@@ -53,7 +53,7 @@ class QueryExecutor:
             search_result = self._client.data_modeling.instances.search(
                 view, query, properties=properties, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
             )
-            dumped = self._prepare_list_result(search_result)
+            dumped = self._prepare_list_result(search_result, set(properties))
         else:
             raise NotImplementedError(f"Operation {operation} is not supported")
         return {f"{operation}{view.external_id}": dumped}
@@ -65,7 +65,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
         connection_properties = self._get_connection_properties(view.properties, properties)
 
@@ -77,7 +77,7 @@ class QueryExecutor:
                 limit=limit,
                 sort=sort,
             )
-            return self._prepare_list_result(result)
+            return self._prepare_list_result(result, set(properties))
 
         builder = QueryBuilder()
         has_data = dm.filters.HasData(views=[view_id])
@@ -180,11 +180,23 @@ class QueryExecutor:
         else:
             raise NotImplementedError(f"Property {property.source=} is not supported")
 
-    def _prepare_list_result(self, result: dm.NodeList[dm.Node]) -> dict[str, Any]:
+    def _prepare_list_result(self, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
+        output: list[dict[str, Any]] = []
+        for node in result:
+            dumped = node.dump()
+            dumped_properties = dumped.pop("properties", {})
+            item = {key: value for key, value in dumped.items() if key in selected_properties}
+            for _, props_by_view_id in dumped_properties.items():
+                for __, props in props_by_view_id.items():
+                    for key, value in props.items():
+                        if key in selected_properties:
+                            item[key] = value
+            if item:
+                output.append(item)
+        return output
+
+    def _prepare_query_result(self, result: Any) -> list[dict[str, Any]]:
         raise NotImplementedError()
 
-    def _prepare_query_result(self, result: Any) -> dict[str, Any]:
-        raise NotImplementedError()
-
-    def _prepare_aggregate_result(self, result: Any) -> dict[str, Any]:
+    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
         raise NotImplementedError()
