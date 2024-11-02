@@ -31,13 +31,13 @@ class QueryExecutor:
         properties: list[str],
         filter: filters.Filter | None = None,
         query: str | None = None,
-        groupby: str | None = None,
+        groupby: str | Sequence[str] | None = None,
         aggregates: MetricAggregation | Sequence[MetricAggregation] | None = None,
         sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         if operation == "list":
-            return self._execute_list(view, properties, filter, sort, limit)
+            dumped = self._execute_list(view, properties, filter, sort, limit)
         elif operation == "aggregate":
             aggregate_result = self._client.data_modeling.instances.aggregate(  # type: ignore[misc]
                 view,
@@ -48,14 +48,15 @@ class QueryExecutor:
                 filter=filter,
                 limit=limit,  # type: ignore[arg-type]
             )
-            return {"items": aggregate_result.dump()}
+            dumped = self._prepare_aggregate_result(aggregate_result)
         elif operation == "search":
             search_result = self._client.data_modeling.instances.search(
                 view, query, properties=properties, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
             )
-            return {"items": search_result.dump()}
+            dumped = self._prepare_list_result(search_result)
         else:
             raise NotImplementedError(f"Operation {operation} is not supported")
+        return {f"{operation}{view.external_id}": dumped}
 
     def _execute_list(
         self,
@@ -76,7 +77,7 @@ class QueryExecutor:
                 limit=limit,
                 sort=sort,
             )
-            return {"items": result.dump()}
+            return self._prepare_list_result(result)
 
         builder = QueryBuilder()
         has_data = dm.filters.HasData(views=[view_id])
@@ -145,7 +146,8 @@ class QueryExecutor:
                         connection_type=connection_type,
                     )
                 )
-        return builder.execute_query(self._client, remove_not_connected=False)
+        query_result = builder.execute_query(self._client, remove_not_connected=False)
+        return self._prepare_query_result(query_result)
 
     @classmethod
     def _get_connection_properties(
@@ -177,3 +179,12 @@ class QueryExecutor:
             return reverse_prop.type.is_list
         else:
             raise NotImplementedError(f"Property {property.source=} is not supported")
+
+    def _prepare_list_result(self, result: dm.NodeList[dm.Node]) -> dict[str, Any]:
+        raise NotImplementedError()
+
+    def _prepare_query_result(self, result: Any) -> dict[str, Any]:
+        raise NotImplementedError()
+
+    def _prepare_aggregate_result(self, result: Any) -> dict[str, Any]:
+        raise NotImplementedError()
