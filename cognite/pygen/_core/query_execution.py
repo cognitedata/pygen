@@ -8,7 +8,7 @@ from typing import Any, Literal, TypeAlias
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
-from cognite.client.data_classes.aggregations import MetricAggregation
+from cognite.client.data_classes.aggregations import Aggregation
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
@@ -60,28 +60,25 @@ class QueryExecutor:
         self,
         view: dm.ViewId,
         operation: Literal["list", "aggregate", "search"],
-        properties: Properties,
+        properties: Properties | None = None,
         filter: filters.Filter | None = None,
         query: str | None = None,
-        groupby: str | Sequence[str] | None = None,
-        aggregates: MetricAggregation | Sequence[MetricAggregation] | None = None,
+        group_by: str | Sequence[str] | None = None,
+        aggregates: Aggregation | Sequence[Aggregation] | None = None,
         sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         if operation == "list":
+            if properties is None:
+                raise ValueError("Properties are required for list operation")
             dumped = self._execute_list(view, properties, filter, sort, limit)
         elif operation == "aggregate":
-            aggregate_result = self._client.data_modeling.instances.aggregate(  # type: ignore[misc]
-                view,
-                aggregates=aggregates,  # type: ignore[arg-type]
-                group_by=groupby,  # type: ignore[arg-type]
-                query=query,
-                properties=self._as_property_list(properties, operation),
-                filter=filter,
-                limit=limit,  # type: ignore[arg-type]
+            dumped = self._execute_aggregation(
+                view, properties, filter, group_by, aggregates, sort, limit
             )
-            dumped = self._prepare_aggregate_result(aggregate_result)
         elif operation == "search":
+            if properties is None:
+                raise ValueError("Properties are required for search operation")
             flatten_props = self._as_property_list(properties, operation)
             search_result = self._client.data_modeling.instances.search(
                 view, query, properties=flatten_props, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
@@ -133,6 +130,30 @@ class QueryExecutor:
             if item:
                 output.append(item)
         return output
+
+
+    def _execute_aggregation(
+        self,
+        view_id: dm.ViewId,
+        properties: Properties | None = None,
+        filter: filters.Filter | None = None,
+        group_by: str | Sequence[str] | None = None,
+        aggregates: Aggregation | Sequence[Aggregation] | None = None,
+        sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        aggregate_result = self._client.data_modeling.instances.aggregate(  # type: ignore[misc]
+            view_id,
+            aggregates=aggregates,  # type: ignore[arg-type]
+            group_by=group_by,  # type: ignore[arg-type]
+            query=query,
+            properties=self._as_property_list(properties, operation),
+            filter=filter,
+            limit=limit,  # type: ignore[arg-type]
+        )
+        dumped = self._prepare_aggregate_result(aggregate_result)
+
+
 
     def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
         raise NotImplementedError()

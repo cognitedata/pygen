@@ -120,3 +120,41 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
     properties_set = set(properties)
     ill_formed_items = [item for item in result["listPrimitiveNullable"] if not (set(item.keys()) <= properties_set)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+
+
+def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["PrimitiveRequired"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    result = executor.execute_query(view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(
+        property="externalId"
+    ))
+
+    assert isinstance(result, dict)
+    assert "aggregatePrimitiveRequired" in result
+    assert isinstance(result["aggregatePrimitiveRequired"], list)
+    assert len(result["aggregatePrimitiveRequired"]) > 0
+
+def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["PrimitiveRequired"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    result = executor.execute_query(view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(
+        property="externalId"
+    ), group_by="boolean")
+
+    assert isinstance(result, dict)
+    assert "aggregatePrimitiveRequired" in result
+    assert isinstance(result["aggregatePrimitiveRequired"], list)
+    assert len(result["aggregatePrimitiveRequired"]) > 0
+    assert all("aggregates" in item for item in result["aggregatePrimitiveRequired"])
+
+def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["PrimitiveRequired"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    result = executor.execute_query(view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float_32", interval=10.0))
+
+    assert isinstance(result, dict)
+    assert "histogramPrimitiveRequired" in result
+    assert isinstance(result["histogramPrimitiveRequired"], list)
+    assert len(result["histogramPrimitiveRequired"]) > 0
+    assert all("buckets" in item for item in result["histogramPrimitiveRequired"])
+    assert all("count" in bucket for item in result["histogramPrimitiveRequired"] for bucket in item["buckets"])
