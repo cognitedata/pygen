@@ -12,6 +12,10 @@ from cognite.client.exceptions import CogniteAPIError
 
 from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
 
+_NODE_PROPERTIES = frozenset(
+    {"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"}
+)
+
 
 class QueryExecutor:
     def __init__(self, client: CogniteClient, views: Sequence[dm.View] | None = None):
@@ -112,8 +116,14 @@ class QueryExecutor:
                     filter=dm.filters.And(filter, has_data) if filter else has_data,
                 ),
                 select=self._create_select(
-                    [prop for prop in flatten_properties if prop not in nested_properties_by_property], view_id
+                    [
+                        prop
+                        for prop in flatten_properties
+                        if prop not in nested_properties_by_property and prop not in _NODE_PROPERTIES
+                    ],
+                    view_id,
                 ),
+                selected_properties=flatten_properties,
                 view_id=view.as_id(),
                 max_retrieve_limit=-1 if limit is None else limit,
                 raw_filter=filter,
@@ -150,6 +160,8 @@ class QueryExecutor:
                 and isinstance(connection.type, dm.DirectRelation)
                 and connection.source
             ):
+                selected_properties = nested_properties_by_property.get(connection_id, ["*"])
+                query_properties = self._create_query_properties(selected_properties, connection_id)
                 builder.append(
                     QueryStep(
                         builder.create_name(root_name),
@@ -159,9 +171,8 @@ class QueryExecutor:
                             through=view_id.as_property_ref(connection_id),
                         ),
                         view_property=view_property,
-                        select=self._create_select(
-                            nested_properties_by_property.get(connection_id, ["*"]), connection.source
-                        ),
+                        select=self._create_select(query_properties, connection.source),
+                        selected_properties=selected_properties,
                         view_id=connection.source,
                     )
                 )
@@ -171,8 +182,7 @@ class QueryExecutor:
                 )
                 other_view = self._get_view(connection.source)
                 selected_properties = nested_properties_by_property.get(connection_id, ["*"])
-                if connection_type is None and connection.through.property not in selected_properties:
-                    selected_properties.append(connection.through.property)
+                query_properties = self._create_query_properties(selected_properties, connection.through.property)
 
                 builder.append(
                     QueryStep(
@@ -183,13 +193,28 @@ class QueryExecutor:
                             through=other_view.as_property_ref(connection.through.property),
                         ),
                         view_property=view_property,
-                        select=self._create_select(selected_properties, other_view.as_id()),
+                        select=self._create_select(query_properties, other_view.as_id()),
+                        selected_properties=selected_properties,
                         view_id=connection.source,
                         connection_type=connection_type,
                     )
                 )
         _ = builder.execute_query(self._client, remove_not_connected=False)
         return self._prepare_query_result(builder)
+
+    @classmethod
+    def _create_query_properties(cls, properties: list[str], connection_id: str) -> list[str]:
+        include_connection_prop = "*" not in properties
+        nested_properties: list[str] = []
+        for prop_id in properties:
+            if prop_id in _NODE_PROPERTIES:
+                continue
+            if prop_id == connection_id:
+                include_connection_prop = False
+            nested_properties.append(prop_id)
+        if include_connection_prop:
+            nested_properties.append(connection_id)
+        return nested_properties
 
     @staticmethod
     def _as_nested_property_by_properties(properties: list[str | dict[str, list[str]]]) -> dict[str, list[str]]:
@@ -287,7 +312,7 @@ class QueryExecutor:
         node_expression: dm.query.NodeResultSetExpression,
         results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]],
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:
-        step_properties = set(step.selected_properties)
+        step_properties = set(step.selected_properties or [])
         connection_property: str | None = None
         if node_expression.through and node_expression.direction == "inwards":
             connection_property = node_expression.through.property

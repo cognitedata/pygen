@@ -76,6 +76,7 @@ class QueryStep:
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         view_property: ViewPropertyId | None = None,
+        selected_properties: list[str] | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -92,6 +93,7 @@ class QueryStep:
         self.raw_filter = raw_filter
         self.connection_type = connection_type
         self.view_property = view_property
+        self.selected_properties = selected_properties
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
@@ -136,12 +138,6 @@ class QueryStep:
     @property
     def edge_results(self) -> Iterable[dm.Edge]:
         return (item for item in self.results if isinstance(item, dm.Edge))
-
-    @property
-    def selected_properties(self) -> list[str]:
-        if self.select is None:
-            return []
-        return [prop for source in self.select.sources for prop in source.properties or []]
 
     def update_expression_limit(self) -> None:
         if self.is_unlimited:
