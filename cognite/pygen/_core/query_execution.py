@@ -1,8 +1,9 @@
 import copy
 import warnings
 from collections import defaultdict
-from collections.abc import Sequence
-from typing import Any, Literal
+from collections.abc import Callable, Sequence
+from functools import cached_property
+from typing import Any, Literal, TypeAlias
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -18,6 +19,8 @@ from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
 _NODE_PROPERTIES = frozenset(
     {"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"}
 )
+
+Properties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
 
 
 class QueryExecutor:
@@ -35,7 +38,8 @@ class QueryExecutor:
             self._view_by_id[view_id] = view[0]
         return self._view_by_id[view_id]
 
-    def _flatten_properties(self, properties: list[str | dict[str, list[str]]], operation: str) -> list[str]:
+    @staticmethod
+    def _as_property_list(properties: Properties, operation: str) -> list[str]:
         output = []
         is_nested_supported = operation == "list"
         for prop in properties:
@@ -56,7 +60,7 @@ class QueryExecutor:
         self,
         view: dm.ViewId,
         operation: Literal["list", "aggregate", "search"],
-        properties: list[str | dict[str, list[str]]],
+        properties: Properties,
         filter: filters.Filter | None = None,
         query: str | None = None,
         groupby: str | Sequence[str] | None = None,
@@ -72,13 +76,13 @@ class QueryExecutor:
                 aggregates=aggregates,  # type: ignore[arg-type]
                 group_by=groupby,  # type: ignore[arg-type]
                 query=query,
-                properties=self._flatten_properties(properties, operation),
+                properties=self._as_property_list(properties, operation),
                 filter=filter,
                 limit=limit,  # type: ignore[arg-type]
             )
             dumped = self._prepare_aggregate_result(aggregate_result)
         elif operation == "search":
-            flatten_props = self._flatten_properties(properties, operation)
+            flatten_props = self._as_property_list(properties, operation)
             search_result = self._client.data_modeling.instances.search(
                 view, query, properties=flatten_props, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
             )
@@ -90,16 +94,17 @@ class QueryExecutor:
     def _execute_list(
         self,
         view_id: dm.ViewId,
-        properties: list[str | dict[str, list[str]]],
+        properties: Properties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
-        flatten_properties = self._flatten_properties(properties, "list")
-        connection_properties = self._get_connection_properties(view.properties, flatten_properties)
+        root_properties = self._as_property_list(properties, "list")
+        builder = QueryBuilder()
+        factory = QueryStepFactory(view, properties, builder.create_name)
 
-        if not connection_properties:
+        if not factory.connection_properties:
             result = self._client.data_modeling.instances.list(
                 instance_type="node",
                 sources=[view_id],
@@ -107,110 +112,217 @@ class QueryExecutor:
                 limit=limit,
                 sort=sort,
             )
-            return self._prepare_list_result(result, set(flatten_properties))
+            return self._prepare_list_result(result, set(root_properties))
 
-        nested_properties_by_property = self._as_nested_property_by_properties(properties)
-        reverse_properties = {
-            prop_id: prop for prop_id, prop in connection_properties.items() if isinstance(prop, ReverseDirectRelation)
+        reverse_views = {
+            prop.through.source: self._get_view(prop.through.source)
+            for prop in factory.reverse_properties.values()
+            if isinstance(prop.through.source, dm.ViewId)
         }
-        skip = _NODE_PROPERTIES | set(reverse_properties.keys())
-        builder = QueryBuilder()
-        has_data = dm.filters.HasData(views=[view_id])
-        root_name = builder.create_name(None)
-        builder.append(
-            QueryStep(
-                root_name,
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter, has_data) if filter else has_data,
-                ),
-                select=self._create_select([prop for prop in flatten_properties if prop not in skip], view_id),
-                selected_properties=flatten_properties,
-                view_id=view.as_id(),
-                max_retrieve_limit=-1 if limit is None else limit,
-                raw_filter=filter,
-            )
-        )
-        for connection_id, connection in connection_properties.items():
-            view_property = ViewPropertyId(view_id, connection_id)
-            selected_properties = nested_properties_by_property.get(connection_id, ["*"])
-            if isinstance(connection, dm.EdgeConnection):
-                edge_name = builder.create_name(root_name)
-                builder.append(
-                    QueryStep(
-                        edge_name,
-                        dm.query.EdgeResultSetExpression(
-                            from_=root_name,
-                            direction=connection.direction,
-                            chain_to="source" if connection.direction == "outwards" else "destination",
-                        ),
-                        selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
-                        view_property=view_property,
-                    )
-                )
-                node_properties = next(
-                    (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
-                )
-                if isinstance(node_properties, dict):
-                    selected_node_properties = node_properties["node"]
-                    query_properties = self._create_query_properties(selected_node_properties, None)
-                    target_view = connection.source
-                    builder.append(
-                        QueryStep(
-                            builder.create_name(edge_name),
-                            dm.query.NodeResultSetExpression(
-                                from_=edge_name,
-                                filter=dm.filters.HasData(views=[target_view]),
-                            ),
-                            select=self._create_select(query_properties, target_view),
-                            selected_properties=selected_node_properties,
-                            view_property=ViewPropertyId(target_view, "node"),
-                            view_id=target_view,
-                        )
-                    )
-            elif (
-                isinstance(connection, dm.MappedProperty)
-                and isinstance(connection.type, dm.DirectRelation)
-                and connection.source
-            ):
-                query_properties = self._create_query_properties(selected_properties, None)
-                builder.append(
-                    QueryStep(
-                        builder.create_name(root_name),
-                        dm.query.NodeResultSetExpression(
-                            from_=root_name,
-                            direction="outwards",
-                            through=view_id.as_property_ref(connection_id),
-                        ),
-                        view_property=view_property,
-                        select=self._create_select(query_properties, connection.source),
-                        selected_properties=selected_properties,
-                        view_id=connection.source,
-                    )
-                )
-            elif isinstance(connection, ReverseDirectRelation):
-                connection_type: Literal["reverse-list"] | None = (
-                    "reverse-list" if self._is_listable(connection.through) else None
-                )
-                other_view = self._get_view(connection.source)
-                query_properties = self._create_query_properties(selected_properties, connection.through.property)
-
-                builder.append(
-                    QueryStep(
-                        builder.create_name(root_name),
-                        dm.query.NodeResultSetExpression(
-                            from_=root_name,
-                            direction="inwards",
-                            through=other_view.as_property_ref(connection.through.property),
-                        ),
-                        view_property=view_property,
-                        select=self._create_select(query_properties, other_view.as_id()),
-                        selected_properties=selected_properties,
-                        view_id=connection.source,
-                        connection_type=connection_type,
-                    )
-                )
+        builder.append(factory.root())
+        for connection_id, connection in factory.connection_properties.items():
+            builder.extend(factory.from_connection(connection_id, connection, reverse_views))
         _ = builder.execute_query(self._client, remove_not_connected=False)
         return QueryUnpacker(builder).unpack()
+
+    @classmethod
+    def _prepare_list_result(cls, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
+        output: list[dict[str, Any]] = []
+        for node in result:
+            item = QueryUnpacker.flatten_dump(node, selected_properties)
+            if item:
+                output.append(item)
+        return output
+
+    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
+        raise NotImplementedError()
+
+
+class QueryStepFactory:
+    def __init__(
+        self,
+        view: dm.View,
+        user_selected_properties: Properties,
+        create_step_name: Callable[[str | None], str],
+    ) -> None:
+        self._view = view
+        self._view_id = view.as_id()
+        self._user_selected_properties = user_selected_properties
+        self._create_step_name = create_step_name
+        self._root_name: str | None = None
+
+    @cached_property
+    def _root_properties(self) -> list[str]:
+        root_properties: list[str] = []
+        for prop in self._user_selected_properties:
+            if isinstance(prop, str):
+                root_properties.append(prop)
+            elif isinstance(prop, dict):
+                key = next(iter(prop.keys()))
+                root_properties.append(key)
+        return root_properties
+
+    @cached_property
+    def connection_properties(self) -> dict[str, ViewProperty]:
+        output: dict[str, ViewProperty] = {}
+        for prop in self._root_properties:
+            definition = self._view.properties.get(prop)
+            if not definition:
+                continue
+            if self._is_connection(definition):
+                output[prop] = definition
+        return output
+
+    @cached_property
+    def reverse_properties(self) -> dict[str, ReverseDirectRelation]:
+        return {
+            prop_id: prop
+            for prop_id, prop in self.connection_properties.items()
+            if isinstance(prop, ReverseDirectRelation)
+        }
+
+    @cached_property
+    def _nested_properties_by_property(self) -> dict[str, list[str | dict[str, list[str]]]]:
+        nested_properties_by_property: dict[str, list[str | dict[str, list[str]]]] = {}
+        for prop in self._user_selected_properties:
+            if isinstance(prop, dict):
+                key, value = next(iter(prop.items()))
+                nested_properties_by_property[key] = value
+        return nested_properties_by_property
+
+    def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
+        skip = _NODE_PROPERTIES | set(self.reverse_properties.keys())
+        if self._root_name is not None:
+            raise ValueError("Root step is already created")
+        self._root_name = self._create_step_name(None)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        return QueryStep(
+            self._root_name,
+            dm.query.NodeResultSetExpression(
+                filter=dm.filters.And(filter, has_data) if filter else has_data,
+            ),
+            select=self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id),
+            selected_properties=self._root_properties,
+            view_id=self._view_id,
+            max_retrieve_limit=-1 if limit is None else limit,
+            raw_filter=filter,
+        )
+
+    def from_connection(
+        self, connection_id: str, connection: ViewProperty, reverse_views: dict[dm.ViewId, dm.View]
+    ) -> list[QueryStep]:
+        if self._root_name is None:
+            raise ValueError("Root step is not created")
+        view_property = ViewPropertyId(self._view_id, connection_id)
+        selected_properties = self._nested_properties_by_property.get(connection_id, ["*"])
+        if isinstance(connection, dm.EdgeConnection):
+            return self._from_edge(connection, view_property, selected_properties)
+        elif isinstance(connection, ReverseDirectRelation):
+            validated = self._validate_flat_properties(selected_properties)
+            return self._from_reverse_relation(connection, view_property, validated, reverse_views)
+        elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
+            validated = self._validate_flat_properties(selected_properties)
+            return self.from_direct_relation(connection, view_property, validated)
+        else:
+            warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
+        return []
+
+    def from_direct_relation(
+        self,
+        connection: dm.MappedProperty,
+        view_property: ViewPropertyId,
+        selected_properties: list[str],
+    ) -> list[QueryStep]:
+        query_properties = self._create_query_properties(selected_properties, None)
+        if connection.source is None:
+            raise ValueError("Source view not found")
+        return [
+            QueryStep(
+                self._create_step_name(self._root_name),
+                dm.query.NodeResultSetExpression(
+                    from_=self._root_name,
+                    direction="outwards",
+                    through=self._view_id.as_property_ref(view_property.property),
+                ),
+                view_property=view_property,
+                select=self._create_select(query_properties, connection.source),
+                selected_properties=selected_properties,
+                view_id=connection.source,
+            )
+        ]
+
+    def _from_edge(
+        self,
+        connection: dm.EdgeConnection,
+        view_property: ViewPropertyId,
+        selected_properties: list[str | dict[str, list[str]]],
+    ) -> list[QueryStep]:
+        edge_name = self._create_step_name(self._root_name)
+        steps = []
+        step = QueryStep(
+            edge_name,
+            dm.query.EdgeResultSetExpression(
+                from_=self._root_name,
+                direction=connection.direction,
+                chain_to="source" if connection.direction == "outwards" else "destination",
+            ),
+            selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
+            view_property=view_property,
+        )
+        steps.append(step)
+
+        node_properties = next(
+            (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
+        )
+        if isinstance(node_properties, dict):
+            selected_node_properties = node_properties["node"]
+            query_properties = self._create_query_properties(selected_node_properties, None)
+            target_view = connection.source
+
+            step = QueryStep(
+                self._create_step_name(edge_name),
+                dm.query.NodeResultSetExpression(
+                    from_=edge_name,
+                    filter=dm.filters.HasData(views=[target_view]),
+                ),
+                select=self._create_select(query_properties, target_view),
+                selected_properties=selected_node_properties,
+                view_property=ViewPropertyId(target_view, "node"),
+                view_id=target_view,
+            )
+            steps.append(step)
+        return steps
+
+    def _from_reverse_relation(
+        self,
+        connection: ReverseDirectRelation,
+        view_property: ViewPropertyId,
+        selected_properties: list[str],
+        reverse_views: dict[dm.ViewId, dm.View],
+    ) -> list[QueryStep]:
+        connection_type: Literal["reverse-list"] | None = (
+            "reverse-list" if self._is_listable(connection.through, reverse_views) else None
+        )
+        query_properties = self._create_query_properties(selected_properties, connection.through.property)
+        try:
+            other_view = reverse_views[connection.source]
+        except KeyError:
+            raise ValueError(f"View {connection.source} not found in {reverse_views.keys()}") from None
+        return [
+            QueryStep(
+                self._create_step_name(self._root_name),
+                dm.query.NodeResultSetExpression(
+                    from_=self._root_name,
+                    direction="inwards",
+                    through=other_view.as_property_ref(connection.through.property),
+                ),
+                view_property=view_property,
+                select=self._create_select(query_properties, other_view.as_id()),
+                selected_properties=selected_properties,
+                view_id=connection.source,
+                connection_type=connection_type,
+            )
+        ]
 
     @classmethod
     def _create_query_properties(cls, properties: list[str], connection_id: str | None = None) -> list[str]:
@@ -227,28 +339,6 @@ class QueryExecutor:
         return nested_properties
 
     @staticmethod
-    def _as_nested_property_by_properties(properties: list[str | dict[str, list[str]]]) -> dict[str, list[str]]:
-        nested_properties_by_property: dict[str, list[str]] = {}
-        for prop in properties:
-            if isinstance(prop, dict):
-                key, value = next(iter(prop.items()))
-                nested_properties_by_property[key] = value
-        return nested_properties_by_property
-
-    @classmethod
-    def _get_connection_properties(
-        cls, view_properties: dict[str, ViewProperty], properties: list[str]
-    ) -> dict[str, ViewProperty]:
-        output: dict[str, ViewProperty] = {}
-        for prop in properties:
-            definition = view_properties.get(prop)
-            if not definition:
-                continue
-            if cls._is_connection(definition):
-                output[prop] = definition
-        return output
-
-    @staticmethod
     def _is_connection(definition: ViewProperty) -> bool:
         return isinstance(definition, dm.ConnectionDefinition) or (
             isinstance(definition, dm.MappedProperty) and isinstance(definition.type, dm.DirectRelation)
@@ -258,9 +348,13 @@ class QueryExecutor:
     def _create_select(properties: list[str], view_id: dm.ViewId) -> dm.query.Select:
         return dm.query.Select([dm.query.SourceSelector(view_id, properties)])
 
-    def _is_listable(self, property: dm.PropertyId) -> bool:
+    @staticmethod
+    def _is_listable(property: dm.PropertyId, reverse_views: dict[dm.ViewId, dm.View]) -> bool:
         if isinstance(property.source, dm.ViewId):
-            view = self._get_view(property.source)
+            try:
+                view = reverse_views[property.source]
+            except KeyError:
+                raise ValueError(f"View {property.source} not found in {reverse_views.keys()}") from None
             if property.property not in view.properties:
                 raise TypeError(f"Reverse property {property.property} not found in {property.source!r}")
             reverse_prop = view.properties[property.property]
@@ -270,17 +364,15 @@ class QueryExecutor:
         else:
             raise NotImplementedError(f"Property {property.source=} is not supported")
 
-    @classmethod
-    def _prepare_list_result(cls, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
-        output: list[dict[str, Any]] = []
-        for node in result:
-            item = QueryUnpacker.flatten_dump(node, selected_properties)
-            if item:
-                output.append(item)
+    @staticmethod
+    def _validate_flat_properties(properties: list[str | dict[str, list[str]]]) -> list[str]:
+        output = []
+        for prop in properties:
+            if isinstance(prop, str):
+                output.append(prop)
+            else:
+                raise ValueError(f"Direct relations do not support nested properties. Got {prop}")
         return output
-
-    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
-        raise NotImplementedError()
 
 
 class QueryUnpacker:
