@@ -11,6 +11,8 @@ from cognite.client.data_classes.aggregations import MetricAggregation
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
+from cognite.pygen._version import __version__
+
 from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
 
 _NODE_PROPERTIES = frozenset(
@@ -21,6 +23,8 @@ _NODE_PROPERTIES = frozenset(
 class QueryExecutor:
     def __init__(self, client: CogniteClient, views: Sequence[dm.View] | None = None):
         self._client = client
+        # Used for aggregated logging of requests
+        client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor"
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
 
     def _get_view(self, view_id: dm.ViewId) -> dm.View:
@@ -206,7 +210,7 @@ class QueryExecutor:
                     )
                 )
         _ = builder.execute_query(self._client, remove_not_connected=False)
-        return self._prepare_query_result(builder)
+        return QueryUnpacker(builder).unpack()
 
     @classmethod
     def _create_query_properties(cls, properties: list[str], connection_id: str | None = None) -> list[str]:
@@ -270,13 +274,51 @@ class QueryExecutor:
     def _prepare_list_result(cls, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
         output: list[dict[str, Any]] = []
         for node in result:
-            item = cls._flatten_dump(node, selected_properties)
+            item = QueryUnpacker.flatten_dump(node, selected_properties)
             if item:
                 output.append(item)
         return output
 
+    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
+        raise NotImplementedError()
+
+
+class QueryUnpacker:
+    def __init__(self, builder: QueryBuilder):
+        self._builder = builder
+
+    def unpack(self) -> list[dict[str, Any]]:
+        nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        for step in reversed(self._builder):
+            source_property = step.view_property and step.view_property.property
+            if node_expression := step.node_expression:
+                unpacked = self._unpack_node(step, node_expression, nodes_by_from)
+                nodes_by_from[step.from_].append((source_property, unpacked))
+            elif edge_expression := step.edge_expression:
+                step_properties = set(step.selected_properties or [])
+                unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+                for edge in step.edge_results:
+                    start_node = dm.NodeId.load(edge.start_node.dump())
+                    end_node = dm.NodeId.load(edge.end_node.dump())
+                    dumped = self.flatten_dump(edge, step_properties)
+                    if edge_expression.direction == "outwards":
+                        source_node = start_node
+                        target_node = end_node
+                    else:
+                        source_node = end_node
+                        target_node = start_node
+                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
+                        if target_node in nested_by_id:
+                            dumped[nested_prop] = nested_by_id[target_node]
+
+                    unpacked_edge[source_node].append(dumped)
+                nodes_by_from[step.from_].append((source_property, unpacked_edge))
+            else:
+                raise TypeError("Unexpected step")
+        return [item[0] for item in nodes_by_from[None][0][1].values()]
+
     @classmethod
-    def _flatten_dump(
+    def flatten_dump(
         cls, node: dm.Node | dm.Edge, selected_properties: set[str], connection_property: str | None = None
     ) -> dict[str, Any]:
         dumped = node.dump()
@@ -296,36 +338,6 @@ class QueryExecutor:
                         item[key] = value
         return item
 
-    def _prepare_query_result(self, builder: QueryBuilder) -> list[dict[str, Any]]:
-        nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
-        for step in reversed(builder):
-            source_property = step.view_property and step.view_property.property
-            if node_expression := step.node_expression:
-                unpacked = self._unpack_node(step, node_expression, nodes_by_from)
-                nodes_by_from[step.from_].append((source_property, unpacked))
-            elif edge_expression := step.edge_expression:
-                step_properties = set(step.selected_properties or [])
-                unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
-                for edge in step.edge_results:
-                    start_node = dm.NodeId.load(edge.start_node.dump())
-                    end_node = dm.NodeId.load(edge.end_node.dump())
-                    dumped = self._flatten_dump(edge, step_properties)
-                    if edge_expression.direction == "outwards":
-                        source_node = start_node
-                        target_node = end_node
-                    else:
-                        source_node = end_node
-                        target_node = start_node
-                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
-                        if target_node in nested_by_id:
-                            dumped[nested_prop] = nested_by_id[target_node]
-
-                    unpacked_edge[source_node].append(dumped)
-                nodes_by_from[step.from_].append((source_property, unpacked_edge))
-            else:
-                raise TypeError("Unexpected step")
-        return [item[0] for item in nodes_by_from[None][0][1].values()]
-
     def _unpack_node(
         self,
         step: QueryStep,
@@ -339,7 +351,7 @@ class QueryExecutor:
         unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
-            dumped = self._flatten_dump(node, step_properties, connection_property)
+            dumped = self.flatten_dump(node, step_properties, connection_property)
             for nested_prop, nested_by_id in results_by_from.get(step.name, []):
                 if neste_item := nested_by_id.get(node_id):
                     # Reverse or Edge
@@ -372,6 +384,3 @@ class QueryExecutor:
                     for item in reverse:
                         unpacked[item].append(copy.deepcopy(dumped))
         return unpacked
-
-    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
-        raise NotImplementedError()
