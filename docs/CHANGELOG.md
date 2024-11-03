@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.42] - 24-11-03
+### Added
+- Experimental feature generic query.
+
 ## [0.99.41] - 24-10-30
 ### Added
 - The `cognite.pygen.utils.MockGenerator` now generate properties for edges that have properties.

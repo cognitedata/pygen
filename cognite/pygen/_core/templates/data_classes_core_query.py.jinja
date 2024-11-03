@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections.abc import Collection
 from collections.abc import MutableSequence, Iterable
 from contextlib import suppress
+from dataclasses import dataclass
 from typing import (
     cast,
     ClassVar,
@@ -24,6 +25,7 @@ from typing import (
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes._base import CogniteObject
 from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
