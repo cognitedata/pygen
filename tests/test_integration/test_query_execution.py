@@ -8,22 +8,23 @@ def test_query_reverse_direct_relation_list(cognite_client: CogniteClient, omni_
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
     executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
-    result = executor.execute_query(
-        item_e.as_id(), "list", ["name", {"directReverseMulti": ["name"]}, "directNoSource"], limit=5
-    )
+    properties = ["name", {"directReverseMulti": ["name"]}, "directNoSource"]
+    flatten_props = {"name", "directReverseMulti", "directNoSource"}
+    result = executor.execute_query(item_e.as_id(), "list", properties, limit=5)
 
     assert isinstance(result, dict)
     assert "listConnectionItemE" in result
     assert isinstance(result["listConnectionItemE"], list)
     assert len(result["listConnectionItemE"]) > 0
-    for item in result["listConnectionItemE"]:
-        assert isinstance(item, dict)
-        assert "name" in item
-        assert "directReverseMulti" in item
-        assert isinstance(item["directReverseMulti"], list)
-        for reverse_item in item["directReverseMulti"]:
-            assert isinstance(reverse_item, dict)
-            assert "name" in reverse_item
+    ill_formed_items = [item for item in result["listConnectionItemE"] if not (set(item.keys()) <= flatten_props)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    ill_formed_subitems = [
+        subitem
+        for item in result["listConnectionItemE"]
+        for subitem in item.get("directReverse", [])
+        if not (set(subitem.keys()) <= {"name"})
+    ]
+    assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
 
 
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:

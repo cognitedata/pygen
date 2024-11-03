@@ -10,7 +10,7 @@ from cognite.client.data_classes.aggregations import MetricAggregation
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
-from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep
+from .query_builder import SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
 
 
 class QueryExecutor:
@@ -99,11 +99,8 @@ class QueryExecutor:
                 sort=sort,
             )
             return self._prepare_list_result(result, set(flatten_properties))
-        nested_properties_by_property: dict[str, list[str]] = {}
-        for prop in properties:
-            if isinstance(prop, dict):
-                key, value = next(iter(prop.items()))
-                nested_properties_by_property[key] = value
+
+        nested_properties_by_property = self._as_nested_property_by_properties(properties)
 
         builder = QueryBuilder()
         has_data = dm.filters.HasData(views=[view_id])
@@ -123,6 +120,7 @@ class QueryExecutor:
             )
         )
         for connection_id, connection in connection_properties.items():
+            view_property = ViewPropertyId(view_id, connection_id)
             if isinstance(connection, dm.EdgeConnection):
                 edge_name = builder.create_name(root_name)
                 builder.append(
@@ -143,6 +141,7 @@ class QueryExecutor:
                             from_=edge_name,
                             filter=dm.filters.HasData(views=[target_view]),
                         ),
+                        view_property=view_property,
                         view_id=target_view,
                     )
                 )
@@ -159,6 +158,7 @@ class QueryExecutor:
                             direction="outwards",
                             through=view_id.as_property_ref(connection_id),
                         ),
+                        view_property=view_property,
                         select=self._create_select(
                             nested_properties_by_property.get(connection_id, ["*"]), connection.source
                         ),
@@ -178,6 +178,7 @@ class QueryExecutor:
                             direction="inwards",
                             through=other_view.as_property_ref(connection.through.property),
                         ),
+                        view_property=view_property,
                         select=self._create_select(
                             nested_properties_by_property.get(connection_id, ["*"]), other_view.as_id()
                         ),
@@ -187,6 +188,15 @@ class QueryExecutor:
                 )
         _ = builder.execute_query(self._client, remove_not_connected=False)
         return self._prepare_query_result(builder)
+
+    @staticmethod
+    def _as_nested_property_by_properties(properties: list[str | dict[str, list[str]]]) -> dict[str, list[str]]:
+        nested_properties_by_property: dict[str, list[str]] = {}
+        for prop in properties:
+            if isinstance(prop, dict):
+                key, value = next(iter(prop.items()))
+                nested_properties_by_property[key] = value
+        return nested_properties_by_property
 
     @classmethod
     def _get_connection_properties(
@@ -254,46 +264,54 @@ class QueryExecutor:
         return item
 
     def _prepare_query_result(self, builder: QueryBuilder) -> list[dict[str, Any]]:
-        output: list[dict[str, Any]] = []
         results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(
             list
         )
         for step in reversed(builder):
-            step_properties = set(step.selected_properties)
             if node_expression := step.node_expression:
-                connection_property: str | None = None
-                property_ = node_expression.through and node_expression.through.property
-                if node_expression.through and node_expression.direction == "inwards":
-                    connection_property = node_expression.through.property
-                unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
-                for node in step.node_results:
-                    node_id = node.as_id()
-                    dumped = self._flatten_dump(node, step_properties, connection_property)
-                    if step.name in results_by_from:
-                        for nested_prop, nested_by_id in results_by_from[step.name]:
-                            if nested_prop is None:
-                                # Edge
-                                raise NotImplementedError()
-                            else:
-                                if neste_item := nested_by_id.get(node_id):
-                                    dumped[nested_prop] = neste_item
+                unpacked = self._unpack_node(step, node_expression, results_by_from)
 
-                    if connection_property is None:
-                        unpacked[node_id].append(dumped)
-                    else:
-                        reverse = dumped.pop(connection_property)
-                        if isinstance(reverse, dm.NodeId):
-                            unpacked[reverse].append(dumped)
-                        elif isinstance(reverse, list):
-                            for item in reverse:
-                                unpacked[item].append(copy.deepcopy(dumped))
-
-                results_by_from[step.from_].append((property_, unpacked))
-            elif edge_expression := step.edge_expression:
+                source_property = step.view_property and step.view_property.property
+                results_by_from[step.from_].append((source_property, unpacked))
+            elif _ := step.edge_expression:
                 raise NotImplementedError()
             else:
                 raise TypeError("Unexpected step")
-        return output
+        return [item[0] for item in results_by_from[None][0][1].values()]
+
+    def _unpack_node(
+        self,
+        step: QueryStep,
+        node_expression: dm.query.NodeResultSetExpression,
+        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        step_properties = set(step.selected_properties)
+        connection_property: str | None = None
+        if node_expression.through and node_expression.direction == "inwards":
+            connection_property = node_expression.through.property
+        unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+        for node in step.node_results:
+            node_id = node.as_id()
+            dumped = self._flatten_dump(node, step_properties, connection_property)
+            if step.name in results_by_from:
+                for nested_prop, nested_by_id in results_by_from[step.name]:
+                    if nested_prop is None:
+                        # Edge
+                        raise NotImplementedError()
+                    else:
+                        if neste_item := nested_by_id.get(node_id):
+                            dumped[nested_prop] = neste_item
+
+            if connection_property is None:
+                unpacked[node_id].append(dumped)
+            else:
+                reverse = dumped.pop(connection_property)
+                if isinstance(reverse, dm.NodeId):
+                    unpacked[reverse].append(dumped)
+                elif isinstance(reverse, list):
+                    for item in reverse:
+                        unpacked[item].append(copy.deepcopy(dumped))
+        return unpacked
 
     def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
         raise NotImplementedError()
