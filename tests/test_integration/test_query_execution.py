@@ -79,6 +79,34 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
     assert not ill_formed_subitems_single, f"Subitems with unexpected properties: {ill_formed_subitems_single}"
 
 
+def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    item_a = omni_views["ConnectionItemA"]
+    item_b = omni_views["ConnectionItemB"]
+    executor = _QueryExecutor(cognite_client, views=[item_a, item_b])
+    properties = [
+        "externalId",
+        "name",
+        {"outwards": [{"node": {"name", "externalId"}}, "type"]},
+    ]
+    flatten_props = {"name", "outwards", "externalId"}
+    result = executor.execute_query(item_a.as_id(), "list", properties, limit=5)
+
+    assert isinstance(result, dict)
+    assert "listConnectionItemA" in result
+    assert isinstance(result["listConnectionItemA"], list)
+    assert len(result["listConnectionItemA"]) > 0
+    ill_formed_items = [item for item in result["listConnectionItemA"] if not (set(item.keys()) <= flatten_props)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    ill_formed_subitems = [
+        subitem
+        for item in result["listConnectionItemA"]
+        for edge in item.get("outwards", [])
+        for subitem in edge.get("node", [])
+        if not (set(subitem.keys()) <= {"name", "externalId"})
+    ]
+    assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+
+
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveNullable"]
     executor = _QueryExecutor(cognite_client, views=[view])
