@@ -105,7 +105,10 @@ class QueryExecutor:
             return self._prepare_list_result(result, set(flatten_properties))
 
         nested_properties_by_property = self._as_nested_property_by_properties(properties)
-
+        reverse_properties = {
+            prop_id: prop for prop_id, prop in connection_properties.items() if isinstance(prop, ReverseDirectRelation)
+        }
+        skip = _NODE_PROPERTIES | set(reverse_properties.keys())
         builder = QueryBuilder()
         has_data = dm.filters.HasData(views=[view_id])
         root_name = builder.create_name(None)
@@ -115,14 +118,7 @@ class QueryExecutor:
                 dm.query.NodeResultSetExpression(
                     filter=dm.filters.And(filter, has_data) if filter else has_data,
                 ),
-                select=self._create_select(
-                    [
-                        prop
-                        for prop in flatten_properties
-                        if prop not in nested_properties_by_property and prop not in _NODE_PROPERTIES
-                    ],
-                    view_id,
-                ),
+                select=self._create_select([prop for prop in flatten_properties if prop not in skip], view_id),
                 selected_properties=flatten_properties,
                 view_id=view.as_id(),
                 max_retrieve_limit=-1 if limit is None else limit,
@@ -161,7 +157,7 @@ class QueryExecutor:
                 and connection.source
             ):
                 selected_properties = nested_properties_by_property.get(connection_id, ["*"])
-                query_properties = self._create_query_properties(selected_properties, connection_id)
+                query_properties = self._create_query_properties(selected_properties, None)
                 builder.append(
                     QueryStep(
                         builder.create_name(root_name),
@@ -171,9 +167,9 @@ class QueryExecutor:
                             through=view_id.as_property_ref(connection_id),
                         ),
                         view_property=view_property,
-                        select=self._create_select(query_properties, view_id),
+                        select=self._create_select(query_properties, connection.source),
                         selected_properties=selected_properties,
-                        view_id=view_id,
+                        view_id=connection.source,
                     )
                 )
             elif isinstance(connection, ReverseDirectRelation):
@@ -203,7 +199,7 @@ class QueryExecutor:
         return self._prepare_query_result(builder)
 
     @classmethod
-    def _create_query_properties(cls, properties: list[str], connection_id: str) -> list[str]:
+    def _create_query_properties(cls, properties: list[str], connection_id: str | None = None) -> list[str]:
         include_connection_prop = "*" not in properties
         nested_properties: list[str] = []
         for prop_id in properties:
@@ -212,7 +208,7 @@ class QueryExecutor:
             if prop_id == connection_id:
                 include_connection_prop = False
             nested_properties.append(prop_id)
-        if include_connection_prop:
+        if include_connection_prop and connection_id:
             nested_properties.append(connection_id)
         return nested_properties
 
@@ -327,7 +323,20 @@ class QueryExecutor:
                         raise NotImplementedError()
                     else:
                         if neste_item := nested_by_id.get(node_id):
+                            # Reverse
                             dumped[nested_prop] = neste_item
+                        elif nested_prop in dumped:
+                            identifier = dumped.pop(nested_prop)
+                            if isinstance(identifier, dict):
+                                other_id = dm.NodeId.load(identifier)
+                                if other_id in nested_by_id:
+                                    dumped[nested_prop] = nested_by_id[other_id]
+                            elif isinstance(identifier, list):
+                                dumped[nested_prop] = []
+                                for item in identifier:
+                                    other_id = dm.NodeId.load(item)
+                                    if other_id in nested_by_id:
+                                        dumped[nested_prop].extend(nested_by_id[other_id])
 
             if connection_property is None:
                 unpacked[node_id].append(dumped)
