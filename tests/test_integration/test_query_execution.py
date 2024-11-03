@@ -1,5 +1,6 @@
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from omni import OmniClient
 
 from cognite.pygen import _QueryExecutor
 
@@ -157,3 +158,18 @@ def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]
     assert "aggregatePrimitiveRequired" in result
     assert isinstance(result["aggregatePrimitiveRequired"], dict)
     assert "histogram" in result["aggregatePrimitiveRequired"]
+
+
+def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_views: dict[str, dm.View]) -> None:
+    items = omni_client.primitive_required.list(limit=1)
+    assert len(items) > 0
+    item = items[0]
+    word = item.text.split(" ", maxsplit=1)[0]
+
+    view = omni_views["PrimitiveRequired"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    result = executor.execute_query(view.as_id(), "search", query=word, limit=5)
+
+    assert isinstance(result, dict)
+    assert "searchPrimitiveRequired" in result
+    assert isinstance(result["searchPrimitiveRequired"], list)

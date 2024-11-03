@@ -81,13 +81,11 @@ class QueryExecutor:
             flatten_props = self._as_property_list(properties, operation) if properties else None
             dumped = self._execute_aggregation(view, aggregates, flatten_props, query, filter, group_by, limit)
         elif operation == "search":
-            if properties is None:
-                raise ValueError("Properties are required for search operation")
-            flatten_props = self._as_property_list(properties, operation)
+            flatten_props = self._as_property_list(properties, operation) if properties else None
             search_result = self._client.data_modeling.instances.search(
                 view, query, properties=flatten_props, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
             )
-            dumped = self._prepare_list_result(search_result, set(flatten_props))
+            dumped = self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
         else:
             raise NotImplementedError(f"Operation {operation} is not supported")
         return {f"{operation}{view.external_id}": dumped}
@@ -127,7 +125,9 @@ class QueryExecutor:
         return QueryUnpacker(builder).unpack()
 
     @classmethod
-    def _prepare_list_result(cls, result: dm.NodeList[dm.Node], selected_properties: set[str]) -> list[dict[str, Any]]:
+    def _prepare_list_result(
+        cls, result: dm.NodeList[dm.Node], selected_properties: set[str] | None
+    ) -> list[dict[str, Any]]:
         output: list[dict[str, Any]] = []
         for node in result:
             item = QueryUnpacker.flatten_dump(node, selected_properties)
@@ -488,11 +488,13 @@ class QueryUnpacker:
 
     @classmethod
     def flatten_dump(
-        cls, node: dm.Node | dm.Edge, selected_properties: set[str], connection_property: str | None = None
+        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, connection_property: str | None = None
     ) -> dict[str, Any]:
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
-        item = {key: value for key, value in dumped.items() if key in selected_properties}
+        item = {
+            key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
+        }
         for _, props_by_view_id in dumped_properties.items():
             for __, props in props_by_view_id.items():
                 for key, value in props.items():
@@ -503,7 +505,7 @@ class QueryUnpacker:
                             item[key] = [dm.NodeId.load(item) for item in value]
                         else:
                             raise TypeError(f"Unexpected connection property value: {value}")
-                    elif key in selected_properties:
+                    elif selected_properties is None or key in selected_properties:
                         item[key] = value
         return item
 
