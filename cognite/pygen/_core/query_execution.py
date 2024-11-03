@@ -1,4 +1,5 @@
 import copy
+import warnings
 from collections import defaultdict
 from collections.abc import Sequence
 from typing import Any, Literal
@@ -127,6 +128,7 @@ class QueryExecutor:
         )
         for connection_id, connection in connection_properties.items():
             view_property = ViewPropertyId(view_id, connection_id)
+            selected_properties = nested_properties_by_property.get(connection_id, ["*"])
             if isinstance(connection, dm.EdgeConnection):
                 edge_name = builder.create_name(root_name)
                 builder.append(
@@ -137,26 +139,35 @@ class QueryExecutor:
                             direction=connection.direction,
                             chain_to="source" if connection.direction == "outwards" else "destination",
                         ),
-                    )
-                )
-                target_view = connection.source
-                builder.append(
-                    QueryStep(
-                        builder.create_name(edge_name),
-                        dm.query.NodeResultSetExpression(
-                            from_=edge_name,
-                            filter=dm.filters.HasData(views=[target_view]),
-                        ),
+                        selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
                         view_property=view_property,
-                        view_id=target_view,
                     )
                 )
+                node_properties = next(
+                    (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
+                )
+                if isinstance(node_properties, dict):
+                    selected_node_properties = node_properties["node"]
+                    query_properties = self._create_query_properties(selected_node_properties, None)
+                    target_view = connection.source
+                    builder.append(
+                        QueryStep(
+                            builder.create_name(edge_name),
+                            dm.query.NodeResultSetExpression(
+                                from_=edge_name,
+                                filter=dm.filters.HasData(views=[target_view]),
+                            ),
+                            select=self._create_select(query_properties, target_view),
+                            selected_properties=selected_node_properties,
+                            view_property=ViewPropertyId(target_view, "node"),
+                            view_id=target_view,
+                        )
+                    )
             elif (
                 isinstance(connection, dm.MappedProperty)
                 and isinstance(connection.type, dm.DirectRelation)
                 and connection.source
             ):
-                selected_properties = nested_properties_by_property.get(connection_id, ["*"])
                 query_properties = self._create_query_properties(selected_properties, None)
                 builder.append(
                     QueryStep(
@@ -177,7 +188,6 @@ class QueryExecutor:
                     "reverse-list" if self._is_listable(connection.through) else None
                 )
                 other_view = self._get_view(connection.source)
-                selected_properties = nested_properties_by_property.get(connection_id, ["*"])
                 query_properties = self._create_query_properties(selected_properties, connection.through.property)
 
                 builder.append(
@@ -267,7 +277,7 @@ class QueryExecutor:
 
     @classmethod
     def _flatten_dump(
-        cls, node: dm.Node, selected_properties: set[str], connection_property: str | None = None
+        cls, node: dm.Node | dm.Edge, selected_properties: set[str], connection_property: str | None = None
     ) -> dict[str, Any]:
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
@@ -287,26 +297,40 @@ class QueryExecutor:
         return item
 
     def _prepare_query_result(self, builder: QueryBuilder) -> list[dict[str, Any]]:
-        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(
-            list
-        )
+        nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
         for step in reversed(builder):
+            source_property = step.view_property and step.view_property.property
             if node_expression := step.node_expression:
-                unpacked = self._unpack_node(step, node_expression, results_by_from)
+                unpacked = self._unpack_node(step, node_expression, nodes_by_from)
+                nodes_by_from[step.from_].append((source_property, unpacked))
+            elif edge_expression := step.edge_expression:
+                step_properties = set(step.selected_properties or [])
+                unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+                for edge in step.edge_results:
+                    start_node = dm.NodeId.load(edge.start_node.dump())
+                    end_node = dm.NodeId.load(edge.end_node.dump())
+                    dumped = self._flatten_dump(edge, step_properties)
+                    if edge_expression.direction == "outwards":
+                        source_node = start_node
+                        target_node = end_node
+                    else:
+                        source_node = end_node
+                        target_node = start_node
+                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
+                        if target_node in nested_by_id:
+                            dumped[nested_prop] = nested_by_id[target_node]
 
-                source_property = step.view_property and step.view_property.property
-                results_by_from[step.from_].append((source_property, unpacked))
-            elif _ := step.edge_expression:
-                raise NotImplementedError()
+                    unpacked_edge[source_node].append(dumped)
+                nodes_by_from[step.from_].append((source_property, unpacked_edge))
             else:
                 raise TypeError("Unexpected step")
-        return [item[0] for item in results_by_from[None][0][1].values()]
+        return [item[0] for item in nodes_by_from[None][0][1].values()]
 
     def _unpack_node(
         self,
         step: QueryStep,
         node_expression: dm.query.NodeResultSetExpression,
-        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str, Any]]]]]],
+        results_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]],
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:
         step_properties = set(step.selected_properties or [])
         connection_property: str | None = None
@@ -316,27 +340,27 @@ class QueryExecutor:
         for node in step.node_results:
             node_id = node.as_id()
             dumped = self._flatten_dump(node, step_properties, connection_property)
-            if step.name in results_by_from:
-                for nested_prop, nested_by_id in results_by_from[step.name]:
-                    if nested_prop is None:
-                        # Edge
-                        raise NotImplementedError()
-                    else:
-                        if neste_item := nested_by_id.get(node_id):
-                            # Reverse
-                            dumped[nested_prop] = neste_item
-                        elif nested_prop in dumped:
-                            identifier = dumped.pop(nested_prop)
-                            if isinstance(identifier, dict):
-                                other_id = dm.NodeId.load(identifier)
-                                if other_id in nested_by_id:
-                                    dumped[nested_prop] = nested_by_id[other_id]
-                            elif isinstance(identifier, list):
-                                dumped[nested_prop] = []
-                                for item in identifier:
-                                    other_id = dm.NodeId.load(item)
-                                    if other_id in nested_by_id:
-                                        dumped[nested_prop].extend(nested_by_id[other_id])
+            for nested_prop, nested_by_id in results_by_from.get(step.name, []):
+                if neste_item := nested_by_id.get(node_id):
+                    # Reverse or Edge
+                    dumped[nested_prop] = neste_item
+                elif nested_prop in dumped:
+                    # Direct relation
+                    identifier = dumped.pop(nested_prop)
+                    if isinstance(identifier, dict):
+                        other_id = dm.NodeId.load(identifier)
+                        if other_id in nested_by_id:
+                            dumped[nested_prop] = nested_by_id[other_id]
+                    elif isinstance(identifier, list):
+                        dumped[nested_prop] = []
+                        for item in identifier:
+                            other_id = dm.NodeId.load(item)
+                            if other_id in nested_by_id:
+                                dumped[nested_prop].extend(nested_by_id[other_id])
+                else:
+                    warnings.warn(
+                        f"Nested property {nested_prop} not found in {dumped.keys()}", UserWarning, stacklevel=2
+                    )
 
             if connection_property is None:
                 unpacked[node_id].append(dumped)
