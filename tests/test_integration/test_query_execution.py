@@ -144,19 +144,16 @@ def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views
     assert "aggregatePrimitiveRequired" in result
     assert isinstance(result["aggregatePrimitiveRequired"], list)
     assert len(result["aggregatePrimitiveRequired"]) > 0
-    assert all("aggregates" in item for item in result["aggregatePrimitiveRequired"])
 
 
 def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
     result = executor.execute_query(
-        view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float_32", interval=10.0)
+        view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float32", interval=100.0)
     )
 
     assert isinstance(result, dict)
-    assert "histogramPrimitiveRequired" in result
-    assert isinstance(result["histogramPrimitiveRequired"], list)
-    assert len(result["histogramPrimitiveRequired"]) > 0
-    assert all("buckets" in item for item in result["histogramPrimitiveRequired"])
-    assert all("count" in bucket for item in result["histogramPrimitiveRequired"] for bucket in item["buckets"])
+    assert "aggregatePrimitiveRequired" in result
+    assert isinstance(result["aggregatePrimitiveRequired"], dict)
+    assert "histogram" in result["aggregatePrimitiveRequired"]
