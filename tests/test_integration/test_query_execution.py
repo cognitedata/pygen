@@ -58,14 +58,18 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
     assert len(result["listConnectionItemD"]) > 0
     ill_formed_items = [item for item in result["listConnectionItemD"] if not (set(item.keys()) <= flatten_props)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    has_subitems = any(item.get("directMulti") or item.get("directSingle") for item in result["listConnectionItemD"])
+    assert has_subitems, "No subitems found"
+
     ill_formed_subitems = [
         subitem
         for item in result["listConnectionItemD"]
         for subitem in item.get("directMulti", [])
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
-
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+    has_subitems_single = any(item.get("directSingle") for item in result["listConnectionItemD"])
+    assert has_subitems_single, "No single subitems found"
     ill_formed_subitems_single = [
         subitem
         for item in result["listConnectionItemD"]

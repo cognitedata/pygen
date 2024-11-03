@@ -171,9 +171,9 @@ class QueryExecutor:
                             through=view_id.as_property_ref(connection_id),
                         ),
                         view_property=view_property,
-                        select=self._create_select(query_properties, connection.source),
+                        select=self._create_select(query_properties, view_id),
                         selected_properties=selected_properties,
-                        view_id=connection.source,
+                        view_id=view_id,
                     )
                 )
             elif isinstance(connection, ReverseDirectRelation):
