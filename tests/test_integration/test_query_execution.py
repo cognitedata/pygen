@@ -4,12 +4,17 @@ from cognite.client import data_modeling as dm
 from cognite.pygen import _QueryExecutor
 
 
-def test_query_reverse_direct_relation_list(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
     executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
-    properties = ["name", {"directReverseMulti": ["name"]}, "directNoSource"]
-    flatten_props = {"name", "directReverseMulti", "directNoSource"}
+    properties = [
+        "name",
+        {"directReverseMulti": ["name"]},
+        "directNoSource",
+        {"directReverseSingle": ["name", "directMulti"]},
+    ]
+    flatten_props = {"name", "directReverseMulti", "directNoSource", "directReverseSingle"}
     result = executor.execute_query(item_e.as_id(), "list", properties, limit=5)
 
     assert isinstance(result, dict)
@@ -21,10 +26,17 @@ def test_query_reverse_direct_relation_list(cognite_client: CogniteClient, omni_
     ill_formed_subitems = [
         subitem
         for item in result["listConnectionItemE"]
-        for subitem in item.get("directReverse", [])
+        for subitem in item.get("directReverseMulti", [])
         if not (set(subitem.keys()) <= {"name"})
     ]
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+    ill_formed_subitems_single = [
+        subitem
+        for item in result["listConnectionItemE"]
+        for subitem in item.get("directReverseSingle", [])
+        if not (set(subitem.keys()) <= {"name", "directMulti"})
+    ]
+    assert not ill_formed_subitems_single, f"Subitems with unexpected properties: {ill_formed_subitems_single}"
 
 
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:

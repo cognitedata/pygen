@@ -170,6 +170,10 @@ class QueryExecutor:
                     "reverse-list" if self._is_listable(connection.through) else None
                 )
                 other_view = self._get_view(connection.source)
+                selected_properties = nested_properties_by_property.get(connection_id, ["*"])
+                if connection_type is None and connection.through.property not in selected_properties:
+                    selected_properties.append(connection.through.property)
+
                 builder.append(
                     QueryStep(
                         builder.create_name(root_name),
@@ -179,9 +183,7 @@ class QueryExecutor:
                             through=other_view.as_property_ref(connection.through.property),
                         ),
                         view_property=view_property,
-                        select=self._create_select(
-                            nested_properties_by_property.get(connection_id, ["*"]), other_view.as_id()
-                        ),
+                        select=self._create_select(selected_properties, other_view.as_id()),
                         view_id=connection.source,
                         connection_type=connection_type,
                     )
@@ -252,15 +254,15 @@ class QueryExecutor:
         for _, props_by_view_id in dumped_properties.items():
             for __, props in props_by_view_id.items():
                 for key, value in props.items():
-                    if key in selected_properties:
-                        item[key] = value
-                    elif key == connection_property:
+                    if key == connection_property:
                         if isinstance(value, dict):
                             item[key] = dm.NodeId.load(value)
                         elif isinstance(value, list):
                             item[key] = [dm.NodeId.load(item) for item in value]
                         else:
                             raise TypeError(f"Unexpected connection property value: {value}")
+                    elif key in selected_properties:
+                        item[key] = value
         return item
 
     def _prepare_query_result(self, builder: QueryBuilder) -> list[dict[str, Any]]:
