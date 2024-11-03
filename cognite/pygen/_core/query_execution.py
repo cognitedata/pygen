@@ -68,14 +68,14 @@ class QueryExecutor:
         sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
+        dumped: Any
         if operation == "list":
             if properties is None:
                 raise ValueError("Properties are required for list operation")
             dumped = self._execute_list(view, properties, filter, sort, limit)
         elif operation == "aggregate":
-            dumped = self._execute_aggregation(
-                view, properties, filter, group_by, aggregates, sort, limit
-            )
+            flatten_props = self._as_property_list(properties, operation) if properties else None
+            dumped = self._execute_aggregation(view, flatten_props, query, filter, group_by, aggregates, limit)
         elif operation == "search":
             if properties is None:
                 raise ValueError("Properties are required for search operation")
@@ -131,32 +131,59 @@ class QueryExecutor:
                 output.append(item)
         return output
 
-
     def _execute_aggregation(
         self,
         view_id: dm.ViewId,
-        properties: Properties | None = None,
+        properties: list[str] | None = None,
+        query: str | None = None,
         filter: filters.Filter | None = None,
         group_by: str | Sequence[str] | None = None,
         aggregates: Aggregation | Sequence[Aggregation] | None = None,
-        sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
-    ) -> list[dict[str, Any]]:
-        aggregate_result = self._client.data_modeling.instances.aggregate(  # type: ignore[misc]
-            view_id,
-            aggregates=aggregates,  # type: ignore[arg-type]
-            group_by=group_by,  # type: ignore[arg-type]
-            query=query,
-            properties=self._as_property_list(properties, operation),
-            filter=filter,
-            limit=limit,  # type: ignore[arg-type]
-        )
-        dumped = self._prepare_aggregate_result(aggregate_result)
+    ) -> dict[str, Any]:
+        aggregates_list = aggregates if isinstance(aggregates, Sequence) else [aggregates]
+        metric_aggregates = [agg for agg in aggregates_list if isinstance(agg, dm.aggregations.MetricAggregation)]
+        histogram_aggregates = [agg for agg in aggregates_list if isinstance(agg, dm.aggregations.Histogram)]
+        output: dict[str, Any] = {}
+        if metric_aggregates and group_by:
+            group_by_result = self._client.data_modeling.instances.aggregate(
+                view_id,
+                group_by=group_by,
+                aggregates=metric_aggregates,
+                query=query,
+                properties=properties,
+                filter=filter,
+                limit=limit,
+            )
+            raise NotImplementedError("Group by with metric aggregates is not supported")
+        elif metric_aggregates:
+            metric_results = self._client.data_modeling.instances.aggregate(
+                view_id,
+                aggregates=metric_aggregates,
+                query=query,
+                properties=properties,
+                filter=filter,
+                limit=limit,
+            )
+            output.update(self._metric_aggregation_to_dict(metric_results))
+        if histogram_aggregates:
+            histogram_results = self._client.data_modeling.instances.histogram(
+                view_id,
+                aggregates=histogram_aggregates,
+                query=query,
+                properties=properties,
+                filter=filter,
+                limit=limit,
+            )
+            raise NotImplementedError()
+        return output
 
-
-
-    def _prepare_aggregate_result(self, result: Any) -> list[dict[str, Any]]:
-        raise NotImplementedError()
+    @staticmethod
+    def _metric_aggregation_to_dict(aggregation: list[dm.aggregations.AggregatedNumberedValue]) -> dict[str, Any]:
+        values_by_aggregations: dict[str, dict[str, Any]] = defaultdict(dict)
+        for item in aggregation:
+            values_by_aggregations[item._aggregate][item.property] = item.value
+        return dict(values_by_aggregations)
 
 
 class QueryStepFactory:

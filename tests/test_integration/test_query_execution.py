@@ -125,21 +125,20 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
 def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(
-        property="externalId"
-    ))
+    result = executor.execute_query(view.as_id(), "aggregate", aggregates=dm.aggregations.Count(property="externalId"))
 
     assert isinstance(result, dict)
     assert "aggregatePrimitiveRequired" in result
-    assert isinstance(result["aggregatePrimitiveRequired"], list)
-    assert len(result["aggregatePrimitiveRequired"]) > 0
+    assert isinstance(result["aggregatePrimitiveRequired"], dict)
+    assert "count" in result["aggregatePrimitiveRequired"]
+
 
 def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(
-        property="externalId"
-    ), group_by="boolean")
+    result = executor.execute_query(
+        view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(property="externalId"), group_by="boolean"
+    )
 
     assert isinstance(result, dict)
     assert "aggregatePrimitiveRequired" in result
@@ -147,10 +146,13 @@ def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views
     assert len(result["aggregatePrimitiveRequired"]) > 0
     assert all("aggregates" in item for item in result["aggregatePrimitiveRequired"])
 
+
 def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float_32", interval=10.0))
+    result = executor.execute_query(
+        view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float_32", interval=10.0)
+    )
 
     assert isinstance(result, dict)
     assert "histogramPrimitiveRequired" in result
