@@ -153,7 +153,7 @@ class QueryExecutor:
 
         if metric_aggregates and group_by is not None:
             group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
-                view_id=view_id,
+                view=view_id,
                 group_by=group_by,
                 aggregates=metric_aggregates,
                 query=query,
