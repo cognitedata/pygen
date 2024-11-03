@@ -484,7 +484,7 @@ class MultiAPIGenerator:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_query.py.jinja")
         query_builder = get_classes_code(
-            frozenset({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})
+            frozenset({"ViewPropertyId", "QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})
         )
 
         return (

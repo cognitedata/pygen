@@ -22,7 +22,7 @@ def get_classes_code(class_names: frozenset[str]) -> str:
     class_code: list[str] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef) and node.name in class_names:
-            start_lineno = node.lineno - 1
+            start_lineno = node.lineno - 1 - len(node.decorator_list)
             end_lineno = node.end_lineno
             class_code.append("\n".join(source_lines[start_lineno:end_lineno]))
 
@@ -30,4 +30,8 @@ def get_classes_code(class_names: frozenset[str]) -> str:
 
 
 if __name__ == "__main__":
-    print(get_classes_code(frozenset({"QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})))
+    print(
+        get_classes_code(
+            frozenset({"ViewPropertyId", "QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})
+        )
+    )

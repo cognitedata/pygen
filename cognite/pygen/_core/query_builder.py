@@ -5,6 +5,7 @@ import warnings
 from collections import defaultdict
 from collections.abc import Collection, Iterable, Iterator, MutableSequence
 from contextlib import suppress
+from dataclasses import dataclass
 from typing import (
     Any,
     Literal,
@@ -15,6 +16,7 @@ from typing import (
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes._base import CogniteObject
 from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
@@ -29,6 +31,26 @@ ACTUAL_INSTANCE_QUERY_LIMIT = 5_000
 MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS = 30
 PRINT_PROGRESS_PER_N_NODES = 10_000
 SEARCH_LIMIT = 1_000
+AGGREGATION_LIMIT = 1_000
+
+
+@dataclass(frozen=True)
+class ViewPropertyId(CogniteObject):
+    view: dm.ViewId
+    property: str
+
+    @classmethod
+    def _load(cls, resource: dict[str, Any], cognite_client: CogniteClient | None = None) -> "ViewPropertyId":
+        return cls(
+            view=dm.ViewId.load(resource["view"]),
+            property=resource["identifier"],
+        )
+
+    def dump(self, camel_case: bool = True) -> dict[str, Any]:
+        return {
+            "view": self.view.dump(camel_case=camel_case, include_type=False),
+            "identifier": self.property,
+        }
 
 
 class _NotSetSentinel:
@@ -54,6 +76,8 @@ class QueryStep:
         select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
+        view_property: ViewPropertyId | None = None,
+        selected_properties: list[str] | None = None,
     ):
         self.name = name
         self.expression = expression
@@ -69,6 +93,8 @@ class QueryStep:
             self.select = select  # type: ignore[assignment]
         self.raw_filter = raw_filter
         self.connection_type = connection_type
+        self.view_property = view_property
+        self.selected_properties = selected_properties
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
         self.total_retrieved: int = 0
@@ -217,7 +243,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 return False
         return True
 
-    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, Any]:
+    def execute_query(self, client: CogniteClient, remove_not_connected: bool = False) -> dict[str, list[Instance]]:
         self._reset()
         query, to_search, temp_select = self._build()
 
@@ -269,11 +295,8 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
                 limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
-                properties = None if step.select is None else step.select.sources[0].properties
-                if properties == ["*"]:
-                    properties = None
                 step_result = client.data_modeling.instances.search(
-                    view_id, properties=properties, filter=is_selected, limit=limit
+                    view_id, properties=None, filter=is_selected, limit=limit
                 )
                 batch[step.name] = dm.NodeListWithCursor(step_result, None)
 

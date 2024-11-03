@@ -34,6 +34,7 @@ nav:
     - Cognite Functions: cognite_functions.md
     - Extra:
         - Generating Mock Data: extra/mock_data.ipynb
+        - (Experimental) Generic query: extra/generic_query.ipynb
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md
