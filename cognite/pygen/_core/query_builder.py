@@ -295,11 +295,8 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
                 limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
-                properties = None if step.select is None else step.select.sources[0].properties
-                if properties == ["*"]:
-                    properties = None
                 step_result = client.data_modeling.instances.search(
-                    view_id, properties=properties, filter=is_selected, limit=limit
+                    view_id, properties=None, filter=is_selected, limit=limit
                 )
                 batch[step.name] = dm.NodeListWithCursor(step_result, None)
 

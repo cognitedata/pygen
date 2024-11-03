@@ -118,7 +118,7 @@ class QueryExecutor:
             for prop in factory.reverse_properties.values()
             if isinstance(prop.through.source, dm.ViewId)
         }
-        builder.append(factory.root())
+        builder.append(factory.root(filter, limit))
         for connection_id, connection in factory.connection_properties.items():
             builder.extend(factory.from_connection(connection_id, connection, reverse_views))
         _ = builder.execute_query(self._client, remove_not_connected=False)
