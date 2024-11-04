@@ -9,14 +9,16 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
+
+from {{ import_path }}.data_classes._core import ({% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,{% endif %}
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
-from {{ top_level_package }}.data_classes import (
+from {{ import_path }}.data_classes import (
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -32,7 +34,7 @@ from {{ top_level_package }}.data_classes import (
     {{ dependency.read_name }},{% endif %}{% endfor %}{% for child in data_class.direct_children %}
     {{ child.read_name }},{% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
+from {{ import_path }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.query_cls_name }},{% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
@@ -116,8 +118,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
             Create a new {{ data_class.variable }}:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
+                >>> from {{ import_path }} import {{ client_name }}
+                >>> from {{ import_path }}.data_classes import {{ data_class.write_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
                 >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
@@ -149,7 +151,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
             Delete {{ data_class.variable }} by id:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.{{ api_class.parent_attribute }}.delete("my_{{ data_class.variable }}")
         """
@@ -189,7 +191,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
             Retrieve {{ data_class.variable }} by id:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
 
@@ -244,7 +246,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
            Search for 'my_{{ data_class.variable }}' in all text properties:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search('my_{{ data_class.variable }}')
 
@@ -344,7 +346,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
             Count {{ data_class.doc_list_name }} in space `my_space`:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> result = client.{{ api_class.parent_attribute }}.aggregate("count", space="my_space")
 
@@ -445,7 +447,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
             List {{ data_class.doc_list_name }} and limit to 5:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.list(limit=5)
 

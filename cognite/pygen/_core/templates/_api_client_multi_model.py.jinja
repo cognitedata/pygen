@@ -8,12 +8,15 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
+
+from {{ import_path }}._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
     {{ api.api_class.name }},{% endif %}{% endfor %}
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
-from . import data_classes
+from {{ import_path }}._api._core import SequenceNotStr, GraphQLQueryResponse
+from {{ import_path }}.data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
+from {{ import_path }}. import data_classes
+
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
 
 {% for api in multi_apis %}
 class {{ api.name }}:
@@ -188,7 +191,7 @@ class {{ client_name }}:
 
             Delete item by id:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.delete("my_node_external_id")
         """{% if not has_default_instance_space %}

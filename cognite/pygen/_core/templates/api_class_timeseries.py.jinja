@@ -9,8 +9,11 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
-from {{ top_level_package }}.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
+
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
+
+from {{ import_path }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
+from {{ import_path }}.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
 from ._core import DEFAULT_LIMIT_READ
 
 
@@ -68,7 +71,7 @@ class {{ timeseries_api.query_class}}:
             In this example,
             we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve(start="2w-ago")
         """
@@ -128,7 +131,7 @@ class {{ timeseries_api.query_class}}:
             In this example,
             we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_array(start="2w-ago")
         """
@@ -197,7 +200,7 @@ class {{ timeseries_api.query_class}}:
             In this example,
             we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_dataframe(start="2w-ago")
         """
@@ -274,7 +277,7 @@ class {{ timeseries_api.query_class}}:
             In this example,
             get weekly aggregates for the 'my_{{ timeseries_api.parent_attribute }}' for the first month of 2023 in Oslo time:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> from datetime import datetime, timezone
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(
@@ -381,7 +384,7 @@ class {{ timeseries_api.name}}:
 
             Retrieve all data for 5 {{ data_class.variable }}.{{ timeseries_api.parent_attribute }} timeseries:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(limit=5).retrieve()
 
@@ -419,7 +422,7 @@ class {{ timeseries_api.name}}:
 
             List {{ data_class.variable }}.{{ timeseries_api.parent_attribute }} and limit to 5:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}.list(limit=5)
 

@@ -55,8 +55,10 @@ class SDKGenerator:
         implements: Literal["inheritance", "composition"] = "inheritance",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
+        import_prefix: str | None = None,
     ):
         self.top_level_package = top_level_package
+        self.import_prefix = import_prefix
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
@@ -201,9 +203,11 @@ class MultiAPIGenerator:
         implements: Literal["inheritance", "composition"] = "inheritance",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
+        import_prefix: str | None = None,
     ):
         self.env = Environment(loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape())
         self.top_level_package = top_level_package
+        self.import_prefix = import_prefix
         self.client_name = client_name
         self.default_instance_space = default_instance_space
         self._implements = implements
@@ -807,12 +811,13 @@ class APIGenerator:
             + "\n"
         )
 
-    def generate_api_file(self, top_level_package: str, client_name: str) -> str:
+    def generate_api_file(self, top_level_package: str, client_name: str, import_prefix: str | None = None) -> str:
         """Generate the API file for the view.
 
         Args:
             top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
+            import_prefix: Import prefix, prepended to all relative imports.
 
         Returns:
             The generated API file as a string.
@@ -836,11 +841,14 @@ class APIGenerator:
                 # ft = field types
                 ft=fields,
                 dm=dm,
+                import_prefix=import_prefix,
             )
             + "\n"
         )
 
-    def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
+    def generate_api_query_file(
+        self, top_level_package: str, client_name: str, import_prefix: str | None = None
+    ) -> str:
         """Generate the API query file for the view.
 
         This is the basis for the Python query functionality for the view.
@@ -848,6 +856,7 @@ class APIGenerator:
         Args:
             top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
+            import_prefix: Import prefix, prepended to all relative imports.
 
         Returns:
             The generated API query file as a string.
@@ -871,23 +880,27 @@ class APIGenerator:
                 ft=fields,
                 dm=dm,
                 sorted=sorted,
+                import_prefix=import_prefix,
             )
             + "\n"
         )
 
-    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+    def generate_edge_api_files(
+        self, top_level_package: str, client_name: str, import_prefix: str | None = None
+    ) -> Iterator[tuple[str, str]]:
         """Generate the edge API files for the view.
 
 
         Args:
             top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
+            import_prefix: Import prefix, prepended to all relative.
 
         Returns:
             Iterator of tuples of file names and file contents for the edge APIs.
         """
 
-        edge_class = self._env.get_template("api_class_edge.py.jinja")
+        edge_class = self._env.get_template("api_class_query.py.jinja")
         for edge_api in self.edge_apis:
             yield (
                 edge_api.file_name,
@@ -901,17 +914,21 @@ class APIGenerator:
                         # ft = field types
                         ft=fields,
                         dm=dm,
+                        import_prefix=import_prefix,
                     )
                     + "\n"
                 ),
             )
 
-    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+    def generate_timeseries_api_files(
+        self, top_level_package: str, client_name: str, import_prefix: str | None = None
+    ) -> Iterator[tuple[str, str]]:
         """Generate the timeseries API files for the view.
 
         Args:
             top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
+            import_prefix: Import prefix, prepended to all relative imports.
 
         Returns:
             Iterator of tuples of file names and file contents for the timeseries APIs.
@@ -931,6 +948,7 @@ class APIGenerator:
                         # ft = field types
                         ft=fields,
                         dm=dm,
+                        import_prefix=import_prefix,
                     )
                     + "\n"
                 ),

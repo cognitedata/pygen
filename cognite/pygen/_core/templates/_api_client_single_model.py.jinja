@@ -15,6 +15,7 @@ from ._api._core import SequenceNotStr, GraphQLQueryResponse
 from .data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
 from . import data_classes
 
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
 
 class {{ client_name }}:
     """
@@ -163,7 +164,7 @@ class {{ client_name }}:
 
             Delete item by id:
 
-                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ import_path }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.delete("my_node_external_id")
         """{% if not has_default_instance_space %}

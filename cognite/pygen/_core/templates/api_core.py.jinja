@@ -21,8 +21,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
 
-from {{ top_level_package }} import data_classes
-from {{ top_level_package }}.data_classes._core import (
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
+from {{ import_path }} import data_classes
+from {{ import_path }}.data_classes._core import (
     DomainModel,
     DomainModelWrite,{% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,{% endif %}

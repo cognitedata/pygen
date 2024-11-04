@@ -43,6 +43,7 @@ def generate_sdk(  # type: ignore[overload-overlap, misc]
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[False] = False,
+    import_prefix: Optional[str] = None,
 ) -> None: ...
 
 
@@ -59,6 +60,7 @@ def generate_sdk(
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
+    import_prefix: Optional[str] = None,
 ) -> dict[Path, str]: ...
 
 
@@ -74,6 +76,7 @@ def generate_sdk(
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
     return_sdk_files: bool = False,
+    import_prefix: Optional[str] = None,
 ) -> None | dict[Path, str]:
     """
     Generates a Python SDK tailored to the given Data Model(s).
@@ -98,6 +101,7 @@ def generate_sdk(
         config: The configuration used to control how to generate the SDK.
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
+        import_prefix: prefix to prepend to all package imports (e.g., 'theater' for 'theater.movies.data_classes')
     """
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
@@ -117,6 +121,7 @@ def generate_sdk(
         "inheritance",
         logger,
         config or PygenConfig(),
+        import_prefix,
     )
     sdk = sdk_generator.generate_sdk()
     if return_sdk_files:
@@ -136,6 +141,7 @@ def generate_sdk_notebook(
     default_instance_space: str | None = None,
     config: Optional[PygenConfig] = None,
     clean_pygen_temp_dir: bool = True,
+    import_prefix: Optional[str] = None,
 ) -> Any:
     """
     Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
@@ -165,6 +171,7 @@ def generate_sdk_notebook(
         config: The configuration used to control how to generate the SDK.
         clean_pygen_temp_dir: Whether to clean the temporary directory used to store the generated SDK.
             Defaults to True.
+        import_prefix: prefix to prepend to all package imports (e.g., 'theater' for 'theater.movies.data_classes')
 
     Returns:
         The instantiated generated client class.
@@ -197,6 +204,7 @@ def generate_sdk_notebook(
         overwrite=True,
         format_code=False,
         config=config,
+        import_prefix=import_prefix,
     )
     if str(output_dir) not in sys.path:
         sys.path.append(str(output_dir))

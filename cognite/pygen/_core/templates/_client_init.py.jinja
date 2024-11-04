@@ -1,3 +1,4 @@
-from {{ top_level_package }}._api_client import {{ client_name }}
+{% set import_path = import_prefix + "." if import_prefix else "" + top_level_package %}
+from {{ import_path }}._api_client import {{ client_name }}
 
 __all__ = ["{{ client_name }}"]
