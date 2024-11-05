@@ -37,7 +37,7 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import (
+from {{ top_level_package }}._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,{% if data_class.is_writable %}
     NodeAPI{% else %}NodeReadAPI{% endif %},
