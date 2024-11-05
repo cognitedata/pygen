@@ -87,7 +87,8 @@ def generate_sdk(
             if we have top_level_package=`apm` and the client_name=`APMClient`, then
             the importing the client will be `from apm import APMClient`. If nothing is passed,
             the package will be [external_id:snake] of the first data model given, while
-            the client name will be [external_id:pascal_case]
+            the client name will be [external_id:pascal_case]. In the case, pygen is part of another package,
+            the top level package should be the full package name. For example, `cognite.apm`.
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         default_instance_space: The default instance space to use for the generated SDK. If not provided,
             the space must be specified when creating, deleting, and retrieving nodes and edges.
@@ -123,7 +124,7 @@ def generate_sdk(
         return sdk
     output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code, top_level_package)
+    write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code)
     logger("Done!")
     return None
 
@@ -380,7 +381,6 @@ def write_sdk_to_disk(
     overwrite: bool,
     logger: Optional[Callable[[str], None]],
     format_code: bool = True,
-    top_level_package: str | None = None,
 ) -> None:
     """Write a generated SDK to disk.
 
@@ -402,8 +402,6 @@ def write_sdk_to_disk(
 
     if overwrite:
         top_path = output_dir
-        if top_level_package is not None:
-            top_path = top_path / Path(top_level_package.replace(".", "/"))
         existing_files = {path.relative_to(output_dir) for path in top_path.rglob("*.py")}
         new_files = {path for path in sdk.keys()}
         files_to_remove = existing_files - new_files

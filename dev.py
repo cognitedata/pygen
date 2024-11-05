@@ -60,7 +60,6 @@ def generate_sdks(
             overwrite=True,
             logger=print,
             format_code=True,
-            top_level_package=example_sdk.top_level_package,
         )
         typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
         typer.echo("All files updated! Including files assumed to be manually maintained.")
