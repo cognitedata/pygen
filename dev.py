@@ -56,7 +56,7 @@ def generate_sdks(
         sdk = sdk_generator.generate_sdk()
         write_sdk_to_disk(
             sdk,
-            EXAMPLES_DIR,
+            example_sdk.client_dir,
             overwrite=True,
             logger=print,
             format_code=True,
