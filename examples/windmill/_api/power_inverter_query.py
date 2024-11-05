@@ -10,7 +10,7 @@ from windmill.data_classes import (
     DomainModelCore,
     PowerInverter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,

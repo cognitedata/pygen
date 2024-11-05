@@ -29,13 +29,13 @@ from omni.data_classes._implementation_1_non_writeable import (
     _IMPLEMENTATION1NONWRITEABLE_PROPERTIES_BY_FIELD,
     _create_implementation_1_non_writeable_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeReadAPI,
     SequenceNotStr,
 )
-from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
+from omni._api.implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
 class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):

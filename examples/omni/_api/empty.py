@@ -32,13 +32,13 @@ from omni.data_classes._empty import (
     _EMPTY_PROPERTIES_BY_FIELD,
     _create_empty_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .empty_query import EmptyQueryAPI
+from omni._api.empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):

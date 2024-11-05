@@ -32,15 +32,15 @@ from omni.data_classes._connection_item_b import (
     _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
     _create_connection_item_b_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .connection_item_b_inwards import ConnectionItemBInwardsAPI
-from .connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
-from .connection_item_b_query import ConnectionItemBQueryAPI
+from omni._api.connection_item_b_inwards import ConnectionItemBInwardsAPI
+from omni._api.connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
+from omni._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList, ConnectionItemBWriteList]):

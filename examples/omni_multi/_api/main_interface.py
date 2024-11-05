@@ -31,13 +31,13 @@ from omni_multi.data_classes._main_interface import (
     _MAININTERFACE_PROPERTIES_BY_FIELD,
     _create_main_interface_filter,
 )
-from ._core import (
+from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .main_interface_query import MainInterfaceQueryAPI
+from omni_multi._api.main_interface_query import MainInterfaceQueryAPI
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):

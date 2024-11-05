@@ -32,13 +32,13 @@ from omni.data_classes._primitive_nullable import (
     _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
     _create_primitive_nullable_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .primitive_nullable_query import PrimitiveNullableQueryAPI
+from omni._api.primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
 class PrimitiveNullableAPI(

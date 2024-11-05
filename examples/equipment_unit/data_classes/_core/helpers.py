@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 from cognite.client import data_modeling as dm
-from .base import DomainModel, T_DomainModel
-from .constants import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes._core.base import DomainModel, T_DomainModel
+from equipment_unit.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
 
 def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:

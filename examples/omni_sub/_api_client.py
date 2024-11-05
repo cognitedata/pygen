@@ -8,14 +8,14 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from omni_sub._api import (
     ConnectionItemAAPI,
     ConnectionItemBAPI,
     ConnectionItemCNodeAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import GraphQLList
-from . import data_classes
+from omni_sub._api._core import SequenceNotStr, GraphQLQueryResponse
+from omni_sub.data_classes._core import GraphQLList
+from omni_sub import data_classes
 
 
 class OmniSubClient:

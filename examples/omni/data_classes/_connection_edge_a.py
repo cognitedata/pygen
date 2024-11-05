@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKIN
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
-from ._core import (
+from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
@@ -28,14 +28,14 @@ from ._core import (
     StringFilter,
     TimestampFilter,
 )
-from ._connection_item_f import ConnectionItemFWrite
-from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
-from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
+from omni.data_classes._connection_item_f import ConnectionItemFWrite
+from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+from omni.data_classes._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 
 if TYPE_CHECKING:
-    from ._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
-    from ._connection_item_f import ConnectionItemF, ConnectionItemFGraphQL, ConnectionItemFWrite
-    from ._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
+    from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+    from omni.data_classes._connection_item_f import ConnectionItemF, ConnectionItemFGraphQL, ConnectionItemFWrite
+    from omni.data_classes._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 
 
 __all__ = [

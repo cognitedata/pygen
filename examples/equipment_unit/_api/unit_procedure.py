@@ -37,15 +37,15 @@ from equipment_unit.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
     _create_unit_procedure_filter,
 )
-from ._core import (
+from equipment_unit._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
-from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
-from .unit_procedure_query import UnitProcedureQueryAPI
+from equipment_unit._api.unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
+from equipment_unit._api.unit_procedure_work_units import UnitProcedureWorkUnitsAPI
+from equipment_unit._api.unit_procedure_query import UnitProcedureQueryAPI
 
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureList, UnitProcedureWriteList]):

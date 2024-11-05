@@ -15,7 +15,7 @@ from omni.data_classes._connection_item_e import (
     ConnectionItemE,
     _create_connection_item_e_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -26,7 +26,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from .connection_item_e_query import ConnectionItemEQueryAPI
+    from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):

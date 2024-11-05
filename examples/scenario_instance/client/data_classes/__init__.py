@@ -1,4 +1,4 @@
-from ._core import (
+from scenario_instance.client.data_classes._core import (
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,

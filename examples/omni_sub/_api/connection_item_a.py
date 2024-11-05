@@ -32,14 +32,14 @@ from omni_sub.data_classes._connection_item_a import (
     _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
     _create_connection_item_a_filter,
 )
-from ._core import (
+from omni_sub._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .connection_item_a_outwards import ConnectionItemAOutwardsAPI
-from .connection_item_a_query import ConnectionItemAQueryAPI
+from omni_sub._api.connection_item_a_outwards import ConnectionItemAOutwardsAPI
+from omni_sub._api.connection_item_a_query import ConnectionItemAQueryAPI
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):

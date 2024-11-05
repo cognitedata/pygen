@@ -31,16 +31,16 @@ from windmill.data_classes._high_speed_shaft import (
     _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD,
     _create_high_speed_shaft_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .high_speed_shaft_bending_moment_y import HighSpeedShaftBendingMomentYAPI
-from .high_speed_shaft_bending_monent_x import HighSpeedShaftBendingMonentXAPI
-from .high_speed_shaft_torque import HighSpeedShaftTorqueAPI
-from .high_speed_shaft_query import HighSpeedShaftQueryAPI
+from windmill._api.high_speed_shaft_bending_moment_y import HighSpeedShaftBendingMomentYAPI
+from windmill._api.high_speed_shaft_bending_monent_x import HighSpeedShaftBendingMonentXAPI
+from windmill._api.high_speed_shaft_torque import HighSpeedShaftTorqueAPI
+from windmill._api.high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList, HighSpeedShaftWriteList]):

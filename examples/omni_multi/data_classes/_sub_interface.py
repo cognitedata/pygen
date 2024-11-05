@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
@@ -33,7 +33,7 @@ from ._core import (
     NodeQueryCore,
     StringFilter,
 )
-from ._main_interface import MainInterface, MainInterfaceWrite
+from omni_multi.data_classes._main_interface import MainInterface, MainInterfaceWrite
 
 
 __all__ = [

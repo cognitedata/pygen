@@ -31,25 +31,29 @@ from windmill.data_classes._sensor_position import (
     _SENSORPOSITION_PROPERTIES_BY_FIELD,
     _create_sensor_position_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .sensor_position_edgewise_bend_mom_crosstalk_corrected import SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI
-from .sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
-from .sensor_position_edgewise_bend_mom_offset_crosstalk_corrected import (
+from windmill._api.sensor_position_edgewise_bend_mom_crosstalk_corrected import (
+    SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI,
+)
+from windmill._api.sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
+from windmill._api.sensor_position_edgewise_bend_mom_offset_crosstalk_corrected import (
     SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI,
 )
-from .sensor_position_edgewisewise_bend_mom import SensorPositionEdgewisewiseBendMomAPI
-from .sensor_position_flapwise_bend_mom import SensorPositionFlapwiseBendMomAPI
-from .sensor_position_flapwise_bend_mom_crosstalk_corrected import SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI
-from .sensor_position_flapwise_bend_mom_offset import SensorPositionFlapwiseBendMomOffsetAPI
-from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
+from windmill._api.sensor_position_edgewisewise_bend_mom import SensorPositionEdgewisewiseBendMomAPI
+from windmill._api.sensor_position_flapwise_bend_mom import SensorPositionFlapwiseBendMomAPI
+from windmill._api.sensor_position_flapwise_bend_mom_crosstalk_corrected import (
+    SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI,
+)
+from windmill._api.sensor_position_flapwise_bend_mom_offset import SensorPositionFlapwiseBendMomOffsetAPI
+from windmill._api.sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
     SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI,
 )
-from .sensor_position_query import SensorPositionQueryAPI
+from windmill._api.sensor_position_query import SensorPositionQueryAPI
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):

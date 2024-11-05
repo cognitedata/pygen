@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from windmill._api._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
 from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 

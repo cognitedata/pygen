@@ -11,7 +11,7 @@ from equipment_unit.data_classes import (
 )
 from equipment_unit.data_classes._start_end_time import _create_start_end_time_filter
 
-from ._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
+from equipment_unit._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 

@@ -37,15 +37,15 @@ from omni.data_classes._connection_item_e import (
     _CONNECTIONITEME_PROPERTIES_BY_FIELD,
     _create_connection_item_e_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
-from .connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
-from .connection_item_e_query import ConnectionItemEQueryAPI
+from omni._api.connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
+from omni._api.connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
+from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, ConnectionItemEList, ConnectionItemEWriteList]):

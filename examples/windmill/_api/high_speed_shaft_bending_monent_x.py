@@ -11,7 +11,7 @@ from cognite.client.data_classes import Datapoints, DatapointsArrayList, Datapoi
 from cognite.client.data_classes.datapoints import Aggregate
 from windmill.data_classes._high_speed_shaft import _create_high_speed_shaft_filter
 from windmill.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from ._core import DEFAULT_LIMIT_READ
+from windmill._api._core import DEFAULT_LIMIT_READ
 
 
 ColumnNames = Literal["bending_moment_y", "bending_monent_x", "torque"]

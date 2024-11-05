@@ -8,14 +8,14 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from equipment_unit._api import (
     EquipmentModuleAPI,
     UnitProcedureAPI,
     WorkOrderAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from . import data_classes
+from equipment_unit._api._core import SequenceNotStr, GraphQLQueryResponse
+from equipment_unit.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from equipment_unit import data_classes
 
 
 class EquipmentUnitClient:

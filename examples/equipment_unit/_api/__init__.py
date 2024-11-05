@@ -1,12 +1,12 @@
-from .equipment_module import EquipmentModuleAPI
-from .equipment_module_query import EquipmentModuleQueryAPI
-from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
-from .unit_procedure import UnitProcedureAPI
-from .unit_procedure_query import UnitProcedureQueryAPI
-from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
-from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
-from .work_order import WorkOrderAPI
-from .work_order_query import WorkOrderQueryAPI
+from equipment_unit._api.equipment_module import EquipmentModuleAPI
+from equipment_unit._api.equipment_module_query import EquipmentModuleQueryAPI
+from equipment_unit._api.equipment_module_sensor_value import EquipmentModuleSensorValueAPI
+from equipment_unit._api.unit_procedure import UnitProcedureAPI
+from equipment_unit._api.unit_procedure_query import UnitProcedureQueryAPI
+from equipment_unit._api.unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
+from equipment_unit._api.unit_procedure_work_units import UnitProcedureWorkUnitsAPI
+from equipment_unit._api.work_order import WorkOrderAPI
+from equipment_unit._api.work_order_query import WorkOrderQueryAPI
 
 __all__ = [
     "EquipmentModuleAPI",

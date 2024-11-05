@@ -8,7 +8,7 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from windmill._api import (
     BladeAPI,
     GearboxAPI,
     GeneratorAPI,
@@ -21,9 +21,9 @@ from ._api import (
     SensorPositionAPI,
     WindmillAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from . import data_classes
+from windmill._api._core import SequenceNotStr, GraphQLQueryResponse
+from windmill.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from windmill import data_classes
 
 
 class WindmillClient:

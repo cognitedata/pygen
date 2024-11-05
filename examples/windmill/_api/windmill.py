@@ -35,15 +35,15 @@ from windmill.data_classes._windmill import (
     _WINDMILL_PROPERTIES_BY_FIELD,
     _create_windmill_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .windmill_blades import WindmillBladesAPI
-from .windmill_metmast import WindmillMetmastAPI
-from .windmill_query import WindmillQueryAPI
+from windmill._api.windmill_blades import WindmillBladesAPI
+from windmill._api.windmill_metmast import WindmillMetmastAPI
+from windmill._api.windmill_query import WindmillQueryAPI
 
 
 class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteList]):

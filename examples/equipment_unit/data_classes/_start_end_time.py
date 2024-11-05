@@ -6,7 +6,7 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKIN
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from ._core import (
+from equipment_unit.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
@@ -27,13 +27,17 @@ from ._core import (
     StringFilter,
     TimestampFilter,
 )
-from ._unit_procedure import UnitProcedureWrite
-from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
-from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
+from equipment_unit.data_classes._unit_procedure import UnitProcedureWrite
+from equipment_unit.data_classes._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
+from equipment_unit.data_classes._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
 
 if TYPE_CHECKING:
-    from ._equipment_module import EquipmentModule, EquipmentModuleGraphQL, EquipmentModuleWrite
-    from ._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
+    from equipment_unit.data_classes._equipment_module import (
+        EquipmentModule,
+        EquipmentModuleGraphQL,
+        EquipmentModuleWrite,
+    )
+    from equipment_unit.data_classes._work_order import WorkOrder, WorkOrderGraphQL, WorkOrderWrite
 
 
 __all__ = [

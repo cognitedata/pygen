@@ -32,14 +32,14 @@ from omni.data_classes._dependent_on_non_writable import (
     _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
     _create_dependent_on_non_writable_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
-from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
+from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
+from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(

@@ -32,14 +32,14 @@ from scenario_instance.client.data_classes._scenario_instance import (
     _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
     _create_scenario_instance_filter,
 )
-from ._core import (
+from scenario_instance.client._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
-from .scenario_instance_query import ScenarioInstanceQueryAPI
+from scenario_instance.client._api.scenario_instance_price_forecast import ScenarioInstancePriceForecastAPI
+from scenario_instance.client._api.scenario_instance_query import ScenarioInstanceQueryAPI
 
 
 class ScenarioInstanceAPI(

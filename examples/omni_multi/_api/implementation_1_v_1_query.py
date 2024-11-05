@@ -10,7 +10,7 @@ from omni_multi.data_classes import (
     DomainModelCore,
     Implementation1v1,
 )
-from ._core import (
+from omni_multi._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,

@@ -8,12 +8,12 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from scenario_instance.client._api import (
     ScenarioInstanceAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from . import data_classes
+from scenario_instance.client._api._core import SequenceNotStr, GraphQLQueryResponse
+from scenario_instance.client.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
+from scenario_instance.client import data_classes
 
 
 class ScenarioInstanceClient:
