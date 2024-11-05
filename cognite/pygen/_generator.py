@@ -101,6 +101,8 @@ def generate_sdk(
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
     """
+    if output_dir is not None and top_level_package is None:
+        raise ValueError("top_level_package must be provided if output_dir is provided")
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
 
