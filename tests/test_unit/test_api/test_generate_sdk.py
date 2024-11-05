@@ -31,7 +31,7 @@ class TestGenerateSDK:
             default_instance_space="field_space",
         )
 
-        with append_to_sys_path(str(tmp_path)):
+        with append_to_sys_path(str(tmp_path / top_level_package)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
@@ -48,7 +48,7 @@ class TestGenerateSDK:
             default_instance_space="no_properties_space",
         )
 
-        with append_to_sys_path(str(tmp_path)):
+        with append_to_sys_path(str(tmp_path / top_level_package)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
@@ -65,7 +65,7 @@ class TestGenerateSDK:
             default_instance_space="illegal_property_names_space",
         )
 
-        with append_to_sys_path(str(tmp_path)):
+        with append_to_sys_path(str(tmp_path / top_level_package)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
@@ -82,7 +82,7 @@ class TestGenerateSDK:
             default_instance_space="reverse_direct_relation_space",
         )
 
-        with append_to_sys_path(str(tmp_path)):
+        with append_to_sys_path(str(tmp_path / top_level_package)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 

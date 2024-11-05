@@ -457,12 +457,24 @@ class MultiAPIGenerator:
 
         api_classes = sorted(api_classes, key=lambda api: api.name)
 
-        return api_core.render(api_classes=api_classes).removeprefix("\n") + "\n"
+        return (
+            api_core.render(
+                api_classes=api_classes,
+                top_level_package=self.top_level_package,
+            ).removeprefix("\n")
+            + "\n"
+        )
 
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_base.py.jinja")
-        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_constants_file(self) -> str:
         """Generate the core/constants data classes file for the SDK."""
@@ -490,7 +502,12 @@ class MultiAPIGenerator:
     def generate_data_class_core_init_file(self) -> str:
         """Generate the core/__init__ data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_init.py.jinja")
-        return data_class_core.render() + "\n"
+        return (
+            data_class_core.render(
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_query_file(self) -> str:
         """Generate the core data classes file for the SDK."""
@@ -511,7 +528,12 @@ class MultiAPIGenerator:
     def generate_data_class_core_cdf_external_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_cdf_external.py.jinja")
-        return data_class_core.render() + "\n"
+        return (
+            data_class_core.render(
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_client_init_file(self) -> str:
         """Generate the __init__.py file for the client.
