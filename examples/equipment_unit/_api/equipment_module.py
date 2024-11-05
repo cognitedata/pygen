@@ -31,14 +31,14 @@ from equipment_unit.data_classes._equipment_module import (
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
     _create_equipment_module_filter,
 )
-from ._core import (
+from equipment_unit._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
-from .equipment_module_query import EquipmentModuleQueryAPI
+from equipment_unit._api.equipment_module_sensor_value import EquipmentModuleSensorValueAPI
+from equipment_unit._api.equipment_module_query import EquipmentModuleQueryAPI
 
 
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, EquipmentModuleList, EquipmentModuleWriteList]):

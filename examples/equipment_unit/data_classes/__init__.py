@@ -1,4 +1,4 @@
-from ._core import (
+from equipment_unit.data_classes._core import (
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,

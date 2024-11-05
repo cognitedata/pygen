@@ -11,7 +11,7 @@ from omni.data_classes import (
 )
 from omni.data_classes._connection_edge_a import _create_connection_edge_a_filter
 
-from ._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
+from omni._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 

@@ -36,14 +36,14 @@ from omni.data_classes._connection_item_g import (
     _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
     _create_connection_item_g_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
-from .connection_item_g_query import ConnectionItemGQueryAPI
+from omni._api.connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
+from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList, ConnectionItemGWriteList]):

@@ -10,7 +10,7 @@ from omni.data_classes import (
     DomainModelCore,
     CDFExternalReferencesListed,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,

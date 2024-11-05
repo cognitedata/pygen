@@ -31,15 +31,15 @@ from windmill.data_classes._rotor import (
     _ROTOR_PROPERTIES_BY_FIELD,
     _create_rotor_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .rotor_rotor_speed_controller import RotorRotorSpeedControllerAPI
-from .rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
-from .rotor_query import RotorQueryAPI
+from windmill._api.rotor_rotor_speed_controller import RotorRotorSpeedControllerAPI
+from windmill._api.rotor_rpm_low_speed_shaft import RotorRpmLowSpeedShaftAPI
+from windmill._api.rotor_query import RotorQueryAPI
 
 
 class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):

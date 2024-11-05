@@ -20,7 +20,7 @@ from windmill.data_classes._metmast import (
     Metmast,
     _create_metmast_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -31,8 +31,8 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from .blade_query import BladeQueryAPI
-    from .metmast_query import MetmastQueryAPI
+    from windmill._api.blade_query import BladeQueryAPI
+    from windmill._api.metmast_query import MetmastQueryAPI
 
 
 class WindmillQueryAPI(QueryAPI[T_DomainModelList]):

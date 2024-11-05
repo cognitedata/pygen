@@ -30,7 +30,7 @@ from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
 
-from .base import (
+from omni_sub.data_classes._core.base import (
     DomainModelList,
     T_DomainList,
     DomainRelationList,
@@ -39,7 +39,7 @@ from .base import (
     DomainRelation,
     DomainModel,
 )
-from .constants import (
+from omni_sub.data_classes._core.constants import (
     _NotSetSentinel,
     DEFAULT_QUERY_LIMIT,
     ACTUAL_INSTANCE_QUERY_LIMIT,
@@ -48,7 +48,7 @@ from .constants import (
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
 )
-from .helpers import as_node_id
+from omni_sub.data_classes._core.helpers import as_node_id
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)

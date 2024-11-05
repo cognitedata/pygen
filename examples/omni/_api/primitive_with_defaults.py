@@ -31,13 +31,13 @@ from omni.data_classes._primitive_with_defaults import (
     _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD,
     _create_primitive_with_default_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
+from omni._api.primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
 class PrimitiveWithDefaultsAPI(

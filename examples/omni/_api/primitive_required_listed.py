@@ -32,13 +32,13 @@ from omni.data_classes._primitive_required_listed import (
     _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD,
     _create_primitive_required_listed_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
+from omni._api.primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
 
 
 class PrimitiveRequiredListedAPI(

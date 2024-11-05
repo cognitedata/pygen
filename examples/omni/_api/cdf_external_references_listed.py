@@ -31,14 +31,14 @@ from omni.data_classes._cdf_external_references_listed import (
     _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
     _create_cdf_external_references_listed_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
-from .cdf_external_references_listed_query import CDFExternalReferencesListedQueryAPI
+from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
+from omni._api.cdf_external_references_listed_query import CDFExternalReferencesListedQueryAPI
 
 
 class CDFExternalReferencesListedAPI(

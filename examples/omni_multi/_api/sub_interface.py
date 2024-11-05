@@ -31,13 +31,13 @@ from omni_multi.data_classes._sub_interface import (
     _SUBINTERFACE_PROPERTIES_BY_FIELD,
     _create_sub_interface_filter,
 )
-from ._core import (
+from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .sub_interface_query import SubInterfaceQueryAPI
+from omni_multi._api.sub_interface_query import SubInterfaceQueryAPI
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):

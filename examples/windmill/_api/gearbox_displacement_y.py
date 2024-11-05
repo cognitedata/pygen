@@ -11,7 +11,7 @@ from cognite.client.data_classes import Datapoints, DatapointsArrayList, Datapoi
 from cognite.client.data_classes.datapoints import Aggregate
 from windmill.data_classes._gearbox import _create_gearbox_filter
 from windmill.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from ._core import DEFAULT_LIMIT_READ
+from windmill._api._core import DEFAULT_LIMIT_READ
 
 
 ColumnNames = Literal["displacement_x", "displacement_y", "displacement_z"]

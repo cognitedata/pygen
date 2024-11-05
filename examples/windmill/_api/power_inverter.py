@@ -31,16 +31,16 @@ from windmill.data_classes._power_inverter import (
     _POWERINVERTER_PROPERTIES_BY_FIELD,
     _create_power_inverter_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .power_inverter_active_power_total import PowerInverterActivePowerTotalAPI
-from .power_inverter_apparent_power_total import PowerInverterApparentPowerTotalAPI
-from .power_inverter_reactive_power_total import PowerInverterReactivePowerTotalAPI
-from .power_inverter_query import PowerInverterQueryAPI
+from windmill._api.power_inverter_active_power_total import PowerInverterActivePowerTotalAPI
+from windmill._api.power_inverter_apparent_power_total import PowerInverterApparentPowerTotalAPI
+from windmill._api.power_inverter_reactive_power_total import PowerInverterReactivePowerTotalAPI
+from windmill._api.power_inverter_query import PowerInverterQueryAPI
 
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList, PowerInverterWriteList]):

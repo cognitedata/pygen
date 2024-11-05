@@ -31,18 +31,18 @@ from windmill.data_classes._main_shaft import (
     _MAINSHAFT_PROPERTIES_BY_FIELD,
     _create_main_shaft_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .main_shaft_bending_x import MainShaftBendingXAPI
-from .main_shaft_bending_y import MainShaftBendingYAPI
-from .main_shaft_calculated_tilt_moment import MainShaftCalculatedTiltMomentAPI
-from .main_shaft_calculated_yaw_moment import MainShaftCalculatedYawMomentAPI
-from .main_shaft_torque import MainShaftTorqueAPI
-from .main_shaft_query import MainShaftQueryAPI
+from windmill._api.main_shaft_bending_x import MainShaftBendingXAPI
+from windmill._api.main_shaft_bending_y import MainShaftBendingYAPI
+from windmill._api.main_shaft_calculated_tilt_moment import MainShaftCalculatedTiltMomentAPI
+from windmill._api.main_shaft_calculated_yaw_moment import MainShaftCalculatedYawMomentAPI
+from windmill._api.main_shaft_torque import MainShaftTorqueAPI
+from windmill._api.main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):

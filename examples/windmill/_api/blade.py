@@ -32,14 +32,14 @@ from windmill.data_classes._blade import (
     _BLADE_PROPERTIES_BY_FIELD,
     _create_blade_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .blade_sensor_positions import BladeSensorPositionsAPI
-from .blade_query import BladeQueryAPI
+from windmill._api.blade_sensor_positions import BladeSensorPositionsAPI
+from windmill._api.blade_query import BladeQueryAPI
 
 
 class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):

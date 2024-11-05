@@ -16,9 +16,7 @@ def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator
     expected = OmniFiles.primitive_nullable_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -33,9 +31,7 @@ def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator
     expected = OmniFiles.primitive_required_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -50,9 +46,7 @@ def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_nullable_list_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -67,9 +61,7 @@ def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_required_list_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -84,9 +76,7 @@ def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.primitive_with_defaults_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -101,9 +91,7 @@ def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.cdf_external_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -120,9 +108,7 @@ def test_generate_cdf_external_references_list(
     expected = OmniFiles.cdf_external_list_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -137,9 +123,7 @@ def test_generate_implementation1(omni_multi_api_generator: MultiAPIGenerator, c
     expected = OmniFiles.implementation_1_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -156,9 +140,7 @@ def test_generate_implementation1_non_writable(
     expected = OmniFiles.implementation_1_non_writeable_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -171,9 +153,7 @@ def test_generate_sub_interface(omni_multi_api_generator: MultiAPIGenerator, cod
     expected = OmniFiles.sub_interface.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -188,9 +168,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_a_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -205,9 +183,7 @@ def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_b_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -222,9 +198,7 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_c_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -239,9 +213,7 @@ def test_generate_connection_item_e(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_e_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -256,9 +228,7 @@ def test_generate_connection_item_f(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_f_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -273,9 +243,7 @@ def test_generate_connection_item_g(omni_multi_api_generator: MultiAPIGenerator,
     expected = OmniFiles.connection_item_g_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omni_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -292,9 +260,7 @@ def test_generate_connection_item_a_no_default_space(
     expected = OmniSubFiles.connection_item_a_api.read_text()
 
     # Act
-    actual = api_generator.generate_api_file(
-        omnisub_multi_api_generator.top_level_package, omnisub_multi_api_generator.client_name
-    )
+    actual = api_generator.generate_api_file(omnisub_multi_api_generator.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert

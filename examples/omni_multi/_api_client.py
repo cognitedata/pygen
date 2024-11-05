@@ -8,15 +8,15 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from omni_multi._api import (
     Implementation1v1API,
     Implementation1v2API,
     MainInterfaceAPI,
     SubInterfaceAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import GraphQLList
-from . import data_classes
+from omni_multi._api._core import SequenceNotStr, GraphQLQueryResponse
+from omni_multi.data_classes._core import GraphQLList
+from omni_multi import data_classes
 
 
 class OmniMultiAAPIs:
@@ -111,7 +111,7 @@ class OmniMultiClient:
     OmniMultiClient
 
     Generated with:
-        pygen = 0.99.42
+        pygen = 0.99.43
         cognite-sdk = 7.63.6
         pydantic = 2.9.2
 
@@ -125,7 +125,7 @@ class OmniMultiClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.42"
+        client.config.client_name = "CognitePygen:0.99.43"
 
         self.omni_multi_a = OmniMultiAAPIs(client)
         self.omni_multi_b = OmniMultiBAPIs(client)

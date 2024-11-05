@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from windmill.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -37,7 +37,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._sensor_position import SensorPosition, SensorPositionGraphQL, SensorPositionWrite
+    from windmill.data_classes._sensor_position import SensorPosition, SensorPositionGraphQL, SensorPositionWrite
 
 
 __all__ = [

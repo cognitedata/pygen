@@ -10,7 +10,7 @@ from equipment_unit.data_classes import (
     DomainModelCore,
     WorkOrder,
 )
-from ._core import (
+from equipment_unit._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,

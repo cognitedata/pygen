@@ -1,4 +1,4 @@
-from ._core import (
+from omni_multi.data_classes._core import (
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,

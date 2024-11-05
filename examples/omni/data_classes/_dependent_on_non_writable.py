@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -36,7 +36,10 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableGraphQL
+    from omni.data_classes._implementation_1_non_writeable import (
+        Implementation1NonWriteable,
+        Implementation1NonWriteableGraphQL,
+    )
 
 
 __all__ = [

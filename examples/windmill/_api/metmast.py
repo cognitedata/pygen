@@ -31,16 +31,16 @@ from windmill.data_classes._metmast import (
     _METMAST_PROPERTIES_BY_FIELD,
     _create_metmast_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .metmast_temperature import MetmastTemperatureAPI
-from .metmast_tilt_angle import MetmastTiltAngleAPI
-from .metmast_wind_speed import MetmastWindSpeedAPI
-from .metmast_query import MetmastQueryAPI
+from windmill._api.metmast_temperature import MetmastTemperatureAPI
+from windmill._api.metmast_tilt_angle import MetmastTiltAngleAPI
+from windmill._api.metmast_wind_speed import MetmastWindSpeedAPI
+from windmill._api.metmast_query import MetmastQueryAPI
 
 
 class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):

@@ -11,7 +11,7 @@ from cognite.client.data_classes import Datapoints, DatapointsArrayList, Datapoi
 from cognite.client.data_classes.datapoints import Aggregate
 from equipment_unit.data_classes._equipment_module import _create_equipment_module_filter
 from equipment_unit.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from ._core import DEFAULT_LIMIT_READ
+from equipment_unit._api._core import DEFAULT_LIMIT_READ
 
 
 ColumnNames = Literal["description", "name", "sensor_value", "type"]

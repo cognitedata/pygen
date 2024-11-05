@@ -17,7 +17,7 @@ from cognite.client.data_classes import ({% if data_class.has_primitive_field_of
 {{ data_class.import_pydantic_field }}{% endif %}
 from pydantic import field_validator, model_validator
 
-from ._core import ({% if has_default_instance_space %}
+from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,{% endif %}
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -53,10 +53,10 @@ from ._core import ({% if has_default_instance_space %}
     StringFilter,{% if data_class.has_filtering_fields %}
     {{ data_class.filtering_import }}{% endif %}
 ){% if data_class.implements %}{% for implements in data_class.implements %}
-from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
+from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies_not_self %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
+    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
 
 __all__ = [

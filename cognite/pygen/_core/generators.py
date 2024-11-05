@@ -110,7 +110,7 @@ class SDKGenerator:
         Returns:
             A Python SDK given as a dictionary of file paths and file contents, which can be written to disk.
         """
-        client_dir = Path(self.top_level_package.replace(".", "/"))
+        client_dir = Path()
         sdk = self._multi_api_generator.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
         return sdk
@@ -227,6 +227,7 @@ class MultiAPIGenerator:
         self.api_by_type_by_view_id = self.create_api_by_view_id_type(
             unique_views,
             default_instance_space is not None,
+            top_level_package,
             config,
             base_name_functions=[
                 DataClass.to_base_name,
@@ -337,6 +338,7 @@ class MultiAPIGenerator:
         cls,
         views: list[dm.View],
         has_default_instance_space: bool,
+        top_level_package: str,
         config: PygenConfig,
         base_name_functions: list[Callable[[dm.View], str]],
         selected_function: int = 0,
@@ -360,14 +362,14 @@ class MultiAPIGenerator:
                 view = views_with_base_name[0]
                 if view.used_for == "all":
                     api_by_view_id["node"][view.as_id()] = APIGenerator(
-                        view, has_default_instance_space, config, "node", f"{base_name}Node"
+                        view, has_default_instance_space, top_level_package, config, "node", f"{base_name}Node"
                     )
                     api_by_view_id["edge"][view.as_id()] = APIGenerator(
-                        view, has_default_instance_space, config, "edge", f"{base_name}Edge"
+                        view, has_default_instance_space, top_level_package, config, "edge", f"{base_name}Edge"
                     )
                 elif view.used_for == "node" or view.used_for == "edge":
                     api_by_view_id[view.used_for][view.as_id()] = APIGenerator(
-                        view, has_default_instance_space, config, view.used_for, base_name
+                        view, has_default_instance_space, top_level_package, config, view.used_for, base_name
                     )
                 else:
                     warnings.warn("View used_for is not set. Skipping view", UserWarning, stacklevel=2)
@@ -375,7 +377,12 @@ class MultiAPIGenerator:
 
             # The base name is not unique, so we need to try another base name function to separate the views.
             update = cls.create_api_by_view_id_type(
-                views_with_base_name, has_default_instance_space, config, base_name_functions, selected_function + 1
+                views_with_base_name,
+                has_default_instance_space,
+                top_level_package,
+                config,
+                base_name_functions,
+                selected_function + 1,
             )
             api_by_view_id["node"].update(update["node"])
             api_by_view_id["edge"].update(update["edge"])
@@ -400,15 +407,13 @@ class MultiAPIGenerator:
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             if isinstance(api.data_class, EdgeDataClass):
                 continue
-            sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
+            sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.client_name)
 
-            sdk[api_dir / f"{api.query_api.file_name}.py"] = api.generate_api_query_file(
-                self.top_level_package, self.client_name
-            )
+            sdk[api_dir / f"{api.query_api.file_name}.py"] = api.generate_api_query_file(self.client_name)
 
             for file_name, file_content in itertools.chain(
-                api.generate_edge_api_files(self.top_level_package, self.client_name),
-                api.generate_timeseries_api_files(self.top_level_package, self.client_name),
+                api.generate_edge_api_files(self.client_name),
+                api.generate_timeseries_api_files(self.client_name),
             ):
                 sdk[api_dir / f"{file_name}.py"] = file_content
 
@@ -452,12 +457,24 @@ class MultiAPIGenerator:
 
         api_classes = sorted(api_classes, key=lambda api: api.name)
 
-        return api_core.render(api_classes=api_classes).removeprefix("\n") + "\n"
+        return (
+            api_core.render(
+                api_classes=api_classes,
+                top_level_package=self.top_level_package,
+            ).removeprefix("\n")
+            + "\n"
+        )
 
     def generate_data_class_core_base_file(self) -> str:
         """Generate the core/base.py data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_base.py.jinja")
-        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_constants_file(self) -> str:
         """Generate the core/constants data classes file for the SDK."""
@@ -466,6 +483,7 @@ class MultiAPIGenerator:
             data_class_core.render(
                 default_instance_space=self.default_instance_space,
                 has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -473,12 +491,23 @@ class MultiAPIGenerator:
     def generate_data_class_core_helpers_file(self) -> str:
         """Generate the core/helpers data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_helpers.py.jinja")
-        return data_class_core.render(has_default_instance_space=self.has_default_instance_space) + "\n"
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_init_file(self) -> str:
         """Generate the core/__init__ data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_init.py.jinja")
-        return data_class_core.render() + "\n"
+        return (
+            data_class_core.render(
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_data_class_core_query_file(self) -> str:
         """Generate the core data classes file for the SDK."""
@@ -489,7 +518,9 @@ class MultiAPIGenerator:
 
         return (
             data_class_core.render(
-                has_default_instance_space=self.has_default_instance_space, query_builder=query_builder
+                has_default_instance_space=self.has_default_instance_space,
+                query_builder=query_builder,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -497,7 +528,12 @@ class MultiAPIGenerator:
     def generate_data_class_core_cdf_external_file(self) -> str:
         """Generate the core data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_cdf_external.py.jinja")
-        return data_class_core.render() + "\n"
+        return (
+            data_class_core.render(
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
     def generate_client_init_file(self) -> str:
         """Generate the __init__.py file for the client.
@@ -547,6 +583,7 @@ class MultiAPIGenerator:
                 dependencies_by_names=dependencies_by_names,
                 ft=fields,
                 dm=dm,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -620,6 +657,7 @@ class MultiAPIGenerator:
                 len=len,
                 parent_classes_by_module=parent_classes_by_module,
                 readonly_properties_by_view=readonly_properties_by_view or {},
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -648,6 +686,7 @@ class APIGenerator:
         self,
         view: dm.View,
         has_default_instance_space: bool,
+        top_level_package: str,
         config: PygenConfig,
         used_for: Literal["node", "edge"],
         base_name: str | None = None,
@@ -658,6 +697,7 @@ class APIGenerator:
         self.view = view
         self.base_name = base_name or DataClass.to_base_name(view)
         self.has_default_instance_space = has_default_instance_space
+        self.top_level_package = top_level_package
         self._config = config
         self.used_for = used_for
 
@@ -803,15 +843,15 @@ class APIGenerator:
                 unique_end_classes=unique_end_classes,
                 grouped_edge_classes=grouped_edge_classes,
                 has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
 
-    def generate_api_file(self, top_level_package: str, client_name: str) -> str:
+    def generate_api_file(self, client_name: str) -> str:
         """Generate the API file for the view.
 
         Args:
-            top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
 
         Returns:
@@ -823,7 +863,7 @@ class APIGenerator:
 
         return (
             type_api.render(
-                top_level_package=top_level_package,
+                top_level_package=self.top_level_package,
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
@@ -840,13 +880,12 @@ class APIGenerator:
             + "\n"
         )
 
-    def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
+    def generate_api_query_file(self, client_name: str) -> str:
         """Generate the API query file for the view.
 
         This is the basis for the Python query functionality for the view.
 
         Args:
-            top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
 
         Returns:
@@ -858,7 +897,6 @@ class APIGenerator:
 
         return (
             query_api.render(
-                top_level_package=top_level_package,
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
@@ -871,16 +909,16 @@ class APIGenerator:
                 ft=fields,
                 dm=dm,
                 sorted=sorted,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
 
-    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+    def generate_edge_api_files(self, client_name: str) -> Iterator[tuple[str, str]]:
         """Generate the edge API files for the view.
 
 
         Args:
-            top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
 
         Returns:
@@ -893,7 +931,7 @@ class APIGenerator:
                 edge_api.file_name,
                 (
                     edge_class.render(
-                        top_level_package=top_level_package,
+                        top_level_package=self.top_level_package,
                         client_name=client_name,
                         edge_api=edge_api,
                         api_class=self.api_class,
@@ -906,11 +944,10 @@ class APIGenerator:
                 ),
             )
 
-    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+    def generate_timeseries_api_files(self, client_name: str) -> Iterator[tuple[str, str]]:
         """Generate the timeseries API files for the view.
 
         Args:
-            top_level_package: The top level package for the SDK.
             client_name: The name of the client class.
 
         Returns:
@@ -922,7 +959,7 @@ class APIGenerator:
                 timeseries.file_name,
                 (
                     timeseries_api.render(
-                        top_level_package=top_level_package,
+                        top_level_package=self.top_level_package,
                         client_name=client_name,
                         api_class=self.api_class,
                         data_class=self.data_class,

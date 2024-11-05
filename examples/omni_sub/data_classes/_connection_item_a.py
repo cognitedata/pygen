@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
@@ -35,8 +35,12 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
-    from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeGraphQL, ConnectionItemCNodeWrite
+    from omni_sub.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+    from omni_sub.data_classes._connection_item_c_node import (
+        ConnectionItemCNode,
+        ConnectionItemCNodeGraphQL,
+        ConnectionItemCNodeWrite,
+    )
 
 
 __all__ = [

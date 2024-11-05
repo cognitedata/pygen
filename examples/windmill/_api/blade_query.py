@@ -14,7 +14,7 @@ from windmill.data_classes._sensor_position import (
     SensorPosition,
     _create_sensor_position_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -25,7 +25,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from .sensor_position_query import SensorPositionQueryAPI
+    from windmill._api.sensor_position_query import SensorPositionQueryAPI
 
 
 class BladeQueryAPI(QueryAPI[T_DomainModelList]):

@@ -99,9 +99,7 @@ def test_create_view_api_classes_equipment_module(
     expected = EquipmentSDKFiles.equipment_api.read_text()
 
     # Act
-    actual = equipment_module_api_generator.generate_api_file(
-        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-    )
+    actual = equipment_module_api_generator.generate_api_file(EQUIPMENT_UNIT_SDK.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -115,11 +113,7 @@ def test_generate_equipment_module_sensor_value_api(
     expected = EquipmentSDKFiles.equipment_module_sensor_value_api.read_text()
 
     # Act
-    _, actual = next(
-        equipment_module_api_generator.generate_timeseries_api_files(
-            EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-        )
-    )
+    _, actual = next(equipment_module_api_generator.generate_timeseries_api_files(EQUIPMENT_UNIT_SDK.client_name))
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -133,9 +127,7 @@ def test_create_view_api_classes_unit_procedure(
     expected = EquipmentSDKFiles.unit_procedure_api.read_text()
 
     # Act
-    actual = unit_procedure_api_generator.generate_api_file(
-        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-    )
+    actual = unit_procedure_api_generator.generate_api_file(EQUIPMENT_UNIT_SDK.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -149,9 +141,7 @@ def test_create_view_api_classes_unit_procedure_query(
     expected = EquipmentSDKFiles.unit_procedure_query.read_text()
 
     # Act
-    actual = unit_procedure_api_generator.generate_api_query_file(
-        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-    )
+    actual = unit_procedure_api_generator.generate_api_query_file(EQUIPMENT_UNIT_SDK.client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -168,9 +158,7 @@ def test_create_view_api_classes_unit_procedure_work_units(
 
     actual_by_file_name = {
         filename: content
-        for filename, content in unit_procedure_api_generator.generate_edge_api_files(
-            EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-        )
+        for filename, content in unit_procedure_api_generator.generate_edge_api_files(EQUIPMENT_UNIT_SDK.client_name)
     }
     actual = actual_by_file_name[EquipmentSDKFiles.unit_procedure_work_units.stem]
     actual = code_formatter.format_code(actual)

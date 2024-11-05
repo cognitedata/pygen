@@ -31,15 +31,15 @@ from windmill.data_classes._generator import (
     _GENERATOR_PROPERTIES_BY_FIELD,
     _create_generator_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .generator_generator_speed_controller import GeneratorGeneratorSpeedControllerAPI
-from .generator_generator_speed_controller_reference import GeneratorGeneratorSpeedControllerReferenceAPI
-from .generator_query import GeneratorQueryAPI
+from windmill._api.generator_generator_speed_controller import GeneratorGeneratorSpeedControllerAPI
+from windmill._api.generator_generator_speed_controller_reference import GeneratorGeneratorSpeedControllerReferenceAPI
+from windmill._api.generator_query import GeneratorQueryAPI
 
 
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWriteList]):

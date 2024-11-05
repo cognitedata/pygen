@@ -38,15 +38,15 @@ from omni.data_classes._connection_item_f import (
     _CONNECTIONITEMF_PROPERTIES_BY_FIELD,
     _create_connection_item_f_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
-from .connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
-from .connection_item_f_query import ConnectionItemFQueryAPI
+from omni._api.connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
+from omni._api.connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
+from omni._api.connection_item_f_query import ConnectionItemFQueryAPI
 
 
 class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList, ConnectionItemFWriteList]):

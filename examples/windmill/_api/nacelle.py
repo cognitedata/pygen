@@ -36,18 +36,18 @@ from windmill.data_classes._nacelle import (
     _NACELLE_PROPERTIES_BY_FIELD,
     _create_nacelle_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .nacelle_acc_from_back_side_x import NacelleAccFromBackSideXAPI
-from .nacelle_acc_from_back_side_y import NacelleAccFromBackSideYAPI
-from .nacelle_acc_from_back_side_z import NacelleAccFromBackSideZAPI
-from .nacelle_yaw_direction import NacelleYawDirectionAPI
-from .nacelle_yaw_error import NacelleYawErrorAPI
-from .nacelle_query import NacelleQueryAPI
+from windmill._api.nacelle_acc_from_back_side_x import NacelleAccFromBackSideXAPI
+from windmill._api.nacelle_acc_from_back_side_y import NacelleAccFromBackSideYAPI
+from windmill._api.nacelle_acc_from_back_side_z import NacelleAccFromBackSideZAPI
+from windmill._api.nacelle_yaw_direction import NacelleYawDirectionAPI
+from windmill._api.nacelle_yaw_error import NacelleYawErrorAPI
+from windmill._api.nacelle_query import NacelleQueryAPI
 
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):

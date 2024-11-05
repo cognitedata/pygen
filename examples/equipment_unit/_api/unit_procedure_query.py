@@ -19,7 +19,7 @@ from equipment_unit.data_classes._equipment_module import (
     EquipmentModule,
     _create_equipment_module_filter,
 )
-from ._core import (
+from equipment_unit._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -34,8 +34,8 @@ from equipment_unit.data_classes._start_end_time import (
 )
 
 if TYPE_CHECKING:
-    from .work_order_query import WorkOrderQueryAPI
-    from .equipment_module_query import EquipmentModuleQueryAPI
+    from equipment_unit._api.work_order_query import WorkOrderQueryAPI
+    from equipment_unit._api.equipment_module_query import EquipmentModuleQueryAPI
 
 
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):

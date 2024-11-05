@@ -10,7 +10,7 @@ from scenario_instance.client.data_classes import (
     DomainModelCore,
     ScenarioInstance,
 )
-from ._core import (
+from scenario_instance.client._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,

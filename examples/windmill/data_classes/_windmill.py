@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from windmill.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -37,10 +37,10 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._blade import Blade, BladeGraphQL, BladeWrite
-    from ._metmast import Metmast, MetmastGraphQL, MetmastWrite
-    from ._nacelle import Nacelle, NacelleGraphQL, NacelleWrite
-    from ._rotor import Rotor, RotorGraphQL, RotorWrite
+    from windmill.data_classes._blade import Blade, BladeGraphQL, BladeWrite
+    from windmill.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
+    from windmill.data_classes._nacelle import Nacelle, NacelleGraphQL, NacelleWrite
+    from windmill.data_classes._rotor import Rotor, RotorGraphQL, RotorWrite
 
 
 __all__ = [

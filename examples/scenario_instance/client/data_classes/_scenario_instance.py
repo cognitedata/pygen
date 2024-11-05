@@ -13,7 +13,7 @@ from cognite.client.data_classes import (
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from scenario_instance.client.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,

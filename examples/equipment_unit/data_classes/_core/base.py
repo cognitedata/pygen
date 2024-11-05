@@ -39,7 +39,7 @@ from cognite.client.data_classes.data_modeling.instances import (
 )
 from pydantic import BaseModel, Field, model_validator
 
-from .constants import DEFAULT_INSTANCE_SPACE
+from equipment_unit.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
 if sys.version_info >= (3, 11):
     from typing import Self

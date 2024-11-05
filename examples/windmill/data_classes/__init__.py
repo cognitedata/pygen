@@ -1,4 +1,4 @@
-from ._core import (
+from windmill.data_classes._core import (
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,

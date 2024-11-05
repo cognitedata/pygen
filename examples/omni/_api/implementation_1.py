@@ -31,13 +31,13 @@ from omni.data_classes._implementation_1 import (
     _IMPLEMENTATION1_PROPERTIES_BY_FIELD,
     _create_implementation_1_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .implementation_1_query import Implementation1QueryAPI
+from omni._api.implementation_1_query import Implementation1QueryAPI
 
 
 class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List, Implementation1WriteList]):

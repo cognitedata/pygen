@@ -12,7 +12,7 @@ from cognite.client.data_classes import (
 from pydantic import Field
 from pydantic import field_validator, model_validator
 
-from ._core import (
+from windmill.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -46,11 +46,11 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._gearbox import Gearbox, GearboxGraphQL, GearboxWrite
-    from ._generator import Generator, GeneratorGraphQL, GeneratorWrite
-    from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftGraphQL, HighSpeedShaftWrite
-    from ._main_shaft import MainShaft, MainShaftGraphQL, MainShaftWrite
-    from ._power_inverter import PowerInverter, PowerInverterGraphQL, PowerInverterWrite
+    from windmill.data_classes._gearbox import Gearbox, GearboxGraphQL, GearboxWrite
+    from windmill.data_classes._generator import Generator, GeneratorGraphQL, GeneratorWrite
+    from windmill.data_classes._high_speed_shaft import HighSpeedShaft, HighSpeedShaftGraphQL, HighSpeedShaftWrite
+    from windmill.data_classes._main_shaft import MainShaft, MainShaftGraphQL, MainShaftWrite
+    from windmill.data_classes._power_inverter import PowerInverter, PowerInverterGraphQL, PowerInverterWrite
 
 
 __all__ = [

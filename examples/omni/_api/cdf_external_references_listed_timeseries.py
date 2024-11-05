@@ -11,7 +11,7 @@ from cognite.client.data_classes import Datapoints, DatapointsArrayList, Datapoi
 from cognite.client.data_classes.datapoints import Aggregate
 from omni.data_classes._cdf_external_references_listed import _create_cdf_external_references_listed_filter
 from omni.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from ._core import DEFAULT_LIMIT_READ
+from omni._api._core import DEFAULT_LIMIT_READ
 
 
 ColumnNames = Literal["files", "sequences", "timeseries"]

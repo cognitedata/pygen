@@ -31,13 +31,13 @@ from equipment_unit.data_classes._work_order import (
     _WORKORDER_PROPERTIES_BY_FIELD,
     _create_work_order_filter,
 )
-from ._core import (
+from equipment_unit._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .work_order_query import WorkOrderQueryAPI
+from equipment_unit._api.work_order_query import WorkOrderQueryAPI
 
 
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWriteList]):

@@ -19,7 +19,7 @@ from omni.data_classes._connection_item_f import (
     ConnectionItemF,
     _create_connection_item_f_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -34,8 +34,8 @@ from omni.data_classes._connection_edge_a import (
 )
 
 if TYPE_CHECKING:
-    from .connection_item_d_query import ConnectionItemDQueryAPI
-    from .connection_item_f_query import ConnectionItemFQueryAPI
+    from omni._api.connection_item_d_query import ConnectionItemDQueryAPI
+    from omni._api.connection_item_f_query import ConnectionItemFQueryAPI
 
 
 class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):

@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKIN
 from cognite.client import data_modeling as dm, CogniteClient{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import ({% if has_default_instance_space %}
+from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,{% endif %}
     DataRecord,
     DataRecordWrite,
@@ -28,11 +28,11 @@ from ._core import ({% if has_default_instance_space %}
     StringFilter,{% if data_class.has_filtering_fields %}
     {{ data_class.filtering_import }}{% endif %}
 ){% for class_ in unique_start_classes %}
-from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
-from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
+from {{ top_level_package }}.data_classes.{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
+from {{ top_level_package }}.data_classes.{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
 {% if data_class.has_dependencies_not_self %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
+    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
 
 

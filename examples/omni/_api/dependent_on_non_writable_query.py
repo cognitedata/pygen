@@ -14,7 +14,7 @@ from omni.data_classes._implementation_1_non_writeable import (
     Implementation1NonWriteable,
     _create_implementation_1_non_writeable_filter,
 )
-from ._core import (
+from omni._api._core import (
     DEFAULT_QUERY_LIMIT,
     EdgeQueryStep,
     NodeQueryStep,
@@ -25,7 +25,7 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
+    from omni._api.implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
 class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):

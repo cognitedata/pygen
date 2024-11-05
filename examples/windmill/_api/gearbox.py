@@ -31,16 +31,16 @@ from windmill.data_classes._gearbox import (
     _GEARBOX_PROPERTIES_BY_FIELD,
     _create_gearbox_filter,
 )
-from ._core import (
+from windmill._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from .gearbox_displacement_x import GearboxDisplacementXAPI
-from .gearbox_displacement_y import GearboxDisplacementYAPI
-from .gearbox_displacement_z import GearboxDisplacementZAPI
-from .gearbox_query import GearboxQueryAPI
+from windmill._api.gearbox_displacement_x import GearboxDisplacementXAPI
+from windmill._api.gearbox_displacement_y import GearboxDisplacementYAPI
+from windmill._api.gearbox_displacement_z import GearboxDisplacementZAPI
+from windmill._api.gearbox_query import GearboxQueryAPI
 
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):

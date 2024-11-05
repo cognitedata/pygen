@@ -8,14 +8,14 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import (
+from omni_sub._api import (
     ConnectionItemAAPI,
     ConnectionItemBAPI,
     ConnectionItemCNodeAPI,
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import GraphQLList
-from . import data_classes
+from omni_sub._api._core import SequenceNotStr, GraphQLQueryResponse
+from omni_sub.data_classes._core import GraphQLList
+from omni_sub import data_classes
 
 
 class OmniSubClient:
@@ -23,7 +23,7 @@ class OmniSubClient:
     OmniSubClient
 
     Generated with:
-        pygen = 0.99.42
+        pygen = 0.99.43
         cognite-sdk = 7.63.6
         pydantic = 2.9.2
 
@@ -41,7 +41,7 @@ class OmniSubClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.42"
+        client.config.client_name = "CognitePygen:0.99.43"
 
         self._client = client
 

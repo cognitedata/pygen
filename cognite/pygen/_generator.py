@@ -87,11 +87,13 @@ def generate_sdk(
             if we have top_level_package=`apm` and the client_name=`APMClient`, then
             the importing the client will be `from apm import APMClient`. If nothing is passed,
             the package will be [external_id:snake] of the first data model given, while
-            the client name will be [external_id:pascal_case]
+            the client name will be [external_id:pascal_case]. In the case, pygen is part of another package,
+            the top level package should be the full package name. For example, `cognite.apm`.
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         default_instance_space: The default instance space to use for the generated SDK. If not provided,
             the space must be specified when creating, deleting, and retrieving nodes and edges.
-        output_dir: The location to output the generated SDK. Defaults to the current working directory.
+        output_dir: The location to output the generated SDK.
+            Defaults: Path.cwd() / Path(top_level_package.replace(".", "/")).
         logger: A logger function to log progress. Defaults to print.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
@@ -99,6 +101,8 @@ def generate_sdk(
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
     """
+    if output_dir is not None and top_level_package is None:
+        raise ValueError("top_level_package must be provided if output_dir is provided")
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
 
@@ -121,9 +125,9 @@ def generate_sdk(
     sdk = sdk_generator.generate_sdk()
     if return_sdk_files:
         return sdk
-    output_dir = output_dir or Path.cwd()
+    output_dir = output_dir or (Path.cwd() / Path(top_level_package.replace(".", "/")))
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code, top_level_package)
+    write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code)
     logger("Done!")
     return None
 
@@ -193,7 +197,7 @@ def generate_sdk_notebook(
         top_level_package=top_level_package,
         client_name=client_name,
         default_instance_space=default_instance_space,
-        output_dir=output_dir,
+        output_dir=output_dir / _top_level_to_path(top_level_package),
         overwrite=True,
         format_code=False,
         config=config,
@@ -223,6 +227,10 @@ def generate_sdk_notebook(
 
 def _default_top_level_package(external_id: str) -> str:
     return f"{to_snake(external_id)}"
+
+
+def _top_level_to_path(top_level_package: str) -> Path:
+    return Path(top_level_package.replace(".", "/"))
 
 
 def _default_client_name(external_id: str) -> str:
@@ -380,7 +388,6 @@ def write_sdk_to_disk(
     overwrite: bool,
     logger: Optional[Callable[[str], None]],
     format_code: bool = True,
-    top_level_package: str | None = None,
 ) -> None:
     """Write a generated SDK to disk.
 
@@ -395,15 +402,11 @@ def write_sdk_to_disk(
             A logger function to log progress.
         format_code (bool):
             Whether to format the generated code using black.
-        top_level_package (str):
-            The name of the top level package for the SDK.
     """
     formatter = CodeFormatter(format_code, print)
 
     if overwrite:
         top_path = output_dir
-        if top_level_package is not None:
-            top_path = top_path / Path(top_level_package.replace(".", "/"))
         existing_files = {path.relative_to(output_dir) for path in top_path.rglob("*.py")}
         new_files = {path for path in sdk.keys()}
         files_to_remove = existing_files - new_files
