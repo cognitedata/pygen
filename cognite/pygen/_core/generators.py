@@ -110,7 +110,7 @@ class SDKGenerator:
         Returns:
             A Python SDK given as a dictionary of file paths and file contents, which can be written to disk.
         """
-        client_dir = Path(self.top_level_package.replace(".", "/"))
+        client_dir = Path()
         sdk = self._multi_api_generator.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
         return sdk
