@@ -16,11 +16,7 @@ def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGene
     expected = OmniFiles.cdf_external_timeseries_api.read_text()
 
     # Act
-    _, actual = next(
-        api_generator.generate_timeseries_api_files(
-            omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-        )
-    )
+    _, actual = next(api_generator.generate_timeseries_api_files(omni_multi_api_generator.client_name))
     actual = code_formatter.format_code(actual)
 
     # Assert

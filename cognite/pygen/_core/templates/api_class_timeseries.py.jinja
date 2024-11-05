@@ -11,7 +11,7 @@ from cognite.client.data_classes import Datapoints, DatapointsArrayList, Datapoi
 from cognite.client.data_classes.datapoints import Aggregate
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
 from {{ top_level_package }}.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from ._core import DEFAULT_LIMIT_READ
+from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ
 
 
 ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]

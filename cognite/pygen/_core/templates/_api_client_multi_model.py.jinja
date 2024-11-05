@@ -8,12 +8,12 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
+from {{ top_level_package }}._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
     {{ api.api_class.name }},{% endif %}{% endfor %}
 )
-from ._api._core import SequenceNotStr, GraphQLQueryResponse
-from .data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
-from . import data_classes
+from {{ top_level_package }}._api._core import SequenceNotStr, GraphQLQueryResponse
+from {{ top_level_package }}.data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
+from {{ top_level_package }} import data_classes
 
 {% for api in multi_apis %}
 class {{ api.name }}:

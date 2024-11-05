@@ -14,9 +14,7 @@ def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator,
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_a_edge_apis}
 
     # Act
-    for name, actual in api_generator.generate_edge_api_files(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    ):
+    for name, actual in api_generator.generate_edge_api_files(omni_multi_api_generator.client_name):
         actual = code_formatter.format_code(actual)
 
         # Assert
@@ -31,9 +29,7 @@ def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator,
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_b_edge_apis}
 
     # Act
-    for name, actual in api_generator.generate_edge_api_files(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    ):
+    for name, actual in api_generator.generate_edge_api_files(omni_multi_api_generator.client_name):
         actual = code_formatter.format_code(actual)
 
         # Assert
@@ -48,9 +44,7 @@ def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator,
     filepath_by_name = {f.stem: f for f in OmniFiles.connection_item_c_edge_apis}
 
     # Act
-    for name, actual in api_generator.generate_edge_api_files(
-        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
-    ):
+    for name, actual in api_generator.generate_edge_api_files(omni_multi_api_generator.client_name):
         actual = code_formatter.format_code(actual)
 
         # Assert
@@ -67,9 +61,7 @@ def test_generate_connection_item_a_no_default_space(
     filepath_by_name = {f.stem: f for f in OmniSubFiles.connection_item_a_edge_apis}
 
     # Act
-    for name, actual in api_generator.generate_edge_api_files(
-        omnisub_multi_api_generator.top_level_package, omnisub_multi_api_generator.client_name
-    ):
+    for name, actual in api_generator.generate_edge_api_files(omnisub_multi_api_generator.client_name):
         actual = code_formatter.format_code(actual)
 
         # Assert

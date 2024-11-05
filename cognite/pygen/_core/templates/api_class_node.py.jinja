@@ -43,9 +43,9 @@ from ._core import (
     NodeAPI{% else %}NodeReadAPI{% endif %},
     SequenceNotStr,
 ){% for class_ in edge_apis %}{% if class_.field.is_write_field %}
-from .{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
-from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
-from .{{ query_api.file_name }} import {{ query_api.name }}
+from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}{% for class_ in timeseries_apis %}
+from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}{% endfor %}
+from {{ top_level_package }}._api.{{ query_api.file_name }} import {{ query_api.name }}
 
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):

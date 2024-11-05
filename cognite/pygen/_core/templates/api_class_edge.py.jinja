@@ -11,7 +11,7 @@ from {{ top_level_package }}.data_classes import (
 )
 from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
 {% endif %}
-from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}{% if has_default_instance_space %}
+from {{ top_level_package }}._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}{% if has_default_instance_space %}
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE{% endif %}
 
 
