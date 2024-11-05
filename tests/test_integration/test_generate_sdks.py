@@ -10,7 +10,7 @@ def test_generate_omni(cognite_client: CogniteClient, tmp_path: Path) -> None:
     generate_sdk(
         OMNI_SDK.data_model_ids,
         cognite_client,
-        output_dir=tmp_path,
+        output_dir=tmp_path / Path(OMNI_SDK.top_level_package.replace(".", "/")),
     )
 
 

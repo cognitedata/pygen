@@ -25,7 +25,7 @@ class TestGenerateSDK:
         generate_sdk(
             DATA_MODEL_WITH_VIEW_NAMED_FIELD,
             top_level_package=top_level_package,
-            output_dir=tmp_path,
+            output_dir=tmp_path / top_level_package,
             overwrite=True,
             client_name=client_name,
             default_instance_space="field_space",
@@ -42,7 +42,7 @@ class TestGenerateSDK:
         generate_sdk(
             DATA_MODEL_WITH_VIEW_WITHOUT_PROPERTIES,
             top_level_package=top_level_package,
-            output_dir=tmp_path,
+            output_dir=tmp_path / top_level_package,
             overwrite=True,
             client_name=client_name,
             default_instance_space="no_properties_space",
@@ -59,7 +59,7 @@ class TestGenerateSDK:
         generate_sdk(
             DATA_MODEL_WITH_ILLEGAL_PROPERTY_NAMES,
             top_level_package=top_level_package,
-            output_dir=tmp_path,
+            output_dir=tmp_path / top_level_package,
             overwrite=True,
             client_name=client_name,
             default_instance_space="illegal_property_names_space",
@@ -76,7 +76,7 @@ class TestGenerateSDK:
         generate_sdk(
             DATA_MODEL_WITH_REVERSE_DIRECT_RELATION_WITHOUT_TARGET,
             top_level_package=top_level_package,
-            output_dir=tmp_path,
+            output_dir=tmp_path / top_level_package,
             overwrite=True,
             client_name=client_name,
             default_instance_space="reverse_direct_relation_space",

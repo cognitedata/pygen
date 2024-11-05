@@ -195,7 +195,7 @@ def generate_sdk_notebook(
         top_level_package=top_level_package,
         client_name=client_name,
         default_instance_space=default_instance_space,
-        output_dir=output_dir,
+        output_dir=output_dir / _top_level_to_path(top_level_package),
         overwrite=True,
         format_code=False,
         config=config,
@@ -225,6 +225,10 @@ def generate_sdk_notebook(
 
 def _default_top_level_package(external_id: str) -> str:
     return f"{to_snake(external_id)}"
+
+
+def _top_level_to_path(top_level_package: str) -> Path:
+    return Path(top_level_package.replace(".", "/"))
 
 
 def _default_client_name(external_id: str) -> str:

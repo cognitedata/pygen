@@ -67,8 +67,8 @@ if _has_typer:
             cdf_project: str = typer.Option(
                 default=loaded_settings.cdf_project.default, help=loaded_settings.cdf_project.help
             ),
-            output_dir: Path = typer.Option(
-                default=loaded_settings.output_dir.default or Path.cwd(), help=loaded_settings.output_dir.help
+            output_dir: Path | None = typer.Option(
+                default=loaded_settings.output_dir.default, help=loaded_settings.output_dir.help
             ),
             top_level_package: str = typer.Option(
                 loaded_settings.top_level_package.default, help=loaded_settings.top_level_package.help
@@ -117,8 +117,7 @@ if _has_typer:
                     top_level_package,
                     client_name,
                     None,
-                    output_dir,
-                    typer.echo,
+                    logger=typer.echo,
                     overwrite=overwrite,
                     format_code=not skip_formatting,
                 )
@@ -141,7 +140,7 @@ if _has_typer:
             token_url: Annotated[Optional[str], typer.Option(..., help=default_settings.token_url.help)] = None,
             scopes: Annotated[Optional[str], typer.Option(..., help=default_settings.scopes.help)] = None,
             audience: Annotated[Optional[str], typer.Option(..., help=default_settings.audience.help)] = None,
-            output_dir: Path = typer.Option(Path.cwd(), help=default_settings.output_dir.help),
+            output_dir: Path = typer.Option(None, help=default_settings.output_dir.help),
             top_level_package: str = typer.Option(
                 default_settings.top_level_package.default, help=default_settings.top_level_package.help
             ),
@@ -174,6 +173,7 @@ if _has_typer:
                 )
             else:
                 print("Either tenant-id or token-url is required parameters")
+                raise typer.Exit(code=1)
             try:
                 generate_sdk(
                     (space, external_id, version),
@@ -181,8 +181,8 @@ if _has_typer:
                     top_level_package,
                     client_name,
                     None,
-                    output_dir,
-                    typer.echo,
+                    output_dir=output_dir,
+                    logger=typer.echo,
                     overwrite=overwrite,
                     format_code=not skip_formatting,
                 )

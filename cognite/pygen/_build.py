@@ -23,6 +23,7 @@ from ._generator import (
     _default_top_level_package,
     _extract_external_id,
     _get_data_model,
+    _top_level_to_path,
     generate_sdk,
 )
 
@@ -88,7 +89,7 @@ def build_wheel(
         top_level_package=top_level_package,
         client_name=client_name,
         default_instance_space=default_instance_space,
-        output_dir=build_dir,
+        output_dir=build_dir / _top_level_to_path(top_level_package),
         overwrite=True,
         format_code=format_code,
         config=config,
