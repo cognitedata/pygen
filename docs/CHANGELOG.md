@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.43] - 24-11-05
 ### Changed
 - The following two changes is to give more granular control over were `pygen` writes the generated SDK. This
   is to make it easier to integrate `pygen` with another code base:
