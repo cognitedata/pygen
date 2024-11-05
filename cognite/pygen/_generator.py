@@ -92,7 +92,8 @@ def generate_sdk(
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         default_instance_space: The default instance space to use for the generated SDK. If not provided,
             the space must be specified when creating, deleting, and retrieving nodes and edges.
-        output_dir: The location to output the generated SDK. Defaults to the current working directory.
+        output_dir: The location to output the generated SDK.
+            Defaults: Path.cwd() / Path(top_level_package.replace(".", "/")).
         logger: A logger function to log progress. Defaults to print.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
@@ -122,7 +123,7 @@ def generate_sdk(
     sdk = sdk_generator.generate_sdk()
     if return_sdk_files:
         return sdk
-    output_dir = output_dir or Path.cwd()
+    output_dir = output_dir or (Path.cwd() / Path(top_level_package.replace(".", "/")))
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code)
     logger("Done!")
@@ -395,8 +396,6 @@ def write_sdk_to_disk(
             A logger function to log progress.
         format_code (bool):
             Whether to format the generated code using black.
-        top_level_package (str):
-            The name of the top level package for the SDK.
     """
     formatter = CodeFormatter(format_code, print)
 
