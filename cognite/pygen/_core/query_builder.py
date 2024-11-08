@@ -279,8 +279,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
 
                 raise e
 
-            search_result = self._fetch_reverse_direct_relation_of_lists(client, to_search)
-            batch.update(search_result)
+            self._fetch_reverse_direct_relation_of_lists(client, to_search, batch)
 
             for name in temp_select:
                 batch.pop(name, None)
@@ -322,11 +321,10 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
 
     @staticmethod
     def _fetch_reverse_direct_relation_of_lists(
-        client: CogniteClient, to_search: list[QueryStep]
-    ) -> dict[str, dm.NodeListWithCursor]:
+        client: CogniteClient, to_search: list[QueryStep], batch: dm.query.QueryResult
+    ) -> None:
         """Reverse direct relations for lists are not supported by the query API.
         This method fetches them separately."""
-        batch: dict[str, dm.NodeListWithCursor] = {}
         for step in to_search:
             if step.from_ is None or step.from_ not in batch:
                 continue
@@ -349,7 +347,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 view_id, properties=None, filter=is_selected, limit=limit
             )
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
-        return batch
+        return None
 
     def get_from(self) -> str | None:
         if len(self) == 0:
