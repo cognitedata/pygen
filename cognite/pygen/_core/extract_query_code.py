@@ -21,7 +21,7 @@ def get_classes_code(class_names: frozenset[str]) -> str:
 
     class_code: list[str] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef) and node.name in class_names:
+        if isinstance(node, ast.ClassDef | ast.FunctionDef) and node.name in class_names:
             start_lineno = node.lineno - 1 - len(node.decorator_list)
             end_lineno = node.end_lineno
             class_code.append("\n".join(source_lines[start_lineno:end_lineno]))

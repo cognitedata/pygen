@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Improved
+- In the underlying `query` operation, used for `.list(...)` as well as query methods, `pygen` now
+  does chunking queries that leads to use of `In` filters. This is to avoid the `CogniteAPIError - Internal Server 500` 
+
 ## [0.99.43] - 24-11-05
 ### Changed
 - The following two changes is to give more granular control over were `pygen` writes the generated SDK. This

@@ -3,7 +3,7 @@ import math
 import time
 import warnings
 from collections import defaultdict
-from collections.abc import Collection, Iterable, Iterator, MutableSequence
+from collections.abc import Collection, Iterable, Iterator, MutableSequence, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import (
@@ -23,6 +23,8 @@ from cognite.client.exceptions import CogniteAPIError
 
 DEFAULT_QUERY_LIMIT = 5
 INSTANCE_QUERY_LIMIT = 1_000
+# The limit used for the In filter in /search
+IN_FILTER_CHUNK_SIZE = 100
 # This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
 # The actual instance query limit is 10_000, but we set it to 5_000 such that is matches the In filter
 # which we use in /search for reverse of list direct relations.
@@ -64,6 +66,22 @@ class QueryReducingBatchSize(UserWarning):
     """Raised when a query is too large and the batch size must be reduced."""
 
     ...
+
+
+def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
+    """
+    Split a sequence into chunks of size chunk_size.
+
+    Args:
+        sequence: The sequence to split.
+        chunk_size: The size of each chunk.
+
+    Returns:
+        An iterator over the chunks.
+
+    """
+    for i in range(0, len(sequence), chunk_size):
+        yield sequence[i : i + chunk_size]
 
 
 class QueryStep:
@@ -277,28 +295,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
 
                 raise e
 
-            for step in to_search:
-                if step.from_ is None or step.from_ not in batch:
-                    continue
-                item_ids = [node.as_id() for node in batch[step.from_].data]
-                if not item_ids:
-                    continue
-
-                view_id = step.view_id
-                expression = step.node_expression
-                if view_id is None or expression is None:
-                    raise ValueError(
-                        "Invalid state of the query. Search should always be a node expression with view properties"
-                    )
-                if expression.through is None:
-                    raise ValueError("Missing through set in a reverse-list query")
-                is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
-                is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
-                limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
-                step_result = client.data_modeling.instances.search(
-                    view_id, properties=None, filter=is_selected, limit=limit
-                )
-                batch[step.name] = dm.NodeListWithCursor(step_result, None)
+            self._fetch_reverse_direct_relation_of_lists(client, to_search, batch)
 
             for name in temp_select:
                 batch.pop(name, None)
@@ -337,6 +334,42 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             _QueryResultCleaner(self).clean()
 
         return {step.name: step.results for step in self}
+
+    @staticmethod
+    def _fetch_reverse_direct_relation_of_lists(
+        client: CogniteClient, to_search: list[QueryStep], batch: dm.query.QueryResult
+    ) -> None:
+        """Reverse direct relations for lists are not supported by the query API.
+        This method fetches them separately."""
+        for step in to_search:
+            if step.from_ is None or step.from_ not in batch:
+                continue
+            item_ids = [node.as_id() for node in batch[step.from_].data]
+            if not item_ids:
+                continue
+
+            view_id = step.view_id
+            expression = step.node_expression
+            if view_id is None or expression is None:
+                raise ValueError(
+                    "Invalid state of the query. Search should always be a node expression with view properties"
+                )
+            if expression.through is None:
+                raise ValueError("Missing through set in a reverse-list query")
+            limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
+
+            step_result = dm.NodeList[dm.Node]([])
+            for item_ids_chunk in chunker(item_ids, IN_FILTER_CHUNK_SIZE):
+                is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
+                is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
+
+                chunk_result = client.data_modeling.instances.search(
+                    view_id, properties=None, filter=is_selected, limit=limit
+                )
+                step_result.extend(chunk_result)
+
+            batch[step.name] = dm.NodeListWithCursor(step_result, None)
+        return None
 
     def get_from(self) -> str | None:
         if len(self) == 0:
