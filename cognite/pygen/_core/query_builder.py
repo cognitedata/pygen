@@ -3,7 +3,7 @@ import math
 import time
 import warnings
 from collections import defaultdict
-from collections.abc import Collection, Iterable, Iterator, MutableSequence
+from collections.abc import Collection, Iterable, Iterator, MutableSequence, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import (
@@ -66,6 +66,22 @@ class QueryReducingBatchSize(UserWarning):
     """Raised when a query is too large and the batch size must be reduced."""
 
     ...
+
+
+def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
+    """
+    Split a sequence into chunks of size chunk_size.
+
+    Args:
+        sequence: The sequence to split.
+        chunk_size: The size of each chunk.
+
+    Returns:
+        An iterator over the chunks.
+
+    """
+    for i in range(0, len(sequence), chunk_size):
+        yield sequence[i : i + chunk_size]
 
 
 class QueryStep:
@@ -340,12 +356,18 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 )
             if expression.through is None:
                 raise ValueError("Missing through set in a reverse-list query")
-            is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids)
-            is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
             limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
-            step_result = client.data_modeling.instances.search(
-                view_id, properties=None, filter=is_selected, limit=limit
-            )
+
+            step_result = dm.NodeList[dm.Node]([])
+            for item_ids_chunk in chunker(item_ids, IN_FILTER_CHUNK_SIZE):
+                is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
+                is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
+
+                chunk_result = client.data_modeling.instances.search(
+                    view_id, properties=None, filter=is_selected, limit=limit
+                )
+                step_result.extend(chunk_result)
+
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
         return None
 
