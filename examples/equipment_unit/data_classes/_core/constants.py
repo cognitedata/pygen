@@ -1,5 +1,7 @@
 DEFAULT_QUERY_LIMIT = 5
 INSTANCE_QUERY_LIMIT = 1_000
+# The limit used for the In filter in /search
+IN_FILTER_CHUNK_SIZE = 100
 # This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
 # The actual instance query limit is 10_000, but we set it to 5_000 such that is matches the In filter
 # which we use in /search for reverse of list direct relations.
