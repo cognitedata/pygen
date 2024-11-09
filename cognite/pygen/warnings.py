@@ -121,7 +121,7 @@ def print_warnings(
     warning_list: list[warnings.WarningMessage], console: Callable[[str], None], context: Literal["notebook", "cli"]
 ) -> None:
     for group, group_warnings in itertools.groupby(
-        sorted(warning_list, key=lambda w: w.category.__name__),  # type: ignore[arg-type, return-value]
+        sorted(warning_list, key=lambda w: w.category.__name__),
         key=lambda w: w.category,
     ):
         group_list = [w.message for w in group_warnings if isinstance(w.message, PygenWarning)]
