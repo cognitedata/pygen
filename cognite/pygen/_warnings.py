@@ -118,7 +118,9 @@ class PydanticNamespaceCollisionWarning(PygenWarning, UserWarning):
 
 
 def print_warnings(
-    warning_list: list[warnings.WarningMessage], console: Callable[[str], None], context: Literal["notebook", "cli"]
+    warning_list: list[warnings.WarningMessage],
+    console: Callable[[str], None],
+    context: Literal["notebook", "cli"] = "cli",
 ) -> None:
     for group, group_warnings in itertools.groupby(
         sorted(warning_list, key=lambda w: w.category.__name__),
