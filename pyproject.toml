@@ -83,7 +83,6 @@ cli = ["packaging", "typer", "toml", "build"]
 format = ["black"]
 all = ["packaging", "typer", "toml", "black", "build"]
 
-
 [tool.poetry.dev-dependencies]
 twine = "*"
 pre-commit = "*"
@@ -112,7 +111,8 @@ pytest-icdiff = "^0.8"
 Faker = "*"
 hypothesis = "*"
 jupyterlab = "*"
-cognite-toolkit = "0.3.4"
+#cognite-toolkit = "0.3.8"
+cognite-toolkit = { git = "https://github.com/cognitedata/toolkit.git", branch = "verify-quickstart" }
 
 [tool.pytest.ini_options]
 filterwarnings = [
