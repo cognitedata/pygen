@@ -489,11 +489,11 @@ class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}
         return self.as_write()
 {% for field in data_class.read_connection_fields_including_parents %}
     @property
-    def {{ field.name }}(self) -> {{ field.destination_class.read_list_name }}:{% if field.destination_class.file_name != data_class.file_name %}
-        from .{{ field.destination_class.file_name }} import {{ field.destination_class.read_name }}, {{ field.destination_class.read_list_name }}
+    def {{ field.name }}(self) -> {{ field.linked_class.read_list_name }}:{% if field.linked_class.file_name != data_class.file_name %}
+        from .{{ field.linked_class.file_name }} import {{ field.linked_class.read_name }}, {{ field.linked_class.read_list_name }}
 {% endif %}{% if field.is_one_to_one %}
-        return {{ field.destination_class.read_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.destination_class.read_name }})]){% else %}
-        return {{ field.destination_class.read_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.destination_class.read_name }})]){% endif %}
+        return {{ field.linked_class.read_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.linked_class.read_name }})]){% else %}
+        return {{ field.linked_class.read_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.read_name }})]){% endif %}
 {% endfor %}
 
 class {{ data_class.write_list_name }}(DomainModelWriteList[{{ data_class.write_name }}]):
@@ -502,11 +502,11 @@ class {{ data_class.write_list_name }}(DomainModelWriteList[{{ data_class.write_
     _INSTANCE = {{ data_class.write_name }}
 {% for field in data_class.write_connection_fields_including_parents %}
     @property
-    def {{ field.name }}(self) -> {{ field.destination_class.write_list_name }}:{% if field.destination_class.file_name != data_class.file_name %}
-        from .{{ field.destination_class.file_name }} import {{ field.destination_class.write_name }}, {{ field.destination_class.write_list_name }}
+    def {{ field.name }}(self) -> {{ field.linked_class.write_list_name }}:{% if field.linked_class.file_name != data_class.file_name %}
+        from .{{ field.linked_class.file_name }} import {{ field.linked_class.write_name }}, {{ field.linked_class.write_list_name }}
 {% endif %}{% if field.is_one_to_one %}
-        return {{ field.destination_class.write_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.destination_class.write_name }})]){% else %}
-        return {{ field.destination_class.write_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.destination_class.write_name }})]){% endif %}
+        return {{ field.linked_class.write_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.linked_class.write_name }})]){% else %}
+        return {{ field.linked_class.write_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.write_name }})]){% endif %}
 {% endfor %}
 class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 

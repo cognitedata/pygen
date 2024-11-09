@@ -338,15 +338,15 @@ class ConnectionItemGList(DomainModelList[ConnectionItemG]):
         return self.as_write()
 
     @property
-    def inwards_multi_property(self) -> ConnectionItemFList:
-        from ._connection_item_f import ConnectionItemF, ConnectionItemFList
+    def inwards_multi_property(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
 
-        return ConnectionItemFList(
+        return ConnectionEdgeAList(
             [
                 item
                 for items in self.data
                 for item in items.inwards_multi_property or []
-                if isinstance(item, ConnectionItemF)
+                if isinstance(item, ConnectionEdgeA)
             ]
         )
 
@@ -357,15 +357,15 @@ class ConnectionItemGWriteList(DomainModelWriteList[ConnectionItemGWrite]):
     _INSTANCE = ConnectionItemGWrite
 
     @property
-    def inwards_multi_property(self) -> ConnectionItemFWriteList:
-        from ._connection_item_f import ConnectionItemFWrite, ConnectionItemFWriteList
+    def inwards_multi_property(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
 
-        return ConnectionItemFWriteList(
+        return ConnectionEdgeAWriteList(
             [
                 item
                 for items in self.data
                 for item in items.inwards_multi_property or []
-                if isinstance(item, ConnectionItemFWrite)
+                if isinstance(item, ConnectionEdgeAWrite)
             ]
         )
 

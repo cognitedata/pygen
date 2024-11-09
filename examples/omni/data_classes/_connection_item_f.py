@@ -427,19 +427,19 @@ class ConnectionItemFList(DomainModelList[ConnectionItemF]):
         )
 
     @property
-    def outwards_multi(self) -> ConnectionItemGList:
-        from ._connection_item_g import ConnectionItemG, ConnectionItemGList
+    def outwards_multi(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
 
-        return ConnectionItemGList(
-            [item for items in self.data for item in items.outwards_multi or [] if isinstance(item, ConnectionItemG)]
+        return ConnectionEdgeAList(
+            [item for items in self.data for item in items.outwards_multi or [] if isinstance(item, ConnectionEdgeA)]
         )
 
     @property
-    def outwards_single(self) -> ConnectionItemEList:
-        from ._connection_item_e import ConnectionItemE, ConnectionItemEList
+    def outwards_single(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
 
-        return ConnectionItemEList(
-            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemE)]
+        return ConnectionEdgeAList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionEdgeA)]
         )
 
 
@@ -457,24 +457,24 @@ class ConnectionItemFWriteList(DomainModelWriteList[ConnectionItemFWrite]):
         )
 
     @property
-    def outwards_multi(self) -> ConnectionItemGWriteList:
-        from ._connection_item_g import ConnectionItemGWrite, ConnectionItemGWriteList
+    def outwards_multi(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
 
-        return ConnectionItemGWriteList(
+        return ConnectionEdgeAWriteList(
             [
                 item
                 for items in self.data
                 for item in items.outwards_multi or []
-                if isinstance(item, ConnectionItemGWrite)
+                if isinstance(item, ConnectionEdgeAWrite)
             ]
         )
 
     @property
-    def outwards_single(self) -> ConnectionItemEWriteList:
-        from ._connection_item_e import ConnectionItemEWrite, ConnectionItemEWriteList
+    def outwards_single(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
 
-        return ConnectionItemEWriteList(
-            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemEWrite)]
+        return ConnectionEdgeAWriteList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionEdgeAWrite)]
         )
 
 

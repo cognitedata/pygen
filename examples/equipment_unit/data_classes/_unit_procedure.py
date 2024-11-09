@@ -361,19 +361,19 @@ class UnitProcedureList(DomainModelList[UnitProcedure]):
         return self.as_write()
 
     @property
-    def work_orders(self) -> WorkOrderList:
-        from ._work_order import WorkOrder, WorkOrderList
+    def work_orders(self) -> StartEndTimeList:
+        from ._start_end_time import StartEndTime, StartEndTimeList
 
-        return WorkOrderList(
-            [item for items in self.data for item in items.work_orders or [] if isinstance(item, WorkOrder)]
+        return StartEndTimeList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, StartEndTime)]
         )
 
     @property
-    def work_units(self) -> EquipmentModuleList:
-        from ._equipment_module import EquipmentModule, EquipmentModuleList
+    def work_units(self) -> StartEndTimeList:
+        from ._start_end_time import StartEndTime, StartEndTimeList
 
-        return EquipmentModuleList(
-            [item for items in self.data for item in items.work_units or [] if isinstance(item, EquipmentModule)]
+        return StartEndTimeList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, StartEndTime)]
         )
 
 
@@ -383,19 +383,19 @@ class UnitProcedureWriteList(DomainModelWriteList[UnitProcedureWrite]):
     _INSTANCE = UnitProcedureWrite
 
     @property
-    def work_orders(self) -> WorkOrderWriteList:
-        from ._work_order import WorkOrderWrite, WorkOrderWriteList
+    def work_orders(self) -> StartEndTimeWriteList:
+        from ._start_end_time import StartEndTimeWrite, StartEndTimeWriteList
 
-        return WorkOrderWriteList(
-            [item for items in self.data for item in items.work_orders or [] if isinstance(item, WorkOrderWrite)]
+        return StartEndTimeWriteList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, StartEndTimeWrite)]
         )
 
     @property
-    def work_units(self) -> EquipmentModuleWriteList:
-        from ._equipment_module import EquipmentModuleWrite, EquipmentModuleWriteList
+    def work_units(self) -> StartEndTimeWriteList:
+        from ._start_end_time import StartEndTimeWrite, StartEndTimeWriteList
 
-        return EquipmentModuleWriteList(
-            [item for items in self.data for item in items.work_units or [] if isinstance(item, EquipmentModuleWrite)]
+        return StartEndTimeWriteList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, StartEndTimeWrite)]
         )
 
 

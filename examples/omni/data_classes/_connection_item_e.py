@@ -50,10 +50,6 @@ if TYPE_CHECKING:
         ConnectionItemDWrite,
         ConnectionItemDWriteList,
     )
-    from omni.data_classes._connection_item_f import (
-        ConnectionItemFList,
-        ConnectionItemFWriteList,
-    )
 
 
 __all__ = [
@@ -505,14 +501,14 @@ class ConnectionItemEList(DomainModelList[ConnectionItemE]):
         )
 
     @property
-    def inwards_single_property(self) -> ConnectionItemFList:
-        from ._connection_item_f import ConnectionItemF, ConnectionItemFList
+    def inwards_single_property(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
 
-        return ConnectionItemFList(
+        return ConnectionEdgeAList(
             [
                 item.inwards_single_property
                 for item in self.data
-                if isinstance(item.inwards_single_property, ConnectionItemF)
+                if isinstance(item.inwards_single_property, ConnectionEdgeA)
             ]
         )
 
@@ -531,14 +527,14 @@ class ConnectionItemEWriteList(DomainModelWriteList[ConnectionItemEWrite]):
         )
 
     @property
-    def inwards_single_property(self) -> ConnectionItemFWriteList:
-        from ._connection_item_f import ConnectionItemFWrite, ConnectionItemFWriteList
+    def inwards_single_property(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
 
-        return ConnectionItemFWriteList(
+        return ConnectionEdgeAWriteList(
             [
                 item.inwards_single_property
                 for item in self.data
-                if isinstance(item.inwards_single_property, ConnectionItemFWrite)
+                if isinstance(item.inwards_single_property, ConnectionEdgeAWrite)
             ]
         )
 
