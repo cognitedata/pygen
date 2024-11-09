@@ -168,3 +168,13 @@ def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) ->
     )
 
     assert len(result) == 2
+
+
+def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) -> None:
+    result = (
+        core_client.cognite_asset.query()
+        .space.equals(CORE_SDK.instance_space)
+        .parent.name.equals("230900")
+        .list_full(limit=-1)
+    )
+    assert len(result) == 2
