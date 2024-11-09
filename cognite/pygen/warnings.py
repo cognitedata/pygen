@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 
 from cognite.client.data_classes.data_modeling import ViewId
@@ -78,3 +79,18 @@ class InvalidCodeGenerated(PygenWarning, UserWarning):
 
     def __str__(self) -> str:
         return f"Invalid code generated in {self.filepath}. {self.error_message}"
+
+
+class PydanticNamespaceCollisionWarning(PygenWarning, UserWarning):
+    def __init__(self, view_id: ViewId, names: str) -> None:
+        self.view_id = view_id
+        self.names = names
+
+    def __str__(self) -> str:
+        return (
+            f"Field(s) {self.names} in view {self.view_id} has potential conflict "
+            "with protected Pydantic namespace 'model_'"
+        )
+
+
+def print_warnings(warning_list: list[warnings.WarningMessage], console: Callable[[str], None]) -> None: ...

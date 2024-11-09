@@ -23,7 +23,7 @@ from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.text import to_pascal, to_snake
-from cognite.pygen.warnings import InvalidCodeGenerated
+from cognite.pygen.warnings import InvalidCodeGenerated, print_warnings
 
 DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
@@ -122,7 +122,11 @@ def generate_sdk(
         logger,
         config or PygenConfig(),
     )
-    sdk = sdk_generator.generate_sdk()
+    with warnings.catch_warnings(record=True) as warning_logger:
+        sdk = sdk_generator.generate_sdk()
+    if warning_logger:
+        print_warnings(warning_logger, logger)
+
     if return_sdk_files:
         return sdk
     output_dir = output_dir or (Path.cwd() / Path(top_level_package.replace(".", "/")))

@@ -24,6 +24,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
+from cognite.pygen.warnings import PydanticNamespaceCollisionWarning
 
 from . import validation
 from .extract_query_code import get_classes_code
@@ -833,12 +834,7 @@ class APIGenerator:
 
         if self.data_class.has_any_field_model_prefix:
             names = ", ".join(field.name for field in self.data_class.fields if field.name.startswith("name"))
-            warnings.warn(
-                f"Field(s) {names} in view {self.view_id} has potential conflict with protected Pydantic "
-                "namespace 'model_'",
-                UserWarning,
-                stacklevel=2,
-            )
+            warnings.warn(PydanticNamespaceCollisionWarning(self.view_id, names), stacklevel=2)
 
         return (
             type_data.render(
