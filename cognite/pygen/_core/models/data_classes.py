@@ -341,6 +341,7 @@ class DataClass:
             if isinstance(field, BaseConnectionField)
             and not field.is_direct_relation_no_source
             and field.is_write_field
+            and field.linked_class.is_writable
         )
 
     @property
