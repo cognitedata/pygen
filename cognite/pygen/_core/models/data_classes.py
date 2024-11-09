@@ -333,6 +333,24 @@ class DataClass:
         )
 
     @property
+    def write_connection_fields_including_parents(self) -> Iterator[BaseConnectionField]:
+        """These fields are used when creating properties in the lists classes"""
+        return (
+            field
+            for field in self
+            if isinstance(field, BaseConnectionField)
+            and not field.is_direct_relation_no_source
+            and field.is_write_field
+        )
+
+    @property
+    def read_connection_fields_including_parents(self) -> Iterator[BaseConnectionField]:
+        """These fields are used when creating properties in the lists classes as well as querying"""
+        return (
+            field for field in self if isinstance(field, BaseConnectionField) and not field.is_direct_relation_no_source
+        )
+
+    @property
     def has_write_connection_fields(self) -> bool:
         """Check if the data class has any write connection fields."""
         return any(self.write_connection_fields)

@@ -56,7 +56,7 @@ from {{ top_level_package }}.data_classes._core import ({% if has_default_instan
 from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_dependencies_not_self %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
+    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.read_list_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}, {{ dependency_class.write_list_name }}{% endif %}{% endif %}{% endfor %}
 {% endif %}
 
 __all__ = [
@@ -487,13 +487,27 @@ class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}
             stacklevel=2,
         )
         return self.as_write()
-
+{% for field in data_class.read_connection_fields_including_parents %}
+    @property
+    def {{ field.name }}(self) -> {{ field.destination_class.read_list_name }}:{% if field.destination_class.file_name != data_class.file_name %}
+        from .{{ field.destination_class.file_name }} import {{ field.destination_class.read_name }}, {{ field.destination_class.read_list_name }}
+{% endif %}{% if field.is_one_to_one %}
+        return {{ field.destination_class.read_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.destination_class.read_name }})]){% else %}
+        return {{ field.destination_class.read_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.destination_class.read_name }})]){% endif %}
+{% endfor %}
 
 class {{ data_class.write_list_name }}(DomainModelWriteList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
-
+{% for field in data_class.write_connection_fields_including_parents %}
+    @property
+    def {{ field.name }}(self) -> {{ field.destination_class.write_list_name }}:{% if field.destination_class.file_name != data_class.file_name %}
+        from .{{ field.destination_class.file_name }} import {{ field.destination_class.write_name }}, {{ field.destination_class.write_list_name }}
+{% endif %}{% if field.is_one_to_one %}
+        return {{ field.destination_class.write_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.destination_class.write_name }})]){% else %}
+        return {{ field.destination_class.write_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.destination_class.write_name }})]){% endif %}
+{% endfor %}
 class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
 {% endif %}
