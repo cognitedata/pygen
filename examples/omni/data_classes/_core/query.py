@@ -177,7 +177,11 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
     def _create_query(
-        self, limit: int, result_list_cls: type[DomainModelList], return_step: Literal["first", "last"] | None = None, try_reverse: bool = False,
+        self,
+        limit: int,
+        result_list_cls: type[DomainModelList],
+        return_step: Literal["first", "last"] | None = None,
+        try_reverse: bool = False,
     ) -> DataClassQueryBuilder:
         builder = DataClassQueryBuilder(result_list_cls, return_step=return_step)
         from_: str | None = None
@@ -773,7 +777,12 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
     """This is a helper class to build and execute a query. It is responsible for
     doing the paging of the query and keeping track of the results."""
 
-    def __init__(self, result_cls: type[T_DomainModelList] | None, steps: Collection[QueryStep] | None = None, return_step: Literal["first", "last"] | None = None):
+    def __init__(
+        self,
+        result_cls: type[T_DomainModelList] | None,
+        steps: Collection[QueryStep] | None = None,
+        return_step: Literal["first", "last"] | None = None,
+    ):
         super().__init__(steps or [])
         self._result_list_cls = result_cls
         self._return_step: Literal["first", "last"] | None = return_step

@@ -161,12 +161,12 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
     def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
-        builder = self._create_query(limit, self._result_list_cls, try_reverse=True)
+        builder = self._create_query(limit, self._result_list_cls, return_step="first", try_reverse=True)
         builder.execute_query(self._client, remove_not_connected=True)
         return builder.unpack()
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
-        builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end))
+        builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
         for step in builder[:-1]:
             step.select = None
         builder.execute_query(self._client, remove_not_connected=False)
@@ -176,9 +176,13 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
 
     def _create_query(
-        self, limit: int, result_list_cls: type[DomainModelList], try_reverse: bool = False
+        self,
+        limit: int,
+        result_list_cls: type[DomainModelList],
+        return_step: Literal["first", "last"] | None = None,
+        try_reverse: bool = False,
     ) -> DataClassQueryBuilder:
-        builder = DataClassQueryBuilder(result_list_cls)
+        builder = DataClassQueryBuilder(result_list_cls, return_step=return_step)
         from_: str | None = None
         first: bool = True
         for item in self._creation_path:
@@ -769,10 +773,15 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
     """This is a helper class to build and execute a query. It is responsible for
     doing the paging of the query and keeping track of the results."""
 
-    def __init__(self, result_cls: type[T_DomainModelList] | None, steps: Collection[QueryStep] | None = None):
+    def __init__(
+        self,
+        result_cls: type[T_DomainModelList] | None,
+        steps: Collection[QueryStep] | None = None,
+        return_step: Literal["first", "last"] | None = None,
+    ):
         super().__init__(steps or [])
         self._result_list_cls = result_cls
-        self._return_step: Literal["first", "last"] = "first"
+        self._return_step: Literal["first", "last"] | None = return_step
 
     def unpack(self) -> T_DomainModelList:
         if self._result_list_cls is None:
@@ -824,18 +833,20 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
             if __object.from_ is not None:
                 raise ValueError("The first step should not have a 'from_' value")
             if self._result_list_cls is None:
-                self._return_step = "first"
+                if self._return_step is None:
+                    self._return_step = "first"
             else:
                 if not isinstance(__object, NodeQueryStep):
                     raise ValueError("The first step should be a NodeQueryStep")
                 # If the first step is a NodeQueryStep, and matches the instance
                 # in the result_list_cls we can return the result from the first step
                 # Alternative is result_cls is not set, then we also assume that the first step
-                if __object.result_cls is self._result_list_cls._INSTANCE:
-                    self._return_step = "first"
-                else:
-                    # If not, we assume that the last step is the one we want to return
-                    self._return_step = "last"
+                if self._return_step is None:
+                    if __object.result_cls is self._result_list_cls._INSTANCE:
+                        self._return_step = "first"
+                    else:
+                        # If not, we assume that the last step is the one we want to return
+                        self._return_step = "last"
         else:
             if __object.from_ is None:
                 raise ValueError("The 'from_' value should be set")
