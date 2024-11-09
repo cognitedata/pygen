@@ -38,7 +38,7 @@ def generate_sdks(
             if not example_sdk.client_name.casefold().startswith(sdk_name.casefold())
         )
     sdks = list(sdks_to_generate)
-    with Pool(min(6, len(sdks))) as pool:
+    with Pool(min(8, len(sdks))) as pool:
         pool.map(_generate_sdk, sdks)
 
     typer.echo("All SDKs Created!")
