@@ -36,7 +36,13 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
 
 
 __all__ = [
@@ -331,11 +337,37 @@ class ConnectionItemGList(DomainModelList[ConnectionItemG]):
         )
         return self.as_write()
 
+    @property
+    def inwards_multi_property(self) -> ConnectionItemFList:
+        from ._connection_item_f import ConnectionItemF, ConnectionItemFList
+
+        return ConnectionItemFList(
+            [
+                item
+                for items in self.data
+                for item in items.inwards_multi_property or []
+                if isinstance(item, ConnectionItemF)
+            ]
+        )
+
 
 class ConnectionItemGWriteList(DomainModelWriteList[ConnectionItemGWrite]):
     """List of connection item gs in the writing version."""
 
     _INSTANCE = ConnectionItemGWrite
+
+    @property
+    def inwards_multi_property(self) -> ConnectionItemFWriteList:
+        from ._connection_item_f import ConnectionItemFWrite, ConnectionItemFWriteList
+
+        return ConnectionItemFWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.inwards_multi_property or []
+                if isinstance(item, ConnectionItemFWrite)
+            ]
+        )
 
 
 class ConnectionItemGApplyList(ConnectionItemGWriteList): ...

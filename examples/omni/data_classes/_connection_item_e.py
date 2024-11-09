@@ -36,8 +36,24 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
-    from omni.data_classes._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
+    from omni.data_classes._connection_item_d import (
+        ConnectionItemD,
+        ConnectionItemDList,
+        ConnectionItemDGraphQL,
+        ConnectionItemDWrite,
+        ConnectionItemDWriteList,
+    )
+    from omni.data_classes._connection_item_f import (
+        ConnectionItemFList,
+        ConnectionItemFWriteList,
+    )
 
 
 __all__ = [
@@ -455,11 +471,76 @@ class ConnectionItemEList(DomainModelList[ConnectionItemE]):
         )
         return self.as_write()
 
+    @property
+    def direct_reverse_multi(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [
+                item
+                for items in self.data
+                for item in items.direct_reverse_multi or []
+                if isinstance(item, ConnectionItemD)
+            ]
+        )
+
+    @property
+    def direct_reverse_single(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [
+                item.direct_reverse_single
+                for item in self.data
+                if isinstance(item.direct_reverse_single, ConnectionItemD)
+            ]
+        )
+
+    @property
+    def inwards_single(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemD)]
+        )
+
+    @property
+    def inwards_single_property(self) -> ConnectionItemFList:
+        from ._connection_item_f import ConnectionItemF, ConnectionItemFList
+
+        return ConnectionItemFList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionItemF)
+            ]
+        )
+
 
 class ConnectionItemEWriteList(DomainModelWriteList[ConnectionItemEWrite]):
     """List of connection item es in the writing version."""
 
     _INSTANCE = ConnectionItemEWrite
+
+    @property
+    def inwards_single(self) -> ConnectionItemDWriteList:
+        from ._connection_item_d import ConnectionItemDWrite, ConnectionItemDWriteList
+
+        return ConnectionItemDWriteList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemDWrite)]
+        )
+
+    @property
+    def inwards_single_property(self) -> ConnectionItemFWriteList:
+        from ._connection_item_f import ConnectionItemFWrite, ConnectionItemFWriteList
+
+        return ConnectionItemFWriteList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionItemFWrite)
+            ]
+        )
 
 
 class ConnectionItemEApplyList(ConnectionItemEWriteList): ...

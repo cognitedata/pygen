@@ -402,17 +402,23 @@ class ConnectionItemAList(DomainModelList[ConnectionItemA]):
     def other_direct(self) -> ConnectionItemCNodeList:
         from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeList
 
-        return ConnectionItemCNodeList([item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNode)])
+        return ConnectionItemCNodeList(
+            [item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNode)]
+        )
 
     @property
     def outwards(self) -> ConnectionItemBList:
         from ._connection_item_b import ConnectionItemB, ConnectionItemBList
 
-        return ConnectionItemBList([item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemB)])
+        return ConnectionItemBList(
+            [item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemB)]
+        )
 
     @property
     def self_direct(self) -> ConnectionItemAList:
-        return ConnectionItemAList([item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemA)])
+        return ConnectionItemAList(
+            [item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemA)]
+        )
 
 
 class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
@@ -424,17 +430,23 @@ class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
     def other_direct(self) -> ConnectionItemCNodeWriteList:
         from ._connection_item_c_node import ConnectionItemCNodeWrite, ConnectionItemCNodeWriteList
 
-        return ConnectionItemCNodeWriteList([item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNodeWrite)])
+        return ConnectionItemCNodeWriteList(
+            [item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNodeWrite)]
+        )
 
     @property
     def outwards(self) -> ConnectionItemBWriteList:
         from ._connection_item_b import ConnectionItemBWrite, ConnectionItemBWriteList
 
-        return ConnectionItemBWriteList([item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemBWrite)])
+        return ConnectionItemBWriteList(
+            [item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemBWrite)]
+        )
 
     @property
     def self_direct(self) -> ConnectionItemAWriteList:
-        return ConnectionItemAWriteList([item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemAWrite)])
+        return ConnectionItemAWriteList(
+            [item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemAWrite)]
+        )
 
 
 class ConnectionItemAApplyList(ConnectionItemAWriteList): ...

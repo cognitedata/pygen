@@ -36,7 +36,13 @@ from equipment_unit.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from equipment_unit.data_classes._start_end_time import StartEndTime, StartEndTimeGraphQL, StartEndTimeWrite
+    from equipment_unit.data_classes._start_end_time import (
+        StartEndTime,
+        StartEndTimeList,
+        StartEndTimeGraphQL,
+        StartEndTimeWrite,
+        StartEndTimeWriteList,
+    )
 
 
 __all__ = [
@@ -354,11 +360,43 @@ class UnitProcedureList(DomainModelList[UnitProcedure]):
         )
         return self.as_write()
 
+    @property
+    def work_orders(self) -> WorkOrderList:
+        from ._work_order import WorkOrder, WorkOrderList
+
+        return WorkOrderList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, WorkOrder)]
+        )
+
+    @property
+    def work_units(self) -> EquipmentModuleList:
+        from ._equipment_module import EquipmentModule, EquipmentModuleList
+
+        return EquipmentModuleList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, EquipmentModule)]
+        )
+
 
 class UnitProcedureWriteList(DomainModelWriteList[UnitProcedureWrite]):
     """List of unit procedures in the writing version."""
 
     _INSTANCE = UnitProcedureWrite
+
+    @property
+    def work_orders(self) -> WorkOrderWriteList:
+        from ._work_order import WorkOrderWrite, WorkOrderWriteList
+
+        return WorkOrderWriteList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, WorkOrderWrite)]
+        )
+
+    @property
+    def work_units(self) -> EquipmentModuleWriteList:
+        from ._equipment_module import EquipmentModuleWrite, EquipmentModuleWriteList
+
+        return EquipmentModuleWriteList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, EquipmentModuleWrite)]
+        )
 
 
 class UnitProcedureApplyList(UnitProcedureWriteList): ...

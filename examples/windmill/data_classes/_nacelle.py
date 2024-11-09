@@ -46,11 +46,35 @@ from windmill.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from windmill.data_classes._gearbox import Gearbox, GearboxGraphQL, GearboxWrite
-    from windmill.data_classes._generator import Generator, GeneratorGraphQL, GeneratorWrite
-    from windmill.data_classes._high_speed_shaft import HighSpeedShaft, HighSpeedShaftGraphQL, HighSpeedShaftWrite
-    from windmill.data_classes._main_shaft import MainShaft, MainShaftGraphQL, MainShaftWrite
-    from windmill.data_classes._power_inverter import PowerInverter, PowerInverterGraphQL, PowerInverterWrite
+    from windmill.data_classes._gearbox import Gearbox, GearboxList, GearboxGraphQL, GearboxWrite, GearboxWriteList
+    from windmill.data_classes._generator import (
+        Generator,
+        GeneratorList,
+        GeneratorGraphQL,
+        GeneratorWrite,
+        GeneratorWriteList,
+    )
+    from windmill.data_classes._high_speed_shaft import (
+        HighSpeedShaft,
+        HighSpeedShaftList,
+        HighSpeedShaftGraphQL,
+        HighSpeedShaftWrite,
+        HighSpeedShaftWriteList,
+    )
+    from windmill.data_classes._main_shaft import (
+        MainShaft,
+        MainShaftList,
+        MainShaftGraphQL,
+        MainShaftWrite,
+        MainShaftWriteList,
+    )
+    from windmill.data_classes._power_inverter import (
+        PowerInverter,
+        PowerInverterList,
+        PowerInverterGraphQL,
+        PowerInverterWrite,
+        PowerInverterWriteList,
+    )
 
 
 __all__ = [
@@ -539,11 +563,81 @@ class NacelleList(DomainModelList[Nacelle]):
         )
         return self.as_write()
 
+    @property
+    def gearbox(self) -> GearboxList:
+        from ._gearbox import Gearbox, GearboxList
+
+        return GearboxList([item.gearbox for item in self.data if isinstance(item.gearbox, Gearbox)])
+
+    @property
+    def generator(self) -> GeneratorList:
+        from ._generator import Generator, GeneratorList
+
+        return GeneratorList([item.generator for item in self.data if isinstance(item.generator, Generator)])
+
+    @property
+    def high_speed_shaft(self) -> HighSpeedShaftList:
+        from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftList
+
+        return HighSpeedShaftList(
+            [item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaft)]
+        )
+
+    @property
+    def main_shaft(self) -> MainShaftList:
+        from ._main_shaft import MainShaft, MainShaftList
+
+        return MainShaftList([item.main_shaft for item in self.data if isinstance(item.main_shaft, MainShaft)])
+
+    @property
+    def power_inverter(self) -> PowerInverterList:
+        from ._power_inverter import PowerInverter, PowerInverterList
+
+        return PowerInverterList(
+            [item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverter)]
+        )
+
 
 class NacelleWriteList(DomainModelWriteList[NacelleWrite]):
     """List of nacelles in the writing version."""
 
     _INSTANCE = NacelleWrite
+
+    @property
+    def gearbox(self) -> GearboxWriteList:
+        from ._gearbox import GearboxWrite, GearboxWriteList
+
+        return GearboxWriteList([item.gearbox for item in self.data if isinstance(item.gearbox, GearboxWrite)])
+
+    @property
+    def generator(self) -> GeneratorWriteList:
+        from ._generator import GeneratorWrite, GeneratorWriteList
+
+        return GeneratorWriteList([item.generator for item in self.data if isinstance(item.generator, GeneratorWrite)])
+
+    @property
+    def high_speed_shaft(self) -> HighSpeedShaftWriteList:
+        from ._high_speed_shaft import HighSpeedShaftWrite, HighSpeedShaftWriteList
+
+        return HighSpeedShaftWriteList(
+            [item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaftWrite)]
+        )
+
+    @property
+    def main_shaft(self) -> MainShaftWriteList:
+        from ._main_shaft import MainShaftWrite, MainShaftWriteList
+
+        return MainShaftWriteList(
+            [item.main_shaft for item in self.data if isinstance(item.main_shaft, MainShaftWrite)]
+        )
+
+    @property
+    def power_inverter(self) -> PowerInverterWriteList:
+        from ._power_inverter import PowerInverterWrite, PowerInverterWriteList
+
+        return PowerInverterWriteList(
+            [item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverterWrite)]
+        )
 
 
 class NacelleApplyList(NacelleWriteList): ...

@@ -36,8 +36,20 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
-    from omni.data_classes._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
+    from omni.data_classes._connection_item_d import (
+        ConnectionItemD,
+        ConnectionItemDList,
+        ConnectionItemDGraphQL,
+        ConnectionItemDWrite,
+        ConnectionItemDWriteList,
+    )
 
 
 __all__ = [
@@ -406,11 +418,64 @@ class ConnectionItemFList(DomainModelList[ConnectionItemF]):
         )
         return self.as_write()
 
+    @property
+    def direct_list(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [item for items in self.data for item in items.direct_list or [] if isinstance(item, ConnectionItemD)]
+        )
+
+    @property
+    def outwards_multi(self) -> ConnectionItemGList:
+        from ._connection_item_g import ConnectionItemG, ConnectionItemGList
+
+        return ConnectionItemGList(
+            [item for items in self.data for item in items.outwards_multi or [] if isinstance(item, ConnectionItemG)]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionItemEList:
+        from ._connection_item_e import ConnectionItemE, ConnectionItemEList
+
+        return ConnectionItemEList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemE)]
+        )
+
 
 class ConnectionItemFWriteList(DomainModelWriteList[ConnectionItemFWrite]):
     """List of connection item fs in the writing version."""
 
     _INSTANCE = ConnectionItemFWrite
+
+    @property
+    def direct_list(self) -> ConnectionItemDWriteList:
+        from ._connection_item_d import ConnectionItemDWrite, ConnectionItemDWriteList
+
+        return ConnectionItemDWriteList(
+            [item for items in self.data for item in items.direct_list or [] if isinstance(item, ConnectionItemDWrite)]
+        )
+
+    @property
+    def outwards_multi(self) -> ConnectionItemGWriteList:
+        from ._connection_item_g import ConnectionItemGWrite, ConnectionItemGWriteList
+
+        return ConnectionItemGWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.outwards_multi or []
+                if isinstance(item, ConnectionItemGWrite)
+            ]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionItemEWriteList:
+        from ._connection_item_e import ConnectionItemEWrite, ConnectionItemEWriteList
+
+        return ConnectionItemEWriteList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemEWrite)]
+        )
 
 
 class ConnectionItemFApplyList(ConnectionItemFWriteList): ...

@@ -38,6 +38,7 @@ from omni.data_classes._core import (
 if TYPE_CHECKING:
     from omni.data_classes._implementation_1_non_writeable import (
         Implementation1NonWriteable,
+        Implementation1NonWriteableList,
         Implementation1NonWriteableGraphQL,
     )
 
@@ -330,11 +331,40 @@ class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
         )
         return self.as_write()
 
+    @property
+    def to_non_writable(self) -> Implementation1NonWriteableList:
+        from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableList
+
+        return Implementation1NonWriteableList(
+            [
+                item
+                for items in self.data
+                for item in items.to_non_writable or []
+                if isinstance(item, Implementation1NonWriteable)
+            ]
+        )
+
 
 class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritableWrite]):
     """List of dependent on non writables in the writing version."""
 
     _INSTANCE = DependentOnNonWritableWrite
+
+    @property
+    def to_non_writable(self) -> Implementation1NonWriteableWriteList:
+        from ._implementation_1_non_writeable import (
+            Implementation1NonWriteableWrite,
+            Implementation1NonWriteableWriteList,
+        )
+
+        return Implementation1NonWriteableWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.to_non_writable or []
+                if isinstance(item, Implementation1NonWriteableWrite)
+            ]
+        )
 
 
 class DependentOnNonWritableApplyList(DependentOnNonWritableWriteList): ...

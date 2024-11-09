@@ -37,10 +37,10 @@ from windmill.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from windmill.data_classes._blade import Blade, BladeGraphQL, BladeWrite
-    from windmill.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
-    from windmill.data_classes._nacelle import Nacelle, NacelleGraphQL, NacelleWrite
-    from windmill.data_classes._rotor import Rotor, RotorGraphQL, RotorWrite
+    from windmill.data_classes._blade import Blade, BladeList, BladeGraphQL, BladeWrite, BladeWriteList
+    from windmill.data_classes._metmast import Metmast, MetmastList, MetmastGraphQL, MetmastWrite, MetmastWriteList
+    from windmill.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
+    from windmill.data_classes._rotor import Rotor, RotorList, RotorGraphQL, RotorWrite, RotorWriteList
 
 
 __all__ = [
@@ -428,11 +428,63 @@ class WindmillList(DomainModelList[Windmill]):
         )
         return self.as_write()
 
+    @property
+    def blades(self) -> BladeList:
+        from ._blade import Blade, BladeList
+
+        return BladeList([item for items in self.data for item in items.blades or [] if isinstance(item, Blade)])
+
+    @property
+    def metmast(self) -> MetmastList:
+        from ._metmast import Metmast, MetmastList
+
+        return MetmastList([item for items in self.data for item in items.metmast or [] if isinstance(item, Metmast)])
+
+    @property
+    def nacelle(self) -> NacelleList:
+        from ._nacelle import Nacelle, NacelleList
+
+        return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
+
+    @property
+    def rotor(self) -> RotorList:
+        from ._rotor import Rotor, RotorList
+
+        return RotorList([item.rotor for item in self.data if isinstance(item.rotor, Rotor)])
+
 
 class WindmillWriteList(DomainModelWriteList[WindmillWrite]):
     """List of windmills in the writing version."""
 
     _INSTANCE = WindmillWrite
+
+    @property
+    def blades(self) -> BladeWriteList:
+        from ._blade import BladeWrite, BladeWriteList
+
+        return BladeWriteList(
+            [item for items in self.data for item in items.blades or [] if isinstance(item, BladeWrite)]
+        )
+
+    @property
+    def metmast(self) -> MetmastWriteList:
+        from ._metmast import MetmastWrite, MetmastWriteList
+
+        return MetmastWriteList(
+            [item for items in self.data for item in items.metmast or [] if isinstance(item, MetmastWrite)]
+        )
+
+    @property
+    def nacelle(self) -> NacelleWriteList:
+        from ._nacelle import NacelleWrite, NacelleWriteList
+
+        return NacelleWriteList([item.nacelle for item in self.data if isinstance(item.nacelle, NacelleWrite)])
+
+    @property
+    def rotor(self) -> RotorWriteList:
+        from ._rotor import RotorWrite, RotorWriteList
+
+        return RotorWriteList([item.rotor for item in self.data if isinstance(item.rotor, RotorWrite)])
 
 
 class WindmillApplyList(WindmillWriteList): ...
