@@ -36,11 +36,13 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite, ConnectionItemBList, ConnectionItemBWriteList
     from omni.data_classes._connection_item_c_node import (
         ConnectionItemCNode,
         ConnectionItemCNodeGraphQL,
         ConnectionItemCNodeWrite,
+        ConnectionItemCNodeList,
+        ConnectionItemCNodeWriteList,
     )
 
 
@@ -390,11 +392,43 @@ class ConnectionItemAList(DomainModelList[ConnectionItemA]):
         )
         return self.as_write()
 
+    @property
+    def other_direct(self) -> ConnectionItemCNodeList:
+        from ._connection_item_c_node import ConnectionItemCNodeList, ConnectionItemCNode
+
+        return ConnectionItemCNodeList([node.other_direct for node in self.data if isinstance(node.other_direct, ConnectionItemCNode)])
+
+    @property
+    def outwards(self) -> ConnectionItemBList:
+        from ._connection_item_b import ConnectionItemBList, ConnectionItemB
+
+        return ConnectionItemBList([item for node in self.data for item in node.outwards or [] if isinstance(item, ConnectionItemB)])
+
+    @property
+    def self_direct(self) -> ConnectionItemAList:
+        return ConnectionItemAList([node.self_direct for node in self.data if isinstance(node.self_direct, ConnectionItemA)])
+
 
 class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
     """List of connection item as in the writing version."""
 
     _INSTANCE = ConnectionItemAWrite
+
+    @property
+    def other_direct(self) -> ConnectionItemCNodeWriteList:
+        from ._connection_item_c_node import ConnectionItemCNodeWriteList
+
+        return ConnectionItemCNodeWriteList([node.other_direct for node in self.data if isinstance(node.other_direct, ConnectionItemCNodeWrite)])
+
+    @property
+    def outwards(self) -> ConnectionItemBWriteList:
+        from ._connection_item_b import ConnectionItemBWriteList
+
+        return ConnectionItemBWriteList([item for node in self.data for item in node.outwards or [] if isinstance(item, ConnectionItemBWrite)])
+
+    @property
+    def self_direct(self) -> ConnectionItemAWriteList:
+        return ConnectionItemAWriteList([node.self_direct for node in self.data if isinstance(node.self_direct, ConnectionItemAWrite)])
 
 
 class ConnectionItemAApplyList(ConnectionItemAWriteList): ...
