@@ -12,6 +12,7 @@ variables:
         pygen_models_space: sp_pygen_models
         pygen_power: sp_pygen_power
         pygen_other_models_space: sp_pygen_models_other
+
       cdf_idm_extension:
         organization: YourOrg
         schema_space: sp_enterprise_min_schema_idm
@@ -96,3 +97,28 @@ variables:
         rawSourceDatabase: ingestion
         schemaSpace: cdf_cdm
         instanceSpace: springfield_instances
+
+    contextualization:
+      cdf_connection_sql:
+        activityToAssetTransformationExternalId: activity_to_asset
+        activityToEquipmentTransformationExternalId: activity_to_equipment
+        activityToTimeSeriesTransformationExternalId: activity_to_timeseries
+        timeSeriesToAssetTransformationExternalId: timeseries_to_asset
+        timeSeriesToEquipmentTransformationExternalId: timeseries_to_equipment
+        dataset: ingestion
+        instanceSpace: springfield_instances
+        schemaSpace: cdf_cdm
+
+      cdf_p_and_id_parser:
+        contextualizationId: p_and_id_parser
+        contextualizationName: P&ID Parser
+        annotatorJob: ctx_files_pandid_annotater
+        directRelationJob: ctx_files_direct_relation_write
+        dataset: ingestion
+        rawStateDatabase: contextualizationState
+        rawStateTable: diagramParsing
+        schemaSpace: cdf_cdm
+        annotationSpace: springfield_instances
+        instanceSpaces:
+        - springfield_instances
+
