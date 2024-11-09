@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import itertools
 import warnings
 from collections.abc import Callable
 from pathlib import Path
+from typing import Literal
 
 from cognite.client.data_classes.data_modeling import ViewId
 
@@ -10,24 +12,42 @@ from cognite.client.data_classes.data_modeling import ViewId
 class PygenWarning(UserWarning):
     """Base class for warnings in pygen."""
 
-    ...
-
-
-class NameCollisionWarning(PygenWarning, RuntimeWarning):
-    @classmethod
-    def create(cls, word: str, view_id: ViewId | None, property_name: str | None) -> NameCollisionWarning:
-        if view_id and property_name:
-            return ViewPropertyNameCollisionWarning(view_id, property_name, word)
-        elif view_id:
-            return ViewNameCollisionWarning(view_id, word)
-        else:
-            return ParameterNameCollisionWarning(word)
-
     def warn(self):
         warnings.warn(self, stacklevel=2)
 
 
-class ViewNameCollisionWarning(NameCollisionWarning):
+class NameCollisionWarning(PygenWarning, RuntimeWarning):
+    @classmethod
+    def create(
+        cls,
+        word: str,
+        word_type: Literal["field", "data class", "parameter", "filename"],
+        view_id: ViewId | None,
+        property_name: str | None,
+    ) -> NameCollisionWarning:
+        if view_id and property_name:
+            return ViewPropertyNameCollisionWarning(view_id, property_name, word)
+        elif view_id and word_type == "filename":
+            return NameCollisionFileNameWarning(view_id, word)
+        elif view_id and word_type == "data class":
+            return NameCollisionDataClassNameWarning(view_id, word)
+        else:
+            return ParameterNameCollisionWarning(word)
+
+
+class NameCollisionFileNameWarning(NameCollisionWarning):
+    def __init__(self, view_id: ViewId, word: str):
+        self.view_id = view_id
+        self.word = word
+
+    def __str__(self) -> str:
+        return (
+            f"Name collision detected in {self.view_id}: {self.word!r}. "
+            f"An underscore will be added to the {self.word!r} to avoid name collision."
+        )
+
+
+class NameCollisionDataClassNameWarning(NameCollisionWarning):
     def __init__(self, view_id: ViewId, word: str):
         self.view_id = view_id
         self.word = word
@@ -93,4 +113,24 @@ class PydanticNamespaceCollisionWarning(PygenWarning, UserWarning):
         )
 
 
-def print_warnings(warning_list: list[warnings.WarningMessage], console: Callable[[str], None]) -> None: ...
+def print_warnings(warning_list: list[warnings.WarningMessage], console: Callable[[str], None]) -> None:
+    for group, group_warnings in itertools.groupby(
+        sorted(warning_list, key=lambda w: w.category),  # type: ignore[arg-type, return-value]
+        key=lambda w: w.category,
+    ):
+        group_list = [w.message for w in group_warnings if isinstance(w.message, PygenWarning)]
+        _print_warning(group_list, group, console)
+
+
+def _print_warning(
+    pygen_warnings: list[PygenWarning], group: type[PygenWarning], console: Callable[[str], None]
+) -> None:
+    if group is PydanticNamespaceCollisionWarning:
+        return
+    if group is InvalidCodeGenerated:
+        _print_one_by_one(console, *pygen_warnings)
+
+
+def _print_one_by_one(console: Callable[[str], None], *warning_list) -> None:
+    for warning in warning_list:
+        console(f"{warning!s}")
