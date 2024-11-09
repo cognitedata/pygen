@@ -41,6 +41,9 @@ nav:
         - Filtering: config/filtering_methods.md
     - Example SDK Docs:
         - Home: example_docs/index.md
+        - CogniteCore Client: example_docs/core_client.md
+        -  APIs: example_docs/core_apis.md
+        - CogniteCore Data Classes: example_docs/core_data_classes.md
         - Omni Client: example_docs/omni_client.md
         - Omni APIs: example_docs/omni_apis.md
         - Omni Data Classes: example_docs/omni_data_classes.md
