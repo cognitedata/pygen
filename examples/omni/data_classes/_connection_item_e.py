@@ -36,8 +36,20 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
-    from omni.data_classes._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
+    from omni.data_classes._connection_item_d import (
+        ConnectionItemD,
+        ConnectionItemDList,
+        ConnectionItemDGraphQL,
+        ConnectionItemDWrite,
+        ConnectionItemDWriteList,
+    )
 
 
 __all__ = [
@@ -455,11 +467,76 @@ class ConnectionItemEList(DomainModelList[ConnectionItemE]):
         )
         return self.as_write()
 
+    @property
+    def direct_reverse_multi(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [
+                item
+                for items in self.data
+                for item in items.direct_reverse_multi or []
+                if isinstance(item, ConnectionItemD)
+            ]
+        )
+
+    @property
+    def direct_reverse_single(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [
+                item.direct_reverse_single
+                for item in self.data
+                if isinstance(item.direct_reverse_single, ConnectionItemD)
+            ]
+        )
+
+    @property
+    def inwards_single(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemD)]
+        )
+
+    @property
+    def inwards_single_property(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
+
+        return ConnectionEdgeAList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionEdgeA)
+            ]
+        )
+
 
 class ConnectionItemEWriteList(DomainModelWriteList[ConnectionItemEWrite]):
     """List of connection item es in the writing version."""
 
     _INSTANCE = ConnectionItemEWrite
+
+    @property
+    def inwards_single(self) -> ConnectionItemDWriteList:
+        from ._connection_item_d import ConnectionItemDWrite, ConnectionItemDWriteList
+
+        return ConnectionItemDWriteList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemDWrite)]
+        )
+
+    @property
+    def inwards_single_property(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
+
+        return ConnectionEdgeAWriteList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionEdgeAWrite)
+            ]
+        )
 
 
 class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
@@ -547,7 +624,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             reverse_expression,
         )
 
-        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemDQuery not in created_types:
             self.direct_reverse_multi = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -561,7 +638,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_type="reverse-list",
             )
 
-        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemDQuery not in created_types:
             self.direct_reverse_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -574,7 +651,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_name="direct_reverse_single",
             )
 
-        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemDQuery not in created_types:
             self.inwards_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -587,7 +664,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_name="inwards_single",
             )
 
-        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionEdgeAQuery not in created_types:
             self.inwards_single_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

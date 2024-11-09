@@ -36,7 +36,13 @@ from equipment_unit.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from equipment_unit.data_classes._start_end_time import StartEndTime, StartEndTimeGraphQL, StartEndTimeWrite
+    from equipment_unit.data_classes._start_end_time import (
+        StartEndTime,
+        StartEndTimeList,
+        StartEndTimeGraphQL,
+        StartEndTimeWrite,
+        StartEndTimeWriteList,
+    )
 
 
 __all__ = [
@@ -354,11 +360,43 @@ class UnitProcedureList(DomainModelList[UnitProcedure]):
         )
         return self.as_write()
 
+    @property
+    def work_orders(self) -> StartEndTimeList:
+        from ._start_end_time import StartEndTime, StartEndTimeList
+
+        return StartEndTimeList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, StartEndTime)]
+        )
+
+    @property
+    def work_units(self) -> StartEndTimeList:
+        from ._start_end_time import StartEndTime, StartEndTimeList
+
+        return StartEndTimeList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, StartEndTime)]
+        )
+
 
 class UnitProcedureWriteList(DomainModelWriteList[UnitProcedureWrite]):
     """List of unit procedures in the writing version."""
 
     _INSTANCE = UnitProcedureWrite
+
+    @property
+    def work_orders(self) -> StartEndTimeWriteList:
+        from ._start_end_time import StartEndTimeWrite, StartEndTimeWriteList
+
+        return StartEndTimeWriteList(
+            [item for items in self.data for item in items.work_orders or [] if isinstance(item, StartEndTimeWrite)]
+        )
+
+    @property
+    def work_units(self) -> StartEndTimeWriteList:
+        from ._start_end_time import StartEndTimeWrite, StartEndTimeWriteList
+
+        return StartEndTimeWriteList(
+            [item for items in self.data for item in items.work_units or [] if isinstance(item, StartEndTimeWrite)]
+        )
 
 
 class UnitProcedureApplyList(UnitProcedureWriteList): ...
@@ -430,7 +468,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             reverse_expression,
         )
 
-        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
+        if _StartEndTimeQuery not in created_types:
             self.work_orders = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -444,7 +482,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 connection_name="work_orders",
             )
 
-        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
+        if _StartEndTimeQuery not in created_types:
             self.work_units = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,

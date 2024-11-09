@@ -480,7 +480,6 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             filter_,
         )
 
-    @property
     def query(self) -> WorkOrderQuery:
         """Start a query for work orders."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -616,7 +616,6 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             filter_,
         )
 
-    @property
     def query(self) -> EmptyQuery:
         """Start a query for empties."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

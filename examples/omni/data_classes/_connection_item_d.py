@@ -36,7 +36,13 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+    from omni.data_classes._connection_item_e import (
+        ConnectionItemE,
+        ConnectionItemEList,
+        ConnectionItemEGraphQL,
+        ConnectionItemEWrite,
+        ConnectionItemEWriteList,
+    )
 
 
 __all__ = [
@@ -415,11 +421,59 @@ class ConnectionItemDList(DomainModelList[ConnectionItemD]):
         )
         return self.as_write()
 
+    @property
+    def direct_multi(self) -> ConnectionItemEList:
+        from ._connection_item_e import ConnectionItemE, ConnectionItemEList
+
+        return ConnectionItemEList(
+            [item for items in self.data for item in items.direct_multi or [] if isinstance(item, ConnectionItemE)]
+        )
+
+    @property
+    def direct_single(self) -> ConnectionItemEList:
+        from ._connection_item_e import ConnectionItemE, ConnectionItemEList
+
+        return ConnectionItemEList(
+            [item.direct_single for item in self.data if isinstance(item.direct_single, ConnectionItemE)]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionItemEList:
+        from ._connection_item_e import ConnectionItemE, ConnectionItemEList
+
+        return ConnectionItemEList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemE)]
+        )
+
 
 class ConnectionItemDWriteList(DomainModelWriteList[ConnectionItemDWrite]):
     """List of connection item ds in the writing version."""
 
     _INSTANCE = ConnectionItemDWrite
+
+    @property
+    def direct_multi(self) -> ConnectionItemEWriteList:
+        from ._connection_item_e import ConnectionItemEWrite, ConnectionItemEWriteList
+
+        return ConnectionItemEWriteList(
+            [item for items in self.data for item in items.direct_multi or [] if isinstance(item, ConnectionItemEWrite)]
+        )
+
+    @property
+    def direct_single(self) -> ConnectionItemEWriteList:
+        from ._connection_item_e import ConnectionItemEWrite, ConnectionItemEWriteList
+
+        return ConnectionItemEWriteList(
+            [item.direct_single for item in self.data if isinstance(item.direct_single, ConnectionItemEWrite)]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionItemEWriteList:
+        from ._connection_item_e import ConnectionItemEWrite, ConnectionItemEWriteList
+
+        return ConnectionItemEWriteList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemEWrite)]
+        )
 
 
 class ConnectionItemDApplyList(ConnectionItemDWriteList): ...
@@ -527,7 +581,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             reverse_expression,
         )
 
-        if _ConnectionItemEQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemEQuery not in created_types:
             self.direct_multi = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -540,7 +594,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_name="direct_multi",
             )
 
-        if _ConnectionItemEQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemEQuery not in created_types:
             self.direct_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -553,7 +607,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_name="direct_single",
             )
 
-        if _ConnectionItemEQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemEQuery not in created_types:
             self.outwards_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,

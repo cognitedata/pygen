@@ -3,6 +3,7 @@
 import re
 from collections import defaultdict
 from datetime import datetime
+from multiprocessing import Pool
 from typing import TypeVar
 
 import toml
@@ -14,7 +15,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
 from cognite.pygen.utils import MockGenerator
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
+from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
 
 app = typer.Typer(
     add_completion=False,
@@ -29,43 +30,51 @@ app = typer.Typer(
 def generate_sdks(
     sdk_name: str = typer.Option(None, "--sdk", help="Generate only the specified SDK"),
 ):
-    for example_sdk in EXAMPLE_SDKS:
-        if not example_sdk.generate_sdk:
-            continue
-        if sdk_name is not None and not example_sdk.client_name.casefold().startswith(sdk_name.casefold()):
-            continue
-        typer.echo(f"Generating {example_sdk.client_name} SDK...")
-        data_models = example_sdk.load_data_models()
-        if len(data_models) == 1:
-            data_models = data_models[0]
-
-        if example_sdk.is_typed:
-            output_file = example_sdk.client_dir / "typed.py"
-            include_views = {dm.ViewId(data_models.space, t, "1") for t in example_sdk.typed_classes} or None
-            generate_typed(data_models, output_file, include_views=include_views, implements="composition")
-            continue
-
-        sdk_generator = SDKGenerator(
-            example_sdk.top_level_package,
-            example_sdk.client_name,
-            data_models,
-            logger=typer.echo,
-            default_instance_space=example_sdk.instance_space,
+    sdks_to_generate = (example_sdk for example_sdk in EXAMPLE_SDKS if example_sdk.generate_sdk)
+    if sdk_name is not None:
+        sdks_to_generate = (
+            example_sdk
+            for example_sdk in sdks_to_generate
+            if not example_sdk.client_name.casefold().startswith(sdk_name.casefold())
         )
-
-        sdk = sdk_generator.generate_sdk()
-        write_sdk_to_disk(
-            sdk,
-            example_sdk.client_dir,
-            overwrite=True,
-            logger=print,
-            format_code=True,
-        )
-        typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
-        typer.echo("All files updated! Including files assumed to be manually maintained.")
-        typer.echo("\n")
+    sdks = list(sdks_to_generate)
+    with Pool(min(8, len(sdks))) as pool:
+        pool.map(_generate_sdk, sdks)
 
     typer.echo("All SDKs Created!")
+
+
+def _generate_sdk(example_sdk: ExampleSDK) -> None:
+    typer.echo(f"Generating {example_sdk.client_name} SDK...")
+    data_models = example_sdk.load_data_models()
+    if len(data_models) == 1:
+        data_models = data_models[0]
+
+    if example_sdk.is_typed:
+        output_file = example_sdk.client_dir / "typed.py"
+        include_views = {dm.ViewId(data_models.space, t, "1") for t in example_sdk.typed_classes} or None
+        generate_typed(data_models, output_file, include_views=include_views, implements="composition")
+        return
+
+    sdk_generator = SDKGenerator(
+        example_sdk.top_level_package,
+        example_sdk.client_name,
+        data_models,
+        logger=typer.echo,
+        default_instance_space=example_sdk.instance_space,
+    )
+
+    sdk = sdk_generator.generate_sdk()
+    write_sdk_to_disk(
+        sdk,
+        example_sdk.client_dir,
+        overwrite=True,
+        logger=print,
+        format_code=True,
+    )
+    typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
+    typer.echo("All files updated! Including files assumed to be manually maintained.")
+    typer.echo("\n")
 
 
 @app.command("download", help="Download the DMS representation of all example SDKs")

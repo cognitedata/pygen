@@ -618,7 +618,6 @@ class PrimitiveNullableAPI(
             filter_,
         )
 
-    @property
     def query(self) -> PrimitiveNullableQuery:
         """Start a query for primitive nullables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

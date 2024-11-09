@@ -36,8 +36,20 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
-    from omni.data_classes._connection_item_d import ConnectionItemD, ConnectionItemDGraphQL, ConnectionItemDWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
+    from omni.data_classes._connection_item_d import (
+        ConnectionItemD,
+        ConnectionItemDList,
+        ConnectionItemDGraphQL,
+        ConnectionItemDWrite,
+        ConnectionItemDWriteList,
+    )
 
 
 __all__ = [
@@ -406,11 +418,64 @@ class ConnectionItemFList(DomainModelList[ConnectionItemF]):
         )
         return self.as_write()
 
+    @property
+    def direct_list(self) -> ConnectionItemDList:
+        from ._connection_item_d import ConnectionItemD, ConnectionItemDList
+
+        return ConnectionItemDList(
+            [item for items in self.data for item in items.direct_list or [] if isinstance(item, ConnectionItemD)]
+        )
+
+    @property
+    def outwards_multi(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
+
+        return ConnectionEdgeAList(
+            [item for items in self.data for item in items.outwards_multi or [] if isinstance(item, ConnectionEdgeA)]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
+
+        return ConnectionEdgeAList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionEdgeA)]
+        )
+
 
 class ConnectionItemFWriteList(DomainModelWriteList[ConnectionItemFWrite]):
     """List of connection item fs in the writing version."""
 
     _INSTANCE = ConnectionItemFWrite
+
+    @property
+    def direct_list(self) -> ConnectionItemDWriteList:
+        from ._connection_item_d import ConnectionItemDWrite, ConnectionItemDWriteList
+
+        return ConnectionItemDWriteList(
+            [item for items in self.data for item in items.direct_list or [] if isinstance(item, ConnectionItemDWrite)]
+        )
+
+    @property
+    def outwards_multi(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
+
+        return ConnectionEdgeAWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.outwards_multi or []
+                if isinstance(item, ConnectionEdgeAWrite)
+            ]
+        )
+
+    @property
+    def outwards_single(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
+
+        return ConnectionEdgeAWriteList(
+            [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionEdgeAWrite)]
+        )
 
 
 class ConnectionItemFApplyList(ConnectionItemFWriteList): ...
@@ -496,7 +561,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             reverse_expression,
         )
 
-        if _ConnectionItemDQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemDQuery not in created_types:
             self.direct_list = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -509,7 +574,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 connection_name="direct_list",
             )
 
-        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionEdgeAQuery not in created_types:
             self.outwards_multi = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -523,7 +588,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 connection_name="outwards_multi",
             )
 
-        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionEdgeAQuery not in created_types:
             self.outwards_single = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -383,7 +383,6 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             filter_,
         )
 
-    @property
     def query(self) -> HighSpeedShaftQuery:
         """Start a query for high speed shafts."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

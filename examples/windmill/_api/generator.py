@@ -381,7 +381,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
             filter_,
         )
 
-    @property
     def query(self) -> GeneratorQuery:
         """Start a query for generators."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

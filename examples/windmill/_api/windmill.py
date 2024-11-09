@@ -641,7 +641,6 @@ class WindmillAPI(NodeAPI[Windmill, WindmillWrite, WindmillList, WindmillWriteLi
             filter_,
         )
 
-    @property
     def query(self) -> WindmillQuery:
         """Start a query for windmills."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -36,7 +36,13 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
 
 
 __all__ = [
@@ -331,11 +337,37 @@ class ConnectionItemGList(DomainModelList[ConnectionItemG]):
         )
         return self.as_write()
 
+    @property
+    def inwards_multi_property(self) -> ConnectionEdgeAList:
+        from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
+
+        return ConnectionEdgeAList(
+            [
+                item
+                for items in self.data
+                for item in items.inwards_multi_property or []
+                if isinstance(item, ConnectionEdgeA)
+            ]
+        )
+
 
 class ConnectionItemGWriteList(DomainModelWriteList[ConnectionItemGWrite]):
     """List of connection item gs in the writing version."""
 
     _INSTANCE = ConnectionItemGWrite
+
+    @property
+    def inwards_multi_property(self) -> ConnectionEdgeAWriteList:
+        from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
+
+        return ConnectionEdgeAWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.inwards_multi_property or []
+                if isinstance(item, ConnectionEdgeAWrite)
+            ]
+        )
 
 
 class ConnectionItemGApplyList(ConnectionItemGWriteList): ...
@@ -398,7 +430,7 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             reverse_expression,
         )
 
-        if _ConnectionEdgeAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionEdgeAQuery not in created_types:
             self.inwards_multi_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

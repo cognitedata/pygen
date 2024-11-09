@@ -35,7 +35,13 @@ from omni_sub.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni_sub.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from omni_sub.data_classes._connection_item_a import (
+        ConnectionItemA,
+        ConnectionItemAList,
+        ConnectionItemAGraphQL,
+        ConnectionItemAWrite,
+        ConnectionItemAWriteList,
+    )
 
 
 __all__ = [
@@ -347,11 +353,39 @@ class ConnectionItemBList(DomainModelList[ConnectionItemB]):
         )
         return self.as_write()
 
+    @property
+    def inwards(self) -> ConnectionItemAList:
+        from ._connection_item_a import ConnectionItemA, ConnectionItemAList
+
+        return ConnectionItemAList(
+            [item for items in self.data for item in items.inwards or [] if isinstance(item, ConnectionItemA)]
+        )
+
+    @property
+    def self_edge(self) -> ConnectionItemBList:
+        return ConnectionItemBList(
+            [item for items in self.data for item in items.self_edge or [] if isinstance(item, ConnectionItemB)]
+        )
+
 
 class ConnectionItemBWriteList(DomainModelWriteList[ConnectionItemBWrite]):
     """List of connection item bs in the writing version."""
 
     _INSTANCE = ConnectionItemBWrite
+
+    @property
+    def inwards(self) -> ConnectionItemAWriteList:
+        from ._connection_item_a import ConnectionItemAWrite, ConnectionItemAWriteList
+
+        return ConnectionItemAWriteList(
+            [item for items in self.data for item in items.inwards or [] if isinstance(item, ConnectionItemAWrite)]
+        )
+
+    @property
+    def self_edge(self) -> ConnectionItemBWriteList:
+        return ConnectionItemBWriteList(
+            [item for items in self.data for item in items.self_edge or [] if isinstance(item, ConnectionItemBWrite)]
+        )
 
 
 class ConnectionItemBApplyList(ConnectionItemBWriteList): ...
@@ -413,7 +447,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
             reverse_expression,
         )
 
-        if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemAQuery not in created_types:
             self.inwards = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -426,7 +460,7 @@ class _ConnectionItemBQuery(NodeQueryCore[T_DomainModelList, ConnectionItemBList
                 connection_name="inwards",
             )
 
-        if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemBQuery not in created_types:
             self.self_edge = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,

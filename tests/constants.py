@@ -153,6 +153,14 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
     instance_space="IntegrationTestsImmutable",
 )
 
+CORE_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("cdf_cdm", "CogniteCore", "v1")],
+    _top_level_package="cognite_core",
+    client_name="CogniteCoreClient",
+    generate_sdk=True,
+    instance_space="springfield_instances",
+)
+
 
 class EquipmentSDKFiles:
     client_dir = EQUIPMENT_UNIT_SDK.client_dir

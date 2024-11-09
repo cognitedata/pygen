@@ -461,7 +461,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             filter_,
         )
 
-    @property
     def query(self) -> SubInterfaceQuery:
         """Start a query for sub interfaces."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

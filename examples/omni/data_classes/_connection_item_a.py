@@ -36,11 +36,19 @@ from omni.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+    from omni.data_classes._connection_item_b import (
+        ConnectionItemB,
+        ConnectionItemBList,
+        ConnectionItemBGraphQL,
+        ConnectionItemBWrite,
+        ConnectionItemBWriteList,
+    )
     from omni.data_classes._connection_item_c_node import (
         ConnectionItemCNode,
+        ConnectionItemCNodeList,
         ConnectionItemCNodeGraphQL,
         ConnectionItemCNodeWrite,
+        ConnectionItemCNodeWriteList,
     )
 
 
@@ -390,11 +398,55 @@ class ConnectionItemAList(DomainModelList[ConnectionItemA]):
         )
         return self.as_write()
 
+    @property
+    def other_direct(self) -> ConnectionItemCNodeList:
+        from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeList
+
+        return ConnectionItemCNodeList(
+            [item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNode)]
+        )
+
+    @property
+    def outwards(self) -> ConnectionItemBList:
+        from ._connection_item_b import ConnectionItemB, ConnectionItemBList
+
+        return ConnectionItemBList(
+            [item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemB)]
+        )
+
+    @property
+    def self_direct(self) -> ConnectionItemAList:
+        return ConnectionItemAList(
+            [item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemA)]
+        )
+
 
 class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
     """List of connection item as in the writing version."""
 
     _INSTANCE = ConnectionItemAWrite
+
+    @property
+    def other_direct(self) -> ConnectionItemCNodeWriteList:
+        from ._connection_item_c_node import ConnectionItemCNodeWrite, ConnectionItemCNodeWriteList
+
+        return ConnectionItemCNodeWriteList(
+            [item.other_direct for item in self.data if isinstance(item.other_direct, ConnectionItemCNodeWrite)]
+        )
+
+    @property
+    def outwards(self) -> ConnectionItemBWriteList:
+        from ._connection_item_b import ConnectionItemBWrite, ConnectionItemBWriteList
+
+        return ConnectionItemBWriteList(
+            [item for items in self.data for item in items.outwards or [] if isinstance(item, ConnectionItemBWrite)]
+        )
+
+    @property
+    def self_direct(self) -> ConnectionItemAWriteList:
+        return ConnectionItemAWriteList(
+            [item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemAWrite)]
+        )
 
 
 class ConnectionItemAApplyList(ConnectionItemAWriteList): ...
@@ -501,7 +553,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
             reverse_expression,
         )
 
-        if _ConnectionItemCNodeQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemCNodeQuery not in created_types:
             self.other_direct = _ConnectionItemCNodeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -514,7 +566,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 connection_name="other_direct",
             )
 
-        if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemBQuery not in created_types:
             self.outwards = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -527,7 +579,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 connection_name="outwards",
             )
 
-        if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemAQuery not in created_types:
             self.self_direct = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -716,7 +716,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             filter_,
         )
 
-    @property
     def query(self) -> NacelleQuery:
         """Start a query for nacelles."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

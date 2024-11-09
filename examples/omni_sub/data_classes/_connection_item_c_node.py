@@ -35,8 +35,20 @@ from omni_sub.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from omni_sub.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
-    from omni_sub.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
+    from omni_sub.data_classes._connection_item_a import (
+        ConnectionItemA,
+        ConnectionItemAList,
+        ConnectionItemAGraphQL,
+        ConnectionItemAWrite,
+        ConnectionItemAWriteList,
+    )
+    from omni_sub.data_classes._connection_item_b import (
+        ConnectionItemB,
+        ConnectionItemBList,
+        ConnectionItemBGraphQL,
+        ConnectionItemBWrite,
+        ConnectionItemBWriteList,
+    )
 
 
 __all__ = [
@@ -335,11 +347,53 @@ class ConnectionItemCNodeList(DomainModelList[ConnectionItemCNode]):
         )
         return self.as_write()
 
+    @property
+    def connection_item_a(self) -> ConnectionItemAList:
+        from ._connection_item_a import ConnectionItemA, ConnectionItemAList
+
+        return ConnectionItemAList(
+            [item for items in self.data for item in items.connection_item_a or [] if isinstance(item, ConnectionItemA)]
+        )
+
+    @property
+    def connection_item_b(self) -> ConnectionItemBList:
+        from ._connection_item_b import ConnectionItemB, ConnectionItemBList
+
+        return ConnectionItemBList(
+            [item for items in self.data for item in items.connection_item_b or [] if isinstance(item, ConnectionItemB)]
+        )
+
 
 class ConnectionItemCNodeWriteList(DomainModelWriteList[ConnectionItemCNodeWrite]):
     """List of connection item c nodes in the writing version."""
 
     _INSTANCE = ConnectionItemCNodeWrite
+
+    @property
+    def connection_item_a(self) -> ConnectionItemAWriteList:
+        from ._connection_item_a import ConnectionItemAWrite, ConnectionItemAWriteList
+
+        return ConnectionItemAWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.connection_item_a or []
+                if isinstance(item, ConnectionItemAWrite)
+            ]
+        )
+
+    @property
+    def connection_item_b(self) -> ConnectionItemBWriteList:
+        from ._connection_item_b import ConnectionItemBWrite, ConnectionItemBWriteList
+
+        return ConnectionItemBWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.connection_item_b or []
+                if isinstance(item, ConnectionItemBWrite)
+            ]
+        )
 
 
 class ConnectionItemCNodeApplyList(ConnectionItemCNodeWriteList): ...
@@ -394,7 +448,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
             reverse_expression,
         )
 
-        if _ConnectionItemAQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemAQuery not in created_types:
             self.connection_item_a = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -407,7 +461,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
                 connection_name="connection_item_a",
             )
 
-        if _ConnectionItemBQuery not in created_types and connection_type != "reverse-list":
+        if _ConnectionItemBQuery not in created_types:
             self.connection_item_b = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -142,9 +142,12 @@ class GraphQLList(UserList):
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
 
-    def to_pandas(self) -> pd.DataFrame:
+    def to_pandas(self, dropna_columns: bool = False) -> pd.DataFrame:
         """
         Convert the list of nodes to a pandas.DataFrame.
+
+        Args:
+            dropna_columns: Whether to drop columns that are all NaN.
 
         Returns:
             A pandas.DataFrame with the nodes as rows.
@@ -159,10 +162,15 @@ class GraphQLList(UserList):
         columns = (
             id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
         )
-        return df[columns]
+        df = df[columns]
+        if df.empty:
+            return df
+        if dropna_columns:
+            df.dropna(how="all", axis=1, inplace=True)
+        return df
 
     def _repr_html_(self) -> str:
-        return self.to_pandas()._repr_html_()  # type: ignore[operator]
+        return self.to_pandas(dropna_columns=True)._repr_html_()  # type: ignore[operator]
 
 
 class DomainModelCore(Core, ABC):
@@ -389,9 +397,12 @@ class CoreList(UserList, Generic[T_Core]):
     def as_external_ids(self) -> list[str]:
         return [node.external_id for node in self.data]
 
-    def to_pandas(self) -> pd.DataFrame:
+    def to_pandas(self, dropna_columns: bool = False) -> pd.DataFrame:
         """
         Convert the list of nodes to a pandas.DataFrame.
+
+        Args:
+            dropna_columns: Whether to drop columns that are all NaN.
 
         Returns:
             A pandas.DataFrame with the nodes as rows.
@@ -406,10 +417,15 @@ class CoreList(UserList, Generic[T_Core]):
         columns = (
             id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
         )
-        return df[columns]
+        df = df[columns]
+        if df.empty:
+            return df
+        if dropna_columns:
+            df.dropna(how="all", axis=1, inplace=True)
+        return df
 
     def _repr_html_(self) -> str:
-        return self.to_pandas()._repr_html_()  # type: ignore[operator]
+        return self.to_pandas(dropna_columns=True)._repr_html_()  # type: ignore[operator]
 
 
 class DomainModelList(CoreList[T_DomainModel]):

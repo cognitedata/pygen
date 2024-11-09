@@ -37,7 +37,13 @@ from windmill.data_classes._core import (
 )
 
 if TYPE_CHECKING:
-    from windmill.data_classes._sensor_position import SensorPosition, SensorPositionGraphQL, SensorPositionWrite
+    from windmill.data_classes._sensor_position import (
+        SensorPosition,
+        SensorPositionList,
+        SensorPositionGraphQL,
+        SensorPositionWrite,
+        SensorPositionWriteList,
+    )
 
 
 __all__ = [
@@ -333,11 +339,32 @@ class BladeList(DomainModelList[Blade]):
         )
         return self.as_write()
 
+    @property
+    def sensor_positions(self) -> SensorPositionList:
+        from ._sensor_position import SensorPosition, SensorPositionList
+
+        return SensorPositionList(
+            [item for items in self.data for item in items.sensor_positions or [] if isinstance(item, SensorPosition)]
+        )
+
 
 class BladeWriteList(DomainModelWriteList[BladeWrite]):
     """List of blades in the writing version."""
 
     _INSTANCE = BladeWrite
+
+    @property
+    def sensor_positions(self) -> SensorPositionWriteList:
+        from ._sensor_position import SensorPositionWrite, SensorPositionWriteList
+
+        return SensorPositionWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.sensor_positions or []
+                if isinstance(item, SensorPositionWrite)
+            ]
+        )
 
 
 class BladeApplyList(BladeWriteList): ...
@@ -402,7 +429,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             reverse_expression,
         )
 
-        if _SensorPositionQuery not in created_types and connection_type != "reverse-list":
+        if _SensorPositionQuery not in created_types:
             self.sensor_positions = _SensorPositionQuery(
                 created_types.copy(),
                 self._creation_path,

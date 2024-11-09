@@ -383,7 +383,6 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
             filter_,
         )
 
-    @property
     def query(self) -> GearboxQuery:
         """Start a query for gearboxes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
