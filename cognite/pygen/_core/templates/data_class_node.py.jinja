@@ -555,7 +555,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             reverse_expression,
         )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
-        if _{{ field.linked_class.query_cls_name }} not in created_types and connection_type != "reverse-list":
+        if _{{ field.linked_class.query_cls_name }} not in created_types:
             self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
