@@ -468,7 +468,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
             reverse_expression,
         )
 
-        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
+        if _StartEndTimeQuery not in created_types:
             self.work_orders = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -482,7 +482,7 @@ class _UnitProcedureQuery(NodeQueryCore[T_DomainModelList, UnitProcedureList]):
                 connection_name="work_orders",
             )
 
-        if _StartEndTimeQuery not in created_types and connection_type != "reverse-list":
+        if _StartEndTimeQuery not in created_types:
             self.work_units = _StartEndTimeQuery(
                 created_types.copy(),
                 self._creation_path,

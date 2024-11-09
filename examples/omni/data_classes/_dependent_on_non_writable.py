@@ -410,7 +410,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             reverse_expression,
         )
 
-        if _Implementation1NonWriteableQuery not in created_types and connection_type != "reverse-list":
+        if _Implementation1NonWriteableQuery not in created_types:
             self.to_non_writable = _Implementation1NonWriteableQuery(
                 created_types.copy(),
                 self._creation_path,

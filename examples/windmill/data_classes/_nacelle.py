@@ -793,7 +793,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             reverse_expression,
         )
 
-        if _GearboxQuery not in created_types and connection_type != "reverse-list":
+        if _GearboxQuery not in created_types:
             self.gearbox = _GearboxQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -806,7 +806,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="gearbox",
             )
 
-        if _GeneratorQuery not in created_types and connection_type != "reverse-list":
+        if _GeneratorQuery not in created_types:
             self.generator = _GeneratorQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -819,7 +819,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="generator",
             )
 
-        if _HighSpeedShaftQuery not in created_types and connection_type != "reverse-list":
+        if _HighSpeedShaftQuery not in created_types:
             self.high_speed_shaft = _HighSpeedShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -832,7 +832,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="high_speed_shaft",
             )
 
-        if _MainShaftQuery not in created_types and connection_type != "reverse-list":
+        if _MainShaftQuery not in created_types:
             self.main_shaft = _MainShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -845,7 +845,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="main_shaft",
             )
 
-        if _PowerInverterQuery not in created_types and connection_type != "reverse-list":
+        if _PowerInverterQuery not in created_types:
             self.power_inverter = _PowerInverterQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -589,7 +589,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
             reverse_expression,
         )
 
-        if _BladeQuery not in created_types and connection_type != "reverse-list":
+        if _BladeQuery not in created_types:
             self.blades = _BladeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -602,7 +602,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 connection_name="blades",
             )
 
-        if _MetmastQuery not in created_types and connection_type != "reverse-list":
+        if _MetmastQuery not in created_types:
             self.metmast = _MetmastQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -615,7 +615,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 connection_name="metmast",
             )
 
-        if _NacelleQuery not in created_types and connection_type != "reverse-list":
+        if _NacelleQuery not in created_types:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -628,7 +628,7 @@ class _WindmillQuery(NodeQueryCore[T_DomainModelList, WindmillList]):
                 connection_name="nacelle",
             )
 
-        if _RotorQuery not in created_types and connection_type != "reverse-list":
+        if _RotorQuery not in created_types:
             self.rotor = _RotorQuery(
                 created_types.copy(),
                 self._creation_path,

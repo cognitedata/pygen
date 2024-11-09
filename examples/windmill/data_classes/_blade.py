@@ -429,7 +429,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             reverse_expression,
         )
 
-        if _SensorPositionQuery not in created_types and connection_type != "reverse-list":
+        if _SensorPositionQuery not in created_types:
             self.sensor_positions = _SensorPositionQuery(
                 created_types.copy(),
                 self._creation_path,
