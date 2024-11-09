@@ -28,7 +28,7 @@ Changes are grouped as follows
   ina Notebook environment.
 
 ### Fixed
-- The `.list_<type>` of the `.query()` method no longer returns empyt lists when the start node is the same as the
+- The `.list_<type>` of the `.query()` method no longer returns empty lists when the start node is the same as the
   end node.
 
 ## [0.99.44] - 24-11-08
