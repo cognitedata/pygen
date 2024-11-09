@@ -593,8 +593,8 @@ typing-extensions = "^4.0"
 [package.source]
 type = "git"
 url = "https://github.com/cognitedata/toolkit.git"
-reference = "verify-quickstart"
-resolved_reference = "132eadba4af346cc6c2229cf8f6d9e94c92a4970"
+reference = "linting-contextualization-functions"
+resolved_reference = "0dcb7b48522db2fdc7f98ec702c585a04f85f830"
 
 [[package]]
 name = "colorama"
@@ -4694,4 +4694,4 @@ format = ["black"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "25c6bacd3b6991a237019450011e3e608821a20709f29cbefc1bc4f094abd42e"
+content-hash = "896baa1e9eeed31ce5b584ab7514eb0408db41bc107c44eb50c9665adef41a0a"

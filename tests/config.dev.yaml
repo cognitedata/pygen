@@ -49,30 +49,6 @@ variables:
       - springfield_instances
       - cdf_cdm_units
 
-    contextualization:
-      cdf_connection_sql:
-        activityToAssetTransformationExternalId: activity_to_asset
-        activityToEquipmentTransformationExternalId: activity_to_equipment
-        activityToTimeSeriesTransformationExternalId: activity_to_timeseries
-        timeSeriesToAssetTransformationExternalId: timeseries_to_asset
-        timeSeriesToEquipmentTransformationExternalId: timeseries_to_equipment
-        dataset: ingestion
-        instanceSpace: springfield_instances
-        schemaSpace: cdf_cdm
-
-      cdf_p_and_id_parser:
-        contextualizationId: p_and_id_parser
-        contextualizationName: P&ID Parser
-        annotatorJob: ctx_files_pandid_annotater
-        directRelationJob: ctx_files_direct_relation_write
-        dataset: ingestion
-        rawStateDatabase: contextualizationState
-        rawStateTable: diagramParsing
-        schemaSpace: cdf_cdm
-        annotationSpace: springfield_instances
-        instanceSpaces:
-        - springfield_instances
-
     industrial_tools:
       cdf_search:
         location: springfield
