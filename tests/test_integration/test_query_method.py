@@ -132,6 +132,13 @@ def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
     assert "Circular" in str(e.value)
 
 
+def test_query_past_reverse_list_value_error(omni_client: OmniClient) -> None:
+    with pytest.raises(ValueError) as e:
+        omni_client.connection_item_e.query().direct_reverse_multi.direct_single.list_full(limit=5)
+
+    assert "Cannot traverse past reverse direct relation of list." in str(e.value)
+
+
 def test_query_across_reversed_list(omni_client: OmniClient) -> None:
     result = omni_client.connection_item_e.query().direct_reverse_multi.list_full(limit=5)
     assert result

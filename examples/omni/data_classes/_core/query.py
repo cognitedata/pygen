@@ -186,7 +186,14 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = DataClassQueryBuilder(result_list_cls, return_step=return_step)
         from_: str | None = None
         first: bool = True
+        is_last_reverse_list = False
         for item in self._creation_path:
+            if is_last_reverse_list:
+                raise ValueError("Cannot traverse past reverse direct relation of list. "
+                                 "This is a limitation of the modeling implementation in your data model."
+                                 "To do this query, you need to reimplement the data model and use an edge to "
+                                 "implement this connection instead of a reverse direct relation"
+                                 )
             name = builder.create_name(from_)
             max_retrieve_limit = limit if first else -1
             step: QueryStep
@@ -229,6 +236,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             else:
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
 
+            is_last_reverse_list = item._connection_type == "reverse-list"
             first = False
             from_ = name
         return builder
