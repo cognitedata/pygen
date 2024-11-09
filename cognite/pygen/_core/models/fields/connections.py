@@ -251,17 +251,15 @@ class BaseConnectionField(Field, ABC):
         if not isinstance(prop, dm.EdgeConnection | dm.MappedProperty | ReverseDirectRelation):
             return None
         if isinstance(prop, ReverseDirectRelation):
-            field_string = f"{view_id}.{base.prop_name}"
             target = (
                 direct_relations_by_view_id.get(prop.through.source)
                 if isinstance(prop.through.source, dm.ViewId)
                 else None
             )
             if target is None or prop.through.property not in target:
-                target_str = (
-                    f"{prop.through.source}.{prop.through.property}" if target is not None else str(prop.through.source)
+                warnings.warn(
+                    MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
                 )
-                warnings.warn(MissingReverseDirectRelationTargetWarning(target_str, field_string), stacklevel=2)
                 return None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
         direction: Literal["outwards", "inwards"]

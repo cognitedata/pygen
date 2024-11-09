@@ -15,7 +15,7 @@ from cognite.pygen._core.models import (
 from cognite.pygen._core.models.fields import EdgeClass
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
-    ViewPropertyNameCollisionWarning,
+    NameCollisionViewPropertyWarning,
 )
 
 
@@ -46,7 +46,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
     )
 
     # Act
-    with pytest.warns(ViewPropertyNameCollisionWarning):
+    with pytest.warns(NameCollisionViewPropertyWarning):
         actual = Field.from_property(
             name,
             prop,

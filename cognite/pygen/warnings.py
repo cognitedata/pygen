@@ -6,7 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Literal
 
-from cognite.client.data_classes.data_modeling import ViewId
+from cognite.client.data_classes.data_modeling import PropertyId, ViewId
 
 
 class PygenWarning(UserWarning):
@@ -26,13 +26,13 @@ class NameCollisionWarning(PygenWarning, RuntimeWarning):
         property_name: str | None,
     ) -> NameCollisionWarning:
         if view_id and property_name:
-            return ViewPropertyNameCollisionWarning(view_id, property_name, word)
+            return NameCollisionViewPropertyWarning(view_id, property_name, word)
         elif view_id and word_type == "filename":
             return NameCollisionFileNameWarning(view_id, word)
         elif view_id and word_type == "data class":
             return NameCollisionDataClassNameWarning(view_id, word)
         else:
-            return ParameterNameCollisionWarning(word)
+            return NameCollisionParameterWarning(word)
 
 
 class NameCollisionFileNameWarning(NameCollisionWarning):
@@ -59,7 +59,7 @@ class NameCollisionDataClassNameWarning(NameCollisionWarning):
         )
 
 
-class ViewPropertyNameCollisionWarning(NameCollisionWarning):
+class NameCollisionViewPropertyWarning(NameCollisionWarning):
     def __init__(self, view_id: ViewId, property_name: str, word: str):
         self.view_id = view_id
         self.property_name = property_name
@@ -72,7 +72,7 @@ class ViewPropertyNameCollisionWarning(NameCollisionWarning):
         )
 
 
-class ParameterNameCollisionWarning(NameCollisionWarning):
+class NameCollisionParameterWarning(NameCollisionWarning):
     def __init__(self, word: str):
         self.word = word
 
@@ -84,12 +84,16 @@ class ParameterNameCollisionWarning(NameCollisionWarning):
 
 
 class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
-    def __init__(self, target: str, field: str) -> None:
-        self.target = target
-        self.field = field
+    def __init__(self, source: PropertyId, view: ViewId, property_: str) -> None:
+        self.source = source
+        self.view = view
+        self.property_ = property_
 
     def __str__(self) -> str:
-        return f"Target {self.target} does not exists. Skipping reverse direct relation {self.field}."
+        return (
+            f"Target {self.source!r} does not exists. "
+            f"Skipping reverse direct relation {self.view.external_id}.{self.property_}."
+        )
 
 
 class InvalidCodeGenerated(PygenWarning, UserWarning):
