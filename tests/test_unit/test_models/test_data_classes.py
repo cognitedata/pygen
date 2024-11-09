@@ -3,10 +3,11 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._core.models import EdgeDataClass, NodeDataClass
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import (
-    ViewNameCollisionWarning,
+from cognite.pygen._warnings import (
+    NameCollisionDataClassNameWarning,
+    NameCollisionFileNameWarning,
 )
+from cognite.pygen.config import PygenConfig
 from tests.omni_constants import OMNI_SPACE
 from tests.utils import to_data_class_by_view_id
 
@@ -105,7 +106,7 @@ class TestDataClasses:
         )
 
         # Act
-        with pytest.warns(ViewNameCollisionWarning):
+        with pytest.warns(NameCollisionDataClassNameWarning):
             actual = NodeDataClass.from_view(
                 view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
             )
@@ -139,7 +140,7 @@ class TestDataClasses:
         )
 
         # Act
-        with pytest.warns(ViewNameCollisionWarning):
+        with pytest.warns(NameCollisionFileNameWarning):
             actual = NodeDataClass.from_view(
                 view, NodeDataClass.to_base_name(view), "node", pygen_config.naming.data_class
             )

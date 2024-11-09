@@ -7,7 +7,7 @@ from typing import Literal
 from cognite.client import data_modeling as dm
 from pydantic import BaseModel
 
-from cognite.pygen.warnings import NameCollisionWarning
+from cognite.pygen._warnings import NameCollisionWarning
 
 PYTHON_BUILTIN_NAMES = {name for name in vars(builtins) if not name.startswith("_")}
 FIELD_NAMES = (
@@ -75,6 +75,6 @@ def is_reserved_word(
     property_name: str | None = None,
 ) -> bool:
     if keyword.iskeyword(word) or word in PYTHON_BUILTIN_NAMES or word in _NAMES_BY_TYPE[word_type]:
-        NameCollisionWarning.create(word, view_id, property_name).warn()
+        NameCollisionWarning.create(word, word_type, view_id, property_name).warn()
         return True
     return False

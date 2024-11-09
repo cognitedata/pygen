@@ -9,10 +9,10 @@ from cognite.pygen._core.models import (
     FilterMethod,
     FilterParameter,
 )
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import (
-    ParameterNameCollisionWarning,
+from cognite.pygen._warnings import (
+    NameCollisionParameterWarning,
 )
+from cognite.pygen.config import PygenConfig
 from tests.omni_constants import OMNI_SPACE
 
 
@@ -130,7 +130,7 @@ def test_filter_condition(filter_condition: FilterImplementation, expected_args:
 )
 def test_filter_parameter_expected_warning(name: str, expected_name: str, pygen_config: PygenConfig) -> None:
     # Act
-    with pytest.warns(ParameterNameCollisionWarning):
+    with pytest.warns(NameCollisionParameterWarning):
         actual = FilterParameter(name, "str", "dummy")
 
     # Assert

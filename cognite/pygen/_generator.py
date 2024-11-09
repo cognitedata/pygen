@@ -20,10 +20,10 @@ from cognite.pygen._core.generators import SDKGenerator
 from cognite.pygen._core.models import DataClass
 from cognite.pygen._settings import _load_pyproject_toml
 from cognite.pygen._version import __version__
+from cognite.pygen._warnings import InvalidCodeGenerated, print_warnings
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.text import to_pascal, to_snake
-from cognite.pygen.warnings import InvalidCodeGenerated
 
 DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
@@ -101,6 +101,35 @@ def generate_sdk(
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
     """
+    return _generate_sdk(
+        model_id,
+        client,
+        top_level_package,
+        client_name,
+        default_instance_space,
+        output_dir,
+        logger,
+        overwrite,
+        format_code,
+        config,
+        return_sdk_files,
+    )
+
+
+def _generate_sdk(
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
+    output_dir: Optional[Path] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    overwrite: bool = False,
+    format_code: bool = True,
+    config: Optional[PygenConfig] = None,
+    return_sdk_files: bool = False,
+    context: Literal["notebook", "cli"] = "cli",
+) -> None | dict[Path, str]:
     if output_dir is not None and top_level_package is None:
         raise ValueError("top_level_package must be provided if output_dir is provided")
     logger = logger or print
@@ -122,7 +151,11 @@ def generate_sdk(
         logger,
         config or PygenConfig(),
     )
-    sdk = sdk_generator.generate_sdk()
+    with warnings.catch_warnings(record=True) as warning_logger:
+        sdk = sdk_generator.generate_sdk()
+    if warning_logger:
+        print_warnings(warning_logger, logger, context)
+
     if return_sdk_files:
         return sdk
     output_dir = output_dir or (Path.cwd() / Path(top_level_package.replace(".", "/")))
@@ -191,7 +224,7 @@ def generate_sdk_notebook(
         top_level_package = _default_top_level_package(external_id)
     if client_name is None:
         client_name = _default_client_name(external_id)
-    generate_sdk(
+    _generate_sdk(
         data_model,
         client,
         top_level_package=top_level_package,
@@ -201,6 +234,7 @@ def generate_sdk_notebook(
         overwrite=True,
         format_code=False,
         config=config,
+        context="notebook",
     )
     if str(output_dir) not in sys.path:
         sys.path.append(str(output_dir))
