@@ -9,10 +9,10 @@ from cognite.pygen._core.models import (
     FilterMethod,
     FilterParameter,
 )
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import (
+from cognite.pygen._warnings import (
     NameCollisionParameterWarning,
 )
+from cognite.pygen.config import PygenConfig
 from tests.omni_constants import OMNI_SPACE
 
 

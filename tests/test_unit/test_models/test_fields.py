@@ -13,10 +13,10 @@ from cognite.pygen._core.models import (
     NodeDataClass,
 )
 from cognite.pygen._core.models.fields import EdgeClass
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import (
+from cognite.pygen._warnings import (
     NameCollisionViewPropertyWarning,
 )
+from cognite.pygen.config import PygenConfig
 
 
 @pytest.mark.parametrize(

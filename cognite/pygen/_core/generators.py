@@ -23,8 +23,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
+from cognite.pygen._warnings import PydanticNamespaceCollisionWarning
 from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import PydanticNamespaceCollisionWarning
 
 from . import validation
 from .extract_query_code import get_classes_code

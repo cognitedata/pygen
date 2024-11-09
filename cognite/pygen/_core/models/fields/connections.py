@@ -16,7 +16,7 @@ from cognite.client.data_classes.data_modeling.views import (
     SingleReverseDirectRelation,
 )
 
-from cognite.pygen.warnings import MissingReverseDirectRelationTargetWarning
+from cognite.pygen._warnings import MissingReverseDirectRelationTargetWarning
 
 from .base import Field
 

@@ -3,10 +3,10 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import MultiAPIGenerator
 from cognite.pygen._core.models import EdgeDataClass, NodeDataClass
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import (
+from cognite.pygen._warnings import (
     NameCollisionDataClassNameWarning,
 )
+from cognite.pygen.config import PygenConfig
 from tests.omni_constants import OMNI_SPACE
 from tests.utils import to_data_class_by_view_id
 
