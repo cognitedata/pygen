@@ -1,0 +1,32 @@
+space: {{ pygen_models_space }}
+externalId: DependentOnNonWritable
+name: DependentOnNonWritable
+version: '1'
+properties:
+  aValue:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: MainInterface
+      type: container
+    containerPropertyIdentifier: mainValue
+    name: aValue
+  toNonWritable:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: toNonWritable
+    source:
+      space: {{ pygen_models_space }}
+      externalId: Implementation1NonWriteable
+      version: '1'
+      type: view
+    direction: outwards
+    name: outwards
+    connectionType: multi_edge_connection
+filter:
+  equals:
+    property:
+      - node
+      - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: DependentOnNonWritable

@@ -1,0 +1,17 @@
+space: {{ pygen_models_space }}
+externalId: Implementation2
+name: Implementation2
+version: '1'
+implements:
+  - space: {{ pygen_models_space }}
+    externalId: SubInterface
+    version: '1'
+properties: {}
+filter:
+  equals:
+    property:
+      - node
+      - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: Implementation2

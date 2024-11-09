@@ -1,0 +1,94 @@
+space: {{ pygen_models_space }}
+externalId: Omni
+name: Omni
+description: This data model is designed to test all functionality of CDF data models
+version: "1"
+views:
+- space: {{ pygen_models_space }}
+  externalId: ConnectionEdgeA
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemA
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemB
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemC
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemD
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemE
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemF
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: ConnectionItemG
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: DependentOnNonWritable
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: Empty
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: Implementation1
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: Implementation1NonWriteable
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: Implementation2
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: MainInterface
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: PrimitiveNullable
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: PrimitiveNullableListed
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: PrimitiveRequired
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: PrimitiveRequiredListed
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: PrimitiveWithDefaults
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: SubInterface
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: CDFExternalReferences
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
+  externalId: CDFExternalReferencesListed
+  version: "1"
+  type: view

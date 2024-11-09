@@ -1,0 +1,23 @@
+space: {{ pygen_models_space }}
+externalId: Implementation1
+name: Implementation1
+usedFor: node
+properties:
+  implementation1Value:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: child1Value
+  requiredImplementation1Value:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: false
+    autoIncrement: false
+    immutable: false
+    name: requiredChild1Value

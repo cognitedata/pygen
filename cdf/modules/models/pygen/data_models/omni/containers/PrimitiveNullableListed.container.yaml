@@ -1,0 +1,78 @@
+space: {{ pygen_models_space }}
+externalId: PrimitiveNullableListed
+name: PrimitiveNullableListed
+usedFor: node
+properties:
+  text:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: text
+  boolean:
+    type:
+      list: true
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: text
+  float32:
+    type:
+      list: true
+      type: float32
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: float32
+  float64:
+    type:
+      list: true
+      type: float64
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: float64
+  int32:
+    type:
+      list: true
+      type: int32
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: int32
+  int64:
+    type:
+      list: true
+      type: int64
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: int64
+  timestamp:
+    type:
+      list: true
+      type: timestamp
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: timestamp
+  date:
+    type:
+      list: true
+      type: date
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: date
+  json:
+    type:
+      list: true
+      type: json
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: json

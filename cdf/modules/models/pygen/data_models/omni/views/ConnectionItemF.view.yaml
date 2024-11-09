@@ -1,0 +1,66 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionItemF
+name: ConnectionItemF
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemF
+properties:
+  name:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionDirectList
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  directList:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionDirectList
+      type: container
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemD
+      version: '1'
+      type: view
+    containerPropertyIdentifier: directList
+    name: directList
+  outwardsSingle:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: singleProperty
+    edgeSource:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionEdgeA
+      version: '1'
+      type: view
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemE
+      version: '1'
+      type: view
+    direction: outwards
+    name: outwards
+    connectionType: single_edge_connection
+  outwardsMulti:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: multiProperty
+    edgeSource:
+        space: {{ pygen_models_space }}
+        externalId: ConnectionEdgeA
+        version: '1'
+        type: view
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemG
+      version: '1'
+      type: view
+    direction: outwards
+    name: outwards
+    connectionType: multi_edge_connection

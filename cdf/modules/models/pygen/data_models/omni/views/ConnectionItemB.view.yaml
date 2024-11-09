@@ -1,0 +1,44 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionItemB
+name: ConnectionItemB
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemB
+properties:
+  name:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  inwards:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: bidirectional
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+    direction: inwards
+    name: inwards
+    connectionType: multi_edge_connection
+  selfEdge:
+    type:
+      space: {{ pygen_models_space }}
+      externalId: reflexive
+    source:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+    direction: outwards
+    name: selfEdge
+    connectionType: multi_edge_connection
