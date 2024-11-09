@@ -21,6 +21,7 @@ Changes are grouped as follows
 ### Added
 - In the generated list classes, all connection properties are now available as properties. This is to make it easier
   to access the connection properties without having to go through the `data_record` property.
+- Support for traversing over reverse direct relation of list in the `.query()` method.
 
 ### Changed
 - [Experimental - Breaking] Reverted breaking change from `0.99.40`; The `.query` property is now a method `query`.
