@@ -350,22 +350,6 @@ class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritabl
 
     _INSTANCE = DependentOnNonWritableWrite
 
-    @property
-    def to_non_writable(self) -> Implementation1NonWriteableWriteList:
-        from ._implementation_1_non_writeable import (
-            Implementation1NonWriteableWrite,
-            Implementation1NonWriteableWriteList,
-        )
-
-        return Implementation1NonWriteableWriteList(
-            [
-                item
-                for items in self.data
-                for item in items.to_non_writable or []
-                if isinstance(item, Implementation1NonWriteableWrite)
-            ]
-        )
-
 
 class DependentOnNonWritableApplyList(DependentOnNonWritableWriteList): ...
 
