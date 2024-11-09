@@ -542,7 +542,6 @@ class CogniteFileCategoryAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteFileCategoryQuery:
         """Start a query for Cognite file categories."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

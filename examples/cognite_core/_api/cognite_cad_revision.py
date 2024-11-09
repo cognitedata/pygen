@@ -492,7 +492,6 @@ class CogniteCADRevisionAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteCADRevisionQuery:
         """Start a query for Cognite cad revisions."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

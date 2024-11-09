@@ -522,7 +522,6 @@ class Cognite360ImageModelAPI(
             filter_,
         )
 
-    @property
     def query(self) -> Cognite360ImageModelQuery:
         """Start a query for Cognite 360 image models."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

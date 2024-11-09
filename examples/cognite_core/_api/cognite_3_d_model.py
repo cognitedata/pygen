@@ -543,7 +543,6 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
             filter_,
         )
 
-    @property
     def query(self) -> Cognite3DModelQuery:
         """Start a query for Cognite 3D models."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -696,7 +696,6 @@ class CognitePointCloudVolumeAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CognitePointCloudVolumeQuery:
         """Start a query for Cognite point cloud volumes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

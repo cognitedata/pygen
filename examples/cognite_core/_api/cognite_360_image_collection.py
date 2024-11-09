@@ -553,7 +553,6 @@ class Cognite360ImageCollectionAPI(
             filter_,
         )
 
-    @property
     def query(self) -> Cognite360ImageCollectionQuery:
         """Start a query for Cognite 360 image collections."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

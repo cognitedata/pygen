@@ -618,7 +618,6 @@ class PrimitiveRequiredAPI(
             filter_,
         )
 
-    @property
     def query(self) -> PrimitiveRequiredQuery:
         """Start a query for primitive requireds."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

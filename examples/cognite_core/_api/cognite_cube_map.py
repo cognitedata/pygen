@@ -778,7 +778,6 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
             filter_,
         )
 
-    @property
     def query(self) -> CogniteCubeMapQuery:
         """Start a query for Cognite cube maps."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

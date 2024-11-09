@@ -1196,7 +1196,6 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             filter_,
         )
 
-    @property
     def query(self) -> Cognite360ImageQuery:
         """Start a query for Cognite 360 images."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

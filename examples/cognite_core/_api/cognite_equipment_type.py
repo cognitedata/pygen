@@ -572,7 +572,6 @@ class CogniteEquipmentTypeAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteEquipmentTypeQuery:
         """Start a query for Cognite equipment types."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

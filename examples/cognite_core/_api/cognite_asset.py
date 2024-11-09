@@ -1121,7 +1121,6 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             filter_,
         )
 
-    @property
     def query(self) -> CogniteAssetQuery:
         """Start a query for Cognite assets."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

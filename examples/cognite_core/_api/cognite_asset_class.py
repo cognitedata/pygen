@@ -512,7 +512,6 @@ class CogniteAssetClassAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteAssetClassQuery:
         """Start a query for Cognite asset class."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

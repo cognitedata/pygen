@@ -534,7 +534,6 @@ class CognitePointCloudModelAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CognitePointCloudModelQuery:
         """Start a query for Cognite point cloud models."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

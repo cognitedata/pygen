@@ -570,7 +570,6 @@ class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, Cog
             filter_,
         )
 
-    @property
     def query(self) -> CogniteUnitQuery:
         """Start a query for Cognite units."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

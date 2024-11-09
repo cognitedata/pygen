@@ -1015,7 +1015,6 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
             filter_,
         )
 
-    @property
     def query(self) -> CogniteActivityQuery:
         """Start a query for Cognite activities."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

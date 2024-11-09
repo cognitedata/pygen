@@ -669,7 +669,6 @@ class Cognite3DTransformationNodeAPI(
             filter_,
         )
 
-    @property
     def query(self) -> Cognite3DTransformationNodeQuery:
         """Start a query for Cognite 3D transformation nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

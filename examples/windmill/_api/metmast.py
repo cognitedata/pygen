@@ -413,7 +413,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
             filter_,
         )
 
-    @property
     def query(self) -> MetmastQuery:
         """Start a query for metmasts."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

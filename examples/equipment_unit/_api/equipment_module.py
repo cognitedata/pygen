@@ -483,7 +483,6 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
             filter_,
         )
 
-    @property
     def query(self) -> EquipmentModuleQuery:
         """Start a query for equipment modules."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -513,7 +513,6 @@ class CogniteSchedulableAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteSchedulableQuery:
         """Start a query for Cognite schedulables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

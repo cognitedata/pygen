@@ -512,7 +512,6 @@ class CogniteSourceSystemAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteSourceSystemQuery:
         """Start a query for Cognite source systems."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

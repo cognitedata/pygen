@@ -594,7 +594,6 @@ class CogniteDescribableNodeAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteDescribableNodeQuery:
         """Start a query for Cognite describable nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

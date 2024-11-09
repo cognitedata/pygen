@@ -460,7 +460,6 @@ class CogniteVisualizableAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteVisualizableQuery:
         """Start a query for Cognite visualizables."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

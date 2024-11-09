@@ -691,7 +691,6 @@ class CogniteSourceableNodeAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteSourceableNodeQuery:
         """Start a query for Cognite sourceable nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

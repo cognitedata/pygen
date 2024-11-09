@@ -936,7 +936,6 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
             filter_,
         )
 
-    @property
     def query(self) -> CogniteFileQuery:
         """Start a query for Cognite files."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

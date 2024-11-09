@@ -943,7 +943,6 @@ class CogniteTimeSeriesAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CogniteTimeSeriesQuery:
         """Start a query for Cognite time series."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

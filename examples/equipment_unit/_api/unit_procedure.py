@@ -485,7 +485,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             filter_,
         )
 
-    @property
     def query(self) -> UnitProcedureQuery:
         """Start a query for unit procedures."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

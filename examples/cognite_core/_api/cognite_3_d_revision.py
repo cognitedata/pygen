@@ -489,7 +489,6 @@ class Cognite3DRevisionAPI(
             filter_,
         )
 
-    @property
     def query(self) -> Cognite3DRevisionQuery:
         """Start a query for Cognite 3D revisions."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

@@ -388,7 +388,6 @@ class CDFExternalReferencesListedAPI(
             filter_,
         )
 
-    @property
     def query(self) -> CDFExternalReferencesListedQuery:
         """Start a query for cdf external references listeds."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")

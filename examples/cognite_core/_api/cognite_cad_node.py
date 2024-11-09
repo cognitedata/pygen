@@ -679,7 +679,6 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
             filter_,
         )
 
-    @property
     def query(self) -> CogniteCADNodeQuery:
         """Start a query for Cognite cad nodes."""
         warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
