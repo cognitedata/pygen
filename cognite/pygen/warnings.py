@@ -4,7 +4,7 @@ import itertools
 import warnings
 from collections.abc import Callable
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from cognite.client.data_classes.data_modeling import PropertyId, ViewId
 
@@ -117,24 +117,62 @@ class PydanticNamespaceCollisionWarning(PygenWarning, UserWarning):
         )
 
 
-def print_warnings(warning_list: list[warnings.WarningMessage], console: Callable[[str], None]) -> None:
+def print_warnings(
+    warning_list: list[warnings.WarningMessage], console: Callable[[str], None], context: Literal["notebook", "cli"]
+) -> None:
     for group, group_warnings in itertools.groupby(
         sorted(warning_list, key=lambda w: w.category),  # type: ignore[arg-type, return-value]
         key=lambda w: w.category,
     ):
         group_list = [w.message for w in group_warnings if isinstance(w.message, PygenWarning)]
-        _print_warning(group_list, group, console)
+        _print_warning(group_list, group, console, context)
 
 
 def _print_warning(
-    pygen_warnings: list[PygenWarning], group: type[PygenWarning], console: Callable[[str], None]
+    pygen_warnings: list[PygenWarning],
+    group: type[PygenWarning],
+    console: Callable[[str], None],
+    context: Literal["notebook", "cli"],
 ) -> None:
     if group is PydanticNamespaceCollisionWarning:
         return
-    if group is InvalidCodeGenerated:
-        _print_one_by_one(console, *pygen_warnings)
+    elif context == "notebook" and group is NameCollisionFileNameWarning:
+        return
+    elif group is InvalidCodeGenerated or len(pygen_warnings) == 1:
+        _print_one_by_one(console, pygen_warnings)
+    elif issubclass(group, NameCollisionWarning | MissingReverseDirectRelationTargetWarning):
+        _print_group(console, group, pygen_warnings)
 
 
-def _print_one_by_one(console: Callable[[str], None], *warning_list) -> None:
+def _print_one_by_one(console: Callable[[str], None], warning_list: list[PygenWarning]) -> None:
     for warning in warning_list:
         console(f"{warning!s}")
+
+
+def _print_group(console: Callable[[str], None], group: type[PygenWarning], warning_list: list[PygenWarning]) -> None:
+    console(f"{group.__name__}: {len(warning_list)}")
+    indent = " " * 4
+    if group in {NameCollisionFileNameWarning, NameCollisionDataClassNameWarning}:
+        view_warnings = cast(list[NameCollisionFileNameWarning | NameCollisionDataClassNameWarning], warning_list)
+        views_str = ", ".join(f"{warning.view_id!r}" for warning in view_warnings)
+        console(f"{indent}The following views will have an underscore added to avoid name collision: {views_str}")
+    elif group is NameCollisionViewPropertyWarning:
+        property_warnings = cast(list[NameCollisionViewPropertyWarning], warning_list)
+        for view, properties in itertools.groupby(
+            sorted(property_warnings, key=lambda w: w.view_id.external_id), key=lambda w: w.view_id.external_id
+        ):
+            properties_str = ", ".join(warning.property_name for warning in properties)
+            console(
+                f"{indent}The following properties in view {view} will have an underscore "
+                f"added to avoid name collision: {properties_str}"
+            )
+    elif group is MissingReverseDirectRelationTargetWarning:
+        relation_warnings = cast(list[MissingReverseDirectRelationTargetWarning], warning_list)
+        for relation_warn in relation_warnings:
+            console(
+                f"{indent} Skipping reverse direct "
+                f"relation {relation_warn.view.external_id}.{relation_warn.property_}."
+            )
+    else:
+        for warning in warning_list:
+            console(f"{indent}{warning!s}")
