@@ -3,15 +3,15 @@ environment:
   project: python-pygen
   type: dev
   selected:
-  - models
-  - data_testing
+  - modules/
 
 variables:
   modules:
     models:
-      pygen_models_space: sp_pygen_models
-      pygen_power: sp_pygen_power
-      pygen_other_models_space: sp_pygen_models_other
+      pygen:
+        pygen_models_space: sp_pygen_models
+        pygen_power: sp_pygen_power
+        pygen_other_models_space: sp_pygen_models_other
       cdf_idm_extension:
         organization: YourOrg
         schema_space: sp_enterprise_min_schema_idm
@@ -21,7 +21,7 @@ variables:
 
     cdf_ingestion:
       workflow: ingestion
-      groupSourceId: <not set>
+      groupSourceId: fc008a26-40e8-4a4c-a357-2d914fbd9873
       ingestionClientId: ${INGESTION_CLIENT_ID}
       ingestionClientSecret: ${INGESTION_CLIENT_SECRET}
       assetTransformationExternalId: sap_assets_springfield_s4hana
@@ -59,7 +59,6 @@ variables:
         dataset: ingestion
         instanceSpace: springfield_instances
         schemaSpace: cdf_cdm
-        groupSourceId: <not set>
 
       cdf_p_and_id_parser:
         contextualizationId: p_and_id_parser
@@ -73,10 +72,6 @@ variables:
         annotationSpace: springfield_instances
         instanceSpaces:
         - springfield_instances
-        groupSourceId: <not set>
-        workflow: p_and_id_parser
-        workflowClientId: ${P_AND_ID_PARSER_CLIENT_ID}
-        workflowClientSecret: ${P_AND_ID_PARSER_CLIENT_SECRET}
 
     industrial_tools:
       cdf_search:
@@ -93,10 +88,6 @@ variables:
         rawSourceDatabase: ingestion
         schemaSpace: cdf_cdm
         instanceSpace: springfield_instances
-        groupSourceId: <not set>
-        workflow: aveva_pi_population # can also contain location aveva_pi_springfield_population
-        workflowClientId: ${AVEVA_PI_SPRINGFIELD_CLIENT_ID}
-        workflowClientSecret: ${AVEVA_PI_SPRINGFIELD_CLIENT_SECRET}
 
       cdf_sap_assets:
         sourceName: SAP Springfield S/4HANA Assets
@@ -109,10 +100,6 @@ variables:
         rawSourceDatabase: ingestion
         schemaSpace: cdf_cdm
         instanceSpace: springfield_instances
-        groupSourceId: <not set>
-        workflow: sap_s4hana_population # can also contain location sap_springfield_s4hana_population
-        workflowClientId: ${SAP_SPRINGFIELD_S4HANA_CLIENT_ID}
-        workflowClientSecret: ${SAP_SPRINGFIELD_S4HANA_CLIENT_SECRET}
 
       cdf_sap_events:
         sourceName: SAP Springfield S/4HANA Activities
@@ -124,10 +111,6 @@ variables:
         rawSourceDatabase: ingestion
         schemaSpace2: cdf_idm
         instanceSpace: springfield_instances
-        workflow: sap_s4hana_population_events # can also contain location sap_springfield_s4hana_population
-        groupSourceId: <not set>
-        workflowClientId: ${SAP_SPRINGFIELD_S4HANA_CLIENT_ID}
-        workflowClientSecret: ${SAP_SPRINGFIELD_S4HANA_CLIENT_SECRET}
 
       cdf_sharepoint:
         sourceName: Springfield Sharepoint
@@ -137,7 +120,3 @@ variables:
         rawSourceDatabase: ingestion
         schemaSpace: cdf_cdm
         instanceSpace: springfield_instances
-        groupSourceId: <not set>
-        workflow: files_metadata_population # can also contain location files_metadata_springfield_population
-        workflowClientId: ${SHAREPOINT_SERVICE_PRINCIPAL_CLIENT_ID}
-        workflowClientSecret: ${SHAREPOINT_SERVICE_PRINCIPAL_CLIENT_SECRET}
