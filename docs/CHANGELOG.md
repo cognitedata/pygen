@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Improved
+- When calling `generate_sdk` or `generate_sdk_notebook` you now get an improved formatting of warnings. In addition,
+  irrelevant warnings are no longer shown.
+
 ## [0.99.44] - 24-11-08
 ### Improved
 - In the underlying `query` operation, used for `.list(...)` as well as query methods, `pygen` now
