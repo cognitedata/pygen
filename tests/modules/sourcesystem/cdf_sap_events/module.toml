@@ -1,0 +1,14 @@
+[module]
+title = "SAP Source System Events"
+
+[packages]
+tags = [
+    "sourcesystem",
+    "quickstart",
+]
+
+[[data]]
+repoType = "GitHub"
+repo = "cognitedata/toolkit-data"
+source = "data/publicdata/[work]*.csv"
+destination = "raw/"

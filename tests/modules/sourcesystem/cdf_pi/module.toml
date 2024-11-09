@@ -1,0 +1,18 @@
+[module]
+title = "OSIsoft/AVEVA PI Data Source"
+is_selected_by_default = false
+
+[packages]
+tags = [
+    "sourcesystem",
+    "quickstart",
+]
+
+[dependencies]
+modules = []
+
+[[data]]
+repoType = "GitHub"
+repo = "cognitedata/toolkit-data"
+source = "data/publicdata/pi_timeseries.Table.csv"
+destination = "raw/timeseries.Table.csv"

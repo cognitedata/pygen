@@ -1,0 +1,14 @@
+externalId: {{ timeseriesTransformationExternalId }}
+dataSetExternalId: {{ dataset }}
+name: TimeSeries Transformations for {{ sourceName }}
+destination:
+  type: nodes
+  view:
+    space: cdf_cdm
+    externalId: CogniteTimeSeries
+    version: v1
+  instanceSpace: {{ instanceSpace }}
+conflictMode: upsert
+isPublic: true
+ignoreNullFields: true
+

@@ -1,0 +1,13 @@
+externalId: {{ fileTransformationExternalId }}
+dataSetExternalId: {{ dataset }}
+name: File Transformations for {{ sourceName }}
+destination:
+  type: nodes
+  view:
+    space: cdf_cdm
+    externalId: CogniteFile
+    version: v1
+  instanceSpace: {{ instanceSpace }}
+ignoreNullFields: true
+isPublic: true
+conflictMode: upsert
