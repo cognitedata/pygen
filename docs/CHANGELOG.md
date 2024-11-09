@@ -18,6 +18,15 @@ Changes are grouped as follows
 - When calling `generate_sdk` or `generate_sdk_notebook` you now get an improved formatting of warnings. In addition,
   irrelevant warnings are no longer shown.
 
+### Added
+- In the generated list classes, all connection properties are now available as properties. This is to make it easier
+  to access the connection properties without having to go through the `data_record` property.
+
+### Changed
+- [Experimental - Breaking] Reverted breaking change from `0.99.40`; The `.query` property is now a method `query`.
+  Instead of `client.asset.query` you now do `client.asset.query()`. This is to make type hints better when working
+  ina Notebook environment.
+
 ## [0.99.44] - 24-11-08
 ### Improved
 - In the underlying `query` operation, used for `.list(...)` as well as query methods, `pygen` now
