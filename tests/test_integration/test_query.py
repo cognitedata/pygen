@@ -1,8 +1,5 @@
-from cognite_core import CogniteCoreClient
 from omni import OmniClient
 from omni import data_classes as dc
-
-from tests.constants import CORE_SDK
 
 
 def test_query_with_direct_relation(omni_client: OmniClient) -> None:
@@ -82,14 +79,3 @@ def test_query_direct_relation_to_self(omni_client: OmniClient) -> None:
     assert isinstance(erin, dc.ConnectionItemA)
     assert isinstance(erin.self_direct, dc.ConnectionItemA)
     assert erin.self_direct.external_id == "ConnectionItemA:Alexander"
-
-
-def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) -> None:
-    result = (
-        core_client.cognite_asset.query()
-        .name.equals("230900")
-        .space.equals(CORE_SDK.instance_space)
-        .children.list_cognite_asset(limit=-1)
-    )
-
-    assert len(result) == 2

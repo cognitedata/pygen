@@ -1,7 +1,10 @@
 import pytest
+from cognite_core import CogniteCoreClient
 from omni import OmniClient
 from omni import data_classes as dc
 from windmill import WindmillClient
+
+from tests.constants import CORE_SDK
 
 
 def test_query_across_direct_relation(omni_client: OmniClient) -> None:
@@ -154,3 +157,14 @@ def test_query_across_reverse_direct_relation_to_list_full(omni_client: OmniClie
 
     assert len(items) > 0
     assert items.dump()
+
+
+def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) -> None:
+    result = (
+        core_client.cognite_asset.query()
+        .name.equals("230900")
+        .space.equals(CORE_SDK.instance_space)
+        .children.list_cognite_asset(limit=-1)
+    )
+
+    assert len(result) == 2

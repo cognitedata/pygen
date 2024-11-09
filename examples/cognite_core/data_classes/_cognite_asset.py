@@ -1164,7 +1164,6 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="children",
-                connection_type="reverse-list",
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -1178,7 +1177,6 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="equipment",
-                connection_type="reverse-list",
             )
 
         if _CogniteFileQuery not in created_types:
