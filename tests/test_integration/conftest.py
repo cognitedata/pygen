@@ -9,6 +9,7 @@ import toml
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+from cognite_core import CogniteCoreClient
 from omni import OmniClient
 from omni_sub import OmniSubClient
 from scenario_instance.client import ScenarioInstanceClient
@@ -71,6 +72,11 @@ def cognite_client_alpha(client_config_alpha: dict[str, str]) -> CogniteClient:
 @pytest.fixture(scope="session")
 def omni_client(cognite_client: CogniteClient) -> OmniClient:
     return OmniClient(cognite_client)
+
+
+@pytest.fixture(scope="session")
+def core_client(cognite_client: CogniteClient) -> CogniteCoreClient:
+    return CogniteCoreClient(cognite_client)
 
 
 @pytest.fixture(scope="session")
