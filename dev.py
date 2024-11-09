@@ -1,6 +1,7 @@
 """This is a small CLI used for Pygen development."""
 
 import re
+import time
 from collections import defaultdict
 from datetime import datetime
 from multiprocessing import Pool
@@ -30,6 +31,7 @@ app = typer.Typer(
 def generate_sdks(
     sdk_name: str = typer.Option(None, "--sdk", help="Generate only the specified SDK"),
 ):
+    t0 = time.time()
     sdks_to_generate = (example_sdk for example_sdk in EXAMPLE_SDKS if example_sdk.generate_sdk)
     if sdk_name is not None:
         sdks_to_generate = (
@@ -41,7 +43,8 @@ def generate_sdks(
     with Pool(min(8, len(sdks))) as pool:
         pool.map(_generate_sdk, sdks)
 
-    typer.echo("All SDKs Created!")
+    elapsed = time.time() - t0
+    typer.echo(f"All SDKs Created in {elapsed:.1f} seconds!")
 
 
 def _generate_sdk(example_sdk: ExampleSDK) -> None:

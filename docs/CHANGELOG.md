@@ -27,6 +27,10 @@ Changes are grouped as follows
   Instead of `client.asset.query` you now do `client.asset.query()`. This is to make type hints better when working
   ina Notebook environment.
 
+### Fixed
+- The `.list_<type>` of the `.query()` method no longer returns empty lists when the start node is the same as the
+  end node.
+
 ## [0.99.44] - 24-11-08
 ### Improved
 - In the underlying `query` operation, used for `.list(...)` as well as query methods, `pygen` now

@@ -292,4 +292,10 @@ class WindMillFiles:
         wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"
 
 
+class CogniteCoreFiles:
+    client_dir = CORE_SDK.client_dir
+    data_classes = client_dir / "data_classes"
+    data_cognite_asset = data_classes / "_cognite_asset.py"
+
+
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]
