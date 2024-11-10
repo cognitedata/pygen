@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.46] - 24-11-11
+### Fixed
+- Views with external ids on the formate `UPPERCASE_LETTERS_NUMBERS` no longer raise a NameConflict error when
+  generating the SDK. This was caused by a bug in `to_pascal` method used to create the data class names.
+
+## [0.99.45] - 24-11-10
 ### Improved
 - When calling `generate_sdk` or `generate_sdk_notebook` you now get an improved formatting of warnings. In addition,
   irrelevant warnings are no longer shown.
