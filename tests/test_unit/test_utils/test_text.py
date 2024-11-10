@@ -17,6 +17,7 @@ from cognite.pygen.utils.text import to_pascal, to_snake
         ("pygen_model-power", False, False, "PygenModelPower"),
         ("pygen-model_power", False, False, "PygenModelPower"),
         ("1", False, False, "1"),
+        ("CFIHOS_00000001", False, False, "CFIHOS00000001"),
     ],
 )
 def test_to_pascal(word: str, singularize: bool, pluralize: bool, expected: str):
