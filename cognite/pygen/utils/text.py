@@ -73,9 +73,13 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         # Ensure pascal
         string = string[0].upper() + string[1:]
         pascal_splits = [string]
-    string_split = []
+    string_split: list[str] = []
     for part in pascal_splits:
-        string_split.extend(re.findall(r"[A-Z][a-z0-9]*", part))
+        # Split on capital letters to maintain the capital letters from the original string
+        # The extra filter is to remove empty strings
+        # This can happen if the string starts with a capital letter
+        string_split.extend(sub for sub in re.split(r"(?=[A-Z])", part) if sub)
+
     if not string_split:
         string_split = [string]
     if pluralize and singularize:

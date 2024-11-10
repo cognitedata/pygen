@@ -1,6 +1,6 @@
 import pytest
 
-from cognite.pygen.utils.text import to_pascal, to_snake
+from cognite.pygen.utils.text import to_camel, to_pascal, to_snake
 
 
 @pytest.mark.parametrize(
@@ -23,6 +23,20 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 def test_to_pascal(word: str, singularize: bool, pluralize: bool, expected: str):
     # Act
     actual = to_pascal(word, singularize=singularize, pluralize=pluralize)
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "word, singularize, pluralize, expected",
+    [
+        ("a_b", False, False, "aB"),
+    ],
+)
+def test_to_camel(word: str, singularize: bool, pluralize: bool, expected: str):
+    # Act
+    actual = to_camel(word, singularize=singularize, pluralize=pluralize)
 
     # Assert
     assert actual == expected
