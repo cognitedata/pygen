@@ -32,7 +32,7 @@ class WindmillClient:
 
     Generated with:
         pygen = 0.99.46
-        cognite-sdk = 7.64.8
+        cognite-sdk = 7.64.12
         pydantic = 2.9.2
 
     Data Model:

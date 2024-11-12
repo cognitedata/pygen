@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- Raised lower bound of dependency `inflect` to `6.2` when support for `pydantic` `v2` was added.
+
 ## [0.99.46] - 24-11-11
 ### Fixed
 - Views with external ids on the formate `UPPERCASE_LETTERS_NUMBERS` no longer raise a NameConflict error when
