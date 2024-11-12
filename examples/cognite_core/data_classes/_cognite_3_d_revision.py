@@ -59,13 +59,13 @@ __all__ = [
 
 
 Cognite3DRevisionTextFields = Literal["external_id",]
-Cognite3DRevisionFields = Literal["external_id", "published", "status", "revision_type"]
+Cognite3DRevisionFields = Literal["external_id", "published", "status", "type_"]
 
 _COGNITE3DREVISION_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "published": "published",
     "status": "status",
-    "revision_type": "type",
+    "type_": "type",
 }
 
 
@@ -82,14 +82,14 @@ class Cognite3DRevisionGraphQL(GraphQLCore, protected_namespaces=()):
         model_3d: The model 3d field.
         published: The published field.
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
     model_3d: Optional[Cognite3DModelGraphQL] = Field(default=None, repr=False, alias="model3D")
     published: Optional[bool] = None
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
-    revision_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -127,7 +127,7 @@ class Cognite3DRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             model_3d=self.model_3d.as_read() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
             published=self.published,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -141,7 +141,7 @@ class Cognite3DRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             model_3d=self.model_3d.as_write() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
             published=self.published,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
 
@@ -157,7 +157,7 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
         model_3d: The model 3d field.
         published: The published field.
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
@@ -167,7 +167,7 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
     model_3d: Union[Cognite3DModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
     published: Optional[bool] = None
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
-    revision_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     def as_write(self) -> Cognite3DRevisionWrite:
         """Convert this read version of Cognite 3D revision to the writing version."""
@@ -178,7 +178,7 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
             model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
             published=self.published,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     def as_apply(self) -> Cognite3DRevisionWrite:
@@ -220,7 +220,7 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
         model_3d: The model 3d field.
         published: The published field.
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
@@ -230,7 +230,7 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
     model_3d: Union[Cognite3DModelWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
     published: Optional[bool] = None
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
-    revision_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     @field_validator("model_3d", mode="before")
     def as_node_id(cls, value: Any) -> Any:
@@ -266,8 +266,8 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
         if self.status is not None or write_none:
             properties["status"] = self.status
 
-        if self.revision_type is not None or write_none:
-            properties["type"] = self.revision_type
+        if self.type_ is not None or write_none:
+            properties["type"] = self.type_
 
         if properties:
             this_node = dm.NodeApply(

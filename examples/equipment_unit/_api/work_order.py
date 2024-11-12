@@ -56,8 +56,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -70,8 +70,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -88,8 +88,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -211,8 +211,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -230,8 +230,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -260,8 +260,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -288,8 +288,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -308,8 +308,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -332,8 +332,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -355,8 +355,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -378,8 +378,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -404,8 +404,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -430,8 +430,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -448,8 +448,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -465,8 +465,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -491,8 +491,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -508,8 +508,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -538,8 +538,8 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,

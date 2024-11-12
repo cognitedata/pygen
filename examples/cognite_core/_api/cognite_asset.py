@@ -127,7 +127,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -167,7 +167,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            asset_type: The asset type to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -204,7 +204,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            asset_type,
+            type_,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -221,7 +221,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         """Add or update (upsert) Cognite assets.
 
         Note: This method iterates through all nodes and timeseries linked to cognite_asset and creates them including the edges
-        between the nodes. For example, if any of `asset_class`, `object_3d`, `parent`, `path`, `root`, `source` or `asset_type` are set, then these
+        between the nodes. For example, if any of `asset_class`, `object_3d`, `parent`, `path`, `root`, `source` or `type_` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -392,7 +392,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -437,7 +437,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            asset_type: The asset type to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -486,7 +486,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            asset_type,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -575,7 +575,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -663,7 +663,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -755,7 +755,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -846,7 +846,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -895,7 +895,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            asset_type: The asset type to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -940,7 +940,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            asset_type,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -1027,7 +1027,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -1071,7 +1071,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            asset_type: The asset type to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -1107,7 +1107,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            asset_type,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -1194,7 +1194,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        asset_type: (
+        type_: (
             str
             | tuple[str, str]
             | dm.NodeId
@@ -1238,7 +1238,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            asset_type: The asset type to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -1248,7 +1248,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `activities`, `asset_class`, `children`, `equipment`, `files`, `object_3d`, `parent`, `path`, `root`, `source`, `time_series` and `asset_type` for the Cognite assets. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `activities`, `asset_class`, `children`, `equipment`, `files`, `object_3d`, `parent`, `path`, `root`, `source`, `time_series` and `type_` for the Cognite assets. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
@@ -1289,7 +1289,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            asset_type,
+            type_,
             external_id_prefix,
             space,
             filter,

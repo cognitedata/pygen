@@ -63,7 +63,7 @@ __all__ = [
 
 Cognite360ImageCollectionTextFields = Literal["external_id", "aliases", "description", "name", "tags"]
 Cognite360ImageCollectionFields = Literal[
-    "external_id", "aliases", "description", "name", "published", "status", "tags", "revision_type"
+    "external_id", "aliases", "description", "name", "published", "status", "tags", "type_"
 ]
 
 _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD = {
@@ -74,7 +74,7 @@ _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD = {
     "published": "published",
     "status": "status",
     "tags": "tags",
-    "revision_type": "type",
+    "type_": "type",
 }
 
 
@@ -95,7 +95,7 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
         published: The published field.
         status: The status field.
         tags: Text based labels for generic use, limited to 1000
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -106,7 +106,7 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
     published: Optional[bool] = None
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
     tags: Optional[list[str]] = None
-    revision_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -148,7 +148,7 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
             published=self.published,
             status=self.status,
             tags=self.tags,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -166,7 +166,7 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
             published=self.published,
             status=self.status,
             tags=self.tags,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
 
@@ -186,7 +186,7 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
         published: The published field.
         status: The status field.
         tags: Text based labels for generic use, limited to 1000
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -206,7 +206,7 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
             published=self.published,
             status=self.status,
             tags=self.tags,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     def as_apply(self) -> Cognite360ImageCollectionWrite:
@@ -252,7 +252,7 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
         published: The published field.
         status: The status field.
         tags: Text based labels for generic use, limited to 1000
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -295,8 +295,8 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
         if self.tags is not None or write_none:
             properties["tags"] = self.tags
 
-        if self.revision_type is not None or write_none:
-            properties["type"] = self.revision_type
+        if self.type_ is not None or write_none:
+            properties["type"] = self.type_
 
         if properties:
             this_node = dm.NodeApply(

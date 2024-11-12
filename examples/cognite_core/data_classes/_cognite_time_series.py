@@ -117,7 +117,7 @@ CogniteTimeSeriesFields = Literal[
     "source_updated_time",
     "source_updated_user",
     "tags",
-    "time_series_type",
+    "type_",
 ]
 
 _COGNITETIMESERIES_PROPERTIES_BY_FIELD = {
@@ -134,7 +134,7 @@ _COGNITETIMESERIES_PROPERTIES_BY_FIELD = {
     "source_updated_time": "sourceUpdatedTime",
     "source_updated_user": "sourceUpdatedUser",
     "tags": "tags",
-    "time_series_type": "type",
+    "type_": "type",
 }
 
 
@@ -164,7 +164,7 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
         source_updated_time: When the instance was last updated in the source system (if available)
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
-        time_series_type: Specifies the data type of the data points.
+        type_: Specifies the data type of the data points.
         unit: The unit of the time series.
     """
 
@@ -185,7 +185,7 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
     tags: Optional[list[str]] = None
-    time_series_type: Optional[Literal["numeric", "string"]] = Field(None, alias="type")
+    type_: Optional[Literal["numeric", "string"]] = Field(None, alias="type")
     unit: Optional[CogniteUnitGraphQL] = Field(default=None, repr=False)
 
     @model_validator(mode="before")
@@ -237,7 +237,7 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            time_series_type=self.time_series_type,
+            type_=self.type_,
             unit=self.unit.as_read() if isinstance(self.unit, GraphQLCore) else self.unit,
         )
 
@@ -264,7 +264,7 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            time_series_type=self.time_series_type,
+            type_=self.type_,
             unit=self.unit.as_write() if isinstance(self.unit, GraphQLCore) else self.unit,
         )
 
@@ -294,7 +294,7 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
         source_updated_time: When the instance was last updated in the source system (if available)
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
-        time_series_type: Specifies the data type of the data points.
+        type_: Specifies the data type of the data points.
         unit: The unit of the time series.
     """
 
@@ -306,7 +306,7 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     equipment: Optional[list[Union[CogniteEquipment, str, dm.NodeId]]] = Field(default=None, repr=False)
     is_step: bool = Field(alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
-    time_series_type: Literal["numeric", "string"] = Field(alias="type")
+    type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
     def as_write(self) -> CogniteTimeSeriesWrite:
@@ -333,7 +333,7 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            time_series_type=self.time_series_type,
+            type_=self.type_,
             unit=self.unit.as_write() if isinstance(self.unit, DomainModel) else self.unit,
         )
 
@@ -426,7 +426,7 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         source_updated_time: When the instance was last updated in the source system (if available)
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
-        time_series_type: Specifies the data type of the data points.
+        type_: Specifies the data type of the data points.
         unit: The unit of the time series.
     """
 
@@ -437,7 +437,7 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
     equipment: Optional[list[Union[CogniteEquipmentWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     is_step: bool = Field(alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
-    time_series_type: Literal["numeric", "string"] = Field(alias="type")
+    type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnitWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
 
     @field_validator("assets", "equipment", "unit", mode="before")
@@ -526,8 +526,8 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         if self.tags is not None or write_none:
             properties["tags"] = self.tags
 
-        if self.time_series_type is not None:
-            properties["type"] = self.time_series_type
+        if self.type_ is not None:
+            properties["type"] = self.type_
 
         if self.unit is not None:
             properties["unit"] = {

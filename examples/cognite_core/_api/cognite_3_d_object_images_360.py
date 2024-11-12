@@ -15,7 +15,7 @@ from cognite_core._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from cognite_core.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
-class Cognite3DObjectImagesAPI(EdgePropertyAPI):
+class Cognite3DObjectImages360API(EdgePropertyAPI):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
     _class_type = Cognite360ImageAnnotation
     _class_write_type = Cognite360ImageAnnotationWrite

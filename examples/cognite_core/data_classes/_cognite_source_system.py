@@ -51,11 +51,9 @@ __all__ = [
 
 
 CogniteSourceSystemTextFields = Literal[
-    "external_id", "aliases", "description", "manufacturer", "name", "tags", "source_system_version"
+    "external_id", "aliases", "description", "manufacturer", "name", "tags", "version_"
 ]
-CogniteSourceSystemFields = Literal[
-    "external_id", "aliases", "description", "manufacturer", "name", "tags", "source_system_version"
-]
+CogniteSourceSystemFields = Literal["external_id", "aliases", "description", "manufacturer", "name", "tags", "version_"]
 
 _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -64,7 +62,7 @@ _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD = {
     "manufacturer": "manufacturer",
     "name": "name",
     "tags": "tags",
-    "source_system_version": "version",
+    "version_": "version",
 }
 
 
@@ -83,7 +81,7 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
         manufacturer: Manufacturer of the source system
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
-        source_system_version: Version identifier for the source system
+        version_: Version identifier for the source system
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
@@ -92,7 +90,7 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
     manufacturer: Optional[str] = None
     name: Optional[str] = None
     tags: Optional[list[str]] = None
-    source_system_version: Optional[str] = Field(None, alias="version")
+    version_: Optional[str] = Field(None, alias="version")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -124,7 +122,7 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
             manufacturer=self.manufacturer,
             name=self.name,
             tags=self.tags,
-            source_system_version=self.source_system_version,
+            version_=self.version_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -140,7 +138,7 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
             manufacturer=self.manufacturer,
             name=self.name,
             tags=self.tags,
-            source_system_version=self.source_system_version,
+            version_=self.version_,
         )
 
 
@@ -158,14 +156,14 @@ class CogniteSourceSystem(CogniteDescribableNode):
         manufacturer: Manufacturer of the source system
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
-        source_system_version: Version identifier for the source system
+        version_: Version identifier for the source system
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
     manufacturer: Optional[str] = None
-    source_system_version: Optional[str] = Field(None, alias="version")
+    version_: Optional[str] = Field(None, alias="version")
 
     def as_write(self) -> CogniteSourceSystemWrite:
         """Convert this read version of Cognite source system to the writing version."""
@@ -178,7 +176,7 @@ class CogniteSourceSystem(CogniteDescribableNode):
             manufacturer=self.manufacturer,
             name=self.name,
             tags=self.tags,
-            source_system_version=self.source_system_version,
+            version_=self.version_,
         )
 
     def as_apply(self) -> CogniteSourceSystemWrite:
@@ -205,14 +203,14 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
         manufacturer: Manufacturer of the source system
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
-        source_system_version: Version identifier for the source system
+        version_: Version identifier for the source system
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     manufacturer: Optional[str] = None
-    source_system_version: Optional[str] = Field(None, alias="version")
+    version_: Optional[str] = Field(None, alias="version")
 
     def _to_instances_write(
         self,
@@ -241,8 +239,8 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
         if self.tags is not None or write_none:
             properties["tags"] = self.tags
 
-        if self.source_system_version is not None or write_none:
-            properties["version"] = self.source_system_version
+        if self.version_ is not None or write_none:
+            properties["version"] = self.version_
 
         if properties:
             this_node = dm.NodeApply(
@@ -311,8 +309,8 @@ def _create_cognite_source_system_filter(
     manufacturer_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    source_system_version: str | list[str] | None = None,
-    source_system_version_prefix: str | None = None,
+    version_: str | list[str] | None = None,
+    version_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -336,12 +334,12 @@ def _create_cognite_source_system_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if isinstance(source_system_version, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("version"), value=source_system_version))
-    if source_system_version and isinstance(source_system_version, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("version"), values=source_system_version))
-    if source_system_version_prefix is not None:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("version"), value=source_system_version_prefix))
+    if isinstance(version_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("version"), value=version_))
+    if version_ and isinstance(version_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("version"), values=version_))
+    if version_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("version"), value=version_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -387,7 +385,7 @@ class _CogniteSourceSystemQuery(NodeQueryCore[T_DomainModelList, CogniteSourceSy
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.manufacturer = StringFilter(self, self._view_id.as_property_ref("manufacturer"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self.source_system_version = StringFilter(self, self._view_id.as_property_ref("version"))
+        self.version_ = StringFilter(self, self._view_id.as_property_ref("version"))
         self._filter_classes.extend(
             [
                 self.space,
@@ -395,7 +393,7 @@ class _CogniteSourceSystemQuery(NodeQueryCore[T_DomainModelList, CogniteSourceSy
                 self.description,
                 self.manufacturer,
                 self.name,
-                self.source_system_version,
+                self.version_,
             ]
         )
 

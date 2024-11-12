@@ -58,7 +58,7 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
         retrieve_parent: bool = False,
         retrieve_root: bool = False,
         retrieve_source: bool = False,
-        retrieve_asset_type: bool = False,
+        retrieve_type_: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
@@ -68,7 +68,7 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
             retrieve_parent: Whether to retrieve the parent for each Cognite asset or not.
             retrieve_root: Whether to retrieve the root for each Cognite asset or not.
             retrieve_source: Whether to retrieve the source for each Cognite asset or not.
-            retrieve_asset_type: Whether to retrieve the asset type for each Cognite asset or not.
+            retrieve_type_: Whether to retrieve the type for each Cognite asset or not.
 
         Returns:
             The list of the source nodes of the query.
@@ -85,8 +85,8 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_root(from_)
         if retrieve_source:
             self._query_append_source(from_)
-        if retrieve_asset_type:
-            self._query_append_asset_type(from_)
+        if retrieve_type_:
+            self._query_append_type_(from_)
         return self._query()
 
     def _query_append_asset_class(self, from_: str) -> None:
@@ -159,7 +159,7 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_asset_type(self, from_: str) -> None:
+    def _query_append_type_(self, from_: str) -> None:
         self._builder.append(
             NodeQueryStep(
                 name=self._builder.create_name(from_),

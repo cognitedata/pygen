@@ -65,8 +65,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         self,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -77,8 +77,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         Args:
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            unit_procedure_type: The unit procedure type to filter on.
-            unit_procedure_type_prefix: The prefix of the unit procedure type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -93,8 +93,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             name,
             name_prefix,
-            unit_procedure_type,
-            unit_procedure_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -238,8 +238,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         properties: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -255,8 +255,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             properties: The property to search, if nothing is passed all text fields will be searched.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            unit_procedure_type: The unit procedure type to filter on.
-            unit_procedure_type_prefix: The prefix of the unit procedure type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -283,8 +283,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             name,
             name_prefix,
-            unit_procedure_type,
-            unit_procedure_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -309,8 +309,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -327,8 +327,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -349,8 +349,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -370,8 +370,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -391,8 +391,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             search_property: The text field to search in.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            unit_procedure_type: The unit procedure type to filter on.
-            unit_procedure_type_prefix: The prefix of the unit procedure type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -415,8 +415,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             name,
             name_prefix,
-            unit_procedure_type,
-            unit_procedure_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -439,8 +439,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         search_property: UnitProcedureTextFields | SequenceNotStr[UnitProcedureTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -455,8 +455,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             search_property: The text field to search in.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            unit_procedure_type: The unit procedure type to filter on.
-            unit_procedure_type_prefix: The prefix of the unit procedure type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -470,8 +470,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             name,
             name_prefix,
-            unit_procedure_type,
-            unit_procedure_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -494,8 +494,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         self,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        unit_procedure_type: str | list[str] | None = None,
-        unit_procedure_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -510,8 +510,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
         Args:
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            unit_procedure_type: The unit procedure type to filter on.
-            unit_procedure_type_prefix: The prefix of the unit procedure type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -540,8 +540,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
             self._view_id,
             name,
             name_prefix,
-            unit_procedure_type,
-            unit_procedure_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,

@@ -16,6 +16,10 @@ Changes are grouped as follows
 ## TBD
 ### Fixed
 - Raised lower bound of dependency `inflect` to `6.2` when support for `pydantic` `v2` was added.
+- Reverting change from `0.99.34`. For example, for `CogniteTimeSeries` the property `type` will
+  now be named `type_` and not `time_series_type`. This is to avoid conflicts if the view has a property
+  named `time_series_type`. This typically occurs when someone extends `CogniteTimeSeries` and introduces
+  custom `types`.
 
 ## [0.99.46] - 24-11-11
 ### Fixed

@@ -68,8 +68,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         description_prefix: str | None = None,
         performed_by: str | list[str] | None = None,
         performed_by_prefix: str | None = None,
-        work_order_type: str | list[str] | None = None,
-        work_order_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         min_end_time_edge: datetime.datetime | None = None,
@@ -88,8 +88,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             description_prefix: The prefix of the description to filter on.
             performed_by: The performed by to filter on.
             performed_by_prefix: The prefix of the performed by to filter on.
-            work_order_type: The work order type to filter on.
-            work_order_type_prefix: The prefix of the work order type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             min_end_time_edge: The minimum value of the end time to filter on.
@@ -141,8 +141,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             description_prefix,
             performed_by,
             performed_by_prefix,
-            work_order_type,
-            work_order_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -155,8 +155,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        equipment_module_type: str | list[str] | None = None,
-        equipment_module_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         min_end_time_edge: datetime.datetime | None = None,
@@ -175,8 +175,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            equipment_module_type: The equipment module type to filter on.
-            equipment_module_type_prefix: The prefix of the equipment module type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             min_end_time_edge: The minimum value of the end time to filter on.
@@ -228,8 +228,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             description_prefix,
             name,
             name_prefix,
-            equipment_module_type,
-            equipment_module_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
