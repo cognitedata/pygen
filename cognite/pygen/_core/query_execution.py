@@ -214,6 +214,40 @@ class QueryExecutor:
             }
         return dict(output)
 
+    def search(
+        self,
+        view: dm.ViewId,
+        properties: Properties,
+        query: str | None = None,
+        filter: filters.Filter | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        raise NotImplementedError("Search is not implemented")
+
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        filters: filters.Filter | None = None,
+        group_by: str | SequenceNotStr[str] | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        raise NotImplementedError("Aggregate is not implemented")
+
+    def list(
+        self,
+        view: dm.ViewId,
+        properties: Properties,
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        raise NotImplementedError("List is not implemented")
+
 
 class QueryStepFactory:
     def __init__(
