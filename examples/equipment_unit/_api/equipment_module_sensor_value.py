@@ -367,8 +367,8 @@ class EquipmentModuleSensorValueAPI:
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        equipment_module_type: str | list[str] | None = None,
-        equipment_module_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -381,8 +381,8 @@ class EquipmentModuleSensorValueAPI:
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            equipment_module_type: The equipment module type to filter on.
-            equipment_module_type_prefix: The prefix of the equipment module type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -407,8 +407,8 @@ class EquipmentModuleSensorValueAPI:
             description_prefix,
             name,
             name_prefix,
-            equipment_module_type,
-            equipment_module_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -427,8 +427,8 @@ class EquipmentModuleSensorValueAPI:
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        equipment_module_type: str | list[str] | None = None,
-        equipment_module_type_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -441,8 +441,8 @@ class EquipmentModuleSensorValueAPI:
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            equipment_module_type: The equipment module type to filter on.
-            equipment_module_type_prefix: The prefix of the equipment module type to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -466,8 +466,8 @@ class EquipmentModuleSensorValueAPI:
             description_prefix,
             name,
             name_prefix,
-            equipment_module_type,
-            equipment_module_type_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,

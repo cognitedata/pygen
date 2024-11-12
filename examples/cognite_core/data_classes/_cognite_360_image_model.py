@@ -67,7 +67,7 @@ __all__ = [
 
 
 Cognite360ImageModelTextFields = Literal["external_id", "aliases", "description", "name", "tags"]
-Cognite360ImageModelFields = Literal["external_id", "aliases", "description", "name", "tags", "model_type"]
+Cognite360ImageModelFields = Literal["external_id", "aliases", "description", "name", "tags", "type_"]
 
 _COGNITE360IMAGEMODEL_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -75,11 +75,11 @@ _COGNITE360IMAGEMODEL_PROPERTIES_BY_FIELD = {
     "description": "description",
     "name": "name",
     "tags": "tags",
-    "model_type": "type",
+    "type_": "type",
 }
 
 
-class Cognite360ImageModelGraphQL(GraphQLCore, protected_namespaces=()):
+class Cognite360ImageModelGraphQL(GraphQLCore):
     """This represents the reading version of Cognite 360 image model, used
     when data is retrieved from CDF using GraphQL.
 
@@ -95,7 +95,7 @@ class Cognite360ImageModelGraphQL(GraphQLCore, protected_namespaces=()):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
         thumbnail: Thumbnail of the 3D model
-        model_type: CAD, PointCloud or Image360
+        type_: CAD, PointCloud or Image360
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
@@ -105,7 +105,7 @@ class Cognite360ImageModelGraphQL(GraphQLCore, protected_namespaces=()):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
     thumbnail: Optional[CogniteFileGraphQL] = Field(default=None, repr=False)
-    model_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -146,7 +146,7 @@ class Cognite360ImageModelGraphQL(GraphQLCore, protected_namespaces=()):
             name=self.name,
             tags=self.tags,
             thumbnail=self.thumbnail.as_read() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            model_type=self.model_type,
+            type_=self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -162,11 +162,11 @@ class Cognite360ImageModelGraphQL(GraphQLCore, protected_namespaces=()):
             name=self.name,
             tags=self.tags,
             thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            model_type=self.model_type,
+            type_=self.type_,
         )
 
 
-class Cognite360ImageModel(Cognite3DModel, protected_namespaces=()):
+class Cognite360ImageModel(Cognite3DModel):
     """This represents the reading version of Cognite 360 image model.
 
     It is used to when data is retrieved from CDF.
@@ -181,7 +181,7 @@ class Cognite360ImageModel(Cognite3DModel, protected_namespaces=()):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
         thumbnail: Thumbnail of the 3D model
-        model_type: CAD, PointCloud or Image360
+        type_: CAD, PointCloud or Image360
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
@@ -200,7 +200,7 @@ class Cognite360ImageModel(Cognite3DModel, protected_namespaces=()):
             name=self.name,
             tags=self.tags,
             thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, DomainModel) else self.thumbnail,
-            model_type=self.model_type,
+            type_=self.type_,
         )
 
     def as_apply(self) -> Cognite360ImageModelWrite:
@@ -240,7 +240,7 @@ class Cognite360ImageModel(Cognite3DModel, protected_namespaces=()):
                 model_3d.collections.append(node)
 
 
-class Cognite360ImageModelWrite(Cognite3DModelWrite, protected_namespaces=()):
+class Cognite360ImageModelWrite(Cognite3DModelWrite):
     """This represents the writing version of Cognite 360 image model.
 
     It is used to when data is sent to CDF.
@@ -254,7 +254,7 @@ class Cognite360ImageModelWrite(Cognite3DModelWrite, protected_namespaces=()):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
         thumbnail: Thumbnail of the 3D model
-        model_type: CAD, PointCloud or Image360
+        type_: CAD, PointCloud or Image360
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
@@ -291,8 +291,8 @@ class Cognite360ImageModelWrite(Cognite3DModelWrite, protected_namespaces=()):
                 "externalId": self.thumbnail if isinstance(self.thumbnail, str) else self.thumbnail.external_id,
             }
 
-        if self.model_type is not None or write_none:
-            properties["type"] = self.model_type
+        if self.type_ is not None or write_none:
+            properties["type"] = self.type_
 
         if properties:
             this_node = dm.NodeApply(

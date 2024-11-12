@@ -49,14 +49,14 @@ __all__ = [
 ]
 
 
-WorkOrderTextFields = Literal["external_id", "description", "performed_by", "work_order_type"]
-WorkOrderFields = Literal["external_id", "description", "performed_by", "work_order_type"]
+WorkOrderTextFields = Literal["external_id", "description", "performed_by", "type_"]
+WorkOrderFields = Literal["external_id", "description", "performed_by", "type_"]
 
 _WORKORDER_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "description": "description",
     "performed_by": "performedBy",
-    "work_order_type": "type",
+    "type_": "type",
 }
 
 
@@ -72,13 +72,13 @@ class WorkOrderGraphQL(GraphQLCore):
         data_record: The data record of the work order node.
         description: The description field.
         performed_by: The performed by field.
-        work_order_type: The work order type field.
+        type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
-    work_order_type: Optional[str] = Field(None, alias="type")
+    type_: Optional[str] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -107,7 +107,7 @@ class WorkOrderGraphQL(GraphQLCore):
             ),
             description=self.description,
             performed_by=self.performed_by,
-            work_order_type=self.work_order_type,
+            type_=self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -120,7 +120,7 @@ class WorkOrderGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             description=self.description,
             performed_by=self.performed_by,
-            work_order_type=self.work_order_type,
+            type_=self.type_,
         )
 
 
@@ -135,7 +135,7 @@ class WorkOrder(DomainModel):
         data_record: The data record of the work order node.
         description: The description field.
         performed_by: The performed by field.
-        work_order_type: The work order type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
@@ -144,7 +144,7 @@ class WorkOrder(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
-    work_order_type: Optional[str] = Field(None, alias="type")
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_write(self) -> WorkOrderWrite:
         """Convert this read version of work order to the writing version."""
@@ -154,7 +154,7 @@ class WorkOrder(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             performed_by=self.performed_by,
-            work_order_type=self.work_order_type,
+            type_=self.type_,
         )
 
     def as_apply(self) -> WorkOrderWrite:
@@ -178,7 +178,7 @@ class WorkOrderWrite(DomainModelWrite):
         data_record: The data record of the work order node.
         description: The description field.
         performed_by: The performed by field.
-        work_order_type: The work order type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
@@ -187,7 +187,7 @@ class WorkOrderWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     description: Optional[str] = None
     performed_by: Optional[str] = Field(None, alias="performedBy")
-    work_order_type: Optional[str] = Field(None, alias="type")
+    type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_write(
         self,
@@ -207,8 +207,8 @@ class WorkOrderWrite(DomainModelWrite):
         if self.performed_by is not None or write_none:
             properties["performedBy"] = self.performed_by
 
-        if self.work_order_type is not None or write_none:
-            properties["type"] = self.work_order_type
+        if self.type_ is not None or write_none:
+            properties["type"] = self.type_
 
         if properties:
             this_node = dm.NodeApply(
@@ -275,8 +275,8 @@ def _create_work_order_filter(
     description_prefix: str | None = None,
     performed_by: str | list[str] | None = None,
     performed_by_prefix: str | None = None,
-    work_order_type: str | list[str] | None = None,
-    work_order_type_prefix: str | None = None,
+    type_: str | list[str] | None = None,
+    type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -294,12 +294,12 @@ def _create_work_order_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("performedBy"), values=performed_by))
     if performed_by_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("performedBy"), value=performed_by_prefix))
-    if isinstance(work_order_type, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=work_order_type))
-    if work_order_type and isinstance(work_order_type, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=work_order_type))
-    if work_order_type_prefix is not None:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=work_order_type_prefix))
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
+    if type_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -344,14 +344,14 @@ class _WorkOrderQuery(NodeQueryCore[T_DomainModelList, WorkOrderList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.performed_by = StringFilter(self, self._view_id.as_property_ref("performedBy"))
-        self.work_order_type = StringFilter(self, self._view_id.as_property_ref("type"))
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
                 self.description,
                 self.performed_by,
-                self.work_order_type,
+                self.type_,
             ]
         )
 

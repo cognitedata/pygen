@@ -61,14 +61,14 @@ __all__ = [
 
 
 CogniteCADRevisionTextFields = Literal["external_id",]
-CogniteCADRevisionFields = Literal["external_id", "published", "revision_id", "status", "revision_type"]
+CogniteCADRevisionFields = Literal["external_id", "published", "revision_id", "status", "type_"]
 
 _COGNITECADREVISION_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "published": "published",
     "revision_id": "revisionId",
     "status": "status",
-    "revision_type": "type",
+    "type_": "type",
 }
 
 
@@ -86,7 +86,7 @@ class CogniteCADRevisionGraphQL(GraphQLCore, protected_namespaces=()):
         published: The published field.
         revision_id: The 3D API revision identifier for this CAD model
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1")
@@ -94,7 +94,7 @@ class CogniteCADRevisionGraphQL(GraphQLCore, protected_namespaces=()):
     published: Optional[bool] = None
     revision_id: Optional[int] = Field(None, alias="revisionId")
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
-    revision_type: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -133,7 +133,7 @@ class CogniteCADRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             published=self.published,
             revision_id=self.revision_id,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -148,7 +148,7 @@ class CogniteCADRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             published=self.published,
             revision_id=self.revision_id,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
 
@@ -165,7 +165,7 @@ class CogniteCADRevision(Cognite3DRevision, protected_namespaces=()):
         published: The published field.
         revision_id: The 3D API revision identifier for this CAD model
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1")
@@ -183,7 +183,7 @@ class CogniteCADRevision(Cognite3DRevision, protected_namespaces=()):
             published=self.published,
             revision_id=self.revision_id,
             status=self.status,
-            revision_type=self.revision_type,
+            type_=self.type_,
         )
 
     def as_apply(self) -> CogniteCADRevisionWrite:
@@ -226,7 +226,7 @@ class CogniteCADRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
         published: The published field.
         revision_id: The 3D API revision identifier for this CAD model
         status: The status field.
-        revision_type: The revision type field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1")
@@ -261,8 +261,8 @@ class CogniteCADRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
         if self.status is not None or write_none:
             properties["status"] = self.status
 
-        if self.revision_type is not None or write_none:
-            properties["type"] = self.revision_type
+        if self.type_ is not None or write_none:
+            properties["type"] = self.type_
 
         if properties:
             this_node = dm.NodeApply(

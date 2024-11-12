@@ -60,8 +60,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -76,8 +76,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix: The prefix of the manufacturer to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            source_system_version: The source system version to filter on.
-            source_system_version_prefix: The prefix of the source system version to filter on.
+            version_: The version to filter on.
+            version_prefix: The prefix of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite source systems to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -96,8 +96,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix,
             name,
             name_prefix,
-            source_system_version,
-            source_system_version_prefix,
+            version_,
+            version_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -221,8 +221,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -242,8 +242,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix: The prefix of the manufacturer to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            source_system_version: The source system version to filter on.
-            source_system_version_prefix: The prefix of the source system version to filter on.
+            version_: The version to filter on.
+            version_prefix: The prefix of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite source systems to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -274,8 +274,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix,
             name,
             name_prefix,
-            source_system_version,
-            source_system_version_prefix,
+            version_,
+            version_prefix,
             external_id_prefix,
             space,
             filter,
@@ -304,8 +304,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -326,8 +326,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -352,8 +352,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -377,8 +377,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -402,8 +402,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix: The prefix of the manufacturer to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            source_system_version: The source system version to filter on.
-            source_system_version_prefix: The prefix of the source system version to filter on.
+            version_: The version to filter on.
+            version_prefix: The prefix of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite source systems to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -430,8 +430,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix,
             name,
             name_prefix,
-            source_system_version,
-            source_system_version_prefix,
+            version_,
+            version_prefix,
             external_id_prefix,
             space,
             filter,
@@ -458,8 +458,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -478,8 +478,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix: The prefix of the manufacturer to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            source_system_version: The source system version to filter on.
-            source_system_version_prefix: The prefix of the source system version to filter on.
+            version_: The version to filter on.
+            version_prefix: The prefix of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite source systems to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -497,8 +497,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix,
             name,
             name_prefix,
-            source_system_version,
-            source_system_version_prefix,
+            version_,
+            version_prefix,
             external_id_prefix,
             space,
             filter,
@@ -525,8 +525,8 @@ class CogniteSourceSystemAPI(
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source_system_version: str | list[str] | None = None,
-        source_system_version_prefix: str | None = None,
+        version_: str | list[str] | None = None,
+        version_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -544,8 +544,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix: The prefix of the manufacturer to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            source_system_version: The source system version to filter on.
-            source_system_version_prefix: The prefix of the source system version to filter on.
+            version_: The version to filter on.
+            version_prefix: The prefix of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite source systems to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -576,8 +576,8 @@ class CogniteSourceSystemAPI(
             manufacturer_prefix,
             name,
             name_prefix,
-            source_system_version,
-            source_system_version_prefix,
+            version_,
+            version_prefix,
             external_id_prefix,
             space,
             filter,

@@ -45,7 +45,7 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImagesAPI
+from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImages360API
 from cognite_core._api.cognite_3_d_object_query import Cognite3DObjectQueryAPI
 
 
@@ -59,7 +59,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-        self.images_360_edge = Cognite3DObjectImagesAPI(client)
+        self.images_360_edge = Cognite3DObjectImages360API(client)
 
     def __call__(
         self,

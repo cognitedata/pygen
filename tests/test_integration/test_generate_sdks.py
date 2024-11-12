@@ -23,4 +23,4 @@ def test_generate_process_industries(cognite_client: CogniteClient, tmp_path: Pa
 
     df = client.cognite_time_series.list(limit=1).to_pandas()
 
-    assert {"space", "external_id", "name", "time_series_type", "is_step"} <= set(df.columns)
+    assert {"space", "external_id", "name", "type_", "is_step"} <= set(df.columns)

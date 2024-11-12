@@ -186,7 +186,7 @@ class CogniteAssetGraphQL(GraphQLCore):
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the asset.
-        asset_type: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
@@ -212,7 +212,7 @@ class CogniteAssetGraphQL(GraphQLCore):
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
     tags: Optional[list[str]] = None
     time_series: Optional[list[CogniteTimeSeriesGraphQL]] = Field(default=None, repr=False, alias="timeSeries")
-    asset_type: Optional[CogniteAssetTypeGraphQL] = Field(default=None, repr=False, alias="type")
+    type_: Optional[CogniteAssetTypeGraphQL] = Field(default=None, repr=False, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -237,7 +237,7 @@ class CogniteAssetGraphQL(GraphQLCore):
         "root",
         "source",
         "time_series",
-        "asset_type",
+        "type_",
         mode="before",
     )
     def parse_graphql(cls, value: Any) -> Any:
@@ -283,7 +283,7 @@ class CogniteAssetGraphQL(GraphQLCore):
             source_updated_user=self.source_updated_user,
             tags=self.tags,
             time_series=[time_series.as_read() for time_series in self.time_series or []],
-            asset_type=self.asset_type.as_read() if isinstance(self.asset_type, GraphQLCore) else self.asset_type,
+            type_=self.type_.as_read() if isinstance(self.type_, GraphQLCore) else self.type_,
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -311,7 +311,7 @@ class CogniteAssetGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            asset_type=self.asset_type.as_write() if isinstance(self.asset_type, GraphQLCore) else self.asset_type,
+            type_=self.type_.as_write() if isinstance(self.type_, GraphQLCore) else self.type_,
         )
 
 
@@ -346,7 +346,7 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the asset.
-        asset_type: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
@@ -362,7 +362,7 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
     path_last_updated_time: Optional[datetime.datetime] = Field(None, alias="pathLastUpdatedTime")
     root: Union[CogniteAsset, str, dm.NodeId, None] = Field(default=None, repr=False)
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
-    asset_type: Union[CogniteAssetType, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
+    type_: Union[CogniteAssetType, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
     def as_write(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
@@ -387,7 +387,7 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            asset_type=self.asset_type.as_write() if isinstance(self.asset_type, DomainModel) else self.asset_type,
+            type_=self.type_.as_write() if isinstance(self.type_, DomainModel) else self.type_,
         )
 
     def as_apply(self) -> CogniteAssetWrite:
@@ -447,11 +447,11 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
             ):
                 instance.source = source
             if (
-                isinstance(instance.asset_type, (dm.NodeId, str))
-                and (asset_type := nodes_by_id.get(instance.asset_type))
-                and isinstance(asset_type, CogniteAssetType)
+                isinstance(instance.type_, (dm.NodeId, str))
+                and (type_ := nodes_by_id.get(instance.type_))
+                and isinstance(type_, CogniteAssetType)
             ):
-                instance.asset_type = asset_type
+                instance.type_ = type_
             if instance.path:
                 new_path: list[CogniteAsset | str | dm.NodeId] = []
                 for relation in instance.path:
@@ -532,7 +532,7 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         source_updated_time: When the instance was last updated in the source system (if available)
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
-        asset_type: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
@@ -545,9 +545,9 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
     path: Optional[list[Union[CogniteAssetWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     path_last_updated_time: Optional[datetime.datetime] = Field(None, alias="pathLastUpdatedTime")
     root: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    asset_type: Union[CogniteAssetTypeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
+    type_: Union[CogniteAssetTypeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
-    @field_validator("asset_class", "parent", "path", "root", "asset_type", mode="before")
+    @field_validator("asset_class", "parent", "path", "root", "type_", mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)
@@ -647,10 +647,10 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         if self.tags is not None or write_none:
             properties["tags"] = self.tags
 
-        if self.asset_type is not None:
+        if self.type_ is not None:
             properties["type"] = {
-                "space": self.space if isinstance(self.asset_type, str) else self.asset_type.space,
-                "externalId": self.asset_type if isinstance(self.asset_type, str) else self.asset_type.external_id,
+                "space": self.space if isinstance(self.type_, str) else self.type_.space,
+                "externalId": self.type_ if isinstance(self.type_, str) else self.type_.external_id,
             }
 
         if properties:
@@ -689,8 +689,8 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
             other_resources = self.source._to_instances_write(cache)
             resources.extend(other_resources)
 
-        if isinstance(self.asset_type, DomainModelWrite):
-            other_resources = self.asset_type._to_instances_write(cache)
+        if isinstance(self.type_, DomainModelWrite):
+            other_resources = self.type_._to_instances_write(cache)
             resources.extend(other_resources)
 
         for path in self.path or []:
@@ -808,12 +808,10 @@ class CogniteAssetList(DomainModelList[CogniteAsset]):
         )
 
     @property
-    def asset_type(self) -> CogniteAssetTypeList:
+    def type_(self) -> CogniteAssetTypeList:
         from ._cognite_asset_type import CogniteAssetType, CogniteAssetTypeList
 
-        return CogniteAssetTypeList(
-            [item.asset_type for item in self.data if isinstance(item.asset_type, CogniteAssetType)]
-        )
+        return CogniteAssetTypeList([item.type_ for item in self.data if isinstance(item.type_, CogniteAssetType)])
 
 
 class CogniteAssetWriteList(DomainModelWriteList[CogniteAssetWrite]):
@@ -860,11 +858,11 @@ class CogniteAssetWriteList(DomainModelWriteList[CogniteAssetWrite]):
         )
 
     @property
-    def asset_type(self) -> CogniteAssetTypeWriteList:
+    def type_(self) -> CogniteAssetTypeWriteList:
         from ._cognite_asset_type import CogniteAssetTypeWrite, CogniteAssetTypeWriteList
 
         return CogniteAssetTypeWriteList(
-            [item.asset_type for item in self.data if isinstance(item.asset_type, CogniteAssetTypeWrite)]
+            [item.type_ for item in self.data if isinstance(item.type_, CogniteAssetTypeWrite)]
         )
 
 
@@ -939,7 +937,7 @@ def _create_cognite_asset_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
-    asset_type: (
+    type_: (
         str
         | tuple[str, str]
         | dm.NodeId
@@ -1067,16 +1065,11 @@ def _create_cognite_asset_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
         )
-    if isinstance(asset_type, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(asset_type):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=as_instance_dict_id(asset_type)))
-    if (
-        asset_type
-        and isinstance(asset_type, Sequence)
-        and not isinstance(asset_type, str)
-        and not is_tuple_id(asset_type)
-    ):
+    if isinstance(type_, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(type_):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=as_instance_dict_id(type_)))
+    if type_ and isinstance(type_, Sequence) and not isinstance(type_, str) and not is_tuple_id(type_):
         filters.append(
-            dm.filters.In(view_id.as_property_ref("type"), values=[as_instance_dict_id(item) for item in asset_type])
+            dm.filters.In(view_id.as_property_ref("type"), values=[as_instance_dict_id(item) for item in type_])
         )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
@@ -1273,7 +1266,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
             )
 
         if _CogniteAssetTypeQuery not in created_types:
-            self.asset_type = _CogniteAssetTypeQuery(
+            self.type_ = _CogniteAssetTypeQuery(
                 created_types.copy(),
                 self._creation_path,
                 client,
@@ -1282,7 +1275,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     through=self._view_id.as_property_ref("type"),
                     direction="outwards",
                 ),
-                connection_name="asset_type",
+                connection_name="type_",
             )
 
         self.space = StringFilter(self, ["node", "space"])

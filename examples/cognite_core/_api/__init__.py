@@ -9,7 +9,7 @@ from cognite_core._api.cognite_360_image_station_query import Cognite360ImageSta
 from cognite_core._api.cognite_3_d_model import Cognite3DModelAPI
 from cognite_core._api.cognite_3_d_model_query import Cognite3DModelQueryAPI
 from cognite_core._api.cognite_3_d_object import Cognite3DObjectAPI
-from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImagesAPI
+from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImages360API
 from cognite_core._api.cognite_3_d_object_query import Cognite3DObjectQueryAPI
 from cognite_core._api.cognite_3_d_revision import Cognite3DRevisionAPI
 from cognite_core._api.cognite_3_d_revision_query import Cognite3DRevisionQueryAPI
@@ -72,7 +72,7 @@ __all__ = [
     "Cognite3DModelAPI",
     "Cognite3DModelQueryAPI",
     "Cognite3DObjectAPI",
-    "Cognite3DObjectImagesAPI",
+    "Cognite3DObjectImages360API",
     "Cognite3DObjectQueryAPI",
     "Cognite3DRevisionAPI",
     "Cognite3DRevisionQueryAPI",
