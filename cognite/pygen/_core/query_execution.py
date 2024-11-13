@@ -1,9 +1,10 @@
 import copy
+import itertools
 import warnings
 from collections import defaultdict
 from collections.abc import Callable, Sequence
 from functools import cached_property
-from typing import Any, Literal, TypeAlias
+from typing import Any, Literal, TypeAlias, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -16,7 +17,15 @@ from cognite.client.utils.useful_types import SequenceNotStr
 
 from cognite.pygen._version import __version__
 
-from .query_builder import AGGREGATION_LIMIT, SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
+from .query_builder import (
+    AGGREGATION_LIMIT,
+    IN_FILTER_CHUNK_SIZE,
+    SEARCH_LIMIT,
+    QueryBuilder,
+    QueryStep,
+    ViewPropertyId,
+    chunker,
+)
 
 _NODE_PROPERTIES = frozenset(
     {"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"}
@@ -70,6 +79,9 @@ class QueryExecutor:
         sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
+        warnings.warn(
+            "This method is deprecated. Use list, aggregate or search methods instead", UserWarning, stacklevel=2
+        )
         dumped: Any
         if operation == "list":
             if properties is None:
@@ -139,7 +151,7 @@ class QueryExecutor:
         self,
         view_id: dm.ViewId,
         aggregates: Aggregation | Sequence[Aggregation],
-        properties: list[str] | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
         query: str | None = None,
         filter: filters.Filter | None = None,
         group_by: str | SequenceNotStr[str] | None = None,
@@ -157,7 +169,7 @@ class QueryExecutor:
                 group_by=group_by,
                 aggregates=metric_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -167,7 +179,7 @@ class QueryExecutor:
                 view_id,
                 aggregates=metric_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -178,7 +190,7 @@ class QueryExecutor:
                 view_id,
                 histograms=histogram_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,  # type: ignore[arg-type]
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -213,6 +225,114 @@ class QueryExecutor:
                 "buckets": [bucket.dump() for bucket in item.buckets],
             }
         return dict(output)
+
+    def search(
+        self,
+        view: dm.ViewId,
+        properties: Properties | None = None,
+        query: str | None = None,
+        filter: filters.Filter | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        search_result = self._client.data_modeling.instances.search(
+            view,
+            query,
+            properties=search_properties,  # type: ignore[arg-type]
+            filter=filter,
+            limit=limit or SEARCH_LIMIT,
+            sort=sort,
+        )
+
+        flatten_props = self._as_property_list(properties, "list") if properties else None
+        are_flat_properties = flatten_props == properties
+        if properties is None or are_flat_properties:
+            return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
+
+        # Lookup nested properties:
+
+        order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
+        # If we are sorting, then we need to ensure externalId and space are included in the properties.
+        # This is because we need them for the final sorting.
+        include_space = False
+        include_external_id = False
+        if sort is not None:
+            include_space = "space" not in properties
+            include_external_id = "externalId" not in properties
+        if include_space:
+            properties.append("space")
+        if include_external_id:
+            properties.append("externalId")
+
+        result: list[dict[str, Any]] = []
+        for space, space_nodes in itertools.groupby(
+            sorted(order_by_node_ids.keys(), key=lambda x: x.space), key=lambda x: x.space
+        ):
+            is_space = filters.Equals(["node", "space"], space)
+            for chunk in chunker(list(space_nodes), IN_FILTER_CHUNK_SIZE):
+                batch_filter = filters.And(
+                    filters.In(["node", "externalId"], [node.external_id for node in chunk]), is_space
+                )
+                batch_result = self.list(view, properties, batch_filter, sort, limit or SEARCH_LIMIT)
+                result.extend(batch_result)
+
+        if sort is not None:
+            result.sort(key=lambda x: order_by_node_ids[dm.NodeId(x["space"], x["externalId"])])
+        if include_space or include_external_id:
+            for item in result:
+                if include_space:
+                    del item["space"]
+                if include_external_id:
+                    del item["externalId"]
+
+        return result
+
+    @overload
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        group_by: None = None,
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]: ...
+
+    @overload
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        group_by: str | SequenceNotStr[str],
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]: ...
+
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        group_by: str | SequenceNotStr[str] | None = None,
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[dict[str, Any]]:
+        return self._execute_aggregation(view, aggregates, search_properties, query, filter, group_by, limit)
+
+    def list(
+        self,
+        view: dm.ViewId,
+        properties: Properties,
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        return self._execute_list(view, properties, filter, sort, limit)
 
 
 class QueryStepFactory:

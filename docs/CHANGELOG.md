@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.48] - 24-11-13
+### Changed
+- [Experimental feature] Generic query split into three methods `.list()`, `.search()`, and `.aggregate(...)`.
+
 ## [0.99.47] - 24-11-12
 ### Fixed
 - Raised lower bound of dependency `inflect` to `6.2` when support for `pydantic` `v2` was added.

@@ -16,24 +16,22 @@ def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views
         {"directReverseSingle": ["name", "directMulti", "externalId"]},
     ]
     flatten_props = {"name", "directReverseMulti", "directReverseSingle", "externalId"}
-    result = executor.execute_query(item_e.as_id(), "list", properties, limit=5)
+    result = executor.list(item_e.as_id(), properties, limit=5)
 
-    assert isinstance(result, dict)
-    assert "listConnectionItemE" in result
-    assert isinstance(result["listConnectionItemE"], list)
-    assert len(result["listConnectionItemE"]) > 0
-    ill_formed_items = [item for item in result["listConnectionItemE"] if not (set(item.keys()) <= flatten_props)]
+    assert isinstance(result, list)
+    assert len(result) > 0
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
     ill_formed_subitems = [
         subitem
-        for item in result["listConnectionItemE"]
+        for item in result
         for subitem in item.get("directReverseMulti", [])
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
     ill_formed_subitems_single = [
         subitem
-        for item in result["listConnectionItemE"]
+        for item in result
         for subitem in item.get("directReverseSingle", [])
         if not (set(subitem.keys()) <= {"name", "directMulti", "externalId"})
     ]
@@ -51,29 +49,27 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
         {"directSingle": ["name", "externalId"]},
     ]
     flatten_props = {"name", "directMulti", "directSingle", "externalId"}
-    result = executor.execute_query(item_d.as_id(), "list", properties, limit=5)
+    result = executor.list(item_d.as_id(), properties, limit=5)
 
-    assert isinstance(result, dict)
-    assert "listConnectionItemD" in result
-    assert isinstance(result["listConnectionItemD"], list)
-    assert len(result["listConnectionItemD"]) > 0
-    ill_formed_items = [item for item in result["listConnectionItemD"] if not (set(item.keys()) <= flatten_props)]
+    assert isinstance(result, list)
+    assert len(result) > 0
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
-    has_subitems = any(item.get("directMulti") or item.get("directSingle") for item in result["listConnectionItemD"])
+    has_subitems = any(item.get("directMulti") or item.get("directSingle") for item in result)
     assert has_subitems, "No subitems found"
 
     ill_formed_subitems = [
         subitem
-        for item in result["listConnectionItemD"]
+        for item in result
         for subitem in item.get("directMulti", [])
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
-    has_subitems_single = any(item.get("directSingle") for item in result["listConnectionItemD"])
+    has_subitems_single = any(item.get("directSingle") for item in result)
     assert has_subitems_single, "No single subitems found"
     ill_formed_subitems_single = [
         subitem
-        for item in result["listConnectionItemD"]
+        for item in result
         for subitem in item.get("directSingle", [])
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
@@ -90,17 +86,14 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
         {"outwards": [{"node": ["name", "externalId"]}, "type"]},
     ]
     flatten_props = {"name", "outwards", "externalId"}
-    result = executor.execute_query(item_a.as_id(), "list", properties, limit=5)
-
-    assert isinstance(result, dict)
-    assert "listConnectionItemA" in result
-    assert isinstance(result["listConnectionItemA"], list)
-    assert len(result["listConnectionItemA"]) > 0
-    ill_formed_items = [item for item in result["listConnectionItemA"] if not (set(item.keys()) <= flatten_props)]
+    result = executor.list(item_a.as_id(), properties, limit=5)
+    assert isinstance(result, list)
+    assert len(result) > 0
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
     ill_formed_subitems = [
         subitem
-        for item in result["listConnectionItemA"]
+        for item in result
         for edge in item.get("outwards", [])
         for subitem in edge.get("node", [])
         if not (set(subitem.keys()) <= {"name", "externalId"})
@@ -112,52 +105,41 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
     view = omni_views["PrimitiveNullable"]
     executor = _QueryExecutor(cognite_client, views=[view])
     properties = ["text", "boolean", "date"]
-    result = executor.execute_query(view.as_id(), "list", properties, limit=5)
+    result = executor.list(view.as_id(), properties, limit=5)
 
-    assert isinstance(result, dict)
-    assert "listPrimitiveNullable" in result
-    assert isinstance(result["listPrimitiveNullable"], list)
-    assert len(result["listPrimitiveNullable"]) > 0
+    assert isinstance(result, list)
+    assert len(result) > 0
     properties_set = set(properties)
-    ill_formed_items = [item for item in result["listPrimitiveNullable"] if not (set(item.keys()) <= properties_set)]
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
 
 
 def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(view.as_id(), "aggregate", aggregates=dm.aggregations.Count(property="externalId"))
+    result = executor.aggregate(view.as_id(), aggregates=dm.aggregations.Count(property="externalId"))
 
     assert isinstance(result, dict)
-    assert "aggregatePrimitiveRequired" in result
-    assert isinstance(result["aggregatePrimitiveRequired"], dict)
-    assert "count" in result["aggregatePrimitiveRequired"]
+    assert "count" in result
 
 
 def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(
-        view.as_id(), "aggregate", [], aggregates=dm.aggregations.Count(property="externalId"), group_by="boolean"
+    result = executor.aggregate(
+        view.as_id(), aggregates=dm.aggregations.Count(property="externalId"), group_by="boolean"
     )
-
-    assert isinstance(result, dict)
-    assert "aggregatePrimitiveRequired" in result
-    assert isinstance(result["aggregatePrimitiveRequired"], list)
-    assert len(result["aggregatePrimitiveRequired"]) > 0
+    assert isinstance(result, list)
+    assert len(result) > 0
 
 
 def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(
-        view.as_id(), "aggregate", aggregates=dm.aggregations.Histogram(property="float32", interval=100.0)
-    )
+    result = executor.aggregate(view.as_id(), aggregates=dm.aggregations.Histogram(property="float32", interval=100.0))
 
     assert isinstance(result, dict)
-    assert "aggregatePrimitiveRequired" in result
-    assert isinstance(result["aggregatePrimitiveRequired"], dict)
-    assert "histogram" in result["aggregatePrimitiveRequired"]
+    assert "histogram" in result
 
 
 def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_views: dict[str, dm.View]) -> None:
@@ -168,8 +150,32 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.execute_query(view.as_id(), "search", query=word, limit=5)
+    selected_properties = ["text", "boolean", "externalId"]
+    result = executor.search(view.as_id(), selected_properties, query=word, limit=5)
 
-    assert isinstance(result, dict)
-    assert "searchPrimitiveRequired" in result
-    assert isinstance(result["searchPrimitiveRequired"], list)
+    assert isinstance(result, list)
+    assert len(result) > 0
+    properties_set = set(selected_properties)
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+
+
+def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["ConnectionItemE"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    selected_properties = ["externalId", "name", {"directReverseMulti": ["name", "externalId"]}]
+    result = executor.search(view.as_id(), selected_properties, limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    flatten_props = {"name", "directReverseMulti", "externalId"}
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    assert any(item.get("directReverseMulti") for item in result), "No subitems found"
+    ill_formed_subitems = [
+        subitem
+        for item in result
+        for subitem in item.get("directReverseMulti", [])
+        if not (set(subitem.keys()) <= {"name", "externalId"})
+    ]
+    assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
