@@ -3,7 +3,7 @@ import warnings
 from collections import defaultdict
 from collections.abc import Callable, Sequence
 from functools import cached_property
-from typing import Any, Literal, TypeAlias
+from typing import Any, Literal, TypeAlias, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -70,6 +70,9 @@ class QueryExecutor:
         sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
+        warnings.warn(
+            "This method is deprecated. Use list, aggregate or search methods instead", UserWarning, stacklevel=2
+        )
         dumped: Any
         if operation == "list":
             if properties is None:
@@ -139,7 +142,7 @@ class QueryExecutor:
         self,
         view_id: dm.ViewId,
         aggregates: Aggregation | Sequence[Aggregation],
-        properties: list[str] | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
         query: str | None = None,
         filter: filters.Filter | None = None,
         group_by: str | SequenceNotStr[str] | None = None,
@@ -157,7 +160,7 @@ class QueryExecutor:
                 group_by=group_by,
                 aggregates=metric_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -167,7 +170,7 @@ class QueryExecutor:
                 view_id,
                 aggregates=metric_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -178,7 +181,7 @@ class QueryExecutor:
                 view_id,
                 histograms=histogram_aggregates,
                 query=query,
-                properties=properties,
+                properties=search_properties,  # type: ignore[arg-type]
                 filter=filter,
                 limit=limit or AGGREGATION_LIMIT,
             )
@@ -217,26 +220,59 @@ class QueryExecutor:
     def search(
         self,
         view: dm.ViewId,
-        properties: Properties,
+        properties: Properties | None = None,
         query: str | None = None,
         filter: filters.Filter | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
-    ) -> dict[str, Any]:
-        raise NotImplementedError("Search is not implemented")
+    ) -> list[dict[str, Any]]:
+        search_result = self._client.data_modeling.instances.search(
+            view,
+            query,
+            properties=search_properties,  # type: ignore[arg-type]
+            filter=filter,
+            limit=limit or SEARCH_LIMIT,
+            sort=sort,
+        )
+        flatten_props = self._as_property_list(properties, "search") if properties else None
+        return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
+
+    @overload
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        group_by: None = None,
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]: ...
+
+    @overload
+    def aggregate(
+        self,
+        view: dm.ViewId,
+        aggregates: Aggregation | Sequence[Aggregation],
+        group_by: str | SequenceNotStr[str],
+        filter: filters.Filter | None = None,
+        query: str | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]: ...
 
     def aggregate(
         self,
         view: dm.ViewId,
         aggregates: Aggregation | Sequence[Aggregation],
-        filters: filters.Filter | None = None,
         group_by: str | SequenceNotStr[str] | None = None,
+        filter: filters.Filter | None = None,
         query: str | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
-    ) -> dict[str, Any]:
-        raise NotImplementedError("Aggregate is not implemented")
+    ) -> dict[str, Any] | list[dict[str, Any]]:
+        return self._execute_aggregation(view, aggregates, search_properties, query, filter, group_by, limit)
 
     def list(
         self,
@@ -245,8 +281,8 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
-    ) -> dict[str, Any]:
-        raise NotImplementedError("List is not implemented")
+    ) -> list[dict[str, Any]]:
+        return self._execute_list(view, properties, filter, sort, limit)
 
 
 class QueryStepFactory:
