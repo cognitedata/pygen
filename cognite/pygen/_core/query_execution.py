@@ -1,4 +1,5 @@
 import copy
+import itertools
 import warnings
 from collections import defaultdict
 from collections.abc import Callable, Sequence
@@ -16,7 +17,15 @@ from cognite.client.utils.useful_types import SequenceNotStr
 
 from cognite.pygen._version import __version__
 
-from .query_builder import AGGREGATION_LIMIT, SEARCH_LIMIT, QueryBuilder, QueryStep, ViewPropertyId
+from .query_builder import (
+    AGGREGATION_LIMIT,
+    IN_FILTER_CHUNK_SIZE,
+    SEARCH_LIMIT,
+    QueryBuilder,
+    QueryStep,
+    ViewPropertyId,
+    chunker,
+)
 
 _NODE_PROPERTIES = frozenset(
     {"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"}
@@ -235,8 +244,49 @@ class QueryExecutor:
             limit=limit or SEARCH_LIMIT,
             sort=sort,
         )
-        flatten_props = self._as_property_list(properties, "search") if properties else None
-        return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
+
+        flatten_props = self._as_property_list(properties, "list") if properties else None
+        are_flat_properties = flatten_props == properties
+        if properties is None or are_flat_properties:
+            return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
+
+        # Lookup nested properties:
+
+        order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
+        # If we are sorting, then we need to ensure externalId and space are included in the properties.
+        # This is because we need them for the final sorting.
+        include_space = False
+        include_external_id = False
+        if sort is not None:
+            include_space = "space" not in properties
+            include_external_id = "externalId" not in properties
+        if include_space:
+            properties.append("space")
+        if include_external_id:
+            properties.append("externalId")
+
+        result: list[dict[str, Any]] = []
+        for space, space_nodes in itertools.groupby(
+            sorted(order_by_node_ids.keys(), key=lambda x: x.space), key=lambda x: x.space
+        ):
+            is_space = filters.Equals(["node", "space"], space)
+            for chunk in chunker(list(space_nodes), IN_FILTER_CHUNK_SIZE):
+                batch_filter = filters.And(
+                    filters.In(["node", "externalId"], [node.external_id for node in chunk]), is_space
+                )
+                batch_result = self.list(view, properties, batch_filter, sort, limit or SEARCH_LIMIT)
+                result.extend(batch_result)
+
+        if sort is not None:
+            result.sort(key=lambda x: order_by_node_ids[dm.NodeId(x["space"], x["externalId"])])
+        if include_space or include_external_id:
+            for item in result:
+                if include_space:
+                    del item["space"]
+                if include_external_id:
+                    del item["externalId"]
+
+        return result
 
     @overload
     def aggregate(

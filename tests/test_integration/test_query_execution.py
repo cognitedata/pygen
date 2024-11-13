@@ -150,7 +150,32 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    result = executor.search(view.as_id(), query=word, limit=5)
+    selected_properties = ["text", "boolean", "externalId"]
+    result = executor.search(view.as_id(), selected_properties, query=word, limit=5)
 
     assert isinstance(result, list)
     assert len(result) > 0
+    properties_set = set(selected_properties)
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+
+
+def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["ConnectionItemE"]
+    executor = _QueryExecutor(cognite_client, views=[view])
+    selected_properties = ["externalId", "name", {"directReverseMulti": ["name", "externalId"]}]
+    result = executor.search(view.as_id(), selected_properties, limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    flatten_props = {"name", "directReverseMulti", "externalId"}
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    assert any(item.get("directReverseMulti") for item in result), "No subitems found"
+    ill_formed_subitems = [
+        subitem
+        for item in result
+        for subitem in item.get("directReverseMulti", [])
+        if not (set(subitem.keys()) <= {"name", "externalId"})
+    ]
+    assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
