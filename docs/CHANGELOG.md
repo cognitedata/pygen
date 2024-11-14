@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.48] - 24-11-14
+### Fixed
+- Add ability to filter on node external ID and space even when no other filterable properties are present.
+
 ## [0.99.48] - 24-11-13
 ### Changed
 - [Experimental feature] Generic query split into three methods `.list()`, `.search()`, and `.aggregate(...)`.
