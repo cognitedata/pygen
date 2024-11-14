@@ -399,6 +399,9 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_primitive_nullable_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableListedList:
         return self._list(limit=limit)
 

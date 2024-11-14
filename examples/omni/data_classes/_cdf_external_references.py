@@ -349,6 +349,9 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
         return self._list(limit=limit)
 
