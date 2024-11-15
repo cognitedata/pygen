@@ -1,7 +1,7 @@
 space: {{ pygen_power_enterprise }}
 externalId: Distance
 name: Distance
-version: 1
+version: v1
 properties:
   distance:
     container:

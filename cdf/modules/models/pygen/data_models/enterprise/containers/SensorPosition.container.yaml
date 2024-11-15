@@ -14,7 +14,7 @@ properties:
   flapwise_bend_mom:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -22,7 +22,7 @@ properties:
   flapwise_bend_mom_offset:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -30,7 +30,7 @@ properties:
   flapwise_bend_mom_crosstalk_corrected:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -38,7 +38,7 @@ properties:
   flapwise_bend_mom_offset_crosstalk_corrected:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -46,7 +46,7 @@ properties:
   edgewisewise_bend_mom:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -54,7 +54,7 @@ properties:
   edgewise_bend_mom_offset:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -62,7 +62,7 @@ properties:
   edgewise_bend_mom_crosstalk_corrected:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -70,7 +70,7 @@ properties:
   edgewise_bend_mom_offset_crosstalk_corrected:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false

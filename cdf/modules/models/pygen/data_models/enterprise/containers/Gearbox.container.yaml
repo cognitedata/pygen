@@ -6,7 +6,7 @@ properties:
   displacement_x:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -14,7 +14,7 @@ properties:
   displacement_y:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -22,7 +22,7 @@ properties:
   displacement_z:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false

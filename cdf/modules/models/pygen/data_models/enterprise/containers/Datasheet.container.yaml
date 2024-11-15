@@ -1,13 +1,14 @@
 space: {{ pygen_power_enterprise }}
-externalId: Blade
-name: Blade
+externalId: DataSheet
+name: DataSheet
 usedFor: node
 properties:
-  is_damaged:
+  UUID:
     type:
       list: false
-      type: boolean
+      collation: ucs_basic
+      type: text
     nullable: true
     autoIncrement: false
     immutable: false
-    name: is_damaged
+    name: UUID

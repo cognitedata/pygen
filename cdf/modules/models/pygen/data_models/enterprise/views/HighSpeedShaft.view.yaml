@@ -1,7 +1,11 @@
 space: {{ pygen_power_enterprise }}
 externalId: HighSpeedShaft
 name: HighSpeedShaft
-version: 1
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
 properties:
   torque:
     container:
@@ -10,6 +14,11 @@ properties:
       type: container
     containerPropertyIdentifier: torque
     name: torque
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
   bending_monent_x:
     container:
       space: {{ pygen_power_enterprise }}
@@ -17,6 +26,11 @@ properties:
       type: container
     containerPropertyIdentifier: bending_monent_x
     name: bending_monent_x
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
   bending_moment_y:
     container:
       space: {{ pygen_power_enterprise }}
@@ -24,6 +38,11 @@ properties:
       type: container
     containerPropertyIdentifier: bending_moment_y
     name: bending_moment_y
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
   nacelle:
     source:
       space: {{ pygen_power_enterprise }}
@@ -38,3 +57,4 @@ properties:
         type: view
       identifier: high_speed_shaft
     connectionType: single_reverse_direct_relation
+

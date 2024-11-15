@@ -6,7 +6,7 @@ properties:
   active_power_total:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -14,7 +14,7 @@ properties:
   reactive_power_total:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -22,7 +22,7 @@ properties:
   apparent_power_total:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false

@@ -1,7 +1,11 @@
 space: {{ pygen_power_enterprise }}
 externalId: Generator
 name: Generator
-version: 1
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
 properties:
   generator_speed_controller:
     container:
@@ -10,6 +14,11 @@ properties:
       type: container
     containerPropertyIdentifier: generator_speed_controller
     name: generator_speed_controller
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
   generator_speed_controller_reference:
     container:
       space: {{ pygen_power_enterprise }}
@@ -17,6 +26,11 @@ properties:
       type: container
     containerPropertyIdentifier: generator_speed_controller_reference
     name: generator_speed_controller_reference
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
   nacelle:
     source:
       space: {{ pygen_power_enterprise }}

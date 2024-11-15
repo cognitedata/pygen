@@ -1,7 +1,7 @@
 space: {{ pygen_power_enterprise }}
 externalId: SolarPanel
 name: SolarPanel
-version: 1
+version: v1
 implements:
   - space: {{ pygen_power_enterprise }}
     externalId: GeneratingUnit

@@ -77,70 +77,6 @@ views:
   version: v1
   type: view
 - space: cdf_cdm
-  externalId: Cognite3DTransformation
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteCubeMap
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite3DObject
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite3DModel
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteCADModel
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite3DRevision
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CognitePointCloudModel
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite360ImageModel
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteCADRevision
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CognitePointCloudRevision
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite360ImageCollection
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteCADNode
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CognitePointCloudVolume
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite360Image
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite360ImageStation
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: Cognite360ImageAnnotation
-  version: v1
-  type: view
-- space: cdf_cdm
   externalId: CogniteAsset
   version: v1
   type: view
@@ -174,14 +110,6 @@ views:
   type: view
 - space: cdf_cdm
   externalId: CogniteTimeSeries
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteAnnotation
-  version: v1
-  type: view
-- space: cdf_cdm
-  externalId: CogniteDiagramAnnotation
   version: v1
   type: view
 - space: cdf_cdm

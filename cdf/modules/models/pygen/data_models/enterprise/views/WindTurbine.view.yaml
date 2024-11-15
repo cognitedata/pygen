@@ -1,7 +1,7 @@
 space: {{ pygen_power_enterprise }}
 externalId: WindTurbine
 name: WindTurbine
-version: 1
+version: v1
 implements:
   - space: {{ pygen_power_enterprise }}
     externalId: GeneratingUnit
@@ -24,7 +24,7 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: Rotor
-      version: 1
+      version: v1
       type: view
   nacelle:
     container:
@@ -36,7 +36,7 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: Nacelle
-      version: 1
+      version: v1
       type: view
   blades:
     container:
@@ -46,7 +46,7 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: Blade
-      version: 1
+      version: v1
       type: view
     containerPropertyIdentifier: blades
     name: blades
@@ -57,12 +57,12 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: Metmast
-      version: 1
+      version: v1
       type: view
     edgeSource:
       space: {{ pygen_power_enterprise }}
       externalId: Distance
-      version: 1
+      version: v1
       type: view
     direction: outwards
     name: metmast

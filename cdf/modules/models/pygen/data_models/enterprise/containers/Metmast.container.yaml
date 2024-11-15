@@ -14,7 +14,7 @@ properties:
   wind_speed:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -22,7 +22,7 @@ properties:
   tilt_angle:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -30,7 +30,7 @@ properties:
   temperature:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false

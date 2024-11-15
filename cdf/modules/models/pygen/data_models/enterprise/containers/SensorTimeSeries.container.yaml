@@ -1,21 +1,23 @@
 space: {{ pygen_power_enterprise }}
-externalId: SolarPanel
-name: SolarPanel
+externalId: SensorTimeSeries
+name: SensorTimeSeries
 usedFor: node
 properties:
-  efficiency:
+  standardName:
     type:
       list: false
-      type: direct
+      collation: ucs_basic
+      type: text
     nullable: true
     autoIncrement: false
     immutable: false
-    name: efficiency
-  orientation:
+    name: standardName
+  conceptId:
     type:
       list: false
-      type: direct
+      collation: ucs_basic
+      type: text
     nullable: true
     autoIncrement: false
     immutable: false
-    name: orientation
+    name: conceptId

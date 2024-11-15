@@ -1,15 +1,12 @@
 space: {{ pygen_power_enterprise }}
 externalId: Blade
 name: Blade
-version: 1
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
 properties:
-  name:
-    container:
-      space: {{ pygen_power_enterprise }}
-      externalId: Blade
-      type: container
-    containerPropertyIdentifier: name
-    name: name
   is_damaged:
     container:
       space: {{ pygen_power_enterprise }}

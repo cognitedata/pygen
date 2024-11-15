@@ -1,7 +1,7 @@
 space: {{ pygen_power_enterprise }}
 externalId: Metmast
 name: Metmast
-version: 1
+version: v1
 properties:
   position:
     container:
@@ -38,12 +38,12 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
-      version: 1
+      version: v1
       type: view
     edgeSource:
       space: {{ pygen_power_enterprise }}
       externalId: Distance
-      version: 1
+      version: v1
       type: view
     direction: inwards
     name: wind_turbines

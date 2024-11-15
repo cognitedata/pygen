@@ -41,7 +41,7 @@ properties:
   acc_from_back_side_x:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -49,7 +49,7 @@ properties:
   acc_from_back_side_y:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -57,7 +57,7 @@ properties:
   acc_from_back_side_z:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -65,7 +65,7 @@ properties:
   yaw_direction:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
@@ -73,7 +73,7 @@ properties:
   yaw_error:
     type:
       list: false
-      type: timeseries
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false
