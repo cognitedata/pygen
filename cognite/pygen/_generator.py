@@ -142,16 +142,17 @@ def _generate_sdk(
     if client_name is None:
         client_name = _default_client_name(external_id)
 
-    sdk_generator = SDKGenerator(
-        top_level_package,
-        client_name,
-        data_model,
-        default_instance_space,
-        "inheritance",
-        logger,
-        config or PygenConfig(),
-    )
     with warnings.catch_warnings(record=True) as warning_logger:
+        sdk_generator = SDKGenerator(
+            top_level_package,
+            client_name,
+            data_model,
+            default_instance_space,
+            "inheritance",
+            logger,
+            config or PygenConfig(),
+        )
+
         sdk = sdk_generator.generate_sdk()
     if warning_logger:
         print_warnings(warning_logger, logger, context)
