@@ -1,0 +1,40 @@
+space: {{ pygen_power_enterprise }}
+externalId: Gearbox
+name: Gearbox
+version: 1
+properties:
+  displacement_x:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Gearbox
+      type: container
+    containerPropertyIdentifier: displacement_x
+    name: displacement_x
+  displacement_y:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Gearbox
+      type: container
+    containerPropertyIdentifier: displacement_y
+    name: displacement_y
+  displacement_z:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Gearbox
+      type: container
+    containerPropertyIdentifier: displacement_z
+    name: displacement_z
+  nacelle:
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power_enterprise }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: gearbox
+    connectionType: single_reverse_direct_relation
