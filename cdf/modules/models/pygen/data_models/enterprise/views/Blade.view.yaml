@@ -18,13 +18,13 @@ properties:
     source:
       space: {{ pygen_power_enterprise }}
       externalId: SensorPosition
-      version: '1'
+      version: 'v1'
       type: view
     through:
       source:
         space: {{ pygen_power_enterprise }}
         externalId: SensorPosition
-        version: '1'
+        version: 'v1'
         type: view
       identifier: blade
     connectionType: multi_reverse_direct_relation

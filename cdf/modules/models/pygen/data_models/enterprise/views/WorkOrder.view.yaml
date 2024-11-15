@@ -1,6 +1,6 @@
 space: {{ pygen_power_enterprise }}
-externalId: {{ organization }}Activity
-name: Activity
+externalId: WorkOrder
+name: WorkOrder
 description: Represents activities. Activities typically happen over a period and
   have a start and end time.
 implements:
@@ -16,11 +16,11 @@ properties:
       externalId: CogniteActivity
       type: container
     containerPropertyIdentifier: assets
-    name: Assets
+    name: Generating unit
     description: A list of assets the activity is related to.
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: {{ organization }}Asset
+      externalId: GeneratingUnit
       version: v1
       type: view
   equipment:
@@ -33,7 +33,7 @@ properties:
     description: A list of equipment the activity is related to.
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: {{ organization }}Equipment
+      externalId: GeneratingEquipment
       version: v1
       type: view
   timeSeries:
@@ -46,7 +46,7 @@ properties:
     description: A list of time series the activity is related to.
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: {{ organization }}TimeSeries
+      externalId: SensorTimeSeries
       version: v1
       type: view
   source:
@@ -57,8 +57,8 @@ properties:
     containerPropertyIdentifier: source
     description: Direct relation to a source system
     source:
-      space: {{ pygen_power_enterprise }}
-      externalId: {{ organization }}SourceSystem
+      space: cdf_cdm
+      externalId: CogniteSourceSystem
       version: v1
       type: view
   UUID:

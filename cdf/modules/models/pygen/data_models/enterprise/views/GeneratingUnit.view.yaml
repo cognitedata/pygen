@@ -5,7 +5,7 @@ version: v1
 implements:
   - space: cdf_cdm
     externalId: CogniteAsset
-    version: '1'
+    version: 'v1'
 properties:
   capacity:
     container:
@@ -85,13 +85,13 @@ properties:
   files:
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: WindFile
+      externalId: DataSheet
       version: v1
       type: view
     through:
       source:
         space: cdf_cdm
-        externalId: WindFile
+        externalId: DataSheet
         version: v1
         type: view
       identifier: assets
@@ -118,13 +118,13 @@ properties:
   equipment:
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: WindEquipment
+      externalId: GeneratingEquipment
       version: v1
       type: view
     through:
       source:
         space: {{ pygen_power_enterprise }}
-        externalId: WindEquipment
+        externalId: GeneratingEquipment
         version: v1
         type: view
       identifier: asset
@@ -134,13 +134,13 @@ properties:
   activities:
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: WindActivity
+      externalId: WorkOrder
       version: v1
       type: view
     through:
       source:
         space: {{ pygen_power_enterprise }}
-        externalId: WindActivity
+        externalId: WorkOrder
         version: v1
         type: view
       identifier: assets

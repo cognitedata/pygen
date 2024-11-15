@@ -78,7 +78,7 @@ properties:
     containerPropertyIdentifier: edgewise_bend_mom_offset
     name: edgewise_bend_mom_offset
     source:
-      space: { { pygen_power_enterprise } }
+      space: {{ pygen_power_enterprise }}
       externalId: SensorTimeSeries
       version: v1
       type: view
@@ -90,7 +90,7 @@ properties:
     containerPropertyIdentifier: edgewise_bend_mom_crosstalk_corrected
     name: edgewise_bend_mom_crosstalk_corrected
     source:
-      space: { { pygen_power_enterprise } }
+      space: {{ pygen_power_enterprise }}
       externalId: SensorTimeSeries
       version: v1
       type: view
@@ -102,7 +102,7 @@ properties:
     containerPropertyIdentifier: edgewise_bend_mom_offset_crosstalk_corrected
     name: edgewise_bend_mom_offset_crosstalk_corrected
     source:
-      space: { { pygen_power_enterprise } }
+      space: {{ pygen_power_enterprise }}
       externalId: SensorTimeSeries
       version: v1
       type: view

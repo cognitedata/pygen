@@ -5,7 +5,7 @@ version: v1
 implements:
   - space: {{ pygen_power_enterprise }}
     externalId: GeneratingUnit
-    version: '1'
+    version: 'v1'
 properties:
   windfarm:
     container:

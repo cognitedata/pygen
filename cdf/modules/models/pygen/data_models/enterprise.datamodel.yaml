@@ -56,6 +56,22 @@ views:
   externalId: SolarPanel
   version: v1
   type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: WorkOrder
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: SensorTimeSeries
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: GeneratingEquipment
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: DataSheet
+  version: v1
+  type: view
 - space: cdf_cdm
   externalId: CogniteDescribable
   version: v1
