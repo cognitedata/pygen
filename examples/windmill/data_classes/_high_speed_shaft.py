@@ -352,6 +352,9 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:
         return self._list(limit=limit)
 

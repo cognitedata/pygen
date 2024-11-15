@@ -396,6 +396,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
         return self._list(limit=limit)
 

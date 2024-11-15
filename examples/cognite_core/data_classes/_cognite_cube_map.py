@@ -698,6 +698,9 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_name="top",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_cognite_cube_map(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteCubeMapList:
         return self._list(limit=limit)
 

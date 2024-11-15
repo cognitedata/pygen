@@ -382,6 +382,9 @@ class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualiz
                 connection_name="object_3d",
             )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_cognite_visualizable(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteVisualizableList:
         return self._list(limit=limit)
 

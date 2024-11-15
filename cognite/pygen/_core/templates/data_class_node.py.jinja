@@ -577,9 +577,9 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                 connection_name="{{ field.name }}",{% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
                 connection_type="reverse-list",{% endif %}
             ){% endif %}
-{% endfor %}{% if data_class.has_filtering_fields %}
+{% endfor %}
         self.space = StringFilter(self, ["node", "space"])
-        self.external_id = StringFilter(self, ["node", "externalId"]){% for field in data_class.filtering_fields %}
+        self.external_id = StringFilter(self, ["node", "externalId"]){% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
         self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
         self._filter_classes.extend([
             self.space,

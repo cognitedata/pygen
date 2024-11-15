@@ -358,6 +358,9 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
             reverse_expression,
         )
 
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+
     def list_power_inverter(self, limit: int = DEFAULT_QUERY_LIMIT) -> PowerInverterList:
         return self._list(limit=limit)
 
