@@ -81,6 +81,12 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             A query API for {{ data_class.doc_list_name}}.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
