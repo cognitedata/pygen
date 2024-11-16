@@ -1,1 +1,1 @@
-::: examples.windmill.data_classes
+::: examples.wind_turbine.data_classes
