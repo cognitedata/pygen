@@ -130,14 +130,6 @@ PUMP_SDK = ExampleSDK(
     instance_space=None,
 )
 
-EQUIPMENT_UNIT_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
-    _top_level_package="equipment_unit",
-    client_name="EquipmentUnitClient",
-    generate_sdk=True,
-    instance_space="IntegrationTestsImmutable",
-)
-
 CORE_SDK = ExampleSDK(
     data_model_ids=[DataModelId("cdf_cdm", "CogniteCore", "v1")],
     _top_level_package="cognite_core",
@@ -161,27 +153,6 @@ WIND_TURBINE = ExampleSDK(
     generate_sdk=True,
     instance_space="sp_wind",
 )
-
-
-class EquipmentSDKFiles:
-    client_dir = EQUIPMENT_UNIT_SDK.client_dir
-    client = client_dir / "_api_client.py"
-    data_classes = client_dir / "data_classes"
-    core_data = data_classes / "_core.py"
-    start_end_time_data = data_classes / "_start_end_time.py"
-    unit_procedure_data = data_classes / "_unit_procedure.py"
-    equipment_module_data = data_classes / "_equipment_module.py"
-
-    api = client_dir / "_api"
-    equipment_api = api / "equipment_module.py"
-    equipment_module_sensor_value_api = api / "equipment_module_sensor_value.py"
-
-    unit_procedure_api = api / "unit_procedure.py"
-    unit_procedure_query = api / "unit_procedure_query.py"
-    unit_procedure_work_units = api / "unit_procedure_work_units.py"
-    core_api = api / "_core.py"
-
-    data_init = data_classes / "__init__.py"
 
 
 class OmniFiles:
