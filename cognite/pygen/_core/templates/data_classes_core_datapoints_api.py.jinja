@@ -72,6 +72,8 @@ class DataPointsAPI:
             missing a value (due to being stored in a numpy array); all will become NaNs in the dataframe.
         """
         node_ids = self._get_node_ids(timeseries_limit)
+        if not node_ids:
+            return pd.DataFrame()
         return self._client.time_series.data.retrieve_dataframe(
             instance_id=node_ids,
             start=start,
