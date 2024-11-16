@@ -70,7 +70,7 @@ properties:
       type: view
     through:
       source:
-        space: cdf_cdm
+        space: {{ pygen_power_enterprise }}
         externalId: SensorTimeSeries
         version: v1
         type: view
