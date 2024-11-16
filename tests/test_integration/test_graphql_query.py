@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from omni import OmniClient
 from omni import data_classes as odc
-from scenario_instance.client import ScenarioInstanceClient
-from scenario_instance.client import data_classes as sidc
 from wind_turbine import WindTurbineClient
 from wind_turbine import data_classes as wdc
 
@@ -155,13 +153,13 @@ def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
     assert len(direct_reverse_single) > 0, "No direct reverse single found"
 
 
-def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient) -> None:
-    result = scenario_instance_client.graphql_query(
+def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
+    result = turbine_client.graphql_query(
         """{
-  listScenarioInstance(first: 1){
+  listMetmast(first: 1){
     items{
       __typename
-      priceForecast{
+      temperature{
         externalId
         name
         getDataPoints(granularity: "1d", aggregates: SUM){
@@ -177,12 +175,6 @@ def test_query_with_datapoints(scenario_instance_client: ScenarioInstanceClient)
 """
     )
     assert len(result) == 1
-    instance = result[0]
-    assert isinstance(instance, sidc.ScenarioInstanceGraphQL)
-    assert instance.price_forecast is not None
-    assert instance.price_forecast.external_id is not None
-    assert instance.price_forecast.name is not None
-    assert instance.price_forecast.data is not None
-    assert len(instance.price_forecast.data) > 0
-    assert instance.price_forecast.data.sum[0] is not None
-    assert instance.price_forecast.data.timestamp[0] is not None
+    item = result[0]
+    # Currently (16/11/2024 - there is now datapoints in the timeseries)
+    assert isinstance(item, wdc.MetmastGraphQL)
