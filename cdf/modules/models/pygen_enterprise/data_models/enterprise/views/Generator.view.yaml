@@ -43,5 +43,5 @@ properties:
         externalId: Nacelle
         version: 'v1'
         type: view
-      identifier: main_shaft
+      identifier: generator
     connectionType: single_reverse_direct_relation
