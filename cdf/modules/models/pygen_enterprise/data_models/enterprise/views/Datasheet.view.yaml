@@ -39,17 +39,17 @@ properties:
   equipment:
     source:
       space: {{ pygen_power_enterprise }}
-      externalId: CogniteEquipment
+      externalId: GeneratingEquipment
       version: v1
       type: view
     through:
       source:
         space: {{ pygen_power_enterprise }}
-        externalId: CogniteEquipment
+        externalId: GeneratingEquipment
         version: v1
         type: view
       identifier: files
-    name: CogniteEquipment
+    name: GeneratingEquipment
     description: An automatically updated list of equipment this file is related to.
     connectionType: multi_reverse_direct_relation
   source:
