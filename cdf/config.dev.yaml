@@ -19,9 +19,6 @@ variables:
         organization: YourOrg
         schema_space: sp_enterprise_min_schema_idm
 
-    data_testing:
-      ds_windturbine_timeseries: ds_windturbine_timeseries
-
     cdf_ingestion:
       workflow: ingestion
       groupSourceId: fc008a26-40e8-4a4c-a357-2d914fbd9873
