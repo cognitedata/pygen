@@ -152,8 +152,8 @@ def test_query_end_on_reverse_direct_relation_to_list(omni_client: OmniClient) -
     assert items.dump()
 
 
-def test_query_list_across_edge_limit(turbine_client: WindTurbineClient) -> None:
-    items = turbine_client.wind_turbine.query().name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
+def test_query_list_across_edge_with_limit(turbine_client: WindTurbineClient) -> None:
+    items = turbine_client.wind_turbine.query().name.equals("hornsea_1_mill_1").metmast.end_node.list_full(limit=5)
 
     assert len(items) > 0
     assert items.dump()
