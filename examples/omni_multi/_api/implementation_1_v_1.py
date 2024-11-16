@@ -479,7 +479,14 @@ class Implementation1v1API(
 
     def query(self) -> Implementation1v1Query:
         """Start a query for implementation 1 v 1."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Implementation1v1Query(self._client)
+
+    def select(self) -> Implementation1v1Query:
+        """Start selecting from implementation 1 v 1."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Implementation1v1Query(self._client)
 
     def list(

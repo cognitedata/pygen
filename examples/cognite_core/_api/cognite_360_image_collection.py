@@ -555,7 +555,14 @@ class Cognite360ImageCollectionAPI(
 
     def query(self) -> Cognite360ImageCollectionQuery:
         """Start a query for Cognite 360 image collections."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Cognite360ImageCollectionQuery(self._client)
+
+    def select(self) -> Cognite360ImageCollectionQuery:
+        """Start selecting from Cognite 360 image collections."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Cognite360ImageCollectionQuery(self._client)
 
     def list(

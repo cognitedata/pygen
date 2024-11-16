@@ -536,7 +536,14 @@ class CognitePointCloudModelAPI(
 
     def query(self) -> CognitePointCloudModelQuery:
         """Start a query for Cognite point cloud models."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CognitePointCloudModelQuery(self._client)
+
+    def select(self) -> CognitePointCloudModelQuery:
+        """Start selecting from Cognite point cloud models."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CognitePointCloudModelQuery(self._client)
 
     def list(

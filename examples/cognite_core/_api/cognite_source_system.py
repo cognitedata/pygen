@@ -514,7 +514,14 @@ class CogniteSourceSystemAPI(
 
     def query(self) -> CogniteSourceSystemQuery:
         """Start a query for Cognite source systems."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteSourceSystemQuery(self._client)
+
+    def select(self) -> CogniteSourceSystemQuery:
+        """Start selecting from Cognite source systems."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteSourceSystemQuery(self._client)
 
     def list(

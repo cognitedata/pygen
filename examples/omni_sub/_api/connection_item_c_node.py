@@ -405,7 +405,14 @@ class ConnectionItemCNodeAPI(
 
     def query(self) -> ConnectionItemCNodeQuery:
         """Start a query for connection item c nodes."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return ConnectionItemCNodeQuery(self._client)
+
+    def select(self) -> ConnectionItemCNodeQuery:
+        """Start selecting from connection item c nodes."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return ConnectionItemCNodeQuery(self._client)
 
     def list(

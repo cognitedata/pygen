@@ -385,7 +385,14 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
     def query(self) -> PowerInverterQuery:
         """Start a query for power inverters."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return PowerInverterQuery(self._client)
+
+    def select(self) -> PowerInverterQuery:
+        """Start selecting from power inverters."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return PowerInverterQuery(self._client)
 
     def list(

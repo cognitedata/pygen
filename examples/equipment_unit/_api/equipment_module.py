@@ -485,7 +485,14 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleWrite, Equipmen
 
     def query(self) -> EquipmentModuleQuery:
         """Start a query for equipment modules."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return EquipmentModuleQuery(self._client)
+
+    def select(self) -> EquipmentModuleQuery:
+        """Start selecting from equipment modules."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return EquipmentModuleQuery(self._client)
 
     def list(

@@ -482,7 +482,14 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderWrite, WorkOrderList, WorkOrderWr
 
     def query(self) -> WorkOrderQuery:
         """Start a query for work orders."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return WorkOrderQuery(self._client)
+
+    def select(self) -> WorkOrderQuery:
+        """Start selecting from work orders."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return WorkOrderQuery(self._client)
 
     def list(

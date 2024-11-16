@@ -385,7 +385,14 @@ class CDFExternalReferencesAPI(
 
     def query(self) -> CDFExternalReferencesQuery:
         """Start a query for cdf external references."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CDFExternalReferencesQuery(self._client)
+
+    def select(self) -> CDFExternalReferencesQuery:
+        """Start selecting from cdf external references."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CDFExternalReferencesQuery(self._client)
 
     def list(

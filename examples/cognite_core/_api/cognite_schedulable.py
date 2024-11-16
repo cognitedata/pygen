@@ -515,7 +515,14 @@ class CogniteSchedulableAPI(
 
     def query(self) -> CogniteSchedulableQuery:
         """Start a query for Cognite schedulables."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteSchedulableQuery(self._client)
+
+    def select(self) -> CogniteSchedulableQuery:
+        """Start selecting from Cognite schedulables."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteSchedulableQuery(self._client)
 
     def list(

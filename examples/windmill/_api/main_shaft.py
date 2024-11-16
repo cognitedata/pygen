@@ -389,7 +389,14 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
     def query(self) -> MainShaftQuery:
         """Start a query for main shafts."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return MainShaftQuery(self._client)
+
+    def select(self) -> MainShaftQuery:
+        """Start selecting from main shafts."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return MainShaftQuery(self._client)
 
     def list(

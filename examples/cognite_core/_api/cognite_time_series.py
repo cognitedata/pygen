@@ -945,7 +945,14 @@ class CogniteTimeSeriesAPI(
 
     def query(self) -> CogniteTimeSeriesQuery:
         """Start a query for Cognite time series."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteTimeSeriesQuery(self._client)
+
+    def select(self) -> CogniteTimeSeriesQuery:
+        """Start selecting from Cognite time series."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteTimeSeriesQuery(self._client)
 
     def list(
