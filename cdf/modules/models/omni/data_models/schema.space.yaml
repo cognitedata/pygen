@@ -1,0 +1,7 @@
+- space: {{ pygen_models_space }}
+  name: PygenModels
+  description: This space contains all the schemas for the pygen models
+- space: {{ pygen_other_models_space }}
+  name: PygenModels
+  description: This is an additional space for the pygen models, used to test
+    creating a model with views in different spaces.

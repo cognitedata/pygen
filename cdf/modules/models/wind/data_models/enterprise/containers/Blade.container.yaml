@@ -1,0 +1,13 @@
+space: {{ pygen_power_enterprise }}
+externalId: Blade
+name: Blade
+usedFor: node
+properties:
+  is_damaged:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: is_damaged

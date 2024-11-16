@@ -1,0 +1,43 @@
+space: {{ pygen_power }}
+externalId: Generator
+name: Generator
+version: 1
+properties:
+  generator_speed_controller:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Generator
+      type: container
+    containerPropertyIdentifier: generator_speed_controller
+    name: generator_speed_controller
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  generator_speed_controller_reference:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Generator
+      type: container
+    containerPropertyIdentifier: generator_speed_controller_reference
+    name: generator_speed_controller_reference
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: main_shaft
+    connectionType: single_reverse_direct_relation

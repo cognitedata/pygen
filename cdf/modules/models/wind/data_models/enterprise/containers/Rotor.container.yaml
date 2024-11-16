@@ -1,0 +1,21 @@
+space: {{ pygen_power_enterprise }}
+externalId: Rotor
+name: Rotor
+usedFor: node
+properties:
+  rotor_speed_controller:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: rotor_speed_controller
+  rpm_low_speed_shaft:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: rpm_low_speed_shaft

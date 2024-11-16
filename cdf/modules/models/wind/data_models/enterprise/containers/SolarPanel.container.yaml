@@ -1,0 +1,21 @@
+space: {{ pygen_power_enterprise }}
+externalId: SolarPanel
+name: SolarPanel
+usedFor: node
+properties:
+  efficiency:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: efficiency
+  orientation:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: orientation

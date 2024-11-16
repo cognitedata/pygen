@@ -69,3 +69,4 @@ node_modules/
 package-lock.json
 package.json
 *.env
+playground.ipynb

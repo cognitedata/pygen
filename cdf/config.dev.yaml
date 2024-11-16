@@ -8,10 +8,12 @@ environment:
 variables:
   modules:
     models:
-      pygen:
+      omni:
         pygen_models_space: sp_pygen_models
-        pygen_power: sp_pygen_power
         pygen_other_models_space: sp_pygen_models_other
+      wind:
+        pygen_power: sp_pygen_power
+        pygen_power_enterprise: sp_pygen_power_enterprise
 
       cdf_idm_extension:
         organization: YourOrg

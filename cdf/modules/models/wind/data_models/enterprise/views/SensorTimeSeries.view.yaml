@@ -1,0 +1,80 @@
+space: {{ pygen_power_enterprise }}
+externalId: SensorTimeSeries
+name: SensorTimeSeries
+version: v1
+implements:
+  - space: cdf_cdm
+    externalId: CogniteTimeSeries
+    version: v1
+properties:
+  conceptId:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      type: container
+    containerPropertyIdentifier: conceptId
+    name: Concept ID
+    description: The concept ID of the time series.
+  standardName:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      type: container
+    containerPropertyIdentifier: standardName
+    name: standardName
+    description: The standard name of the time series.
+  assets:
+    container:
+      space: cdf_cdm
+      externalId: CogniteTimeSeries
+      type: container
+    containerPropertyIdentifier: assets
+    name: Assets
+    description: A list of assets the time series is related to.
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: GeneratingUnit
+      version: v1
+      type: view
+  equipment:
+    container:
+      space: cdf_cdm
+      externalId: CogniteTimeSeries
+      type: container
+    containerPropertyIdentifier: equipment
+    name: Equipment
+    description: A list of equipment the time series is related to.
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: GeneratingEquipment
+      version: v1
+      type: view
+  activities:
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: WorkOrder
+      version: v1
+      type: view
+    through:
+      source:
+        space: {{ pygen_power_enterprise }}
+        externalId: WorkOrder
+        version: v1
+        type: view
+      identifier: timeSeries
+    name: Activities
+    description: An automatically updated list of activities the time series is related
+      to.
+    connectionType: multi_reverse_direct_relation
+  source:
+    container:
+      space: cdf_cdm
+      externalId: CogniteSourceable
+      type: container
+    containerPropertyIdentifier: source
+    description: Direct relation to a source system
+    source:
+      space: cdf_cdm
+      externalId: CogniteSourceSystem
+      version: v1
+      type: view

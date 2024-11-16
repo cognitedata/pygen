@@ -1,0 +1,30 @@
+space: {{ pygen_power_enterprise }}
+externalId: Blade
+name: Blade
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
+properties:
+  is_damaged:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: is_damaged
+    name: is_damaged
+  sensor_positions:
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorPosition
+      version: 'v1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power_enterprise }}
+        externalId: SensorPosition
+        version: 'v1'
+        type: view
+      identifier: blade
+    connectionType: multi_reverse_direct_relation

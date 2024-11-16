@@ -1,0 +1,45 @@
+space: {{ pygen_power_enterprise }}
+externalId: MainShaft
+name: MainShaft
+usedFor: node
+properties:
+  torque:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: torque
+  calculated_tilt_moment:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: calculated_tilt_moment
+  calculated_yaw_moment:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: calculated_yaw_moment
+  bending_x:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: bending_x
+  bending_y:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: bending_y

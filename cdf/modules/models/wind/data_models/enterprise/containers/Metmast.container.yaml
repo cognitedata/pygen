@@ -1,0 +1,37 @@
+space: {{ pygen_power_enterprise }}
+externalId: Metmast
+name: Metmast
+usedFor: node
+properties:
+  position:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: position
+  wind_speed:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: wind_speed
+  tilt_angle:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: tilt_angle
+  temperature:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: temperature

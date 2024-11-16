@@ -1,0 +1,88 @@
+space: {{ pygen_power_enterprise }}
+externalId: WindTurbine
+name: WindTurbine
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingUnit
+    version: 'v1'
+properties:
+  windfarm:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: windfarm
+    name: windfarm
+  rotor:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: rotor
+    name: rotor
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Rotor
+      version: v1
+      type: view
+  nacelle:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: nacelle
+    name: nacelle
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      version: v1
+      type: view
+  blades:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Blade
+      version: v1
+      type: view
+    containerPropertyIdentifier: blades
+    name: blades
+  metmast:
+    type:
+      space: {{ pygen_power_enterprise }}
+      externalId: Distance
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Metmast
+      version: v1
+      type: view
+    edgeSource:
+      space: {{ pygen_power_enterprise }}
+      externalId: Distance
+      version: v1
+      type: view
+    direction: outwards
+    name: metmast
+    connectionType: multi_edge_connection
+  datasheets:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: datasheets
+    name: datasheets
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: DataSheet
+      version: v1
+      type: view
+  powerCurve:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      type: container
+    containerPropertyIdentifier: powerCurve
+    name: powerCurve

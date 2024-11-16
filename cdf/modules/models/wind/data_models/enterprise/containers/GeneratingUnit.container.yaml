@@ -1,0 +1,24 @@
+space: {{ pygen_power_enterprise }}
+externalId: GeneratingUnit
+name: GeneratingUnit
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name
+  capacity:
+    type:
+      list: false
+      type: float64
+      unit:
+        externalId: power:megaw
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: capacity

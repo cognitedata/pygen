@@ -1,0 +1,29 @@
+space: {{ pygen_power_enterprise }}
+externalId: HighSpeedShaft
+name: HighSpeedShaft
+usedFor: node
+properties:
+  torque:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: torque
+  bending_monent_x:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: bending_monent_x
+  bending_moment_y:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: bending_moment_y

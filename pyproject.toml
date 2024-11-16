@@ -111,7 +111,7 @@ pytest-icdiff = "^0.8"
 Faker = "*"
 hypothesis = "*"
 jupyterlab = "*"
-cognite-toolkit = "0.3.8"
+cognite-toolkit = "0.3.10"
 #cognite-toolkit = { git = "https://github.com/cognitedata/toolkit.git", branch = "linting-contextualization-functions" }
 
 [tool.pytest.ini_options]

@@ -1,0 +1,43 @@
+space: {{ pygen_power }}
+externalId: Rotor
+name: Rotor
+version: 1
+properties:
+  rotor_speed_controller:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Rotor
+      type: container
+    containerPropertyIdentifier: rotor_speed_controller
+    name: rotor_speed_controller
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  rpm_low_speed_shaft:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Rotor
+      type: container
+    containerPropertyIdentifier: rpm_low_speed_shaft
+    name: rpm_low_speed_shaft
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  wind_turbine:
+    source:
+      space: {{ pygen_power }}
+      externalId: WindTurbine
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      identifier: rotor
+    connectionType: single_reverse_direct_relation

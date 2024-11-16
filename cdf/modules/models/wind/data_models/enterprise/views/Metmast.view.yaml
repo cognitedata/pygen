@@ -1,0 +1,50 @@
+space: {{ pygen_power_enterprise }}
+externalId: Metmast
+name: Metmast
+version: v1
+properties:
+  position:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Metmast
+      type: container
+    containerPropertyIdentifier: position
+    name: position
+  wind_speed:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Metmast
+      type: container
+    containerPropertyIdentifier: wind_speed
+    name: wind_speed
+  tilt_angle:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Metmast
+      type: container
+    containerPropertyIdentifier: tilt_angle
+    name: tilt_angle
+  temperature:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Metmast
+      type: container
+    containerPropertyIdentifier: temperature
+    name: temperature
+  wind_turbines:
+    type:
+      space: {{ pygen_power_enterprise }}
+      externalId: Distance
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: WindTurbine
+      version: v1
+      type: view
+    edgeSource:
+      space: {{ pygen_power_enterprise }}
+      externalId: Distance
+      version: v1
+      type: view
+    direction: inwards
+    name: wind_turbines
+    connectionType: multi_edge_connection

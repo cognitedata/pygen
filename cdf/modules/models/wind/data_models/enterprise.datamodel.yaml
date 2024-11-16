@@ -1,0 +1,206 @@
+space: {{ pygen_power_enterprise }}
+externalId: WindDomain
+version: v1
+name: WindDomain
+description: This is an enterprise data model for wind domain.
+views:
+- space: {{ pygen_power_enterprise }}
+  externalId: Blade
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: Gearbox
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: Generator
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: HighSpeedShaft
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: MainShaft
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: Metmast
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: Nacelle
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: PowerInverter
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: Rotor
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: SensorPosition
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: GeneratingUnit
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: WindTurbine
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: SolarPanel
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: WorkOrder
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: SensorTimeSeries
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: GeneratingEquipment
+  version: v1
+  type: view
+- space: {{ pygen_power_enterprise }}
+  externalId: DataSheet
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteDescribable
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteSourceable
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteSourceSystem
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteSchedulable
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteVisualizable
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite3DTransformation
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteCubeMap
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite3DObject
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite3DModel
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteCADModel
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite3DRevision
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CognitePointCloudModel
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite360ImageModel
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteCADRevision
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CognitePointCloudRevision
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite360ImageCollection
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteCADNode
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CognitePointCloudVolume
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite360Image
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite360ImageStation
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: Cognite360ImageAnnotation
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteAsset
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteAssetClass
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteAssetType
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteEquipment
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteEquipmentType
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteFile
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteFileCategory
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteActivity
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteTimeSeries
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteAnnotation
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteDiagramAnnotation
+  version: v1
+  type: view
+- space: cdf_cdm
+  externalId: CogniteUnit
+  version: v1
+  type: view
