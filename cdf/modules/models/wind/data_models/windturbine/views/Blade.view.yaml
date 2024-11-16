@@ -5,11 +5,11 @@ version: 1
 properties:
   name:
     container:
-      space: {{ pygen_power_enterprise }}
-      externalId: Blade
+      space: cdf_cdm
+      externalId: CogniteDescribable
       type: container
     containerPropertyIdentifier: name
-    name: name
+    description: Name of the instance
   is_damaged:
     container:
       space: {{ pygen_power_enterprise }}
