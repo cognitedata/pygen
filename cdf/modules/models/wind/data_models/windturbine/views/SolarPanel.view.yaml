@@ -14,6 +14,11 @@ properties:
       type: container
     containerPropertyIdentifier: efficiency
     name: efficiency
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   orientation:
     container:
       space: {{ pygen_power_enterprise }}
@@ -21,3 +26,8 @@ properties:
       type: container
     containerPropertyIdentifier: orientation
     name: orientation
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view

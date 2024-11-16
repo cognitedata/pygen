@@ -77,6 +77,11 @@ properties:
       type: container
     containerPropertyIdentifier: acc_from_back_side_y
     name: acc_from_back_side_y
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   acc_from_back_side_z:
     container:
       space: {{ pygen_power_enterprise }}
@@ -84,6 +89,11 @@ properties:
       type: container
     containerPropertyIdentifier: acc_from_back_side_z
     name: acc_from_back_side_z
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   yaw_direction:
     container:
       space: {{ pygen_power_enterprise }}
@@ -91,6 +101,11 @@ properties:
       type: container
     containerPropertyIdentifier: yaw_direction
     name: yaw_direction
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   yaw_error:
     container:
       space: {{ pygen_power_enterprise }}
@@ -98,6 +113,11 @@ properties:
       type: container
     containerPropertyIdentifier: yaw_error
     name: yaw_error
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   wind_turbine:
     source:
       space: {{ pygen_power }}

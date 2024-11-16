@@ -10,6 +10,11 @@ properties:
       type: container
     containerPropertyIdentifier: active_power_total
     name: active_power_total
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   reactive_power_total:
     container:
       space: {{ pygen_power_enterprise }}
@@ -17,6 +22,11 @@ properties:
       type: container
     containerPropertyIdentifier: reactive_power_total
     name: reactive_power_total
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   apparent_power_total:
     container:
       space: {{ pygen_power_enterprise }}
@@ -24,6 +34,11 @@ properties:
       type: container
     containerPropertyIdentifier: apparent_power_total
     name: apparent_power_total
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
   nacelle:
     source:
       space: {{ pygen_power }}

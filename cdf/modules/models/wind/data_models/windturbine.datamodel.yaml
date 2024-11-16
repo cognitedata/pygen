@@ -56,3 +56,7 @@ views:
   externalId: SolarPanel
   version: 1
   type: view
+- space: {{ pygen_power }}
+  externalId: Distance
+  version: 1
+  type: view
