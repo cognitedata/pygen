@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 
 from .base import Field
-from .primitive import BasePrimitiveField, PrimitiveListField
+from .primitive import BasePrimitiveField, ContainerProperty, PrimitiveListField
 
 
 @dataclass(frozen=True)
@@ -104,6 +104,7 @@ class CDFExternalField(BasePrimitiveField):
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> CDFExternalField | None:
         if not isinstance(prop.type, dm.CDFExternalIdReference):
             return None
+        container = ContainerProperty(prop.container, prop.container_property_identifier)
         if prop.type.is_list:
             return CDFExternalListField(
                 name=base.name,
@@ -114,6 +115,7 @@ class CDFExternalField(BasePrimitiveField):
                 description=prop.description,
                 pydantic_field=base.pydantic_field,
                 variable=variable,
+                container=container,
             )
         else:
             return CDFExternalField(
@@ -124,6 +126,7 @@ class CDFExternalField(BasePrimitiveField):
                 is_nullable=prop.nullable,
                 description=prop.description,
                 pydantic_field=base.pydantic_field,
+                container=container,
             )
 
 

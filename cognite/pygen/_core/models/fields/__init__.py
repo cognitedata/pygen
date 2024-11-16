@@ -11,7 +11,7 @@ from .connections import (
     OneToManyConnectionField,
     OneToOneConnectionField,
 )
-from .primitive import BasePrimitiveField, PrimitiveField, PrimitiveListField
+from .primitive import BasePrimitiveField, ContainerProperty, PrimitiveField, PrimitiveListField
 
 __all__ = [
     "Field",
@@ -26,4 +26,5 @@ __all__ = [
     "BaseConnectionField",
     "OneToOneConnectionField",
     "OneToManyConnectionField",
+    "ContainerProperty",
 ]

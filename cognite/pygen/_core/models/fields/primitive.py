@@ -14,6 +14,12 @@ from .base import Field
 
 
 @dataclass(frozen=True)
+class ContainerProperty:
+    source: dm.ContainerId
+    identifier: str
+
+
+@dataclass(frozen=True)
 class BasePrimitiveField(Field, ABC):
     """This is a base class for all primitive fields
 
@@ -23,6 +29,7 @@ class BasePrimitiveField(Field, ABC):
 
     type_: dm.PropertyType
     is_nullable: bool
+    container: ContainerProperty
 
     @property
     def is_time_field(self) -> bool:
@@ -56,6 +63,7 @@ class BasePrimitiveField(Field, ABC):
 
     @classmethod
     def load(cls, base: Field, prop: dm.MappedProperty, variable: str) -> BasePrimitiveField | None:
+        container = ContainerProperty(prop.container, prop.container_property_identifier)
         if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
             return PrimitiveListField(
                 name=base.name,
@@ -66,6 +74,7 @@ class BasePrimitiveField(Field, ABC):
                 type_=prop.type,
                 is_nullable=prop.nullable,
                 variable=variable,
+                container=container,
             )
         else:
             return PrimitiveField(
@@ -77,6 +86,7 @@ class BasePrimitiveField(Field, ABC):
                 type_=prop.type,
                 is_nullable=prop.nullable,
                 default=prop.default_value,
+                container=container,
             )
 
 
