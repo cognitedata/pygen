@@ -173,7 +173,7 @@ WIND_TURBINE = ExampleSDK(
     data_model_ids=[DataModelId("sp_pygen_power", "WindTurbine", "1")],
     _top_level_package="wind_turbine",
     client_name="WindTurbineClient",
-    generate_sdk=False,
+    generate_sdk=True,
     instance_space="sp_wind",
 )
 
