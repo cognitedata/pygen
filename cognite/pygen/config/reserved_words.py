@@ -23,6 +23,7 @@ FIELD_NAMES = (
         "replace",
         "type",
         "list_full",
+        "data",
     }
     | {f for f in dir(BaseModel)}
     | {

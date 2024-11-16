@@ -7,7 +7,7 @@ from cognite.client.data_classes.data_modeling.ids import NodeId
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
 
-from {{ top_level_package }}.data_classes._core.constants import DEFAULT_QUERY_LIMIT
+from wind_turbine.data_classes._core.constants import DEFAULT_QUERY_LIMIT
 
 
 class DataPointsAPI:
