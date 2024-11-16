@@ -7,9 +7,11 @@ from cognite.client.data_classes.data_modeling.ids import NodeId
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
 
+from omni.data_classes._core.constants import DEFAULT_QUERY_LIMIT
+
 
 class DataPointsAPI:
-    def __init__(self, client: CogniteClient, get_node_ids: Callable[[], list[NodeId]]) -> None:
+    def __init__(self, client: CogniteClient, get_node_ids: Callable[[int], list[NodeId]]) -> None:
         self._client = client
         self._get_node_ids = get_node_ids
 
@@ -23,6 +25,7 @@ class DataPointsAPI:
         target_unit: str | None = None,
         target_unit_system: str | None = None,
         limit: int | None = None,
+        timeseries_limit: int = DEFAULT_QUERY_LIMIT,
         include_outside_points: bool = False,
         ignore_unknown_ids: bool = False,
         include_status: bool = False,
@@ -49,6 +52,7 @@ class DataPointsAPI:
             target_unit (str | None): The unit_external_id of the datapoints returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system (str | None): The unit system of the datapoints returned. Cannot be used with target_unit.
             limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            timeseries_limit (int): Maximum number of timeseries to fetch (columns in the dataframe). Default: 5
             include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
             ignore_unknown_ids (bool): Whether to ignore missing time series rather than raising an exception. Default: False
             include_status (bool): Also return the status code, an integer, for each datapoint in the response. Only relevant for raw datapoint queries, not aggregates.
@@ -67,7 +71,7 @@ class DataPointsAPI:
             When retrieving raw datapoints with ``ignore_bad_datapoints=False``, bad datapoints with the value NaN can not be distinguished from those
             missing a value (due to being stored in a numpy array); all will become NaNs in the dataframe.
         """
-        node_ids = self._get_node_ids()
+        node_ids = self._get_node_ids(timeseries_limit)
         return self._client.time_series.data.retrieve_dataframe(
             instance_id=node_ids,
             start=start,
@@ -86,5 +90,5 @@ class DataPointsAPI:
             uniform_index=uniform_index,
             include_aggregate_name=include_aggregate_name,
             include_granularity_name=include_granularity_name,
-            column_names="instance_id"
+            column_names="instance_id",
         )
