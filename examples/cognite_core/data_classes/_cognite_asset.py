@@ -301,7 +301,6 @@ class CogniteAssetGraphQL(GraphQLCore):
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
             parent=self.parent.as_write() if isinstance(self.parent, GraphQLCore) else self.parent,
             path=[path.as_write() for path in self.path or []],
-            path_last_updated_time=self.path_last_updated_time,
             root=self.root.as_write() if isinstance(self.root, GraphQLCore) else self.root,
             source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
             source_context=self.source_context,
@@ -377,7 +376,6 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
             parent=self.parent.as_write() if isinstance(self.parent, DomainModel) else self.parent,
             path=[path.as_write() if isinstance(path, DomainModel) else path for path in self.path or []],
-            path_last_updated_time=self.path_last_updated_time,
             root=self.root.as_write() if isinstance(self.root, DomainModel) else self.root,
             source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
             source_context=self.source_context,
@@ -522,7 +520,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         object_3d: Direct relation to an Object3D instance representing the 3D resource
         parent: The parent of the asset.
         path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables subtree filtering to find all assets under a parent.
-        path_last_updated_time: The last time the path was updated for this asset.
         root: An automatically updated reference to the top-level asset of the hierarchy.
         source: Direct relation to a source system
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
@@ -543,7 +540,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
     )
     parent: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     path: Optional[list[Union[CogniteAssetWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
-    path_last_updated_time: Optional[datetime.datetime] = Field(None, alias="pathLastUpdatedTime")
     root: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Union[CogniteAssetTypeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 

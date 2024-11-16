@@ -137,10 +137,8 @@ class DataSheetGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             description=self.description,
             directory=self.directory,
-            is_uploaded=self.is_uploaded,
             mime_type=self.mime_type,
             name=self.name,
-            uploaded_time=self.uploaded_time,
         )
 
 
@@ -180,10 +178,8 @@ class DataSheet(DomainModel):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             description=self.description,
             directory=self.directory,
-            is_uploaded=self.is_uploaded,
             mime_type=self.mime_type,
             name=self.name,
-            uploaded_time=self.uploaded_time,
         )
 
     def as_apply(self) -> DataSheetWrite:
@@ -207,10 +203,8 @@ class DataSheetWrite(DomainModelWrite):
         data_record: The data record of the data sheet node.
         description: Description of the instance
         directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
-        is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
-        uploaded_time: The time the file upload completed.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "DataSheet", "1")
@@ -219,10 +213,8 @@ class DataSheetWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     description: Optional[str] = None
     directory: Optional[str] = None
-    is_uploaded: Optional[bool] = Field(False, alias="isUploaded")
     mime_type: Optional[str] = Field(None, alias="mimeType")
     name: Optional[str] = None
-    uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
     def _to_instances_write(
         self,
