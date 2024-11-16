@@ -2,7 +2,7 @@ import pytest
 from cognite_core import CogniteCoreClient
 from omni import OmniClient
 from omni import data_classes as dc
-from windmill import WindmillClient
+from wind_turbine import WindTurbineClient
 
 from tests.constants import CORE_SDK
 
@@ -152,8 +152,8 @@ def test_query_end_on_reverse_direct_relation_to_list(omni_client: OmniClient) -
     assert items.dump()
 
 
-def test_query_list_across_edge_limit(wind_client: WindmillClient) -> None:
-    items = wind_client.windmill.query().name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
+def test_query_list_across_edge_limit(turbine_client: WindTurbineClient) -> None:
+    items = turbine_client.wind_turbine.query().name.equals("hornsea_1_mill_1").blades.list_blade(limit=5)
 
     assert len(items) > 0
     assert items.dump()
