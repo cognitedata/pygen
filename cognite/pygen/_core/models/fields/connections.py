@@ -16,9 +16,11 @@ from cognite.client.data_classes.data_modeling.views import (
     SingleReverseDirectRelation,
 )
 
+from cognite.pygen._constants import is_readonly_property
 from cognite.pygen._warnings import MissingReverseDirectRelationTargetWarning
 
 from .base import Field
+from .primitive import ContainerProperty
 
 if TYPE_CHECKING:
     from cognite.pygen._core.models.data_classes import EdgeDataClass, NodeDataClass
@@ -145,6 +147,7 @@ class BaseConnectionField(Field, ABC):
     through: dm.PropertyId | None
     destination_class: NodeDataClass | None
     edge_class: EdgeDataClass | None
+    container: ContainerProperty | None
 
     @property
     def linked_class(self) -> NodeDataClass | EdgeDataClass:
@@ -185,7 +188,9 @@ class BaseConnectionField(Field, ABC):
     @property
     def is_write_field(self) -> bool:
         """Returns True if the connection is writable."""
-        return not self.is_reverse_direct_relation
+        return not self.is_reverse_direct_relation and not (
+            self.container and is_readonly_property(self.container.source, self.container.identifier)
+        )
 
     @property
     def is_edge(self) -> bool:
@@ -261,12 +266,14 @@ class BaseConnectionField(Field, ABC):
                     MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
                 )
                 return None
+        container: ContainerProperty | None = None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None
         direction: Literal["outwards", "inwards"]
         if isinstance(prop, dm.EdgeConnection):
             direction = prop.direction
         elif isinstance(prop, dm.MappedProperty):
             direction = "outwards"
+            container = ContainerProperty(prop.container, prop.container_property_identifier)
         elif isinstance(prop, ReverseDirectRelation):
             direction = "inwards"
         else:
@@ -299,6 +306,7 @@ class BaseConnectionField(Field, ABC):
                 type_hint_node_reference=type_hint_node_reference,
                 destination_class=destination_class,
                 edge_class=edge_class,
+                container=container,
             )
         elif cls._is_supported_one_to_one_connection(prop):
             return OneToOneConnectionField(
@@ -313,6 +321,7 @@ class BaseConnectionField(Field, ABC):
                 type_hint_node_reference=type_hint_node_reference,
                 destination_class=destination_class,
                 edge_class=edge_class,
+                container=container,
             )
         else:
             return None

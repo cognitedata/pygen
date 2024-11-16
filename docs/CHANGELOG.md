@@ -16,6 +16,8 @@ Changes are grouped as follows
 ## TBD
 ### Fixed
 - Doing `.query()` over an edge with properties without filtering no longer raises a `ValueError`.
+- When using the `CogniteCore` model, either directly or an extension of it, the generated SDK now
+  respects the read-only properties in `CogniteAsset` and `CogniteFile`.
 
 ## [0.99.48] - 24-11-14
 ### Fixed

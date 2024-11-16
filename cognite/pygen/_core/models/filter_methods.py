@@ -11,7 +11,14 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 
-from .fields import BaseConnectionField, Field, OneToManyConnectionField, OneToOneConnectionField, PrimitiveField
+from .fields import (
+    BaseConnectionField,
+    ContainerProperty,
+    Field,
+    OneToManyConnectionField,
+    OneToOneConnectionField,
+    PrimitiveField,
+)
 
 
 @dataclass
@@ -333,6 +340,10 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
     default=None,
     description=None,
     pydantic_field="Field",
+    container=ContainerProperty(
+        source=dm.ContainerId("irrelevant", "also_irrelevant"),
+        identifier="not_relevant",
+    ),
 )
 _SPACE_FIELD = PrimitiveField(
     name="space",
@@ -343,4 +354,8 @@ _SPACE_FIELD = PrimitiveField(
     default=None,
     description=None,
     pydantic_field="Field",
+    container=ContainerProperty(
+        source=dm.ContainerId("irrelevant", "also_irrelevant"),
+        identifier="not_relevant",
+    ),
 )
