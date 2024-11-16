@@ -255,7 +255,7 @@ def test_generate_sensor_time_series(
 ) -> None:
     # Arrange
     api_generator = turbine_multi_api_generator.api_by_type_by_view_id["node"][
-        dm.ViewId("turbine", "SensorTimeSeries", "1")
+        dm.ViewId("sp_pygen_power", "SensorTimeSeries", "1")
     ]
     expected = WindTurbineFiles.data_sensor_time_series.read_text()
 

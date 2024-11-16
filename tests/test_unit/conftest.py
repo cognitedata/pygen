@@ -76,6 +76,7 @@ def core_multi_api_generator(core_data_model: dm.DataModel[dm.View]) -> MultiAPI
     )
 
 
+@pytest.fixture(scope="session")
 def turbine_multi_api_generator(turbine_data_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
     return MultiAPIGenerator(
         WIND_TURBINE.top_level_package,
