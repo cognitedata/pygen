@@ -13,6 +13,7 @@ from cognite_core import CogniteCoreClient
 from omni import OmniClient
 from omni_sub import OmniSubClient
 from scenario_instance.client import ScenarioInstanceClient
+from wind_turbine import WindTurbineClient
 from windmill import WindmillClient
 
 from tests.constants import OMNI_SDK
@@ -87,6 +88,11 @@ def omnisub_client(cognite_client: CogniteClient) -> OmniSubClient:
 @pytest.fixture(scope="session")
 def wind_client(cognite_client: CogniteClient) -> WindmillClient:
     return WindmillClient(cognite_client)
+
+
+@pytest.fixture(scope="session")
+def windturbine_client(cognite_client: CogniteClient) -> WindTurbineClient:
+    return WindTurbineClient(cognite_client)
 
 
 @pytest.fixture(scope="session")
