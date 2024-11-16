@@ -130,14 +130,6 @@ PUMP_SDK = ExampleSDK(
     instance_space=None,
 )
 
-SCENARIO_INSTANCE_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
-    _top_level_package="scenario_instance.client",
-    client_name="ScenarioInstanceClient",
-    generate_sdk=True,
-    instance_space="IntegrationTestsImmutable",
-)
-
 EQUIPMENT_UNIT_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
     _top_level_package="equipment_unit",
@@ -190,13 +182,6 @@ class EquipmentSDKFiles:
     core_api = api / "_core.py"
 
     data_init = data_classes / "__init__.py"
-
-
-class ScenarioInstanceFiles:
-    client_dir = SCENARIO_INSTANCE_SDK.client_dir
-
-    api = client_dir / "_api"
-    scenario_instance_api = api / "scenario_instance.py"
 
 
 class OmniFiles:
