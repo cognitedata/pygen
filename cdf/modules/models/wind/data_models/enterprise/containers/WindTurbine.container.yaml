@@ -38,7 +38,7 @@ properties:
   datasheets:
     type:
       list: true
-      type: file
+      type: direct
     nullable: true
     autoIncrement: false
     immutable: false

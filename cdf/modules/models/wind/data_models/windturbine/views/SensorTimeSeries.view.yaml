@@ -64,16 +64,3 @@ properties:
     containerPropertyIdentifier: sourceUnit
     name: Source unit
     description: The unit specified in the source system.
-  unit:
-    container:
-      space: cdf_cdm
-      externalId: CogniteTimeSeries
-      type: container
-    containerPropertyIdentifier: unit
-    name: Unit
-    description: The unit of the time series.
-    source:
-      space: cdf_cdm
-      externalId: CogniteUnit
-      version: v1
-      type: view

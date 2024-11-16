@@ -74,6 +74,11 @@ properties:
       type: container
     containerPropertyIdentifier: datasheets
     name: datasheets
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: DataSheet
+      version: v1
+      type: view
   powerCurve:
     container:
       space: {{ pygen_power_enterprise }}
