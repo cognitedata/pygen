@@ -76,6 +76,11 @@ class CDFExternalReferencesAPI(
             A query API for cdf external references.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cdf_external_reference_filter(
             self._view_id,
