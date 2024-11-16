@@ -98,12 +98,12 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             raise ValueError(f"Cannot query across a reverse-list connection.")
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
-    def _assemble_filter(self) -> dm.filters.Filter:
+    def _assemble_filter(self) -> dm.filters.Filter | None:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
         for filter_cls in self._filter_classes:
             if item := filter_cls._as_filter():
                 filters.append(item)
-        return dm.filters.And(*filters)
+        return dm.filters.And(*filters) if filters else None
 
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]

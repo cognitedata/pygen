@@ -4,12 +4,12 @@ from omni import OmniClient
 from omni import data_classes as odc
 from scenario_instance.client import ScenarioInstanceClient
 from scenario_instance.client import data_classes as sidc
-from windmill import WindmillClient
-from windmill import data_classes as wdc
+from wind_turbine import WindTurbineClient
+from wind_turbine import data_classes as wdc
 
 
-def test_graphql_query(wind_client: WindmillClient) -> None:
-    result = wind_client.graphql_query(
+def test_graphql_query(turbine_client: WindTurbineClient) -> None:
+    result = turbine_client.graphql_query(
         """{
   listBlade(first: 1) {
     items {

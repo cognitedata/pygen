@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- Doing `.query()` over an edge with properties without filtering no longer raises a `ValueError`.
+
 ## [0.99.48] - 24-11-14
 ### Fixed
 - Add ability to filter on node external ID and space even when no other filterable properties are present.
