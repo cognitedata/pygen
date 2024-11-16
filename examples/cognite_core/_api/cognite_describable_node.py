@@ -123,6 +123,11 @@ class CogniteDescribableNodeAPI(
             A query API for Cognite describable nodes.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_describable_node_filter(
             self._view_id,
