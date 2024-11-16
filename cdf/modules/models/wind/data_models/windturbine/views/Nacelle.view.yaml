@@ -11,7 +11,7 @@ properties:
     containerPropertyIdentifier: gearbox
     name: gearbox
     source:
-      space: {{ pygen_power_enterprise }}
+      space: {{ pygen_power }}
       externalId: Gearbox
       version: 1
       type: view
@@ -23,7 +23,7 @@ properties:
     containerPropertyIdentifier: generator
     name: generator
     source:
-      space: {{ pygen_power_enterprise }}
+      space: {{ pygen_power }}
       externalId: Generator
       version: 1
       type: view
