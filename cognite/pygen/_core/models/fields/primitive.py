@@ -10,6 +10,8 @@ from typing import Literal
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import Enum, ListablePropertyType
 
+from cognite.pygen._constants import is_readonly_property
+
 from .base import Field
 
 
@@ -30,6 +32,10 @@ class BasePrimitiveField(Field, ABC):
     type_: dm.PropertyType
     is_nullable: bool
     container: ContainerProperty
+
+    @property
+    def is_write_field(self) -> bool:
+        return not is_readonly_property(self.container.source, self.container.identifier)
 
     @property
     def is_time_field(self) -> bool:
