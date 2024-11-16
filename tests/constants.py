@@ -161,6 +161,22 @@ CORE_SDK = ExampleSDK(
     instance_space="springfield_instances",
 )
 
+WIND_ENTERPRISE = ExampleSDK(
+    data_model_ids=[DataModelId("sp_pygen_power_enterprise", "WindDomain", "v1")],
+    _top_level_package="wind_enterprise",
+    client_name="WindEnterpriseClient",
+    generate_sdk=False,
+    instance_space="sp_wind",
+)
+
+WIND_TURBINE = ExampleSDK(
+    data_model_ids=[DataModelId("sp_pygen_power", "WindTurbine", "1")],
+    _top_level_package="wind_turbine",
+    client_name="WindTurbineClient",
+    generate_sdk=False,
+    instance_space="sp_wind",
+)
+
 
 class EquipmentSDKFiles:
     client_dir = EQUIPMENT_UNIT_SDK.client_dir
