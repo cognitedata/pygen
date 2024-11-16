@@ -1,7 +1,7 @@
 space: {{ pygen_power }}
 externalId: SensorTimeSeries
 name: SensorTimeSeries
-version: v1
+version: 1
 properties:
   name:
     container:

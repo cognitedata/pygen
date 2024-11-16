@@ -60,3 +60,11 @@ views:
   externalId: Distance
   version: 1
   type: view
+- space: {{ pygen_power }}
+  externalId: SensorTimeSeries
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: DataSheet
+  version: 1
+  type: view
