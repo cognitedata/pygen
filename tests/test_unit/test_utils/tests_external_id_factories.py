@@ -308,12 +308,12 @@ def test_doc_example():
     # Using the custom factory directly:
     DomainModelWrite.external_id_factory = ExternalIdFactory(custom_factory_by_domain_class)
     # Example input and output:
-    windmill_with_name = WindTurbineWrite(name="Oslo 1")
-    assert windmill_with_name.external_id == "Oslo 1"
+    turbine_with_name = WindTurbineWrite(name="Oslo 1")
+    assert turbine_with_name.external_id == "Oslo 1"
     rotor_no_name = RotorWrite(rotor_speed_controller="time_series_external_id")
     assert uuid_.UUID(rotor_no_name.external_id)
-    windmill_with_external_id = WindTurbineWrite(external_id="custom_external_id")
-    assert uuid_.UUID(windmill_with_external_id.external_id)
+    turbine_with_external_id = WindTurbineWrite(external_id="custom_external_id")
+    assert uuid_.UUID(turbine_with_external_id.external_id)
 
     # Using the create_external_id_factory function to have a prefix and suffix combination:
     DomainModelWrite.external_id_factory = ExternalIdFactory.create_external_id_factory(
@@ -323,13 +323,13 @@ def test_doc_example():
         suffix_ext_id_factory=ExternalIdFactory(custom_factory_by_domain_class),
     )
     # Example input and output:
-    windmill_with_name = WindTurbineWrite(name="Oslo 1")
-    assert windmill_with_name.external_id == "windmill_Oslo 1"
+    turbine_with_name = WindTurbineWrite(name="Oslo 1")
+    assert turbine_with_name.external_id == "wind_turbine_Oslo 1"
     rotor_no_name = RotorWrite(rotor_speed_controller="time_series_external_id")
     assert rotor_no_name.external_id.startswith("rotor_")
     assert uuid_.UUID(rotor_no_name.external_id.removeprefix("rotor_"))
-    windmill_with_external_id = WindTurbineWrite(external_id="custom_external_id")
-    assert windmill_with_external_id.external_id == "custom_external_id"
+    turbine_with_external_id = WindTurbineWrite(external_id="custom_external_id")
+    assert turbine_with_external_id.external_id == "custom_external_id"
 
 
 def test_domain_name_for_class_name_ending_with_write():
