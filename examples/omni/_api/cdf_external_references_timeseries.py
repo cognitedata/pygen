@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from collections.abc import Sequence
 from typing import Literal, cast
 
@@ -389,6 +390,12 @@ class CDFExternalReferencesTimeseriesAPI:
                 >>> cdf_external_references = client.cdf_external_references.timeseries(limit=5).retrieve()
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select()...data.retrieve_dataframe() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         filter_ = _create_cdf_external_reference_filter(
             self._view_id,
             external_id_prefix,

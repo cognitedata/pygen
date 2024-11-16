@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from collections.abc import Sequence
 from typing import Literal, cast
 
@@ -417,6 +418,12 @@ class ScenarioInstancePriceForecastAPI:
                 >>> scenario_instances = client.scenario_instance.price_forecast(limit=5).retrieve()
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select()...data.retrieve_dataframe() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         filter_ = _create_scenario_instance_filter(
             self._view_id,
             aggregation,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from collections.abc import Sequence
 from typing import Literal, cast
 
@@ -393,6 +394,12 @@ class MetmastWindSpeedAPI:
                 >>> metmasts = client.metmast.wind_speed(limit=5).retrieve()
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select()...data.retrieve_dataframe() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         filter_ = _create_metmast_filter(
             self._view_id,
             min_position,

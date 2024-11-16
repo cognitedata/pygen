@@ -3,7 +3,7 @@ from cognite.client import data_modeling as dm
 from omni import data_classes as omni_classes
 
 from cognite.pygen.utils.text import to_pascal, to_snake
-from tests.constants import CORE_SDK, OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK
+from tests.constants import CORE_SDK, OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK, WIND_TURBINE
 from tests.omni_constants import OmniClasses
 
 
@@ -20,6 +20,11 @@ def omnisub_data_model() -> dm.DataModel[dm.View]:
 @pytest.fixture(scope="session")
 def core_data_model() -> dm.DataModel[dm.View]:
     return CORE_SDK.load_data_model()
+
+
+@pytest.fixture(scope="session")
+def turbine_data_model() -> dm.DataModel[dm.View]:
+    return WIND_TURBINE.load_data_model()
 
 
 @pytest.fixture(scope="session")

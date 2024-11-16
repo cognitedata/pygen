@@ -302,4 +302,10 @@ class CogniteCoreFiles:
     data_cognite_asset = data_classes / "_cognite_asset.py"
 
 
+class WindTurbineFiles:
+    client_dir = WIND_TURBINE.client_dir
+    data_classes = client_dir / "data_classes"
+    data_sensor_time_series = data_classes / "_sensor_time_series.py"
+
+
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

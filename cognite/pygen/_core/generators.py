@@ -429,6 +429,7 @@ class MultiAPIGenerator:
         sdk[data_classes_dir / "_core" / "__init__.py"] = self.generate_data_class_core_init_file()
         sdk[data_classes_dir / "_core" / "query.py"] = self.generate_data_class_core_query_file()
         sdk[data_classes_dir / "_core" / "cdf_external.py"] = self.generate_data_class_core_cdf_external_file()
+        sdk[data_classes_dir / "_core" / "datapoints_api.py"] = self.generate_data_class_core_datapoints_api_file()
         return sdk
 
     def generate_api_core_file(self) -> str:
@@ -530,6 +531,17 @@ class MultiAPIGenerator:
             data_class_core.render(
                 has_default_instance_space=self.has_default_instance_space,
                 query_builder=query_builder,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_datapoints_api_file(self) -> str:
+        """Generate the core data classes file for the SDK."""
+        data_class_core = self.env.get_template("data_classes_core_datapoints_api.py.jinja")
+
+        return (
+            data_class_core.render(
                 top_level_package=self.top_level_package,
             )
             + "\n"

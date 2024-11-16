@@ -11,6 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen import config as pygen_config
+from cognite.pygen._constants import COGNITE_TIMESERIES
 from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.cdf import _find_first_node_type
 from cognite.pygen.utils.text import create_name, to_pascal, to_words
@@ -191,6 +192,15 @@ class DataClass:
         """Update the direct children of the data class."""
         self.direct_children.extend(children)
         self.initialization.add("children")
+
+    @property
+    def is_cognite_timeseries(self) -> bool:
+        return any(
+            isinstance(field, BaseConnectionField | BasePrimitiveField)
+            and field.container is not None
+            and field.container.source == COGNITE_TIMESERIES
+            for field in self
+        )
 
     @property
     def read_base_class(self) -> str:

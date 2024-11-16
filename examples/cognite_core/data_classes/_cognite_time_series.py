@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    DataPointsAPI,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -967,6 +968,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 self.source_updated_user,
             ]
         )
+        self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_cognite_time_series(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteTimeSeriesList:
         return self._list(limit=limit)

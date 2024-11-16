@@ -14,8 +14,15 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## TBD
+### Added
+- Any views that extends the `CogniteTimeSeries` now has the property `data` you can use to retrieve datapoints.
+  For example, `pygen.rotor.select().rotor_speed_controller.data.retrieve_dataframe(...)` will retrieve the datapoints
+  for the `rotor_speed_controller` timeseries.
+
 ### Fixed
-- Doing `.query()` over an edge with properties without filtering no longer raises a `ValueError`.
+- The `.query()` method has been renamed to `.select()`. The `.query()` method is still available, but will
+  be removed shortly.
+- Doing `.select()` over an edge with properties without filtering no longer raises a `ValueError`.
 - When using the `CogniteCore` model, either directly or an extension of it, the generated SDK now
   respects the read-only properties in `CogniteAsset` and `CogniteFile`.
 

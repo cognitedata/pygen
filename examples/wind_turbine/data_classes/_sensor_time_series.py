@@ -11,6 +11,7 @@ from pydantic import field_validator, model_validator
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    DataPointsAPI,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -449,6 +450,7 @@ class _SensorTimeSeriesQuery(NodeQueryCore[T_DomainModelList, SensorTimeSeriesLi
                 self.standard_name,
             ]
         )
+        self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_sensor_time_series(self, limit: int = DEFAULT_QUERY_LIMIT) -> SensorTimeSeriesList:
         return self._list(limit=limit)

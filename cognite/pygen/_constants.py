@@ -9,6 +9,8 @@ _READONLY_PROPERTIES: Mapping[dm.ContainerId, frozenset[str]] = {
     dm.ContainerId("cdf_cdm", "CogniteFile"): frozenset({"isUploaded", "uploadedTime"}),
 }
 
+COGNITE_TIMESERIES = dm.ContainerId("cdf_cdm", "CogniteTimeSeries")
+
 
 def is_readonly_property(container: dm.ContainerId, identifier: str) -> bool:
     return container in _READONLY_PROPERTIES and identifier in _READONLY_PROPERTIES[container]
