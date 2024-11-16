@@ -1,6 +1,5 @@
 import json
 from collections.abc import Callable
-from pathlib import Path
 from typing import cast
 
 import pytest
@@ -13,7 +12,7 @@ from wind_turbine.data_classes import ResourcesWrite, WindTurbineWrite
 from cognite.pygen.utils.external_id_factories import (
     ExternalIdFactory,
 )
-from tests.constants import OMNI_SDK
+from tests.constants import JSON_DIR, OMNI_SDK
 from tests.omni_constants import OmniClasses
 
 
@@ -120,7 +119,6 @@ class TestToInstancesWrite:
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
 
-@pytest.mark.skip("Moved data, not maintained")
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
     [
@@ -128,21 +126,21 @@ class TestToInstancesWrite:
         # so hashing it will lead to fewer nodes
         (
             ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.sha256_factory()),
-            135,
-            105,
+            4,
+            0,
         ),
         (
             ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.incremental_factory()),
-            145,
-            105,
+            4,
+            0,
         ),
         (
             ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.uuid_factory()),
-            145,
-            105,
+            4,
+            0,
         ),
-        (ExternalIdFactory.sha256_factory().short, 135, 105),
-        (ExternalIdFactory.uuid_factory().short, 145, 105),
+        (ExternalIdFactory.sha256_factory().short, 4, 0),
+        (ExternalIdFactory.uuid_factory().short, 4, 0),
     ],
 )
 def test_load_windturbines_from_json(
@@ -151,7 +149,7 @@ def test_load_windturbines_from_json(
     expected_edge_count: int,
 ) -> None:
     # Arrange
-    raw_json = Path("unknown location")
+    raw_json = (JSON_DIR / "turbine.json").read_text()
     try:
         WindDomainModelWrite.external_id_factory = factory
 
