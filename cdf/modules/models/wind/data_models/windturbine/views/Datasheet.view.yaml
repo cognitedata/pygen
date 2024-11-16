@@ -2,7 +2,6 @@ space: {{ pygen_power }}
 externalId: DataSheet
 name: DataSheet
 description: A view representing a datasheet.
-implements:
 version: v1
 properties:
   name:
