@@ -1,0 +1,1658 @@
+space: sp_pygen_power
+externalId: WindTurbine
+name: WindTurbine
+description: This is the demo model used in the documentation of pygen.
+version: '1'
+views:
+- space: sp_pygen_power
+  externalId: Blade
+  name: Blade
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    is_damaged:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Blade
+      containerPropertyIdentifier: is_damaged
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: is_damaged
+      description: null
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+    sensor_positions:
+      source:
+        space: sp_pygen_power
+        externalId: SensorPosition
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: SensorPosition
+          version: '1'
+          type: view
+        identifier: blade
+      name: null
+      description: null
+      connectionType: multi_reverse_direct_relation
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: DataSheet
+  name: DataSheet
+  description: A view representing a datasheet.
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Description of the instance
+    directory:
+      container:
+        space: cdf_cdm
+        externalId: CogniteFile
+      containerPropertyIdentifier: directory
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Directory
+      description: Contains the path elements from the source (if the source system
+        has a file system hierarchy or similar.)
+    isUploaded:
+      container:
+        space: cdf_cdm
+        externalId: CogniteFile
+      containerPropertyIdentifier: isUploaded
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: false
+      name: Is uploaded
+      description: Specifies if the file content has been uploaded to Cognite Data
+        Fusion or not.
+    mimeType:
+      container:
+        space: cdf_cdm
+        externalId: CogniteFile
+      containerPropertyIdentifier: mimeType
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: MIME type
+      description: The MIME type of the file.
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+    uploadedTime:
+      container:
+        space: cdf_cdm
+        externalId: CogniteFile
+      containerPropertyIdentifier: uploadedTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Uploaded time
+      description: The time the file upload completed.
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Distance
+  name: Distance
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: edge
+  isGlobal: false
+  properties:
+    distance:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Distance
+      containerPropertyIdentifier: distance
+      type:
+        list: false
+        unit:
+          externalId: length:m
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: distance
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Gearbox
+  name: Gearbox
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    displacement_x:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_x
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: displacement_x
+      description: null
+    displacement_y:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_y
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: displacement_y
+      description: null
+    displacement_z:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_z
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: displacement_z
+      description: null
+    nacelle:
+      source:
+        space: sp_pygen_power
+        externalId: Nacelle
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+          type: view
+        identifier: gearbox
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: GeneratingUnit
+  name: GeneratingUnit
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    capacity:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: GeneratingUnit
+      containerPropertyIdentifier: capacity
+      type:
+        list: false
+        unit:
+          externalId: power:megaw
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: capacity
+      description: null
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Description of the instance
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Generator
+  name: Generator
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    generator_speed_controller:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Generator
+      containerPropertyIdentifier: generator_speed_controller
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: generator_speed_controller
+      description: null
+    generator_speed_controller_reference:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Generator
+      containerPropertyIdentifier: generator_speed_controller_reference
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: generator_speed_controller_reference
+      description: null
+    nacelle:
+      source:
+        space: sp_pygen_power
+        externalId: Nacelle
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+          type: view
+        identifier: main_shaft
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: HighSpeedShaft
+  name: HighSpeedShaft
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    bending_moment_y:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: bending_moment_y
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: bending_moment_y
+      description: null
+    bending_monent_x:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: bending_monent_x
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: bending_monent_x
+      description: null
+    nacelle:
+      source:
+        space: sp_pygen_power
+        externalId: Nacelle
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+          type: view
+        identifier: high_speed_shaft
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+    torque:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: torque
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: torque
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: MainShaft
+  name: MainShaft
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    bending_x:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: MainShaft
+      containerPropertyIdentifier: bending_x
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: bending_x
+      description: null
+    bending_y:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: MainShaft
+      containerPropertyIdentifier: bending_y
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: bending_y
+      description: null
+    calculated_tilt_moment:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: MainShaft
+      containerPropertyIdentifier: calculated_tilt_moment
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: calculated_tilt_moment
+      description: null
+    calculated_yaw_moment:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: MainShaft
+      containerPropertyIdentifier: calculated_yaw_moment
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: calculated_yaw_moment
+      description: null
+    nacelle:
+      source:
+        space: sp_pygen_power
+        externalId: Nacelle
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+          type: view
+        identifier: generator
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+    torque:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: MainShaft
+      containerPropertyIdentifier: torque
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: torque
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Metmast
+  name: Metmast
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    position:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Metmast
+      containerPropertyIdentifier: position
+      type:
+        list: false
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: position
+      description: null
+    temperature:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Metmast
+      containerPropertyIdentifier: temperature
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: temperature
+      description: null
+    tilt_angle:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Metmast
+      containerPropertyIdentifier: tilt_angle
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: tilt_angle
+      description: null
+    wind_speed:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Metmast
+      containerPropertyIdentifier: wind_speed
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: wind_speed
+      description: null
+    wind_turbines:
+      type:
+        space: sp_pygen_power_enterprise
+        externalId: Distance
+      source:
+        space: sp_pygen_power
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      name: wind_turbines
+      description: null
+      edgeSource:
+        space: sp_pygen_power
+        externalId: Distance
+        version: '1'
+        type: view
+      direction: inwards
+      connectionType: multi_edge_connection
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Nacelle
+  name: Nacelle
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    acc_from_back_side_x:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_x
+      type:
+        list: false
+        type: direct
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: acc_from_back_side_x
+      description: null
+    acc_from_back_side_y:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_y
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: acc_from_back_side_y
+      description: null
+    acc_from_back_side_z:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_z
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: acc_from_back_side_z
+      description: null
+    gearbox:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: gearbox
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Gearbox
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: gearbox
+      description: null
+    generator:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: generator
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Generator
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: generator
+      description: null
+    high_speed_shaft:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: high_speed_shaft
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: HighSpeedShaft
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: high_speed_shaft
+      description: null
+    main_shaft:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: main_shaft
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: MainShaft
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: main_shaft
+      description: null
+    power_inverter:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: power_inverter
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: PowerInverter
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: power_inverter
+      description: null
+    wind_turbine:
+      source:
+        space: sp_pygen_power
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: WindTurbine
+          version: '1'
+          type: view
+        identifier: nacelle
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+    yaw_direction:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: yaw_direction
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: yaw_direction
+      description: null
+    yaw_error:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Nacelle
+      containerPropertyIdentifier: yaw_error
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: yaw_error
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: PowerInverter
+  name: PowerInverter
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    active_power_total:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: PowerInverter
+      containerPropertyIdentifier: active_power_total
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: active_power_total
+      description: null
+    apparent_power_total:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: PowerInverter
+      containerPropertyIdentifier: apparent_power_total
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: apparent_power_total
+      description: null
+    nacelle:
+      source:
+        space: sp_pygen_power
+        externalId: Nacelle
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+          type: view
+        identifier: power_inverter
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+    reactive_power_total:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: PowerInverter
+      containerPropertyIdentifier: reactive_power_total
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: reactive_power_total
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: Rotor
+  name: Rotor
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    rotor_speed_controller:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Rotor
+      containerPropertyIdentifier: rotor_speed_controller
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: rotor_speed_controller
+      description: null
+    rpm_low_speed_shaft:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: Rotor
+      containerPropertyIdentifier: rpm_low_speed_shaft
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: rpm_low_speed_shaft
+      description: null
+    wind_turbine:
+      source:
+        space: sp_pygen_power
+        externalId: WindTurbine
+        version: '1'
+        type: view
+      through:
+        source:
+          space: sp_pygen_power
+          externalId: WindTurbine
+          version: '1'
+          type: view
+        identifier: rotor
+      name: null
+      description: null
+      connectionType: single_reverse_direct_relation
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: SensorPosition
+  name: SensorPosition
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    blade:
+      container:
+        space: sp_pygen_power
+        externalId: SensorPosition
+      containerPropertyIdentifier: blade
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Blade
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: blade
+      description: null
+    edgewise_bend_mom_crosstalk_corrected:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_crosstalk_corrected
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: edgewise_bend_mom_crosstalk_corrected
+      description: null
+    edgewise_bend_mom_offset:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_offset
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: edgewise_bend_mom_offset
+      description: null
+    edgewise_bend_mom_offset_crosstalk_corrected:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_offset_crosstalk_corrected
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: edgewise_bend_mom_offset_crosstalk_corrected
+      description: null
+    edgewisewise_bend_mom:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewisewise_bend_mom
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: edgewisewise_bend_mom
+      description: null
+    flapwise_bend_mom:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: flapwise_bend_mom
+      description: null
+    flapwise_bend_mom_crosstalk_corrected:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_crosstalk_corrected
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: flapwise_bend_mom_crosstalk_corrected
+      description: null
+    flapwise_bend_mom_offset:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_offset
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: flapwise_bend_mom_offset
+      description: null
+    flapwise_bend_mom_offset_crosstalk_corrected:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_offset_crosstalk_corrected
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: flapwise_bend_mom_offset_crosstalk_corrected
+      description: null
+    position:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorPosition
+      containerPropertyIdentifier: position
+      type:
+        list: false
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: position
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: SensorTimeSeries
+  name: SensorTimeSeries
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    aliases:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: aliases
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Alternative names for the node
+    conceptId:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorTimeSeries
+      containerPropertyIdentifier: conceptId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Concept ID
+      description: The concept ID of the time series.
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Description of the instance
+    isStep:
+      container:
+        space: cdf_cdm
+        externalId: CogniteTimeSeries
+      containerPropertyIdentifier: isStep
+      type:
+        list: false
+        type: boolean
+      nullable: false
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: false
+      name: Is step
+      description: Specifies whether the time series is a step time series or not.
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+    sourceUnit:
+      container:
+        space: cdf_cdm
+        externalId: CogniteTimeSeries
+      containerPropertyIdentifier: sourceUnit
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Source unit
+      description: The unit specified in the source system.
+    standardName:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SensorTimeSeries
+      containerPropertyIdentifier: standardName
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: standardName
+      description: The standard name of the time series.
+    type:
+      container:
+        space: cdf_cdm
+        externalId: CogniteTimeSeries
+      containerPropertyIdentifier: type
+      type:
+        values:
+          string:
+            name: string
+            description: Time series with string data points.
+          numeric:
+            name: numeric
+            description: Time series with double floating point data points.
+        type: enum
+      nullable: false
+      immutable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Type
+      description: Specifies the data type of the data points.
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: SolarPanel
+  name: SolarPanel
+  implements:
+  - space: sp_pygen_power
+    externalId: GeneratingUnit
+    version: '1'
+    type: view
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    capacity:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: GeneratingUnit
+      containerPropertyIdentifier: capacity
+      type:
+        list: false
+        unit:
+          externalId: power:megaw
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: capacity
+      description: null
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Description of the instance
+    efficiency:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SolarPanel
+      containerPropertyIdentifier: efficiency
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: efficiency
+      description: null
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+    orientation:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: SolarPanel
+      containerPropertyIdentifier: orientation
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: SensorTimeSeries
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: orientation
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+- space: sp_pygen_power
+  externalId: WindTurbine
+  name: WindTurbine
+  implements:
+  - space: sp_pygen_power
+    externalId: GeneratingUnit
+    version: '1'
+    type: view
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    blades:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: blades
+      type:
+        list: true
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Blade
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: blades
+      description: null
+    capacity:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: GeneratingUnit
+      containerPropertyIdentifier: capacity
+      type:
+        list: false
+        unit:
+          externalId: power:megaw
+        type: float64
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: capacity
+      description: null
+    datasheets:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: datasheets
+      type:
+        list: true
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: DataSheet
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: datasheets
+      description: null
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Description of the instance
+    metmast:
+      type:
+        space: sp_pygen_power_enterprise
+        externalId: Distance
+      source:
+        space: sp_pygen_power
+        externalId: Metmast
+        version: '1'
+        type: view
+      name: metmast
+      description: null
+      edgeSource:
+        space: sp_pygen_power
+        externalId: Distance
+        version: '1'
+        type: view
+      direction: outwards
+      connectionType: multi_edge_connection
+    nacelle:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: nacelle
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Nacelle
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: nacelle
+      description: null
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: null
+      description: Name of the instance
+    powerCurve:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: powerCurve
+      type:
+        list: false
+        type: sequence
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: powerCurve
+      description: null
+    rotor:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: rotor
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_power
+          externalId: Rotor
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: rotor
+      description: null
+    windfarm:
+      container:
+        space: sp_pygen_power_enterprise
+        externalId: WindTurbine
+      containerPropertyIdentifier: windfarm
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: windfarm
+      description: null
+  lastUpdatedTime: 1731748766969
+  createdTime: 1731748766969
+isGlobal: false
+lastUpdatedTime: 1731748769133
+createdTime: 1731748769133
