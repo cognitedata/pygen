@@ -9,14 +9,14 @@ implements:
 properties:
   efficiency:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: SolarPanel
       type: container
     containerPropertyIdentifier: efficiency
     name: efficiency
   orientation:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: SolarPanel
       type: container
     containerPropertyIdentifier: orientation

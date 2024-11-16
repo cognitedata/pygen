@@ -5,14 +5,14 @@ version: 1
 properties:
   name:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Blade
       type: container
     containerPropertyIdentifier: name
     name: name
   is_damaged:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Blade
       type: container
     containerPropertyIdentifier: is_damaged

@@ -5,31 +5,31 @@ version: 1
 properties:
   gearbox:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: gearbox
     name: gearbox
     source:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Gearbox
       version: 1
       type: view
   generator:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: generator
     name: generator
     source:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Generator
       version: 1
       type: view
   high_speed_shaft:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: high_speed_shaft
@@ -41,7 +41,7 @@ properties:
       type: view
   main_shaft:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: main_shaft
@@ -53,7 +53,7 @@ properties:
       type: view
   power_inverter:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: power_inverter
@@ -65,35 +65,35 @@ properties:
       type: view
   acc_from_back_side_x:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: acc_from_back_side_x
     name: acc_from_back_side_x
   acc_from_back_side_y:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: acc_from_back_side_y
     name: acc_from_back_side_y
   acc_from_back_side_z:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: acc_from_back_side_z
     name: acc_from_back_side_z
   yaw_direction:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: yaw_direction
     name: yaw_direction
   yaw_error:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Nacelle
       type: container
     containerPropertyIdentifier: yaw_error

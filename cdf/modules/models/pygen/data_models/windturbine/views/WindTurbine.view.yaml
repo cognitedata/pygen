@@ -9,14 +9,14 @@ implements:
 properties:
   windfarm:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: windfarm
     name: windfarm
   rotor:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: rotor
@@ -28,7 +28,7 @@ properties:
       type: view
   nacelle:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: nacelle
@@ -40,7 +40,7 @@ properties:
       type: view
   blades:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     source:
@@ -52,7 +52,7 @@ properties:
     name: blades
   metmast:
     type:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Distance
     source:
       space: {{ pygen_power }}
@@ -69,14 +69,14 @@ properties:
     connectionType: multi_edge_connection
   datasheets:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: datasheets
     name: datasheets
   powerCurve:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: WindTurbine
       type: container
     containerPropertyIdentifier: powerCurve

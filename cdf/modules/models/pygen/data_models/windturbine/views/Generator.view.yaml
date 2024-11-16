@@ -5,14 +5,14 @@ version: 1
 properties:
   generator_speed_controller:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Generator
       type: container
     containerPropertyIdentifier: generator_speed_controller
     name: generator_speed_controller
   generator_speed_controller_reference:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: Generator
       type: container
     containerPropertyIdentifier: generator_speed_controller_reference

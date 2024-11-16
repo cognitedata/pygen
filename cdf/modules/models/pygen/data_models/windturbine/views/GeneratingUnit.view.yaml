@@ -5,14 +5,14 @@ version: 1
 properties:
   name:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: GeneratingUnit
       type: container
     containerPropertyIdentifier: name
     name: name
   capacity:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: GeneratingUnit
       type: container
     containerPropertyIdentifier: capacity

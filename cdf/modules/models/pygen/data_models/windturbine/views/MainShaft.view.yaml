@@ -5,35 +5,35 @@ version: 1
 properties:
   torque:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: MainShaft
       type: container
     containerPropertyIdentifier: torque
     name: torque
   calculated_tilt_moment:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: MainShaft
       type: container
     containerPropertyIdentifier: calculated_tilt_moment
     name: calculated_tilt_moment
   calculated_yaw_moment:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: MainShaft
       type: container
     containerPropertyIdentifier: calculated_yaw_moment
     name: calculated_yaw_moment
   bending_x:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: MainShaft
       type: container
     containerPropertyIdentifier: bending_x
     name: bending_x
   bending_y:
     container:
-      space: {{ pygen_power }}
+      space: {{ pygen_power_enterprise }}
       externalId: MainShaft
       type: container
     containerPropertyIdentifier: bending_y

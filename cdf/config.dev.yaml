@@ -12,6 +12,7 @@ variables:
         pygen_models_space: sp_pygen_models
         pygen_power: sp_pygen_power
         pygen_other_models_space: sp_pygen_models_other
+        pygen_power_enterprise: sp_pygen_power_enterprise
       pygen_enterprise:
         pygen_power_enterprise: sp_pygen_power_enterprise
 
