@@ -175,11 +175,3 @@ properties:
       externalId: CogniteSourceSystem
       version: v1
       type: view
-  object3D:
-    container:
-      space: cdf_cdm
-      externalId: CogniteVisualizable
-      type: container
-    containerPropertyIdentifier: object3D
-    description: This is not used, overwritten to point to nothing to avoid including 3D.
-    # Note that source is not included.
