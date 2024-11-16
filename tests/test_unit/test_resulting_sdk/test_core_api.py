@@ -138,7 +138,7 @@ def parse_graphql_query():
                 )
             ]
         ),
-        id="listWindmill with createdTime",
+        id="listWindTurbine with createdTime",
     )
 
 
@@ -155,7 +155,7 @@ class TestGraphQLQuery:
         assert exc_info.match("Error message")
 
     def test_parse_query_without_typename(self) -> None:
-        result = {"listWindmill": {"items": [{"name": "hornsea_1_mill_3", "capacity": 7}]}}
+        result = {"listWindTurbine": {"items": [{"name": "hornsea_1_mill_3", "capacity": 7}]}}
         with pytest.raises(RuntimeError) as exc_info:
             GraphQLQueryResponse(dm.DataModelId("sp_pygen_power", "WindTurbine", "1")).parse(result)
         assert exc_info.match("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")

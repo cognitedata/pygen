@@ -1,18 +1,19 @@
 import json
 from collections.abc import Callable
+from pathlib import Path
 from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
 from omni import data_classes as dc
 from pydantic import TypeAdapter
-from windmill.data_classes import DomainModelWrite as WindmillDomainModelWrite
-from windmill.data_classes import ResourcesWrite, WindmillWrite
+from wind_turbine.data_classes import DomainModelWrite as WindDomainModelWrite
+from wind_turbine.data_classes import ResourcesWrite, WindTurbineWrite
 
 from cognite.pygen.utils.external_id_factories import (
     ExternalIdFactory,
 )
-from tests.constants import OMNI_SDK, WindMillFiles
+from tests.constants import OMNI_SDK
 from tests.omni_constants import OmniClasses
 
 
@@ -119,11 +120,11 @@ class TestToInstancesWrite:
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
 
-@pytest.mark.skip("Moved data")
+@pytest.mark.skip("Moved data, not maintained")
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
     [
-        # There are none unique sensor positions in the windmill data
+        # There are none unique sensor positions in the windturbine data
         # so hashing it will lead to fewer nodes
         (
             ExternalIdFactory.create_external_id_factory(suffix_ext_id_factory=ExternalIdFactory.sha256_factory()),
@@ -144,40 +145,40 @@ class TestToInstancesWrite:
         (ExternalIdFactory.uuid_factory().short, 145, 105),
     ],
 )
-def test_load_windmills_from_json(
+def test_load_windturbines_from_json(
     factory: Callable[[type, dict], str],
     expected_node_count: int,
     expected_edge_count: int,
 ) -> None:
     # Arrange
-    raw_json = WindMillFiles.Data.wind_mill_json.read_text()
+    raw_json = Path("unknown location")
     try:
-        WindmillDomainModelWrite.external_id_factory = factory
+        WindDomainModelWrite.external_id_factory = factory
 
         loaded_json = json.loads(raw_json)
 
         # Act
-        windmills = TypeAdapter(list[WindmillWrite]).validate_json(raw_json)
+        turbines = TypeAdapter(list[WindTurbineWrite]).validate_json(raw_json)
 
         created = ResourcesWrite()
-        for item in windmills:
+        for item in turbines:
             created.extend(item.to_instances_write())
 
         # Assert
         exclude = {"external_id", "space", "data_record", "externalId"}
-        for windmill, json_item in zip(windmills, loaded_json, strict=False):
-            dumped_windmill = json.loads(
-                windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
+        for wind_turbine, json_item in zip(turbines, loaded_json, strict=False):
+            dumped_turbine = json.loads(
+                wind_turbine.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True, exclude_unset=True)
             )
 
             # The exclude=True is not recursive in pydantic, so we need to do it manually
-            _recursive_exclude(dumped_windmill, exclude)
-            assert dumped_windmill == json_item
+            _recursive_exclude(dumped_turbine, exclude)
+            assert dumped_turbine == json_item
 
         assert len(created.nodes) == expected_node_count
         assert len(created.edges) == expected_edge_count
     finally:
-        WindmillDomainModelWrite.external_id_factory = None
+        WindDomainModelWrite.external_id_factory = None
 
 
 def _recursive_exclude(d: dict, exclude: set[str]) -> None:
