@@ -620,7 +620,14 @@ class PrimitiveRequiredAPI(
 
     def query(self) -> PrimitiveRequiredQuery:
         """Start a query for primitive requireds."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return PrimitiveRequiredQuery(self._client)
+
+    def select(self) -> PrimitiveRequiredQuery:
+        """Start selecting from primitive requireds."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return PrimitiveRequiredQuery(self._client)
 
     def list(

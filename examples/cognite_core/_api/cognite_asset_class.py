@@ -514,7 +514,14 @@ class CogniteAssetClassAPI(
 
     def query(self) -> CogniteAssetClassQuery:
         """Start a query for Cognite asset class."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteAssetClassQuery(self._client)
+
+    def select(self) -> CogniteAssetClassQuery:
+        """Start selecting from Cognite asset class."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteAssetClassQuery(self._client)
 
     def list(

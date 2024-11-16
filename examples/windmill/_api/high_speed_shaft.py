@@ -385,7 +385,14 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
     def query(self) -> HighSpeedShaftQuery:
         """Start a query for high speed shafts."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return HighSpeedShaftQuery(self._client)
+
+    def select(self) -> HighSpeedShaftQuery:
+        """Start selecting from high speed shafts."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return HighSpeedShaftQuery(self._client)
 
     def list(

@@ -487,7 +487,14 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureWrite, UnitProcedureL
 
     def query(self) -> UnitProcedureQuery:
         """Start a query for unit procedures."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return UnitProcedureQuery(self._client)
+
+    def select(self) -> UnitProcedureQuery:
+        """Start selecting from unit procedures."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return UnitProcedureQuery(self._client)
 
     def list(

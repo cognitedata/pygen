@@ -1,1 +1,1 @@
-::: examples.windmill._api_client.WindmillClient
+::: examples.wind_turbine._api_client.WindTurbineClient

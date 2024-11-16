@@ -1,0 +1,19 @@
+[{
+	"capacity": 7.0,
+	"name": "Doctrino Turbine 11",
+    "windfarm": "Oslo B2",
+	"blades": [
+		{
+			"is_damaged": false,
+			"name": "Blade A"
+		},
+		{
+            "is_damaged": false,
+			"name": "Blade B"
+		},
+		{
+			"is_damaged": true,
+			"name": "Blade C"
+		}
+    ]
+}]

@@ -671,7 +671,14 @@ class Cognite3DTransformationNodeAPI(
 
     def query(self) -> Cognite3DTransformationNodeQuery:
         """Start a query for Cognite 3D transformation nodes."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Cognite3DTransformationNodeQuery(self._client)
+
+    def select(self) -> Cognite3DTransformationNodeQuery:
+        """Start selecting from Cognite 3D transformation nodes."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Cognite3DTransformationNodeQuery(self._client)
 
     def list(

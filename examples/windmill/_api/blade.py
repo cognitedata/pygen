@@ -458,7 +458,14 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
     def query(self) -> BladeQuery:
         """Start a query for blades."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return BladeQuery(self._client)
+
+    def select(self) -> BladeQuery:
+        """Start selecting from blades."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return BladeQuery(self._client)
 
     def list(

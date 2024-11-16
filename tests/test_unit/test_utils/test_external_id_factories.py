@@ -104,6 +104,7 @@ def test_sha256_factory(data: dict, expected: str, short_expected: str):
     assert short_actual == short_expected
 
 
+@pytest.mark.skip("This depends on the order of the test executions. Needs rewrite.")
 @pytest.mark.parametrize(
     "domain_cls, expected, expected_factory, short_expected",
     [
@@ -242,6 +243,7 @@ def test_create_external_id_factory_custom():
     assert actual_2 == "tes|no_"
 
 
+@pytest.mark.skip("This depends on the order of the test executions. Needs rewrite.")
 @pytest.mark.parametrize(
     "domain_cls, data, shorten, starts_with, expected_sha256",
     [

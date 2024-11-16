@@ -544,7 +544,14 @@ class CogniteFileCategoryAPI(
 
     def query(self) -> CogniteFileCategoryQuery:
         """Start a query for Cognite file categories."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteFileCategoryQuery(self._client)
+
+    def select(self) -> CogniteFileCategoryQuery:
+        """Start selecting from Cognite file categories."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteFileCategoryQuery(self._client)
 
     def list(

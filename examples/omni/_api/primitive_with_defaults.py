@@ -511,7 +511,14 @@ class PrimitiveWithDefaultsAPI(
 
     def query(self) -> PrimitiveWithDefaultsQuery:
         """Start a query for primitive with defaults."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return PrimitiveWithDefaultsQuery(self._client)
+
+    def select(self) -> PrimitiveWithDefaultsQuery:
+        """Start selecting from primitive with defaults."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return PrimitiveWithDefaultsQuery(self._client)
 
     def list(

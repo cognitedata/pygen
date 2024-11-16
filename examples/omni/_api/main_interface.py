@@ -438,7 +438,14 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
     def query(self) -> MainInterfaceQuery:
         """Start a query for main interfaces."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return MainInterfaceQuery(self._client)
+
+    def select(self) -> MainInterfaceQuery:
+        """Start selecting from main interfaces."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return MainInterfaceQuery(self._client)
 
     def list(

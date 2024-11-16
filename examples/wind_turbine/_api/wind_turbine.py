@@ -797,7 +797,14 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
     def query(self) -> WindTurbineQuery:
         """Start a query for wind turbines."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return WindTurbineQuery(self._client)
+
+    def select(self) -> WindTurbineQuery:
+        """Start selecting from wind turbines."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return WindTurbineQuery(self._client)
 
     def list(

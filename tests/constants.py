@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling import DataModelId
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data" / "models"
 DATA_WRITE_DIR = REPO_ROOT / "tests" / "data" / "write"
+JSON_DIR = REPO_ROOT / "tests" / "data" / "json"
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
 
@@ -65,14 +66,6 @@ class ExampleSDK:
     def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
         return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
 
-
-WINDMILL_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("power-models", "Windmill", "1")],
-    _top_level_package="windmill",
-    client_name="WindmillClient",
-    generate_sdk=True,
-    instance_space="windmill-instances",
-)
 
 OMNI_SDK = ExampleSDK(
     data_model_ids=[DataModelId("sp_pygen_models", "Omni", "1")],
@@ -301,11 +294,6 @@ class OmniSubFiles:
 class OmniMultiFiles:
     client_dir = OMNI_MULTI_SDK.client_dir
     api_client = client_dir / "_api_client.py"
-
-
-class WindMillFiles:
-    class Data:
-        wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"
 
 
 class CogniteCoreFiles:

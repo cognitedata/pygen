@@ -1,1 +1,1 @@
-::: examples.windmill._api
+::: examples.wind_turbine._api

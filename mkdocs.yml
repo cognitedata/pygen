@@ -35,10 +35,6 @@ nav:
     - Extra:
         - Generating Mock Data: extra/mock_data.ipynb
         - (Experimental) Generic query: extra/generic_query.ipynb
-    - Pygen Config:
-        - Home: config/index.md
-        - Naming: config/naming.md
-        - Filtering: config/filtering_methods.md
     - Example SDK Docs:
         - Home: example_docs/index.md
         - CogniteCore Client: example_docs/core_client.md
@@ -47,9 +43,9 @@ nav:
         - Omni Client: example_docs/omni_client.md
         - Omni APIs: example_docs/omni_apis.md
         - Omni Data Classes: example_docs/omni_data_classes.md
-        - Windmill Client: example_docs/wind_client.md
-        - Windmill APIs: example_docs/wind_apis.md
-        - Windmill Data Classes: example_docs/wind_data_classes.md
+        - WindTurbine Client: example_docs/wind_client.md
+        - WindTurbine APIs: example_docs/wind_apis.md
+        - WindTurbine Data Classes: example_docs/wind_data_classes.md
     - Developer Docs:
         - Querying: docs-dev/docs_query.ipynb
     - Reference - Code API:
@@ -62,8 +58,12 @@ nav:
             - Mock Generator: api/utils_mock_generator.md
             - Text: api/utils_text.md
             - ExternalID Factories: api/utils_external_id_factory.md
+        - Pygen Config:
+            - Home: config/index.md
+            - Naming: config/naming.md
+            - Filtering: config/filtering_methods.md
     - Changelog: CHANGELOG.md
-    - Developer Docs:
+    - Contributor Docs:
         - Home: developer_docs/index.md
         - Core:
             - Generators: developer_docs/core/generators.md
