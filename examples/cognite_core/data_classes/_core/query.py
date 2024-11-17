@@ -8,7 +8,7 @@ from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection, MutableSequence, Iterable, Sequence
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import (
     cast,
     ClassVar,
@@ -170,6 +170,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
         for step in builder[:-1]:
             step.select = None
+        builder[-1].max_retrieve_limit = limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 
@@ -288,6 +289,42 @@ def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
         yield sequence[i : i + chunk_size]
 
 
+@dataclass
+class Progress:
+    total: float | None
+    _last_print: float = field(default=0.0, init=False)
+    _estimated_nodes_per_second: float = field(default=0.0, init=False)
+    _is_large_query: bool = field(default=False, init=False)
+
+    def _update_nodes_per_second(self, last_node_count: int, last_execution_time: float) -> None:
+        # Estimate the number of nodes per second using exponential moving average
+        last_batch_nodes_per_second = last_node_count / last_execution_time
+        if self._estimated_nodes_per_second == 0.0:
+            self._estimated_nodes_per_second = last_batch_nodes_per_second
+        else:
+            self._estimated_nodes_per_second = (
+                0.1 * last_batch_nodes_per_second + 0.9 * self._estimated_nodes_per_second
+            )
+
+    def log(self, last_node_count: int, last_execution_time: float, total_retrieved: int) -> None:
+        if self.total is None:
+            return
+        self._update_nodes_per_second(last_node_count, last_execution_time)
+        # Estimate the time to completion
+        remaining_nodes = self.total - total_retrieved
+        remaining_time = remaining_nodes / self._estimated_nodes_per_second
+        if self._is_large_query and (total_retrieved - self._last_print) > PRINT_PROGRESS_PER_N_NODES:
+            estimate = datetime.timedelta(seconds=round(remaining_time, 0))
+            print(
+                f"Progress: {total_retrieved:,}/{self.total:,} nodes retrieved. "
+                f"Estimated time to completion: {estimate}"
+            )
+            self._last_print = total_retrieved
+        if self._is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
+            self._is_large_query = True
+            print("Large query detected. Will print progress.")
+
+
 class QueryStep:
     def __init__(
         self,
@@ -382,18 +419,18 @@ class QueryStep:
             (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
             or self.cursor is None
             or self.last_batch_count == 0
-            # Single direct relations are dependent on the parent node,
-            # so we assume that the parent node is the limiting factor.
-            or self.is_single_direct_relation
         )
 
-    def count_total(self, cognite_client: CogniteClient) -> float:
+    def count_total(self, cognite_client: CogniteClient) -> float | None:
         if self.view_id is None:
-            raise ValueError("Cannot count total if select is not set")
-
-        return cognite_client.data_modeling.instances.aggregate(
-            self.view_id, Count("externalId"), filter=self.raw_filter
-        ).value
+            # Cannot count the total without a view
+            return None
+        try:
+            return cognite_client.data_modeling.instances.aggregate(
+                self.view_id, Count("externalId"), filter=self.raw_filter
+            ).value
+        except CogniteAPIError:
+            return None
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
@@ -455,10 +492,6 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             expression.cursor = batch.cursors.get(expression.name)
             expression.results.extend(batch[expression.name].data)
 
-    @property
-    def _is_finished(self) -> bool:
-        return self[0].is_finished
-
     def _reduce_max_batch_limit(self) -> bool:
         for expression in self:
             if not expression.reduce_max_batch_limit():
@@ -472,13 +505,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         if not self:
             raise ValueError("No query steps to execute")
 
-        count: float | None = None
-        with suppress(ValueError, CogniteAPIError):
-            count = self[0].count_total(client)
+        select_step = next((step for step in self if step.select is not None), None)
+        if select_step is None:
+            raise ValueError("No select step found in the query")
 
-        is_large_query = False
-        last_progress_print = 0
-        nodes_per_second = 0.0
+        total = select_step.count_total(client)
+
+        progress = Progress(total)
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
@@ -490,7 +523,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                     # Too big query, try to reduce the limit
                     if self._reduce_max_batch_limit():
                         continue
-                    new_limit = self[0]._max_retrieve_batch_limit
+                    new_limit = select_step._max_retrieve_batch_limit
                     warnings.warn(
                         f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
                         QueryReducingBatchSize,
@@ -507,35 +540,15 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             last_execution_time = time.time() - t0
 
             self._update(batch)
-            if self._is_finished:
+            if remove_not_connected and len(self) > 1:
+                removed = _QueryResultCleaner(self).clean()
+                for step in self:
+                    step.total_retrieved -= removed.get(step.name, 0)
+
+            if select_step.is_finished:
                 break
 
-            if count is None:
-                continue
-            # Estimate the number of nodes per second using exponential moving average
-            last_batch_nodes_per_second = len(batch[self[0].name]) / last_execution_time
-            if nodes_per_second == 0.0:
-                nodes_per_second = last_batch_nodes_per_second
-            else:
-                nodes_per_second = 0.1 * last_batch_nodes_per_second + 0.9 * nodes_per_second
-            # Estimate the time to completion
-            remaining_nodes = count - self[0].total_retrieved
-            remaining_time = remaining_nodes / nodes_per_second
-
-            if is_large_query and (self[0].total_retrieved - last_progress_print) > PRINT_PROGRESS_PER_N_NODES:
-                estimate = datetime.timedelta(seconds=round(remaining_time, 0))
-                print(
-                    f"Progress: {self[0].total_retrieved:,}/{count:,} nodes retrieved. "
-                    f"Estimated time to completion: {estimate}"
-                )
-                last_progress_print = self[0].total_retrieved
-
-            if is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
-                is_large_query = True
-                print("Large query detected. Will print progress.")
-
-        if remove_not_connected and len(self) > 1:
-            _QueryResultCleaner(self).clean()
+            progress.log(len(batch[select_step.name]), last_execution_time, select_step.total_retrieved)
 
         return {step.name: step.results for step in self}
 
@@ -632,8 +645,10 @@ class _QueryResultCleaner:
             tree[step.from_].append(step)
         return dict(tree)
 
-    def clean(self) -> None:
-        self._clean(self._root)
+    def clean(self) -> dict[str, int]:
+        removed_by_name: dict[str, int] = defaultdict(int)
+        self._clean(self._root, removed_by_name)
+        return dict(removed_by_name)
 
     @staticmethod
     def as_node_id(direct_relation: dm.DirectRelationReference | dict[str, str]) -> dm.NodeId:
@@ -642,9 +657,10 @@ class _QueryResultCleaner:
 
         return dm.NodeId(direct_relation.space, direct_relation.external_id)
 
-    def _clean(self, step: QueryStep) -> tuple[set[dm.NodeId], str | None]:
+    def _clean(self, step: QueryStep, removed_by_name: dict[str, int]) -> tuple[set[dm.NodeId], str | None]:
         if step.name not in self._tree:
             # Leaf Node
+            # Nothing to clean, just return the node ids with the connection property
             direct_relation: str | None = None
             if step.node_expression and (through := step.node_expression.through) is not None:
                 direct_relation = through.property
@@ -657,7 +673,7 @@ class _QueryResultCleaner:
 
         expected_ids_by_property: dict[str | None, set[dm.NodeId]] = {}
         for child in self._tree[step.name]:
-            child_ids, property_id = self._clean(child)
+            child_ids, property_id = self._clean(child, removed_by_name)
             if property_id not in expected_ids_by_property:
                 expected_ids_by_property[property_id] = child_ids
             else:
@@ -668,6 +684,8 @@ class _QueryResultCleaner:
             for node in step.node_results:
                 if self._is_connected_node(node, expected_ids_by_property):
                     filtered_results.append(node)
+                else:
+                    removed_by_name[step.name] += 1
             step.results = filtered_results
             direct_relation = None if step.node_expression.through is None else step.node_expression.through.property
             return {node.as_id() for node in step.node_results}, direct_relation
@@ -676,12 +694,15 @@ class _QueryResultCleaner:
             if len(expected_ids_by_property) > 1 or None not in expected_ids_by_property:
                 raise RuntimeError(f"Invalid state of {type(self).__name__}")
             expected_ids = expected_ids_by_property[None]
+            before = len(step.results)
             if step.edge_expression.direction == "outwards":
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
-                return {self.as_node_id(edge.start_node) for edge in step.edge_results}, None
+                connected_node_ids = {self.as_node_id(edge.start_node) for edge in step.edge_results}
             else:  # inwards
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.start_node) in expected_ids]
-                return {self.as_node_id(edge.end_node) for edge in step.edge_results}, None
+                connected_node_ids = {self.as_node_id(edge.end_node) for edge in step.edge_results}
+            removed_by_name[step.name] += before - len(step.results)
+            return connected_node_ids, None
 
         raise TypeError(f"Unsupported query step type: {type(step)}")
 

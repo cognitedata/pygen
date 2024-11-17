@@ -22,9 +22,11 @@ Changes are grouped as follows
 ### Fixed
 - The `.query()` method has been renamed to `.select()`. The `.query()` method is still available, but will
   be removed shortly.
-- Doing `.select()` over an edge with properties without filtering no longer raises a `ValueError`.
+- Calling `.select()` over an edge with properties without filtering no longer raises a `ValueError`.
 - When using the `CogniteCore` model, either directly or an extension of it, the generated SDK now
   respects the read-only properties in `CogniteAsset` and `CogniteFile`.
+- When calling `.select()` the `limit` parameter is now respected and the correct number of nodes are returned.
+  There were some edge cases when the pagination stopped before the limit was reached. This is now fixed.
 
 ## [0.99.48] - 24-11-14
 ### Fixed
