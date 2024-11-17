@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    FileContentAPI,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -419,6 +420,7 @@ class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
                 self.uploaded_time,
             ]
         )
+        self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_data_sheet(self, limit: int = DEFAULT_QUERY_LIMIT) -> DataSheetList:
         return self._list(limit=limit)

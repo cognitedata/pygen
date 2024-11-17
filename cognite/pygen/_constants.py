@@ -10,6 +10,7 @@ _READONLY_PROPERTIES: Mapping[dm.ContainerId, frozenset[str]] = {
 }
 
 COGNITE_TIMESERIES = dm.ContainerId("cdf_cdm", "CogniteTimeSeries")
+COGNITE_FILE = dm.ContainerId("cdf_cdm", "CogniteFile")
 
 
 def is_readonly_property(container: dm.ContainerId, identifier: str) -> bool:

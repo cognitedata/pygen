@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    FileContentAPI,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -912,6 +913,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 self.uploaded_time,
             ]
         )
+        self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_cognite_file(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteFileList:
         return self._list(limit=limit)
