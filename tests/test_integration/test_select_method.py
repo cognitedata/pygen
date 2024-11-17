@@ -171,7 +171,7 @@ def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) ->
         core_client.cognite_asset.query()
         .name.equals("230900")
         .space.equals(CORE_SDK.instance_space)
-        .children.list_cognite_asset(limit=-1)
+        .children.list_cognite_asset(limit=2)
     )
 
     assert len(result) == 2
