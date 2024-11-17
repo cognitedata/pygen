@@ -170,6 +170,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
         for step in builder[:-1]:
             step.select = None
+        builder[-1].max_retrieve_limit = limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 
@@ -418,18 +419,18 @@ class QueryStep:
             (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
             or self.cursor is None
             or self.last_batch_count == 0
-            # Single direct relations are dependent on the parent node,
-            # so we assume that the parent node is the limiting factor.
-            or self.is_single_direct_relation
         )
 
-    def count_total(self, cognite_client: CogniteClient) -> float:
+    def count_total(self, cognite_client: CogniteClient) -> float | None:
         if self.view_id is None:
-            raise ValueError("Cannot count total if select is not set")
-
-        return cognite_client.data_modeling.instances.aggregate(
-            self.view_id, Count("externalId"), filter=self.raw_filter
-        ).value
+            # Cannot count the total without a view
+            return None
+        try:
+            return cognite_client.data_modeling.instances.aggregate(
+                self.view_id, Count("externalId"), filter=self.raw_filter
+            ).value
+        except CogniteAPIError:
+            return None
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
@@ -504,11 +505,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         if not self:
             raise ValueError("No query steps to execute")
 
-        count: float | None = None
-        with suppress(ValueError, CogniteAPIError):
-            count = self[0].count_total(client)
+        select_step = next((step for step in self if step.select is not None), None)
+        if select_step is None:
+            raise ValueError("No select step found in the query")
 
-        progress = Progress(count)
+        total = select_step.count_total(client)
+
+        progress = Progress(total)
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
@@ -520,7 +523,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                     # Too big query, try to reduce the limit
                     if self._reduce_max_batch_limit():
                         continue
-                    new_limit = self[0]._max_retrieve_batch_limit
+                    new_limit = select_step._max_retrieve_batch_limit
                     warnings.warn(
                         f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
                         QueryReducingBatchSize,
@@ -542,10 +545,10 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 for step in self:
                     step.total_retrieved -= removed.get(step.name, 0)
 
-            if self[0].is_finished:
+            if select_step.is_finished:
                 break
 
-            progress.log(len(batch[self[0].name]), last_execution_time, self[0].total_retrieved)
+            progress.log(len(batch[select_step.name]), last_execution_time, select_step.total_retrieved)
 
         return {step.name: step.results for step in self}
 

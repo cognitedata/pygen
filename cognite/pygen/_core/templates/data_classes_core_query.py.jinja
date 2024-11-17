@@ -170,6 +170,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
         for step in builder[:-1]:
             step.select = None
+        builder[-1].max_retrieve_limit = limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 

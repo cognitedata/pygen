@@ -426,7 +426,9 @@ class QueryStep:
             # Cannot count the total without a view
             return None
         try:
-            return cognite_client.data_modeling.instances.aggregate(self.view_id, Count("externalId"), filter=self.raw_filter).value
+            return cognite_client.data_modeling.instances.aggregate(
+                self.view_id, Count("externalId"), filter=self.raw_filter
+            ).value
         except CogniteAPIError:
             return None
 
