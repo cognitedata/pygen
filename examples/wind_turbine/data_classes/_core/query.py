@@ -491,10 +491,6 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             expression.cursor = batch.cursors.get(expression.name)
             expression.results.extend(batch[expression.name].data)
 
-    @property
-    def _is_finished(self) -> bool:
-        return self[0].is_finished
-
     def _reduce_max_batch_limit(self) -> bool:
         for expression in self:
             if not expression.reduce_max_batch_limit():
@@ -541,13 +537,15 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             last_execution_time = time.time() - t0
 
             self._update(batch)
-            if self._is_finished:
+            if remove_not_connected and len(self) > 1:
+                removed = _QueryResultCleaner(self).clean()
+                for step in self:
+                    step.total_retrieved -= removed.get(step.name, 0)
+
+            if self[0].is_finished:
                 break
 
             progress.log(len(batch[self[0].name]), last_execution_time, self[0].total_retrieved)
-
-        if remove_not_connected and len(self) > 1:
-            _QueryResultCleaner(self).clean()
 
         return {step.name: step.results for step in self}
 
@@ -644,8 +642,10 @@ class _QueryResultCleaner:
             tree[step.from_].append(step)
         return dict(tree)
 
-    def clean(self) -> None:
-        self._clean(self._root)
+    def clean(self) -> dict[str, int]:
+        removed_by_name: dict[str, int] = defaultdict(int)
+        self._clean(self._root, removed_by_name)
+        return dict(removed_by_name)
 
     @staticmethod
     def as_node_id(direct_relation: dm.DirectRelationReference | dict[str, str]) -> dm.NodeId:
@@ -654,9 +654,10 @@ class _QueryResultCleaner:
 
         return dm.NodeId(direct_relation.space, direct_relation.external_id)
 
-    def _clean(self, step: QueryStep) -> tuple[set[dm.NodeId], str | None]:
+    def _clean(self, step: QueryStep, removed_by_name: dict[str, int]) -> tuple[set[dm.NodeId], str | None]:
         if step.name not in self._tree:
             # Leaf Node
+            # Nothing to clean, just return the node ids with the connection property
             direct_relation: str | None = None
             if step.node_expression and (through := step.node_expression.through) is not None:
                 direct_relation = through.property
@@ -669,7 +670,7 @@ class _QueryResultCleaner:
 
         expected_ids_by_property: dict[str | None, set[dm.NodeId]] = {}
         for child in self._tree[step.name]:
-            child_ids, property_id = self._clean(child)
+            child_ids, property_id = self._clean(child, removed_by_name)
             if property_id not in expected_ids_by_property:
                 expected_ids_by_property[property_id] = child_ids
             else:
@@ -680,6 +681,8 @@ class _QueryResultCleaner:
             for node in step.node_results:
                 if self._is_connected_node(node, expected_ids_by_property):
                     filtered_results.append(node)
+                else:
+                    removed_by_name[step.name] += 1
             step.results = filtered_results
             direct_relation = None if step.node_expression.through is None else step.node_expression.through.property
             return {node.as_id() for node in step.node_results}, direct_relation
@@ -688,12 +691,15 @@ class _QueryResultCleaner:
             if len(expected_ids_by_property) > 1 or None not in expected_ids_by_property:
                 raise RuntimeError(f"Invalid state of {type(self).__name__}")
             expected_ids = expected_ids_by_property[None]
+            before = len(step.results)
             if step.edge_expression.direction == "outwards":
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.end_node) in expected_ids]
-                return {self.as_node_id(edge.start_node) for edge in step.edge_results}, None
+                connected_node_ids = {self.as_node_id(edge.start_node) for edge in step.edge_results}
             else:  # inwards
                 step.results = [edge for edge in step.edge_results if self.as_node_id(edge.start_node) in expected_ids]
-                return {self.as_node_id(edge.end_node) for edge in step.edge_results}, None
+                connected_node_ids = {self.as_node_id(edge.end_node) for edge in step.edge_results}
+            removed_by_name[step.name] += before - len(step.results)
+            return connected_node_ids, None
 
         raise TypeError(f"Unsupported query step type: {type(step)}")
 
