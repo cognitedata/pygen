@@ -18,6 +18,9 @@ Changes are grouped as follows
 - Any views that extends the `CogniteTimeSeries` now has the property `data` you can use to retrieve datapoints.
   For example, `pygen.rotor.select().rotor_speed_controller.data.retrieve_dataframe(...)` will retrieve the datapoints
   for the `rotor_speed_controller` timeseries.
+- Any views that extends the `CogniteFile` now has the property `content` you can use to download the file.
+  For example, `pygen.wind_turbine.select().datasheets.content.download("my_directory")` will download the files
+  for the `data_sheet` files for all wind turbines.
 
 ### Fixed
 - The `.query()` method has been renamed to `.select()`. The `.query()` method is still available, but will
