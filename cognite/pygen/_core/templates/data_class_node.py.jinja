@@ -533,7 +533,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
 
     def __init__(
         self,
-        created_triples: set[type],
+        created_triples: set[tuple[type | None, str, type]],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -555,8 +555,9 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             connection_type,
             reverse_expression,
         )
+        subject = self._result_cls
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
-        if _{{ field.linked_class.query_cls_name }} not in created_triples:
+        if (subject, "{{ field.name }}", _{{ field.linked_class.query_cls_name }}._result_cls) not in created_triples:
             self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
                 created_triples.copy(),
                 self._creation_path,
