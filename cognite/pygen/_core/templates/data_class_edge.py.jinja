@@ -332,7 +332,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
 
     def __init__(
         self,
-        created_triples: set[type],
+        created_triples: set[tuple[type | None, str, type]],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
@@ -343,7 +343,10 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
         super().__init__(created_triples, creation_path, client, result_list_cls, expression, None, connection_name)
-        if end_node_cls not in created_triples:
+        subject = self._result_cls
+        # Edges with properties are considered as nodes in this context,
+        # so we have one triple with it as object and one with it as subject
+        if (subject, "end_node", end_node_cls._result_cls) not in created_triples:
             self.end_node = end_node_cls(
                 created_triples=created_triples.copy(),
                 creation_path=self._creation_path,
@@ -352,7 +355,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 expression=dm.query.NodeResultSetExpression(),
             )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
-        if _{{ field.destination_class.query_cls_name }} not in created_triples:
+        if (subject, "{{ field.name }}", _{{ field.destination_class.query_cls_name }}._result_cls) not in created_triples:
             self.{{ field.name }} = _{{ field.destination_class.query_cls_name }}(
                 created_triples.copy(),
                 self._creation_path,
