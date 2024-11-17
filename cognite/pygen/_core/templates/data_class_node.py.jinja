@@ -533,7 +533,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -545,7 +545,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -556,9 +556,9 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             reverse_expression,
         )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
-        if _{{ field.linked_class.query_cls_name }} not in created_types:
+        if _{{ field.linked_class.query_cls_name }} not in created_triples:
             self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,{% if field.is_edge_with_properties %}

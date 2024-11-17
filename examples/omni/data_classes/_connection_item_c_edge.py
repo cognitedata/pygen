@@ -230,7 +230,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
-                created_types=created_types.copy(),
+                created_triples=created_types.copy(),
                 creation_path=self._creation_path,
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]

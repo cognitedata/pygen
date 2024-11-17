@@ -62,7 +62,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: "list[QueryCore]",
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
@@ -72,7 +72,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
-        created_types.add(type(self))
+        created_triples.add(type(self))
         self._creation_path = creation_path[:] + [self]
         self._client = client
         self._result_list_cls = result_list_cls
