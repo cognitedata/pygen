@@ -519,6 +519,7 @@ class MultiAPIGenerator:
                 {
                     "ViewPropertyId",
                     "chunker",
+                    "Progress",
                     "QueryReducingBatchSize",
                     "QueryStep",
                     "QueryBuilder",

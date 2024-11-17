@@ -182,6 +182,6 @@ def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) 
         core_client.cognite_asset.query()
         .space.equals(CORE_SDK.instance_space)
         .parent.name.equals("230900")
-        .list_full(limit=-1)
+        .list_full(limit=2)
     )
     assert len(result) == 2
