@@ -8,7 +8,7 @@ from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection, MutableSequence, Iterable, Sequence
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import (
     cast,
     ClassVar,
@@ -287,6 +287,42 @@ def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
         yield sequence[i : i + chunk_size]
 
 
+@dataclass
+class Progress:
+    total: float | None
+    _last_print: float = field(default=0.0, init=False)
+    _estimated_nodes_per_second: float = field(default=0.0, init=False)
+    _is_large_query: bool = field(default=False, init=False)
+
+    def _update_nodes_per_second(self, last_node_count: int, last_execution_time: float) -> None:
+        # Estimate the number of nodes per second using exponential moving average
+        last_batch_nodes_per_second = last_node_count / last_execution_time
+        if self._estimated_nodes_per_second == 0.0:
+            self._estimated_nodes_per_second = last_batch_nodes_per_second
+        else:
+            self._estimated_nodes_per_second = (
+                0.1 * last_batch_nodes_per_second + 0.9 * self._estimated_nodes_per_second
+            )
+
+    def log(self, last_node_count: int, last_execution_time: float, total_retrieved: int) -> None:
+        if self.total is None:
+            return
+        self._update_nodes_per_second(last_node_count, last_execution_time)
+        # Estimate the time to completion
+        remaining_nodes = self.total - total_retrieved
+        remaining_time = remaining_nodes / self._estimated_nodes_per_second
+        if self._is_large_query and (total_retrieved - self._last_print) > PRINT_PROGRESS_PER_N_NODES:
+            estimate = datetime.timedelta(seconds=round(remaining_time, 0))
+            print(
+                f"Progress: {total_retrieved:,}/{self.total:,} nodes retrieved. "
+                f"Estimated time to completion: {estimate}"
+            )
+            self._last_print = total_retrieved
+        if self._is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
+            self._is_large_query = True
+            print("Large query detected. Will print progress.")
+
+
 class QueryStep:
     def __init__(
         self,
@@ -475,9 +511,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         with suppress(ValueError, CogniteAPIError):
             count = self[0].count_total(client)
 
-        is_large_query = False
-        last_progress_print = 0
-        nodes_per_second = 0.0
+        progress = Progress(count)
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
@@ -509,29 +543,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             if self._is_finished:
                 break
 
-            if count is None:
-                continue
-            # Estimate the number of nodes per second using exponential moving average
-            last_batch_nodes_per_second = len(batch[self[0].name]) / last_execution_time
-            if nodes_per_second == 0.0:
-                nodes_per_second = last_batch_nodes_per_second
-            else:
-                nodes_per_second = 0.1 * last_batch_nodes_per_second + 0.9 * nodes_per_second
-            # Estimate the time to completion
-            remaining_nodes = count - self[0].total_retrieved
-            remaining_time = remaining_nodes / nodes_per_second
-
-            if is_large_query and (self[0].total_retrieved - last_progress_print) > PRINT_PROGRESS_PER_N_NODES:
-                estimate = datetime.timedelta(seconds=round(remaining_time, 0))
-                print(
-                    f"Progress: {self[0].total_retrieved:,}/{count:,} nodes retrieved. "
-                    f"Estimated time to completion: {estimate}"
-                )
-                last_progress_print = self[0].total_retrieved
-
-            if is_large_query is False and remaining_time > MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS:
-                is_large_query = True
-                print("Large query detected. Will print progress.")
+            progress.log(len(batch[self[0].name]), last_execution_time, self[0].total_retrieved)
 
         if remove_not_connected and len(self) > 1:
             _QueryResultCleaner(self).clean()

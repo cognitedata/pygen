@@ -301,9 +301,13 @@ class Progress:
         if self._estimated_nodes_per_second == 0.0:
             self._estimated_nodes_per_second = last_batch_nodes_per_second
         else:
-            self._estimated_nodes_per_second = 0.1 * last_batch_nodes_per_second + 0.9 * self._estimated_nodes_per_second
+            self._estimated_nodes_per_second = (
+                0.1 * last_batch_nodes_per_second + 0.9 * self._estimated_nodes_per_second
+            )
 
     def log(self, last_node_count: int, last_execution_time: float, total_retrieved: int) -> None:
+        if self.total is None:
+            return
         self._update_nodes_per_second(last_node_count, last_execution_time)
         # Estimate the time to completion
         remaining_nodes = self.total - total_retrieved
@@ -508,7 +512,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         with suppress(ValueError, CogniteAPIError):
             count = self[0].count_total(client)
 
-        progress = Progress(total=count)
+        progress = Progress(count)
         while True:
             self._update_expression_limits()
             query.cursors = self._cursors
@@ -539,9 +543,6 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             self._update(batch)
             if self._is_finished:
                 break
-
-            if count is None:
-                continue
 
             progress.log(len(batch[self[0].name]), last_execution_time, self[0].total_retrieved)
 
