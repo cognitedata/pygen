@@ -275,7 +275,7 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -286,7 +286,7 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
     ):
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,

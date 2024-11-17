@@ -389,7 +389,7 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -401,7 +401,7 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
         from ._cognite_cad_model import _CogniteCADModelQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -412,9 +412,9 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
             reverse_expression,
         )
 
-        if _CogniteCADModelQuery not in created_types:
+        if _CogniteCADModelQuery not in created_triples:
             self.model_3d = _CogniteCADModelQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

@@ -388,7 +388,7 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -400,7 +400,7 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
         from ._cognite_3_d_model import _Cognite3DModelQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -411,9 +411,9 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
             reverse_expression,
         )
 
-        if _Cognite3DModelQuery not in created_types:
+        if _Cognite3DModelQuery not in created_triples:
             self.model_3d = _Cognite3DModelQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

@@ -637,7 +637,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -653,7 +653,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
         from ._cognite_point_cloud_volume import _CognitePointCloudVolumeQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -664,9 +664,9 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.asset = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -677,9 +677,9 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_name="asset",
             )
 
-        if _CogniteCADNodeQuery not in created_types:
+        if _CogniteCADNodeQuery not in created_triples:
             self.cad_nodes = _CogniteCADNodeQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -690,9 +690,9 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_name="cad_nodes",
             )
 
-        if _Cognite360ImageAnnotationQuery not in created_types:
+        if _Cognite360ImageAnnotationQuery not in created_triples:
             self.images_360 = _Cognite360ImageAnnotationQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -704,9 +704,9 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_name="images_360",
             )
 
-        if _CognitePointCloudVolumeQuery not in created_types:
+        if _CognitePointCloudVolumeQuery not in created_triples:
             self.point_cloud_volumes = _CognitePointCloudVolumeQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

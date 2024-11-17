@@ -472,7 +472,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -484,7 +484,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -495,9 +495,9 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.efficiency = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -508,9 +508,9 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                 connection_name="efficiency",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.orientation = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

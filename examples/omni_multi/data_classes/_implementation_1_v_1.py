@@ -319,7 +319,7 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -330,7 +330,7 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
     ):
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,

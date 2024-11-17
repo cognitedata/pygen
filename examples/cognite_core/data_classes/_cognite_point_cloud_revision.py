@@ -391,7 +391,7 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -403,7 +403,7 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
         from ._cognite_point_cloud_model import _CognitePointCloudModelQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -414,9 +414,9 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
             reverse_expression,
         )
 
-        if _CognitePointCloudModelQuery not in created_types:
+        if _CognitePointCloudModelQuery not in created_triples:
             self.model_3d = _CognitePointCloudModelQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

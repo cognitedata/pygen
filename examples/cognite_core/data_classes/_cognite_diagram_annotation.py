@@ -896,7 +896,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
@@ -906,19 +906,19 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
     ):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
-        if end_node_cls not in created_types:
+        super().__init__(created_triples, creation_path, client, result_list_cls, expression, None, connection_name)
+        if end_node_cls not in created_triples:
             self.end_node = end_node_cls(
-                created_types=created_types.copy(),
+                created_triples=created_triples.copy(),
                 creation_path=self._creation_path,
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_triples:
             self.source = _CogniteSourceSystemQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,  # type: ignore[type-var]

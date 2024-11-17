@@ -498,7 +498,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -510,7 +510,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -521,9 +521,9 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
             reverse_expression,
         )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_triples:
             self.source = _CogniteSourceSystemQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

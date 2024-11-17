@@ -437,7 +437,7 @@ class _Cognite3DTransformationNodeQuery(NodeQueryCore[T_DomainModelList, Cognite
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -448,7 +448,7 @@ class _Cognite3DTransformationNodeQuery(NodeQueryCore[T_DomainModelList, Cognite
     ):
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,

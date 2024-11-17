@@ -435,7 +435,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -447,7 +447,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
         from ._cognite_360_image_model import _Cognite360ImageModelQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -458,9 +458,9 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
             reverse_expression,
         )
 
-        if _Cognite360ImageModelQuery not in created_types:
+        if _Cognite360ImageModelQuery not in created_triples:
             self.model_3d = _Cognite360ImageModelQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

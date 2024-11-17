@@ -332,7 +332,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
@@ -342,19 +342,19 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
     ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
         from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
-        if end_node_cls not in created_types:
+        super().__init__(created_triples, creation_path, client, result_list_cls, expression, None, connection_name)
+        if end_node_cls not in created_triples:
             self.end_node = end_node_cls(
-                created_types=created_types.copy(),
+                created_triples=created_triples.copy(),
                 creation_path=self._creation_path,
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
 {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
-        if _{{ field.destination_class.query_cls_name }} not in created_types:
+        if _{{ field.destination_class.query_cls_name }} not in created_triples:
             self.{{ field.name }} = _{{ field.destination_class.query_cls_name }}(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,  # type: ignore[type-var]{% if field.is_direct_relation %}

@@ -1067,7 +1067,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -1086,7 +1086,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
         from ._cognite_time_series import _CogniteTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -1097,9 +1097,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
             reverse_expression,
         )
 
-        if _CogniteActivityQuery not in created_types:
+        if _CogniteActivityQuery not in created_triples:
             self.activities = _CogniteActivityQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1111,9 +1111,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetClassQuery not in created_types:
+        if _CogniteAssetClassQuery not in created_triples:
             self.asset_class = _CogniteAssetClassQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1124,9 +1124,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="asset_class",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.children = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1137,9 +1137,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="children",
             )
 
-        if _CogniteEquipmentQuery not in created_types:
+        if _CogniteEquipmentQuery not in created_triples:
             self.equipment = _CogniteEquipmentQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1150,9 +1150,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="equipment",
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_triples:
             self.files = _CogniteFileQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1164,9 +1164,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _Cognite3DObjectQuery not in created_types:
+        if _Cognite3DObjectQuery not in created_triples:
             self.object_3d = _Cognite3DObjectQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1177,9 +1177,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="object_3d",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.parent = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1190,9 +1190,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="parent",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.path = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1203,9 +1203,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="path",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.root = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1216,9 +1216,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="root",
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_triples:
             self.source = _CogniteSourceSystemQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1229,9 +1229,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_name="source",
             )
 
-        if _CogniteTimeSeriesQuery not in created_types:
+        if _CogniteTimeSeriesQuery not in created_triples:
             self.time_series = _CogniteTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1243,9 +1243,9 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetTypeQuery not in created_types:
+        if _CogniteAssetTypeQuery not in created_triples:
             self.type_ = _CogniteAssetTypeQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

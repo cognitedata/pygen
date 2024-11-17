@@ -585,7 +585,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -598,7 +598,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -609,9 +609,9 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.active_power_total = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -622,9 +622,9 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_name="active_power_total",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.apparent_power_total = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -635,9 +635,9 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_name="apparent_power_total",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_triples:
             self.nacelle = _NacelleQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -648,9 +648,9 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_name="nacelle",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.reactive_power_total = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

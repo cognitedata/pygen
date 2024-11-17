@@ -524,7 +524,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -537,7 +537,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -548,9 +548,9 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.generator_speed_controller = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -561,9 +561,9 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                 connection_name="generator_speed_controller",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.generator_speed_controller_reference = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -574,9 +574,9 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                 connection_name="generator_speed_controller_reference",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_triples:
             self.nacelle = _NacelleQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

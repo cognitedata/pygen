@@ -1057,7 +1057,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -1075,7 +1075,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         from ._wind_turbine import _WindTurbineQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -1086,9 +1086,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.acc_from_back_side_y = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1099,9 +1099,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="acc_from_back_side_y",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.acc_from_back_side_z = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1112,9 +1112,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="acc_from_back_side_z",
             )
 
-        if _GearboxQuery not in created_types:
+        if _GearboxQuery not in created_triples:
             self.gearbox = _GearboxQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1125,9 +1125,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="gearbox",
             )
 
-        if _GeneratorQuery not in created_types:
+        if _GeneratorQuery not in created_triples:
             self.generator = _GeneratorQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1138,9 +1138,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="generator",
             )
 
-        if _HighSpeedShaftQuery not in created_types:
+        if _HighSpeedShaftQuery not in created_triples:
             self.high_speed_shaft = _HighSpeedShaftQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1151,9 +1151,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="high_speed_shaft",
             )
 
-        if _MainShaftQuery not in created_types:
+        if _MainShaftQuery not in created_triples:
             self.main_shaft = _MainShaftQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1164,9 +1164,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="main_shaft",
             )
 
-        if _PowerInverterQuery not in created_types:
+        if _PowerInverterQuery not in created_triples:
             self.power_inverter = _PowerInverterQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1177,9 +1177,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="power_inverter",
             )
 
-        if _WindTurbineQuery not in created_types:
+        if _WindTurbineQuery not in created_triples:
             self.wind_turbine = _WindTurbineQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1190,9 +1190,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="wind_turbine",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.yaw_direction = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1203,9 +1203,9 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_name="yaw_direction",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.yaw_error = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

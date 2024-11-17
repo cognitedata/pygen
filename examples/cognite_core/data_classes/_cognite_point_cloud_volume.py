@@ -619,7 +619,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -633,7 +633,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         from ._cognite_cad_revision import _CogniteCADRevisionQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -644,9 +644,9 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
             reverse_expression,
         )
 
-        if _CogniteCADModelQuery not in created_types:
+        if _CogniteCADModelQuery not in created_triples:
             self.model_3d = _CogniteCADModelQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -657,9 +657,9 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                 connection_name="model_3d",
             )
 
-        if _Cognite3DObjectQuery not in created_types:
+        if _Cognite3DObjectQuery not in created_triples:
             self.object_3d = _Cognite3DObjectQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -670,9 +670,9 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                 connection_name="object_3d",
             )
 
-        if _CogniteCADRevisionQuery not in created_types:
+        if _CogniteCADRevisionQuery not in created_triples:
             self.revisions = _CogniteCADRevisionQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

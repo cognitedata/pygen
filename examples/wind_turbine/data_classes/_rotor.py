@@ -512,7 +512,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -525,7 +525,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         from ._wind_turbine import _WindTurbineQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -536,9 +536,9 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.rotor_speed_controller = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -549,9 +549,9 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                 connection_name="rotor_speed_controller",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.rpm_low_speed_shaft = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -562,9 +562,9 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                 connection_name="rpm_low_speed_shaft",
             )
 
-        if _WindTurbineQuery not in created_types:
+        if _WindTurbineQuery not in created_triples:
             self.wind_turbine = _WindTurbineQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

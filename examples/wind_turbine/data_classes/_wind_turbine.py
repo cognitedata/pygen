@@ -713,7 +713,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -730,7 +730,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         from ._rotor import _RotorQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -741,9 +741,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
             reverse_expression,
         )
 
-        if _BladeQuery not in created_types:
+        if _BladeQuery not in created_triples:
             self.blades = _BladeQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -754,9 +754,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_name="blades",
             )
 
-        if _DataSheetQuery not in created_types:
+        if _DataSheetQuery not in created_triples:
             self.datasheets = _DataSheetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -767,9 +767,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_name="datasheets",
             )
 
-        if _DistanceQuery not in created_types:
+        if _DistanceQuery not in created_triples:
             self.metmast = _DistanceQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -781,9 +781,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_name="metmast",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_triples:
             self.nacelle = _NacelleQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -794,9 +794,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_name="nacelle",
             )
 
-        if _RotorQuery not in created_types:
+        if _RotorQuery not in created_triples:
             self.rotor = _RotorQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

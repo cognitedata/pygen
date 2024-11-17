@@ -342,7 +342,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -354,7 +354,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         from ._sensor_position import _SensorPositionQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -365,9 +365,9 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             reverse_expression,
         )
 
-        if _SensorPositionQuery not in created_types:
+        if _SensorPositionQuery not in created_triples:
             self.sensor_positions = _SensorPositionQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

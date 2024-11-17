@@ -801,7 +801,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -816,7 +816,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -827,9 +827,9 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.assets = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -840,9 +840,9 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_name="assets",
             )
 
-        if _CogniteFileCategoryQuery not in created_types:
+        if _CogniteFileCategoryQuery not in created_triples:
             self.category = _CogniteFileCategoryQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -853,9 +853,9 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_name="category",
             )
 
-        if _CogniteEquipmentQuery not in created_types:
+        if _CogniteEquipmentQuery not in created_triples:
             self.equipment = _CogniteEquipmentQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -867,9 +867,9 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_triples:
             self.source = _CogniteSourceSystemQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

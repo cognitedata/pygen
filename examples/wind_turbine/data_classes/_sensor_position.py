@@ -1181,7 +1181,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -1194,7 +1194,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -1205,9 +1205,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             reverse_expression,
         )
 
-        if _BladeQuery not in created_types:
+        if _BladeQuery not in created_triples:
             self.blade = _BladeQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1218,9 +1218,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="blade",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.edgewise_bend_mom_crosstalk_corrected = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1231,9 +1231,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="edgewise_bend_mom_crosstalk_corrected",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.edgewise_bend_mom_offset = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1244,9 +1244,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="edgewise_bend_mom_offset",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.edgewise_bend_mom_offset_crosstalk_corrected = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1257,9 +1257,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="edgewise_bend_mom_offset_crosstalk_corrected",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.edgewisewise_bend_mom = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1270,9 +1270,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="edgewisewise_bend_mom",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.flapwise_bend_mom = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1283,9 +1283,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="flapwise_bend_mom",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.flapwise_bend_mom_crosstalk_corrected = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1296,9 +1296,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="flapwise_bend_mom_crosstalk_corrected",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.flapwise_bend_mom_offset = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -1309,9 +1309,9 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_name="flapwise_bend_mom_offset",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.flapwise_bend_mom_offset_crosstalk_corrected = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

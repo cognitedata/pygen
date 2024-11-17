@@ -847,7 +847,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -863,7 +863,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
         from ._cognite_unit import _CogniteUnitQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -874,9 +874,9 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
             reverse_expression,
         )
 
-        if _CogniteActivityQuery not in created_types:
+        if _CogniteActivityQuery not in created_triples:
             self.activities = _CogniteActivityQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -888,9 +888,9 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_triples:
             self.assets = _CogniteAssetQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -901,9 +901,9 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_name="assets",
             )
 
-        if _CogniteEquipmentQuery not in created_types:
+        if _CogniteEquipmentQuery not in created_triples:
             self.equipment = _CogniteEquipmentQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -914,9 +914,9 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_name="equipment",
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_triples:
             self.source = _CogniteSourceSystemQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -927,9 +927,9 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_name="source",
             )
 
-        if _CogniteUnitQuery not in created_types:
+        if _CogniteUnitQuery not in created_triples:
             self.unit = _CogniteUnitQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

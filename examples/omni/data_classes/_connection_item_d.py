@@ -558,7 +558,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -570,7 +570,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
         from ._connection_item_e import _ConnectionItemEQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -581,9 +581,9 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             reverse_expression,
         )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_triples:
             self.direct_multi = _ConnectionItemEQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -594,9 +594,9 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_name="direct_multi",
             )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_triples:
             self.direct_single = _ConnectionItemEQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -607,9 +607,9 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_name="direct_single",
             )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_triples:
             self.outwards_single = _ConnectionItemEQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

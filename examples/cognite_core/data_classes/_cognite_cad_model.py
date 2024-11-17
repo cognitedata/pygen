@@ -436,7 +436,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -449,7 +449,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
         from ._cognite_file import _CogniteFileQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -460,9 +460,9 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
             reverse_expression,
         )
 
-        if _CogniteCADRevisionQuery not in created_types:
+        if _CogniteCADRevisionQuery not in created_triples:
             self.revisions = _CogniteCADRevisionQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -473,9 +473,9 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
                 connection_name="revisions",
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_triples:
             self.thumbnail = _CogniteFileQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

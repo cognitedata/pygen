@@ -420,7 +420,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -432,7 +432,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
         from ._cognite_file import _CogniteFileQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -443,9 +443,9 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
             reverse_expression,
         )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_triples:
             self.thumbnail = _CogniteFileQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

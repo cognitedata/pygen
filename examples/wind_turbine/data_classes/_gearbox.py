@@ -536,7 +536,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -549,7 +549,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -560,9 +560,9 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.displacement_x = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -573,9 +573,9 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_name="displacement_x",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.displacement_y = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -586,9 +586,9 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_name="displacement_y",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.displacement_z = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -599,9 +599,9 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_name="displacement_z",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_triples:
             self.nacelle = _NacelleQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

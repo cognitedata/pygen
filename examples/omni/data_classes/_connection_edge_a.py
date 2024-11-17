@@ -415,7 +415,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
@@ -427,10 +427,10 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         from ._connection_item_f import _ConnectionItemFQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
-        if end_node_cls not in created_types:
+        super().__init__(created_triples, creation_path, client, result_list_cls, expression, None, connection_name)
+        if end_node_cls not in created_triples:
             self.end_node = end_node_cls(
-                created_triples=created_types.copy(),
+                created_triples=created_triples.copy(),
                 creation_path=self._creation_path,
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]

@@ -681,7 +681,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -694,7 +694,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
         from ._sensor_time_series import _SensorTimeSeriesQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -705,9 +705,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.bending_x = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -718,9 +718,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_name="bending_x",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.bending_y = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -731,9 +731,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_name="bending_y",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.calculated_tilt_moment = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -744,9 +744,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_name="calculated_tilt_moment",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.calculated_yaw_moment = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -757,9 +757,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_name="calculated_yaw_moment",
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_triples:
             self.nacelle = _NacelleQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
@@ -770,9 +770,9 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_name="nacelle",
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_triples:
             self.torque = _SensorTimeSeriesQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,

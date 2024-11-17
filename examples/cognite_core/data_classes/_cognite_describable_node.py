@@ -322,7 +322,7 @@ class _CogniteDescribableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteDescr
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -333,7 +333,7 @@ class _CogniteDescribableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteDescr
     ):
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,

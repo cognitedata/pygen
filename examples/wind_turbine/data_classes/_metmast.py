@@ -453,7 +453,7 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
 
     def __init__(
         self,
-        created_types: set[type],
+        created_triples: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
@@ -466,7 +466,7 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
         from ._wind_turbine import _WindTurbineQuery
 
         super().__init__(
-            created_types,
+            created_triples,
             creation_path,
             client,
             result_list_cls,
@@ -477,9 +477,9 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
             reverse_expression,
         )
 
-        if _DistanceQuery not in created_types:
+        if _DistanceQuery not in created_triples:
             self.wind_turbines = _DistanceQuery(
-                created_types.copy(),
+                created_triples.copy(),
                 self._creation_path,
                 client,
                 result_list_cls,
