@@ -17,7 +17,7 @@ from cognite.client.data_classes.data_modeling.views import (
 )
 
 from cognite.pygen._constants import is_readonly_property
-from cognite.pygen._warnings import MissingReverseDirectRelationTargetWarning
+from cognite.pygen._warnings import MissingReverseDirectRelationTargetWarning, UnknownConnectionTargetWarning
 
 from .base import Field
 from .primitive import ContainerProperty
@@ -251,6 +251,7 @@ class BaseConnectionField(Field, ABC):
         has_default_instance_space: bool,
         view_id: dm.ViewId,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_by_id: dict[dm.ViewId, dm.View],
     ) -> Field | None:
         """Load a connection field from a property"""
         if not isinstance(prop, dm.EdgeConnection | dm.MappedProperty | ReverseDirectRelation):
@@ -265,6 +266,10 @@ class BaseConnectionField(Field, ABC):
                 warnings.warn(
                     MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
                 )
+                return None
+        elif isinstance(prop, dm.EdgeConnection | dm.MappedProperty) and prop.source is not None:
+            if prop.source not in view_by_id:
+                warnings.warn(UnknownConnectionTargetWarning(prop.source, view_id, base.prop_name), stacklevel=2)
                 return None
         container: ContainerProperty | None = None
         edge_type = prop.type if isinstance(prop, dm.EdgeConnection) else None

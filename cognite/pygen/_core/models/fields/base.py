@@ -96,6 +96,7 @@ class Field:
                 has_default_instance_space,
                 view_id,
                 direct_relations_by_view_id,
+                view_by_id,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             return CDFExternalField.load(base, prop, variable)
