@@ -96,6 +96,18 @@ class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
         )
 
 
+class UnknownConnectionTargetWarning(PygenWarning, UserWarning):
+    def __init__(self, source: ViewId, view: ViewId, property_: str) -> None:
+        self.source = source
+        self.view = view
+        self.property_ = property_
+
+    def __str__(self) -> str:
+        return (
+            f"Target {self.source!r} does not exists. " f"Skipping connection {self.view.external_id}.{self.property_}."
+        )
+
+
 class InvalidCodeGenerated(PygenWarning, UserWarning):
     def __init__(self, filepath: str | Path, error_message: str) -> None:
         self.filepath = filepath
