@@ -268,13 +268,15 @@ class NodeQueryStep(QueryStep):
         super().__init__(name, expression, result_cls._view_id, max_retrieve_limit, select, raw_filter, connection_type)
 
     def unpack(self) -> dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel]:
-        return {% raw %}{{% endraw %}{% if has_default_instance_space %}
+        return {{'{'}}
+            {% if has_default_instance_space %}
             (
                 instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
             ){% else %}
-            instance.as_id(){% endif %}: self.result_cls.from_instance(instance){% if has_default_instance_space %}
-            {% else %} {% endif %}for instance in cast(list[dm.Node], self.results)
-        }
+            instance.as_id(){% endif %}: self.result_cls.from_instance(instance){% if has_default_instance_space +%}
+           {%+ else %}
+            {% endif %} for instance in cast(list[dm.Node], self.results)
+        {{'}'}}
 
     @property
     def node_results(self) -> list[dm.Node]:

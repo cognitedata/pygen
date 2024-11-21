@@ -27,10 +27,10 @@ def as_direct_relation_reference(
 
 # Any is to make mypy happy, while the rest is a hint of what the function expects
 def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif %} dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
-{% if has_default_instance_space %}
+    {% if has_default_instance_space %}
     if isinstance(value, str):
         return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
-{% endif %}
+    {% endif %}
     if isinstance(value, dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
     if isinstance(value, tuple) and is_tuple_id(value):
@@ -42,6 +42,7 @@ def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif 
 
 def is_tuple_id(value: Any) -> bool:
     return isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], str) and isinstance(value[1], str)
+
 
 {% if has_default_instance_space %}
 def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
