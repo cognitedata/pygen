@@ -1,0 +1,14 @@
+space: {{ pygen_power_enterprise }}
+externalId: DataSheet
+name: DataSheet
+usedFor: node
+properties:
+  UUID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: UUID

@@ -1,0 +1,59 @@
+space: {{ pygen_power_enterprise }}
+externalId: PowerInverter
+name: PowerInverter
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
+properties:
+  active_power_total:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: PowerInverter
+      type: container
+    containerPropertyIdentifier: active_power_total
+    name: active_power_total
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  reactive_power_total:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: PowerInverter
+      type: container
+    containerPropertyIdentifier: reactive_power_total
+    name: reactive_power_total
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  apparent_power_total:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: PowerInverter
+      type: container
+    containerPropertyIdentifier: apparent_power_total
+    name: apparent_power_total
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  nacelle:
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      version: 'v1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power_enterprise }}
+        externalId: Nacelle
+        version: 'v1'
+        type: view
+      identifier: power_inverter
+    connectionType: single_reverse_direct_relation

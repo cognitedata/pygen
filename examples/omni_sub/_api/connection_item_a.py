@@ -93,6 +93,11 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             A query API for connection item as.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_connection_item_a_filter(
             self._view_id,
@@ -553,7 +558,14 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
     def query(self) -> ConnectionItemAQuery:
         """Start a query for connection item as."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return ConnectionItemAQuery(self._client)
+
+    def select(self) -> ConnectionItemAQuery:
+        """Start selecting from connection item as."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return ConnectionItemAQuery(self._client)
 
     def list(

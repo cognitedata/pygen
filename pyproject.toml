@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.99.49"
+version = "0.99.50"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -12,7 +12,7 @@ packages = [{ include="cognite", from="." }]
 
 [tool.black]
 line-length = 120
-target_version = ['py312']
+target_version = ['py310']
 include = '\.py$'
 
 [tool.ruff]
@@ -111,7 +111,7 @@ pytest-icdiff = "^0.8"
 Faker = "*"
 hypothesis = "*"
 jupyterlab = "*"
-cognite-toolkit = "0.3.8"
+cognite-toolkit = "0.3.10"
 #cognite-toolkit = { git = "https://github.com/cognitedata/toolkit.git", branch = "linting-contextualization-functions" }
 
 [tool.pytest.ini_options]

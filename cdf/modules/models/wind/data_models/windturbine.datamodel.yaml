@@ -1,0 +1,70 @@
+space: {{ pygen_power }}
+externalId: WindTurbine
+version: "1"
+name: WindTurbine
+description: This is the demo model used in the documentation of pygen.
+views:
+- space: {{ pygen_power }}
+  externalId: Blade
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Gearbox
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Generator
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: HighSpeedShaft
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: MainShaft
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Metmast
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Nacelle
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: PowerInverter
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Rotor
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: SensorPosition
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: GeneratingUnit
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: WindTurbine
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: SolarPanel
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: Distance
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: SensorTimeSeries
+  version: 1
+  type: view
+- space: {{ pygen_power }}
+  externalId: DataSheet
+  version: 1
+  type: view

@@ -1,0 +1,129 @@
+space: {{ pygen_power_enterprise }}
+externalId: Nacelle
+name: Nacelle
+version: v1
+implements:
+  - space: {{ pygen_power_enterprise }}
+    externalId: GeneratingEquipment
+    version: v1
+properties:
+  gearbox:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: gearbox
+    name: gearbox
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Gearbox
+      version: v1
+      type: view
+  generator:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: generator
+    name: generator
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: Generator
+      version: v1
+      type: view
+  high_speed_shaft:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: high_speed_shaft
+    name: high_speed_shaft
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: HighSpeedShaft
+      version: v1
+      type: view
+  main_shaft:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: main_shaft
+    name: main_shaft
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      version: v1
+      type: view
+  power_inverter:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: power_inverter
+    name: power_inverter
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: PowerInverter
+      version: v1
+      type: view
+  acc_from_back_side_x:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: acc_from_back_side_x
+    name: acc_from_back_side_x
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  acc_from_back_side_y:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: acc_from_back_side_y
+    name: acc_from_back_side_y
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  acc_from_back_side_z:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: acc_from_back_side_z
+    name: acc_from_back_side_z
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  yaw_direction:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: yaw_direction
+    name: yaw_direction
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  yaw_error:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Nacelle
+      type: container
+    containerPropertyIdentifier: yaw_error
+    name: yaw_error
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view

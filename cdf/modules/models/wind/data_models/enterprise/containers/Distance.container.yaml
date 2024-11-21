@@ -1,0 +1,15 @@
+space: {{ pygen_power_enterprise }}
+externalId: Distance
+name: Distance
+usedFor: edge
+properties:
+  distance:
+    type:
+      list: false
+      type: float64
+      unit:
+        externalId: length:m
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name

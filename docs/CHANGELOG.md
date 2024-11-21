@@ -13,7 +13,33 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.48] - 24-11-14
+## TBD
+
+### Fixed
+
+- Generating an SDK with a connection property with a source pointing to a non-existing target
+  no longer raiser `AttributeError: 'NoneType' object has no attribute 'view_id'`. Instead, a warning is issued
+  and the connection is skipped.
+
+## [0.99.50] - 24-11-17
+### Added
+- Any views that extends the `CogniteTimeSeries` now has the property `data` you can use to retrieve datapoints.
+  For example, `pygen.rotor.select().rotor_speed_controller.data.retrieve_dataframe(...)` will retrieve the datapoints
+  for the `rotor_speed_controller` timeseries.
+- Any views that extends the `CogniteFile` now has the property `content` you can use to download the file.
+  For example, `pygen.wind_turbine.select().datasheets.content.download("my_directory")` will download the files
+  for the `data_sheet` files for all wind turbines.
+
+### Fixed
+- The `.query()` method has been renamed to `.select()`. The `.query()` method is still available, but will
+  be removed shortly.
+- Calling `.select()` over an edge with properties without filtering no longer raises a `ValueError`.
+- When using the `CogniteCore` model, either directly or an extension of it, the generated SDK now
+  respects the read-only properties in `CogniteAsset` and `CogniteFile`.
+- When calling `.select()` the `limit` parameter is now respected and the correct number of nodes are returned.
+  There were some edge cases when the pagination stopped before the limit was reached. This is now fixed.
+
+## [0.99.49] - 24-11-14
 ### Fixed
 - Add ability to filter on node external ID and space even when no other filterable properties are present.
 

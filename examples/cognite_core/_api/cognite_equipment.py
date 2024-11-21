@@ -154,6 +154,11 @@ class CogniteEquipmentAPI(
             A query API for Cognite equipments.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_equipment_filter(
             self._view_id,
@@ -961,7 +966,14 @@ class CogniteEquipmentAPI(
 
     def query(self) -> CogniteEquipmentQuery:
         """Start a query for Cognite equipments."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteEquipmentQuery(self._client)
+
+    def select(self) -> CogniteEquipmentQuery:
+        """Start selecting from Cognite equipments."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteEquipmentQuery(self._client)
 
     def list(

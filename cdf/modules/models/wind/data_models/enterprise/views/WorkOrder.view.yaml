@@ -1,0 +1,69 @@
+space: {{ pygen_power_enterprise }}
+externalId: WorkOrder
+name: WorkOrder
+description: Represents activities. Activities typically happen over a period and
+  have a start and end time.
+implements:
+- space: cdf_cdm
+  externalId: CogniteActivity
+  version: v1
+  type: view
+version: v1
+properties:
+  assets:
+    container:
+      space: cdf_cdm
+      externalId: CogniteActivity
+      type: container
+    containerPropertyIdentifier: assets
+    name: Generating unit
+    description: A list of assets the activity is related to.
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: GeneratingUnit
+      version: v1
+      type: view
+  equipment:
+    container:
+      space: cdf_cdm
+      externalId: CogniteActivity
+      type: container
+    containerPropertyIdentifier: equipment
+    name: Equipment
+    description: A list of equipment the activity is related to.
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: GeneratingEquipment
+      version: v1
+      type: view
+  timeSeries:
+    container:
+      space: cdf_cdm
+      externalId: CogniteActivity
+      type: container
+    containerPropertyIdentifier: timeSeries
+    name: Time series
+    description: A list of time series the activity is related to.
+    source:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      version: v1
+      type: view
+  source:
+    container:
+      space: cdf_cdm
+      externalId: CogniteSourceable
+      type: container
+    containerPropertyIdentifier: source
+    description: Direct relation to a source system
+    source:
+      space: cdf_cdm
+      externalId: CogniteSourceSystem
+      version: v1
+      type: view
+  UUID:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: UUID

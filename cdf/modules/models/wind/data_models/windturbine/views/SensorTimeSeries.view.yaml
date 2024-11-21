@@ -1,0 +1,66 @@
+space: {{ pygen_power }}
+externalId: SensorTimeSeries
+name: SensorTimeSeries
+version: 1
+properties:
+  name:
+    container:
+      space: cdf_cdm
+      externalId: CogniteDescribable
+      type: container
+    containerPropertyIdentifier: name
+    description: Name of the instance
+  description:
+    container:
+      space: cdf_cdm
+      externalId: CogniteDescribable
+      type: container
+    containerPropertyIdentifier: description
+    description: Description of the instance
+  aliases:
+    container:
+      space: cdf_cdm
+      externalId: CogniteDescribable
+      type: container
+    containerPropertyIdentifier: aliases
+    description: Alternative names for the node
+  conceptId:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      type: container
+    containerPropertyIdentifier: conceptId
+    name: Concept ID
+    description: The concept ID of the time series.
+  standardName:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: SensorTimeSeries
+      type: container
+    containerPropertyIdentifier: standardName
+    name: standardName
+    description: The standard name of the time series.
+  isStep:
+    container:
+      space: cdf_cdm
+      externalId: CogniteTimeSeries
+      type: container
+    containerPropertyIdentifier: isStep
+    name: Is step
+    description: Specifies whether the time series is a step time series or not.
+  type:
+    container:
+      space: cdf_cdm
+      externalId: CogniteTimeSeries
+      type: container
+    containerPropertyIdentifier: type
+    name: Type
+    description: Specifies the data type of the data points.
+  sourceUnit:
+    container:
+      space: cdf_cdm
+      externalId: CogniteTimeSeries
+      type: container
+    containerPropertyIdentifier: sourceUnit
+    name: Source unit
+    description: The unit specified in the source system.

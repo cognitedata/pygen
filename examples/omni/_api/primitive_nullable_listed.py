@@ -77,6 +77,11 @@ class PrimitiveNullableListedAPI(
             A query API for primitive nullable listeds.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_primitive_nullable_listed_filter(
             self._view_id,
@@ -410,7 +415,14 @@ class PrimitiveNullableListedAPI(
 
     def query(self) -> PrimitiveNullableListedQuery:
         """Start a query for primitive nullable listeds."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return PrimitiveNullableListedQuery(self._client)
+
+    def select(self) -> PrimitiveNullableListedQuery:
+        """Start selecting from primitive nullable listeds."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return PrimitiveNullableListedQuery(self._client)
 
     def list(

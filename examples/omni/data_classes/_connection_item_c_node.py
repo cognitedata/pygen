@@ -481,12 +481,6 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-            ]
-        )
 
     def list_connection_item_c_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemCNodeList:
         return self._list(limit=limit)

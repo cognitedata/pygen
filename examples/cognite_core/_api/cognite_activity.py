@@ -158,6 +158,11 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
             A query API for Cognite activities.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_activity_filter(
             self._view_id,
@@ -1017,7 +1022,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
     def query(self) -> CogniteActivityQuery:
         """Start a query for Cognite activities."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteActivityQuery(self._client)
+
+    def select(self) -> CogniteActivityQuery:
+        """Start selecting from Cognite activities."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteActivityQuery(self._client)
 
     def list(

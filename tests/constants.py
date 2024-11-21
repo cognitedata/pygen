@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling import DataModelId
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_MODELS = REPO_ROOT / "tests" / "data" / "models"
 DATA_WRITE_DIR = REPO_ROOT / "tests" / "data" / "write"
+JSON_DIR = REPO_ROOT / "tests" / "data" / "json"
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
 
@@ -65,14 +66,6 @@ class ExampleSDK:
     def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
         return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
 
-
-WINDMILL_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("power-models", "Windmill", "1")],
-    _top_level_package="windmill",
-    client_name="WindmillClient",
-    generate_sdk=True,
-    instance_space="windmill-instances",
-)
 
 OMNI_SDK = ExampleSDK(
     data_model_ids=[DataModelId("sp_pygen_models", "Omni", "1")],
@@ -137,22 +130,6 @@ PUMP_SDK = ExampleSDK(
     instance_space=None,
 )
 
-SCENARIO_INSTANCE_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
-    _top_level_package="scenario_instance.client",
-    client_name="ScenarioInstanceClient",
-    generate_sdk=True,
-    instance_space="IntegrationTestsImmutable",
-)
-
-EQUIPMENT_UNIT_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
-    _top_level_package="equipment_unit",
-    client_name="EquipmentUnitClient",
-    generate_sdk=True,
-    instance_space="IntegrationTestsImmutable",
-)
-
 CORE_SDK = ExampleSDK(
     data_model_ids=[DataModelId("cdf_cdm", "CogniteCore", "v1")],
     _top_level_package="cognite_core",
@@ -161,33 +138,21 @@ CORE_SDK = ExampleSDK(
     instance_space="springfield_instances",
 )
 
+WIND_ENTERPRISE = ExampleSDK(
+    data_model_ids=[DataModelId("sp_pygen_power_enterprise", "WindDomain", "v1")],
+    _top_level_package="wind_enterprise",
+    client_name="WindEnterpriseClient",
+    generate_sdk=False,
+    instance_space="sp_wind",
+)
 
-class EquipmentSDKFiles:
-    client_dir = EQUIPMENT_UNIT_SDK.client_dir
-    client = client_dir / "_api_client.py"
-    data_classes = client_dir / "data_classes"
-    core_data = data_classes / "_core.py"
-    start_end_time_data = data_classes / "_start_end_time.py"
-    unit_procedure_data = data_classes / "_unit_procedure.py"
-    equipment_module_data = data_classes / "_equipment_module.py"
-
-    api = client_dir / "_api"
-    equipment_api = api / "equipment_module.py"
-    equipment_module_sensor_value_api = api / "equipment_module_sensor_value.py"
-
-    unit_procedure_api = api / "unit_procedure.py"
-    unit_procedure_query = api / "unit_procedure_query.py"
-    unit_procedure_work_units = api / "unit_procedure_work_units.py"
-    core_api = api / "_core.py"
-
-    data_init = data_classes / "__init__.py"
-
-
-class ScenarioInstanceFiles:
-    client_dir = SCENARIO_INSTANCE_SDK.client_dir
-
-    api = client_dir / "_api"
-    scenario_instance_api = api / "scenario_instance.py"
+WIND_TURBINE = ExampleSDK(
+    data_model_ids=[DataModelId("sp_pygen_power", "WindTurbine", "1")],
+    _top_level_package="wind_turbine",
+    client_name="WindTurbineClient",
+    generate_sdk=True,
+    instance_space="sp_wind",
+)
 
 
 class OmniFiles:
@@ -287,15 +252,16 @@ class OmniMultiFiles:
     api_client = client_dir / "_api_client.py"
 
 
-class WindMillFiles:
-    class Data:
-        wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"
-
-
 class CogniteCoreFiles:
     client_dir = CORE_SDK.client_dir
     data_classes = client_dir / "data_classes"
     data_cognite_asset = data_classes / "_cognite_asset.py"
+
+
+class WindTurbineFiles:
+    client_dir = WIND_TURBINE.client_dir
+    data_classes = client_dir / "data_classes"
+    data_sensor_time_series = data_classes / "_sensor_time_series.py"
 
 
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

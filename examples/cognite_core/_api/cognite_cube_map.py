@@ -127,6 +127,11 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
             A query API for Cognite cube maps.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_cube_map_filter(
             self._view_id,
@@ -780,7 +785,14 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
     def query(self) -> CogniteCubeMapQuery:
         """Start a query for Cognite cube maps."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteCubeMapQuery(self._client)
+
+    def select(self) -> CogniteCubeMapQuery:
+        """Start selecting from Cognite cube maps."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteCubeMapQuery(self._client)
 
     def list(

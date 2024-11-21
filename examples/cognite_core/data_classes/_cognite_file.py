@@ -12,6 +12,7 @@ from pydantic import field_validator, model_validator
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    FileContentAPI,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -250,7 +251,6 @@ class CogniteFileGraphQL(GraphQLCore):
             category=self.category.as_write() if isinstance(self.category, GraphQLCore) else self.category,
             description=self.description,
             directory=self.directory,
-            is_uploaded=self.is_uploaded,
             mime_type=self.mime_type,
             name=self.name,
             source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
@@ -261,7 +261,6 @@ class CogniteFileGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            uploaded_time=self.uploaded_time,
         )
 
 
@@ -316,7 +315,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
             category=self.category.as_write() if isinstance(self.category, DomainModel) else self.category,
             description=self.description,
             directory=self.directory,
-            is_uploaded=self.is_uploaded,
             mime_type=self.mime_type,
             name=self.name,
             source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
@@ -327,7 +325,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            uploaded_time=self.uploaded_time,
         )
 
     def as_apply(self) -> CogniteFileWrite:
@@ -398,7 +395,6 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         category: Specifies the detected category the file belongs to. It's a direct relation to an instance of CogniteFileCategory.
         description: Description of the instance
         directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
-        is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
         source: Direct relation to a source system
@@ -409,7 +405,6 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         source_updated_time: When the instance was last updated in the source system (if available)
         source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
-        uploaded_time: The time the file upload completed.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFile", "v1")
@@ -418,9 +413,7 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
     assets: Optional[list[Union[CogniteAssetWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     category: Union[CogniteFileCategoryWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     directory: Optional[str] = None
-    is_uploaded: Optional[bool] = Field(False, alias="isUploaded")
     mime_type: Optional[str] = Field(None, alias="mimeType")
-    uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
     @field_validator("assets", "category", mode="before")
     def as_node_id(cls, value: Any) -> Any:
@@ -920,6 +913,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 self.uploaded_time,
             ]
         )
+        self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_cognite_file(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteFileList:
         return self._list(limit=limit)

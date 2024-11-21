@@ -96,6 +96,18 @@ class MissingReverseDirectRelationTargetWarning(PygenWarning, UserWarning):
         )
 
 
+class UnknownConnectionTargetWarning(PygenWarning, UserWarning):
+    def __init__(self, source: ViewId, view: ViewId, property_: str) -> None:
+        self.source = source
+        self.view = view
+        self.property_ = property_
+
+    def __str__(self) -> str:
+        return (
+            f"Target {self.source!r} does not exists. " f"Skipping connection {self.view.external_id}.{self.property_}."
+        )
+
+
 class InvalidCodeGenerated(PygenWarning, UserWarning):
     def __init__(self, filepath: str | Path, error_message: str) -> None:
         self.filepath = filepath
@@ -163,11 +175,18 @@ def _print_group(console: Callable[[str], None], group: type[PygenWarning], warn
         for view, properties in itertools.groupby(
             sorted(property_warnings, key=lambda w: w.view_id.external_id), key=lambda w: w.view_id.external_id
         ):
-            properties_str = ", ".join(warning.property_name for warning in properties)
-            console(
-                f"{indent}The following properties in view {view} will have an underscore "
-                f"added to avoid name collision: {properties_str}"
-            )
+            properties_list = list(properties)
+            if len(properties_list) == 1:
+                console(
+                    f"{indent} The property {properties_list[0].property_name!r} in view {view} "
+                    "will have an underscore to avoid name collision."
+                )
+            else:
+                properties_str = ", ".join(warning.property_name for warning in properties)
+                console(
+                    f"{indent}The following properties in view {view} will have an underscore "
+                    f"added to avoid name collision: {properties_str}"
+                )
     elif group is MissingReverseDirectRelationTargetWarning:
         relation_warnings = cast(list[MissingReverseDirectRelationTargetWarning], warning_list)
         for relation_warn in relation_warnings:

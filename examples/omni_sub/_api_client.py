@@ -23,8 +23,8 @@ class OmniSubClient:
     OmniSubClient
 
     Generated with:
-        pygen = 0.99.49
-        cognite-sdk = 7.64.12
+        pygen = 0.99.50
+        cognite-sdk = 7.66.0
         pydantic = 2.9.2
 
     Data Model:
@@ -41,7 +41,7 @@ class OmniSubClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.49"
+        client.config.client_name = "CognitePygen:0.99.50"
 
         self._client = client
 

@@ -300,9 +300,6 @@ class CogniteAssetGraphQL(GraphQLCore):
             name=self.name,
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
             parent=self.parent.as_write() if isinstance(self.parent, GraphQLCore) else self.parent,
-            path=[path.as_write() for path in self.path or []],
-            path_last_updated_time=self.path_last_updated_time,
-            root=self.root.as_write() if isinstance(self.root, GraphQLCore) else self.root,
             source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
             source_context=self.source_context,
             source_created_time=self.source_created_time,
@@ -376,9 +373,6 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
             name=self.name,
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
             parent=self.parent.as_write() if isinstance(self.parent, DomainModel) else self.parent,
-            path=[path.as_write() if isinstance(path, DomainModel) else path for path in self.path or []],
-            path_last_updated_time=self.path_last_updated_time,
-            root=self.root.as_write() if isinstance(self.root, DomainModel) else self.root,
             source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
             source_context=self.source_context,
             source_created_time=self.source_created_time,
@@ -521,9 +515,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         name: Name of the instance
         object_3d: Direct relation to an Object3D instance representing the 3D resource
         parent: The parent of the asset.
-        path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables subtree filtering to find all assets under a parent.
-        path_last_updated_time: The last time the path was updated for this asset.
-        root: An automatically updated reference to the top-level asset of the hierarchy.
         source: Direct relation to a source system
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
@@ -542,12 +533,9 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         default=None, repr=False, alias="assetClass"
     )
     parent: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    path: Optional[list[Union[CogniteAssetWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
-    path_last_updated_time: Optional[datetime.datetime] = Field(None, alias="pathLastUpdatedTime")
-    root: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Union[CogniteAssetTypeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
-    @field_validator("asset_class", "parent", "path", "root", "type_", mode="before")
+    @field_validator("asset_class", "parent", "type_", mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)
@@ -838,16 +826,6 @@ class CogniteAssetWriteList(DomainModelWriteList[CogniteAssetWrite]):
     @property
     def parent(self) -> CogniteAssetWriteList:
         return CogniteAssetWriteList([item.parent for item in self.data if isinstance(item.parent, CogniteAssetWrite)])
-
-    @property
-    def path(self) -> CogniteAssetWriteList:
-        return CogniteAssetWriteList(
-            [item for items in self.data for item in items.path or [] if isinstance(item, CogniteAssetWrite)]
-        )
-
-    @property
-    def root(self) -> CogniteAssetWriteList:
-        return CogniteAssetWriteList([item.root for item in self.data if isinstance(item.root, CogniteAssetWrite)])
 
     @property
     def source(self) -> CogniteSourceSystemWriteList:

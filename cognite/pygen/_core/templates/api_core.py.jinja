@@ -24,8 +24,10 @@ from cognite.client.data_classes.data_modeling.instances import InstanceSort, In
 from {{ top_level_package }} import data_classes
 from {{ top_level_package }}.data_classes._core import (
     DomainModel,
-    DomainModelWrite,{% if has_default_instance_space %}
-    DEFAULT_INSTANCE_SPACE,{% endif %}
+    DomainModelWrite,
+    {% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,
+    {% endif %}
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -485,13 +487,16 @@ class QueryAPI(Generic[T_DomainModelList]):
 
 
 def _create_edge_filter(
-    edge_type: dm.DirectRelationReference,{% if has_default_instance_space %}
+    edge_type: dm.DirectRelationReference,
+    {% if has_default_instance_space %}
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% else %}
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
+    {% else %}
     start_node: dm.NodeId | list[dm.NodeId] | None = None,
-    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% endif %}
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,
+    {% endif %}
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,

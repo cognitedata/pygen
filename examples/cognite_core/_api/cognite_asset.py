@@ -177,6 +177,11 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             A query API for Cognite assets.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_asset_filter(
             self._view_id,
@@ -221,7 +226,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         """Add or update (upsert) Cognite assets.
 
         Note: This method iterates through all nodes and timeseries linked to cognite_asset and creates them including the edges
-        between the nodes. For example, if any of `asset_class`, `object_3d`, `parent`, `path`, `root`, `source` or `type_` are set, then these
+        between the nodes. For example, if any of `asset_class`, `object_3d`, `parent`, `source` or `type_` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -1123,7 +1128,14 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
     def query(self) -> CogniteAssetQuery:
         """Start a query for Cognite assets."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteAssetQuery(self._client)
+
+    def select(self) -> CogniteAssetQuery:
+        """Start selecting from Cognite assets."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteAssetQuery(self._client)
 
     def list(

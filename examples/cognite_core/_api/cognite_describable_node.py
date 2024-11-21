@@ -123,6 +123,11 @@ class CogniteDescribableNodeAPI(
             A query API for Cognite describable nodes.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_describable_node_filter(
             self._view_id,
@@ -596,7 +601,14 @@ class CogniteDescribableNodeAPI(
 
     def query(self) -> CogniteDescribableNodeQuery:
         """Start a query for Cognite describable nodes."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteDescribableNodeQuery(self._client)
+
+    def select(self) -> CogniteDescribableNodeQuery:
+        """Start selecting from Cognite describable nodes."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteDescribableNodeQuery(self._client)
 
     def list(

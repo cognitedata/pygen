@@ -78,6 +78,11 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             A query API for implementation 1 non writeables.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
@@ -451,7 +456,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
     def query(self) -> Implementation1NonWriteableQuery:
         """Start a query for implementation 1 non writeables."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Implementation1NonWriteableQuery(self._client)
+
+    def select(self) -> Implementation1NonWriteableQuery:
+        """Start selecting from implementation 1 non writeables."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Implementation1NonWriteableQuery(self._client)
 
     def list(

@@ -1,0 +1,21 @@
+space: {{ pygen_power_enterprise }}
+externalId: Generator
+name: Generator
+usedFor: node
+properties:
+  generator_speed_controller:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: generator_speed_controller
+  generator_speed_controller_reference:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: generator_speed_controller_reference

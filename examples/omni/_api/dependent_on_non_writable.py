@@ -81,6 +81,11 @@ class DependentOnNonWritableAPI(
             A query API for dependent on non writables.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_dependent_on_non_writable_filter(
             self._view_id,
@@ -457,7 +462,14 @@ class DependentOnNonWritableAPI(
 
     def query(self) -> DependentOnNonWritableQuery:
         """Start a query for dependent on non writables."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return DependentOnNonWritableQuery(self._client)
+
+    def select(self) -> DependentOnNonWritableQuery:
+        """Start selecting from dependent on non writables."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return DependentOnNonWritableQuery(self._client)
 
     def list(

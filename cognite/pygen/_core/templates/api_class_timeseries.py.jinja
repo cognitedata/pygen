@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import warnings
 from collections.abc import Sequence
 from typing import Literal, cast
 
@@ -390,6 +391,12 @@ class {{ timeseries_api.name}}:
                 >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(limit=5).retrieve()
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select()...data.retrieve_dataframe() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         filter_ = {{ data_class.filter_name }}(
             self._view_id,
             {% for parm in list_method.parameters %}

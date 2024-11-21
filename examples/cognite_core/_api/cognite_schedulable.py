@@ -92,6 +92,11 @@ class CogniteSchedulableAPI(
             A query API for Cognite schedulables.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_schedulable_filter(
             self._view_id,
@@ -515,7 +520,14 @@ class CogniteSchedulableAPI(
 
     def query(self) -> CogniteSchedulableQuery:
         """Start a query for Cognite schedulables."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteSchedulableQuery(self._client)
+
+    def select(self) -> CogniteSchedulableQuery:
+        """Start selecting from Cognite schedulables."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteSchedulableQuery(self._client)
 
     def list(

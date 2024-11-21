@@ -100,6 +100,11 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             A query API for empties.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_empty_filter(
             self._view_id,
@@ -618,7 +623,14 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
     def query(self) -> EmptyQuery:
         """Start a query for empties."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return EmptyQuery(self._client)
+
+    def select(self) -> EmptyQuery:
+        """Start selecting from empties."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return EmptyQuery(self._client)
 
     def list(

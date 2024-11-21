@@ -79,6 +79,11 @@ class CDFExternalReferencesListedAPI(
             A query API for cdf external references listeds.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cdf_external_references_listed_filter(
             self._view_id,
@@ -390,7 +395,14 @@ class CDFExternalReferencesListedAPI(
 
     def query(self) -> CDFExternalReferencesListedQuery:
         """Start a query for cdf external references listeds."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CDFExternalReferencesListedQuery(self._client)
+
+    def select(self) -> CDFExternalReferencesListedQuery:
+        """Start selecting from cdf external references listeds."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CDFExternalReferencesListedQuery(self._client)
 
     def list(

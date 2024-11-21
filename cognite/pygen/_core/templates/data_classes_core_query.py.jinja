@@ -8,7 +8,7 @@ from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection, MutableSequence, Iterable, Sequence
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import (
     cast,
     ClassVar,
@@ -101,12 +101,12 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             raise ValueError(f"Cannot query across a reverse-list connection.")
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
-    def _assemble_filter(self) -> dm.filters.Filter:
+    def _assemble_filter(self) -> dm.filters.Filter | None:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
         for filter_cls in self._filter_classes:
             if item := filter_cls._as_filter():
                 filters.append(item)
-        return dm.filters.And(*filters)
+        return dm.filters.And(*filters) if filters else None
 
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]
@@ -172,6 +172,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
         for step in builder[:-1]:
             step.select = None
+        builder[-1].max_retrieve_limit = limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 

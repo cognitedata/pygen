@@ -1,0 +1,85 @@
+space: {{ pygen_power_enterprise }}
+externalId: SensorPosition
+name: SensorPosition
+usedFor: node
+properties:
+  position:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: position
+  flapwise_bend_mom:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: flapwise_bend_mom
+  flapwise_bend_mom_offset:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: flapwise_bend_mom_offset
+  flapwise_bend_mom_crosstalk_corrected:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: flapwise_bend_mom_crosstalk_corrected
+  flapwise_bend_mom_offset_crosstalk_corrected:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: flapwise_bend_mom_offset_crosstalk_corrected
+  edgewisewise_bend_mom:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: edgewisewise_bend_mom
+  edgewise_bend_mom_offset:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: edgewise_bend_mom_offset
+  edgewise_bend_mom_crosstalk_corrected:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: edgewise_bend_mom_crosstalk_corrected
+  edgewise_bend_mom_offset_crosstalk_corrected:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: edgewise_bend_mom_offset_crosstalk_corrected
+  blade:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: blade

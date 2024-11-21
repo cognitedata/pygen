@@ -1,0 +1,80 @@
+space: {{ pygen_power_enterprise }}
+externalId: Nacelle
+name: Nacelle
+usedFor: node
+properties:
+  gearbox:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: gearbox
+  generator:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: generator
+  high_speed_shaft:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: high_speed_shaft
+  main_shaft:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: main_shaft
+  power_inverter:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: power_inverter
+  acc_from_back_side_x:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: acc_from_back_side_x
+  acc_from_back_side_y:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: acc_from_back_side_y
+  acc_from_back_side_z:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: acc_from_back_side_z
+  yaw_direction:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: yaw_direction
+  yaw_error:
+    type:
+      list: false
+      type: direct
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: yaw_error

@@ -112,6 +112,11 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             A query API for Cognite 3D objects.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_3_d_object_filter(
             self._view_id,
@@ -660,7 +665,14 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
     def query(self) -> Cognite3DObjectQuery:
         """Start a query for Cognite 3D objects."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Cognite3DObjectQuery(self._client)
+
+    def select(self) -> Cognite3DObjectQuery:
+        """Start selecting from Cognite 3D objects."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Cognite3DObjectQuery(self._client)
 
     def list(

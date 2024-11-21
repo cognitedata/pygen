@@ -91,6 +91,11 @@ class Cognite3DRevisionAPI(
             A query API for Cognite 3D revisions.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_3_d_revision_filter(
             self._view_id,
@@ -491,7 +496,14 @@ class Cognite3DRevisionAPI(
 
     def query(self) -> Cognite3DRevisionQuery:
         """Start a query for Cognite 3D revisions."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Cognite3DRevisionQuery(self._client)
+
+    def select(self) -> Cognite3DRevisionQuery:
+        """Start selecting from Cognite 3D revisions."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Cognite3DRevisionQuery(self._client)
 
     def list(

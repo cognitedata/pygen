@@ -356,7 +356,7 @@ class MockGenerator:
         external = ViewMockData(view_id, self._instance_space)
         values: typing.Sequence[ListAbleDataType]
         for name, prop in properties.items():
-            if is_readonly_property(prop):
+            if is_readonly_property(prop.container, prop.container_property_identifier):
                 continue
 
             if name in config.properties:

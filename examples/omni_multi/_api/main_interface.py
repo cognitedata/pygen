@@ -76,6 +76,11 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
             A query API for main interfaces.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_main_interface_filter(
             self._view_id,
@@ -433,7 +438,14 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
     def query(self) -> MainInterfaceQuery:
         """Start a query for main interfaces."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return MainInterfaceQuery(self._client)
+
+    def select(self) -> MainInterfaceQuery:
+        """Start selecting from main interfaces."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return MainInterfaceQuery(self._client)
 
     def list(

@@ -1,0 +1,79 @@
+space: {{ pygen_power }}
+externalId: MainShaft
+name: MainShaft
+version: 1
+properties:
+  torque:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      type: container
+    containerPropertyIdentifier: torque
+    name: torque
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  calculated_tilt_moment:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      type: container
+    containerPropertyIdentifier: calculated_tilt_moment
+    name: calculated_tilt_moment
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  calculated_yaw_moment:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      type: container
+    containerPropertyIdentifier: calculated_yaw_moment
+    name: calculated_yaw_moment
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  bending_x:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      type: container
+    containerPropertyIdentifier: bending_x
+    name: bending_x
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  bending_y:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: MainShaft
+      type: container
+    containerPropertyIdentifier: bending_y
+    name: bending_y
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorTimeSeries
+      version: '1'
+      type: view
+  nacelle:
+    source:
+      space: {{ pygen_power }}
+      externalId: Nacelle
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: Nacelle
+        version: '1'
+        type: view
+      identifier: generator
+    connectionType: single_reverse_direct_relation

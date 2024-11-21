@@ -1,0 +1,23 @@
+space: {{ pygen_power_enterprise }}
+externalId: SensorTimeSeries
+name: SensorTimeSeries
+usedFor: node
+properties:
+  standardName:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: standardName
+  conceptId:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: conceptId

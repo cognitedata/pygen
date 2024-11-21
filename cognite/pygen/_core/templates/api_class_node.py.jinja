@@ -125,6 +125,12 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             A query API for {{ data_class.doc_list_name}}.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = {{ data_class.filter_name }}(
             self._view_id,
@@ -510,7 +516,12 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
     def query(self) -> {{ data_class.query_cls_name }}:
         """Start a query for {{ data_class.doc_list_name}}."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return {{ data_class.query_cls_name }}(self._client)
+
+    def select(self) -> {{ data_class.query_cls_name }}:
+        """Start selecting from {{ data_class.doc_list_name}}."""
+        warnings.warn("The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2)
         return {{ data_class.query_cls_name }}(self._client)
 
     def list(

@@ -120,6 +120,11 @@ class CogniteSourceableNodeAPI(
             A query API for Cognite sourceable nodes.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cognite_sourceable_node_filter(
             self._view_id,
@@ -693,7 +698,14 @@ class CogniteSourceableNodeAPI(
 
     def query(self) -> CogniteSourceableNodeQuery:
         """Start a query for Cognite sourceable nodes."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return CogniteSourceableNodeQuery(self._client)
+
+    def select(self) -> CogniteSourceableNodeQuery:
+        """Start selecting from Cognite sourceable nodes."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return CogniteSourceableNodeQuery(self._client)
 
     def list(

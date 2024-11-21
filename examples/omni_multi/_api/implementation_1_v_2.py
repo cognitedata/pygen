@@ -82,6 +82,11 @@ class Implementation1v2API(
             A query API for implementation 1 v 2.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_implementation_1_v_2_filter(
             self._view_id,
@@ -479,7 +484,14 @@ class Implementation1v2API(
 
     def query(self) -> Implementation1v2Query:
         """Start a query for implementation 1 v 2."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return Implementation1v2Query(self._client)
+
+    def select(self) -> Implementation1v2Query:
+        """Start selecting from implementation 1 v 2."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return Implementation1v2Query(self._client)
 
     def list(

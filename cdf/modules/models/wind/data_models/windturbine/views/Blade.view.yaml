@@ -1,0 +1,33 @@
+space: {{ pygen_power }}
+externalId: Blade
+name: Blade
+version: 1
+properties:
+  name:
+    container:
+      space: cdf_cdm
+      externalId: CogniteDescribable
+      type: container
+    containerPropertyIdentifier: name
+    description: Name of the instance
+  is_damaged:
+    container:
+      space: {{ pygen_power_enterprise }}
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: is_damaged
+    name: is_damaged
+  sensor_positions:
+    source:
+      space: {{ pygen_power }}
+      externalId: SensorPosition
+      version: '1'
+      type: view
+    through:
+      source:
+        space: {{ pygen_power }}
+        externalId: SensorPosition
+        version: '1'
+        type: view
+      identifier: blade
+    connectionType: multi_reverse_direct_relation

@@ -80,6 +80,11 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             A query API for sub interfaces.
 
         """
+        warnings.warn(
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            UserWarning,
+            stacklevel=2,
+        )
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_sub_interface_filter(
             self._view_id,
@@ -463,7 +468,14 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     def query(self) -> SubInterfaceQuery:
         """Start a query for sub interfaces."""
-        warnings.warn("The .query is in alpha and is subject to breaking changes without notice.")
+        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
+        return SubInterfaceQuery(self._client)
+
+    def select(self) -> SubInterfaceQuery:
+        """Start selecting from sub interfaces."""
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return SubInterfaceQuery(self._client)
 
     def list(

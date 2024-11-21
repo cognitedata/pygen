@@ -1,0 +1,6 @@
+- space: {{ pygen_power_enterprise }}
+  name: PygenPowerEnterprise
+  description: This space contains all the schemas for the pygen power enterprise models
+- space: {{ pygen_power }}
+  name: PygenPower
+  description: This space contains all the schemas for the pygen power models
