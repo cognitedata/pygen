@@ -14,6 +14,14 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## TBD
+
+### Fixed
+
+- Generating an SDK with a connection property with a source pointing to a non-existing target
+  no longer raiser `AttributeError: 'NoneType' object has no attribute 'view_id'`. Instead, a warning is issued
+  and the connection is skipped.
+
+## [0.99.50] - 24-11-17
 ### Added
 - Any views that extends the `CogniteTimeSeries` now has the property `data` you can use to retrieve datapoints.
   For example, `pygen.rotor.select().rotor_speed_controller.data.retrieve_dataframe(...)` will retrieve the datapoints
@@ -31,7 +39,7 @@ Changes are grouped as follows
 - When calling `.select()` the `limit` parameter is now respected and the correct number of nodes are returned.
   There were some edge cases when the pagination stopped before the limit was reached. This is now fixed.
 
-## [0.99.48] - 24-11-14
+## [0.99.49] - 24-11-14
 ### Fixed
 - Add ability to filter on node external ID and space even when no other filterable properties are present.
 
