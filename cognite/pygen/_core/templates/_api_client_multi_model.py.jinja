@@ -29,8 +29,12 @@ class {{ api.name }}:
 
     def __init__(self, client: CogniteClient):
         self._client = client
-        {% for sub in api.sub_apis_by_view_id.values() %}{% if not sub.is_edge_class %}
-        self.{{ sub.parent_attribute }} = {{ sub.name }}(client){% endif %}{% endfor %}
+
+        {% for sub in api.sub_apis_by_view_id.values() %}
+        {% if not sub.is_edge_class %}
+        self.{{ sub.parent_attribute }} = {{ sub.name }}(client)
+        {% endif %}
+        {% endfor %}
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the {{ api.model.external_id }} data model.
@@ -64,8 +68,10 @@ class {{ client_name }}:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:{{ pygen_version }}"
-{% for api in multi_apis %}
-        self.{{ api.parent_attribute }} = {{ api.name }}(client){% endfor %}
+
+        {% for api in multi_apis %}
+        self.{{ api.parent_attribute }} = {{ api.name }}(client)
+        {% endfor %}
 
         self._client = client
 
@@ -191,14 +197,17 @@ class {{ client_name }}:
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.delete("my_node_external_id")
-        """{% if not has_default_instance_space %}
+        """
+        {% if not has_default_instance_space %}
         if space is None and (
             isinstance(external_id, str)
             or (isinstance(external_id, Sequence) and any(isinstance(item, str) for item in external_id))
         ):
-            raise ValueError("Expected space to be set when deleting by external_id"){% endif %}
+            raise ValueError("Expected space to be set when deleting by external_id")
+        {% endif %}
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]
+        {% endif %}
         elif isinstance(external_id, dm.NodeId):
             return self._client.data_modeling.instances.delete(nodes=external_id)
         elif isinstance(external_id, data_classes.DomainModelWrite):
@@ -212,7 +221,8 @@ class {{ client_name }}:
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
                 if isinstance(item, str):
-                    node_ids.append(dm.NodeId(space, item)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
+                    node_ids.append(dm.NodeId(space, item)){% if not has_default_instance_space %}  # type: ignore[arg-type]
+                {% endif %}
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
                 elif isinstance(item, data_classes.DomainModelWrite):

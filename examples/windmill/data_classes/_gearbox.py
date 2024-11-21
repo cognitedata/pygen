@@ -360,6 +360,12 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_gearbox(self, limit: int = DEFAULT_QUERY_LIMIT) -> GearboxList:
         return self._list(limit=limit)

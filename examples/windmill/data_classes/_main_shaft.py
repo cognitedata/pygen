@@ -398,6 +398,12 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
         return self._list(limit=limit)

@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from cognite.client import data_modeling as dm
-from {{ top_level_package }}.data_classes._core.base import DomainModel, T_DomainModel{% if has_default_instance_space %}
-from {{ top_level_package }}.data_classes._core.constants import DEFAULT_INSTANCE_SPACE{% endif %}
+from {{ top_level_package }}.data_classes._core.base import DomainModel, T_DomainModel
+{% if has_default_instance_space %}
+from {{ top_level_package }}.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
+{% endif %}
 
 
 def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
@@ -24,9 +26,11 @@ def as_direct_relation_reference(
 
 
 # Any is to make mypy happy, while the rest is a hint of what the function expects
-def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif %} dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:{% if has_default_instance_space %}
+def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif %} dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
+{% if has_default_instance_space %}
     if isinstance(value, str):
-        return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}{% endif %}
+        return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
+{% endif %}
     if isinstance(value, dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
     if isinstance(value, tuple) and is_tuple_id(value):
@@ -64,7 +68,8 @@ def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | s
 
 def select_best_node(
     node1: T_DomainModel | str | dm.NodeId, node2: T_DomainModel | str | dm.NodeId
-) -> T_DomainModel | str | dm.NodeId:{% else %}
+) -> T_DomainModel | str | dm.NodeId:
+{% else %}
 def as_pygen_node_id(value: DomainModel | dm.NodeId) -> dm.NodeId:
     if isinstance(value, dm.NodeId):
         return value
@@ -83,7 +88,8 @@ def are_nodes_equal(node1: DomainModel | dm.NodeId, node2: DomainModel | dm.Node
     return node1_id == node2_id
 
 
-def select_best_node(node1: T_DomainModel | dm.NodeId, node2: T_DomainModel | dm.NodeId) -> T_DomainModel | dm.NodeId:{% endif %}
+def select_best_node(node1: T_DomainModel | dm.NodeId, node2: T_DomainModel | dm.NodeId) -> T_DomainModel | dm.NodeId:
+{% endif %}
     if isinstance(node1, DomainModel):
         return node1  # type: ignore[return-value]
     elif isinstance(node2, DomainModel):

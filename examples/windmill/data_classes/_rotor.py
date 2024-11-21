@@ -336,6 +336,12 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_rotor(self, limit: int = DEFAULT_QUERY_LIMIT) -> RotorList:
         return self._list(limit=limit)

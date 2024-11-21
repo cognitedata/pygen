@@ -501,11 +501,13 @@ def _create_edge_filter(
             ["edge", "type"],
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
-    ]{% if has_default_instance_space %}
+    ]
+{% if has_default_instance_space %}
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        ){% endif %}
+        )
+{% endif %}
     if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
@@ -525,9 +527,11 @@ def _create_edge_filter(
                     for ext_id in start_node
                 ]{% else %}[ext_id.dump(camel_case=True, include_instance_type=False) for ext_id in start_node]{% endif %},
             )
-        ){% if has_default_instance_space %}
+        )
+{% if has_default_instance_space %}
     if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node})){% endif %}
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+{% endif %}
     if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))

@@ -8,8 +8,12 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
 from cognite.client.credentials import OAuthClientCredentials
 
-from {{ top_level_package }}._api import ({% for api in api_classes %}{% if not api.data_class.is_edge_class %}
-    {{ api.api_class.name }},{% endif %}{% endfor %}
+from {{ top_level_package }}._api import (
+    {% for api in api_classes %}
+    {% if not api.data_class.is_edge_class %}
+    {{ api.api_class.name }},
+    {% endif %}
+    {% endfor %}
 )
 from {{ top_level_package }}._api._core import SequenceNotStr, GraphQLQueryResponse
 from {{ top_level_package }}.data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
@@ -42,8 +46,12 @@ class {{ client_name }}:
         client.config.client_name = "CognitePygen:{{ pygen_version }}"
 
         self._client = client
-        {% for api in api_by_view_id.values() %}{% if not api.data_class.is_edge_class %}
-        self.{{ api.api_class.parent_attribute }} = {{ api.api_class.name }}(client){% endif %}{% endfor %}
+
+        {% for api in api_by_view_id.values() %}
+        {% if not api.data_class.is_edge_class %}
+        self.{{ api.api_class.parent_attribute }} = {{ api.api_class.name }}(client)
+        {% endif %}
+        {% endfor %}
 
     def upsert(
         self,
@@ -166,14 +174,16 @@ class {{ client_name }}:
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
                 >>> client.delete("my_node_external_id")
-        """{% if not has_default_instance_space %}
+        """
+        {% if not has_default_instance_space %}
         if space is None and (
             isinstance(external_id, str)
             or (isinstance(external_id, Sequence) and any(isinstance(item, str) for item in external_id))
         ):
-            raise ValueError("Expected space to be set when deleting by external_id"){% endif %}
+            raise ValueError("Expected space to be set when deleting by external_id")
+        {% endif %}
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif +%}
         elif isinstance(external_id, dm.NodeId):
             return self._client.data_modeling.instances.delete(nodes=external_id)
         elif isinstance(external_id, data_classes.DomainModelWrite):
@@ -187,7 +197,7 @@ class {{ client_name }}:
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
                 if isinstance(item, str):
-                    node_ids.append(dm.NodeId(space, item)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif %}
+                    node_ids.append(dm.NodeId(space, item)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif +%}
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
                 elif isinstance(item, data_classes.DomainModelWrite):
@@ -239,8 +249,12 @@ class {{ client_name }}:
 
     def _repr_html_(self) -> str:
         return """<strong>{{ client_name }}</strong> generated from data model ("{{ data_model.space }}", "{{ data_model.external_id }}", "{{ data_model.version }}")<br />
-with the following APIs available<br />{% for api in api_by_view_id.values() %}{% if not api.data_class.is_edge_class %}
-&nbsp;&nbsp;&nbsp;&nbsp;.{{ api.api_class.parent_attribute }}<br />{% endif %}{% endfor %}
+with the following APIs available<br />
+{% for api in api_by_view_id.values() %}
+{% if not api.data_class.is_edge_class %}
+&nbsp;&nbsp;&nbsp;&nbsp;.{{ api.api_class.parent_attribute }}<br />
+{% endif %}
+{% endfor %}
 <br />
 and with the methods:<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.upsert - Create or update any instance.<br />

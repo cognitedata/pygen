@@ -349,6 +349,12 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_generator(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratorList:
         return self._list(limit=limit)

@@ -203,7 +203,12 @@ class MultiAPIGenerator:
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
-        self.env = Environment(loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape())
+        self.env = Environment(
+            loader=PackageLoader("cognite.pygen._core", "templates"),
+            autoescape=select_autoescape(),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
         self.top_level_package = top_level_package
         self.client_name = client_name
         self.default_instance_space = default_instance_space
@@ -702,7 +707,10 @@ class APIGenerator:
         base_name: str | None = None,
     ):
         self._env = Environment(
-            loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
+            loader=PackageLoader("cognite.pygen._core", "templates"),
+            autoescape=select_autoescape(),
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
         self.view = view
         self.base_name = base_name or DataClass.to_base_name(view)

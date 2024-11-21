@@ -1,14 +1,20 @@
 from __future__ import annotations
+
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
-import datetime{% endif %}
+import datetime
+{% endif %}
 import warnings
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import data_modeling as dm, CogniteClient{% if data_class.use_pydantic_field %}
-{{ data_class.import_pydantic_field }}{% endif %}
+from cognite.client import data_modeling as dm, CogniteClient
+{% if data_class.use_pydantic_field %}
+{{ data_class.import_pydantic_field }}
+{% endif %}
 
-from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
-    DEFAULT_INSTANCE_SPACE,{% endif %}
+from {{ top_level_package }}.data_classes._core import (
+    {% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,
+    {% endif %}
     DataRecord,
     DataRecordWrite,
     DomainModel,
@@ -25,14 +31,25 @@ from {{ top_level_package }}.data_classes._core import ({% if has_default_instan
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
-    StringFilter,{% if data_class.has_filtering_fields %}
-    {{ data_class.filtering_import }}{% endif %}
-){% for class_ in unique_start_classes %}
-from {{ top_level_package }}.data_classes.{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
-from {{ top_level_package }}.data_classes.{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}{% endfor %}
+    StringFilter,
+    {% if data_class.has_filtering_fields %}
+    {{ data_class.filtering_import }}
+    {% endif %}
+)
+{% for class_ in unique_start_classes -%}
+from {{ top_level_package }}.data_classes.{{class_.file_name }} import {{ class_.write_name }}
+{% endfor %}
+{% for classes in unique_end_classes %}
+from {{ top_level_package }}.data_classes.{{classes.file_name }} import {{ classes.read_name }}, {{ classes.graphql_name }}, {{ classes.write_name }}
+{% endfor %}
 {% if data_class.has_dependencies_not_self %}
-if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endif %}{% endfor %}
+if TYPE_CHECKING:
+{% for dependency_class in data_class.dependencies %}
+{% if dependency_class.file_name != data_class.file_name %}
+    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}
+{% endif %}
+{% endif %}
+{% endfor %}
 {% endif %}
 
 
@@ -42,8 +59,10 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 {{ data_class.text_field_names }} = Literal["external_id", {{ data_class.text_fields_literals }}]
 {{ data_class.field_names }} = Literal["external_id", {{ data_class.fields_literals }}]
 {{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}
-    "external_id": "externalId",{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
-    "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
+    "external_id": "externalId",
+    {% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
+    "{{ field.name }}": "{{ field.prop_name }}",
+    {% endfor %}
 {% raw %}}{% endraw %}
 
 
@@ -56,11 +75,15 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} node.
+        {% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
     """
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
-    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+    {% for field in data_class %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}
+    {% endfor %}
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -75,8 +98,10 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
                 version=0,
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
-            ),{% for field in data_class %}
-            {{ field.name }}={{ field.as_read_graphql() }},{% endfor %}
+            ),
+            {% for field in data_class %}
+            {{ field.name }}={{ field.as_read_graphql() }},
+            {% endfor %}
         )
 
 {% if data_class.is_writable or data_class.is_interface %}
@@ -100,12 +125,16 @@ class {{ data_class.read_name }}(DomainRelation{% if data_class.has_any_field_mo
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} edge.
+        {% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% for field in data_class.read_fields %}
-    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
+    {% for field in data_class.read_fields %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}
+    {% endfor %}
 
 
 {% if data_class.is_writable or data_class.is_interface %}
@@ -136,12 +165,18 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if data_class.has_any_fi
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} edge.{% for field in data_class %}{% if field.is_write_field %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} edge.
+        {% for field in data_class %}
+        {% if field.is_write_field %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endif %}
+        {% endfor %}
     """
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% for field in data_class.write_fields %}
-    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
+    {% for field in data_class.write_fields %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}
+    {% endfor %}
 
     def _to_instances_write(
         self,
@@ -170,6 +205,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if data_class.has_any_fi
 
         properties: dict[str, Any]  = {}
         {% for field in data_class.container_fields %}
+
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             properties["{{ field.prop_name }}"] = {{ field.as_value() }}
         {% endfor %}
@@ -241,14 +277,19 @@ class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 {% endif %}
 def {{ data_class.filter_name }}(
     edge_type: dm.DirectRelationReference,
-    view_id: dm.ViewId,{% if has_default_instance_space %}
+    view_id: dm.ViewId,
+    {% if has_default_instance_space %}
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% else %}
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
+    {% else %}
     start_node: dm.NodeId | list[dm.NodeId] | None = None,
-    end_node: dm.NodeId | list[dm.NodeId] | None = None,{% endif %}{% for parm in list_method.parameters %}
-    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    end_node: dm.NodeId | list[dm.NodeId] | None = None,
+    {% endif %}
+    {% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+    {% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter:
     filters: list[dm.Filter] = [
@@ -256,11 +297,13 @@ def {{ data_class.filter_name }}(
             ["edge", "type"],
             {"space": edge_type.space, "externalId": edge_type.external_id},
         )
-    ]{% if has_default_instance_space %}
+    ]
+    {% if has_default_instance_space %}
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
-        ){% endif %}
+        )
+    {% endif %}
     if start_node and isinstance(start_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(
@@ -278,9 +321,11 @@ def {{ data_class.filter_name }}(
                     for ext_id in start_node
                 ],
             )
-        ){% if has_default_instance_space %}
+        )
+    {% if has_default_instance_space %}
     if end_node and isinstance(end_node, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node})){% endif %}
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    {% endif %}
     if end_node and isinstance(end_node, dm.NodeId):
         filters.append(
             dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
@@ -296,9 +341,11 @@ def {{ data_class.filter_name }}(
                     for ext_id in end_node
                 ],
             )
-        ){% for filter in list_method.implementations %}
+        )
+    {% for filter in list_method.implementations %}
     if {{ filter.condition }}:
-        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+        filters.append({{ filter.filter_call }}({{ filter.arguments }}))
+    {% endfor %}
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
@@ -339,8 +386,12 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
-    ):{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
+    ):
+        {% for dependency_class in data_class.dependencies %}
+        {% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}
+        {% endif %}
+        {% endfor %}
 
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
@@ -351,33 +402,47 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
             )
-{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_no_source_direct_relation %}
+
+        {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
+        {% if not field.is_no_source_direct_relation %}
         if _{{ field.destination_class.query_cls_name }} not in created_types:
             self.{{ field.name }} = _{{ field.destination_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,  # type: ignore[type-var]{% if field.is_direct_relation %}
+                result_list_cls,  # type: ignore[type-var]
+                {% if field.is_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
-                ),{% elif field.is_reverse_direct_relation %}
+                ),
+                {% elif field.is_reverse_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through={{ field.reverse_property.data_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
                     direction="inwards",
-                ),{% else %}
+                ),
+                {% else %}
                 dm.query.EdgeResultSetExpression(
                     direction="{{ field.edge_direction }}",
                     chain_to="destination",
-                ),{% endif %}
+                ),
+                {% endif %}
                 "{{ field.name }}",
-            ){% endif %}
-{% endfor %}{% if data_class.has_filtering_fields %}
+            )
+        {% endif %}
+
+        {% endfor %}
+        {% if data_class.has_filtering_fields %}
         self.space = StringFilter(self, ["node", "space"])
-        self.external_id = StringFilter(self, ["node", "externalId"]){% for field in data_class.filtering_fields %}
-        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
+        self.external_id = StringFilter(self, ["node", "externalId"])
+        {% for field in data_class.filtering_fields %}
+        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
+        {% endfor %}
         self._filter_classes.extend([
             self.space,
-            self.external_id,{% for field in data_class.filtering_fields %}
-            self.{{ field.name }},{% endfor %}
-        ]){% endif %}
+            self.external_id,
+            {% for field in data_class.filtering_fields %}
+            self.{{ field.name }},
+            {% endfor %}
+        ])
+        {% endif %}
