@@ -358,6 +358,7 @@ class BaseConnectionField(Field, ABC):
         elif self.destination_class:
             types = [self.destination_class.read_name]
         else:
+            # missing source
             types = []
         return self._create_type_hint(types, self.type_hint_node_reference)
 
@@ -378,13 +379,16 @@ class BaseConnectionField(Field, ABC):
 
     def as_graphql_type_hint(self) -> str:
         """Return the type hint for the field in the GraphQL data class."""
+        type_hint_node_reference: list[str] = []
         if self.edge_class:
             types = [self.edge_class.graphql_name]
         elif self.destination_class:
             types = [self.destination_class.graphql_name]
         else:
+            # No source, so we set it to dict.
+            type_hint_node_reference.append("dict")
             types = []
-        return self._create_type_hint(types, [])
+        return self._create_type_hint(types, type_hint_node_reference)
 
     def _create_type_hint(self, types: list[str], type_hint_node_reference: list[str]) -> str:
         field_kwargs = {
@@ -448,6 +452,8 @@ class OneToManyConnectionField(BaseConnectionField):
             inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
         elif self.destination_class:
             inner = f"{self.variable}.{method}()"
+        elif base_cls == "GraphQLCore":
+            inner = f"dm.NodeId.load({self.variable})"
         else:
             inner = f"{self.variable}"
         return f"[{inner} for {self.variable} in self.{self.name} or []]"
