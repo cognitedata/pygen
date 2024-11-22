@@ -456,7 +456,7 @@ class OneToManyConnectionField(BaseConnectionField):
             inner = f"dm.NodeId.load({self.variable})"
         else:
             inner = f"{self.variable}"
-        return f"[{inner} for {self.variable} in self.{self.name} or []]"
+        return f"[{inner} for {self.variable} in self.{self.name} or []] or None"
 
     def as_value(self) -> str:
         if not self.is_direct_relation:
