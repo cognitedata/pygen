@@ -84,6 +84,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_list_no_source: The direct list no source field.
         direct_no_source: The direct no source field.
         direct_reverse_multi: The direct reverse multi field.
         direct_reverse_single: The direct reverse single field.
@@ -93,7 +94,8 @@ class ConnectionItemEGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
-    direct_no_source: Optional[str] = Field(default=None, alias="directNoSource")
+    direct_list_no_source: Optional[list[dict]] = Field(default=None, alias="directListNoSource")
+    direct_no_source: Optional[dict] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(
         default=None, repr=False, alias="directReverseMulti"
     )
@@ -118,6 +120,7 @@ class ConnectionItemEGraphQL(GraphQLCore):
         return values
 
     @field_validator(
+        "direct_list_no_source",
         "direct_no_source",
         "direct_reverse_multi",
         "direct_reverse_single",
@@ -146,6 +149,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
+            direct_list_no_source=[
+                dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source or []
+            ],
             direct_no_source=self.direct_no_source,
             direct_reverse_multi=[
                 direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi or []
@@ -174,6 +180,9 @@ class ConnectionItemEGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
+            direct_list_no_source=[
+                dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source or []
+            ],
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
@@ -196,6 +205,7 @@ class ConnectionItemE(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_list_no_source: The direct list no source field.
         direct_no_source: The direct no source field.
         direct_reverse_multi: The direct reverse multi field.
         direct_reverse_single: The direct reverse single field.
@@ -210,6 +220,7 @@ class ConnectionItemE(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
         "sp_pygen_models", "ConnectionItemE"
     )
+    direct_list_no_source: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="directListNoSource")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
     direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
@@ -225,6 +236,7 @@ class ConnectionItemE(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
+            direct_list_no_source=[direct_list_no_source for direct_list_no_source in self.direct_list_no_source or []],
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
@@ -343,6 +355,7 @@ class ConnectionItemEWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the connection item e.
         data_record: The data record of the connection item e node.
+        direct_list_no_source: The direct list no source field.
         direct_no_source: The direct no source field.
         inwards_single: The inwards single field.
         inwards_single_property: The inwards single property field.
@@ -355,6 +368,7 @@ class ConnectionItemEWrite(DomainModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
         "sp_pygen_models", "ConnectionItemE"
     )
+    direct_list_no_source: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="directListNoSource")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(
         default=None, repr=False, alias="inwardsSingle"
@@ -385,6 +399,19 @@ class ConnectionItemEWrite(DomainModelWrite):
             return resources
 
         properties: dict[str, Any] = {}
+
+        if self.direct_list_no_source is not None:
+            properties["directListNoSource"] = [
+                {
+                    "space": self.space if isinstance(direct_list_no_source, str) else direct_list_no_source.space,
+                    "externalId": (
+                        direct_list_no_source
+                        if isinstance(direct_list_no_source, str)
+                        else direct_list_no_source.external_id
+                    ),
+                }
+                for direct_list_no_source in self.direct_list_no_source or []
+            ]
 
         if self.direct_no_source is not None:
             properties["directNoSource"] = {
@@ -544,6 +571,14 @@ class ConnectionItemEApplyList(ConnectionItemEWriteList): ...
 
 def _create_connection_item_e_filter(
     view_id: dm.ViewId,
+    direct_list_no_source: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     direct_no_source: (
         str
         | tuple[str, str]
@@ -559,6 +594,26 @@ def _create_connection_item_e_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
+    if isinstance(direct_list_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        direct_list_no_source
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directListNoSource"), value=as_instance_dict_id(direct_list_no_source)
+            )
+        )
+    if (
+        direct_list_no_source
+        and isinstance(direct_list_no_source, Sequence)
+        and not isinstance(direct_list_no_source, str)
+        and not is_tuple_id(direct_list_no_source)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directListNoSource"),
+                values=[as_instance_dict_id(item) for item in direct_list_no_source],
+            )
+        )
     if isinstance(direct_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_no_source):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("directNoSource"), value=as_instance_dict_id(direct_no_source))

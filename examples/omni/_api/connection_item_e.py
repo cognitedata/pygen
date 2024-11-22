@@ -63,6 +63,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def __call__(
         self,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -81,6 +89,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """Query starting at connection item es.
 
         Args:
+            direct_list_no_source: The direct list no source to filter on.
             direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
@@ -101,6 +110,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_list_no_source,
             direct_no_source,
             name,
             name_prefix,
@@ -245,6 +255,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         self,
         query: str,
         properties: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -268,6 +286,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            direct_list_no_source: The direct list no source to filter on.
             direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
@@ -295,6 +314,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_list_no_source,
             direct_no_source,
             name,
             name_prefix,
@@ -320,6 +340,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -344,6 +372,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -372,6 +408,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -399,6 +443,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         property: ConnectionItemEFields | SequenceNotStr[ConnectionItemEFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -426,6 +478,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            direct_list_no_source: The direct list no source to filter on.
             direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
@@ -449,6 +502,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_list_no_source,
             direct_no_source,
             name,
             name_prefix,
@@ -472,6 +526,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         interval: float,
         query: str | None = None,
         search_property: ConnectionItemETextFields | SequenceNotStr[ConnectionItemETextFields] | None = None,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -494,6 +556,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            direct_list_no_source: The direct list no source to filter on.
             direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
@@ -508,6 +571,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_list_no_source,
             direct_no_source,
             name,
             name_prefix,
@@ -538,6 +602,14 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     def list(
         self,
+        direct_list_no_source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         direct_no_source: (
             str
             | tuple[str, str]
@@ -560,6 +632,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """List/filter connection item es
 
         Args:
+            direct_list_no_source: The direct list no source to filter on.
             direct_no_source: The direct no source to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
@@ -589,6 +662,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         """
         filter_ = _create_connection_item_e_filter(
             self._view_id,
+            direct_list_no_source,
             direct_no_source,
             name,
             name_prefix,
