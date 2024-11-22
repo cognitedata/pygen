@@ -122,7 +122,11 @@ class ConnectionItemDGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_multi=[direct_multi.as_read() for direct_multi in self.direct_multi or []],
+            direct_multi=(
+                [direct_multi.as_read() for direct_multi in self.direct_multi]
+                if self.direct_multi is not None
+                else None
+            ),
             direct_single=(
                 self.direct_single.as_read() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -142,7 +146,11 @@ class ConnectionItemDGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_multi=[direct_multi.as_write() for direct_multi in self.direct_multi or []],
+            direct_multi=(
+                [direct_multi.as_write() for direct_multi in self.direct_multi]
+                if self.direct_multi is not None
+                else None
+            ),
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, GraphQLCore) else self.direct_single
             ),
@@ -191,10 +199,14 @@ class ConnectionItemD(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_multi=[
-                direct_multi.as_write() if isinstance(direct_multi, DomainModel) else direct_multi
-                for direct_multi in self.direct_multi or []
-            ],
+            direct_multi=(
+                [
+                    direct_multi.as_write() if isinstance(direct_multi, DomainModel) else direct_multi
+                    for direct_multi in self.direct_multi
+                ]
+                if self.direct_multi is not None
+                else None
+            ),
             direct_single=(
                 self.direct_single.as_write() if isinstance(self.direct_single, DomainModel) else self.direct_single
             ),

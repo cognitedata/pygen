@@ -143,7 +143,7 @@ class CogniteCADModelGraphQL(GraphQLCore):
             aliases=self.aliases,
             description=self.description,
             name=self.name,
-            revisions=[revision.as_read() for revision in self.revisions or []],
+            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
             tags=self.tags,
             thumbnail=self.thumbnail.as_read() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
             type_=self.type_,

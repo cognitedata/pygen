@@ -119,7 +119,11 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             a_value=self.a_value,
-            to_non_writable=[to_non_writable.as_read() for to_non_writable in self.to_non_writable or []],
+            to_non_writable=(
+                [to_non_writable.as_read() for to_non_writable in self.to_non_writable]
+                if self.to_non_writable is not None
+                else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -131,7 +135,11 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             a_value=self.a_value,
-            to_non_writable=[to_non_writable.as_write() for to_non_writable in self.to_non_writable or []],
+            to_non_writable=(
+                [to_non_writable.as_write() for to_non_writable in self.to_non_writable]
+                if self.to_non_writable is not None
+                else None
+            ),
         )
 
 
@@ -166,10 +174,14 @@ class DependentOnNonWritable(DomainModel):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             a_value=self.a_value,
-            to_non_writable=[
-                to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
-                for to_non_writable in self.to_non_writable or []
-            ],
+            to_non_writable=(
+                [
+                    to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
+                    for to_non_writable in self.to_non_writable
+                ]
+                if self.to_non_writable is not None
+                else None
+            ),
         )
 
     def as_apply(self) -> DependentOnNonWritableWrite:

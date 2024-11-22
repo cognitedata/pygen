@@ -216,10 +216,10 @@ class CogniteActivityGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             aliases=self.aliases,
-            assets=[asset.as_read() for asset in self.assets or []],
+            assets=[asset.as_read() for asset in self.assets] if self.assets is not None else None,
             description=self.description,
             end_time=self.end_time,
-            equipment=[equipment.as_read() for equipment in self.equipment or []],
+            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
             name=self.name,
             scheduled_end_time=self.scheduled_end_time,
             scheduled_start_time=self.scheduled_start_time,
@@ -232,7 +232,9 @@ class CogniteActivityGraphQL(GraphQLCore):
             source_updated_user=self.source_updated_user,
             start_time=self.start_time,
             tags=self.tags,
-            time_series=[time_series.as_read() for time_series in self.time_series or []],
+            time_series=(
+                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -244,10 +246,10 @@ class CogniteActivityGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             aliases=self.aliases,
-            assets=[asset.as_write() for asset in self.assets or []],
+            assets=[asset.as_write() for asset in self.assets] if self.assets is not None else None,
             description=self.description,
             end_time=self.end_time,
-            equipment=[equipment.as_write() for equipment in self.equipment or []],
+            equipment=[equipment.as_write() for equipment in self.equipment] if self.equipment is not None else None,
             name=self.name,
             scheduled_end_time=self.scheduled_end_time,
             scheduled_start_time=self.scheduled_start_time,
@@ -260,7 +262,9 @@ class CogniteActivityGraphQL(GraphQLCore):
             source_updated_user=self.source_updated_user,
             start_time=self.start_time,
             tags=self.tags,
-            time_series=[time_series.as_write() for time_series in self.time_series or []],
+            time_series=(
+                [time_series.as_write() for time_series in self.time_series] if self.time_series is not None else None
+            ),
         )
 
 
@@ -309,13 +313,21 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             aliases=self.aliases,
-            assets=[asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets or []],
+            assets=(
+                [asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets]
+                if self.assets is not None
+                else None
+            ),
             description=self.description,
             end_time=self.end_time,
-            equipment=[
-                equipment.as_write() if isinstance(equipment, DomainModel) else equipment
-                for equipment in self.equipment or []
-            ],
+            equipment=(
+                [
+                    equipment.as_write() if isinstance(equipment, DomainModel) else equipment
+                    for equipment in self.equipment
+                ]
+                if self.equipment is not None
+                else None
+            ),
             name=self.name,
             scheduled_end_time=self.scheduled_end_time,
             scheduled_start_time=self.scheduled_start_time,
@@ -328,10 +340,14 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
             source_updated_user=self.source_updated_user,
             start_time=self.start_time,
             tags=self.tags,
-            time_series=[
-                time_series.as_write() if isinstance(time_series, DomainModel) else time_series
-                for time_series in self.time_series or []
-            ],
+            time_series=(
+                [
+                    time_series.as_write() if isinstance(time_series, DomainModel) else time_series
+                    for time_series in self.time_series
+                ]
+                if self.time_series is not None
+                else None
+            ),
         )
 
     def as_apply(self) -> CogniteActivityWrite:

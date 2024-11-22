@@ -129,9 +129,15 @@ class ConnectionItemFGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_list=[direct_list.as_read() for direct_list in self.direct_list or []],
+            direct_list=(
+                [direct_list.as_read() for direct_list in self.direct_list] if self.direct_list is not None else None
+            ),
             name=self.name,
-            outwards_multi=[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []],
+            outwards_multi=(
+                [outwards_multi.as_read() for outwards_multi in self.outwards_multi]
+                if self.outwards_multi is not None
+                else None
+            ),
             outwards_single=(
                 self.outwards_single.as_read()
                 if isinstance(self.outwards_single, GraphQLCore)
@@ -147,9 +153,15 @@ class ConnectionItemFGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_list=[direct_list.as_write() for direct_list in self.direct_list or []],
+            direct_list=(
+                [direct_list.as_write() for direct_list in self.direct_list] if self.direct_list is not None else None
+            ),
             name=self.name,
-            outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
+            outwards_multi=(
+                [outwards_multi.as_write() for outwards_multi in self.outwards_multi]
+                if self.outwards_multi is not None
+                else None
+            ),
             outwards_single=(
                 self.outwards_single.as_write()
                 if isinstance(self.outwards_single, GraphQLCore)
@@ -192,12 +204,20 @@ class ConnectionItemF(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list=[
-                direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
-                for direct_list in self.direct_list or []
-            ],
+            direct_list=(
+                [
+                    direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
+                    for direct_list in self.direct_list
+                ]
+                if self.direct_list is not None
+                else None
+            ),
             name=self.name,
-            outwards_multi=[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []],
+            outwards_multi=(
+                [outwards_multi.as_write() for outwards_multi in self.outwards_multi]
+                if self.outwards_multi is not None
+                else None
+            ),
             outwards_single=(
                 self.outwards_single.as_write()
                 if isinstance(self.outwards_single, DomainRelation)

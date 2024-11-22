@@ -226,14 +226,14 @@ class CogniteEquipmentGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            activities=[activity.as_read() for activity in self.activities or []],
+            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
             aliases=self.aliases,
             asset=self.asset.as_read() if isinstance(self.asset, GraphQLCore) else self.asset,
             description=self.description,
             equipment_type=(
                 self.equipment_type.as_read() if isinstance(self.equipment_type, GraphQLCore) else self.equipment_type
             ),
-            files=[file.as_read() for file in self.files or []],
+            files=[file.as_read() for file in self.files] if self.files is not None else None,
             manufacturer=self.manufacturer,
             name=self.name,
             serial_number=self.serial_number,
@@ -245,7 +245,9 @@ class CogniteEquipmentGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            time_series=[time_series.as_read() for time_series in self.time_series or []],
+            time_series=(
+                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -262,7 +264,7 @@ class CogniteEquipmentGraphQL(GraphQLCore):
             equipment_type=(
                 self.equipment_type.as_write() if isinstance(self.equipment_type, GraphQLCore) else self.equipment_type
             ),
-            files=[file.as_write() for file in self.files or []],
+            files=[file.as_write() for file in self.files] if self.files is not None else None,
             manufacturer=self.manufacturer,
             name=self.name,
             serial_number=self.serial_number,
@@ -331,7 +333,11 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
             equipment_type=(
                 self.equipment_type.as_write() if isinstance(self.equipment_type, DomainModel) else self.equipment_type
             ),
-            files=[file.as_write() if isinstance(file, DomainModel) else file for file in self.files or []],
+            files=(
+                [file.as_write() if isinstance(file, DomainModel) else file for file in self.files]
+                if self.files is not None
+                else None
+            ),
             manufacturer=self.manufacturer,
             name=self.name,
             serial_number=self.serial_number,

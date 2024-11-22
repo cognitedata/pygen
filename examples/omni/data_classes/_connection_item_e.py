@@ -149,13 +149,17 @@ class ConnectionItemEGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            direct_list_no_source=[
-                dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source or []
-            ],
+            direct_list_no_source=(
+                [dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source]
+                if self.direct_list_no_source is not None
+                else None
+            ),
             direct_no_source=self.direct_no_source,
-            direct_reverse_multi=[
-                direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi or []
-            ],
+            direct_reverse_multi=(
+                [direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi]
+                if self.direct_reverse_multi is not None
+                else None
+            ),
             direct_reverse_single=(
                 self.direct_reverse_single.as_read()
                 if isinstance(self.direct_reverse_single, GraphQLCore)
@@ -180,9 +184,11 @@ class ConnectionItemEGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            direct_list_no_source=[
-                dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source or []
-            ],
+            direct_list_no_source=(
+                [dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source]
+                if self.direct_list_no_source is not None
+                else None
+            ),
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
@@ -236,9 +242,11 @@ class ConnectionItemE(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list_no_source=[
-                                  direct_list_no_source for direct_list_no_source in self.direct_list_no_source or []
-                              ] or None,
+            direct_list_no_source=(
+                [direct_list_no_source for direct_list_no_source in self.direct_list_no_source]
+                if self.direct_list_no_source is not None
+                else None
+            ),
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single

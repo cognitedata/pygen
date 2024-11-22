@@ -177,7 +177,7 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
             model_3d=self.model_3d.as_read() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
             name=self.name,
             object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_read() for revision in self.revisions or []],
+            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
             tags=self.tags,
             volume=self.volume,
             volume_references=self.volume_references,
@@ -198,7 +198,7 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
             model_3d=self.model_3d.as_write() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
             name=self.name,
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_write() for revision in self.revisions or []],
+            revisions=[revision.as_write() for revision in self.revisions] if self.revisions is not None else None,
             tags=self.tags,
             volume=self.volume,
             volume_references=self.volume_references,
@@ -252,10 +252,11 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
             model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
             name=self.name,
             object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
-            revisions=[
-                revision.as_write() if isinstance(revision, DomainModel) else revision
-                for revision in self.revisions or []
-            ],
+            revisions=(
+                [revision.as_write() if isinstance(revision, DomainModel) else revision for revision in self.revisions]
+                if self.revisions is not None
+                else None
+            ),
             tags=self.tags,
             volume=self.volume,
             volume_references=self.volume_references,

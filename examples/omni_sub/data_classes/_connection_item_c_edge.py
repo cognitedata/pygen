@@ -83,8 +83,16 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            connection_item_a=[connection_item_a.as_read() for connection_item_a in self.connection_item_a or []],
-            connection_item_b=[connection_item_b.as_read() for connection_item_b in self.connection_item_b or []],
+            connection_item_a=(
+                [connection_item_a.as_read() for connection_item_a in self.connection_item_a]
+                if self.connection_item_a is not None
+                else None
+            ),
+            connection_item_b=(
+                [connection_item_b.as_read() for connection_item_b in self.connection_item_b]
+                if self.connection_item_b is not None
+                else None
+            ),
         )
 
 

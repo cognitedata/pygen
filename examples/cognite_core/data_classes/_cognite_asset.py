@@ -261,17 +261,17 @@ class CogniteAssetGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            activities=[activity.as_read() for activity in self.activities or []],
+            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
             aliases=self.aliases,
             asset_class=self.asset_class.as_read() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            children=[child.as_read() for child in self.children or []],
+            children=[child.as_read() for child in self.children] if self.children is not None else None,
             description=self.description,
-            equipment=[equipment.as_read() for equipment in self.equipment or []],
-            files=[file.as_read() for file in self.files or []],
+            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
+            files=[file.as_read() for file in self.files] if self.files is not None else None,
             name=self.name,
             object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
             parent=self.parent.as_read() if isinstance(self.parent, GraphQLCore) else self.parent,
-            path=[path.as_read() for path in self.path or []],
+            path=[path.as_read() for path in self.path] if self.path is not None else None,
             path_last_updated_time=self.path_last_updated_time,
             root=self.root.as_read() if isinstance(self.root, GraphQLCore) else self.root,
             source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
@@ -282,7 +282,9 @@ class CogniteAssetGraphQL(GraphQLCore):
             source_updated_time=self.source_updated_time,
             source_updated_user=self.source_updated_user,
             tags=self.tags,
-            time_series=[time_series.as_read() for time_series in self.time_series or []],
+            time_series=(
+                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
+            ),
             type_=self.type_.as_read() if isinstance(self.type_, GraphQLCore) else self.type_,
         )
 

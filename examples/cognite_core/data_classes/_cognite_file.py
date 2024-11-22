@@ -219,11 +219,11 @@ class CogniteFileGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             aliases=self.aliases,
-            assets=[asset.as_read() for asset in self.assets or []],
+            assets=[asset.as_read() for asset in self.assets] if self.assets is not None else None,
             category=self.category.as_read() if isinstance(self.category, GraphQLCore) else self.category,
             description=self.description,
             directory=self.directory,
-            equipment=[equipment.as_read() for equipment in self.equipment or []],
+            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
             is_uploaded=self.is_uploaded,
             mime_type=self.mime_type,
             name=self.name,
@@ -247,7 +247,7 @@ class CogniteFileGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             aliases=self.aliases,
-            assets=[asset.as_write() for asset in self.assets or []],
+            assets=[asset.as_write() for asset in self.assets] if self.assets is not None else None,
             category=self.category.as_write() if isinstance(self.category, GraphQLCore) else self.category,
             description=self.description,
             directory=self.directory,
@@ -311,7 +311,11 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             aliases=self.aliases,
-            assets=[asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets or []],
+            assets=(
+                [asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets]
+                if self.assets is not None
+                else None
+            ),
             category=self.category.as_write() if isinstance(self.category, DomainModel) else self.category,
             description=self.description,
             directory=self.directory,
