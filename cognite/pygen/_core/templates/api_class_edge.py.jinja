@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 {% if edge_api.has_edge_class and  edge_api.edge_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
-import datetime{% endif %}
+import datetime
+{% endif %}
 
 from cognite.client import data_modeling as dm
+
 {% if edge_api.has_edge_class %}
 from {{ top_level_package }}.data_classes import (
     {{ edge_api.edge_class.read_name }},
@@ -10,26 +13,35 @@ from {{ top_level_package }}.data_classes import (
     {{ edge_api.edge_class.write_name }},
 )
 from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
+
 {% endif %}
-from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}{% if has_default_instance_space %}
-from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE{% endif %}
+from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif +%}
+{% if has_default_instance_space %}
+from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
+{% endif %}
 
 
-class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):{% if edge_api.has_edge_class %}
+class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
+    {% if edge_api.has_edge_class %}
     _view_id = dm.ViewId("{{ edge_api.edge_class.view_id.space }}", "{{ edge_api.edge_class.view_id.external_id }}", "{{ edge_api.edge_class.view_id.version }}")
     _class_type = {{ edge_api.edge_class.read_name }}
     _class_write_type = {{ edge_api.edge_class.write_name }}
     _class_list = {{ edge_api.edge_class.read_list_name }}
-{% endif %}
+
+    {% endif %}
     def list(
-            self,{% for param in edge_api.filter_parameters() %}
-            {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}
-            limit=DEFAULT_LIMIT_READ,
-    ) ->{% if edge_api.has_edge_class %}{{ edge_api.edge_class.read_list_name }}{% else %}dm.EdgeList{% endif %}:
+        self,
+        {% for param in edge_api.filter_parameters() %}
+        {{ param.name }}: {{ param.annotation }} = {{ param.default }},
+        {% endfor %}
+        limit=DEFAULT_LIMIT_READ,
+    ) -> {% if edge_api.has_edge_class %}{{ edge_api.edge_class.read_list_name }}{% else %}dm.EdgeList{% endif %}:
         """List {{edge_api.doc_name}} edges of a {{ edge_api.start_class.doc_name }}.
 
-        Args:{% for param in edge_api.filter_parameters() %}
-            {{ param.name }}: {{ param.description }}{% endfor %}
+        Args:
+            {% for param in edge_api.filter_parameters() %}
+            {{ param.name }}: {{ param.description }}
+            {% endfor %}
             limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
@@ -40,15 +52,21 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
 
             List 5 {{edge_api.doc_name}} edges connected to "my_{{ edge_api.start_class.variable }}":
 
-                >>> from {{ top_level_package }} import {{ client_name }}{% if not has_default_instance_space %}
-                >>> from cognite.client import data_modeling as dm{% endif %}
+                >>> from {{ top_level_package }} import {{ client_name }}
+                {% if not has_default_instance_space %}
+                >>> from cognite.client import data_modeling as dm
+                {% endif %}
                 >>> client = {{ client_name }}()
                 >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list({% if has_default_instance_space %}"my_{{ edge_api.start_class.variable }}"{% else %}dm.NodeId("my_space", "my_connection_item_a"){% endif %}, limit=5)
 
         """
         filter_ = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
-            {%  if edge_api.has_edge_class  %}self._view_id,{% endif %}{% for parm in edge_api.filter_parameters(case="filter_call") %}
-            {{ parm.name }},{% endfor %}
+            {%  if edge_api.has_edge_class  %}
+            self._view_id,
+            {% endif %}
+            {% for parm in edge_api.filter_parameters(case="filter_call") %}
+            {{ parm.name }},
+            {% endfor %}
         )
         return self._list(filter_=filter_, limit=limit)

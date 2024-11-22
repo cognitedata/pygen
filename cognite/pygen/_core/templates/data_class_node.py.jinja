@@ -1,27 +1,51 @@
 from __future__ import annotations
+
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
-import datetime{% endif %}
+import datetime
+{% endif %}
 import warnings
 from collections.abc import Sequence
-{% if data_class.has_dependencies %}from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union{% else %}from typing import Any, ClassVar, Literal, no_type_check, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_dependencies %}
+from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
+{% else %}
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+{% endif %}
+{% if not data_class.use_optional_type %}
+{% endif %}
 
-from cognite.client import data_modeling as dm, CogniteClient{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
-from cognite.client.data_classes import ({% if data_class.has_primitive_field_of_type(dm.FileReference) %}
+from cognite.client import data_modeling as dm, CogniteClient
+{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+from cognite.client.data_classes import (
+    {% if data_class.has_primitive_field_of_type(dm.FileReference) %}
     FileMetadata as CogniteFileMetadata,
-    FileMetadataWrite as CogniteFileMetadataWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    FileMetadataWrite as CogniteFileMetadataWrite,
+    {% endif %}
+    {% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
     TimeSeries as CogniteTimeSeries,
-    TimeSeriesWrite as CogniteTimeSeriesWrite,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
+    {% endif %}
+    {% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     Sequence as CogniteSequence,
-    SequenceWrite as CogniteSequenceWrite,{% endif %}
-){% endif %}{% if data_class.use_pydantic_field %}
-{{ data_class.import_pydantic_field }}{% endif %}
+    SequenceWrite as CogniteSequenceWrite,
+    {% endif %}
+)
+{% endif %}
+{% if data_class.use_pydantic_field %}
+{{ data_class.import_pydantic_field }}
+{% endif %}
 from pydantic import field_validator, model_validator
 
-from {{ top_level_package }}.data_classes._core import ({% if has_default_instance_space %}
-    DEFAULT_INSTANCE_SPACE,{% endif %}
-    DEFAULT_QUERY_LIMIT,{% if data_class.is_cognite_timeseries %}
-    DataPointsAPI,{% endif %}{% if data_class.is_cognite_file %}
-    FileContentAPI,{% endif %}
+from {{ top_level_package }}.data_classes._core import (
+    {% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,
+    {% endif %}
+    DEFAULT_QUERY_LIMIT,
+    {% if data_class.is_cognite_timeseries %}
+    DataPointsAPI,
+    {% endif %}
+    {% if data_class.is_cognite_file %}
+    FileContentAPI,
+    {% endif %}
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
@@ -32,16 +56,22 @@ from {{ top_level_package }}.data_classes._core import ({% if has_default_instan
     DomainRelation,
     DomainRelationWrite,
     GraphQLCore,
-    ResourcesWrite,{% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
+    ResourcesWrite,
+    {% if data_class.has_primitive_field_of_type(dm.CDFExternalIdReference) %}
     FileMetadata,
     FileMetadataWrite,
-    FileMetadataGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
+    FileMetadataGraphQL,
+    {% endif %}
+    {% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
     TimeSeries,
     TimeSeriesWrite,
-    TimeSeriesGraphQL,{% endif %}{% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
+    TimeSeriesGraphQL,
+    {% endif %}
+    {% if data_class.has_primitive_field_of_type(dm.SequenceReference) %}
     SequenceRead,
     SequenceWrite,
-    SequenceGraphQL,{% endif %}
+    SequenceGraphQL,
+    {% endif %}
     T_DomainModelList,
     as_direct_relation_reference,
     as_instance_dict_id,
@@ -52,24 +82,43 @@ from {{ top_level_package }}.data_classes._core import ({% if has_default_instan
     select_best_node,
     QueryCore,
     NodeQueryCore,
-    StringFilter,{% if data_class.has_filtering_fields %}
-    {{ data_class.filtering_import }}{% endif %}
-){% if data_class.implements %}{% for implements in data_class.implements %}
-from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
-{% if data_class.has_dependencies_not_self %}
-if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.read_list_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}, {{ dependency_class.write_list_name }}{% endif %}{% endif %}{% endfor %}
+    StringFilter,
+    {% if data_class.has_filtering_fields %}
+    {{ data_class.filtering_import }}
+    {% endif %}
+)
+{% if data_class.implements %}
+{% for implements in data_class.implements %}
+from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif +%}
+{% endfor %}
 {% endif %}
+{% if data_class.has_dependencies_not_self %}
+if TYPE_CHECKING:
+    {% for dependency_class in data_class.dependencies %}
+    {% if dependency_class.file_name != data_class.file_name %}
+    from {{ top_level_package }}.data_classes.{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.read_list_name }}, {{ dependency_class.graphql_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}, {{ dependency_class.write_list_name }}{% endif +%}
+    {% endif %}
+    {% endfor %}
+{% endif %}
+
 
 __all__ = [
     "{{ data_class.read_name }}",
-    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_name }}",
-    "{{ data_class.read_name }}Apply",{% endif %}
+    {% if data_class.is_writable or data_class.is_interface %}
+    "{{ data_class.write_name }}",
+    "{{ data_class.read_name }}Apply",
+    {% endif %}
     "{{ data_class.read_list_name }}",
-    {% if data_class.is_writable or data_class.is_interface %}"{{ data_class.write_list_name }}",
-    "{{ data_class.read_name }}ApplyList",{% endif %}
-    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}"{{ data_class.field_names }}",{% endif %}
-    {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}"{{ data_class.text_field_names }}",{% endif %}
+    {% if data_class.is_writable or data_class.is_interface %}
+    "{{ data_class.write_list_name }}",
+    "{{ data_class.read_name }}ApplyList",
+    {% endif %}
+    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+    "{{ data_class.field_names }}",
+    {% endif %}
+    {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
+    "{{ data_class.text_field_names }}",
+    {% endif %}
     "{{ data_class.graphql_name }}",
 ]
 
@@ -77,10 +126,13 @@ __all__ = [
 {{ data_class.text_field_names }} = Literal["external_id", {{ data_class.text_fields_literals }}]
 {{ data_class.field_names }} = Literal["external_id", {{ data_class.fields_literals }}]
 
-{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}
-    "external_id": "externalId",{% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
-    "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
-{% raw %}}{% endraw %}
+{{ data_class.properties_dict_name }} = {{'{'}}
+    "external_id": "externalId",
+    {% for field in data_class.fields_of_type(ft.BasePrimitiveField) %}
+    "{{ field.name }}": "{{ field.prop_name }}",
+    {% endfor %}
+{{'}'}}
+
 
 class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}, used
@@ -91,11 +143,16 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} node.
+        {% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
     """
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"){% for field in data_class %}
-    {{ field.name }}: {{ field.as_graphql_type_hint() }}{% endfor %}
+
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
+    {% for field in data_class %}
+    {{ field.name }}: {{ field.as_graphql_type_hint() }}
+    {% endfor %}
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -106,20 +163,25 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
                 created_time=values.pop("createdTime", None),
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
-        return values{% if data_class.has_field_of_type(ft.CDFExternalListField) %}
+        return values
+
+    {% if data_class.has_field_of_type(ft.CDFExternalListField) %}
     @field_validator({% for field in data_class.fields_of_type(ft.CDFExternalListField) %}"{{ field.name }}", {% endfor %}mode="before")
     def clean_list(cls, value: Any) -> Any:
         if isinstance(value, list):
             return [v for v in value if v is not None] or None
         return value
-{% endif %}{% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+    {% endif %}
+
+    {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
     @field_validator({% for field in data_class.fields_of_type(ft.BaseConnectionField) %}"{{ field.name }}", {% endfor %}mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
         if "items" in value:
             return value["items"]
-        return value{% endif %}
+        return value
+    {% endif %}
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
@@ -134,11 +196,13 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
                 version=0,
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
-            ),{% for field in data_class %}
-            {{ field.name }}={{ field.as_read_graphql() }},{% endfor %}
+            ),
+            {% for field in data_class %}
+            {{ field.name }}={{ field.as_read_graphql() }},
+            {% endfor %}
         )
 
-{% if data_class.is_writable or data_class.is_interface %}
+    {% if data_class.is_writable or data_class.is_interface %}
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
@@ -146,10 +210,15 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write_graphql() }},{% endif %}{% endfor %}
+            data_record=DataRecordWrite(existing_version=0),
+            {% for field in data_class %}
+            {% if field.is_write_field %}
+            {{ field.name }}={{ field.as_write_graphql() }},
+            {% endif %}
+            {% endfor %}
         )
-{% endif %}
+    {% endif %}
+
 
 class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
@@ -159,22 +228,34 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} node.
+        {% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
     """
+
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
+
     {% if not data_class.implements %}
-    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
-    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.read_fields %}
-    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
+    {% endif %}
+    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif +%}
+    {% for field in data_class.read_fields %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}
+    {% endfor %}
+
 {% if data_class.is_writable or data_class.is_interface %}
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}{% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write() }},{% endif %}{% endfor %}
+            data_record=DataRecordWrite(existing_version=self.data_record.version),
+            {% for field in data_class %}
+            {% if field.is_write_field %}
+            {{ field.name }}={{ field.as_write() }},
+            {% endif %}
+            {% endfor %}
         )
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -192,14 +273,23 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         instances: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, {{ data_class.read_name }}],  # type: ignore[override]
         nodes_by_id: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel],
         edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:{% if data_class.has_dependencies_not_self %}{% for dependency_class in data_class.dependencies %}{% if dependency_class.file_name != data_class.file_name %}
-        from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% endif %}{% endfor %}
-{% endif %}{% if data_class.has_edges_or_direct_relations %}
-        for instance in instances.values():{% for field in data_class.one_to_one_direct_relations_with_source %}
+    ) -> None:
+        {% if data_class.has_dependencies_not_self %}
+        {% for dependency_class in data_class.dependencies %}
+        {% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% if data_class.has_edges_or_direct_relations %}
+        for instance in instances.values():
+            {% for field in data_class.one_to_one_direct_relations_with_source %}
             if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}(dm.NodeId, str){% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.destination_class.read_name }}
             ):
-                instance.{{ field.name }} = {{ field.name }}{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
+                instance.{{ field.name }} = {{ field.name }}
+            {% endfor %}
+            {% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
                 new_{{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
                 for relation in instance.{{ field.name }}:
@@ -211,10 +301,16 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                         new_{{ field.name }}.append(other)
                     else:
                         new_{{ field.name }}.append(relation)
-                instance.{{ field.name }} = new_{{ field.name }}{% endfor %}{% if data_class.has_edges %}
-            if edges := edges_by_source_node.get(instance.as_id()):{% for field in data_class.one_to_many_edges_without_properties %}
-                {{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
-                {{ field.name }}: list[{{ field.edge_class.read_name }}] = []{% endfor %}
+                instance.{{ field.name }} = new_{{ field.name }}
+            {% endfor %}
+            {% if data_class.has_edges %}
+            if edges := edges_by_source_node.get(instance.as_id()):
+                {% for field in data_class.one_to_many_edges_without_properties %}
+                {{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
+                {% endfor %}
+                {% for field in data_class.one_to_many_edges_with_properties %}
+                {{ field.name }}: list[{{ field.edge_class.read_name }}] = []
+                {% endfor %}
                 for edge in edges:
                     value: DomainModel | DomainRelation{% if has_default_instance_space %} | str{% endif %} | dm.NodeId
                     if isinstance(edge, DomainRelation):
@@ -230,23 +326,28 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                             as_node_id(other_end)
                             if other_end.space != DEFAULT_INSTANCE_SPACE
                             else other_end.external_id
-                        ){% else %} dm.NodeId = as_node_id(other_end){% endif %}
+                        ){% else %} dm.NodeId = as_node_id(other_end){% endif +%}
                         if destination in nodes_by_id:
                             value = nodes_by_id[destination]
                         else:
                             value = destination
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-{% for field in data_class.one_to_many_edges_without_properties %}
+
+                    {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
-                        {{ field.name }}.append(value){% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
+                        {{ field.name }}.append(value)
+                    {% endfor %}
+                    {% for field in data_class.one_to_many_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, {{ field.edge_class.read_name }}
                     ):
                         {{ field.name }}.append(value)
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
+                            value.end_node = end_node  # type: ignore[assignment]
+                    {% endfor %}
+                    {% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
                     ):
@@ -258,7 +359,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
                                 f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
-                            ){% endfor %}{% for field in data_class.one_to_one_edges_with_properties %}
+                            )
+                    {% endfor %}
+                    {% for field in data_class.one_to_one_edges_with_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
                         value, {{ field.edge_class.read_name }}
                     ):
@@ -274,12 +377,22 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]{% endfor %}
-{% for field in data_class.one_to_many_edges_without_properties %}
-                instance.{{ field.name }} = {{ field.name }} or None{% endfor %}{% for field in data_class.one_to_many_edges_with_properties %}
-                instance.{{ field.name }} = {{ field.name }}{% endfor %}
-{% endif %}{% endif %}{% if data_class.has_reverse_direct_relations %}
-        for node in nodes_by_id.values():{% for field in data_class.one_to_one_reverse_direct_relation %}
+                            value.end_node = end_node  # type: ignore[assignment]
+
+                    {% endfor %}
+
+                {% for field in data_class.one_to_many_edges_without_properties %}
+                instance.{{ field.name }} = {{ field.name }} or None
+                {% endfor %}
+                {% for field in data_class.one_to_many_edges_with_properties %}
+                instance.{{ field.name }} = {{ field.name }}
+                {% endfor %}
+
+            {% endif %}
+        {% endif %}
+        {% if data_class.has_reverse_direct_relations %}
+        for node in nodes_by_id.values():
+            {% for field in data_class.one_to_one_reverse_direct_relation %}
             if (
                 isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{ field.reverse_property.name }} is not None
@@ -294,7 +407,10 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                     warnings.warn(
                         f"Expected one direct relation for '{{ field.name }}' in {% raw %}{{% endraw %}{{  field.reverse_property.name }}.as_id(){% raw %}}{% endraw %}."
                         f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}."
-                    ){% endfor %}{% for field in data_class.one_to_many_reverse_direct_relations %}{% if field.reverse_property.is_one_to_one %}
+                    )
+            {% endfor %}
+            {% for field in data_class.one_to_many_reverse_direct_relations %}
+            {% if field.reverse_property.is_one_to_one %}
             if (
                 isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{  field.reverse_property.name }} is not None
@@ -302,7 +418,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
             ):
                 if {{  field.reverse_property.name }}.{{ field.name }} is None:
                     {{  field.reverse_property.name }}.{{ field.name }} = []
-                {{ field.reverse_property.name }}.{{ field.name }}.append(node){% else %}
+                {{ field.reverse_property.name }}.{{ field.name }}.append(node)
+            {% else %}
             if (
                 isinstance(node, {{ field.destination_class.read_name }})
                 and node.{{  field.reverse_property.name }} is not None
@@ -313,9 +430,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                             this_instance.{{ field.name }} = [node]
                         else:
                             this_instance.{{ field.name }}.append(node)
-
-                {% endif %}
-                {% endfor %}
+            {% endif %}
+            
+            {% endfor %}
         {% endif %}
 {% endif %}
 
@@ -328,15 +445,25 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.
-        data_record: The data record of the {{ data_class.doc_name }} node.{% for field in data_class %}{% if field.is_write_field %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
+        data_record: The data record of the {{ data_class.doc_name }} node.
+        {% for field in data_class %}
+        {% if field.is_write_field %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endif %}
+        {% endfor %}
     """
+
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}
-{% if not data_class.implements %}
-    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% endif %}
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.write_fields %}
-    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
-{% if data_class.has_write_connection_fields %}
+
+    {% if not data_class.implements %}
+    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
+    {% endif %}
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif +%}
+    {% for field in data_class.write_fields %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}
+    {% endfor %}
+
+    {% if data_class.has_write_connection_fields %}
     @field_validator({% for field in data_class.write_connection_fields %}"{{ field.name }}", {% endfor %}mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
@@ -345,36 +472,46 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
             return dm.NodeId(value[0], value[1])
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
-        return value{% endif %}
+        return value
+    {% endif %}
+
     def _to_instances_write(
         self,
         cache: set[tuple[str, str]],
         write_none: bool = False,
         allow_version_increase: bool = False,
-    ) -> ResourcesWrite:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
-        from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
-{% endif %}
+    ) -> ResourcesWrite:
+        {% if data_class.has_edge_with_property %}
+        {% for dependency_class in data_class.dependencies_edges %}
+        from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}
+        {% endfor %}
+        {% endif %}
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
-            return resources{% if not data_class.has_container_fields %}
+            return resources
+        {% if not data_class.has_container_fields %}
         cache.add(self.as_tuple_id())
 
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
-            existing_version=None if allow_version_increase else self.data_record.existing_version,{% if data_class.node_type %}
-            type=as_direct_relation_reference(self.node_type),{% endif %}
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            {% if data_class.node_type %}
+            type=as_direct_relation_reference(self.node_type),
+            {% endif %}
             sources=None,
         )
         resources.nodes.append(this_node)
         {% endif %}
-{% if data_class.has_container_fields %}
+
+        {% if data_class.has_container_fields %}
         properties: dict[str, Any] = {}
+
         {% for field in data_class.container_fields %}
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             properties["{{ field.prop_name }}"] = {{ field.as_value() }}
-        {% endfor %}
 
+        {% endfor %}
         if properties:
             this_node = dm.NodeApply(
                 space=self.space,
@@ -391,16 +528,18 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
             cache.add(self.as_tuple_id())
         {% endif %}
 
-{% for field in data_class.one_to_many_edges_with_properties %}
+        {% for field in data_class.one_to_many_edges_with_properties %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationWrite):
                 other_resources = {{ field.variable }}._to_instances_write(
                     cache,
                     self,
                     {{ field.edge_type_str }},
-)
+                )
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.one_to_one_edges_with_properties %}
+
+        {% endfor %}
+        {% for field in data_class.one_to_one_edges_with_properties %}
         if self.{{ field.name }} is not None:
             other_resources = self.{{ field.name }}._to_instances_write(
                 cache,
@@ -408,9 +547,12 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
                 {{ field.edge_type_str }},
             )
             resources.extend(other_resources)
-{% endfor %}{% for field in data_class.one_to_many_edges_without_properties %}
+
+        {% endfor %}
+        {% for field in data_class.one_to_many_edges_without_properties %}
         edge_type = {{ field.edge_type_str }}
-        for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            {% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node=self,
@@ -418,7 +560,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
                 edge_type=edge_type,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
-            ){% else %}
+            )
+            {% else %}
             other_resources = DomainRelationWrite.from_edge_to_resources(
                 cache,
                 start_node={{field.variable}},
@@ -426,37 +569,53 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
                 edge_type=edge_type,
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
-            ){% endif %}
+            )
+            {% endif %}
             resources.extend(other_resources)
-{% endfor %}{% for field in data_class.one_to_one_direct_relations_with_source %}
+
+        {% endfor %}
+        {% for field in data_class.one_to_one_direct_relations_with_source %}
         if isinstance(self.{{ field.name }}, DomainModelWrite):
             other_resources = self.{{ field.name }}._to_instances_write(cache)
             resources.extend(other_resources)
-{% endfor %}{% for field in data_class.one_to_many_direct_relations_with_source %}
+
+        {% endfor %}
+        {% for field in data_class.one_to_many_direct_relations_with_source %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainModelWrite):
                 other_resources = {{ field.variable }}._to_instances_write(cache)
                 resources.extend(other_resources)
-{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.CDFExternalIdReference) %}{% if field.is_list %}
+
+        {% endfor %}
+        {% for field in data_class.primitive_fields_of_type(dm.CDFExternalIdReference) %}
+        {% if field.is_list %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, {{ field.cognite_type_name('write') }}):
-                resources.{{ field.resource_write_name }}.append({{ field.variable }}){% else %}
+                resources.{{ field.resource_write_name }}.append({{ field.variable }})
+        {% else %}
         if isinstance(self.{{ field.name }}, {{ field.cognite_type_name('write') }}):
-            resources.{{ field.resource_write_name }}.append(self.{{ field.name }}){% endif %}
-{% endfor %}{% for field in data_class.one_to_one_edge_without_properties %}
+            resources.{{ field.resource_write_name }}.append(self.{{ field.name }})
+        {% endif %}
+
+        {% endfor %}
+        {% for field in data_class.one_to_one_edge_without_properties %}
         if self.{{field.name}} is not None:
             other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,{% if field.edge_direction == 'outwards' %}
+                cache,
+                {% if field.edge_direction == 'outwards' %}
                 start_node=self,
-                end_node=self.{{ field.name }},{% else %}
+                end_node=self.{{ field.name }},
+                {% else %}
                 start_node=self.{{ field.name }},
-                end_node=self,{% endif %}
+                end_node=self,
+                {% endif %}
                 edge_type={{ field.edge_type_str }},
                 write_none=write_none,
                 allow_version_increase=allow_version_increase,
             )
             resources.extend(other_resources)
-{% endfor %}
+
+        {% endfor %}
         return resources
 
 
@@ -489,39 +648,53 @@ class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}
             stacklevel=2,
         )
         return self.as_write()
-{% for field in data_class.read_connection_fields_including_parents %}
+
+    {% for field in data_class.read_connection_fields_including_parents %}
     @property
-    def {{ field.name }}(self) -> {{ field.linked_class.read_list_name }}:{% if field.linked_class.file_name != data_class.file_name %}
+    def {{ field.name }}(self) -> {{ field.linked_class.read_list_name }}:
+        {% if field.linked_class.file_name != data_class.file_name %}
         from .{{ field.linked_class.file_name }} import {{ field.linked_class.read_name }}, {{ field.linked_class.read_list_name }}
-{% endif %}{% if field.is_one_to_one %}
+        {% endif %}
+        {% if field.is_one_to_one %}
         return {{ field.linked_class.read_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.linked_class.read_name }})]){% else %}
-        return {{ field.linked_class.read_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.read_name }})]){% endif %}
-{% endfor %}
+        return {{ field.linked_class.read_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.read_name }})])
+        {% endif %}
+
+    {% endfor %}
 
 class {{ data_class.write_list_name }}(DomainModelWriteList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
-{% for field in data_class.write_connection_fields_including_parents %}
+    {% for field in data_class.write_connection_fields_including_parents %}
     @property
-    def {{ field.name }}(self) -> {{ field.linked_class.write_list_name }}:{% if field.linked_class.file_name != data_class.file_name %}
+    def {{ field.name }}(self) -> {{ field.linked_class.write_list_name }}:
+        {% if field.linked_class.file_name != data_class.file_name %}
         from .{{ field.linked_class.file_name }} import {{ field.linked_class.write_name }}, {{ field.linked_class.write_list_name }}
-{% endif %}{% if field.is_one_to_one %}
+        {% endif %}
+        {% if field.is_one_to_one %}
         return {{ field.linked_class.write_list_name }}([item.{{ field.name }} for item in self.data if isinstance(item.{{ field.name }}, {{ field.linked_class.write_name }})]){% else %}
-        return {{ field.linked_class.write_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.write_name }})]){% endif %}
-{% endfor %}
+        return {{ field.linked_class.write_list_name }}([item for items in self.data for item in items.{{ field.name }} or [] if isinstance(item, {{ field.linked_class.write_name }})])
+        {% endif %}
+
+    {% endfor %}
+
 class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
 {% endif %}
 
 def {{ data_class.filter_name }}(
-    view_id: dm.ViewId,{% for parm in list_method.parameters %}
-    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    view_id: dm.ViewId,
+    {% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+    {% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
-    filters: list[dm.Filter] = []{% for filter in list_method.implementations %}
+    filters: list[dm.Filter] = []
+    {% for filter in list_method.implementations %}
     if {{ filter.condition }}:
-        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+        filters.append({{ filter.filter_call }}({{ filter.arguments }}))
+    {% endfor %}
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
@@ -542,8 +715,12 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         connection_name: str | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
-    ):{% for dependency_class in data_class.dependencies_with_edge_destinations %}{% if dependency_class.file_name != data_class.file_name %}
-        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}{% endif %}{% endfor %}
+    ):
+        {% for dependency_class in data_class.dependencies_with_edge_destinations %}
+        {% if dependency_class.file_name != data_class.file_name %}
+        from .{{ dependency_class.file_name }} import _{{ dependency_class.query_cls_name }}
+        {% endif %}
+        {% endfor %}
 
         super().__init__(
             created_types,
@@ -556,40 +733,62 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             connection_type,
             reverse_expression,
         )
-{% for field in data_class.fields_of_type(ft.BaseConnectionField) %}{% if not field.is_direct_relation_no_source %}
+
+        {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
+        {% if not field.is_direct_relation_no_source %}
         if _{{ field.linked_class.query_cls_name }} not in created_types:
             self.{{ field.name }} = _{{ field.linked_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
                 client,
-                result_list_cls,{% if field.is_edge_with_properties %}
-                _{{ field.destination_class.query_cls_name }},{% endif %}{% if field.is_direct_relation %}
+                result_list_cls,
+                {% if field.is_edge_with_properties %}
+                _{{ field.destination_class.query_cls_name }},
+                {% endif %}
+                {% if field.is_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through=self._view_id.as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
-                ),{% elif field.is_reverse_direct_relation %}
+                ),
+                {% elif field.is_reverse_direct_relation %}
                 dm.query.NodeResultSetExpression(
                     through={{ field.through_str }},
                     direction="inwards",
-                ),{% else %}
+                ),
+                {% else %}
                 dm.query.EdgeResultSetExpression(
                     direction="{{ field.edge_direction }}",
                     chain_to="destination",
-                ),{% endif %}
-                connection_name="{{ field.name }}",{% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
-                connection_type="reverse-list",{% endif %}
-            ){% endif %}
-{% endfor %}
+                ),
+                {% endif %}
+                connection_name="{{ field.name }}",
+                {% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
+                connection_type="reverse-list",
+                {% endif %}
+            )
+        {% endif %}
+
+        {% endfor %}
         self.space = StringFilter(self, ["node", "space"])
-        self.external_id = StringFilter(self, ["node", "externalId"]){% if data_class.has_filtering_fields %}{% for field in data_class.filtering_fields %}
-        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}")){% endfor %}
+        self.external_id = StringFilter(self, ["node", "externalId"])
+        {% if data_class.has_filtering_fields %}
+        {% for field in data_class.filtering_fields %}
+        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
+        {% endfor %}
         self._filter_classes.extend([
             self.space,
-            self.external_id,{% for field in data_class.filtering_fields %}
-            self.{{ field.name }},{% endfor %}
-        ]){% endif %}{% if data_class.is_cognite_timeseries %}
-        self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids()){% endif %}{% if data_class.is_cognite_file %}
-        self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids()){% endif %}
+            self.external_id,
+            {% for field in data_class.filtering_fields %}
+            self.{{ field.name }},
+            {% endfor %}
+        ])
+        {% endif %}
+        {% if data_class.is_cognite_timeseries %}
+        self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
+        {% endif %}
+        {% if data_class.is_cognite_file %}
+        self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
+        {% endif %}
 
     def list_{{ data_class.variable }}(self, limit: int = DEFAULT_QUERY_LIMIT) -> {{ data_class.read_list_name }}:
         return self._list(limit=limit)

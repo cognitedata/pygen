@@ -362,15 +362,19 @@ class {{ timeseries_api.name}}:
         self._view_id = view_id
 
     def __call__(
-        self,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        self,
+        {% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+        {% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> {{ timeseries_api.query_class}}:
         """Query timeseries `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}`
 
-        Args:{% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
+        Args:
+            {% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}
+            {% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
@@ -394,8 +398,10 @@ class {{ timeseries_api.name}}:
             stacklevel=2,
         )
         filter_ = {{ data_class.filter_name }}(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
+            self._view_id,
+            {% for parm in list_method.parameters %}
+            {{ parm.name }},
+            {% endfor %}
             filter,
         )
 
@@ -407,15 +413,19 @@ class {{ timeseries_api.name}}:
         )
 
     def list(
-        self,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        self,
+        {% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+        {% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
         """List timeseries `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}`
 
-        Args:{% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
+        Args:
+            {% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}
+            {% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
@@ -432,8 +442,10 @@ class {{ timeseries_api.name}}:
 
         """
         filter_ = {{ data_class.filter_name }}(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
+            self._view_id,
+            {% for parm in list_method.parameters %}
+            {{ parm.name }},
+            {% endfor %}
             filter,
         )
         external_ids = _retrieve_timeseries_external_ids_with_extra_{{ timeseries_api.variable }}(self._client, self._view_id, filter_, limit)

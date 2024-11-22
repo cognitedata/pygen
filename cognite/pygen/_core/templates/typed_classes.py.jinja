@@ -1,26 +1,44 @@
 from __future__ import annotations
+
 {% if has_datetime_import %}
-{{ datetime_import }}{% endif %}{% if has_literal_import %}
-from typing import Literal{% endif %}
+{{ datetime_import }}
+{% endif %}
+{% if has_literal_import %}
+from typing import Literal
+{% endif %}
 
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from cognite.client.data_classes.data_modeling.ids import ViewId
 from cognite.client.data_classes.data_modeling.instances import (
-    PropertyOptions,{% if has_edge_cls %}
+    PropertyOptions,
+    {% if has_edge_cls %}
     TypedEdge,
-    TypedEdgeApply,{% endif %}{% if has_node_cls %}
+    TypedEdgeApply,
+    {% endif %}
+    {% if has_node_cls %}
     TypedNode,
-    TypedNodeApply,{% endif %}
-){% for module, parents in parent_classes_by_module.items() %}
-from {{ module }} import ({% for parent in parents %}
-    {{ parent }},{% endfor %}
+    TypedNodeApply,
+    {% endif %}
+)
+{% for module, parents in parent_classes_by_module.items() %}
+from {{ module }} import (
+    {% for parent in parents %}
+    {{ parent }},
+    {% endfor %}
 )
 {% endfor %}
 
-{% for cls in node_classes %}{% if cls.has_container_fields %}
-class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
-    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
-{% endif %}
+{% for cls in node_classes %}
+{% if cls.has_container_fields %}
+class {{ cls.typed_properties_name }}:
+    {% for field in cls.container_fields_sorted('only-self') %}
+    {% if field.name != field.prop_name %}
+    {{ field.name }} = PropertyOptions("{{ field.prop_name }}")
+    {% endif %}
+    {% endfor %}
+    {% if cls.container_fields_sorted('only-self') %}
+    {% endif %}
+
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("{{ cls.view_id.space }}", "{{ cls.view_id.external_id }}", "{{ cls.view_id.version }}")
@@ -30,12 +48,19 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
     """This represents the writing format of {{ cls.doc_name }}.
 
     It is used to when data is written to CDF.
-{% if cls.description %}
-    {{ cls.description }}{% endif %}
+
+    {% if cls.description %}
+    {{ cls.description }}
+
+    {% endif %}
     Args:
         space: The space where the node is located.
-        external_id: The external id of the {{ cls.doc_name }}.{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endif %}{% endfor %}
+        external_id: The external id of the {{ cls.doc_name }}.
+        {% for field in cls.container_fields_sorted() %}
+        {% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endif %}
+        {% endfor %}
         existing_version: Fail the ingestion request if the node's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the node
             (for the specified container or node). If existingVersion is set to 0, the upsert will behave as an insert,
@@ -47,30 +72,49 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         self,
         space: str,
         external_id: str,
-        *,{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
-        {{field.name}}: {{ field.as_typed_hint() }},{% endif %}{% endfor %}
+        *,
+        {% for field in cls.container_fields_sorted() %}
+        {% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        {{field.name}}: {{ field.as_typed_hint() }},
+        {% endif %}
+        {% endfor %}
         existing_version: int | None = None,
         type: DirectRelationReference | tuple[str, str] | None = None,
-    ) -> None:{% if len(cls.implements) == 0 %}
-        TypedNodeApply.__init__(self, space, external_id, existing_version, type){% elif len(cls.implements) == 1 %}
-        super().__init__(space, external_id,{{ cls.implements[0].container_field_variables }}, existing_version=existing_version, type=type){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}Apply.__init__(self, space, external_id, {{ parent.container_field_variables }}, existing_version=existing_version, type=type){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
-        self.{{field.name}} = {{field.as_typed_init_set()}}{% endif %}{% endfor %}
+    ) -> None:
+        {% if len(cls.implements) == 0 %}
+        TypedNodeApply.__init__(self, space, external_id, existing_version, type)
+        {% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id,{{ cls.implements[0].container_field_variables }}, existing_version=existing_version, type=type)
+        {% else %}
+        {% for parent in cls.implements %}
+        {{ parent.read_name }}Apply.__init__(self, space, external_id, {{ parent.container_field_variables }}, existing_version=existing_version, type=type)
+        {% endfor %}
+        {% endif %}
+        {% for field in cls.container_fields_sorted('only-self') %}
+        {% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}
+        {% endif %}
+        {% endfor %}
 
 
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
     """This represents the reading format of {{ cls.doc_name }}.
 
     It is used to when data is read from CDF.
-{% if cls.description %}
-    {{ cls.description }}{% endif %}
+
+    {% if cls.description %}
+    {{ cls.description }}
+
+    {% endif %}
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
         version (int): DMS version.
         last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.{% for field in cls.container_fields_sorted() %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        {% for field in cls.container_fields_sorted() %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
         type: Direct relation pointing to the type node.
         deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
@@ -83,48 +127,73 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         version: int,
         last_updated_time: int,
         created_time: int,
-        *,{% for field in cls.container_fields_sorted() %}
-        {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
+        *,
+        {% for field in cls.container_fields_sorted() %}
+        {{field.name}}: {{ field.as_typed_hint('read') }},
+        {% endfor %}
         type: DirectRelationReference | None = None,
         deleted_time: int | None = None,
-    ) -> None:{% if len(cls.implements) == 0 %}
-        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type){% elif len(cls.implements) == 1 %}
-        super().__init__(space, external_id, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, type=type, deleted_time=deleted_time){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}.__init__(self, space, external_id, version, last_updated_time, created_time, {{ parent.container_field_variables }}, type=type, deleted_time=deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
+    ) -> None:
+        {% if len(cls.implements) == 0 %}
+        TypedNode.__init__(self, space, external_id, version, last_updated_time, created_time, deleted_time, type)
+        {% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, type=type, deleted_time=deleted_time)
+        {% else %}
+        {% for parent in cls.implements %}
+        {{ parent.read_name }}.__init__(self, space, external_id, version, last_updated_time, created_time, {{ parent.container_field_variables }}, type=type, deleted_time=deleted_time)
+        {% endfor %}
+        {% endif %}
+        {% for field in cls.container_fields_sorted('only-self') %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}
+        {% endfor %}
 
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
             self.space,
-            self.external_id,{% for field in cls.container_fields_sorted() %}{% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
-            {{field.name}}=self.{{field.name}},{% if field.is_connection and field.is_one_to_many %}  # type: ignore[arg-type]{% endif %}{% endif %}{% endfor %}
+            self.external_id,
+            {% for field in cls.container_fields_sorted() %}
+            {% if not readonly_properties_by_view.get(cls.view_id) or field.prop_name not in readonly_properties_by_view.get(cls.view_id)  %}
+            {{field.name}}=self.{{field.name}},{% if field.is_connection and field.is_one_to_many %}  # type: ignore[arg-type]{% endif +%}
+            {% endif %}
+            {% endfor %}
             existing_version=self.version,
             type=self.type,
         )
-{% endif %}{% endfor %}
-{% for cls in edge_classes %}{% if cls.has_container_fields and not cls.has_node_class %}
-class {{ cls.typed_properties_name }}:{%  for field in cls.container_fields_sorted('only-self') %}{% if field.name != field.prop_name %}
-    {{ field.name }} = PropertyOptions("{{ field.prop_name }}"){% endif %}{% endfor %}{% if cls.container_fields_sorted('only-self') %}
 {% endif %}
+{% endfor %}
+{% for cls in edge_classes %}
+{% if cls.has_container_fields and not cls.has_node_class %}
+class {{ cls.typed_properties_name }}:
+    {% for field in cls.container_fields_sorted('only-self') %}
+    {% if field.name != field.prop_name %}
+    {{ field.name }} = PropertyOptions("{{ field.prop_name }}")
+    {% endif %}
+    {% endfor %}
+    {% if cls.container_fields_sorted('only-self') %}
+    {% endif %}
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("{{ cls.view_id.space }}", "{{ cls.view_id.external_id }}", "{{ cls.view_id.version }}")
-{% endif %}
 
+{% endif %}
 class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_write_bases_classes }}):
     """This represents the writing format of {{ cls.doc_name }}.
 
     It is used to when data is written to CDF.
-{% if cls.description %}
-    {{ cls.description }}{% endif %}
+
+    {% if cls.description %}
+    {{ cls.description }}
+
+    {% endif %}
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
         type (DirectRelationReference | tuple[str, str]): The type of edge.
         start_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
         end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
-{% for field in cls.container_fields_sorted() %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        {% for field in cls.container_fields_sorted() %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
         existing_version: Fail the ingestion request if the edge's version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge
             (for the specified container or edge). If existingVersion is set to 0, the upsert will behave as an insert,
@@ -138,22 +207,35 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         type: DirectRelationReference | tuple[str, str],
         start_node: DirectRelationReference | tuple[str, str],
         end_node: DirectRelationReference | tuple[str, str],
-        *,{% for field in cls.container_fields_sorted() %}
-        {{field.name}}: {{ field.as_typed_hint() }},{% endfor %}
+        *,
+        {% for field in cls.container_fields_sorted() %}
+        {{field.name}}: {{ field.as_typed_hint() }},
+        {% endfor %}
         existing_version: int | None = None,
-    ) -> None:{% if len(cls.implements) == 0 %}
-        TypedEdgeApply.__init__(self, space, external_id, type, start_node, end_node, existing_version){% elif len(cls.implements) == 1 %}
-        super().__init__(space, external_id, type, start_node, end_node,{{ cls.implements[0].container_field_variables }}, existing_version=existing_version){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}Apply.__init__(self, space, external_id, type, start_node, end_node, {{ parent.container_field_variables }}, existing_version=existing_version){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
+    ) -> None:
+        {% if len(cls.implements) == 0 %}
+        TypedEdgeApply.__init__(self, space, external_id, type, start_node, end_node, existing_version)
+        {% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id, type, start_node, end_node,{{ cls.implements[0].container_field_variables }}, existing_version=existing_version)
+        {% else %}
+        {% for parent in cls.implements %}
+        {{ parent.read_name }}Apply.__init__(self, space, external_id, type, start_node, end_node, {{ parent.container_field_variables }}, existing_version=existing_version)
+        {% endfor %}
+        {% endif %}
+        {% for field in cls.container_fields_sorted('only-self') %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}
+        {% endfor %}
 
 
 class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bases_classes }}):
     """This represents the reading format of {{ cls.doc_name }}.
 
     It is used to when data is read from CDF.
-{% if cls.description %}
-    {{ cls.description }}{% endif %}
+
+    {% if cls.description %}
+    {{ cls.description }}
+
+    {% endif %}
     Args:
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
@@ -162,8 +244,10 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
         version (int): DMS version.
         last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.{% for field in cls.container_fields_sorted() %}
-        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        {% for field in cls.container_fields_sorted() %}
+        {{ field.name }}: {{ field.argument_documentation }}
+        {% endfor %}
         deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
@@ -178,14 +262,18 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         version: int,
         last_updated_time: int,
         created_time: int,
-        *,{% for field in cls.container_fields_sorted() %}
-        {{field.name}}: {{ field.as_typed_hint('read') }},{% endfor %}
+        *,
+        {% for field in cls.container_fields_sorted() %}
+        {{field.name}}: {{ field.as_typed_hint('read') }},
+        {% endfor %}
         deleted_time: int | None = None,
     ) -> None:{% if len(cls.implements) == 0 %}
         TypedEdge.__init__(self, space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time){% elif len(cls.implements) == 1 %}
         super().__init__(space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, deleted_time=deleted_time){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time=deleted_time){% endfor %}{% endif %}{% for field in cls.container_fields_sorted('only-self') %}
-        self.{{field.name}} = {{field.as_typed_init_set()}}{% endfor %}
+        {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time=deleted_time){% endfor %}{% endif %}
+        {% for field in cls.container_fields_sorted('only-self') %}
+        self.{{field.name}} = {{field.as_typed_init_set()}}
+        {% endfor %}
 
     def as_write(self) -> {{ cls.read_name }}Apply:
         return {{ cls.read_name }}Apply(
@@ -193,8 +281,10 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
             self.external_id,
             self.type,
             self.start_node,
-            self.end_node,{% for field in cls.container_fields_sorted() %}
-            {{field.name}}=self.{{field.name}},{% endfor %}
+            self.end_node,
+            {% for field in cls.container_fields_sorted() %}
+            {{field.name}}=self.{{field.name}},
+            {% endfor %}
             existing_version=self.version,
         )
 {% endfor %}

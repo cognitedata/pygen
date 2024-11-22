@@ -17,13 +17,17 @@ from {{ top_level_package }}.data_classes._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-{% for class_ in classes %}{{ class_.init_import }}
+{% for class_ in classes %}
+{{ class_.init_import }}
 {% endfor %}
 {% for (read_name, graphql_name, write_name, has_write_class, has_timeseries_fields) in dependencies_by_names %}{{ read_name }}.model_rebuild()
-{{ graphql_name }}.model_rebuild(){% if has_write_class %}
+{{ graphql_name }}.model_rebuild()
+{% if has_write_class %}
 {{ write_name }}.model_rebuild()
-{{ read_name }}Apply.model_rebuild(){% endif %}
+{{ read_name }}Apply.model_rebuild()
+{% endif %}
 {% endfor %}
+
 
 __all__ = [
     "DataRecord",
@@ -42,14 +46,20 @@ __all__ = [
     "TimeSeriesGraphQL",
     "FileMetadataGraphQL",
     "SequenceColumnGraphQL",
-    "SequenceGraphQL",{% for class_ in classes %}
+    "SequenceGraphQL",
+    {% for class_ in classes %}
     "{{ class_.read_name }}",
-    "{{ class_.graphql_name }}",{% if class_.is_writable or class_.is_interface %}
+    "{{ class_.graphql_name }}",
+    {% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_name }}",
-    "{{ class_.read_name }}Apply",{% endif %}
-    "{{ class_.read_list_name }}",{% if class_.is_writable or class_.is_interface %}
+    "{{ class_.read_name }}Apply",
+    {% endif %}
+    "{{ class_.read_list_name }}",
+    {% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_list_name }}",
-    "{{ class_.read_name }}ApplyList",{% endif %}
+    "{{ class_.read_name }}ApplyList",
+    {% endif %}
     "{{ class_.field_names }}",
-    "{{ class_.text_field_names }}",{% endfor %}
+    "{{ class_.text_field_names }}",
+    {% endfor %}
 ]
