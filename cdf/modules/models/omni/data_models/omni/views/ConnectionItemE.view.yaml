@@ -65,6 +65,13 @@ properties:
       type: container
     containerPropertyIdentifier: direct1
     name: directNoSource
+  directListNoSource:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: directList
+    name: directListNoSource
   inwardsSingleProperty:
     type:
       space: {{ pygen_models_space }}
