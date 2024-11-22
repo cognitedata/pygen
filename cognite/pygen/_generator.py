@@ -461,7 +461,6 @@ def write_sdk_to_disk(
                 file_content = formatter.format_code(file_content)
             except Exception as e:
                 warnings.warn(InvalidCodeGenerated(file_path, str(e)), stacklevel=2)
-                continue
         # Encoding and newline are set to ensure consistent file writing across platforms
         with path.open("w", encoding="utf-8", newline="\n") as f:
             f.write(file_content)

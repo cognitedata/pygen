@@ -103,6 +103,23 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
+    def test_generate_sdk_direct_relation_missing_source(self, tmp_path: Path) -> None:
+        client_name = "HydroClient"
+        top_level_package = "hydro_model"
+
+        generate_sdk(
+            DATA_MODEL_DIRECT_RELATION_MISSING_SOURCE,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="hydro_energi_watercourse_type_space",
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
 
 DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
     space="field_space",
@@ -330,6 +347,49 @@ DATA_MODEL_SOURCE_OUTSIDE_MODEL = dm.DataModel(
                     name=None,
                     description=None,
                 )
+            },
+            last_updated_time=1,
+            created_time=1,
+            description=None,
+            name=None,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+            is_global=False,
+        )
+    ],
+)
+
+DATA_MODEL_DIRECT_RELATION_MISSING_SOURCE = dm.DataModel(
+    space="hydro_energi_watercourse_type_space",
+    external_id="HydroModel",
+    version="v1",
+    is_global=False,
+    last_updated_time=1,
+    created_time=1,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="hydro_energi_watercourse_type_space",
+            external_id="Reservoir",
+            version="v1",
+            properties={
+                "path": dm.MappedProperty(
+                    container=dm.ContainerId(
+                        space="cdf_cdm",
+                        external_id="CogniteTimeSeries",
+                    ),
+                    container_property_identifier="path",
+                    source=None,
+                    name=None,
+                    description=None,
+                    type=dm.DirectRelation(is_list=True),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                ),
             },
             last_updated_time=1,
             created_time=1,
