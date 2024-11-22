@@ -194,8 +194,14 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "directNoSource",
-                'Optional[str] = Field(default=None, alias="directNoSource")',
+                'Optional[dict] = Field(default=None, alias="directNoSource")',
                 id="Single Direct, no source",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directListNoSource",
+                'Optional[list[dict]] = Field(default=None, alias="directListNoSource")',
+                id="List Direct, no source",
             ),
             pytest.param(
                 "ConnectionItemF",
