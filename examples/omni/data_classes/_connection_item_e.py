@@ -236,7 +236,7 @@ class ConnectionItemE(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list_no_source=[direct_list_no_source for direct_list_no_source in self.direct_list_no_source or []],
+            direct_list_no_source=[direct_list_no_source for direct_list_no_source in self.direct_list_no_source or []] or None,
             direct_no_source=self.direct_no_source,
             inwards_single=(
                 self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
