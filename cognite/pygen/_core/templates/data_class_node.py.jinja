@@ -281,7 +281,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         {% endif %}
         {% endfor %}
         {% endif %}
-        {% if data_class.has_edges_or_direct_relations %}
+        {% if data_class.has_edges_or_direct_relations_with_target %}
         for instance in instances.values():
             {% for field in data_class.one_to_one_direct_relations_with_source %}
             if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}(dm.NodeId, str){% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(

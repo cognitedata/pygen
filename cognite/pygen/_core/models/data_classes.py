@@ -483,16 +483,31 @@ class DataClass:
         return any(dependency != self for dependency in self.dependencies)
 
     @property
-    def has_edges_or_direct_relations(self) -> bool:
+    def has_edges_or_direct_relations_with_target(self) -> bool:
         """Whether the data class has any fields that are edges or direct relations."""
         return any(
-            isinstance(field_, BaseConnectionField) and (field_.is_edge or field_.is_direct_relation) for field_ in self
+            isinstance(field_, BaseConnectionField)
+            and (field_.is_edge or field_.is_direct_relation)
+            and field_.destination_class
+            for field_ in self
         )
 
     @property
     def has_reverse_direct_relations(self) -> bool:
         """Whether the data class has any fields that are reverse direct relations."""
         return any(isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation for field_ in self)
+
+    @property
+    def has_container_fields(self) -> bool:
+        """Check if the data class has any container fields."""
+        return any(self.container_fields)
+
+    @property
+    def has_connection_with_target(self) -> bool:
+        """Check if the data class has any connection fields with a target.
+        That is all connection fields minus direct relations without source specified.
+        """
+        return any(isinstance(field_, BaseConnectionField) and field_.destination_class for field_ in self)
 
     @property
     def container_fields(self) -> Iterable[Field]:
@@ -525,18 +540,6 @@ class DataClass:
             return sorted(fields_by_parent[include.read_name], key=key)
         else:
             raise TypeError(f"Invalid value for include: {include}")
-
-    @property
-    def has_container_fields(self) -> bool:
-        """Check if the data class has any container fields."""
-        return any(self.container_fields)
-
-    @property
-    def has_connection_with_target(self) -> bool:
-        """Check if the data class has any connection fields with a target.
-        That is all connection fields minus direct relations without source specified.
-        """
-        return any(isinstance(field_, BaseConnectionField) and field_.destination_class for field_ in self)
 
     @property
     def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
