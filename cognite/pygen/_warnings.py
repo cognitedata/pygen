@@ -104,7 +104,8 @@ class UnknownConnectionTargetWarning(PygenWarning, UserWarning):
 
     def __str__(self) -> str:
         return (
-            f"Target {self.source!r} does not exists. " f"Skipping connection {self.view.external_id}.{self.property_}."
+            f"Target {self.source!r} does not exists in model. "
+            f"Skipping connection {self.view.external_id}.{self.property_}."
         )
 
 

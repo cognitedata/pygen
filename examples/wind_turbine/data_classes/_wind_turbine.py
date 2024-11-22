@@ -160,11 +160,11 @@ class WindTurbineGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            blades=[blade.as_read() for blade in self.blades or []],
+            blades=[blade.as_read() for blade in self.blades] if self.blades is not None else None,
             capacity=self.capacity,
-            datasheets=[datasheet.as_read() for datasheet in self.datasheets or []],
+            datasheets=[datasheet.as_read() for datasheet in self.datasheets] if self.datasheets is not None else None,
             description=self.description,
-            metmast=[metmast.as_read() for metmast in self.metmast or []],
+            metmast=[metmast.as_read() for metmast in self.metmast] if self.metmast is not None else None,
             nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
             power_curve=self.power_curve.as_read() if self.power_curve else None,
@@ -180,11 +180,11 @@ class WindTurbineGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            blades=[blade.as_write() for blade in self.blades or []],
+            blades=[blade.as_write() for blade in self.blades] if self.blades is not None else None,
             capacity=self.capacity,
-            datasheets=[datasheet.as_write() for datasheet in self.datasheets or []],
+            datasheets=[datasheet.as_write() for datasheet in self.datasheets] if self.datasheets is not None else None,
             description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast or []],
+            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
             nacelle=self.nacelle.as_write() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
             name=self.name,
             power_curve=self.power_curve.as_write() if self.power_curve else None,
@@ -231,14 +231,22 @@ class WindTurbine(GeneratingUnit):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=[blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            blades=(
+                [blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades]
+                if self.blades is not None
+                else None
+            ),
             capacity=self.capacity,
-            datasheets=[
-                datasheet.as_write() if isinstance(datasheet, DomainModel) else datasheet
-                for datasheet in self.datasheets or []
-            ],
+            datasheets=(
+                [
+                    datasheet.as_write() if isinstance(datasheet, DomainModel) else datasheet
+                    for datasheet in self.datasheets
+                ]
+                if self.datasheets is not None
+                else None
+            ),
             description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast or []],
+            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
             nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
             name=self.name,
             power_curve=(

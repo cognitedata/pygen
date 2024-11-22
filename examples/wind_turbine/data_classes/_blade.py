@@ -124,7 +124,11 @@ class BladeGraphQL(GraphQLCore):
             ),
             is_damaged=self.is_damaged,
             name=self.name,
-            sensor_positions=[sensor_position.as_read() for sensor_position in self.sensor_positions or []],
+            sensor_positions=(
+                [sensor_position.as_read() for sensor_position in self.sensor_positions]
+                if self.sensor_positions is not None
+                else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking

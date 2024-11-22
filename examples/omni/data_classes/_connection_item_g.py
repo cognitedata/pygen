@@ -120,9 +120,11 @@ class ConnectionItemGGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            inwards_multi_property=[
-                inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=(
+                [inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property]
+                if self.inwards_multi_property is not None
+                else None
+            ),
             name=self.name,
         )
 
@@ -134,9 +136,11 @@ class ConnectionItemGGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            inwards_multi_property=[
-                inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=(
+                [inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property]
+                if self.inwards_multi_property is not None
+                else None
+            ),
             name=self.name,
         )
 
@@ -171,9 +175,11 @@ class ConnectionItemG(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            inwards_multi_property=[
-                inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []
-            ],
+            inwards_multi_property=(
+                [inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property]
+                if self.inwards_multi_property is not None
+                else None
+            ),
             name=self.name,
         )
 

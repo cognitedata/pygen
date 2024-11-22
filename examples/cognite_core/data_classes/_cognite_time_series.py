@@ -222,11 +222,11 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            activities=[activity.as_read() for activity in self.activities or []],
+            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
             aliases=self.aliases,
-            assets=[asset.as_read() for asset in self.assets or []],
+            assets=[asset.as_read() for asset in self.assets] if self.assets is not None else None,
             description=self.description,
-            equipment=[equipment.as_read() for equipment in self.equipment or []],
+            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
             is_step=self.is_step,
             name=self.name,
             source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
@@ -251,9 +251,9 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
             aliases=self.aliases,
-            assets=[asset.as_write() for asset in self.assets or []],
+            assets=[asset.as_write() for asset in self.assets] if self.assets is not None else None,
             description=self.description,
-            equipment=[equipment.as_write() for equipment in self.equipment or []],
+            equipment=[equipment.as_write() for equipment in self.equipment] if self.equipment is not None else None,
             is_step=self.is_step,
             name=self.name,
             source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
@@ -317,12 +317,20 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             aliases=self.aliases,
-            assets=[asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets or []],
+            assets=(
+                [asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets]
+                if self.assets is not None
+                else None
+            ),
             description=self.description,
-            equipment=[
-                equipment.as_write() if isinstance(equipment, DomainModel) else equipment
-                for equipment in self.equipment or []
-            ],
+            equipment=(
+                [
+                    equipment.as_write() if isinstance(equipment, DomainModel) else equipment
+                    for equipment in self.equipment
+                ]
+                if self.equipment is not None
+                else None
+            ),
             is_step=self.is_step,
             name=self.name,
             source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,

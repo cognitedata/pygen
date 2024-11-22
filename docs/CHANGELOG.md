@@ -13,13 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.51] - 24-11-22
 
 ### Fixed
 
 - Generating an SDK with a connection property with a source pointing to a non-existing target
   no longer raiser `AttributeError: 'NoneType' object has no attribute 'view_id'`. Instead, a warning is issued
   and the connection is skipped.
+- Generating an SDK with a listable direct relation property without source no longer raises 
+  `SyntaxError` when importing the generated SDK.
 
 ## [0.99.50] - 24-11-17
 ### Added

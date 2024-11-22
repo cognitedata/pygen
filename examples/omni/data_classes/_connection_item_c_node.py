@@ -122,8 +122,16 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
                 last_updated_time=self.data_record.last_updated_time,
                 created_time=self.data_record.created_time,
             ),
-            connection_item_a=[connection_item_a.as_read() for connection_item_a in self.connection_item_a or []],
-            connection_item_b=[connection_item_b.as_read() for connection_item_b in self.connection_item_b or []],
+            connection_item_a=(
+                [connection_item_a.as_read() for connection_item_a in self.connection_item_a]
+                if self.connection_item_a is not None
+                else None
+            ),
+            connection_item_b=(
+                [connection_item_b.as_read() for connection_item_b in self.connection_item_b]
+                if self.connection_item_b is not None
+                else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -134,8 +142,16 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=0),
-            connection_item_a=[connection_item_a.as_write() for connection_item_a in self.connection_item_a or []],
-            connection_item_b=[connection_item_b.as_write() for connection_item_b in self.connection_item_b or []],
+            connection_item_a=(
+                [connection_item_a.as_write() for connection_item_a in self.connection_item_a]
+                if self.connection_item_a is not None
+                else None
+            ),
+            connection_item_b=(
+                [connection_item_b.as_write() for connection_item_b in self.connection_item_b]
+                if self.connection_item_b is not None
+                else None
+            ),
         )
 
 
@@ -171,14 +187,22 @@ class ConnectionItemCNode(DomainModel):
             space=self.space,
             external_id=self.external_id,
             data_record=DataRecordWrite(existing_version=self.data_record.version),
-            connection_item_a=[
-                connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
-                for connection_item_a in self.connection_item_a or []
-            ],
-            connection_item_b=[
-                connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
-                for connection_item_b in self.connection_item_b or []
-            ],
+            connection_item_a=(
+                [
+                    connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
+                    for connection_item_a in self.connection_item_a
+                ]
+                if self.connection_item_a is not None
+                else None
+            ),
+            connection_item_b=(
+                [
+                    connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
+                    for connection_item_b in self.connection_item_b
+                ]
+                if self.connection_item_b is not None
+                else None
+            ),
         )
 
     def as_apply(self) -> ConnectionItemCNodeWrite:

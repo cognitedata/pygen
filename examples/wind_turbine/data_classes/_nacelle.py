@@ -124,7 +124,7 @@ class NacelleGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Nacelle", "1")
-    acc_from_back_side_x: Optional[str] = Field(default=None)
+    acc_from_back_side_x: Optional[dict] = Field(default=None)
     acc_from_back_side_y: Optional[SensorTimeSeriesGraphQL] = Field(default=None, repr=False)
     acc_from_back_side_z: Optional[SensorTimeSeriesGraphQL] = Field(default=None, repr=False)
     gearbox: Optional[GearboxGraphQL] = Field(default=None, repr=False)

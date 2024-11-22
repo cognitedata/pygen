@@ -142,7 +142,11 @@ class MetmastGraphQL(GraphQLCore):
             temperature=self.temperature.as_read() if self.temperature else None,
             tilt_angle=self.tilt_angle.as_read() if self.tilt_angle else None,
             wind_speed=self.wind_speed.as_read() if self.wind_speed else None,
-            wind_turbines=[wind_turbine.as_read() for wind_turbine in self.wind_turbines or []],
+            wind_turbines=(
+                [wind_turbine.as_read() for wind_turbine in self.wind_turbines]
+                if self.wind_turbines is not None
+                else None
+            ),
         )
 
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -157,7 +161,11 @@ class MetmastGraphQL(GraphQLCore):
             temperature=self.temperature.as_write() if self.temperature else None,
             tilt_angle=self.tilt_angle.as_write() if self.tilt_angle else None,
             wind_speed=self.wind_speed.as_write() if self.wind_speed else None,
-            wind_turbines=[wind_turbine.as_write() for wind_turbine in self.wind_turbines or []],
+            wind_turbines=(
+                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
+                if self.wind_turbines is not None
+                else None
+            ),
         )
 
 
@@ -203,7 +211,11 @@ class Metmast(DomainModel):
             wind_speed=(
                 self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed
             ),
-            wind_turbines=[wind_turbine.as_write() for wind_turbine in self.wind_turbines or []],
+            wind_turbines=(
+                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
+                if self.wind_turbines is not None
+                else None
+            ),
         )
 
     def as_apply(self) -> MetmastWrite:

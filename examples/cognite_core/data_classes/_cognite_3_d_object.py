@@ -180,11 +180,17 @@ class Cognite3DObjectGraphQL(GraphQLCore):
             ),
             aliases=self.aliases,
             asset=self.asset.as_read() if isinstance(self.asset, GraphQLCore) else self.asset,
-            cad_nodes=[cad_node.as_read() for cad_node in self.cad_nodes or []],
+            cad_nodes=[cad_node.as_read() for cad_node in self.cad_nodes] if self.cad_nodes is not None else None,
             description=self.description,
-            images_360=[images_360.as_read() for images_360 in self.images_360 or []],
+            images_360=(
+                [images_360.as_read() for images_360 in self.images_360] if self.images_360 is not None else None
+            ),
             name=self.name,
-            point_cloud_volumes=[point_cloud_volume.as_read() for point_cloud_volume in self.point_cloud_volumes or []],
+            point_cloud_volumes=(
+                [point_cloud_volume.as_read() for point_cloud_volume in self.point_cloud_volumes]
+                if self.point_cloud_volumes is not None
+                else None
+            ),
             tags=self.tags,
             x_max=self.x_max,
             x_min=self.x_min,
@@ -204,7 +210,9 @@ class Cognite3DObjectGraphQL(GraphQLCore):
             data_record=DataRecordWrite(existing_version=0),
             aliases=self.aliases,
             description=self.description,
-            images_360=[images_360.as_write() for images_360 in self.images_360 or []],
+            images_360=(
+                [images_360.as_write() for images_360 in self.images_360] if self.images_360 is not None else None
+            ),
             name=self.name,
             tags=self.tags,
             x_max=self.x_max,
@@ -265,7 +273,9 @@ class Cognite3DObject(CogniteDescribableNode):
             data_record=DataRecordWrite(existing_version=self.data_record.version),
             aliases=self.aliases,
             description=self.description,
-            images_360=[images_360.as_write() for images_360 in self.images_360 or []],
+            images_360=(
+                [images_360.as_write() for images_360 in self.images_360] if self.images_360 is not None else None
+            ),
             name=self.name,
             tags=self.tags,
             x_max=self.x_max,

@@ -194,8 +194,14 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "directNoSource",
-                'Optional[str] = Field(default=None, alias="directNoSource")',
+                'Optional[dict] = Field(default=None, alias="directNoSource")',
                 id="Single Direct, no source",
+            ),
+            pytest.param(
+                "ConnectionItemE",
+                "directListNoSource",
+                'Optional[list[dict]] = Field(default=None, alias="directListNoSource")',
+                id="List Direct, no source",
             ),
             pytest.param(
                 "ConnectionItemF",
@@ -247,7 +253,7 @@ class TestConnections:
                 "ConnectionItemA",
                 "outwards",
                 "[outward.as_write() if isinstance(outward, DomainModel) else outward "
-                "for outward in self.outwards or []]",
+                "for outward in self.outwards] if self.outwards is not None else None",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -266,7 +272,7 @@ class TestConnections:
                 "ConnectionItemB",
                 "inwards",
                 "[inward.as_write() if isinstance(inward, DomainModel) else inward "
-                "for inward in self.inwards or []]",
+                "for inward in self.inwards] if self.inwards is not None else None",
                 id="Inwards MultiEdge",
             ),
             pytest.param(
@@ -278,7 +284,8 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemG",
                 "inwardsMultiProperty",
-                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []]",
+                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property] "
+                "if self.inwards_multi_property is not None else None",
                 id="Inwards MultiEdge with properties",
             ),
             pytest.param(
@@ -319,7 +326,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "[outward.as_write() for outward in self.outwards or []]",
+                "[outward.as_write() for outward in self.outwards] if self.outwards is not None else None",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -337,7 +344,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemB",
                 "inwards",
-                "[inward.as_write() for inward in self.inwards or []]",
+                "[inward.as_write() for inward in self.inwards] if self.inwards is not None else None",
                 id="Inwards MultiEdge",
             ),
             pytest.param(
@@ -349,13 +356,15 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemF",
                 "outwardsMulti",
-                "[outwards_multi.as_write() for outwards_multi in self.outwards_multi or []]",
+                "[outwards_multi.as_write() for outwards_multi in self.outwards_multi] "
+                "if self.outwards_multi is not None else None",
                 id="Outwards MultiEdge with properties",
             ),
             pytest.param(
                 "ConnectionItemG",
                 "inwardsMultiProperty",
-                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property or []]",
+                "[inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property] "
+                "if self.inwards_multi_property is not None else None",
                 id="Inwards MultiEdge with properties",
             ),
             pytest.param(
@@ -396,7 +405,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemA",
                 "outwards",
-                "[outward.as_read() for outward in self.outwards or []]",
+                "[outward.as_read() for outward in self.outwards] if self.outwards is not None else None",
                 id="Outwards MultiEdge",
             ),
             pytest.param(
@@ -414,7 +423,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemB",
                 "inwards",
-                "[inward.as_read() for inward in self.inwards or []]",
+                "[inward.as_read() for inward in self.inwards] if self.inwards is not None else None",
                 id="Inwards MultiEdge",
             ),
             pytest.param(
@@ -426,13 +435,15 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemF",
                 "outwardsMulti",
-                "[outwards_multi.as_read() for outwards_multi in self.outwards_multi or []]",
+                "[outwards_multi.as_read() for outwards_multi in self.outwards_multi] "
+                "if self.outwards_multi is not None else None",
                 id="Outwards MultiEdge with properties",
             ),
             pytest.param(
                 "ConnectionItemG",
                 "inwardsMultiProperty",
-                "[inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property or []]",
+                "[inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property] "
+                "if self.inwards_multi_property is not None else None",
                 id="Inwards MultiEdge with properties",
             ),
             pytest.param(

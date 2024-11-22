@@ -133,7 +133,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
             other_direct=(
                 self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
-            outwards=[outward.as_read() for outward in self.outwards or []],
+            outwards=[outward.as_read() for outward in self.outwards] if self.outwards is not None else None,
             self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
@@ -149,7 +149,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
             other_direct=(
                 self.other_direct.as_write() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
             ),
-            outwards=[outward.as_write() for outward in self.outwards or []],
+            outwards=[outward.as_write() for outward in self.outwards] if self.outwards is not None else None,
             self_direct=self.self_direct.as_write() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
         )
 
@@ -192,9 +192,11 @@ class ConnectionItemA(DomainModel):
             other_direct=(
                 self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
             ),
-            outwards=[
-                outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards or []
-            ],
+            outwards=(
+                [outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards]
+                if self.outwards is not None
+                else None
+            ),
             self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
         )
 

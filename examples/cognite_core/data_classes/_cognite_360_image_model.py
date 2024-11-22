@@ -141,7 +141,9 @@ class Cognite360ImageModelGraphQL(GraphQLCore):
                 created_time=self.data_record.created_time,
             ),
             aliases=self.aliases,
-            collections=[collection.as_read() for collection in self.collections or []],
+            collections=(
+                [collection.as_read() for collection in self.collections] if self.collections is not None else None
+            ),
             description=self.description,
             name=self.name,
             tags=self.tags,

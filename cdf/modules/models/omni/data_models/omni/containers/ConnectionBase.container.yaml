@@ -28,3 +28,11 @@ properties:
     autoIncrement: false
     immutable: false
     name: direct2
+  directList:
+    type:
+      type: direct
+      list: true
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: directList
