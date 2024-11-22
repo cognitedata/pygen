@@ -532,6 +532,13 @@ class DataClass:
         return any(self.container_fields)
 
     @property
+    def has_connection_with_target(self) -> bool:
+        """Check if the data class has any connection fields with a target.
+        That is all connection fields minus direct relations without source specified.
+        """
+        return any(isinstance(field_, BaseConnectionField) and field_.destination_class for field_ in self)
+
+    @property
     def one_to_many_edges_without_properties(self) -> Iterable[OneToManyConnectionField]:
         """All MultiEdges without properties on the edge."""
         return (field_ for field_ in self.fields_of_type(OneToManyConnectionField) if field_.is_edge_without_properties)
