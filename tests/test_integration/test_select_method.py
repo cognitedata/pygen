@@ -187,10 +187,22 @@ def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) 
     assert len(result) == 2
 
 
-def test_select_latest_omni(omni_client: OmniClient) -> None:
-    items = omni_client.primitive_required.list(limit=-1)
-    latest = max(items, key=lambda x: x.timestamp)
+@pytest.fixture(scope="session")
+def primitive_required_list(omni_client: OmniClient) -> dc.PrimitiveRequiredList:
+    return omni_client.primitive_required.list(limit=-1)
+
+
+def test_select_latest_omni(omni_client: OmniClient, primitive_required_list) -> None:
+    latest = max(primitive_required_list, key=lambda x: x.timestamp)
 
     result = omni_client.primitive_required.select().timestamp.latest().list_full()
     assert len(result) == 1
     assert result[0].external_id == latest.external_id
+
+
+def test_select_earliest_omni(omni_client: OmniClient, primitive_required_list) -> None:
+    earliest = min(primitive_required_list, key=lambda x: x.timestamp)
+
+    result = omni_client.primitive_required.select().timestamp.earliest().list_primitive_required()
+    assert len(result) == 1
+    assert result[0].external_id == earliest.external_id

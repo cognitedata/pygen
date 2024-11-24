@@ -115,7 +115,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         return [item for item, _ in sorted(filters, key=lambda x: x[1])] if filters else None
 
     def _has_limit_1(self) -> bool:
-        return any(filter_cls.has_limit_1 for filter_cls in self._filter_classes)
+        return any(filter_cls._has_limit_1 for filter_cls in self._filter_classes)
 
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]
@@ -967,8 +967,20 @@ class Filtering(Generic[T_QueryCore], ABC):
         return self._sort, self._sort_priority or 0
 
     @property
-    def has_limit_1(self) -> bool:
+    def _has_limit_1(self) -> bool:
         return self._limit == 1
+    
+    def sort_ascending(self) -> T_QueryCore:
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "ascending")
+        self._sort_priority = self._get_sort_priority()
+        return self._query
+
+    def sort_descending(self) -> T_QueryCore:
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "descending")
+        self._sort_priority = self._get_sort_priority()
+        return self._query
 
 
 class StringFilter(Filtering[T_QueryCore]):
