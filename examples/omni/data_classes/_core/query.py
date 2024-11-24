@@ -114,6 +114,9 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
                 filters.append((item, priority))
         return [item for item, _ in sorted(filters, key=lambda x: x[1])] if filters else None
 
+    def _has_limit_1(self) -> bool:
+        return any(filter_cls.has_limit_1 for filter_cls in self._filter_classes)
+
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]
         edges = [step._connection_name or "missing" for step in self._creation_path[1:]]
@@ -176,9 +179,11 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
+        set_limit = builder[0].max_retrieve_limit
         for step in builder[:-1]:
             step.select = None
-        builder[-1].max_retrieve_limit = limit
+        # We cannot use the limit above, as the _create_query will set limit=1 if latest/earliest is used
+        builder[-1].max_retrieve_limit = set_limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 
@@ -205,7 +210,15 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     "implement this connection instead of a reverse direct relation"
                 )
             name = builder.create_name(from_)
-            max_retrieve_limit = limit if first else -1
+            if first and item._has_limit_1():
+                if limit != DEFAULT_QUERY_LIMIT:
+                    warnings.warn("When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2)
+                max_retrieve_limit = 1
+            elif first:
+                max_retrieve_limit = limit
+            else:
+                max_retrieve_limit = -1
+
             step: QueryStep
             if isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.NodeResultSetExpression):
                 step = NodeQueryStep(
@@ -943,6 +956,7 @@ class Filtering(Generic[T_QueryCore], ABC):
 
     @classmethod
     def _get_sort_priority(cls) -> int:
+        # This is used in case of multiple sorts, to ensure that the order is correct
         Filtering.counter += 1
         return Filtering.counter
 
@@ -951,6 +965,10 @@ class Filtering(Generic[T_QueryCore], ABC):
 
     def _as_sort(self) -> tuple[dm.InstanceSort | None, int]:
         return self._sort, self._sort_priority or 0
+
+    @property
+    def has_limit_1(self) -> bool:
+        return self._limit == 1
 
 
 class StringFilter(Filtering[T_QueryCore]):
