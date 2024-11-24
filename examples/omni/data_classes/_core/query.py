@@ -969,7 +969,7 @@ class Filtering(Generic[T_QueryCore], ABC):
     @property
     def _has_limit_1(self) -> bool:
         return self._limit == 1
-    
+
     def sort_ascending(self) -> T_QueryCore:
         self._raise_if_sort_set()
         self._sort = dm.InstanceSort(self._prop_path, "ascending")
