@@ -200,7 +200,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             if is_last_reverse_list:
                 raise ValueError(
                     "Cannot traverse past reverse direct relation of list. "
-                    "This is a limitation of the modeling implementation in your data model."
+                    "This is a limitation with the modeling implementation of your data model."
                     "To do this query, you need to reimplement the data model and use an edge to "
                     "implement this connection instead of a reverse direct relation"
                 )
@@ -231,6 +231,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     expression=dm.query.NodeResultSetExpression(
                         from_=edge_name,
                         filter=item._assemble_filter(),
+                        sort=item._create_sort(),
                     ),
                     result_cls=item._result_cls,
                 )
@@ -243,6 +244,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
+                step.expression.sort = item._create_sort()
                 builder.append(step)
             else:
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
