@@ -504,7 +504,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
         resources.nodes.append(this_node)
         {% endif %}
 
-        {% if data_class.container_fields_writable %}
+        {% if data_class.has_container_fields_writable %}
         properties: dict[str, Any] = {}
 
         {% for field in data_class.container_fields_writable %}
