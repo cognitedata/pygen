@@ -586,26 +586,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
                 "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
             }
 
-        if self.path is not None:
-            properties["path"] = [
-                {
-                    "space": self.space if isinstance(path, str) else path.space,
-                    "externalId": path if isinstance(path, str) else path.external_id,
-                }
-                for path in self.path or []
-            ]
-
-        if self.path_last_updated_time is not None or write_none:
-            properties["pathLastUpdatedTime"] = (
-                self.path_last_updated_time.isoformat(timespec="milliseconds") if self.path_last_updated_time else None
-            )
-
-        if self.root is not None:
-            properties["root"] = {
-                "space": self.space if isinstance(self.root, str) else self.root.space,
-                "externalId": self.root if isinstance(self.root, str) else self.root.external_id,
-            }
-
         if self.source is not None:
             properties["source"] = {
                 "space": self.space if isinstance(self.source, str) else self.source.space,
