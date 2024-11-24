@@ -4,6 +4,7 @@ from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite_core.data_classes import CogniteFileWrite
 from omni import data_classes as dc
 from pydantic import TypeAdapter
 from wind_turbine.data_classes import DomainModelWrite as WindDomainModelWrite
@@ -190,3 +191,14 @@ def _recursive_exclude(d: dict, exclude: set[str]) -> None:
                     _recursive_exclude(item, exclude)
         elif key in exclude:
             d.pop(key)
+
+
+def test_cognite_file_as_nodes() -> None:
+    # CogniteFile and CogniteAsset has read-only properties that can cause issus.
+    obj = CogniteFileWrite(
+        external_id="test_cognite_file_as_nodes", source_id="source_id", mime_type="application/json", directory="/tmp"
+    )
+
+    resources = obj.to_instances_write()
+
+    assert len(resources.nodes) == 1

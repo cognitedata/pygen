@@ -465,9 +465,6 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         if self.directory is not None or write_none:
             properties["directory"] = self.directory
 
-        if self.is_uploaded is not None or write_none:
-            properties["isUploaded"] = self.is_uploaded
-
         if self.mime_type is not None or write_none:
             properties["mimeType"] = self.mime_type
 
@@ -504,11 +501,6 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
 
         if self.tags is not None or write_none:
             properties["tags"] = self.tags
-
-        if self.uploaded_time is not None or write_none:
-            properties["uploadedTime"] = (
-                self.uploaded_time.isoformat(timespec="milliseconds") if self.uploaded_time else None
-            )
 
         if properties:
             this_node = dm.NodeApply(

@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.52] - 24-11-24
+### Fixed
+- Calling `.upsert` with `CogniteAsset` or `CogniteFile` or any extension of these no longer raises an
+  `AttributeError`.
+
 ## [0.99.51] - 24-11-22
 
 ### Fixed
