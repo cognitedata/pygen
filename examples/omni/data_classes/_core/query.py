@@ -911,10 +911,11 @@ T_QueryCore = TypeVar("T_QueryCore")
 
 
 class Filtering(Generic[T_QueryCore], ABC):
-    def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]):
+    def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]) -> None:
         self._query = query
         self._prop_path = prop_path
         self._filter: dm.Filter | None = None
+        self._sort: Literal["ascending", "descending"] | None = None
 
     def _raise_if_filter_set(self):
         if self._filter is not None:
@@ -970,6 +971,18 @@ class TimestampFilter(Filtering[T_QueryCore]):
             gte=gte.isoformat(timespec="milliseconds") if gte else None,
             lte=lte.isoformat(timespec="milliseconds") if lte else None,
         )
+        return self._query
+
+    def earliest(self) -> T_QueryCore:
+        if self._sort is not None:
+            raise ValueError(".earliest() or .latest() can only be called once")
+        self._sort = "ascending"
+        return self._query
+
+    def latest(self) -> T_QueryCore:
+        if self._sort is not None:
+            raise ValueError(".earliest() or .latest() can only be called once")
+        self._sort = "descending"
         return self._query
 
 
