@@ -204,7 +204,7 @@ class {{ data_class.write_name }}(DomainRelationWrite{% if data_class.has_any_fi
         external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
 
         properties: dict[str, Any]  = {}
-        {% for field in data_class.container_fields %}
+        {% for field in data_class.container_fields_writable %}
 
         if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             properties["{{ field.prop_name }}"] = {{ field.as_value() }}

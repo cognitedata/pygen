@@ -503,6 +503,11 @@ class DataClass:
         return any(self.container_fields)
 
     @property
+    def has_container_fields_writable(self) -> bool:
+        """Check if the data class has any container fields that are writable."""
+        return any(self.container_fields_writable)
+
+    @property
     def has_connection_with_target(self) -> bool:
         """Check if the data class has any connection fields with a target.
         That is all connection fields minus direct relations without source specified.
@@ -521,6 +526,11 @@ class DataClass:
             if isinstance(field_, BasePrimitiveField)
             or (isinstance(field_, BaseConnectionField) and field_.is_direct_relation)
         )
+
+    @property
+    def container_fields_writable(self) -> Iterable[Field]:
+        """Container fields that are writable."""
+        return (field_ for field_ in self.container_fields if field_.is_write_field)
 
     def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
         """Return all container fields sorted by type."""
