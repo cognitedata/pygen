@@ -212,7 +212,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             name = builder.create_name(from_)
             if first and item._has_limit_1():
                 if limit != DEFAULT_QUERY_LIMIT:
-                    warnings.warn("When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2)
+                    warnings.warn(
+                        "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
+                    )
                 max_retrieve_limit = 1
             elif first:
                 max_retrieve_limit = limit
