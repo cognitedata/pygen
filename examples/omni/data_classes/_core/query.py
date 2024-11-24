@@ -106,6 +106,14 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
                 filters.append(item)
         return dm.filters.And(*filters) if filters else None
 
+    def _create_sort(self) -> list[dm.InstanceSort] | None:
+        filters: list[tuple[dm.InstanceSort, int]] = []
+        for filter_cls in self._filter_classes:
+            item, priority = filter_cls._as_sort()
+            if item:
+                filters.append((item, priority))
+        return [item for item, _ in sorted(filters, key=lambda x: x[1])] if filters else None
+
     def _repr_html_(self) -> str:
         nodes = [step._result_cls.__name__ for step in self._creation_path]
         edges = [step._connection_name or "missing" for step in self._creation_path[1:]]
@@ -209,6 +217,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
+                step.expression.sort = item._create_sort()
                 builder.append(step)
             elif isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.EdgeResultSetExpression):
                 edge_name = name
@@ -911,18 +920,35 @@ T_QueryCore = TypeVar("T_QueryCore")
 
 
 class Filtering(Generic[T_QueryCore], ABC):
+    counter: ClassVar[int] = 0
+
     def __init__(self, query: T_QueryCore, prop_path: list[str] | tuple[str, ...]) -> None:
         self._query = query
         self._prop_path = prop_path
         self._filter: dm.Filter | None = None
-        self._sort: Literal["ascending", "descending"] | None = None
+        self._sort: dm.InstanceSort | None = None
+        self._sort_priority: int | None = None
+        # Used for earliest/latest
+        self._limit: int | None = None
 
     def _raise_if_filter_set(self):
         if self._filter is not None:
             raise ValueError("Filter has already been set")
 
+    def _raise_if_sort_set(self):
+        if self._sort is not None:
+            raise ValueError("Sort has already been set")
+
+    @classmethod
+    def _get_sort_priority(cls) -> int:
+        Filtering.counter += 1
+        return Filtering.counter
+
     def _as_filter(self) -> dm.Filter | None:
         return self._filter
+
+    def _as_sort(self) -> tuple[dm.InstanceSort | None, int]:
+        return self._sort, self._sort_priority or 0
 
 
 class StringFilter(Filtering[T_QueryCore]):
@@ -974,15 +1000,17 @@ class TimestampFilter(Filtering[T_QueryCore]):
         return self._query
 
     def earliest(self) -> T_QueryCore:
-        if self._sort is not None:
-            raise ValueError(".earliest() or .latest() can only be called once")
-        self._sort = "ascending"
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "ascending")
+        self._sort_priority = self._get_sort_priority()
+        self._limit = 1
         return self._query
 
     def latest(self) -> T_QueryCore:
-        if self._sort is not None:
-            raise ValueError(".earliest() or .latest() can only be called once")
-        self._sort = "descending"
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "descending")
+        self._sort_priority = self._get_sort_priority()
+        self._limit = 1
         return self._query
 
 
@@ -994,4 +1022,18 @@ class DateFilter(Filtering[T_QueryCore]):
             gte=gte.isoformat() if gte else None,
             lte=lte.isoformat() if lte else None,
         )
+        return self._query
+
+    def earliest(self) -> T_QueryCore:
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "ascending")
+        self._sort_priority = self._get_sort_priority()
+        self._limit = 1
+        return self._query
+
+    def latest(self) -> T_QueryCore:
+        self._raise_if_sort_set()
+        self._sort = dm.InstanceSort(self._prop_path, "descending")
+        self._sort_priority = self._get_sort_priority()
+        self._limit = 1
         return self._query
