@@ -185,3 +185,38 @@ def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) 
         .list_full(limit=2)
     )
     assert len(result) == 2
+
+
+@pytest.fixture(scope="session")
+def primitive_required_list(omni_client: OmniClient) -> dc.PrimitiveRequiredList:
+    return omni_client.primitive_required.list(limit=-1)
+
+
+def test_select_latest_omni(omni_client: OmniClient, primitive_required_list) -> None:
+    latest = max(primitive_required_list, key=lambda x: x.timestamp)
+
+    result = omni_client.primitive_required.select().timestamp.latest().list_full()
+    assert len(result) == 1
+    assert result[0].external_id == latest.external_id
+
+
+def test_select_earliest_omni(omni_client: OmniClient, primitive_required_list) -> None:
+    earliest = min(primitive_required_list, key=lambda x: x.timestamp)
+
+    result = omni_client.primitive_required.select().timestamp.earliest().list_primitive_required()
+    assert len(result) == 1
+    assert result[0].external_id == earliest.external_id
+
+
+def test_select_sort_ascending(omni_client: OmniClient, primitive_required_list: dc.PrimitiveRequiredList) -> None:
+    sorted_list = sorted(primitive_required_list, key=lambda x: x.timestamp)
+    result = omni_client.primitive_required.select().timestamp.sort_ascending().list_full()
+
+    assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
+
+
+def test_select_sort_descending(omni_client: OmniClient, primitive_required_list: dc.PrimitiveRequiredList) -> None:
+    sorted_list = sorted(primitive_required_list, key=lambda x: x.timestamp, reverse=True)
+    result = omni_client.primitive_required.select().timestamp.sort_descending().list_full()
+
+    assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
