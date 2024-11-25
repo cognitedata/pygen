@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.53] - 24-11-25
+### Added
+- The `.select()` method now supports sorting on properties. For example,
+  `pygen.wind_turbine.select().name.sort_ascending().list_wind_turbine().
+- In the `.select()` method, Timestamp and date properties supports `.latest()` and `.earliest()` as a shorthand
+  for sorting and setting the limit to 1. For example,
+  `pygen.wind_turbine.select().datasheets.uploaded_time.latests().list_datasheets()` will return the latest uploaded
+  datasheet for all wind turbines.
+
 ## [0.99.52] - 24-11-24
 ### Fixed
 - Calling `.upsert` with `CogniteAsset` or `CogniteFile` or any extension of these no longer raises an
