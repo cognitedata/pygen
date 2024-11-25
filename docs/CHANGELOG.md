@@ -19,7 +19,7 @@ Changes are grouped as follows
   `pygen.wind_turbine.select().name.sort_ascending().list_wind_turbine().
 - In the `.select()` method, Timestamp and date properties supports `.latest()` and `.earliest()` as a shorthand
   for sorting and setting the limit to 1. For example,
-  `pygen.wind_turbine.select().datasheets.uploaded_time.latests().list_datasheets()` will return the latest uploaded
+  `pygen.wind_turbine.select().datasheets.uploaded_time.latest().list_data_sheet()` will return the latest uploaded
   datasheet for all wind turbines.
 
 ## [0.99.52] - 24-11-24
