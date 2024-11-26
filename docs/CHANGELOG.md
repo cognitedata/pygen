@@ -16,8 +16,8 @@ Changes are grouped as follows
 ## [0.99.54] - 24-11-26
 ### Fixed
 - Calling `.retrieve(...)` on a view with one-to-many connections no longer raises a `NameError`.
-- Calling `.upsert(...)` on a view with a dependency on a CogniteAsset or CogniteFile
-  (or any extension of these) no longer raises an `AttributeError`.
+- Calling `.upsert(...)` on a view with a dependency on a CogniteAsset or any extension of it
+  no longer raises an `AttributeError`.
 
 ## [0.99.53] - 24-11-25
 ### Added

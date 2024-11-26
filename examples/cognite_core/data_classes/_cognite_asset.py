@@ -651,10 +651,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
             other_resources = self.parent._to_instances_write(cache)
             resources.extend(other_resources)
 
-        if isinstance(self.root, DomainModelWrite):
-            other_resources = self.root._to_instances_write(cache)
-            resources.extend(other_resources)
-
         if isinstance(self.source, DomainModelWrite):
             other_resources = self.source._to_instances_write(cache)
             resources.extend(other_resources)
@@ -662,11 +658,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         if isinstance(self.type_, DomainModelWrite):
             other_resources = self.type_._to_instances_write(cache)
             resources.extend(other_resources)
-
-        for path in self.path or []:
-            if isinstance(path, DomainModelWrite):
-                other_resources = path._to_instances_write(cache)
-                resources.extend(other_resources)
 
         return resources
 
