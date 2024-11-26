@@ -270,7 +270,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 {% endfor %}
                                                ]
             {% if data_class.direct_children %},
-            as_child_class=as_child_clas
+            as_child_class=as_child_class
             {% endif %}
         )
         {% else %}
