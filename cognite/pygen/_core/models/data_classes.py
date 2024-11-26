@@ -581,6 +581,11 @@ class DataClass:
         )
 
     @property
+    def one_to_one_direct_relations_with_source_writable(self) -> Iterable[OneToOneConnectionField]:
+        """All direct relations."""
+        return (field_ for field_ in self.one_to_one_direct_relations_with_source if field_.is_write_field)
+
+    @property
     def one_to_one_reverse_direct_relation(self) -> Iterable[OneToOneConnectionField]:
         """All one to one reverse direct relations."""
         return (
@@ -597,6 +602,11 @@ class DataClass:
             for field_ in self.fields_of_type(OneToManyConnectionField)
             if field_.is_direct_relation and field_.destination_class
         )
+
+    @property
+    def one_to_many_direct_relations_with_source_writable(self) -> Iterable[OneToManyConnectionField]:
+        """All direct relations."""
+        return (field_ for field_ in self.one_to_many_direct_relations_with_source if field_.is_write_field)
 
     @property
     def one_to_many_reverse_direct_relations(self) -> Iterable[OneToManyConnectionField]:
