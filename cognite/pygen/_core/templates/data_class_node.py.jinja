@@ -574,13 +574,13 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
             resources.extend(other_resources)
 
         {% endfor %}
-        {% for field in data_class.one_to_one_direct_relations_with_source %}
+        {% for field in data_class.one_to_one_direct_relations_with_source_writeable %}
         if isinstance(self.{{ field.name }}, DomainModelWrite):
             other_resources = self.{{ field.name }}._to_instances_write(cache)
             resources.extend(other_resources)
 
         {% endfor %}
-        {% for field in data_class.one_to_many_direct_relations_with_source %}
+        {% for field in data_class.one_to_many_direct_relations_with_source_writable %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainModelWrite):
                 other_resources = {{ field.variable }}._to_instances_write(cache)
