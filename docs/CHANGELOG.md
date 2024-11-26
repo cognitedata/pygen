@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+### TBD
+### Fixed
+- Calling `.retrieve(...)` on a view with one-to-many connections no longer raises an `AttributeError`.
+
 ## [0.99.53] - 24-11-25
 ### Added
 - The `.select()` method now supports sorting on properties. For example,
