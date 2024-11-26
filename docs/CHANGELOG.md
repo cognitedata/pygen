@@ -15,7 +15,7 @@ Changes are grouped as follows
 
 ### TBD
 ### Fixed
-- Calling `.retrieve(...)` on a view with one-to-many connections no longer raises an `AttributeError`.
+- Calling `.retrieve(...)` on a view with one-to-many connections no longer raises a `NameError`.
 
 ## [0.99.53] - 24-11-25
 ### Added
