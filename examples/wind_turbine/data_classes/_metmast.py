@@ -32,6 +32,7 @@ from wind_turbine.data_classes._core import (
     TimeSeries,
     TimeSeriesWrite,
     TimeSeriesGraphQL,
+    TimeSeriesReferenceAPI,
     T_DomainModelList,
     as_direct_relation_reference,
     as_instance_dict_id,
@@ -512,6 +513,33 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
                 self.external_id,
                 self.position,
             ]
+        )
+        self.temperature = TimeSeriesReferenceAPI(
+            client,
+            lambda limit: [
+                item.temperature if isinstance(item.temperature, str) else item.temperature.external_id  # type: ignore[misc]
+                for item in self._list(limit=limit)
+                if item.temperature is not None
+                and (isinstance(item.temperature, str) or item.temperature.external_id is not None)
+            ],
+        )
+        self.tilt_angle = TimeSeriesReferenceAPI(
+            client,
+            lambda limit: [
+                item.tilt_angle if isinstance(item.tilt_angle, str) else item.tilt_angle.external_id  # type: ignore[misc]
+                for item in self._list(limit=limit)
+                if item.tilt_angle is not None
+                and (isinstance(item.tilt_angle, str) or item.tilt_angle.external_id is not None)
+            ],
+        )
+        self.wind_speed = TimeSeriesReferenceAPI(
+            client,
+            lambda limit: [
+                item.wind_speed if isinstance(item.wind_speed, str) else item.wind_speed.external_id  # type: ignore[misc]
+                for item in self._list(limit=limit)
+                if item.wind_speed is not None
+                and (isinstance(item.wind_speed, str) or item.wind_speed.external_id is not None)
+            ],
         )
 
     def list_metmast(self, limit: int = DEFAULT_QUERY_LIMIT) -> MetmastList:

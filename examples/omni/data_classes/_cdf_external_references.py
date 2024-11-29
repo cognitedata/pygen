@@ -35,6 +35,7 @@ from omni.data_classes._core import (
     TimeSeries,
     TimeSeriesWrite,
     TimeSeriesGraphQL,
+    TimeSeriesReferenceAPI,
     SequenceRead,
     SequenceWrite,
     SequenceGraphQL,
@@ -351,6 +352,15 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.timeseries = TimeSeriesReferenceAPI(
+            client,
+            lambda limit: [
+                item.timeseries if isinstance(item.timeseries, str) else item.timeseries.external_id  # type: ignore[misc]
+                for item in self._list(limit=limit)
+                if item.timeseries is not None
+                and (isinstance(item.timeseries, str) or item.timeseries.external_id is not None)
+            ],
+        )
 
     def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
         return self._list(limit=limit)

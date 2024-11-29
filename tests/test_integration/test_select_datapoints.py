@@ -13,3 +13,12 @@ def test_retrieve_dataframe(turbine_client: WindTurbineClient) -> None:
 
     assert not df.empty
     assert len(df) == 10
+
+
+def test_retrieve_dataframe_classic(turbine_client: WindTurbineClient) -> None:
+    df = turbine_client.metmast.select().wind_speed.data.retrieve_dataframe(
+        limit=10,
+        timeseries_limit=100,
+    )
+
+    assert list(df.columns)
