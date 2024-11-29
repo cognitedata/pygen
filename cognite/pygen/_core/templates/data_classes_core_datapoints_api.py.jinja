@@ -18,7 +18,12 @@ class TimeSeriesReferenceAPI:
 
 
 class DataPointsAPI:
-    def __init__(self, client: CogniteClient, get_node_ids: Callable[[int], list[NodeId]] | None = None, get_external_ids: Callable[[int], list[str]] | None = None) -> None:
+    def __init__(
+        self,
+        client: CogniteClient,
+        get_node_ids: Callable[[int], list[NodeId]] | None = None,
+        get_external_ids: Callable[[int], list[str]] | None = None,
+    ) -> None:
         if sum(1 for x in [get_node_ids, get_external_ids] if x) != 1:
             raise ValueError("Either get_node_ids or get_external_ids must be provided.")
         self._client = client

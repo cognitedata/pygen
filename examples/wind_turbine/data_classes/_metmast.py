@@ -470,12 +470,14 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
             for item in self._list(limit=limit)
             if item.temperature is not None and
                (isinstance(item.temperature, str) or item.temperature.external_id is not None)
-        ])        self.tilt_angle = TimeSeriesReferenceAPI(client,  lambda limit: [
+        ])
+        self.tilt_angle = TimeSeriesReferenceAPI(client,  lambda limit: [
             item.tilt_angle if isinstance(item.tilt_angle, str) else item.tilt_angle.external_id #type: ignore[misc]
             for item in self._list(limit=limit)
             if item.tilt_angle is not None and
                (isinstance(item.tilt_angle, str) or item.tilt_angle.external_id is not None)
-        ])        self.wind_speed = TimeSeriesReferenceAPI(client,  lambda limit: [
+        ])
+        self.wind_speed = TimeSeriesReferenceAPI(client,  lambda limit: [
             item.wind_speed if isinstance(item.wind_speed, str) else item.wind_speed.external_id #type: ignore[misc]
             for item in self._list(limit=limit)
             if item.wind_speed is not None and
