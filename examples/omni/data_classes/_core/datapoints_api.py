@@ -9,6 +9,7 @@ from cognite.client.utils._time import ZoneInfo
 
 from omni.data_classes._core.constants import DEFAULT_QUERY_LIMIT
 
+
 class TimeSeriesReferenceAPI:
     def __init__(self, client: CogniteClient, get_external_ids: Callable[[int], list[str]]) -> None:
         # This is a thin API. The reason to have it is to have a consistent way to retrieve data
@@ -17,7 +18,12 @@ class TimeSeriesReferenceAPI:
 
 
 class DataPointsAPI:
-    def __init__(self, client: CogniteClient, get_node_ids: Callable[[int], list[NodeId]] | None = None, get_external_ids: Callable[[int], list[str]] | None = None) -> None:
+    def __init__(
+        self,
+        client: CogniteClient,
+        get_node_ids: Callable[[int], list[NodeId]] | None = None,
+        get_external_ids: Callable[[int], list[str]] | None = None,
+    ) -> None:
         if sum(1 for x in [get_node_ids, get_external_ids] if x) != 1:
             raise ValueError("Either get_node_ids or get_external_ids must be provided.")
         self._client = client

@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.55] - 24-11-29
+
+### Added
+- Support for referenced timeseries in `.select()` method.
+
 ## [0.99.54] - 24-11-26
 ### Fixed
 - Calling `.retrieve(...)` on a view with one-to-many connections no longer raises a `NameError`.

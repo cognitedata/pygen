@@ -10,10 +10,25 @@ from cognite.client.utils._time import ZoneInfo
 from wind_turbine.data_classes._core.constants import DEFAULT_QUERY_LIMIT
 
 
+class TimeSeriesReferenceAPI:
+    def __init__(self, client: CogniteClient, get_external_ids: Callable[[int], list[str]]) -> None:
+        # This is a thin API. The reason to have it is to have a consistent way to retrieve data
+        # from time series with reference compared to extensions of CogniteTimeSeries.
+        self.data = DataPointsAPI(client, get_external_ids=get_external_ids)
+
+
 class DataPointsAPI:
-    def __init__(self, client: CogniteClient, get_node_ids: Callable[[int], list[NodeId]]) -> None:
+    def __init__(
+        self,
+        client: CogniteClient,
+        get_node_ids: Callable[[int], list[NodeId]] | None = None,
+        get_external_ids: Callable[[int], list[str]] | None = None,
+    ) -> None:
+        if sum(1 for x in [get_node_ids, get_external_ids] if x) != 1:
+            raise ValueError("Either get_node_ids or get_external_ids must be provided.")
         self._client = client
         self._get_node_ids = get_node_ids
+        self._get_external_ids = get_external_ids
 
     def retrieve_dataframe(
         self,
@@ -71,10 +86,16 @@ class DataPointsAPI:
             When retrieving raw datapoints with ``ignore_bad_datapoints=False``, bad datapoints with the value NaN can not be distinguished from those
             missing a value (due to being stored in a numpy array); all will become NaNs in the dataframe.
         """
-        node_ids = self._get_node_ids(timeseries_limit)
-        if not node_ids:
+        external_ids: list[str] | None = None
+        node_ids: list[NodeId] | None = None
+        if self._get_external_ids:
+            external_ids = self._get_external_ids(timeseries_limit)
+        if self._get_node_ids:
+            node_ids = self._get_node_ids(timeseries_limit)
+        if not node_ids and not external_ids:
             return pd.DataFrame()
         return self._client.time_series.data.retrieve_dataframe(
+            external_id=external_ids,
             instance_id=node_ids,
             start=start,
             end=end,
