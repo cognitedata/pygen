@@ -265,3 +265,18 @@ def test_generate_sensor_time_series(
 
     # Assert
     assert actual == expected
+
+
+def test_generate_metmast(turbine_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter) -> None:
+    # Arrange
+    api_generator = turbine_multi_api_generator.api_by_type_by_view_id["node"][
+        dm.ViewId("sp_pygen_power", "Metmast", "1")
+    ]
+    expected = WindTurbineFiles.data_metmast.read_text()
+
+    # Act
+    actual = api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
