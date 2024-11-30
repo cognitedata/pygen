@@ -367,13 +367,13 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
                 instance.source = source
             if instance.assets:
                 new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for relation in instance.assets:
-                    if isinstance(relation, CogniteAsset):
-                        new_assets.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteAsset):
+                for asset in instance.assets:
+                    if isinstance(asset, CogniteAsset):
+                        new_assets.append(asset)
+                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
                         new_assets.append(other)
                     else:
-                        new_assets.append(relation)
+                        new_assets.append(asset)
                 instance.assets = new_assets
         for node in nodes_by_id.values():
             if isinstance(node, CogniteEquipment) and node.files is not None:

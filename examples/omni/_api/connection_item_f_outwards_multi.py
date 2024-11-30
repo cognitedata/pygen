@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 
 from cognite.client import data_modeling as dm
 

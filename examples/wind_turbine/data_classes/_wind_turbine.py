@@ -293,23 +293,23 @@ class WindTurbine(GeneratingUnit):
                 instance.rotor = rotor
             if instance.blades:
                 new_blades: list[Blade | str | dm.NodeId] = []
-                for relation in instance.blades:
-                    if isinstance(relation, Blade):
-                        new_blades.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, Blade):
+                for blade in instance.blades:
+                    if isinstance(blade, Blade):
+                        new_blades.append(blade)
+                    elif (other := nodes_by_id.get(blade)) and isinstance(other, Blade):
                         new_blades.append(other)
                     else:
-                        new_blades.append(relation)
+                        new_blades.append(blade)
                 instance.blades = new_blades
             if instance.datasheets:
                 new_datasheets: list[DataSheet | str | dm.NodeId] = []
-                for relation in instance.datasheets:
-                    if isinstance(relation, DataSheet):
-                        new_datasheets.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, DataSheet):
+                for datasheet in instance.datasheets:
+                    if isinstance(datasheet, DataSheet):
+                        new_datasheets.append(datasheet)
+                    elif (other := nodes_by_id.get(datasheet)) and isinstance(other, DataSheet):
                         new_datasheets.append(other)
                     else:
-                        new_datasheets.append(relation)
+                        new_datasheets.append(datasheet)
                 instance.datasheets = new_datasheets
             if edges := edges_by_source_node.get(instance.as_id()):
                 metmast: list[Distance] = []

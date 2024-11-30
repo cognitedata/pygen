@@ -247,13 +247,13 @@ class ConnectionItemF(DomainModel):
         for instance in instances.values():
             if instance.direct_list:
                 new_direct_list: list[ConnectionItemD | str | dm.NodeId] = []
-                for relation in instance.direct_list:
-                    if isinstance(relation, ConnectionItemD):
-                        new_direct_list.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemD):
+                for direct_list in instance.direct_list:
+                    if isinstance(direct_list, ConnectionItemD):
+                        new_direct_list.append(direct_list)
+                    elif (other := nodes_by_id.get(direct_list)) and isinstance(other, ConnectionItemD):
                         new_direct_list.append(other)
                     else:
-                        new_direct_list.append(relation)
+                        new_direct_list.append(direct_list)
                 instance.direct_list = new_direct_list
             if edges := edges_by_source_node.get(instance.as_id()):
                 outwards_multi: list[ConnectionEdgeA] = []

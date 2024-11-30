@@ -380,33 +380,33 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
                 instance.source = source
             if instance.assets:
                 new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for relation in instance.assets:
-                    if isinstance(relation, CogniteAsset):
-                        new_assets.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteAsset):
+                for asset in instance.assets:
+                    if isinstance(asset, CogniteAsset):
+                        new_assets.append(asset)
+                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
                         new_assets.append(other)
                     else:
-                        new_assets.append(relation)
+                        new_assets.append(asset)
                 instance.assets = new_assets
             if instance.equipment:
                 new_equipment: list[CogniteEquipment | str | dm.NodeId] = []
-                for relation in instance.equipment:
-                    if isinstance(relation, CogniteEquipment):
-                        new_equipment.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteEquipment):
+                for equipment in instance.equipment:
+                    if isinstance(equipment, CogniteEquipment):
+                        new_equipment.append(equipment)
+                    elif (other := nodes_by_id.get(equipment)) and isinstance(other, CogniteEquipment):
                         new_equipment.append(other)
                     else:
-                        new_equipment.append(relation)
+                        new_equipment.append(equipment)
                 instance.equipment = new_equipment
             if instance.time_series:
                 new_time_series: list[CogniteTimeSeries | str | dm.NodeId] = []
-                for relation in instance.time_series:
-                    if isinstance(relation, CogniteTimeSeries):
-                        new_time_series.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteTimeSeries):
+                for time_series in instance.time_series:
+                    if isinstance(time_series, CogniteTimeSeries):
+                        new_time_series.append(time_series)
+                    elif (other := nodes_by_id.get(time_series)) and isinstance(other, CogniteTimeSeries):
                         new_time_series.append(other)
                     else:
-                        new_time_series.append(relation)
+                        new_time_series.append(time_series)
                 instance.time_series = new_time_series
 
 
