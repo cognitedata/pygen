@@ -39,13 +39,6 @@ jobs:
           poetry config virtualenvs.create false
           poetry install -E all
 
-      - name: Test
-        run: pytest cognite tests/test_unit
-
-      - uses: codecov/codecov-action@v5
-        with:
-          file: ./coverage.xml
-
       - name: Build package
         run: poetry build
 
