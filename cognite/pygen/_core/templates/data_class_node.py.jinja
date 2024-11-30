@@ -246,6 +246,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     {% endfor %}
 
 {% if data_class.is_writable or data_class.is_interface %}
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(

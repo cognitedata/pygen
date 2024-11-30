@@ -363,6 +363,8 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
     type_: Union[CogniteAssetType, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
         return CogniteAssetWrite(
