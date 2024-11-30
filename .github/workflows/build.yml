@@ -21,13 +21,6 @@ jobs:
           poetry config virtualenvs.create false
           # Necessary for running the mypy pre-commit hook
           poetry install -E all
-      - name: Run MyPy
-        continue-on-error: true
-        # MyPy complains about missing properties when using multiple inheritance
-        # Running it twice seems to resolve the issue
-        run: pre-commit run --all-files
-      - uses: pre-commit/action@v3.0.1
-        continue-on-error: true
       - uses: pre-commit/action@v3.0.1
 
   build-docs:
