@@ -38,6 +38,7 @@ from cognite_core.data_classes._core import (
     IntFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_annotation import CogniteAnnotation, CogniteAnnotationWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_source_system import (
@@ -284,7 +285,7 @@ class CogniteDiagramAnnotationGraphQL(GraphQLCore):
         )
 
 
-class CogniteDiagramAnnotation(DomainRelation):
+class CogniteDiagramAnnotation(CogniteAnnotation):
     """This represents the reading version of Cognite diagram annotation.
 
     It is used to when data is retrieved from CDF.
@@ -391,7 +392,7 @@ class CogniteDiagramAnnotation(DomainRelation):
         return self.as_write()
 
 
-class CogniteDiagramAnnotationWrite(DomainRelationWrite):
+class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
     """This represents the writing version of Cognite diagram annotation.
 
     It is used to when data is sent to CDF.

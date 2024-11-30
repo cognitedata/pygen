@@ -37,6 +37,7 @@ from cognite_core.data_classes._core import (
     FloatFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_annotation import CogniteAnnotation, CogniteAnnotationWrite
 from cognite_core.data_classes._cognite_3_d_object import Cognite3DObjectWrite
 from cognite_core.data_classes._cognite_360_image import Cognite360Image, Cognite360ImageGraphQL, Cognite360ImageWrite
 
@@ -218,7 +219,7 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
         )
 
 
-class Cognite360ImageAnnotation(DomainRelation):
+class Cognite360ImageAnnotation(CogniteAnnotation):
     """This represents the reading version of Cognite 360 image annotation.
 
     It is used to when data is retrieved from CDF.
@@ -284,7 +285,7 @@ class Cognite360ImageAnnotation(DomainRelation):
         return self.as_write()
 
 
-class Cognite360ImageAnnotationWrite(DomainRelationWrite):
+class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
     """This represents the writing version of Cognite 360 image annotation.
 
     It is used to when data is sent to CDF.

@@ -37,6 +37,8 @@ from cognite_core.data_classes._core import (
     FloatFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_describable_edge import CogniteDescribableEdge, CogniteDescribableEdgeWrite
+from cognite_core.data_classes._cognite_sourceable_edge import CogniteSourceableEdge, CogniteSourceableEdgeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_source_system import (
@@ -198,7 +200,7 @@ class CogniteAnnotationGraphQL(GraphQLCore):
         )
 
 
-class CogniteAnnotation(DomainRelation):
+class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
     """This represents the reading version of Cognite annotation.
 
     It is used to when data is retrieved from CDF.
@@ -260,7 +262,7 @@ class CogniteAnnotation(DomainRelation):
         return self.as_write()
 
 
-class CogniteAnnotationWrite(DomainRelationWrite):
+class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeWrite):
     """This represents the writing version of Cognite annotation.
 
     It is used to when data is sent to CDF.
