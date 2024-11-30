@@ -61,6 +61,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
         )
 
     # Assert
+    assert actual is not None
     assert actual.name == expected_name
 
 

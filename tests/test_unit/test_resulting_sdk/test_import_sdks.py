@@ -17,7 +17,7 @@ def example_sdk_generated(skip_typed: bool = False) -> Iterable[ExampleSDK]:
             continue
         if skip_typed and sdk.is_typed:
             continue
-        yield pytest.param(sdk, id=sdk.top_level_package)
+        yield pytest.param(sdk, id=sdk.top_level_package)  # type: ignore[misc]
 
 
 @pytest.mark.parametrize("example_sdk", example_sdk_generated())

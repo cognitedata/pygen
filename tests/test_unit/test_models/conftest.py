@@ -23,7 +23,7 @@ def omni_field_factory(
     omni_views: dict[str, dm.View],
     omni_data_classes_by_view_id,
     pygen_config: PygenConfig,
-) -> Callable[[str, str], Field]:
+) -> Callable[[str, str], Field | None]:
     node_class_by_view_id, edge_class_by_view_id = omni_data_classes_by_view_id
     direct_relations_by_view_id: dict[dm.ViewId, set[str]] = {}
     for view in omni_views.values():
@@ -35,7 +35,7 @@ def omni_field_factory(
 
     view_by_id = {view.as_id(): view for view in omni_views.values()}
 
-    def factory(view_ext_id: str, property_name: str) -> Field:
+    def factory(view_ext_id: str, property_name: str) -> Field | None:
         view = omni_views[view_ext_id]
         prop = view.properties[property_name]
         return Field.from_property(

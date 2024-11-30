@@ -55,5 +55,5 @@ def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[str, OmniC
 
 
 @pytest.fixture(scope="session")
-def omni_multi_data_models() -> list[dm.DataModel[dm.View]]:
+def omni_multi_data_models() -> dm.DataModelList[dm.View]:
     return OMNI_MULTI_SDK.load_data_models()

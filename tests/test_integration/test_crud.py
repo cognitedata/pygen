@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from typing import Protocol
 
 import pytest
-from _pytest.mark import ParameterSet
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from omni import OmniClient
@@ -17,13 +16,13 @@ from tests.constants import OMNI_SDK
 from tests.omni_constants import OmniClasses
 
 
-def omni_independent_view_ids() -> list[ParameterSet]:
+def omni_independent_view_ids() -> Iterable[dm.ViewId]:
     for connected in _connected_views(OMNI_SDK.load_data_model().views):
         if len(connected) != 1:
             continue
         view = connected[0]
         if view.writable and view.external_id not in {"SubInterface", "Empty", "ConnectionEdgeA"}:
-            yield pytest.param(view.as_id(), id=view.external_id)
+            yield pytest.param(view.as_id(), id=view.external_id)  # type: ignore[misc]
 
 
 class DomainAPI(Protocol):
@@ -53,6 +52,7 @@ class TestCRUDOperations:
         # Arrange
         api_name = omni_data_classes[view_id.external_id].api_name
         write_class = omni_data_classes[view_id.external_id].write
+        assert write_class is not None
         view = omni_data_classes[view_id.external_id].view
         generator = MockGenerator([view], instance_space=omni_tmp_space.space, seed=42)
         mock_data = generator.generate_mock_data(2, 0)

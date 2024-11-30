@@ -66,6 +66,7 @@ def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
     expected = next((item for item in all_items if item.other_direct), None)
     assert expected is not None, "No item with self_direct set"
 
+    assert isinstance(expected.other_direct, str)
     items = omni_client.connection_item_a.list(other_direct=expected.other_direct, limit=-1)
 
     assert len(items) > 0
@@ -74,41 +75,39 @@ def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
 
 def test_filter_on_space(omni_client: OmniClient) -> None:
     # Act
-    no_items = []  # omni_client.primitive_nullable.list(space="Non-existing space")
     some_items = omni_client.primitive_nullable.list(space=DEFAULT_INSTANCE_SPACE)
 
     # Assert
-    assert len(no_items) == 0
     assert len(some_items) > 0
 
 
 def test_filter_range(omni_client: OmniClient) -> None:
     # Arrange
     items = omni_client.primitive_required.list(limit=5)
-    items = sorted(items, key=lambda item: item.int_32)
+    sorted_items = sorted(items, key=lambda item: item.int_32)
 
     # Act
-    filtered_items = omni_client.primitive_required.list(min_int_32=items[2].int_32, limit=-1)
+    filtered_items = omni_client.primitive_required.list(min_int_32=sorted_items[2].int_32, limit=-1)
 
     # Assert
     assert len(filtered_items) > 0
-    is_below = [item for item in filtered_items if item.int_32 < items[2].int_32]
+    is_below = [item for item in filtered_items if item.int_32 < sorted_items[2].int_32]
     assert not is_below, f"Fount items below: {is_below}"
 
 
 def test_list_above_5000_items(omni_client: OmniClient) -> None:
     # Arrange
     items = [
-        dc.Implementation2Apply(external_id=f"implementation2_5000:{i}", mainValue=f"Implementation2 {i}")
+        dc.Implementation2Apply(external_id=f"implementation2_5000:{i}", main_value=f"Implementation2 {i}")
         for i in range(5001)
     ]
     omni_client.implementation_2.apply(items)
 
     # Act
-    items = omni_client.implementation_2.list(limit=5_002, external_id_prefix="implementation2_5000:")
+    read_items = omni_client.implementation_2.list(limit=5_002, external_id_prefix="implementation2_5000:")
 
     # Assert
-    assert len(items) >= 5001
+    assert len(read_items) >= 5001
 
 
 def test_list_and_sort(omni_client: OmniClient) -> None:

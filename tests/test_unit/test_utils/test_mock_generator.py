@@ -181,8 +181,8 @@ def test__to_leaf_children_by_parent(omni_data_classes: dict[str, OmniClasses]) 
         OmniView.sub_interface: {OmniView.implementation1, OmniView.implementation2},
     }
 
-    actual = MockGenerator._to_leaf_children_by_parent(views)
-    actual = {k.external_id: {vv.external_id for vv in v} for k, v in actual.items()}
+    leaf_children_by_parent = MockGenerator._to_leaf_children_by_parent(views)
+    actual = {k.external_id: {vv.external_id for vv in v} for k, v in leaf_children_by_parent.items()}
 
     assert actual == expected
 

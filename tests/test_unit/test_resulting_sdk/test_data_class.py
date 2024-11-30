@@ -23,7 +23,6 @@ def omni_nodes_with_view():
         if node.external_id.startswith("Implementation1NonWriteable"):
             # Hacky way to skip non-writeable nodes
             continue
-        node: dm.Node
         view_id = cast(dm.ViewId, next(iter(node.properties)))
         yield pytest.param(node, view_id, id=node.external_id)
 
@@ -41,7 +40,10 @@ class TestToFromInstances:
         read_cls = omni_data_classes[lookup_key].read
 
         domain_node = read_cls.from_instance(node)
-        domain_write_node = domain_node.as_write()
+        # All subclasses fo domain_node has as-write
+        # but they have different return types so adding an abstract method
+        # would mean use of generics.
+        domain_write_node = domain_node.as_write()  # type: ignore[attr-defined]
         domain_write_node.to_pandas()
 
         resources = domain_write_node.to_instances_write()
@@ -76,6 +78,7 @@ class TestToFromInstances:
         node_write = node.as_write()
         # Bug in SDK that skips the type
         node_write.type = node.type
+        assert read_cls is not None
         domain_write_node = read_cls.from_instance(node_write)
         domain_write_node.to_pandas()
 
@@ -110,8 +113,10 @@ class TestToInstancesWrite:
         connection = dc.ConnectionItemAWrite(
             external_id="test_create_connection_with_direct_relation_and_tuple",
             name="connectionA",
-            other_direct=("my_space", "my_external_id"),
-            outwards=[dm.DirectRelationReference(space="my_space", external_id="my_external_id2")],
+            # Pydantic converts these to the correct type
+            # We need to turn-off the type checker for this line
+            other_direct=("my_space", "my_external_id"),  # type: ignore[arg-type]
+            outwards=[dm.DirectRelationReference(space="my_space", external_id="my_external_id2")],  # type: ignore[list-item]
             self_direct=dm.NodeId(space="my_space", external_id="my_external_id3"),
         )
 

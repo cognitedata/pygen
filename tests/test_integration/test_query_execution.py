@@ -1,3 +1,5 @@
+from typing import Any
+
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from omni import OmniClient
@@ -9,7 +11,7 @@ def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
     executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
-    properties = [
+    properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
         {"directReverseMulti": ["name", "externalId"]},
@@ -42,7 +44,7 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
     executor = _QueryExecutor(cognite_client, views=[item_e, item_d])
-    properties = [
+    properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
         {"directMulti": ["name", "externalId"]},
@@ -80,7 +82,7 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
     item_a = omni_views["ConnectionItemA"]
     item_b = omni_views["ConnectionItemB"]
     executor = _QueryExecutor(cognite_client, views=[item_a, item_b])
-    properties = [
+    properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
         {"outwards": [{"node": ["name", "externalId"]}, "type"]},
@@ -104,7 +106,7 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveNullable"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    properties = ["text", "boolean", "date"]
+    properties: list[str | dict[str, Any]] = ["text", "boolean", "date"]
     result = executor.list(view.as_id(), properties, limit=5)
 
     assert isinstance(result, list)
@@ -150,7 +152,7 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 
     view = omni_views["PrimitiveRequired"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    selected_properties = ["text", "boolean", "externalId"]
+    selected_properties: list[str | dict[str, Any]] = ["text", "boolean", "externalId"]
     result = executor.search(view.as_id(), selected_properties, query=word, limit=5)
 
     assert isinstance(result, list)
@@ -163,7 +165,11 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["ConnectionItemE"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    selected_properties = ["externalId", "name", {"directReverseMulti": ["name", "externalId"]}]
+    selected_properties: list[str | dict[str, Any]] = [
+        "externalId",
+        "name",
+        {"directReverseMulti": ["name", "externalId"]},
+    ]
     result = executor.search(view.as_id(), selected_properties, limit=5)
 
     assert isinstance(result, list)

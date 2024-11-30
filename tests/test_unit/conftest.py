@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -20,7 +22,7 @@ def pygen_config() -> PygenConfig:
 
 
 @pytest.fixture()
-def mock_cognite_client() -> CogniteClient:
+def mock_cognite_client() -> Iterable[CogniteClient]:
     with monkeypatch_cognite_client() as m:
         yield m
 

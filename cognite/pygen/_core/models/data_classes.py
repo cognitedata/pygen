@@ -1,7 +1,5 @@
 """This represents the generated data classes in the SDK"""
 
-from __future__ import annotations
-
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import total_ordering
@@ -48,14 +46,14 @@ class DataClass:
     file_name: str
     view_id: dm.ViewId
     fields: list[Field]
-    implements: list[DataClass]
+    implements: "list[DataClass]"
     is_writable: bool
     is_interface: bool
-    direct_children: list[DataClass]
+    direct_children: "list[DataClass]"
 
     initialization: set[Literal["fields", "parents", "children"]]
 
-    def __lt__(self, other: DataClass):
+    def __lt__(self, other: "DataClass"):
         if isinstance(other, DataClass):
             return self.read_name < other.read_name
         else:
@@ -88,9 +86,21 @@ class DataClass:
         return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
+    @overload
+    def from_view(
+        cls, view: dm.View, base_name: str, used_for: Literal["node"], data_class: pygen_config.DataClassNaming
+    ) -> "NodeDataClass": ...
+
+    @classmethod
+    @overload
+    def from_view(
+        cls, view: dm.View, base_name: str, used_for: Literal["edge"], data_class: pygen_config.DataClassNaming
+    ) -> "EdgeDataClass": ...
+
+    @classmethod
     def from_view(
         cls, view: dm.View, base_name: str, used_for: Literal["node", "edge"], data_class: pygen_config.DataClassNaming
-    ) -> DataClass:
+    ) -> "NodeDataClass | EdgeDataClass":
         """Create a DataClass from a view."""
         class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
@@ -143,8 +153,8 @@ class DataClass:
     def update_fields(
         self,
         properties: dict[str, ViewProperty],
-        node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
-        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
+        node_class_by_view_id: "dict[dm.ViewId, NodeDataClass]",
+        edge_class_by_view_id: "dict[dm.ViewId, EdgeDataClass]",
         views: list[dm.View],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
@@ -181,14 +191,14 @@ class DataClass:
                 object.__setattr__(field_, "pydantic_field", "pydantic.Field")
         self.initialization.add("fields")
 
-    def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
+    def update_implements_interface_and_writable(self, parents: "list[DataClass]", is_interface: bool):
         """Update the implements, is_interface and is_writable attributes of the data class."""
         self.is_interface = is_interface
         self.implements.extend(parents)
         self.is_writable = self.is_writable or self.is_all_fields_of_type(OneToManyConnectionField)
         self.initialization.add("parents")
 
-    def update_direct_children(self, children: list[DataClass]):
+    def update_direct_children(self, children: "list[DataClass]"):
         """Update the direct children of the data class."""
         self.direct_children.extend(children)
         self.initialization.add("children")
@@ -435,7 +445,7 @@ class DataClass:
         return any(pydantic_field in hint for hint in self._field_type_hints)
 
     @property
-    def dependencies(self) -> list[DataClass]:
+    def dependencies(self) -> "list[DataClass]":
         """Return a list of all data class dependencies (through fields)."""
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
@@ -453,7 +463,7 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
-    def dependencies_with_edge_destinations(self) -> list[DataClass]:
+    def dependencies_with_edge_destinations(self) -> "list[DataClass]":
         """Return a list of all dependencies which also includes the edge
         destination if the dependency is a EdgeClass."""
         unique: dict[dm.ViewId, DataClass] = {}
@@ -536,7 +546,7 @@ class DataClass:
         """Container fields that are writable."""
         return (field_ for field_ in self.container_fields if field_.is_write_field)
 
-    def container_fields_sorted(self, include: Literal["all", "only-self"] | DataClass = "all") -> list[Field]:
+    def container_fields_sorted(self, include: 'Literal["all", "only-self"] | DataClass' = "all") -> list[Field]:
         """Return all container fields sorted by type."""
 
         def key(x: Field) -> int:
@@ -766,7 +776,7 @@ class EdgeDataClass(DataClass):
         self,
         properties: dict[str, ViewProperty],
         node_class_by_view_id: dict[dm.ViewId, NodeDataClass],
-        edge_class_by_view_id: dict[dm.ViewId, EdgeDataClass],
+        edge_class_by_view_id: "dict[dm.ViewId, EdgeDataClass]",
         views: list[dm.View],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
