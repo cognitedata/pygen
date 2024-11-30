@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- Views used for edges that implements other views now correctly include all properties in the generated SDK.
+
 ## [0.99.55] - 24-11-29
 
 ### Added
