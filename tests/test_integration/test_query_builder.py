@@ -138,7 +138,7 @@ class TestQueryBuilder:
         unique_destination_set = set(
             destination.as_id()
             for item in result
-            for destination in item.outwards
+            for destination in item.outwards or []
             if isinstance(destination, dc.ConnectionItemB)
         )
         assert builder[3].total_retrieved == len(unique_destination_set) > 0

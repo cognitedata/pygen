@@ -185,6 +185,7 @@ def test_update_to_null(
     omni_client.upsert(update, write_none=True)
 
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
+    assert retrieved is not None
     assert retrieved.text is None
     assert retrieved.int_32 is None
     assert retrieved.int_64 is None
