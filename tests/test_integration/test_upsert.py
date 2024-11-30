@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Iterable
 
 import pytest
 from cognite.client import CogniteClient
@@ -40,6 +41,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
         retrieved = omni_client.connection_item_c_node.retrieve(new_connection_c.external_id)
 
         # Assert
+        assert retrieved is not None
         assert retrieved.external_id == new_connection_c.external_id
     finally:
         if created is not None:
@@ -138,16 +140,21 @@ def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient
         retrieved = omni_client.connection_item_a.retrieve(new_connection_a.external_id)
 
         # Assert
+        assert retrieved is not None
         assert retrieved.external_id == new_connection_a.external_id
         assert retrieved.name == new_connection_a.name
+        assert isinstance(new_connection_a.other_direct, dc.ConnectionItemCNodeWrite)
         assert retrieved.other_direct == new_connection_a.other_direct.external_id
+        assert isinstance(new_connection_a.self_direct, dc.ConnectionItemAWrite)
         assert retrieved.self_direct == new_connection_a.self_direct.external_id
     finally:
         cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
 
 
 @pytest.fixture(scope="module")
-def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClient) -> dc.PrimitiveNullableApply:
+def primitive_nullable_node(
+    omni_client: OmniClient, cognite_client: CogniteClient
+) -> Iterable[dc.PrimitiveNullableApply]:
     node = dc.PrimitiveNullableApply(
         external_id="integration_test:PrimitiveNullable",
         text="string",
