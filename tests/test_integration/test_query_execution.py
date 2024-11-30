@@ -1,3 +1,5 @@
+from typing import Any
+
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from omni import OmniClient
@@ -163,7 +165,7 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["ConnectionItemE"]
     executor = _QueryExecutor(cognite_client, views=[view])
-    selected_properties = ["externalId", "name", {"directReverseMulti": ["name", "externalId"]}]
+    selected_properties: list[str | dict[str, Any]] = ["externalId", "name", {"directReverseMulti": ["name", "externalId"]}]
     result = executor.search(view.as_id(), selected_properties, limit=5)
 
     assert isinstance(result, list)
