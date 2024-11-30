@@ -98,12 +98,14 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
     steven = result[0]
     assert isinstance(steven, odc.CDFExternalReferencesListedGraphQL)
     assert steven.external_id == "CDFExternalReferencesListed:Steven"
-    assert len(steven.timeseries or []) > 0
+    assert steven.timeseries is not None
+    assert len(steven.timeseries) > 0
     assert isinstance(steven.timeseries[0], odc.TimeSeriesGraphQL)
-    assert len(steven.sequences or []) > 0
+    assert steven.sequences is not None
+    assert len(steven.sequences) > 0
     assert isinstance(steven.sequences[0], odc.SequenceGraphQL)
-    item: odc.CDFExternalReferencesListedGraphQL
     for item in result:
+        assert isinstance(item, odc.CDFExternalReferencesListedGraphQL)
         item.as_read()
         item.as_write()
 
@@ -148,7 +150,11 @@ def test_query_reverse_direct_relation(omni_client: OmniClient) -> None:
     assert len(result) > 0
     first = result[0]
     assert isinstance(first, odc.ConnectionItemEGraphQL)
-    direct_reverse_single = [item.direct_reverse_single for item in result if item.direct_reverse_single]
+    direct_reverse_single = [
+        item.direct_reverse_single
+        for item in result
+        if isinstance(item, odc.ConnectionItemEGraphQL) and item.direct_reverse_single
+    ]
 
     assert len(direct_reverse_single) > 0, "No direct reverse single found"
 
