@@ -53,6 +53,7 @@ class TestCRUDOperations:
         # Arrange
         api_name = omni_data_classes[view_id.external_id].api_name
         write_class = omni_data_classes[view_id.external_id].write
+        assert write_class is not None
         view = omni_data_classes[view_id.external_id].view
         generator = MockGenerator([view], instance_space=omni_tmp_space.space, seed=42)
         mock_data = generator.generate_mock_data(2, 0)

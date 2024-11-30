@@ -8,7 +8,7 @@ def test_aggregate_count(omni_client: OmniClient) -> None:
     result = omni_client.primitive_required.aggregate("count")
 
     # Assert
-    assert result[0].value > 0
+    assert result.value > 0
 
 
 def test_aggregate_count_with_group_by(omni_client: OmniClient) -> None:

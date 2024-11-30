@@ -35,6 +35,7 @@ def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemBList)
     for item in items:
+        assert item.name is not None
         assert item.name.startswith("A")
     assert items.dump()
 
@@ -56,7 +57,7 @@ def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
             subitems := [
                 subitem
                 for subitem in item.outwards or []
-                if not isinstance(subitem, dc.ConnectionItemB) or not subitem.name.startswith("A")
+                if not isinstance(subitem, dc.ConnectionItemB) or not (subitem.name and subitem.name.startswith("A"))
             ]
         )
     }
