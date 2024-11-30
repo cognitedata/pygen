@@ -198,6 +198,8 @@ class ConnectionItemF(DomainModel):
     outwards_multi: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="outwardsMulti")
     outwards_single: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="outwardsSingle")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this read version of connection item f to the writing version."""
         return ConnectionItemFWrite(

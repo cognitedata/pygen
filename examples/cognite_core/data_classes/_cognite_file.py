@@ -304,6 +304,8 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
     mime_type: Optional[str] = Field(None, alias="mimeType")
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteFileWrite:
         """Convert this read version of Cognite file to the writing version."""
         return CogniteFileWrite(

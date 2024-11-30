@@ -143,6 +143,8 @@ class Implementation1v2(SubInterface):
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_2: str = Field(alias="value2")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Implementation1v2Write:
         """Convert this read version of implementation 1 v 2 to the writing version."""
         return Implementation1v2Write(

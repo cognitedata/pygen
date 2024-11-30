@@ -165,6 +165,8 @@ class PrimitiveWithDefaults(DomainModel):
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
         return PrimitiveWithDefaultsWrite(

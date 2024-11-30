@@ -156,6 +156,8 @@ class CogniteSchedulable(DomainModel):
     scheduled_start_time: Optional[datetime.datetime] = Field(None, alias="scheduledStartTime")
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteSchedulableWrite:
         """Convert this read version of Cognite schedulable to the writing version."""
         return CogniteSchedulableWrite(

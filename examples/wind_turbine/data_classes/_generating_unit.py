@@ -146,6 +146,8 @@ class GeneratingUnit(DomainModel):
     description: Optional[str] = None
     name: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""
         return GeneratingUnitWrite(

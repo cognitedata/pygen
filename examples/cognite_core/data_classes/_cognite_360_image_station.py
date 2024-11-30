@@ -156,6 +156,8 @@ class Cognite360ImageStation(CogniteDescribableNode):
     node_type: Union[dm.DirectRelationReference, None] = None
     group_type: Optional[Literal["Station360"]] = Field(None, alias="groupType")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite360ImageStationWrite:
         """Convert this read version of Cognite 360 image station to the writing version."""
         return Cognite360ImageStationWrite(

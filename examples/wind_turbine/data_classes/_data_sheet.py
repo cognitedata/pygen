@@ -171,6 +171,8 @@ class DataSheet(DomainModel):
     name: Optional[str] = None
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> DataSheetWrite:
         """Convert this read version of data sheet to the writing version."""
         return DataSheetWrite(

@@ -176,6 +176,8 @@ class CogniteCubeMap(DomainModel):
     right: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     top: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteCubeMapWrite:
         """Convert this read version of Cognite cube map to the writing version."""
         return CogniteCubeMapWrite(

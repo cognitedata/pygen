@@ -288,6 +288,8 @@ class Nacelle(DomainModel):
     yaw_direction: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_error: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
         return NacelleWrite(

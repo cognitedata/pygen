@@ -189,6 +189,8 @@ class CognitePointCloudModel(Cognite3DModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     revisions: Optional[list[CognitePointCloudRevision]] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CognitePointCloudModelWrite:
         """Convert this read version of Cognite point cloud model to the writing version."""
         return CognitePointCloudModelWrite(

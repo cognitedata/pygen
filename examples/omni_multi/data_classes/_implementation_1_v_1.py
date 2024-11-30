@@ -145,6 +145,8 @@ class Implementation1v1(DomainModel):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Implementation1v1Write:
         """Convert this read version of implementation 1 v 1 to the writing version."""
         return Implementation1v1Write(

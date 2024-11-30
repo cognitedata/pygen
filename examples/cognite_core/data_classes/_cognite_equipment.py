@@ -321,6 +321,8 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
     serial_number: Optional[str] = Field(None, alias="serialNumber")
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteEquipmentWrite:
         """Convert this read version of Cognite equipment to the writing version."""
         return CogniteEquipmentWrite(

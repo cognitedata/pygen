@@ -146,6 +146,8 @@ class CogniteVisualizable(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     object_3d: Union[Cognite3DObject, str, dm.NodeId, None] = Field(default=None, repr=False, alias="object3D")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteVisualizableWrite:
         """Convert this read version of Cognite visualizable to the writing version."""
         return CogniteVisualizableWrite(

@@ -265,6 +265,8 @@ class Cognite3DObject(CogniteDescribableNode):
     z_max: Optional[float] = Field(None, alias="zMax")
     z_min: Optional[float] = Field(None, alias="zMin")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite3DObjectWrite:
         """Convert this read version of Cognite 3D object to the writing version."""
         return Cognite3DObjectWrite(

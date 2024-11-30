@@ -287,6 +287,8 @@ class SensorPosition(DomainModel):
     )
     position: Optional[float] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> SensorPositionWrite:
         """Convert this read version of sensor position to the writing version."""
         return SensorPositionWrite(

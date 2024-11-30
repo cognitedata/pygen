@@ -180,6 +180,8 @@ class ConnectionItemCNode(DomainModel):
         default=None, repr=False, alias="connectionItemB"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this read version of connection item c node to the writing version."""
         return ConnectionItemCNodeWrite(

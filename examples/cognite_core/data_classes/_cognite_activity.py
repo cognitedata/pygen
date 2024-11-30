@@ -306,6 +306,8 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
         default=None, repr=False, alias="timeSeries"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteActivityWrite:
         """Convert this read version of Cognite activity to the writing version."""
         return CogniteActivityWrite(

@@ -196,6 +196,8 @@ class Metmast(DomainModel):
     wind_speed: Union[TimeSeries, str, None] = None
     wind_turbines: Optional[list[Distance]] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""
         return MetmastWrite(

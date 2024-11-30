@@ -225,6 +225,8 @@ class WindTurbine(GeneratingUnit):
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""
         return WindTurbineWrite(

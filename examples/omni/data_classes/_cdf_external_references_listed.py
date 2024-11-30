@@ -175,6 +175,8 @@ class CDFExternalReferencesListed(DomainModel):
     sequences: Optional[list[Union[SequenceRead, str]]] = None
     timeseries: Optional[list[Union[TimeSeries, str]]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this read version of cdf external references listed to the writing version."""
         return CDFExternalReferencesListedWrite(

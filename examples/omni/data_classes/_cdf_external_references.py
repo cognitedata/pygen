@@ -163,6 +163,8 @@ class CDFExternalReferences(DomainModel):
     sequence: Union[SequenceRead, str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
         return CDFExternalReferencesWrite(

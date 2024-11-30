@@ -169,6 +169,8 @@ class ConnectionItemG(DomainModel):
     )
     name: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemGWrite:
         """Convert this read version of connection item g to the writing version."""
         return ConnectionItemGWrite(

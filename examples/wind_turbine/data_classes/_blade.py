@@ -166,6 +166,8 @@ class Blade(DomainModel):
     name: Optional[str] = None
     sensor_positions: Optional[list[SensorPosition]] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> BladeWrite:
         """Convert this read version of blade to the writing version."""
         return BladeWrite(

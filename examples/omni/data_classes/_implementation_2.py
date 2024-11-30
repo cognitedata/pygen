@@ -139,6 +139,8 @@ class Implementation2(SubInterface):
         "sp_pygen_models", "Implementation2"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""
         return Implementation2Write(

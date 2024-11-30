@@ -182,6 +182,8 @@ class ConnectionItemA(DomainModel):
     outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
         return ConnectionItemAWrite(

@@ -310,6 +310,8 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteTimeSeriesWrite:
         """Convert this read version of Cognite time series to the writing version."""
         return CogniteTimeSeriesWrite(

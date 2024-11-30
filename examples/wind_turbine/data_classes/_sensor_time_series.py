@@ -187,6 +187,8 @@ class SensorTimeSeries(DomainModel):
     standard_name: Optional[str] = Field(None, alias="standardName")
     type_: Literal["numeric", "string"] = Field(alias="type")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> SensorTimeSeriesWrite:
         """Convert this read version of sensor time series to the writing version."""
         return SensorTimeSeriesWrite(

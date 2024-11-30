@@ -162,6 +162,8 @@ class ConnectionItemB(DomainModel):
     name: Optional[str] = None
     self_edge: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False, alias="selfEdge")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemBWrite:
         """Convert this read version of connection item b to the writing version."""
         return ConnectionItemBWrite(

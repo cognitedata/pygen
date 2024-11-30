@@ -193,6 +193,8 @@ class ConnectionItemD(DomainModel):
         default=None, repr=False, alias="outwardsSingle"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemDWrite:
         """Convert this read version of connection item d to the writing version."""
         return ConnectionItemDWrite(

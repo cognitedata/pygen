@@ -240,6 +240,8 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
     volume_references: Optional[list[str]] = Field(None, alias="volumeReferences")
     volume_type: Optional[Literal["Box", "Cylinder"]] = Field(None, alias="volumeType")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CognitePointCloudVolumeWrite:
         """Convert this read version of Cognite point cloud volume to the writing version."""
         return CognitePointCloudVolumeWrite(
