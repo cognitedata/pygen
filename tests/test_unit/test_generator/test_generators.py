@@ -14,11 +14,11 @@ def test_to_parents_by_view_id_omni(omni_multi_api_generator: MultiAPIGenerator)
     views = [api.view for api in omni_multi_api_generator.api_by_type_by_view_id["node"].values()]
 
     # Act
-    actual = to_unique_parents_by_view_id(views)
+    unique_parents_by_view_id = to_unique_parents_by_view_id(views)
     # Simplification of output for easy assertion.
     actual = {
         view_id.external_id: parent_names
-        for view_id, parents in actual.items()
+        for view_id, parents in unique_parents_by_view_id.items()
         if (parent_names := [parent.external_id for parent in parents])
     }
 
