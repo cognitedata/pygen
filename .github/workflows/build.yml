@@ -27,6 +27,8 @@ jobs:
         # Running it twice seems to resolve the issue
         run: pre-commit run --all-files
       - uses: pre-commit/action@v3.0.1
+        continue-on-error: true
+      - uses: pre-commit/action@v3.0.1
 
   build-docs:
     runs-on: ubuntu-latest
