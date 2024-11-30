@@ -44,6 +44,11 @@ from {{ top_level_package }}.data_classes._core import (
     {{ data_class.filtering_import }}
     {% endif %}
 )
+{% if data_class.implements %}
+{% for implements in data_class.implements %}
+from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif +%}
+{% endfor %}
+{% endif %}
 {% for class_ in unique_start_classes -%}
 from {{ top_level_package }}.data_classes.{{class_.file_name }} import {{ class_.write_name }}
 {% endfor %}
@@ -125,7 +130,7 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
         )
 {% endif %}
 
-class {{ data_class.read_name }}(DomainRelation{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -165,7 +170,7 @@ class {{ data_class.read_name }}(DomainRelation{% if data_class.has_any_field_mo
         return self.as_write()
 
 
-class {{ data_class.write_name }}(DomainRelationWrite{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
+class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.
