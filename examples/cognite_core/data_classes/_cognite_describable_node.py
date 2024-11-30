@@ -152,6 +152,8 @@ class CogniteDescribableNode(DomainModel):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteDescribableNodeWrite:
         """Convert this read version of Cognite describable node to the writing version."""
         return CogniteDescribableNodeWrite(

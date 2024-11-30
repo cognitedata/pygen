@@ -165,6 +165,8 @@ class CogniteSourceSystem(CogniteDescribableNode):
     manufacturer: Optional[str] = None
     version_: Optional[str] = Field(None, alias="version")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteSourceSystemWrite:
         """Convert this read version of Cognite source system to the writing version."""
         return CogniteSourceSystemWrite(

@@ -169,6 +169,8 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
     type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite3DRevisionWrite:
         """Convert this read version of Cognite 3D revision to the writing version."""
         return Cognite3DRevisionWrite(

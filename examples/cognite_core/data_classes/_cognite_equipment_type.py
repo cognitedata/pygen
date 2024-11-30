@@ -181,6 +181,8 @@ class CogniteEquipmentType(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteEquipmentTypeWrite:
         """Convert this read version of Cognite equipment type to the writing version."""
         return CogniteEquipmentTypeWrite(

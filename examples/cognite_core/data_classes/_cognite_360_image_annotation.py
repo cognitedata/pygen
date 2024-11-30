@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
+from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -22,6 +23,13 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     DomainModelList,
     T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -29,6 +37,7 @@ from cognite_core.data_classes._core import (
     FloatFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_annotation import CogniteAnnotation, CogniteAnnotationWrite
 from cognite_core.data_classes._cognite_3_d_object import Cognite3DObjectWrite
 from cognite_core.data_classes._cognite_360_image import Cognite360Image, Cognite360ImageGraphQL, Cognite360ImageWrite
 
@@ -210,7 +219,7 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
         )
 
 
-class Cognite360ImageAnnotation(DomainRelation):
+class Cognite360ImageAnnotation(CogniteAnnotation):
     """This represents the reading version of Cognite 360 image annotation.
 
     It is used to when data is retrieved from CDF.
@@ -242,6 +251,8 @@ class Cognite360ImageAnnotation(DomainRelation):
     format_version: Optional[str] = Field(None, alias="formatVersion")
     polygon: Optional[list[float]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite360ImageAnnotationWrite:
         """Convert this read version of Cognite 360 image annotation to the writing version."""
         return Cognite360ImageAnnotationWrite(
@@ -276,7 +287,7 @@ class Cognite360ImageAnnotation(DomainRelation):
         return self.as_write()
 
 
-class Cognite360ImageAnnotationWrite(DomainRelationWrite):
+class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
     """This represents the writing version of Cognite 360 image annotation.
 
     It is used to when data is sent to CDF.

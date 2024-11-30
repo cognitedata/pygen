@@ -173,6 +173,8 @@ class CognitePointCloudRevision(Cognite3DRevision, protected_namespaces=()):
     node_type: Union[dm.DirectRelationReference, None] = None
     revision_id: Optional[int] = Field(None, alias="revisionId")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CognitePointCloudRevisionWrite:
         """Convert this read version of Cognite point cloud revision to the writing version."""
         return CognitePointCloudRevisionWrite(

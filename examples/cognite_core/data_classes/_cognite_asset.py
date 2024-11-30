@@ -363,6 +363,8 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
     type_: Union[CogniteAssetType, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
         return CogniteAssetWrite(
@@ -450,13 +452,13 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
                 instance.type_ = type_
             if instance.path:
                 new_path: list[CogniteAsset | str | dm.NodeId] = []
-                for relation in instance.path:
-                    if isinstance(relation, CogniteAsset):
-                        new_path.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteAsset):
+                for path in instance.path:
+                    if isinstance(path, CogniteAsset):
+                        new_path.append(path)
+                    elif (other := nodes_by_id.get(path)) and isinstance(other, CogniteAsset):
                         new_path.append(other)
                     else:
-                        new_path.append(relation)
+                        new_path.append(path)
                 instance.path = new_path
         for node in nodes_by_id.values():
             if isinstance(node, CogniteActivity) and node.assets is not None:

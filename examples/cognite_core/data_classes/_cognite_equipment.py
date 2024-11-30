@@ -321,6 +321,8 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
     serial_number: Optional[str] = Field(None, alias="serialNumber")
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteEquipmentWrite:
         """Convert this read version of Cognite equipment to the writing version."""
         return CogniteEquipmentWrite(
@@ -395,13 +397,13 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
                 instance.source = source
             if instance.files:
                 new_files: list[CogniteFile | str | dm.NodeId] = []
-                for relation in instance.files:
-                    if isinstance(relation, CogniteFile):
-                        new_files.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteFile):
+                for file in instance.files:
+                    if isinstance(file, CogniteFile):
+                        new_files.append(file)
+                    elif (other := nodes_by_id.get(file)) and isinstance(other, CogniteFile):
                         new_files.append(other)
                     else:
-                        new_files.append(relation)
+                        new_files.append(file)
                 instance.files = new_files
         for node in nodes_by_id.values():
             if isinstance(node, CogniteActivity) and node.equipment is not None:

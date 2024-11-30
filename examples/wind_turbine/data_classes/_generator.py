@@ -176,6 +176,8 @@ class Generator(DomainModel):
     )
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> GeneratorWrite:
         """Convert this read version of generator to the writing version."""
         return GeneratorWrite(

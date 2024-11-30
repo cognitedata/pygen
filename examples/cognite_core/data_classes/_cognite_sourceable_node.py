@@ -202,6 +202,8 @@ class CogniteSourceableNode(DomainModel):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteSourceableNodeWrite:
         """Convert this read version of Cognite sourceable node to the writing version."""
         return CogniteSourceableNodeWrite(

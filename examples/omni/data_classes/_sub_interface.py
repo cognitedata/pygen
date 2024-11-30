@@ -138,6 +138,8 @@ class SubInterface(MainInterface):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
         return SubInterfaceWrite(

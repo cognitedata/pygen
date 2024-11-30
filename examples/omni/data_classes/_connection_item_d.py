@@ -193,6 +193,8 @@ class ConnectionItemD(DomainModel):
         default=None, repr=False, alias="outwardsSingle"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemDWrite:
         """Convert this read version of connection item d to the writing version."""
         return ConnectionItemDWrite(
@@ -245,13 +247,13 @@ class ConnectionItemD(DomainModel):
                 instance.direct_single = direct_single
             if instance.direct_multi:
                 new_direct_multi: list[ConnectionItemE | str | dm.NodeId] = []
-                for relation in instance.direct_multi:
-                    if isinstance(relation, ConnectionItemE):
-                        new_direct_multi.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, ConnectionItemE):
+                for direct_multi in instance.direct_multi:
+                    if isinstance(direct_multi, ConnectionItemE):
+                        new_direct_multi.append(direct_multi)
+                    elif (other := nodes_by_id.get(direct_multi)) and isinstance(other, ConnectionItemE):
                         new_direct_multi.append(other)
                     else:
-                        new_direct_multi.append(relation)
+                        new_direct_multi.append(direct_multi)
                 instance.direct_multi = new_direct_multi
             if edges := edges_by_source_node.get(instance.as_id()):
                 for edge in edges:

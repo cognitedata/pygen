@@ -304,6 +304,8 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
     mime_type: Optional[str] = Field(None, alias="mimeType")
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteFileWrite:
         """Convert this read version of Cognite file to the writing version."""
         return CogniteFileWrite(
@@ -367,13 +369,13 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
                 instance.source = source
             if instance.assets:
                 new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for relation in instance.assets:
-                    if isinstance(relation, CogniteAsset):
-                        new_assets.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteAsset):
+                for asset in instance.assets:
+                    if isinstance(asset, CogniteAsset):
+                        new_assets.append(asset)
+                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
                         new_assets.append(other)
                     else:
-                        new_assets.append(relation)
+                        new_assets.append(asset)
                 instance.assets = new_assets
         for node in nodes_by_id.values():
             if isinstance(node, CogniteEquipment) and node.files is not None:

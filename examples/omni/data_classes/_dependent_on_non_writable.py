@@ -167,6 +167,8 @@ class DependentOnNonWritable(DomainModel):
         default=None, repr=False, alias="toNonWritable"
     )
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
         return DependentOnNonWritableWrite(

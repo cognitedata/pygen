@@ -191,6 +191,8 @@ class PrimitiveNullableListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveNullableListedWrite:
         """Convert this read version of primitive nullable listed to the writing version."""
         return PrimitiveNullableListedWrite(

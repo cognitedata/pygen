@@ -182,6 +182,8 @@ class Rotor(DomainModel):
     rpm_low_speed_shaft: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     wind_turbine: Optional[WindTurbine] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
         return RotorWrite(

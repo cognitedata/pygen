@@ -176,6 +176,8 @@ class Gearbox(DomainModel):
     displacement_z: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> GearboxWrite:
         """Convert this read version of gearbox to the writing version."""
         return GearboxWrite(

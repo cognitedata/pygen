@@ -162,6 +162,8 @@ class CogniteAssetClass(CogniteDescribableNode):
     code: Optional[str] = None
     standard: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteAssetClassWrite:
         """Convert this read version of Cognite asset clas to the writing version."""
         return CogniteAssetClassWrite(

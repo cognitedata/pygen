@@ -196,6 +196,8 @@ class Empty(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> EmptyWrite:
         """Convert this read version of empty to the writing version."""
         return EmptyWrite(

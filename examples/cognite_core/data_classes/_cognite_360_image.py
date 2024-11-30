@@ -285,6 +285,8 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
     )
     taken_at: Optional[datetime.datetime] = Field(None, alias="takenAt")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite360ImageWrite:
         """Convert this read version of Cognite 360 image to the writing version."""
         return Cognite360ImageWrite(

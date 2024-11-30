@@ -181,6 +181,8 @@ class CogniteUnit(CogniteDescribableNode):
     source_reference: Optional[str] = Field(None, alias="sourceReference")
     symbol: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteUnitWrite:
         """Convert this read version of Cognite unit to the writing version."""
         return CogniteUnitWrite(

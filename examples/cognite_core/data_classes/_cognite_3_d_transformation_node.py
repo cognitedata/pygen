@@ -199,6 +199,8 @@ class Cognite3DTransformationNode(DomainModel):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite3DTransformationNodeWrite:
         """Convert this read version of Cognite 3D transformation node to the writing version."""
         return Cognite3DTransformationNodeWrite(

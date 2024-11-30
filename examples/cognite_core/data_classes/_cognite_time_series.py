@@ -310,6 +310,8 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteTimeSeriesWrite:
         """Convert this read version of Cognite time series to the writing version."""
         return CogniteTimeSeriesWrite(
@@ -383,23 +385,23 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
                 instance.unit = unit
             if instance.assets:
                 new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for relation in instance.assets:
-                    if isinstance(relation, CogniteAsset):
-                        new_assets.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteAsset):
+                for asset in instance.assets:
+                    if isinstance(asset, CogniteAsset):
+                        new_assets.append(asset)
+                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
                         new_assets.append(other)
                     else:
-                        new_assets.append(relation)
+                        new_assets.append(asset)
                 instance.assets = new_assets
             if instance.equipment:
                 new_equipment: list[CogniteEquipment | str | dm.NodeId] = []
-                for relation in instance.equipment:
-                    if isinstance(relation, CogniteEquipment):
-                        new_equipment.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteEquipment):
+                for equipment in instance.equipment:
+                    if isinstance(equipment, CogniteEquipment):
+                        new_equipment.append(equipment)
+                    elif (other := nodes_by_id.get(equipment)) and isinstance(other, CogniteEquipment):
                         new_equipment.append(other)
                     else:
-                        new_equipment.append(relation)
+                        new_equipment.append(equipment)
                 instance.equipment = new_equipment
         for node in nodes_by_id.values():
             if isinstance(node, CogniteActivity) and node.time_series is not None:

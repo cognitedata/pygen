@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
+from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -22,6 +23,13 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     DomainModelList,
     T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -29,6 +37,8 @@ from cognite_core.data_classes._core import (
     FloatFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_describable_edge import CogniteDescribableEdge, CogniteDescribableEdgeWrite
+from cognite_core.data_classes._cognite_sourceable_edge import CogniteSourceableEdge, CogniteSourceableEdgeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_source_system import (
@@ -190,7 +200,7 @@ class CogniteAnnotationGraphQL(GraphQLCore):
         )
 
 
-class CogniteAnnotation(DomainRelation):
+class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
     """This represents the reading version of Cognite annotation.
 
     It is used to when data is retrieved from CDF.
@@ -220,6 +230,8 @@ class CogniteAnnotation(DomainRelation):
     confidence: Optional[float] = None
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteAnnotationWrite:
         """Convert this read version of Cognite annotation to the writing version."""
         return CogniteAnnotationWrite(
@@ -252,7 +264,7 @@ class CogniteAnnotation(DomainRelation):
         return self.as_write()
 
 
-class CogniteAnnotationWrite(DomainRelationWrite):
+class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeWrite):
     """This represents the writing version of Cognite annotation.
 
     It is used to when data is sent to CDF.

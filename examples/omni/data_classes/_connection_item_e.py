@@ -236,6 +236,8 @@ class ConnectionItemE(DomainModel):
     inwards_single_property: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="inwardsSingleProperty")
     name: Optional[str] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this read version of connection item e to the writing version."""
         return ConnectionItemEWrite(

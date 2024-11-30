@@ -174,6 +174,8 @@ class CogniteFileCategory(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteFileCategoryWrite:
         """Convert this read version of Cognite file category to the writing version."""
         return CogniteFileCategoryWrite(

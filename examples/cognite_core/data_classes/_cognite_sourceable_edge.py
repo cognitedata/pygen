@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
+from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -22,6 +23,13 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     DomainModelList,
     T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -175,6 +183,8 @@ class CogniteSourceableEdge(DomainRelation):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteSourceableEdgeWrite:
         """Convert this read version of Cognite sourceable edge to the writing version."""
         return CogniteSourceableEdgeWrite(

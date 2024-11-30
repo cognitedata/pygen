@@ -191,6 +191,8 @@ class Cognite360ImageModel(Cognite3DModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     collections: Optional[list[Cognite360ImageCollection]] = Field(default=None, repr=False)
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite360ImageModelWrite:
         """Convert this read version of Cognite 360 image model to the writing version."""
         return Cognite360ImageModelWrite(

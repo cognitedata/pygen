@@ -196,6 +196,8 @@ class PrimitiveRequired(DomainModel):
     text: str
     timestamp: datetime.datetime
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> PrimitiveRequiredWrite:
         """Convert this read version of primitive required to the writing version."""
         return PrimitiveRequiredWrite(

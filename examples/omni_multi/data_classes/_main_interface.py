@@ -131,6 +131,8 @@ class MainInterface(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""
         return MainInterfaceWrite(

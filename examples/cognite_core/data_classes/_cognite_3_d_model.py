@@ -179,6 +179,8 @@ class Cognite3DModel(CogniteDescribableNode):
     thumbnail: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite3DModelWrite:
         """Convert this read version of Cognite 3D model to the writing version."""
         return Cognite3DModelWrite(

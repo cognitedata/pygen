@@ -225,6 +225,8 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
     sub_tree_sizes: Optional[list[int]] = Field(None, alias="subTreeSizes")
     tree_indexes: Optional[list[int]] = Field(None, alias="treeIndexes")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteCADNodeWrite:
         """Convert this read version of Cognite cad node to the writing version."""
         return CogniteCADNodeWrite(
@@ -282,13 +284,13 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
                 instance.object_3d = object_3d
             if instance.revisions:
                 new_revisions: list[CogniteCADRevision | str | dm.NodeId] = []
-                for relation in instance.revisions:
-                    if isinstance(relation, CogniteCADRevision):
-                        new_revisions.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(other, CogniteCADRevision):
+                for revision in instance.revisions:
+                    if isinstance(revision, CogniteCADRevision):
+                        new_revisions.append(revision)
+                    elif (other := nodes_by_id.get(revision)) and isinstance(other, CogniteCADRevision):
                         new_revisions.append(other)
                     else:
-                        new_revisions.append(relation)
+                        new_revisions.append(revision)
                 instance.revisions = new_revisions
 
 

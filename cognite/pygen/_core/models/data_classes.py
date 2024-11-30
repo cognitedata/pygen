@@ -216,6 +216,8 @@ class DataClass:
         """Parent read classes."""
         if self.implements:
             return ", ".join(f"{interface.read_name}" for interface in self.implements)
+        elif isinstance(self, EdgeDataClass):
+            return "DomainRelation"
         else:
             return "DomainModel"
 
@@ -224,6 +226,8 @@ class DataClass:
         """Parent write classes."""
         if self.implements:
             return ", ".join(f"{interface.write_name}" for interface in self.implements)
+        elif isinstance(self, EdgeDataClass):
+            return "DomainRelationWrite"
         else:
             return "DomainModelWrite"
 

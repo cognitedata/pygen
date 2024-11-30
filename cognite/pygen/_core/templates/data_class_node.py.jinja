@@ -246,6 +246,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     {% endfor %}
 
 {% if data_class.is_writable or data_class.is_interface %}
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
@@ -293,15 +295,15 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
             {% for field in data_class.one_to_many_direct_relations_with_source %}
             if instance.{{ field.name }}:
                 new_{{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
-                for relation in instance.{{ field.name }}:
-                    if isinstance(relation, {{ field.destination_class.read_name }}):
-                        new_{{ field.name }}.append(relation)
-                    elif (other := nodes_by_id.get(relation)) and isinstance(
+                for {{ field.variable }} in instance.{{ field.name }}:
+                    if isinstance({{ field.variable }}, {{ field.destination_class.read_name }}):
+                        new_{{ field.name }}.append({{ field.variable }})
+                    elif (other := nodes_by_id.get({{ field.variable }})) and isinstance(
                         other, {{ field.destination_class.read_name }}
                     ):
                         new_{{ field.name }}.append(other)
                     else:
-                        new_{{ field.name }}.append(relation)
+                        new_{{ field.name }}.append({{ field.variable }})
                 instance.{{ field.name }} = new_{{ field.name }}
             {% endfor %}
             {% if data_class.has_edges %}
