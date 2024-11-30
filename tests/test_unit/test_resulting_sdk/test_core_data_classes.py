@@ -11,17 +11,19 @@ from omni.data_classes._core import DataRecord, DomainModel, unpack_properties
 from pydantic import Field
 
 
+class Foo(DomainModel):
+    space: str = "FooSpace"
+    bar: Optional[Bar] = Field(None, repr=False)
+
+
+class Bar(DomainModel):
+    space: str = "BarSpace"
+    foo: Optional[Foo] = Field(None, repr=False)
+
+
 class TestDomainModel:
     def test_repr(self):
         # Arrange
-        class Foo(DomainModel):
-            space: str = "FooSpace"
-            bar: Optional[Bar] = Field(None, repr=False)
-
-        class Bar(DomainModel):
-            space: str = "BarSpace"
-            foo: Optional[Foo] = Field(None, repr=False)
-
         Foo.model_rebuild()
         Bar.model_rebuild()
 
@@ -69,7 +71,7 @@ class TestDomainModelWrite:
         domain_node = dc.PrimitiveNullableWrite(
             external_id="1",
             data_record=dc.DataRecordWrite(existing_version=1),
-            float64=1.0,
+            float_64=1.0,
         )
 
         # Act
