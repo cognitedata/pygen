@@ -3,6 +3,7 @@ from __future__ import annotations
 {% if edge_api.has_edge_class and  edge_api.edge_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime
 {% endif %}
+from collections.abc import Sequence
 
 from cognite.client import data_modeling as dm
 
