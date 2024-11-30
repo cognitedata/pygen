@@ -224,8 +224,10 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         if properties:
             properties = [self._properties_by_field.get(prop, prop) for prop in properties]
 
+        is_single_aggregate = False
         if isinstance(aggregate, (str, dm.aggregations.MetricAggregation)):
             aggregate = [aggregate]
+            is_single_aggregate = True
 
         if properties is None and (invalid := [agg for agg in aggregate if isinstance(agg, str) and agg != "count"]):
             raise ValueError(f"Cannot aggregate on {invalid} without specifying properties")
@@ -247,7 +249,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
         return self._client.data_modeling.instances.aggregate(
             view=self._view_id,
-            aggregates=aggregates,
+            aggregates=aggregates[0] if is_single_aggregate else aggregates,
             group_by=group_by,
             instance_type="node",
             query=query,
