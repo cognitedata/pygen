@@ -167,6 +167,7 @@ def test_query_across_reverse_direct_relation_to_list_full(omni_client: OmniClie
 
 
 def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) -> None:
+    assert CORE_SDK.instance_space is not None
     result = (
         core_client.cognite_asset.query()
         .name.equals("230900")
@@ -178,6 +179,7 @@ def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) ->
 
 
 def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) -> None:
+    assert CORE_SDK.instance_space is not None
     result = (
         core_client.cognite_asset.query()
         .space.equals(CORE_SDK.instance_space)

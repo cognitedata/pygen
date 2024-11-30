@@ -12,7 +12,7 @@ repos:
   - hooks:
     - id: mypy
       name: mypy
-      entry: dmypy run -- cognite/ examples/
+      entry: dmypy run -- cognite/ examples/ tests/
       files: ^.*.(py|pyi)$
       language: system
       pass_filenames: false
