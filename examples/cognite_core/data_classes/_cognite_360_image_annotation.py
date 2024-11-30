@@ -251,6 +251,8 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
     format_version: Optional[str] = Field(None, alias="formatVersion")
     polygon: Optional[list[float]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> Cognite360ImageAnnotationWrite:
         """Convert this read version of Cognite 360 image annotation to the writing version."""
         return Cognite360ImageAnnotationWrite(

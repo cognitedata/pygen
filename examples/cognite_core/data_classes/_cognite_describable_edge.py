@@ -143,6 +143,8 @@ class CogniteDescribableEdge(DomainRelation):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteDescribableEdgeWrite:
         """Convert this read version of Cognite describable edge to the writing version."""
         return CogniteDescribableEdgeWrite(

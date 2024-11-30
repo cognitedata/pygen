@@ -230,6 +230,8 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
     confidence: Optional[float] = None
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteAnnotationWrite:
         """Convert this read version of Cognite annotation to the writing version."""
         return CogniteAnnotationWrite(

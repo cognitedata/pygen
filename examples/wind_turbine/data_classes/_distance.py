@@ -128,6 +128,8 @@ class Distance(DomainRelation):
     end_node: Union[Metmast, WindTurbine, str, dm.NodeId]
     distance: Optional[float] = None
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> DistanceWrite:
         """Convert this read version of distance to the writing version."""
         return DistanceWrite(

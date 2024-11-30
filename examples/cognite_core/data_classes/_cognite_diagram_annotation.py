@@ -348,6 +348,8 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
     start_node_y_max: Optional[float] = Field(None, alias="startNodeYMax")
     start_node_y_min: Optional[float] = Field(None, alias="startNodeYMin")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> CogniteDiagramAnnotationWrite:
         """Convert this read version of Cognite diagram annotation to the writing version."""
         return CogniteDiagramAnnotationWrite(

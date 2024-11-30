@@ -147,6 +147,8 @@ class ConnectionEdgeA(DomainRelation):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
+    # We do the ignore argument type as we let pydantic handle the type checking
+    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
         return ConnectionEdgeAWrite(
