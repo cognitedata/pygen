@@ -1,5 +1,7 @@
+import difflib
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes.data_modeling.ids import NodeId
@@ -48,3 +50,10 @@ class FileContentAPI:
             keep_directory_structure=keep_directory_structure,
             resolve_duplicate_file_names=resolve_duplicate_file_names,
         )
+
+    def __getattr__(self, item: str) -> Any:
+        error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
+        attributes = [name for name in vars(self).keys() if not name.startswith("_")]
+        if matches := difflib.get_close_matches(item, attributes):
+            error_message += f". Did you mean one of: {matches}?"
+        raise AttributeError(error_message)
