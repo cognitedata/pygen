@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.56] - 24-12-01
 ### Fixed
 - Views used for edges that implements other views now correctly include all properties in the generated SDK.
 - The `.aggregate("count")` method now correctly returns a single value instead of a list of values.
