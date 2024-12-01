@@ -71,6 +71,9 @@ class Field:
 
         doc_name = to_words(name, singularize=True)
         variable = create_name(prop_id, field_naming.variable)
+        if is_reserved_word(variable, "variable", view_id, prop_id):
+            variable = f"{variable}_"
+
         description: str | None = None
         if hasattr(prop, "description") and isinstance(prop.description, str):
             # This is a workaround for the fact that the description can contain curly quotes

@@ -107,7 +107,11 @@ class DataClass:
             class_name = f"{class_name}_"
 
         variable_name = create_name(base_name, data_class.variable)
+        if is_reserved_word(variable_name, "variable", view.as_id()):
+            variable_name = f"{variable_name}_"
         variable_list = create_name(base_name, data_class.variable_list)
+        if is_reserved_word(variable_list, "variable", view.as_id()):
+            variable_list = f"{variable_list}_"
         doc_name = to_words(base_name, singularize=True)
         doc_list_name = to_words(base_name, pluralize=True)
         if variable_name == variable_list:
