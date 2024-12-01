@@ -1,5 +1,6 @@
 import importlib
 import sys
+import warnings
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -124,15 +125,17 @@ class TestGenerateSDK:
         client_name = "ReverseDirectRelationClient"
         top_level_package = "reverse_direct_relation_model"
 
-        generate_sdk(
-            DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER,
-            top_level_package=top_level_package,
-            output_dir=tmp_path / top_level_package,
-            overwrite=True,
-            client_name=client_name,
-            default_instance_space="reverse_direct_relation_space",
-        )
-
+        with warnings.catch_warnings(record=True) as logger:
+            warnings.simplefilter("always")
+            generate_sdk(
+                DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER,
+                top_level_package=top_level_package,
+                output_dir=tmp_path / top_level_package,
+                overwrite=True,
+                client_name=client_name,
+                default_instance_space="reverse_direct_relation_space",
+            )
+            assert len(logger) == 0
         with append_to_sys_path(str(tmp_path)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
