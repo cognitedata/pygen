@@ -20,6 +20,9 @@ Changes are grouped as follows
 - If a view as a property `classes` the generated SDK no longer raises a `SyntaxError`.
 - Using `.earliest()/.latest()` no longer returns multiple items when used as part nested query.
 
+### Improved
+- Better error message for typos in the `.select()` method.
+
 ## [0.99.55] - 24-11-29
 
 ### Added
