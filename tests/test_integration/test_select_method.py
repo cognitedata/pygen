@@ -223,3 +223,9 @@ def test_select_sort_descending(omni_client: OmniClient, primitive_required_list
     result = omni_client.primitive_required.select().timestamp.sort_descending().list_full()
 
     assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
+
+
+def test_select_latest_core(core_client: CogniteCoreClient) -> None:
+    result = core_client.cognite_equipment.select().asset.path_last_updated_time.latest().list_cognite_asset()
+
+    assert len(result) == 1
