@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import difflib
 import math
 import time
 import warnings
@@ -99,7 +100,11 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
         elif self._connection_type == "reverse-list":
             raise ValueError(f"Cannot query across a reverse-list connection.")
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
+        attributes = [name for name in vars(self).keys() if not name.startswith("_")]
+        if matches := difflib.get_close_matches(item, attributes):
+            error_message += f". Did you mean one of: {matches}?"
+        raise AttributeError(error_message)
 
     def _assemble_filter(self) -> dm.filters.Filter | None:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
