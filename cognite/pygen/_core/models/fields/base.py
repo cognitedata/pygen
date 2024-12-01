@@ -58,6 +58,7 @@ class Field:
         pydantic_field: Literal["Field", "pydantic.Field"],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]],
         view_by_id: dict[dm.ViewId, dm.View],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
@@ -71,6 +72,9 @@ class Field:
 
         doc_name = to_words(name, singularize=True)
         variable = create_name(prop_id, field_naming.variable)
+        if is_reserved_word(variable, "variable", view_id, prop_id):
+            variable = f"{variable}_"
+
         description: str | None = None
         if hasattr(prop, "description") and isinstance(prop.description, str):
             # This is a workaround for the fact that the description can contain curly quotes
@@ -96,6 +100,7 @@ class Field:
                 has_default_instance_space,
                 view_id,
                 direct_relations_by_view_id,
+                view_property_by_container_direct_relation,
                 view_by_id,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):

@@ -2,6 +2,7 @@ from typing import Any
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import filters
 from omni import OmniClient
 
 from cognite.pygen import _QueryExecutor
@@ -185,3 +186,15 @@ def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dic
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+
+
+def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
+    executor = _QueryExecutor(cognite_client)
+    view_id = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
+
+    no_parent = filters.Equals(view_id.as_property_ref("parent"), None)  # type: ignore[arg-type]
+    result = executor.list(view_id, ["externalId", "name", "parent"], filter=no_parent, limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert all(item.get("parent") is None for item in result)

@@ -67,12 +67,13 @@ _NAMES_BY_TYPE = {
     "parameter": PARAMETER_NAMES,
     "data class": DATA_CLASS_NAMES,
     "filename": FILE_NAMES,
+    "variable": set(),
 }
 
 
 def is_reserved_word(
     word: str,
-    word_type: Literal["field", "data class", "parameter", "filename"],
+    word_type: Literal["field", "data class", "parameter", "filename", "variable"],
     view_id: dm.ViewId | None = None,
     property_name: str | None = None,
 ) -> bool:

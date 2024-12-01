@@ -1,3 +1,4 @@
+from omni import OmniClient
 from wind_turbine import WindTurbineClient
 from wind_turbine import data_classes as data_cls
 
@@ -33,3 +34,11 @@ def test_upsert_with_edge(turbine_client: WindTurbineClient) -> None:
         assert len(created.edges) == 1
     finally:
         turbine_client.delete(new_turbine)
+
+
+def test_list_edges_both_directions(omni_client: OmniClient) -> None:
+    outwards = omni_client.connection_item_f.outwards_multi_edge.list(limit=-1)
+    inwards = omni_client.connection_item_g.inwards_multi_property_edge.list(limit=-1)
+
+    assert len(outwards) > 0
+    assert set(outwards.as_edge_ids()) == set(inwards.as_edge_ids())

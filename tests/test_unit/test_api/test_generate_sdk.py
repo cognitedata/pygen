@@ -1,5 +1,6 @@
 import importlib
 import sys
+import warnings
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -116,6 +117,25 @@ class TestGenerateSDK:
             default_instance_space="hydro_energi_watercourse_type_space",
         )
 
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
+    def test_generate_sdk_reverse_direct_relation_through_container(self, tmp_path: Path) -> None:
+        client_name = "ReverseDirectRelationClient"
+        top_level_package = "reverse_direct_relation_model"
+
+        with warnings.catch_warnings(record=True) as logger:
+            warnings.simplefilter("always")
+            generate_sdk(
+                DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER,
+                top_level_package=top_level_package,
+                output_dir=tmp_path / top_level_package,
+                overwrite=True,
+                client_name=client_name,
+                default_instance_space="reverse_direct_relation_space",
+            )
+            assert len(logger) == 0
         with append_to_sys_path(str(tmp_path)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
@@ -251,6 +271,32 @@ DATA_MODEL_WITH_ILLEGAL_PROPERTY_NAMES = dm.DataModel(
                     auto_increment=False,
                     immutable=False,
                 ),
+                "class": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="class",
+                    type=dm.DirectRelation(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId(
+                        space="illegal_property_names_space",
+                        external_id="AnotherType",
+                        version="1",
+                    ),
+                ),
+                "classes": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="classes",
+                    type=dm.DirectRelation(is_list=True),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId(
+                        space="illegal_property_names_space",
+                        external_id="AnotherType",
+                        version="1",
+                    ),
+                ),
             },
             description=None,
             is_global=False,
@@ -260,7 +306,40 @@ DATA_MODEL_WITH_ILLEGAL_PROPERTY_NAMES = dm.DataModel(
             implements=None,
             writable=True,
             filter=None,
-        )
+        ),
+        dm.View(
+            space="illegal_property_names_space",
+            name="AnotherType",
+            external_id="AnotherType",
+            version="1",
+            properties={
+                "name": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+                "field": dm.MappedProperty(
+                    container=dm.ContainerId("illegal_property_names_space", "IllegalPropertyNames"),
+                    container_property_identifier="field",
+                    type=dm.Text(),
+                    nullable=True,
+                    auto_increment=False,
+                    source=dm.ViewId("illegal_property_names_space", "IllegalPropertyNames", "1"),
+                    immutable=False,
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        ),
     ],
 )
 
@@ -401,5 +480,64 @@ DATA_MODEL_DIRECT_RELATION_MISSING_SOURCE = dm.DataModel(
             filter=None,
             is_global=False,
         )
+    ],
+)
+DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER = dm.DataModel(
+    space="reverse_direct_relation_space",
+    external_id="ReverseDirectRelationModel",
+    version="1",
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="reverse_direct_relation_space",
+            name="ReverseDirectRelationTarget",
+            external_id="ReverseDirectRelationTarget",
+            version="1",
+            properties={
+                "name": dm.MappedProperty(
+                    container=dm.ContainerId("reverse_direct_relation_space", "ReverseDirectRelation"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        ),
+        dm.View(
+            space="reverse_direct_relation_space",
+            name="ReverseDirectRelation",
+            external_id="ReverseDirectRelation",
+            version="1",
+            properties={
+                "pointingSourceContainer": dm.MultiReverseDirectRelation(
+                    source=dm.ViewId("reverse_direct_relation_space", "ReverseDirectRelationTarget", "1"),
+                    through=dm.PropertyId(
+                        source=dm.ContainerId("reverse_direct_relation_space", "ReverseDirectRelation"),
+                        property="name",
+                    ),
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        ),
     ],
 )

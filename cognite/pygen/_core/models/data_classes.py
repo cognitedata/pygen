@@ -107,7 +107,11 @@ class DataClass:
             class_name = f"{class_name}_"
 
         variable_name = create_name(base_name, data_class.variable)
+        if is_reserved_word(variable_name, "variable", view.as_id()):
+            variable_name = f"{variable_name}_"
         variable_list = create_name(base_name, data_class.variable_list)
+        if is_reserved_word(variable_list, "variable", view.as_id()):
+            variable_list = f"{variable_list}_"
         doc_name = to_words(base_name, singularize=True)
         doc_list_name = to_words(base_name, pluralize=True)
         if variable_name == variable_list:
@@ -158,6 +162,7 @@ class DataClass:
         views: list[dm.View],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]],
         config: pygen_config.PygenConfig,
     ) -> None:
         """Update the fields of the data class.
@@ -178,6 +183,7 @@ class DataClass:
                 pydantic_field=self.pydantic_field,
                 has_default_instance_space=has_default_instance_space,
                 direct_relations_by_view_id=direct_relations_by_view_id,
+                view_property_by_container_direct_relation=view_property_by_container_direct_relation,
                 view_by_id=view_by_id,
             )
             if field_ is None:
@@ -780,6 +786,7 @@ class EdgeDataClass(DataClass):
         views: list[dm.View],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]],
         config: pygen_config.PygenConfig,
     ):
         """Update the fields of the data class."""
@@ -821,5 +828,6 @@ class EdgeDataClass(DataClass):
             views,
             has_default_instance_space,
             direct_relations_by_view_id,
+            view_property_by_container_direct_relation,
             config,
         )

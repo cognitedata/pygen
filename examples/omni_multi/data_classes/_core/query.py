@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import difflib
 import math
 import time
 import warnings
@@ -96,7 +97,11 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
         elif self._connection_type == "reverse-list":
             raise ValueError(f"Cannot query across a reverse-list connection.")
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
+        attributes = [name for name in vars(self).keys() if not name.startswith("_")]
+        if matches := difflib.get_close_matches(item, attributes):
+            error_message += f". Did you mean one of: {matches}?"
+        raise AttributeError(error_message)
 
     def _assemble_filter(self) -> dm.filters.Filter | None:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter else []
@@ -178,11 +183,8 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
-        set_limit = builder[0].max_retrieve_limit
         for step in builder[:-1]:
             step.select = None
-        # We cannot use the limit above, as the _create_query will set limit=1 if latest/earliest is used
-        builder[-1].max_retrieve_limit = set_limit
         builder.execute_query(self._client, remove_not_connected=False)
         return builder.unpack()
 
@@ -198,7 +200,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     ) -> DataClassQueryBuilder:
         builder = DataClassQueryBuilder(result_list_cls, return_step=return_step)
         from_: str | None = None
-        first: bool = True
+        is_first: bool = True
         is_last_reverse_list = False
         for item in self._creation_path:
             if is_last_reverse_list:
@@ -208,18 +210,33 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     "To do this query, you need to reimplement the data model and use an edge to "
                     "implement this connection instead of a reverse direct relation"
                 )
-            name = builder.create_name(from_)
-            if first and item._has_limit_1():
-                if limit != DEFAULT_QUERY_LIMIT:
-                    warnings.warn(
-                        "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
-                    )
-                max_retrieve_limit = 1
-            elif first:
-                max_retrieve_limit = limit
+            if return_step == "first":
+                if is_first and item._has_limit_1():
+                    if limit != DEFAULT_QUERY_LIMIT:
+                        warnings.warn(
+                            "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
+                        )
+                    max_retrieve_limit = 1
+                elif is_first:
+                    max_retrieve_limit = limit
+                else:
+                    max_retrieve_limit = -1
+            elif return_step == "last":
+                is_last = item is self._creation_path[-1]
+                if is_last and item._has_limit_1():
+                    if limit != DEFAULT_QUERY_LIMIT:
+                        warnings.warn(
+                            "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
+                        )
+                    max_retrieve_limit = 1
+                elif is_last:
+                    max_retrieve_limit = limit
+                else:
+                    max_retrieve_limit = -1
             else:
-                max_retrieve_limit = -1
+                raise ValueError("Bug in Pygen. Invalid return_step. Please report")
 
+            name = builder.create_name(from_)
             step: QueryStep
             if isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.NodeResultSetExpression):
                 step = NodeQueryStep(
@@ -264,7 +281,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
 
             is_last_reverse_list = item._connection_type == "reverse-list"
-            first = False
+            is_first = False
             from_ = name
         return builder
 

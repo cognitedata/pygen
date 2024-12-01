@@ -21,7 +21,7 @@ class NameCollisionWarning(PygenWarning, RuntimeWarning):
     def create(
         cls,
         word: str,
-        word_type: Literal["field", "data class", "parameter", "filename"],
+        word_type: Literal["field", "data class", "parameter", "filename", "variable"],
         view_id: ViewId | None,
         property_name: str | None,
     ) -> NameCollisionWarning:

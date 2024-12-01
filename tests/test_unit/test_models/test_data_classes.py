@@ -28,6 +28,7 @@ class TestDataClasses:
                 list(views),
                 True,
                 {},
+                {},
                 pygen_config,
             )
 
@@ -70,6 +71,7 @@ class TestDataClasses:
             {},
             [view],
             True,
+            {},
             {},
             pygen_config,
         )

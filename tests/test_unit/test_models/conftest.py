@@ -48,6 +48,7 @@ def omni_field_factory(
             "Field",
             True,
             direct_relations_by_view_id,
+            {},
             view_by_id,
         )
 

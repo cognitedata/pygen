@@ -1,5 +1,8 @@
 from collections.abc import Callable
 
+import difflib
+from typing import Any
+
 import pandas as pd
 import datetime
 from cognite.client import CogniteClient
@@ -115,3 +118,10 @@ class DataPointsAPI:
             include_granularity_name=include_granularity_name,
             column_names="instance_id",
         )
+
+    def __getattr__(self, item: str) -> Any:
+        error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
+        attributes = [name for name in vars(self).keys() if not name.startswith("_")]
+        if matches := difflib.get_close_matches(item, attributes):
+            error_message += f". Did you mean one of: {matches}?"
+        raise AttributeError(error_message)

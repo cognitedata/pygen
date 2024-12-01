@@ -236,6 +236,7 @@ class QueryExecutor:
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
+        filter = self._equals_none_to_not_exists(filter)
         search_result = self._client.data_modeling.instances.search(
             view,
             query,
@@ -322,6 +323,7 @@ class QueryExecutor:
         search_properties: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
+        filter = self._equals_none_to_not_exists(filter)
         return self._execute_aggregation(view, aggregates, search_properties, query, filter, group_by, limit)
 
     def list(
@@ -332,7 +334,21 @@ class QueryExecutor:
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
+        filter = self._equals_none_to_not_exists(filter)
         return self._execute_list(view, properties, filter, sort, limit)
+
+    @classmethod
+    def _equals_none_to_not_exists(cls, filter: filters.Filter | None) -> filters.Filter | None:
+        if isinstance(filter, filters.Equals) and filter._value is None:
+            return filters.Not(filters.Exists(filter._property))
+        elif isinstance(filter, filters.And):
+            return filters.And(*[res for f in filter._filters if (res := cls._equals_none_to_not_exists(f))])
+        elif isinstance(filter, filters.Or):
+            return filters.Or(*[res for f in filter._filters if (res := cls._equals_none_to_not_exists(f))])
+        elif isinstance(filter, filters.Not) and filter._filters:
+            if res := cls._equals_none_to_not_exists(filter._filters[0]):
+                return filters.Not(res)
+        return filter
 
 
 class QueryStepFactory:

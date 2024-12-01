@@ -223,3 +223,16 @@ def test_select_sort_descending(omni_client: OmniClient, primitive_required_list
     result = omni_client.primitive_required.select().timestamp.sort_descending().list_full()
 
     assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
+
+
+def test_select_latest_core(core_client: CogniteCoreClient) -> None:
+    result = core_client.cognite_equipment.select().asset.path_last_updated_time.latest().list_cognite_asset()
+
+    assert len(result) == 1
+
+
+def test_select_helpful_feedback_on_type(omni_client: OmniClient) -> None:
+    with pytest.raises(AttributeError) as e:
+        omni_client.primitive_required.select().float64.range(123.0, 456.0).list_full()
+
+    assert "Did you mean one of" in str(e.value)

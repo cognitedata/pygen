@@ -218,17 +218,20 @@ class MultiAPIGenerator:
         unique_views: list[dm.View] = []
         # Used to verify that reverse direct relation's targets exist.
         direct_relations_by_view_id: dict[dm.ViewId, set[str]] = {}
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]] = {}
         for view in itertools.chain.from_iterable(model.views for model in data_models):
             view_id = view.as_id()
             if view_id in seen_views:
                 continue
             unique_views.append(view)
             seen_views.add(view_id)
-            direct_relations_by_view_id[view_id] = {
-                prop_name
-                for prop_name, prop in view.properties.items()
-                if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)
-            }
+            for prop_name, prop in view.properties.items():
+                if not (isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)):
+                    continue
+                direct_relations_by_view_id.setdefault(view_id, set()).add(prop_name)
+                view_property_by_container_direct_relation.setdefault(
+                    (prop.container, prop.container_property_identifier), set()
+                ).add(dm.PropertyId(view_id, prop_name))
 
         self.api_by_type_by_view_id = self.create_api_by_view_id_type(
             unique_views,
@@ -266,6 +269,7 @@ class MultiAPIGenerator:
                 unique_views,
                 self.has_default_instance_space,
                 direct_relations_by_view_id,
+                view_property_by_container_direct_relation,
                 config,
             )
 
