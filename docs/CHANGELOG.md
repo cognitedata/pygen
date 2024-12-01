@@ -17,6 +17,7 @@ Changes are grouped as follows
 ### Fixed
 - Views used for edges that implements other views now correctly include all properties in the generated SDK.
 - The `.aggregate("count")` method now correctly returns a single value instead of a list of values.
+- If a view as a property `classes` the generated SDK no longer raises a `SyntaxError`.
 
 ## [0.99.55] - 24-11-29
 
