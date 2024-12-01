@@ -283,6 +283,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             from_ = name
         return builder
 
+
 class EdgeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainRelation]]
 
