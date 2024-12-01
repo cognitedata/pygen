@@ -17,7 +17,11 @@ from cognite.client.data_classes.data_modeling.views import (
 )
 
 from cognite.pygen._constants import is_readonly_property
-from cognite.pygen._warnings import MissingReverseDirectRelationTargetWarning, UnknownConnectionTargetWarning
+from cognite.pygen._warnings import (
+    MissingReverseDirectRelationTargetWarning,
+    PygenWarning,
+    UnknownConnectionTargetWarning,
+)
 
 from .base import Field
 from .primitive import ContainerProperty
@@ -251,20 +255,46 @@ class BaseConnectionField(Field, ABC):
         has_default_instance_space: bool,
         view_id: dm.ViewId,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]],
         view_by_id: dict[dm.ViewId, dm.View],
     ) -> Field | None:
         """Load a connection field from a property"""
         if not isinstance(prop, dm.EdgeConnection | dm.MappedProperty | ReverseDirectRelation):
             return None
+        through: dm.PropertyId | None = None
         if isinstance(prop, ReverseDirectRelation):
-            target = (
-                direct_relations_by_view_id.get(prop.through.source)
-                if isinstance(prop.through.source, dm.ViewId)
-                else None
-            )
-            if target is None or prop.through.property not in target:
+            if isinstance(prop.through.source, dm.ViewId):
+                direct_relations_in_view = direct_relations_by_view_id.get(prop.through.source)
+                if direct_relations_in_view is None or prop.through.property not in direct_relations_in_view:
+                    warnings.warn(
+                        MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
+                    )
+                    return None
+                through = prop.through
+            elif isinstance(prop.through.source, dm.ContainerId):
+                through_options = view_property_by_container_direct_relation.get(
+                    (prop.through.source, prop.through.property), set()
+                )
+                if len(through_options) == 0:
+                    warnings.warn(
+                        MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
+                    )
+                    return None
+                elif len(through_options) > 1:
+                    warnings.warn(
+                        PygenWarning(
+                            f"Multiple options for through property {prop.through}. Skipping field {prop.through}"
+                        ),
+                        stacklevel=2,
+                    )
+                    return None
+                through = next(iter(through_options))
+            else:
                 warnings.warn(
-                    MissingReverseDirectRelationTargetWarning(prop.through, view_id, base.prop_name), stacklevel=2
+                    PygenWarning(
+                        f"Unknown through source type {type(prop.through.source)}. Skipping field {prop.through}"
+                    ),
+                    stacklevel=2,
                 )
                 return None
         elif isinstance(prop, dm.EdgeConnection | dm.MappedProperty) and prop.source is not None:
@@ -284,8 +314,6 @@ class BaseConnectionField(Field, ABC):
         else:
             warnings.warn(f"Unknown connection type {prop}", stacklevel=2)
             return None
-
-        through = prop.through if isinstance(prop, ReverseDirectRelation) else None
 
         destination_class = node_class_by_view_id.get(prop.source) if prop.source else None
         type_hint_node_reference = ["str", "dm.NodeId"] if has_default_instance_space else ["dm.NodeId"]

@@ -58,6 +58,7 @@ class Field:
         pydantic_field: Literal["Field", "pydantic.Field"],
         has_default_instance_space: bool,
         direct_relations_by_view_id: dict[dm.ViewId, set[str]],
+        view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]],
         view_by_id: dict[dm.ViewId, dm.View],
     ) -> Field | None:
         from .cdf_reference import CDFExternalField
@@ -99,6 +100,7 @@ class Field:
                 has_default_instance_space,
                 view_id,
                 direct_relations_by_view_id,
+                view_property_by_container_direct_relation,
                 view_by_id,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
