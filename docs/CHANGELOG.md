@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.57] - 24-12-12
+### Fixed
+- Added `instance-space` to the `pygen` CLI.
+
 ## [0.99.56] - 24-12-01
 ### Fixed
 - Views used for edges that implements other views now correctly include all properties in the generated SDK.
