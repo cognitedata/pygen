@@ -31,6 +31,7 @@ class PygenSettings(BaseModel):
     output_dir: Argument = Argument(default=None, help="Output directory for generated SDK")
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
+    instance_space: Argument = Argument(default=None, help="Space name for the instance to be generated")
     overwrite: Argument = Argument(
         default=False, help="Whether to overwrite existing files in output directory with the new SDK."
     )

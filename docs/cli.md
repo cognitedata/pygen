@@ -14,6 +14,7 @@ Given a Data Model with external id `Movie` in the space `movies` in CDF, the fo
         --client-secret <client-secret> \
         --cdf-cluster <cdf-cluster> \
         --cdf-project <cdf-project>
+        --instance-space <my_instance_space>
     ```
 
 === "Generic OIDC authentication"
@@ -29,6 +30,7 @@ Given a Data Model with external id `Movie` in the space `movies` in CDF, the fo
         --client-secret <client-secret> \
         --cdf-cluster <cdf-cluster> \
         --cdf-project <cdf-project>
+        --instance-space <my_instance_space>
     ```
 
 In addition, the following options are available and recommended to be used:
@@ -36,6 +38,7 @@ In addition, the following options are available and recommended to be used:
 * `--output-dir` This is the directory where the generated SDK will be placed.
 * `--top-level-package` The top level package for where to place the SDK, for example `movie_sdk.client`.
 * `--client-name` Client name for the generated client expected to be given in `PascalCase`, for example `MovieClient`.
+* `--instance-space` The instance space to use for the generated SDK.
 
 For more information about the available options, see `pygen --help`.
 
@@ -65,6 +68,7 @@ Below is an example of the values that can be set in the `pyproject.toml` and `.
     top_level_package = "movie_domain.client"
     client_name = "MovieClient"
     output_dir = "."
+    instance_space = "my_instance_space"
     ```
 
 === ".secret.toml"

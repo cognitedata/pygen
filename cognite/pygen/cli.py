@@ -74,6 +74,9 @@ if _has_typer:
                 loaded_settings.top_level_package.default, help=loaded_settings.top_level_package.help
             ),
             client_name: str = typer.Option(loaded_settings.client_name.default, help=loaded_settings.client_name.help),
+            instance_space: str | None = typer.Option(
+                loaded_settings.instance_space.default, help=loaded_settings.instance_space.help
+            ),
             overwrite: bool = typer.Option(loaded_settings.overwrite.default, help=loaded_settings.overwrite.help),
             skip_formatting: bool = typer.Option(
                 loaded_settings.skip_formatting.default, help=loaded_settings.skip_formatting.help
@@ -116,7 +119,8 @@ if _has_typer:
                     client,
                     top_level_package,
                     client_name,
-                    None,
+                    instance_space,
+                    output_dir=output_dir,
                     logger=typer.echo,
                     overwrite=overwrite,
                     format_code=not skip_formatting,
@@ -146,6 +150,9 @@ if _has_typer:
             ),
             client_name: str = typer.Option(
                 default_settings.client_name.default, help=default_settings.client_name.help
+            ),
+            instance_space: str | None = typer.Option(
+                default_settings.instance_space.default, help=default_settings.instance_space.help
             ),
             overwrite: bool = typer.Option(default_settings.overwrite.default, help=default_settings.overwrite.help),
             skip_formatting: bool = typer.Option(
@@ -180,7 +187,7 @@ if _has_typer:
                     client,
                     top_level_package,
                     client_name,
-                    None,
+                    default_instance_space=instance_space,
                     output_dir=output_dir,
                     logger=typer.echo,
                     overwrite=overwrite,
