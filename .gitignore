@@ -71,3 +71,4 @@ package.json
 *.env
 playground.ipynb
 wind-data/
+tmp/
