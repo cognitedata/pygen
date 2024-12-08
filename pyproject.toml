@@ -60,6 +60,7 @@ cdf_project = "<cdf-project>"
 top_level_package = "movie_domain.client"
 client_name = "MovieClient"
 output_dir = "docs/examples"
+instance_space = "move_data"
 
 [tool.poetry.scripts]
 pygen = "cognite.pygen.cli:main"
