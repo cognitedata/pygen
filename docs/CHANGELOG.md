@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.58] - 24-12-16
+### Fixed
+- Updated the timeseries API to support TimeZone.
+
 ## [0.99.57] - 24-12-12
 ### Fixed
 - Added `instance-space` to the `pygen` CLI.
