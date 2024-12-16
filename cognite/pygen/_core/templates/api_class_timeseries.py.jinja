@@ -10,6 +10,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
+from cognite.client.utils._time import ZoneInfo
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
 from {{ top_level_package }}.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
 from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ
@@ -36,6 +37,7 @@ class {{ timeseries_api.query_class}}:
         end: int | str | datetime.datetime | None = None,
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
+        granularity: str | None = None,
         timezone: str | datetime.timezone | ZoneInfo | None = None,
         target_unit: str | None = None,
         target_unit_system: str | None = None,
@@ -89,10 +91,14 @@ class {{ timeseries_api.query_class}}:
                 end=end,
                 aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
+                timezone=timezone,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
+                include_status=include_status,
+                ignore_bad_datapoints=ignore_bad_datapoints,
+                treat_uncertain_as_bad=treat_uncertain_as_bad,
             )
         else:
             return DatapointsList([])
@@ -157,10 +163,14 @@ class {{ timeseries_api.query_class}}:
                 end=end,
                 aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
+                timezone=timezone,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
+                include_status=include_status,
+                ignore_bad_datapoints=ignore_bad_datapoints,
+                treat_uncertain_as_bad=treat_uncertain_as_bad,
             )
         else:
             return DatapointsArrayList([])
@@ -233,10 +243,14 @@ class {{ timeseries_api.query_class}}:
                 end=end,
                 aggregates=aggregates,  # type: ignore[arg-type]
                 granularity=granularity,
+                timezone=timezone,
                 target_unit=target_unit,
                 target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
+                include_status=include_status,
+                ignore_bad_datapoints=ignore_bad_datapoints,
+                treat_uncertain_as_bad=treat_uncertain_as_bad,
                 uniform_index=uniform_index,
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
