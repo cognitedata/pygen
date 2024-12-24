@@ -13,8 +13,8 @@ from typing import (
 
 from cognite.client import data_modeling as dm
 
-from omni.data_classes._core._query.builder import QueryBuilder
-from omni.data_classes._core._query.step import QueryStep
+from omni.data_classes._core.query.builder import QueryBuilder
+from omni.data_classes._core.query.step import QueryStep
 from omni.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
 from omni.data_classes._core.constants import NotSetSentinel, DEFAULT_INSTANCE_SPACE
 
