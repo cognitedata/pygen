@@ -1,7 +1,7 @@
 import datetime
+import sys
 import time
 import warnings
-import sys
 from collections.abc import Collection, Iterable, Iterator, MutableSequence, Sequence
 from dataclasses import dataclass, field
 from typing import (

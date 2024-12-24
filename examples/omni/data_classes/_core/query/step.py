@@ -17,8 +17,8 @@ from omni.data_classes._core.query.constants import (
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
-    SelectedProperties,
     NotSetSentinel,
+    SelectedProperties,
 )
 
 

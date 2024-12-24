@@ -15,7 +15,7 @@ from cognite.client.utils.useful_types import SequenceNotStr
 from cognite.pygen._version import __version__
 
 from .builder import QueryBuilder, chunker
-from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, Properties
+from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
 from .processing import QueryUnpacker
 from .step import QueryStepFactory
 
@@ -39,7 +39,7 @@ class QueryExecutor:
         self,
         view: dm.ViewId,
         operation: Literal["list", "aggregate", "search"],
-        properties: Properties | None = None,
+        properties: SelectedProperties | None = None,
         filter: filters.Filter | None = None,
         query: str | None = None,
         group_by: str | SequenceNotStr[str] | None = None,
@@ -81,7 +81,7 @@ class QueryExecutor:
     def search(
         self,
         view: dm.ViewId,
-        properties: Properties | None = None,
+        properties: SelectedProperties | None = None,
         query: str | None = None,
         filter: filters.Filter | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
@@ -237,7 +237,7 @@ class QueryExecutor:
         return self._view_by_id[view_id]
 
     @staticmethod
-    def _as_property_list(properties: Properties, operation: str) -> list[str]:
+    def _as_property_list(properties: SelectedProperties, operation: str) -> list[str]:
         output = []
         is_nested_supported = operation == "list"
         for prop in properties:
@@ -257,7 +257,7 @@ class QueryExecutor:
     def _execute_list(
         self,
         view_id: dm.ViewId,
-        properties: Properties,
+        properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
@@ -382,7 +382,7 @@ class QueryExecutor:
     def list(
         self,
         view: dm.ViewId,
-        properties: Properties,
+        properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,

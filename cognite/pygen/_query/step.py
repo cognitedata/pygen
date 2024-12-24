@@ -3,10 +3,7 @@ import warnings
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
-from typing import (
-    Any,
-    Literal,
-)
+from typing import Any, Literal
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
@@ -21,7 +18,7 @@ from cognite.pygen._query.constants import (
     INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
     NotSetSentinel,
-    Properties,
+    SelectedProperties,
 )
 
 
@@ -159,7 +156,7 @@ class QueryStepFactory:
     def __init__(
         self,
         view: dm.View,
-        user_selected_properties: Properties,
+        user_selected_properties: SelectedProperties,
         create_step_name: Callable[[str | None], str],
     ) -> None:
         self._view = view
