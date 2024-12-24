@@ -7,7 +7,7 @@ from typing import Any
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
-from omni.data_classes._core.query.builder import QueryStep
+from omni.data_classes._core.query.step import QueryStep
 
 
 class QueryResultCleaner:

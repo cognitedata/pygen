@@ -3,10 +3,7 @@ import warnings
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
-from typing import (
-    Any,
-    Literal,
-)
+from typing import Any, Literal
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
