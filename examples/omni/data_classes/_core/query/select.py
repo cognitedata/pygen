@@ -15,7 +15,7 @@ from typing import (
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from omni.data_classes._core._query.filter_classes import Filtering
+from omni.data_classes._core.query.filter_classes import Filtering
 from omni.data_classes._core.base import (
     DomainModelList,
     T_DomainList,
@@ -28,6 +28,8 @@ from omni.data_classes._core.base import (
 from omni.data_classes._core.constants import (
     DEFAULT_QUERY_LIMIT,
 )
+from omni.data_classes._core.query.step import QueryStep
+from omni.data_classes._core.query.data_class_step import NodeQueryStep, EdgeQueryStep, DataClassQueryBuilder
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 

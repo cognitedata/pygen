@@ -60,6 +60,60 @@ def test_generate_data_class_core_query(omni_multi_api_generator: MultiAPIGenera
     assert actual == expected
 
 
+def test_generate_data_class_core_query_init(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_query_init.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_init()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_query_data_class_step(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_query_data_class_step.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_data_classes_step()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_query_filter_classes(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_query_filter_classes.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_filter_classes()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_query_select(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.data_core_query_select.read_text()
+
+    # Act
+    actual = omni_multi_api_generator.generate_data_class_core_query_select()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_query_files(omni_multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    content_by_file = omni_multi_api_generator.generate_data_class_core_query_files()
+    for filename, actual in content_by_file.items():
+        expected = (OmniFiles.core_query_data / filename).read_text()
+
+        # Assert
+        assert actual == expected
+
+
 def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniFiles.data_core_cdf_external.read_text()

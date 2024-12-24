@@ -5,7 +5,8 @@ import ast
 from functools import lru_cache
 from pathlib import Path
 
-QUERY_BUILDER_FILE = Path(__file__).resolve().parent / "query_builder.py"
+THIS_FOLDER = Path(__file__).resolve().parent
+QUERY_BUILDER_FILE = THIS_FOLDER / "query_builder.py"
 
 
 @lru_cache(maxsize=1)
@@ -27,6 +28,11 @@ def get_classes_code(class_names: frozenset[str]) -> str:
             class_code.append("\n".join(source_lines[start_lineno:end_lineno]))
 
     return "\n\n\n".join(class_code)
+
+
+@lru_cache
+def get_file_content(filename: str) -> str:
+    return (THIS_FOLDER / filename).read_text(encoding="utf-8")
 
 
 if __name__ == "__main__":
