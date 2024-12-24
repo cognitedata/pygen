@@ -20,6 +20,7 @@ from cognite.pygen._query.constants import (
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
+    NotSetSentinel,
     Properties,
 )
 
@@ -43,13 +44,6 @@ class ViewPropertyId(CogniteObject):
         }
 
 
-class _NotSetSentinel:
-    """This is a special class that indicates that a value has not been set.
-    It is used when we need to distinguish between not set and None."""
-
-    ...
-
-
 class QueryStep:
     def __init__(
         self,
@@ -57,7 +51,7 @@ class QueryStep:
         expression: dm.query.ResultSetExpression,
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
-        select: dm.query.Select | None | type[_NotSetSentinel] = _NotSetSentinel,
+        select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         view_property: ViewPropertyId | None = None,
@@ -68,7 +62,7 @@ class QueryStep:
         self.view_id = view_id
         self.max_retrieve_limit = max_retrieve_limit
         self.select: dm.query.Select | None
-        if select is _NotSetSentinel:
+        if select is NotSetSentinel:
             try:
                 self.select = self._default_select()
             except NotImplementedError:
