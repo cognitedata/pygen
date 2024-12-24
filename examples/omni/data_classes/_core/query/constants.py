@@ -16,3 +16,10 @@ AGGREGATION_LIMIT = 1_000
 
 NODE_PROPERTIES = frozenset({"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"})
 Properties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
+
+
+class NotSetSentinel:
+    """This is a special class that indicates that a value has not been set.
+    It is used when we need to distinguish between not set and None."""
+
+    ...

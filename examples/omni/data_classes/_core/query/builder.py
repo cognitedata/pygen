@@ -1,6 +1,7 @@
 import datetime
 import time
 import warnings
+import sys
 from collections.abc import Collection, Iterable, Iterator, MutableSequence, Sequence
 from dataclasses import dataclass, field
 from typing import (
@@ -14,14 +15,19 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._query.constants import (
+from omni.data_classes._core.query.constants import (
     IN_FILTER_CHUNK_SIZE,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
 )
-from cognite.pygen._query.processing import QueryResultCleaner
-from cognite.pygen._query.step import QueryStep
+from omni.data_classes._core.query.processing import QueryResultCleaner
+from omni.data_classes._core.query.step import QueryStep
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class QueryReducingBatchSize(UserWarning):
@@ -263,13 +269,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
+    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
 
     @overload
-    def __getitem__(self, item: slice) -> "QueryBuilder": ...
+    def __getitem__(self, item: slice, /) -> Self: ...
 
-    def __getitem__(self, item: SupportsIndex | slice) -> "QueryStep | QueryBuilder":
+    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | Self:
         value = super().__getitem__(item)
         if isinstance(item, slice):
-            return QueryBuilder(value)  # type: ignore[arg-type]
+            return type(self)(value)  # type: ignore[arg-type]
         return cast(QueryStep, value)

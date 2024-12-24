@@ -16,12 +16,12 @@ from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._query.constants import (
+from omni.data_classes._core.query.constants import (
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
-    NotSetSentinel,
     Properties,
+    NotSetSentinel,
 )
 
 

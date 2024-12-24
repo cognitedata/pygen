@@ -1,13 +1,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Collection, Iterable
+from collections.abc import Collection
 from typing import (
     cast,
     Generic,
-    Iterator,
-    overload,
-    SupportsIndex,
     Literal,
 )
 
@@ -16,7 +13,9 @@ from cognite.client import data_modeling as dm
 from omni.data_classes._core.query.builder import QueryBuilder
 from omni.data_classes._core.query.step import QueryStep
 from omni.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
-from omni.data_classes._core.constants import NotSetSentinel, DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core.query.constants import NotSetSentinel
+from omni.data_classes._core.helpers import as_node_id
 
 
 class NodeQueryStep(QueryStep):
@@ -139,7 +138,7 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
         else:
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
-    def append(self, __object: QueryStep, /) -> None:
+    def append(self, __object: QueryStep, /) -> None: #type: ignore[override]
         # Extra validation to ensure all assumptions are met
         if len(self) == 0:
             if __object.from_ is not None:
@@ -163,23 +162,3 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
             if __object.from_ is None:
                 raise ValueError("The 'from_' value should be set")
         super().append(__object)
-
-    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
-        for item in __iterable:
-            self.append(item)
-
-    # The implementations below are to get proper type hints
-    def __iter__(self) -> Iterator[QueryStep]:
-        return super().__iter__()
-
-    @overload
-    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
-
-    @overload
-    def __getitem__(self, item: slice, /) -> DataClassQueryBuilder[T_DomainModelList]: ...
-
-    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | DataClassQueryBuilder[T_DomainModelList]:
-        value = super().__getitem__(item)
-        if isinstance(item, slice):
-            return DataClassQueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type]
-        return cast(QueryStep, value)
