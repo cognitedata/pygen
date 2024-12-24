@@ -22,12 +22,12 @@ from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
+from cognite.pygen._query.extract_query_code import get_classes_code
 from cognite.pygen._version import __version__
 from cognite.pygen._warnings import PydanticNamespaceCollisionWarning
 from cognite.pygen.config import PygenConfig
 
 from . import validation
-from .extract_query_code import get_classes_code
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
 from .models.api_classes import APIClass, EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
