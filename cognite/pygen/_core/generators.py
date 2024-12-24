@@ -22,7 +22,7 @@ from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._query.extract_code import get_classes_code, get_file_content
+from cognite.pygen._query.extract_code import get_file_content
 from cognite.pygen._version import __version__
 from cognite.pygen._warnings import PydanticNamespaceCollisionWarning
 from cognite.pygen.config import PygenConfig
@@ -532,32 +532,6 @@ class MultiAPIGenerator:
             + "\n"
         )
 
-    def generate_data_class_core_query_file(self) -> str:
-        """Generate the core data classes file for the SDK."""
-        data_class_core = self.env.get_template("data_classes_core_query.py.jinja")
-        query_builder = get_classes_code(
-            frozenset(
-                {
-                    "ViewPropertyId",
-                    "chunker",
-                    "Progress",
-                    "QueryReducingBatchSize",
-                    "QueryStep",
-                    "QueryBuilder",
-                    "_QueryResultCleaner",
-                }
-            )
-        )
-
-        return (
-            data_class_core.render(
-                has_default_instance_space=self.has_default_instance_space,
-                query_builder=query_builder,
-                top_level_package=self.top_level_package,
-            )
-            + "\n"
-        )
-
     def generate_data_class_core_query_files(self) -> dict[str, str]:
         """Generate the core query classes files for the SDK.
 
@@ -569,13 +543,43 @@ class MultiAPIGenerator:
             output[f"{file_name}.py"] = file_content.replace("cognite.pygen._query", self.top_level_package)
         return output
 
-    def generate_data_class_core_query_select(self) -> str: ...
+    def generate_data_class_core_query_select(self) -> str:
+        data_class_core = self.env.get_template("data_classes_core_query_select.py.jinja")
 
-    def generate_data_class_core_query_filter_classes(self) -> str: ...
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
 
-    def generate_data_class_core_query_data_classes_step(self) -> str: ...
+    def generate_data_class_core_query_filter_classes(self) -> str:
+        data_class_core = self.env.get_template("data_classes_core_query_filter_classes.py.jinja")
 
-    def generate_data_class_core_query_init(self) -> str: ...
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_query_data_classes_step(self) -> str:
+        data_class_core = self.env.get_template("data_classes_core_query_data_classes_step.py.jinja")
+
+        return (
+            data_class_core.render(
+                has_default_instance_space=self.has_default_instance_space,
+                top_level_package=self.top_level_package,
+            )
+            + "\n"
+        )
+
+    def generate_data_class_core_query_init(self) -> str:
+        data_class_core = self.env.get_template("data_classes_core_query_init.py.jinja")
+
+        return data_class_core.render(top_level_package=self.top_level_package) + "\n"
 
     def generate_data_class_core_datapoints_api_file(self) -> str:
         """Generate the core data classes file for the SDK."""

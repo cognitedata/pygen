@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import datetime
+from abc import ABC
 from collections import defaultdict
 from collections.abc import Collection, Iterable
+
 from typing import (
     cast,
+    ClassVar,
     Generic,
     Iterator,
+    TypeVar,
     overload,
     SupportsIndex,
     Literal,
@@ -16,7 +21,12 @@ from cognite.client import data_modeling as dm
 from omni.data_classes._core.query.builder import QueryBuilder
 from omni.data_classes._core.query.step import QueryStep
 from omni.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
-from omni.data_classes._core.constants import NotSetSentinel, DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core.constants import (
+    NotSetSentinel,
+    {% if has_default_instance_space %}
+    DEFAULT_INSTANCE_SPACE,
+    {% endif %}
+)
 
 
 class NodeQueryStep(QueryStep):
@@ -33,13 +43,16 @@ class NodeQueryStep(QueryStep):
         self.result_cls = result_cls
         super().__init__(name, expression, result_cls._view_id, max_retrieve_limit, select, raw_filter, connection_type)
 
-    def unpack(self) -> dict[dm.NodeId | str, DomainModel]:
-        return {
+    def unpack(self) -> dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel]:
+        return {{'{'}}
+            {% if has_default_instance_space %}
             (
                 instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
-            ): self.result_cls.from_instance(instance)
-            for instance in cast(list[dm.Node], self.results)
-        }
+            ){% else %}
+            instance.as_id(){% endif %}: self.result_cls.from_instance(instance){% if has_default_instance_space +%}
+           {%+ else %}
+            {% endif %} for instance in cast(list[dm.Node], self.results)
+        {{'}'}}
 
     @property
     def node_results(self) -> list[dm.Node]:
@@ -173,12 +186,12 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
+    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
 
     @overload
-    def __getitem__(self, item: slice, /) -> DataClassQueryBuilder[T_DomainModelList]: ...
+    def __getitem__(self, item: slice) -> DataClassQueryBuilder[T_DomainModelList]: ...
 
-    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | DataClassQueryBuilder[T_DomainModelList]:
+    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | DataClassQueryBuilder[T_DomainModelList]:
         value = super().__getitem__(item)
         if isinstance(item, slice):
             return DataClassQueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type]

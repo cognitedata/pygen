@@ -49,17 +49,6 @@ def test_generate_data_class_core_helpers(omni_multi_api_generator: MultiAPIGene
     assert actual == expected
 
 
-def test_generate_data_class_core_query(omni_multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = OmniFiles.data_core_query.read_text()
-
-    # Act
-    actual = omni_multi_api_generator.generate_data_class_core_query_file()
-
-    # Assert
-    assert actual == expected
-
-
 def test_generate_data_class_core_query_init(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniFiles.data_core_query_init.read_text()
@@ -153,17 +142,6 @@ def test_generate_data_class_core_helpers_no_default_space(omnisub_multi_api_gen
 
     # Act
     actual = omnisub_multi_api_generator.generate_data_class_core_helpers_file()
-
-    # Assert
-    assert actual == expected
-
-
-def test_generate_data_class_core_query_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = OmniSubFiles.data_core_query.read_text()
-
-    # Act
-    actual = omnisub_multi_api_generator.generate_data_class_core_query_file()
 
     # Assert
     assert actual == expected
