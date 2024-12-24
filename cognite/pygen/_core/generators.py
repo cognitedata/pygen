@@ -502,13 +502,10 @@ class MultiAPIGenerator:
     def generate_data_class_core_constants_file(self) -> str:
         """Generate the core/constants data classes file for the SDK."""
         data_class_core = self.env.get_template("data_classes_core_constants.py.jinja")
-        return (
-            data_class_core.render(
-                default_instance_space=self.default_instance_space,
-                has_default_instance_space=self.has_default_instance_space,
-                top_level_package=self.top_level_package,
-            )
-            + "\n"
+        return data_class_core.render(
+            default_instance_space=self.default_instance_space,
+            has_default_instance_space=self.has_default_instance_space,
+            top_level_package=self.top_level_package,
         )
 
     def generate_data_class_core_helpers_file(self) -> str:
@@ -540,7 +537,9 @@ class MultiAPIGenerator:
         output: dict[str, str] = {}
         for file_name in ["builder", "constants", "processing", "step"]:
             file_content = get_file_content(f"{file_name}.py")
-            output[f"{file_name}.py"] = file_content.replace("cognite.pygen._query", self.top_level_package)
+            output[f"{file_name}.py"] = file_content.replace(
+                "cognite.pygen._query", f"{self.top_level_package}.data_classes._core.query"
+            )
         return output
 
     def generate_data_class_core_query_select(self) -> str:
@@ -566,7 +565,7 @@ class MultiAPIGenerator:
         )
 
     def generate_data_class_core_query_data_classes_step(self) -> str:
-        data_class_core = self.env.get_template("data_classes_core_query_data_classes_step.py.jinja")
+        data_class_core = self.env.get_template("data_classes_core_query_data_class_step.py.jinja")
 
         return (
             data_class_core.render(
