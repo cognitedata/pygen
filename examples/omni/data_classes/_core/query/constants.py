@@ -15,7 +15,7 @@ SEARCH_LIMIT = 1_000
 AGGREGATION_LIMIT = 1_000
 
 NODE_PROPERTIES = frozenset({"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"})
-Properties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
+SelectedProperties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
 
 
 class NotSetSentinel:

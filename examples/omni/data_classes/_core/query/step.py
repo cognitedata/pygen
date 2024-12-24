@@ -20,7 +20,7 @@ from omni.data_classes._core.query.constants import (
     ACTUAL_INSTANCE_QUERY_LIMIT,
     INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
-    Properties,
+    SelectedProperties,
     NotSetSentinel,
 )
 
@@ -159,7 +159,7 @@ class QueryStepFactory:
     def __init__(
         self,
         view: dm.View,
-        user_selected_properties: Properties,
+        user_selected_properties: SelectedProperties,
         create_step_name: Callable[[str | None], str],
     ) -> None:
         self._view = view
