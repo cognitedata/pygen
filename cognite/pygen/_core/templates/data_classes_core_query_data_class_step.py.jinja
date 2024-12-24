@@ -1,20 +1,8 @@
 from __future__ import annotations
 
-import datetime
-from abc import ABC
 from collections import defaultdict
-from collections.abc import Collection, Iterable
-
-from typing import (
-    cast,
-    ClassVar,
-    Generic,
-    Iterator,
-    TypeVar,
-    overload,
-    SupportsIndex,
-    Literal,
-)
+from collections.abc import Collection
+from typing import cast, Generic, Literal
 
 from cognite.client import data_modeling as dm
 
@@ -151,7 +139,7 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
         else:
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
-    def append(self, __object: QueryStep, /) -> None:
+    def append(self, __object: QueryStep, /) -> None: #type: ignore[override]
         # Extra validation to ensure all assumptions are met
         if len(self) == 0:
             if __object.from_ is not None:
@@ -175,23 +163,3 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
             if __object.from_ is None:
                 raise ValueError("The 'from_' value should be set")
         super().append(__object)
-
-    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
-        for item in __iterable:
-            self.append(item)
-
-    # The implementations below are to get proper type hints
-    def __iter__(self) -> Iterator[QueryStep]:
-        return super().__iter__()
-
-    @overload
-    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
-
-    @overload
-    def __getitem__(self, item: slice) -> DataClassQueryBuilder[T_DomainModelList]: ...
-
-    def __getitem__(self, item: SupportsIndex | slice) -> QueryStep | DataClassQueryBuilder[T_DomainModelList]:
-        value = super().__getitem__(item)
-        if isinstance(item, slice):
-            return DataClassQueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type]
-        return cast(QueryStep, value)

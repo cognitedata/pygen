@@ -2,11 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Collection
-from typing import (
-    cast,
-    Generic,
-    Literal,
-)
+from typing import cast, Generic, Literal
 
 from cognite.client import data_modeling as dm
 
