@@ -296,7 +296,8 @@ class QueryExecutor:
         for node in result:
             item = QueryUnpacker.flatten_dump(node, selected_properties)
             if item:
-                output.append(item)
+                # As long as you have selected properties, you will not get None.
+                output.append(item)  # type: ignore[arg-type]
         return output
 
     def _execute_aggregation(

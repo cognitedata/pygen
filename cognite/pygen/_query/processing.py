@@ -127,18 +127,22 @@ class QueryUnpacker:
         self._builder = builder
 
     def unpack(self) -> list[dict[str, Any]]:
-        nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        nodes_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]] = (
+            defaultdict(list)
+        )
         for step in reversed(self._builder):
-            source_property: str | None = step.view_property and step.view_property.property
+            source_property: str | None = None
+            if step.view_property:
+                source_property = step.view_property.property
             if node_expression := step.node_expression:
                 unpacked = self._unpack_node(step, node_expression, nodes_by_from)
                 nodes_by_from[step.from_].append((source_property, unpacked))
             elif edge_expression := step.edge_expression:
                 step_properties = set(step.selected_properties or [])
-                unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+                unpacked_edge: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
                 for edge in step.edge_results:
-                    start_node = dm.NodeId.load(edge.start_node.dump()) # type: ignore[arg-type]
-                    end_node = dm.NodeId.load(edge.end_node.dump()) # type: ignore[arg-type]
+                    start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
+                    end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
                     dumped = self.flatten_dump(edge, step_properties)
                     if edge_expression.direction == "outwards":
                         source_node = start_node
@@ -154,15 +158,17 @@ class QueryUnpacker:
                 nodes_by_from[step.from_].append((source_property, unpacked_edge))
             else:
                 raise TypeError("Unexpected step")
-        return [item[0] for item in nodes_by_from[None][0][1].values()]
+        # The type ignore below is incorrect, but set for now to be able to run
+        # mypy. Todo: Fix this.
+        return [item[0] for item in nodes_by_from[None][0][1].values()]  # type: ignore[misc]
 
     @classmethod
     def flatten_dump(
         cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, connection_property: str | None = None
-    ) -> dict[str, Any]:
+    ) -> dict[str | None, Any]:
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
-        item = {
+        item: dict[str | None, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
         for _, props_by_view_id in dumped_properties.items():
@@ -183,13 +189,13 @@ class QueryUnpacker:
         self,
         step: QueryStep,
         node_expression: dm.query.NodeResultSetExpression,
-        results_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]],
-    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]],
+    ) -> dict[dm.NodeId, list[dict[str | None, Any]]]:
         step_properties = set(step.selected_properties or [])
         connection_property: str | None = None
         if node_expression.through and node_expression.direction == "inwards":
             connection_property = node_expression.through.property
-        unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+        unpacked: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
             dumped = self.flatten_dump(node, step_properties, connection_property)
