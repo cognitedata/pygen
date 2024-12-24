@@ -1,4 +1,5 @@
 import datetime
+import sys
 import time
 import warnings
 from collections.abc import Collection, Iterable, Iterator, MutableSequence, Sequence
@@ -22,6 +23,11 @@ from cognite.pygen._query.constants import (
 )
 from cognite.pygen._query.processing import QueryResultCleaner
 from cognite.pygen._query.step import QueryStep
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class QueryReducingBatchSize(UserWarning):
@@ -263,13 +269,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: SupportsIndex) -> QueryStep: ...
+    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
 
     @overload
-    def __getitem__(self, item: slice) -> "QueryBuilder": ...
+    def __getitem__(self, item: slice, /) -> Self: ...
 
-    def __getitem__(self, item: SupportsIndex | slice) -> "QueryStep | QueryBuilder":
+    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | Self:
         value = super().__getitem__(item)
         if isinstance(item, slice):
-            return QueryBuilder(value)  # type: ignore[arg-type]
+            return type(self)(value)  # type: ignore[arg-type]
         return cast(QueryStep, value)

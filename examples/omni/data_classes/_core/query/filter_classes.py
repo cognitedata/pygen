@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import datetime
 from abc import ABC
-from typing import TypeVar, Generic, ClassVar
+from typing import ClassVar, Generic, TypeVar
 
-from cognite.client.data_classes import data_modeling as dm
+from cognite.client import data_modeling as dm
+
 
 T_QueryCore = TypeVar("T_QueryCore")
 

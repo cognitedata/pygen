@@ -100,7 +100,7 @@ def test_generate_data_class_query_files(omni_multi_api_generator: MultiAPIGener
         expected = (OmniFiles.core_query_data / filename).read_text()
 
         # Assert
-        assert actual == expected
+        assert actual == expected, f"File: {filename}"
 
 
 def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAPIGenerator) -> None:
