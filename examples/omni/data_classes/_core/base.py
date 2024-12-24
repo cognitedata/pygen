@@ -31,13 +31,14 @@ from cognite.client.data_classes import (
     FileMetadataList,
     SequenceList,
 )
+from cognite.client.utils import ms_to_datetime
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
     InstanceApply,
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -201,7 +202,7 @@ class DomainModelCore(Core, ABC):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DataRecord(BaseModel):
+class DataRecord(BaseModel, populate_by_name=True):
     """The data record represents the metadata of a node.
 
     Args:
@@ -212,9 +213,16 @@ class DataRecord(BaseModel):
     """
 
     version: int
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-    deleted_time: Optional[datetime.datetime] = None
+    last_updated_time: datetime.datetime = Field(alias="lastUpdatedTime")
+    created_time: datetime.datetime = Field(alias="createdTime")
+    deleted_time: Optional[datetime.datetime] = Field(None, alias="deletedTime")
+
+    @field_validator("last_updated_time", "created_time", "deleted_time", mode="before")
+    @classmethod
+    def parse_ms(cls, value: Any) -> datetime.datetime:
+        if isinstance(value, int | float):
+            return ms_to_datetime(value)
+        return value
 
 
 class DomainModel(DomainModelCore, ABC):
@@ -237,6 +245,21 @@ class DomainModel(DomainModelCore, ABC):
             node_type=node_type,
             **unpack_properties(instance.properties),
         )
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_data_record(cls, data: Any) -> Any:
+        if not isinstance(data, dict) or ("data_record" in data):
+            return data
+        data_record = {}
+        for field_name, field_ in DataRecord.model_fields.items():
+            if field_name in data:
+                data_record[field_name] = data.pop(field_name)
+            elif field_.alias and field_.alias in data:
+                data_record[field_name] = data.pop(field_.alias)
+        if data_record:
+            data["data_record"] = data_record
+        return data
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)

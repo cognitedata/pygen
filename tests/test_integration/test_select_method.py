@@ -106,7 +106,10 @@ def test_query_list_full_across_reverse_direct_relation(omni_client: OmniClient)
 
 
 def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
+    items2 = omni_client.connection_item_a.select().outwards.list_full(limit=5, alt_return=True)
     items = omni_client.connection_item_a.query().outwards.list_full(limit=5)
+
+    assert items.dump() == items2.dump()
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)

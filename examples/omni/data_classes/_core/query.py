@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 import difflib
 import math
@@ -177,10 +178,14 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
-    def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
+    def list_full(self, limit: int = DEFAULT_QUERY_LIMIT, alt_return: bool = False) -> T_DomainModelList:
         builder = self._create_query(limit, self._result_list_cls, return_step="first", try_reverse=True)
         builder.execute_query(self._client, remove_not_connected=True)
-        return builder.unpack()
+        if alt_return:
+            result = QueryUnpacker(builder).unpack()
+            return self._result_list_cls([self._result_cls.model_validate(item) for item in result])
+        else:
+            return builder.unpack()
 
     def _list(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainListEnd:
         builder = self._create_query(limit, cast(type[DomainModelList], self._result_list_cls_end), return_step="last")
@@ -1088,3 +1093,107 @@ class DateFilter(Filtering[T_QueryCore]):
         self._sort_priority = self._get_sort_priority()
         self._limit = 1
         return self._query
+
+class QueryUnpacker:
+    def __init__(self, builder: QueryBuilder):
+        self._builder = builder
+
+    def unpack(self) -> list[dict[str, Any]]:
+        nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        for step in reversed(self._builder):
+            source_property = step.view_property and step.view_property.property
+            if node_expression := step.node_expression:
+                unpacked = self._unpack_node(step, node_expression, nodes_by_from)
+                nodes_by_from[step.from_].append((source_property, unpacked))
+            elif edge_expression := step.edge_expression:
+                step_properties = set(step.selected_properties or []) or None
+                unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+                for edge in step.edge_results:
+                    start_node = dm.NodeId.load(edge.start_node.dump())
+                    end_node = dm.NodeId.load(edge.end_node.dump())
+                    dumped = self.flatten_dump(edge, step_properties)
+                    if edge_expression.direction == "outwards":
+                        source_node = start_node
+                        target_node = end_node
+                    else:
+                        source_node = end_node
+                        target_node = start_node
+                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
+                        if target_node in nested_by_id:
+                            dumped[nested_prop] = nested_by_id[target_node]
+
+                    unpacked_edge[source_node].append(dumped)
+                nodes_by_from[step.from_].append((source_property, unpacked_edge))
+            else:
+                raise TypeError("Unexpected step")
+        return [item[0] for item in nodes_by_from[None][0][1].values()]
+
+    @classmethod
+    def flatten_dump(
+        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, connection_property: str | None = None
+    ) -> dict[str, Any]:
+        dumped = node.dump()
+        dumped_properties = dumped.pop("properties", {})
+        item = {
+            key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
+        }
+        for _, props_by_view_id in dumped_properties.items():
+            for __, props in props_by_view_id.items():
+                for key, value in props.items():
+                    if key == connection_property:
+                        if isinstance(value, dict):
+                            item[key] = dm.NodeId.load(value)
+                        elif isinstance(value, list):
+                            item[key] = [dm.NodeId.load(item) for item in value]
+                        else:
+                            raise TypeError(f"Unexpected connection property value: {value}")
+                    elif selected_properties is None or key in selected_properties:
+                        item[key] = value
+        return item
+
+    def _unpack_node(
+        self,
+        step: QueryStep,
+        node_expression: dm.query.NodeResultSetExpression,
+        results_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        step_properties = set(step.selected_properties or []) or None
+        connection_property: str | None = None
+        if node_expression.through and node_expression.direction == "inwards":
+            connection_property = node_expression.through.property
+        unpacked: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+        for node in step.node_results:
+            node_id = node.as_id()
+            dumped = self.flatten_dump(node, step_properties, connection_property)
+            for nested_prop, nested_by_id in results_by_from.get(step.name, []):
+                if neste_item := nested_by_id.get(node_id):
+                    # Reverse or Edge
+                    dumped[nested_prop] = neste_item
+                elif nested_prop in dumped:
+                    # Direct relation
+                    identifier = dumped.pop(nested_prop)
+                    if isinstance(identifier, dict):
+                        other_id = dm.NodeId.load(identifier)
+                        if other_id in nested_by_id:
+                            dumped[nested_prop] = nested_by_id[other_id]
+                    elif isinstance(identifier, list):
+                        dumped[nested_prop] = []
+                        for item in identifier:
+                            other_id = dm.NodeId.load(item)
+                            if other_id in nested_by_id:
+                                dumped[nested_prop].extend(nested_by_id[other_id])
+                else:
+                    warnings.warn(
+                        f"Nested property {nested_prop} not found in {dumped.keys()}", UserWarning, stacklevel=2
+                    )
+
+            if connection_property is None:
+                unpacked[node_id].append(dumped)
+            else:
+                reverse = dumped.pop(connection_property)
+                if isinstance(reverse, dm.NodeId):
+                    unpacked[reverse].append(dumped)
+                elif isinstance(reverse, list):
+                    for item in reverse:
+                        unpacked[item].append(copy.deepcopy(dumped))
+        return unpacked
