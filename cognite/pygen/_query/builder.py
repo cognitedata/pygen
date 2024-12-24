@@ -21,8 +21,7 @@ from cognite.pygen._query.constants import (
     SEARCH_LIMIT,
 )
 from cognite.pygen._query.processing import QueryResultCleaner
-
-from .step import QueryStep
+from cognite.pygen._query.step import QueryStep
 
 
 class QueryReducingBatchSize(UserWarning):

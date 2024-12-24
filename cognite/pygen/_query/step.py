@@ -6,7 +6,6 @@ from functools import cached_property
 from typing import (
     Any,
     Literal,
-    TypeAlias,
 )
 
 from cognite.client import CogniteClient
@@ -17,24 +16,12 @@ from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 
-DEFAULT_QUERY_LIMIT = 5
-INSTANCE_QUERY_LIMIT = 1_000
-# The limit used for the In filter in /search
-IN_FILTER_CHUNK_SIZE = 100
-# This is the actual limit of the API, we typically set it to a lower value to avoid hitting the limit.
-# The actual instance query limit is 10_000, but we set it to 5_000 such that is matches the In filter
-# which we use in /search for reverse of list direct relations.
-ACTUAL_INSTANCE_QUERY_LIMIT = 5_000
-# The minimum estimated seconds before print progress on a query
-MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS = 30
-PRINT_PROGRESS_PER_N_NODES = 10_000
-SEARCH_LIMIT = 1_000
-AGGREGATION_LIMIT = 1_000
-
-_NODE_PROPERTIES = frozenset(
-    {"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"}
+from cognite.pygen._query.constants import (
+    ACTUAL_INSTANCE_QUERY_LIMIT,
+    INSTANCE_QUERY_LIMIT,
+    NODE_PROPERTIES,
+    Properties,
 )
-Properties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
 
 
 @dataclass(frozen=True)
@@ -227,7 +214,7 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
-        skip = _NODE_PROPERTIES | set(self.reverse_properties.keys())
+        skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
@@ -365,7 +352,7 @@ class QueryStepFactory:
         include_connection_prop = "*" not in properties
         nested_properties: list[str] = []
         for prop_id in properties:
-            if prop_id in _NODE_PROPERTIES:
+            if prop_id in NODE_PROPERTIES:
                 continue
             if prop_id == connection_id:
                 include_connection_prop = False

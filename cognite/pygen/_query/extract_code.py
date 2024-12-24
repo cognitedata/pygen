@@ -32,6 +32,6 @@ def get_classes_code(class_names: frozenset[str]) -> str:
 if __name__ == "__main__":
     print(
         get_classes_code(
-            frozenset({"ViewPropertyId", "QueryReducingBatchSize", "QueryStep", "QueryBuilder", "_QueryResultCleaner"})
+            frozenset({"ViewPropertyId", "QueryReducingBatchSize", "QueryStep", "QueryBuilder", "QueryResultCleaner"})
         )
     )
