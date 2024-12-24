@@ -1,3 +1,3 @@
-from .query_execution import QueryExecutor
+from .interface import QueryExecutor
 
 __all__ = ["QueryExecutor"]
