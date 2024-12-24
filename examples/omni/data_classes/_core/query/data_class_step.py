@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import sys
 from collections import defaultdict
-from collections.abc import Collection
-from typing import cast, Generic, Literal
+from collections.abc import Collection, Iterator, Iterable
+from typing import cast, Generic, Literal, overload, SupportsIndex
 
 from cognite.client import data_modeling as dm
 
@@ -12,6 +13,11 @@ from omni.data_classes._core.base import DomainModel, DomainRelation, T_DomainMo
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 from omni.data_classes._core.query.constants import NotSetSentinel
 from omni.data_classes._core.helpers import as_node_id
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class NodeQueryStep(QueryStep):
@@ -158,3 +164,23 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
             if __object.from_ is None:
                 raise ValueError("The 'from_' value should be set")
         super().append(__object)
+
+    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
+        for item in __iterable:
+            self.append(item)
+
+    # The implementations below are to get proper type hints
+    def __iter__(self) -> Iterator[QueryStep]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
+
+    @overload
+    def __getitem__(self, item: slice, /) -> Self: ...
+
+    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | Self:
+        value = super().__getitem__(item)
+        if isinstance(item, slice):
+            return DataClassQueryBuilder(self._result_list_cls, value)  # type: ignore[arg-type, return-value]
+        return cast(QueryStep, value)
