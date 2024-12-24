@@ -129,7 +129,7 @@ class QueryUnpacker:
     def unpack(self) -> list[dict[str, Any]]:
         nodes_by_from: dict[str | None, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
         for step in reversed(self._builder):
-            source_property = step.view_property and step.view_property.property
+            source_property: str | None = step.view_property and step.view_property.property
             if node_expression := step.node_expression:
                 unpacked = self._unpack_node(step, node_expression, nodes_by_from)
                 nodes_by_from[step.from_].append((source_property, unpacked))
@@ -137,8 +137,8 @@ class QueryUnpacker:
                 step_properties = set(step.selected_properties or [])
                 unpacked_edge: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
                 for edge in step.edge_results:
-                    start_node = dm.NodeId.load(edge.start_node.dump())
-                    end_node = dm.NodeId.load(edge.end_node.dump())
+                    start_node = dm.NodeId.load(edge.start_node.dump()) # type: ignore[arg-type]
+                    end_node = dm.NodeId.load(edge.end_node.dump()) # type: ignore[arg-type]
                     dumped = self.flatten_dump(edge, step_properties)
                     if edge_expression.direction == "outwards":
                         source_node = start_node
