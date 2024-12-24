@@ -29,6 +29,7 @@ from omni.data_classes._core.constants import DEFAULT_QUERY_LIMIT
 from omni.data_classes._core.query.step import QueryStep
 from omni.data_classes._core.query.data_class_step import NodeQueryStep, EdgeQueryStep, DataClassQueryBuilder
 
+
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
