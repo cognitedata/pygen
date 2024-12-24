@@ -1,5 +1,6 @@
 from typing import Any, TypeAlias
 
+DEFAULT_QUERY_LIMIT = 5
 INSTANCE_QUERY_LIMIT = 1_000
 # The limit used for the In filter in /search
 IN_FILTER_CHUNK_SIZE = 100

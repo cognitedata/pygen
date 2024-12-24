@@ -5,3 +5,4 @@ from omni.data_classes._core.datapoints_api import *  # noqa
 from omni.data_classes._core.helpers import *  # noqa
 from omni.data_classes._core.filecontent_api import *  # noqa
 from omni.data_classes._core.query import *  # noqa
+from omni.data_classes._core._query.filter_classes import *  # noqa
