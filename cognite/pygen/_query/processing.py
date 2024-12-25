@@ -274,7 +274,6 @@ class QueryUnpacker:
         for edge in step.edge_results:
             start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
             end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
-            dumped = self.flatten_dump(edge, step_properties)
             if edge_expression.direction == "outwards":
                 source_node = start_node
                 target_node = end_node
@@ -282,9 +281,16 @@ class QueryUnpacker:
                 source_node = end_node
                 target_node = start_node
 
-            for connection_property, node_targets_by_source in connections:
-                if target_node in node_targets_by_source:
-                    dumped[connection_property] = node_targets_by_source[target_node]
+            if self._unpack_edges or bool(edge.properties):
+                dumped = self.flatten_dump(edge, step_properties)
+                for connection_property, node_targets_by_source in connections:
+                    if target_node in node_targets_by_source:
+                        dumped[connection_property] = node_targets_by_source[target_node]
 
-            unpacked_by_source[source_node].append(dumped)
+                unpacked_by_source[source_node].append(dumped)
+            else:
+                for _, node_targets_by_source in connections:
+                    if target_node in node_targets_by_source:
+                        unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
+
         return unpacked_by_source
