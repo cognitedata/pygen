@@ -138,20 +138,25 @@ class CogniteFileGraphQL(GraphQLCore):
         data_record: The data record of the Cognite file node.
         aliases: Alternative names for the node
         assets: A list of assets this file is related to.
-        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of CogniteFileCategory.
+        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of
+            CogniteFileCategory.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         equipment: An automatically updated list of equipment this file is related to.
         is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         uploaded_time: The time the file upload completed.
     """
@@ -266,20 +271,25 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
         data_record: The data record of the Cognite file node.
         aliases: Alternative names for the node
         assets: A list of assets this file is related to.
-        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of CogniteFileCategory.
+        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of
+            CogniteFileCategory.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         equipment: An automatically updated list of equipment this file is related to.
         is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         uploaded_time: The time the file upload completed.
     """
@@ -389,18 +399,23 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         data_record: The data record of the Cognite file node.
         aliases: Alternative names for the node
         assets: A list of assets this file is related to.
-        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of CogniteFileCategory.
+        category: Specifies the detected category the file belongs to. It's a direct relation to an instance of
+            CogniteFileCategory.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         mime_type: The MIME type of the file.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
     """
 

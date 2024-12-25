@@ -70,7 +70,8 @@ class DataSheetGraphQL(GraphQLCore):
         external_id: The external id of the data sheet.
         data_record: The data record of the data sheet node.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
@@ -143,7 +144,8 @@ class DataSheet(DomainModel):
         external_id: The external id of the data sheet.
         data_record: The data record of the data sheet node.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         is_uploaded: Specifies if the file content has been uploaded to Cognite Data Fusion or not.
         mime_type: The MIME type of the file.
         name: Name of the instance
@@ -195,7 +197,8 @@ class DataSheetWrite(DomainModelWrite):
         external_id: The external id of the data sheet.
         data_record: The data record of the data sheet node.
         description: Description of the instance
-        directory: Contains the path elements from the source (if the source system has a file system hierarchy or similar.)
+        directory: Contains the path elements from the source (if the source system has a file system hierarchy or
+            similar.)
         mime_type: The MIME type of the file.
         name: Name of the instance
     """

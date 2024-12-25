@@ -148,12 +148,12 @@ class Field:
 
     @property
     def line_width(self) -> int:
-        return 120 -10 - len(self.name)
+        return 120 - 10 - len(self.name)
 
     @property
     def argument_documentation(self) -> str:
         if self.description:
-            msg =  self.description
+            msg = self.description
         else:
             msg = f"The {self.doc_name} field."
 

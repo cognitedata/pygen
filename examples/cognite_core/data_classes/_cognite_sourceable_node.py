@@ -90,12 +90,15 @@ class CogniteSourceableNodeGraphQL(GraphQLCore):
         external_id: The external id of the Cognite sourceable node.
         data_record: The data record of the Cognite sourceable node node.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
@@ -177,12 +180,15 @@ class CogniteSourceableNode(DomainModel):
         external_id: The external id of the Cognite sourceable node.
         data_record: The data record of the Cognite sourceable node node.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
@@ -251,12 +257,15 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
         external_id: The external id of the Cognite sourceable node.
         data_record: The data record of the Cognite sourceable node node.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")

@@ -157,16 +157,20 @@ class CogniteAssetGraphQL(GraphQLCore):
         name: Name of the instance
         object_3d: Direct relation to an Object3D instance representing the 3D resource
         parent: The parent of the asset.
-        path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables subtree filtering to find all assets under a parent.
+        path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables
+            subtree filtering to find all assets under a parent.
         path_last_updated_time: The last time the path was updated for this asset.
         root: An automatically updated reference to the top-level asset of the hierarchy.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the asset.
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
@@ -316,16 +320,20 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
         name: Name of the instance
         object_3d: Direct relation to an Object3D instance representing the 3D resource
         parent: The parent of the asset.
-        path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables subtree filtering to find all assets under a parent.
+        path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables
+            subtree filtering to find all assets under a parent.
         path_last_updated_time: The last time the path was updated for this asset.
         root: An automatically updated reference to the top-level asset of the hierarchy.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the asset.
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
@@ -503,12 +511,15 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         object_3d: Direct relation to an Object3D instance representing the 3D resource
         parent: The parent of the asset.
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """

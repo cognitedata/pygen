@@ -148,13 +148,16 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
         is_step: Specifies whether the time series is a step time series or not.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.
@@ -278,13 +281,16 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
         is_step: Specifies whether the time series is a step time series or not.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.
@@ -420,13 +426,16 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         is_step: Specifies whether the time series is a step time series or not.
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.

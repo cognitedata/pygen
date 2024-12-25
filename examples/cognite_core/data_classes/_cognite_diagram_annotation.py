@@ -134,37 +134,40 @@ class CogniteDiagramAnnotationGraphQL(GraphQLCore):
         aliases: Alternative names for the node
         confidence: The confidence that the annotation is a good match
         description: Description of the instance
-        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an endNode is present. The first page has number 1
-
-        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is defined
-
-        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than endNodeXMin. Only applicable if an endNode is defined
-
-        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than endNodeXMax. Only applicable if an endNode is defined
-
-        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than endNodeYMin. Only applicable if an endNode is defined
-
-        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than endNodeYMax. Only applicable if an endNode is defined
-
+        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an
+            endNode is present. The first page has number 1
+        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is
+            defined
+        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than endNodeXMin. Only applicable if an endNode is defined
+        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than endNodeXMax. Only applicable if an endNode is defined
+        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than
+            endNodeYMin. Only applicable if an endNode is defined
+        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than endNodeYMax. Only applicable if an endNode is defined
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
-        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The first page has number 1
-
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
+        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The
+            first page has number 1
         start_node_text: The text extracted from within the bounding box on the startNode
-        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than startNodeXMin
-
-        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than startNodeXMax
-
-        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than startNodeYMin
-
-        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than startNodeYMax
-
+        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than startNodeXMin
+        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than startNodeXMax
+        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more
+            than startNodeYMin
+        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than startNodeYMax
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -289,38 +292,40 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
         aliases: Alternative names for the node
         confidence: The confidence that the annotation is a good match
         description: Description of the instance
-        end_node_page_number: The number of the page on which this annotation is located in the endNode
-            File if an endNode is present. The first page has number 1
-
-        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is defined
-
-        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than endNodeXMin. Only applicable if an endNode is defined
-
-        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than endNodeXMax. Only applicable if an endNode is defined
-
-        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than endNodeYMin. Only applicable if an endNode is defined
-
-        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than endNodeYMax. Only applicable if an endNode is defined
-
+        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an
+            endNode is present. The first page has number 1
+        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is
+            defined
+        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than endNodeXMin. Only applicable if an endNode is defined
+        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than endNodeXMax. Only applicable if an endNode is defined
+        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than
+            endNodeYMin. Only applicable if an endNode is defined
+        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than endNodeYMax. Only applicable if an endNode is defined
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
-        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The first page has number 1
-
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
+        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The
+            first page has number 1
         start_node_text: The text extracted from within the bounding box on the startNode
-        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than startNodeXMin
-
-        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than startNodeXMax
-
-        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than startNodeYMin
-
-        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than startNodeYMax
-
+        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than startNodeXMin
+        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than startNodeXMax
+        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more
+            than startNodeYMin
+        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than startNodeYMax
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -399,37 +404,40 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
         aliases: Alternative names for the node
         confidence: The confidence that the annotation is a good match
         description: Description of the instance
-        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an endNode is present. The first page has number 1
-
-        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is defined
-
-        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than endNodeXMin. Only applicable if an endNode is defined
-
-        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than endNodeXMax. Only applicable if an endNode is defined
-
-        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than endNodeYMin. Only applicable if an endNode is defined
-
-        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than endNodeYMax. Only applicable if an endNode is defined
-
+        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an
+            endNode is present. The first page has number 1
+        end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is
+            defined
+        end_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than endNodeXMin. Only applicable if an endNode is defined
+        end_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than endNodeXMax. Only applicable if an endNode is defined
+        end_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than
+            endNodeYMin. Only applicable if an endNode is defined
+        end_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than endNodeYMax. Only applicable if an endNode is defined
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
-        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The first page has number 1
-
+        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
+            is not guaranteed to match the user identifiers in CDF
+        start_node_page_number: The number of the page on which this annotation is located in `startNode` File. The
+            first page has number 1
         start_node_text: The text extracted from within the bounding box on the startNode
-        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more than startNodeXMin
-
-        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less than startNodeXMax
-
-        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more than startNodeYMin
-
-        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less than startNodeYMax
-
+        start_node_x_max: Value between [0,1]. Maximum abscissa of the bounding box (right edge). Must be strictly more
+            than startNodeXMin
+        start_node_x_min: Value between [0,1]. Minimum abscissa of the bounding box (left edge). Must be strictly less
+            than startNodeXMax
+        start_node_y_max: Value between [0,1]. Maximum ordinate of the bounding box (top edge). Must be strictly more
+            than startNodeYMin
+        start_node_y_min: Value between [0,1]. Minimum ordinate of the bounding box (bottom edge). Must be strictly less
+            than startNodeYMax
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """

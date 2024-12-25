@@ -123,7 +123,8 @@ class Cognite360ImageGraphQL(GraphQLCore):
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system
@@ -258,7 +259,8 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system
@@ -399,7 +401,8 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system

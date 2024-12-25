@@ -107,8 +107,8 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
@@ -211,8 +211,8 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
@@ -315,8 +315,8 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
