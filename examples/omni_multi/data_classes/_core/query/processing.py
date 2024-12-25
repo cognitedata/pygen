@@ -6,6 +6,7 @@ from typing import Any
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
+from omni_multi.data_classes._core.query.constants import DATA_RECORD_PROPERTIES
 from omni_multi.data_classes._core.query.step import QueryStep
 
 
