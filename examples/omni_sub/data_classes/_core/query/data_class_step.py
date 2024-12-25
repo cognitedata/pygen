@@ -7,12 +7,11 @@ from typing import cast, Generic, Literal, overload, SupportsIndex
 
 from cognite.client import data_modeling as dm
 
-from omni.data_classes._core.query.builder import QueryBuilder
-from omni.data_classes._core.query.step import QueryStep
-from omni.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
-from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
-from omni.data_classes._core.query.constants import NotSetSentinel
-from omni.data_classes._core.helpers import as_node_id
+from omni_sub.data_classes._core.query.builder import QueryBuilder
+from omni_sub.data_classes._core.query.step import QueryStep
+from omni_sub.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
+from omni_sub.data_classes._core.query.constants import NotSetSentinel
+from omni_sub.data_classes._core.helpers import as_node_id
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -34,12 +33,9 @@ class NodeQueryStep(QueryStep):
         self.result_cls = result_cls
         super().__init__(name, expression, result_cls._view_id, max_retrieve_limit, select, raw_filter, connection_type)
 
-    def unpack(self) -> dict[dm.NodeId | str, DomainModel]:
+    def unpack(self) -> dict[dm.NodeId, DomainModel]:
         return {
-            (
-                instance.as_id() if instance.space != DEFAULT_INSTANCE_SPACE else instance.external_id
-            ): self.result_cls.from_instance(instance)
-            for instance in cast(list[dm.Node], self.results)
+            instance.as_id(): self.result_cls.from_instance(instance) for instance in cast(list[dm.Node], self.results)
         }
 
     @property
