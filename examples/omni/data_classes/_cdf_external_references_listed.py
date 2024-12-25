@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union, no_type_check
 
-from cognite.client import data_modeling as dm, CogniteClient
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
     FileMetadata as CogniteFileMetadata,
+)
+from cognite.client.data_classes import (
     FileMetadataWrite as CogniteFileMetadataWrite,
-    TimeSeries as CogniteTimeSeries,
-    TimeSeriesWrite as CogniteTimeSeriesWrite,
+)
+from cognite.client.data_classes import (
     Sequence as CogniteSequence,
+)
+from cognite.client.data_classes import (
     SequenceWrite as CogniteSequenceWrite,
+)
+from cognite.client.data_classes import (
+    TimeSeries as CogniteTimeSeries,
+)
+from cognite.client.data_classes import (
+    TimeSeriesWrite as CogniteTimeSeriesWrite,
 )
 from pydantic import field_validator, model_validator
 
@@ -22,36 +32,27 @@ from omni.data_classes._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
+    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
-    DomainModelList,
-    DomainRelation,
-    DomainRelationWrite,
-    GraphQLCore,
-    ResourcesWrite,
     FileMetadata,
-    FileMetadataWrite,
     FileMetadataGraphQL,
-    TimeSeries,
-    TimeSeriesWrite,
-    TimeSeriesGraphQL,
-    TimeSeriesReferenceAPI,
+    FileMetadataWrite,
+    GraphQLCore,
+    NodeQueryCore,
+    QueryCore,
+    ResourcesWrite,
+    SequenceGraphQL,
     SequenceRead,
     SequenceWrite,
-    SequenceGraphQL,
-    T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
-    as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
-    is_tuple_id,
-    select_best_node,
-    QueryCore,
-    NodeQueryCore,
     StringFilter,
+    T_DomainModelList,
+    TimeSeries,
+    TimeSeriesGraphQL,
+    TimeSeriesReferenceAPI,
+    TimeSeriesWrite,
+    as_direct_relation_reference,
 )
-
 
 __all__ = [
     "CDFExternalReferencesListed",
@@ -376,7 +377,6 @@ class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExte
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
-
         super().__init__(
             created_types,
             creation_path,

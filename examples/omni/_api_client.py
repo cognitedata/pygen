@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
-from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 
+from omni import data_classes
 from omni._api import (
     CDFExternalReferencesAPI,
     CDFExternalReferencesListedAPI,
@@ -31,9 +34,8 @@ from omni._api import (
     PrimitiveWithDefaultsAPI,
     SubInterfaceAPI,
 )
-from omni._api._core import SequenceNotStr, GraphQLQueryResponse
+from omni._api._core import GraphQLQueryResponse, SequenceNotStr
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from omni import data_classes
 
 
 class OmniClient:

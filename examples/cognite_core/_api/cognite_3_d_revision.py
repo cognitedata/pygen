@@ -1,40 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Cognite3DRevision,
-    Cognite3DRevisionWrite,
-    Cognite3DRevisionFields,
-    Cognite3DRevisionList,
-    Cognite3DRevisionWriteList,
-    Cognite3DRevisionTextFields,
-    Cognite3DModel,
-    Cognite360ImageCollection,
-    CogniteCADRevision,
-    CognitePointCloudRevision,
-)
-from cognite_core.data_classes._cognite_3_d_revision import (
-    Cognite3DRevisionQuery,
-    _COGNITE3DREVISION_PROPERTIES_BY_FIELD,
-    _create_cognite_3_d_revision_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -42,6 +15,30 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_3_d_revision_query import Cognite3DRevisionQueryAPI
+from cognite_core.data_classes import (
+    Cognite3DModel,
+    Cognite3DRevision,
+    Cognite3DRevisionFields,
+    Cognite3DRevisionList,
+    Cognite3DRevisionTextFields,
+    Cognite3DRevisionWrite,
+    Cognite3DRevisionWriteList,
+    Cognite360ImageCollection,
+    CogniteCADRevision,
+    CognitePointCloudRevision,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_3_d_revision import (
+    _COGNITE3DREVISION_PROPERTIES_BY_FIELD,
+    Cognite3DRevisionQuery,
+    _create_cognite_3_d_revision_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class Cognite3DRevisionAPI(

@@ -1,25 +1,19 @@
 from __future__ import annotations
 
-import datetime
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, cast
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 
-from cognite.client import data_modeling as dm, CogniteClient
-
+from wind_turbine._api._core import (
+    QueryAPI,
+)
 from wind_turbine.data_classes import (
-    DomainModelCore,
     Blade,
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
     DataClassQueryBuilder,
-)
-from wind_turbine._api._core import (
-    QueryAPI,
-    _create_edge_filter,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 

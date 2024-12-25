@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from cognite.client import data_modeling as dm
+
 from cognite_core.data_classes._core.base import DomainModel, T_DomainModel
 from cognite_core.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -12,7 +13,7 @@ def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
 
 
 def as_direct_relation_reference(
-    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None,
 ) -> dm.DirectRelationReference | None:
     if value is None or isinstance(value, dm.DirectRelationReference):
         return value

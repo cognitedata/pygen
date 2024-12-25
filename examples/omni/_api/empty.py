@@ -1,37 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Empty,
-    EmptyWrite,
-    EmptyFields,
-    EmptyList,
-    EmptyWriteList,
-    EmptyTextFields,
-)
-from omni.data_classes._empty import (
-    EmptyQuery,
-    _EMPTY_PROPERTIES_BY_FIELD,
-    _create_empty_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +16,25 @@ from omni._api._core import (
     SequenceNotStr,
 )
 from omni._api.empty_query import EmptyQueryAPI
+from omni.data_classes import (
+    Empty,
+    EmptyFields,
+    EmptyList,
+    EmptyTextFields,
+    EmptyWrite,
+    EmptyWriteList,
+    ResourcesWriteResult,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+)
+from omni.data_classes._empty import (
+    _EMPTY_PROPERTIES_BY_FIELD,
+    EmptyQuery,
+    _create_empty_filter,
+)
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):

@@ -1,40 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Cognite3DModel,
-    Cognite3DModelWrite,
-    Cognite3DModelFields,
-    Cognite3DModelList,
-    Cognite3DModelWriteList,
-    Cognite3DModelTextFields,
-    CogniteFile,
-    Cognite360ImageModel,
-    CogniteCADModel,
-    CognitePointCloudModel,
-)
-from cognite_core.data_classes._cognite_3_d_model import (
-    Cognite3DModelQuery,
-    _COGNITE3DMODEL_PROPERTIES_BY_FIELD,
-    _create_cognite_3_d_model_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -42,6 +15,30 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_3_d_model_query import Cognite3DModelQueryAPI
+from cognite_core.data_classes import (
+    Cognite3DModel,
+    Cognite3DModelFields,
+    Cognite3DModelList,
+    Cognite3DModelTextFields,
+    Cognite3DModelWrite,
+    Cognite3DModelWriteList,
+    Cognite360ImageModel,
+    CogniteCADModel,
+    CogniteFile,
+    CognitePointCloudModel,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_3_d_model import (
+    _COGNITE3DMODEL_PROPERTIES_BY_FIELD,
+    Cognite3DModelQuery,
+    _create_cognite_3_d_model_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DModelList, Cognite3DModelWriteList]):

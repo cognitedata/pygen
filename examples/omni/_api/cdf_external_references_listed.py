@@ -1,44 +1,40 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CDFExternalReferencesListed,
-    CDFExternalReferencesListedWrite,
-    CDFExternalReferencesListedFields,
-    CDFExternalReferencesListedList,
-    CDFExternalReferencesListedWriteList,
-    CDFExternalReferencesListedTextFields,
-)
-from omni.data_classes._cdf_external_references_listed import (
-    CDFExternalReferencesListedQuery,
-    _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
-    _create_cdf_external_references_listed_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
 from omni._api.cdf_external_references_listed_query import CDFExternalReferencesListedQueryAPI
+from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
+from omni.data_classes import (
+    CDFExternalReferencesListed,
+    CDFExternalReferencesListedFields,
+    CDFExternalReferencesListedList,
+    CDFExternalReferencesListedTextFields,
+    CDFExternalReferencesListedWrite,
+    CDFExternalReferencesListedWriteList,
+    ResourcesWriteResult,
+)
+from omni.data_classes._cdf_external_references_listed import (
+    _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
+    CDFExternalReferencesListedQuery,
+    _create_cdf_external_references_listed_filter,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+)
 
 
 class CDFExternalReferencesListedAPI(

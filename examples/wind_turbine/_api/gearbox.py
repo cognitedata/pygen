@@ -1,37 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from wind_turbine.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Gearbox,
-    GearboxWrite,
-    GearboxFields,
-    GearboxList,
-    GearboxWriteList,
-    GearboxTextFields,
-    Nacelle,
-    SensorTimeSeries,
-)
-from wind_turbine.data_classes._gearbox import (
-    GearboxQuery,
-    _create_gearbox_filter,
-)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +15,27 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.gearbox_query import GearboxQueryAPI
+from wind_turbine.data_classes import (
+    Gearbox,
+    GearboxFields,
+    GearboxList,
+    GearboxTextFields,
+    GearboxWrite,
+    GearboxWriteList,
+    Nacelle,
+    ResourcesWriteResult,
+    SensorTimeSeries,
+)
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
+from wind_turbine.data_classes._gearbox import (
+    GearboxQuery,
+    _create_gearbox_filter,
+)
 
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):

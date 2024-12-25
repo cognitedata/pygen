@@ -4,40 +4,36 @@ import datetime
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
-from cognite.client import data_modeling as dm, CogniteClient
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 
-from omni.data_classes import (
-    DomainModelCore,
-    ConnectionItemF,
-    ConnectionEdgeA,
-)
-from omni.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes._connection_item_g import (
-    ConnectionItemG,
-    _create_connection_item_g_filter,
-)
-from omni.data_classes._connection_item_e import (
-    ConnectionItemE,
-    _create_connection_item_e_filter,
-)
 from omni._api._core import (
     QueryAPI,
-    _create_edge_filter,
 )
-
+from omni.data_classes import (
+    ConnectionEdgeA,
+    ConnectionItemF,
+)
 from omni.data_classes._connection_edge_a import (
     _create_connection_edge_a_filter,
 )
+from omni.data_classes._connection_item_e import (
+    _create_connection_item_e_filter,
+)
+from omni.data_classes._connection_item_g import (
+    _create_connection_item_g_filter,
+)
+from omni.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    EdgeQueryStep,
+    NodeQueryStep,
+    T_DomainModelList,
+)
 
 if TYPE_CHECKING:
-    from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
     from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
+    from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):

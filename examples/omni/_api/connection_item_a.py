@@ -1,38 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    ConnectionItemA,
-    ConnectionItemAWrite,
-    ConnectionItemAFields,
-    ConnectionItemAList,
-    ConnectionItemAWriteList,
-    ConnectionItemATextFields,
-    ConnectionItemB,
-    ConnectionItemCNode,
-)
-from omni.data_classes._connection_item_a import (
-    ConnectionItemAQuery,
-    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
-    _create_connection_item_a_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -41,6 +16,29 @@ from omni._api._core import (
 )
 from omni._api.connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from omni._api.connection_item_a_query import ConnectionItemAQueryAPI
+from omni.data_classes import (
+    ConnectionItemA,
+    ConnectionItemAFields,
+    ConnectionItemAList,
+    ConnectionItemATextFields,
+    ConnectionItemAWrite,
+    ConnectionItemAWriteList,
+    ConnectionItemB,
+    ConnectionItemCNode,
+    ResourcesWriteResult,
+)
+from omni.data_classes._connection_item_a import (
+    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
+    ConnectionItemAQuery,
+    _create_connection_item_a_filter,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    EdgeQueryStep,
+    NodeQueryStep,
+)
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):

@@ -1,26 +1,20 @@
 from __future__ import annotations
 
-import datetime
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, cast
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 
-from cognite.client import data_modeling as dm, CogniteClient
-
+from cognite_core._api._core import (
+    QueryAPI,
+)
 from cognite_core.data_classes import (
-    DomainModelCore,
-    CogniteAssetType,
     CogniteAssetClass,
+    CogniteAssetType,
 )
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
     DataClassQueryBuilder,
-)
-from cognite_core._api._core import (
-    QueryAPI,
-    _create_edge_filter,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 

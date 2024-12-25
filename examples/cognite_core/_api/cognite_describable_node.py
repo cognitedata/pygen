@@ -1,41 +1,38 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
 )
+from cognite_core._api.cognite_describable_node_query import CogniteDescribableNodeQueryAPI
 from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CogniteDescribableNode,
-    CogniteDescribableNodeWrite,
-    CogniteDescribableNodeFields,
-    CogniteDescribableNodeList,
-    CogniteDescribableNodeWriteList,
-    CogniteDescribableNodeTextFields,
+    Cognite3DModel,
+    Cognite3DObject,
     Cognite360ImageCollection,
     Cognite360ImageModel,
     Cognite360ImageStation,
-    Cognite3DModel,
-    Cognite3DObject,
     CogniteActivity,
     CogniteAsset,
     CogniteAssetClass,
     CogniteAssetType,
     CogniteCADModel,
     CogniteCADNode,
+    CogniteDescribableNode,
+    CogniteDescribableNodeFields,
+    CogniteDescribableNodeList,
+    CogniteDescribableNodeTextFields,
+    CogniteDescribableNodeWrite,
+    CogniteDescribableNodeWriteList,
     CogniteEquipment,
     CogniteEquipmentType,
     CogniteFile,
@@ -45,19 +42,18 @@ from cognite_core.data_classes import (
     CogniteSourceSystem,
     CogniteTimeSeries,
     CogniteUnit,
+    ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_describable_node import (
-    CogniteDescribableNodeQuery,
     _COGNITEDESCRIBABLENODE_PROPERTIES_BY_FIELD,
+    CogniteDescribableNodeQuery,
     _create_cognite_describable_node_filter,
 )
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
 )
-from cognite_core._api.cognite_describable_node_query import CogniteDescribableNodeQueryAPI
 
 
 class CogniteDescribableNodeAPI(

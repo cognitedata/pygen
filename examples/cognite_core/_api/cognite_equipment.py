@@ -1,43 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CogniteEquipment,
-    CogniteEquipmentWrite,
-    CogniteEquipmentFields,
-    CogniteEquipmentList,
-    CogniteEquipmentWriteList,
-    CogniteEquipmentTextFields,
-    CogniteActivity,
-    CogniteAsset,
-    CogniteEquipmentType,
-    CogniteFile,
-    CogniteSourceSystem,
-    CogniteTimeSeries,
-)
-from cognite_core.data_classes._cognite_equipment import (
-    CogniteEquipmentQuery,
-    _COGNITEEQUIPMENT_PROPERTIES_BY_FIELD,
-    _create_cognite_equipment_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -45,6 +16,32 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_equipment_query import CogniteEquipmentQueryAPI
+from cognite_core.data_classes import (
+    CogniteActivity,
+    CogniteAsset,
+    CogniteEquipment,
+    CogniteEquipmentFields,
+    CogniteEquipmentList,
+    CogniteEquipmentTextFields,
+    CogniteEquipmentType,
+    CogniteEquipmentWrite,
+    CogniteEquipmentWriteList,
+    CogniteFile,
+    CogniteSourceSystem,
+    CogniteTimeSeries,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_equipment import (
+    _COGNITEEQUIPMENT_PROPERTIES_BY_FIELD,
+    CogniteEquipmentQuery,
+    _create_cognite_equipment_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class CogniteEquipmentAPI(

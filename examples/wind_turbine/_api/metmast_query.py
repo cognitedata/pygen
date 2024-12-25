@@ -1,34 +1,30 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
-from cognite.client import data_modeling as dm, CogniteClient
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 
+from wind_turbine._api._core import (
+    QueryAPI,
+)
 from wind_turbine.data_classes import (
-    DomainModelCore,
-    Metmast,
     Distance,
+    Metmast,
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    T_DomainModelList,
+    DataClassQueryBuilder,
     EdgeQueryStep,
     NodeQueryStep,
-    DataClassQueryBuilder,
+    T_DomainModelList,
 )
-from wind_turbine.data_classes._wind_turbine import (
-    WindTurbine,
-    _create_wind_turbine_filter,
-)
-from wind_turbine._api._core import (
-    QueryAPI,
-    _create_edge_filter,
-)
-
 from wind_turbine.data_classes._distance import (
     _create_distance_filter,
+)
+from wind_turbine.data_classes._wind_turbine import (
+    _create_wind_turbine_filter,
 )
 
 if TYPE_CHECKING:

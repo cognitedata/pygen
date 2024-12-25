@@ -1,37 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CogniteCADRevision,
-    CogniteCADRevisionWrite,
-    CogniteCADRevisionFields,
-    CogniteCADRevisionList,
-    CogniteCADRevisionWriteList,
-    CogniteCADRevisionTextFields,
-    CogniteCADModel,
-)
-from cognite_core.data_classes._cognite_cad_revision import (
-    CogniteCADRevisionQuery,
-    _COGNITECADREVISION_PROPERTIES_BY_FIELD,
-    _create_cognite_cad_revision_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +15,27 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_cad_revision_query import CogniteCADRevisionQueryAPI
+from cognite_core.data_classes import (
+    CogniteCADModel,
+    CogniteCADRevision,
+    CogniteCADRevisionFields,
+    CogniteCADRevisionList,
+    CogniteCADRevisionTextFields,
+    CogniteCADRevisionWrite,
+    CogniteCADRevisionWriteList,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_cad_revision import (
+    _COGNITECADREVISION_PROPERTIES_BY_FIELD,
+    CogniteCADRevisionQuery,
+    _create_cognite_cad_revision_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class CogniteCADRevisionAPI(
