@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
 
-from cognite.client import data_modeling as dm, CogniteClient
-from pydantic import Field
-from pydantic import field_validator, model_validator
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from pydantic import Field, field_validator, model_validator
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -15,69 +15,64 @@ from wind_turbine.data_classes._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
+    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
-    DomainModelList,
     DomainRelation,
-    DomainRelationWrite,
     GraphQLCore,
+    NodeQueryCore,
+    QueryCore,
     ResourcesWrite,
+    StringFilter,
     T_DomainModelList,
+    are_nodes_equal,
     as_direct_relation_reference,
     as_instance_dict_id,
-    as_node_id,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
-    QueryCore,
-    NodeQueryCore,
-    StringFilter,
 )
 
 if TYPE_CHECKING:
-    from wind_turbine.data_classes._gearbox import Gearbox, GearboxList, GearboxGraphQL, GearboxWrite, GearboxWriteList
+    from wind_turbine.data_classes._gearbox import Gearbox, GearboxGraphQL, GearboxList, GearboxWrite, GearboxWriteList
     from wind_turbine.data_classes._generator import (
         Generator,
-        GeneratorList,
         GeneratorGraphQL,
+        GeneratorList,
         GeneratorWrite,
         GeneratorWriteList,
     )
     from wind_turbine.data_classes._high_speed_shaft import (
         HighSpeedShaft,
-        HighSpeedShaftList,
         HighSpeedShaftGraphQL,
+        HighSpeedShaftList,
         HighSpeedShaftWrite,
         HighSpeedShaftWriteList,
     )
     from wind_turbine.data_classes._main_shaft import (
         MainShaft,
-        MainShaftList,
         MainShaftGraphQL,
+        MainShaftList,
         MainShaftWrite,
         MainShaftWriteList,
     )
     from wind_turbine.data_classes._power_inverter import (
         PowerInverter,
-        PowerInverterList,
         PowerInverterGraphQL,
+        PowerInverterList,
         PowerInverterWrite,
         PowerInverterWriteList,
     )
     from wind_turbine.data_classes._sensor_time_series import (
         SensorTimeSeries,
-        SensorTimeSeriesList,
         SensorTimeSeriesGraphQL,
+        SensorTimeSeriesList,
         SensorTimeSeriesWrite,
         SensorTimeSeriesWriteList,
     )
     from wind_turbine.data_classes._wind_turbine import (
         WindTurbine,
-        WindTurbineList,
         WindTurbineGraphQL,
-        WindTurbineWrite,
-        WindTurbineWriteList,
+        WindTurbineList,
     )
 
 

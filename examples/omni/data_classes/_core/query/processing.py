@@ -6,8 +6,8 @@ from typing import Any
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
-from omni.data_classes._core.query.step import QueryStep
 from omni.data_classes._core.query.constants import DATA_RECORD_PROPERTIES
+from omni.data_classes._core.query.step import QueryStep
 
 
 class QueryResultCleaner:
@@ -203,8 +203,11 @@ class QueryUnpacker:
 
     @classmethod
     def flatten_dump(
-        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, direct_property: str | None = None,
-            as_data_record: bool = False
+        cls,
+        node: dm.Node | dm.Edge,
+        selected_properties: set[str] | None,
+        direct_property: str | None = None,
+        as_data_record: bool = False,
     ) -> dict[str, Any]:
         """Dumps the node/edge into a flat dictionary.
 

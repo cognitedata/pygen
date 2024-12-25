@@ -2,43 +2,33 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union, no_type_check
 
-from cognite.client import data_modeling as dm, CogniteClient
-from pydantic import Field
-from pydantic import field_validator, model_validator
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from pydantic import Field, model_validator
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    FileContentAPI,
+    BooleanFilter,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
+    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
-    DomainModelList,
-    DomainRelation,
-    DomainRelationWrite,
+    FileContentAPI,
     GraphQLCore,
-    ResourcesWrite,
-    T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
-    as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
-    is_tuple_id,
-    select_best_node,
-    QueryCore,
     NodeQueryCore,
+    QueryCore,
+    ResourcesWrite,
     StringFilter,
-    BooleanFilter,
+    T_DomainModelList,
     TimestampFilter,
+    as_direct_relation_reference,
 )
-
 
 __all__ = [
     "DataSheet",
@@ -381,7 +371,6 @@ class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
-
         super().__init__(
             created_types,
             creation_path,

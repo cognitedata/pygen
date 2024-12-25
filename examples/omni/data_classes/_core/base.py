@@ -5,31 +5,29 @@ import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping
+from collections.abc import Callable, Collection, Iterator, Mapping
 from dataclasses import dataclass, field
 from typing import (
-    Callable,
-    cast,
+    Any,
     ClassVar,
     Generic,
     Optional,
-    Any,
-    Iterator,
-    TypeVar,
-    overload,
-    Union,
     SupportsIndex,
+    TypeVar,
+    Union,
+    cast,
+    overload,
 )
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
-    TimeSeriesWriteList,
+    FileMetadataList,
     FileMetadataWriteList,
+    SequenceList,
     SequenceWriteList,
     TimeSeriesList,
-    FileMetadataList,
-    SequenceList,
+    TimeSeriesWriteList,
 )
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
@@ -38,7 +36,7 @@ from cognite.client.data_classes.data_modeling.instances import (
     PropertyValue,
 )
 from cognite.client.utils._time import ms_to_datetime
-from pydantic import BaseModel, Field, model_validator, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -223,6 +221,7 @@ class DataRecord(BaseModel, populate_by_name=True):
         if isinstance(value, int):
             return ms_to_datetime(value)
         return value
+
 
 class DomainModel(DomainModelCore, ABC):
     data_record: DataRecord

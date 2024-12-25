@@ -1,36 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni_multi.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni_multi.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    MainInterface,
-    MainInterfaceWrite,
-    MainInterfaceFields,
-    MainInterfaceList,
-    MainInterfaceWriteList,
-    MainInterfaceTextFields,
-    SubInterface,
-)
-from omni_multi.data_classes._main_interface import (
-    MainInterfaceQuery,
-    _MAININTERFACE_PROPERTIES_BY_FIELD,
-    _create_main_interface_filter,
-)
 from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -38,6 +15,25 @@ from omni_multi._api._core import (
     SequenceNotStr,
 )
 from omni_multi._api.main_interface_query import MainInterfaceQueryAPI
+from omni_multi.data_classes import (
+    MainInterface,
+    MainInterfaceFields,
+    MainInterfaceList,
+    MainInterfaceTextFields,
+    MainInterfaceWrite,
+    MainInterfaceWriteList,
+    ResourcesWriteResult,
+    SubInterface,
+)
+from omni_multi.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+)
+from omni_multi.data_classes._main_interface import (
+    _MAININTERFACE_PROPERTIES_BY_FIELD,
+    MainInterfaceQuery,
+    _create_main_interface_filter,
+)
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):

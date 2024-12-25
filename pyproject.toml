@@ -19,7 +19,7 @@ include = '\.py$'
 # See https://beta.ruff.rs/docs/rules for an overview of ruff rules
 line-length = 120
 target-version = "py310"
-exclude = ["examples","examples-pydantic-v1", "scripts"]
+exclude = ["scripts"]
 fix = true
 
 [tool.ruff.lint]
@@ -36,7 +36,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
+known-first-party = []
 known-third-party = ["cognite.client"]
 
 [tool.mypy]

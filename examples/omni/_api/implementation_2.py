@@ -1,36 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Implementation2,
-    Implementation2Write,
-    Implementation2Fields,
-    Implementation2List,
-    Implementation2WriteList,
-    Implementation2TextFields,
-)
-from omni.data_classes._implementation_2 import (
-    Implementation2Query,
-    _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
-    _create_implementation_2_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -38,6 +15,25 @@ from omni._api._core import (
     SequenceNotStr,
 )
 from omni._api.implementation_2_query import Implementation2QueryAPI
+from omni.data_classes import (
+    Implementation2,
+    Implementation2Fields,
+    Implementation2List,
+    Implementation2TextFields,
+    Implementation2Write,
+    Implementation2WriteList,
+    ResourcesWriteResult,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+)
+from omni.data_classes._implementation_2 import (
+    _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
+    Implementation2Query,
+    _create_implementation_2_filter,
+)
 
 
 class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List, Implementation2WriteList]):

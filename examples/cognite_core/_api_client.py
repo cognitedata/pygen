@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
-from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 
+from cognite_core import data_classes
 from cognite_core._api import (
-    Cognite360ImageAPI,
-    Cognite360ImageCollectionAPI,
-    Cognite360ImageModelAPI,
-    Cognite360ImageStationAPI,
     Cognite3DModelAPI,
     Cognite3DObjectAPI,
     Cognite3DRevisionAPI,
     Cognite3DTransformationNodeAPI,
+    Cognite360ImageAPI,
+    Cognite360ImageCollectionAPI,
+    Cognite360ImageModelAPI,
+    Cognite360ImageStationAPI,
     CogniteActivityAPI,
     CogniteAssetAPI,
     CogniteAssetClassAPI,
@@ -34,15 +37,14 @@ from cognite_core._api import (
     CognitePointCloudRevisionAPI,
     CognitePointCloudVolumeAPI,
     CogniteSchedulableAPI,
-    CogniteSourceSystemAPI,
     CogniteSourceableNodeAPI,
+    CogniteSourceSystemAPI,
     CogniteTimeSeriesAPI,
     CogniteUnitAPI,
     CogniteVisualizableAPI,
 )
-from cognite_core._api._core import SequenceNotStr, GraphQLQueryResponse
+from cognite_core._api._core import GraphQLQueryResponse, SequenceNotStr
 from cognite_core.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from cognite_core import data_classes
 
 
 class CogniteCoreClient:

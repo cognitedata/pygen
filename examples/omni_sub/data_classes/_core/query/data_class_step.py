@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
-from collections.abc import Collection, Iterator, Iterable
-from typing import cast, Generic, Literal, overload, SupportsIndex
+from collections.abc import Collection, Iterable, Iterator
+from typing import Generic, Literal, SupportsIndex, cast, overload
 
 from cognite.client import data_modeling as dm
 
-from omni_sub.data_classes._core.query.builder import QueryBuilder
-from omni_sub.data_classes._core.query.step import QueryStep
 from omni_sub.data_classes._core.base import DomainModel, DomainRelation, T_DomainModelList
-from omni_sub.data_classes._core.query.constants import NotSetSentinel
 from omni_sub.data_classes._core.helpers import as_node_id
+from omni_sub.data_classes._core.query.builder import QueryBuilder
+from omni_sub.data_classes._core.query.constants import NotSetSentinel
+from omni_sub.data_classes._core.query.step import QueryStep
 
 if sys.version_info >= (3, 11):
     from typing import Self

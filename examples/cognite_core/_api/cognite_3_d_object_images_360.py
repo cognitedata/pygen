@@ -5,14 +5,13 @@ from collections.abc import Sequence
 
 from cognite.client import data_modeling as dm
 
+from cognite_core._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from cognite_core.data_classes import (
     Cognite360ImageAnnotation,
     Cognite360ImageAnnotationList,
     Cognite360ImageAnnotationWrite,
 )
 from cognite_core.data_classes._cognite_360_image_annotation import _create_cognite_360_image_annotation_filter
-
-from cognite_core._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from cognite_core.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 

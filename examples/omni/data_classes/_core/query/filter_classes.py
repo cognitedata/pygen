@@ -6,7 +6,6 @@ from typing import ClassVar, Generic, TypeVar
 
 from cognite.client import data_modeling as dm
 
-
 T_QueryCore = TypeVar("T_QueryCore")
 
 

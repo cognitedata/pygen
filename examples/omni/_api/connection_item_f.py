@@ -1,43 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    ConnectionItemF,
-    ConnectionItemFWrite,
-    ConnectionItemFFields,
-    ConnectionItemFList,
-    ConnectionItemFWriteList,
-    ConnectionItemFTextFields,
-    ConnectionEdgeA,
-    ConnectionEdgeAWrite,
-    ConnectionEdgeAList,
-    ConnectionEdgeA,
-    ConnectionItemD,
-    ConnectionItemE,
-    ConnectionItemG,
-)
-from omni.data_classes._connection_item_f import (
-    ConnectionItemFQuery,
-    _CONNECTIONITEMF_PROPERTIES_BY_FIELD,
-    _create_connection_item_f_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -47,6 +17,31 @@ from omni._api._core import (
 from omni._api.connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
 from omni._api.connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
 from omni._api.connection_item_f_query import ConnectionItemFQueryAPI
+from omni.data_classes import (
+    ConnectionEdgeA,
+    ConnectionItemD,
+    ConnectionItemE,
+    ConnectionItemF,
+    ConnectionItemFFields,
+    ConnectionItemFList,
+    ConnectionItemFTextFields,
+    ConnectionItemFWrite,
+    ConnectionItemFWriteList,
+    ConnectionItemG,
+    ResourcesWriteResult,
+)
+from omni.data_classes._connection_item_f import (
+    _CONNECTIONITEMF_PROPERTIES_BY_FIELD,
+    ConnectionItemFQuery,
+    _create_connection_item_f_filter,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    EdgeQueryStep,
+    NodeQueryStep,
+)
 
 
 class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList, ConnectionItemFWriteList]):

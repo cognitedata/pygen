@@ -1,41 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CogniteActivity,
-    CogniteActivityWrite,
-    CogniteActivityFields,
-    CogniteActivityList,
-    CogniteActivityWriteList,
-    CogniteActivityTextFields,
-    CogniteAsset,
-    CogniteEquipment,
-    CogniteSourceSystem,
-    CogniteTimeSeries,
-)
-from cognite_core.data_classes._cognite_activity import (
-    CogniteActivityQuery,
-    _COGNITEACTIVITY_PROPERTIES_BY_FIELD,
-    _create_cognite_activity_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -43,6 +16,30 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_activity_query import CogniteActivityQueryAPI
+from cognite_core.data_classes import (
+    CogniteActivity,
+    CogniteActivityFields,
+    CogniteActivityList,
+    CogniteActivityTextFields,
+    CogniteActivityWrite,
+    CogniteActivityWriteList,
+    CogniteAsset,
+    CogniteEquipment,
+    CogniteSourceSystem,
+    CogniteTimeSeries,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_activity import (
+    _COGNITEACTIVITY_PROPERTIES_BY_FIELD,
+    CogniteActivityQuery,
+    _create_cognite_activity_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteActivityList, CogniteActivityWriteList]):

@@ -1,44 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cdf.modules.contextualization.cdf_p_and_id_parser.functions.contextualization_p_and_id_annotater.handler import \
-    ViewProperty
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-    QueryBuilder,
-    QueryStepFactory,
-    ViewPropertyId,
-    QueryUnpacker,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    ConnectionItemA,
-    ConnectionItemAWrite,
-    ConnectionItemAFields,
-    ConnectionItemAList,
-    ConnectionItemAWriteList,
-    ConnectionItemATextFields,
-    ConnectionItemB,
-    ConnectionItemCNode,
-)
-from omni.data_classes._connection_item_a import (
-    ConnectionItemAQuery,
-    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
-    _create_connection_item_a_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -47,6 +16,31 @@ from omni._api._core import (
 )
 from omni._api.connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from omni._api.connection_item_a_query import ConnectionItemAQueryAPI
+from omni.data_classes import (
+    ConnectionItemA,
+    ConnectionItemAFields,
+    ConnectionItemAList,
+    ConnectionItemATextFields,
+    ConnectionItemAWrite,
+    ConnectionItemAWriteList,
+    ConnectionItemB,
+    ConnectionItemCNode,
+    ResourcesWriteResult,
+)
+from omni.data_classes._connection_item_a import (
+    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
+    ConnectionItemAQuery,
+    _create_connection_item_a_filter,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStepFactory,
+    QueryUnpacker,
+    ViewPropertyId,
+)
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):
@@ -675,26 +669,32 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id)
-        step = factory.root(filter, self._create_sort(sort_by, direction, sort), limit) # type: ignore[arg-type]
+        step = factory.root(filter, self._create_sort(sort_by, direction, sort), limit)  # type: ignore[arg-type]
         builder.append(step)
 
-        builder.extend(factory.from_edge(
-            ConnectionItemB._view_id,
-            "outwards",
-            ViewPropertyId(self._view_id, "outwards"),
-            include_end_node=retrieve_connections == "full",
-        ))
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemB._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "outwards"),
+                include_end_node=retrieve_connections == "full",
+            )
+        )
 
         if retrieve_connections == "full":
-            builder.extend(factory.from_direct_relation(
-                ConnectionItemCNode._view_id,
-                ViewPropertyId(self._view_id, "otherDirect"),
-            ))
+            builder.extend(
+                factory.from_direct_relation(
+                    ConnectionItemCNode._view_id,
+                    ViewPropertyId(self._view_id, "otherDirect"),
+                )
+            )
 
-            builder.extend(factory.from_direct_relation(
-                ConnectionItemA._view_id,
-                ViewPropertyId(self._view_id, "selfDirect"),
-            ))
+            builder.extend(
+                factory.from_direct_relation(
+                    ConnectionItemA._view_id,
+                    ViewPropertyId(self._view_id, "selfDirect"),
+                )
+            )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()

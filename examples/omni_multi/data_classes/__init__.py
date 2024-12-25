@@ -4,19 +4,20 @@ from omni_multi.data_classes._core import (
     DataRecordWrite,
     DomainModel,
     DomainModelCore,
-    DomainModelWrite,
     DomainModelList,
+    DomainModelWrite,
     DomainRelationWrite,
+    FileMetadataGraphQL,
     GraphQLCore,
     GraphQLList,
+    PageInfo,
     ResourcesWrite,
     ResourcesWriteResult,
-    PageInfo,
-    TimeSeriesGraphQL,
-    FileMetadataGraphQL,
     SequenceColumnGraphQL,
     SequenceGraphQL,
+    TimeSeriesGraphQL,
 )
+
 from ._implementation_1_v_1 import (
     Implementation1v1,
     Implementation1v1Apply,
@@ -61,7 +62,6 @@ from ._sub_interface import (
     SubInterfaceWrite,
     SubInterfaceWriteList,
 )
-
 
 __all__ = [
     "DataRecord",

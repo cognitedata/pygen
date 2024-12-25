@@ -2,43 +2,34 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
 
-from cognite.client import data_modeling as dm, CogniteClient
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 from pydantic import Field
 
+from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
+from omni.data_classes._connection_item_f import ConnectionItemFWrite
+from omni.data_classes._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainRelation,
-    DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWrite,
     DomainRelationWriteList,
-    GraphQLCore,
-    ResourcesWrite,
-    DomainModelList,
-    T_DomainList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
-    as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
-    is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
+    GraphQLCore,
     NodeQueryCore,
     QueryCore,
+    ResourcesWrite,
     StringFilter,
+    T_DomainList,
     TimestampFilter,
 )
-from omni.data_classes._connection_item_f import ConnectionItemFWrite
-from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
-from omni.data_classes._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
 
 if TYPE_CHECKING:
     from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
@@ -433,10 +424,6 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
     ):
-        from ._connection_item_e import _ConnectionItemEQuery
-        from ._connection_item_f import _ConnectionItemFQuery
-        from ._connection_item_g import _ConnectionItemGQuery
-
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(

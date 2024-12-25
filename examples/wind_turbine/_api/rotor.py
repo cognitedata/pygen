@@ -1,37 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from wind_turbine.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    Rotor,
-    RotorWrite,
-    RotorFields,
-    RotorList,
-    RotorWriteList,
-    RotorTextFields,
-    SensorTimeSeries,
-    WindTurbine,
-)
-from wind_turbine.data_classes._rotor import (
-    RotorQuery,
-    _create_rotor_filter,
-)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +15,27 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.rotor_query import RotorQueryAPI
+from wind_turbine.data_classes import (
+    ResourcesWriteResult,
+    Rotor,
+    RotorFields,
+    RotorList,
+    RotorTextFields,
+    RotorWrite,
+    RotorWriteList,
+    SensorTimeSeries,
+    WindTurbine,
+)
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
+from wind_turbine.data_classes._rotor import (
+    RotorQuery,
+    _create_rotor_filter,
+)
 
 
 class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):

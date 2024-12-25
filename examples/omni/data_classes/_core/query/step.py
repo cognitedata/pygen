@@ -263,7 +263,9 @@ class QueryStepFactory:
                 nested_properties_by_property[key] = value
         return nested_properties_by_property
 
-    def root(self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None) -> QueryStep:
+    def root(
+        self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None
+    ) -> QueryStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)

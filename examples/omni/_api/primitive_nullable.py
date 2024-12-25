@@ -1,37 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from omni.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    PrimitiveNullable,
-    PrimitiveNullableWrite,
-    PrimitiveNullableFields,
-    PrimitiveNullableList,
-    PrimitiveNullableWriteList,
-    PrimitiveNullableTextFields,
-)
-from omni.data_classes._primitive_nullable import (
-    PrimitiveNullableQuery,
-    _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
-    _create_primitive_nullable_filter,
-)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +16,25 @@ from omni._api._core import (
     SequenceNotStr,
 )
 from omni._api.primitive_nullable_query import PrimitiveNullableQueryAPI
+from omni.data_classes import (
+    PrimitiveNullable,
+    PrimitiveNullableFields,
+    PrimitiveNullableList,
+    PrimitiveNullableTextFields,
+    PrimitiveNullableWrite,
+    PrimitiveNullableWriteList,
+    ResourcesWriteResult,
+)
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+)
+from omni.data_classes._primitive_nullable import (
+    _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
+    PrimitiveNullableQuery,
+    _create_primitive_nullable_filter,
+)
 
 
 class PrimitiveNullableAPI(

@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
 
 from cognite.client import data_modeling as dm
 
+from omni._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from omni.data_classes import (
     ConnectionEdgeA,
     ConnectionEdgeAList,
     ConnectionEdgeAWrite,
 )
 from omni.data_classes._connection_edge_a import _create_connection_edge_a_filter
-
-from omni._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 

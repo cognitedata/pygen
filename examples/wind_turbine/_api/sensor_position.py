@@ -1,38 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from wind_turbine.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    SensorPosition,
-    SensorPositionWrite,
-    SensorPositionFields,
-    SensorPositionList,
-    SensorPositionWriteList,
-    SensorPositionTextFields,
-    Blade,
-    SensorTimeSeries,
-)
-from wind_turbine.data_classes._sensor_position import (
-    SensorPositionQuery,
-    _SENSORPOSITION_PROPERTIES_BY_FIELD,
-    _create_sensor_position_filter,
-)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -40,6 +15,28 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.sensor_position_query import SensorPositionQueryAPI
+from wind_turbine.data_classes import (
+    Blade,
+    ResourcesWriteResult,
+    SensorPosition,
+    SensorPositionFields,
+    SensorPositionList,
+    SensorPositionTextFields,
+    SensorPositionWrite,
+    SensorPositionWriteList,
+    SensorTimeSeries,
+)
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
+from wind_turbine.data_classes._sensor_position import (
+    _SENSORPOSITION_PROPERTIES_BY_FIELD,
+    SensorPositionQuery,
+    _create_sensor_position_filter,
+)
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):

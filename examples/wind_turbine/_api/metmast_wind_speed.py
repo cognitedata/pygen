@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, cast
+from typing import Literal
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -11,10 +11,10 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
-from wind_turbine.data_classes._metmast import _create_metmast_filter
-from wind_turbine.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from wind_turbine._api._core import DEFAULT_LIMIT_READ
 
+from wind_turbine._api._core import DEFAULT_LIMIT_READ
+from wind_turbine.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
+from wind_turbine.data_classes._metmast import _create_metmast_filter
 
 ColumnNames = Literal["position", "temperature", "tilt_angle", "wind_speed"]
 

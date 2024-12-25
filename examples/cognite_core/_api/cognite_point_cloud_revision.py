@@ -1,37 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
-)
-from cognite_core.data_classes import (
-    DomainModelCore,
-    DomainModelWrite,
-    ResourcesWriteResult,
-    CognitePointCloudRevision,
-    CognitePointCloudRevisionWrite,
-    CognitePointCloudRevisionFields,
-    CognitePointCloudRevisionList,
-    CognitePointCloudRevisionWriteList,
-    CognitePointCloudRevisionTextFields,
-    CognitePointCloudModel,
-)
-from cognite_core.data_classes._cognite_point_cloud_revision import (
-    CognitePointCloudRevisionQuery,
-    _COGNITEPOINTCLOUDREVISION_PROPERTIES_BY_FIELD,
-    _create_cognite_point_cloud_revision_filter,
-)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -39,6 +15,27 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_point_cloud_revision_query import CognitePointCloudRevisionQueryAPI
+from cognite_core.data_classes import (
+    CognitePointCloudModel,
+    CognitePointCloudRevision,
+    CognitePointCloudRevisionFields,
+    CognitePointCloudRevisionList,
+    CognitePointCloudRevisionTextFields,
+    CognitePointCloudRevisionWrite,
+    CognitePointCloudRevisionWriteList,
+    ResourcesWriteResult,
+)
+from cognite_core.data_classes._cognite_point_cloud_revision import (
+    _COGNITEPOINTCLOUDREVISION_PROPERTIES_BY_FIELD,
+    CognitePointCloudRevisionQuery,
+    _create_cognite_point_cloud_revision_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+)
 
 
 class CognitePointCloudRevisionAPI(

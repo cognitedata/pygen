@@ -2,44 +2,41 @@ from __future__ import annotations
 
 from abc import ABC
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from itertools import groupby
 from typing import (
+    Any,
+    ClassVar,
     Generic,
     Literal,
-    Any,
-    Iterator,
     Protocol,
     SupportsIndex,
     TypeVar,
     overload,
-    ClassVar,
 )
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
 from cognite_core import data_classes
 from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DataClassQueryBuilder,
     DomainModel,
     DomainModelWrite,
-    DEFAULT_INSTANCE_SPACE,
-    PageInfo,
     GraphQLCore,
     GraphQLList,
+    PageInfo,
     ResourcesWriteResult,
     T_DomainModel,
+    T_DomainModelList,
     T_DomainModelWrite,
     T_DomainModelWriteList,
-    T_DomainModelList,
     T_DomainRelation,
-    T_DomainRelationWrite,
     T_DomainRelationList,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-    EdgeQueryStep,
+    T_DomainRelationWrite,
 )
 
 DEFAULT_LIMIT_READ = 25

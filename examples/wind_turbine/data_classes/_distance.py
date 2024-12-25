@@ -1,41 +1,32 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
 
-from cognite.client import data_modeling as dm, CogniteClient
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
     DomainModel,
-    DomainModelCore,
     DomainModelWrite,
     DomainRelation,
-    DomainRelationWrite,
     DomainRelationList,
+    DomainRelationWrite,
     DomainRelationWriteList,
-    GraphQLCore,
-    ResourcesWrite,
-    DomainModelList,
-    T_DomainList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
-    as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
-    is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
+    FloatFilter,
+    GraphQLCore,
     NodeQueryCore,
     QueryCore,
+    ResourcesWrite,
     StringFilter,
-    FloatFilter,
+    T_DomainList,
 )
-from wind_turbine.data_classes._wind_turbine import WindTurbineWrite
 from wind_turbine.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
+from wind_turbine.data_classes._wind_turbine import WindTurbineWrite
 
 if TYPE_CHECKING:
     from wind_turbine.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
@@ -375,9 +366,6 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
     ):
-        from ._metmast import _MetmastQuery
-        from ._wind_turbine import _WindTurbineQuery
-
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
