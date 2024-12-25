@@ -7,6 +7,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
 from omni.data_classes._core.query.step import QueryStep
+from omni.data_classes._core.query.constants import DATA_RECORD_PROPERTIES
 
 
 class QueryResultCleaner:
@@ -165,9 +166,10 @@ class QueryUnpacker:
 
     """
 
-    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True):
+    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True, as_data_record: bool = False) -> None:
         self._steps = steps
         self._unpack_edges = unpack_edges
+        self._as_data_record = as_data_record
 
     def unpack(self) -> list[dict[str, Any]]:
         # The unpacked nodes/edges are stored in the dictionary below
@@ -201,7 +203,8 @@ class QueryUnpacker:
 
     @classmethod
     def flatten_dump(
-        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, direct_property: str | None = None
+        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, direct_property: str | None = None,
+            as_data_record: bool = False
     ) -> dict[str, Any]:
         """Dumps the node/edge into a flat dictionary.
 
@@ -211,6 +214,7 @@ class QueryUnpacker:
             direct_property: Assumed to be the property ID of a direct relation. If present, the value
                 of this property will be converted to a NodeId or a list of NodeIds. The motivation for this is
                 to be able to easily connect this node/edge to other nodes/edges in the result set.
+            as_data_record: If True, node properties are dumped as data records. Default is False.
 
         Returns:
             A dictionary with the properties of the node or edge
@@ -221,6 +225,14 @@ class QueryUnpacker:
         item: dict[str, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
+        if as_data_record:
+            data_record: dict[str, Any] = {}
+            for key in list(item.keys()):
+                if key in DATA_RECORD_PROPERTIES:
+                    data_record[key] = item.pop(key)
+            if data_record:
+                item["data_record"] = data_record
+
         for _, props_by_view_id in dumped_properties.items():
             for __, props in props_by_view_id.items():
                 for key, value in props.items():
@@ -249,7 +261,7 @@ class QueryUnpacker:
         unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
-            dumped = self.flatten_dump(node, step_properties, direct_property)
+            dumped = self.flatten_dump(node, step_properties, direct_property, self._as_data_record)
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
@@ -319,7 +331,7 @@ class QueryUnpacker:
                 target_node = start_node
 
             if self._unpack_edges or bool(edge.properties):
-                dumped = self.flatten_dump(edge, step_properties)
+                dumped = self.flatten_dump(edge, step_properties, as_data_record=self._as_data_record)
                 for connection_property, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         dumped[connection_property] = node_targets_by_source[target_node]

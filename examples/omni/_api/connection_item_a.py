@@ -697,8 +697,6 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             ))
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        unpacked = QueryUnpacker(builder, unpack_edges=False).unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
 
-        return ConnectionItemAList([ConnectionItemA.model_validate(item)
-            for item in unpacked
-        ])
+        return ConnectionItemAList([ConnectionItemA.model_validate(item) for item in unpacked])
