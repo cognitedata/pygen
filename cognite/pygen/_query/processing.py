@@ -134,33 +134,17 @@ class QueryUnpacker:
             defaultdict(list)
         )
         for step in reversed(self._builder):
-            source_property: str | None = None
+            connection_property: str | None = None
             if step.connection_property:
-                source_property = step.connection_property.property
+                connection_property = step.connection_property.property
+
             if node_expression := step.node_expression:
                 unpacked = self._unpack_node(step, node_expression, nodes_by_from)
-                nodes_by_from[step.from_].append((source_property, unpacked))
             elif edge_expression := step.edge_expression:
-                step_properties = set(step.selected_properties or [])
-                unpacked_edge: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
-                for edge in step.edge_results:
-                    start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
-                    end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
-                    dumped = self.flatten_dump(edge, step_properties)
-                    if edge_expression.direction == "outwards":
-                        source_node = start_node
-                        target_node = end_node
-                    else:
-                        source_node = end_node
-                        target_node = start_node
-                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
-                        if target_node in nested_by_id:
-                            dumped[nested_prop] = nested_by_id[target_node]
-
-                    unpacked_edge[source_node].append(dumped)
-                nodes_by_from[step.from_].append((source_property, unpacked_edge))
+                unpacked = self._unpack_edge(step, edge_expression, nodes_by_from)
             else:
                 raise TypeError("Unexpected step")
+            nodes_by_from[step.from_].append((connection_property, unpacked))
         # The type ignore below is incorrect, but set for now to be able to run
         # mypy. Todo: Fix this.
         return [item[0] for item in nodes_by_from[None][0][1].values()]  # type: ignore[misc]
@@ -234,3 +218,28 @@ class QueryUnpacker:
                     for item in reverse:
                         unpacked[item].append(copy.deepcopy(dumped))
         return unpacked
+
+    def _unpack_edge(
+        self,
+        step: QueryStep,
+        edge_expression: dm.query.EdgeResultSetExpression,
+        nodes_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]],
+    ) -> dict[dm.NodeId, list[dict[str | None, Any]]]:
+        step_properties = set(step.selected_properties or [])
+        unpacked_edge: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
+        for edge in step.edge_results:
+            start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
+            end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
+            dumped = self.flatten_dump(edge, step_properties)
+            if edge_expression.direction == "outwards":
+                source_node = start_node
+                target_node = end_node
+            else:
+                source_node = end_node
+                target_node = start_node
+            for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
+                if target_node in nested_by_id:
+                    dumped[nested_prop] = nested_by_id[target_node]
+
+            unpacked_edge[source_node].append(dumped)
+        return unpacked_edge
