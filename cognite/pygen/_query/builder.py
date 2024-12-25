@@ -277,5 +277,5 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
     def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | Self:
         value = super().__getitem__(item)
         if isinstance(item, slice):
-            return type(self)(value)  # type: ignore[arg-type]
+            return QueryBuilder(value)  # type: ignore[arg-type, return-value]
         return cast(QueryStep, value)
