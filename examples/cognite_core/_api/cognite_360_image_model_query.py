@@ -49,7 +49,8 @@ class Cognite360ImageModelQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_thumbnail: Whether to retrieve the thumbnail for each Cognite 360 image model or not.
+            retrieve_thumbnail: Whether to retrieve the thumbnail
+            for each Cognite 360 image model or not.
 
         Returns:
             The list of the source nodes of the query.

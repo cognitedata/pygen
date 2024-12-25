@@ -49,7 +49,8 @@ class CogniteAssetTypeQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_asset_class: Whether to retrieve the asset clas for each Cognite asset type or not.
+            retrieve_asset_class: Whether to retrieve the asset clas
+            for each Cognite asset type or not.
 
         Returns:
             The list of the source nodes of the query.

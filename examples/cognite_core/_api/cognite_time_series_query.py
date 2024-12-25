@@ -51,8 +51,10 @@ class CogniteTimeSeriesQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_source: Whether to retrieve the source for each Cognite time series or not.
-            retrieve_unit: Whether to retrieve the unit for each Cognite time series or not.
+            retrieve_source: Whether to retrieve the source
+            for each Cognite time series or not.
+            retrieve_unit: Whether to retrieve the unit
+            for each Cognite time series or not.
 
         Returns:
             The list of the source nodes of the query.

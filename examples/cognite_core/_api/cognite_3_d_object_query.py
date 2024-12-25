@@ -233,9 +233,10 @@ class Cognite3DObjectQueryAPI(QueryAPI[T_DomainModelList]):
             source_updated_user_prefix_edge: The prefix of the source updated user to filter on.
             external_id_prefix_edge: The prefix of the external ID to filter on.
             space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of images 360 edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of images 360 edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
 
         Returns:
             Cognite360ImageQueryAPI: The query API for the Cognite 360 image.

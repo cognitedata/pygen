@@ -49,7 +49,8 @@ class CogniteSourceableNodeQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_source: Whether to retrieve the source for each Cognite sourceable node or not.
+            retrieve_source: Whether to retrieve the source
+            for each Cognite sourceable node or not.
 
         Returns:
             The list of the source nodes of the query.

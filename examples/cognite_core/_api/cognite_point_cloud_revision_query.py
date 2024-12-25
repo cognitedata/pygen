@@ -49,7 +49,8 @@ class CognitePointCloudRevisionQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_model_3d: Whether to retrieve the model 3d for each Cognite point cloud revision or not.
+            retrieve_model_3d: Whether to retrieve the model 3d
+            for each Cognite point cloud revision or not.
 
         Returns:
             The list of the source nodes of the query.

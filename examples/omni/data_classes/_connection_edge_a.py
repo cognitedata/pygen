@@ -396,7 +396,7 @@ def _validate_end_node(
     start_node: DomainModelWrite,
     end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
 ) -> None:
-    if isinstance(end_node, (str, dm.NodeId)):
+    if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:

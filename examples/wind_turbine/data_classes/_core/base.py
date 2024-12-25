@@ -253,9 +253,12 @@ class DataRecordWrite(BaseModel):
 
     Args:
         existing_version: Fail the ingestion request if the node version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge
+            (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the
+            item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing
+            the ingestion request.
     """
 
     existing_version: Optional[int] = None

@@ -50,8 +50,10 @@ class RotorQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_rotor_speed_controller: Whether to retrieve the rotor speed controller for each rotor or not.
-            retrieve_rpm_low_speed_shaft: Whether to retrieve the rpm low speed shaft for each rotor or not.
+            retrieve_rotor_speed_controller: Whether to retrieve the rotor speed controller
+            for each rotor or not.
+            retrieve_rpm_low_speed_shaft: Whether to retrieve the rpm low speed shaft
+            for each rotor or not.
 
         Returns:
             The list of the source nodes of the query.

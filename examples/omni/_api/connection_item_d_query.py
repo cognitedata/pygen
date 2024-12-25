@@ -93,10 +93,12 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
             space: The space to filter on.
             external_id_prefix_edge: The prefix of the external ID to filter on.
             space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of outwards single edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
-            retrieve_direct_single: Whether to retrieve the direct single for each connection item d or not.
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of outwards single edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
+            retrieve_direct_single: Whether to retrieve the direct single
+                for each connection item d or not.
 
         Returns:
             ConnectionItemEQueryAPI: The query API for the connection item e.
@@ -145,7 +147,8 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_direct_single: Whether to retrieve the direct single for each connection item d or not.
+            retrieve_direct_single: Whether to retrieve the direct single
+            for each connection item d or not.
 
         Returns:
             The list of the source nodes of the query.

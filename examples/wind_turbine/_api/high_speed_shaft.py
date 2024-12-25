@@ -87,8 +87,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             torque: The torque to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of high speed shafts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of high speed shafts to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for high speed shafts.
@@ -120,15 +122,20 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
     ) -> ResourcesWriteResult:
         """Add or update (upsert) high speed shafts.
 
-        Note: This method iterates through all nodes and timeseries linked to high_speed_shaft and creates them including the edges
+        Note: This method iterates through all nodes and timeseries linked to high_speed_shaft
+        and creates them including the edges
         between the nodes. For example, if any of `bending_moment_y`, `bending_monent_x` or `torque` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
-            high_speed_shaft: High speed shaft or sequence of high speed shafts to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            high_speed_shaft: High speed shaft or
+                sequence of high speed shafts to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -268,8 +275,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             torque: The torque to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of high speed shafts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of high speed shafts to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
@@ -472,8 +481,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             torque: The torque to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of high speed shafts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of high speed shafts to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.

@@ -49,7 +49,8 @@ class Cognite360ImageCollectionQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_model_3d: Whether to retrieve the model 3d for each Cognite 360 image collection or not.
+            retrieve_model_3d: Whether to retrieve the model 3d
+            for each Cognite 360 image collection or not.
 
         Returns:
             The list of the source nodes of the query.

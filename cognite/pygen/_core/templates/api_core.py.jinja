@@ -225,7 +225,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             properties = [self._properties_by_field.get(prop, prop) for prop in properties]
 
         is_single_aggregate = False
-        if isinstance(aggregate, (str, dm.aggregations.MetricAggregation)):
+        if isinstance(aggregate, str | dm.aggregations.MetricAggregation):
             aggregate = [aggregate]
             is_single_aggregate = True
 
@@ -561,7 +561,7 @@ def _create_edge_filter(
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if space and isinstance(space, str):
         filters.append(dm.filters.Equals(["edge", "space"], value=space))
-    if space and isinstance(space, list):
+    if space and (space, list):
         filters.append(dm.filters.In(["edge", "space"], values=space))
     if filter:
         filters.append(filter)

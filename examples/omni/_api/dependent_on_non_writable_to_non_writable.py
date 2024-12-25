@@ -26,8 +26,8 @@ class DependentOnNonWritableToNonWritableAPI(EdgeAPI):
             to_implementation_1_non_writeable_space: Location of the implementation 1 non writeables.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of to non writable edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of to non writable edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested to non writable edges.

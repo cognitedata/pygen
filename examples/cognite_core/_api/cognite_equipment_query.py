@@ -53,9 +53,12 @@ class CogniteEquipmentQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_asset: Whether to retrieve the asset for each Cognite equipment or not.
-            retrieve_equipment_type: Whether to retrieve the equipment type for each Cognite equipment or not.
-            retrieve_source: Whether to retrieve the source for each Cognite equipment or not.
+            retrieve_asset: Whether to retrieve the asset
+            for each Cognite equipment or not.
+            retrieve_equipment_type: Whether to retrieve the equipment type
+            for each Cognite equipment or not.
+            retrieve_source: Whether to retrieve the source
+            for each Cognite equipment or not.
 
         Returns:
             The list of the source nodes of the query.

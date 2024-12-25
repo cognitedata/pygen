@@ -50,8 +50,10 @@ class GeneratorQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_generator_speed_controller: Whether to retrieve the generator speed controller for each generator or not.
-            retrieve_generator_speed_controller_reference: Whether to retrieve the generator speed controller reference for each generator or not.
+            retrieve_generator_speed_controller: Whether to retrieve the generator speed controller
+            for each generator or not.
+            retrieve_generator_speed_controller_reference: Whether to retrieve the generator speed controller reference
+            for each generator or not.
 
         Returns:
             The list of the source nodes of the query.

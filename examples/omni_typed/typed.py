@@ -62,8 +62,10 @@ class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedN
         space: The space where the node is located.
         external_id: The external id of the cdf external references listed.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         files: The file field.
         sequences: The sequence field.
         timeseries: The timesery field.
@@ -151,8 +153,10 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the dependent on non writable.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         a_value: The a value field.
         type: Direct relation pointing to the type node.
         deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
@@ -244,8 +248,10 @@ class Implementation1(_Implementation1Properties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the implementation 1.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         value_2: The value 2 field.
         main_value: The main value field.
         sub_value: The sub value field.
@@ -341,8 +347,10 @@ class Implementation2(_Implementation2Properties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the implementation 2.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         main_value: The main value field.
         sub_value: The sub value field.
         type: Direct relation pointing to the type node.
@@ -426,8 +434,10 @@ class MainInterface(_MainInterfaceProperties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the main interface.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         main_value: The main value field.
         type: Direct relation pointing to the type node.
         deleted_time: The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time
@@ -535,8 +545,10 @@ class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the primitive nullable.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -676,8 +688,10 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the primitive required listed.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -793,8 +807,10 @@ class SubInterface(_SubInterfaceProperties, TypedNode):
         space: The space where the node is located.
         external_id: The external id of the sub interface.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         main_value: The main value field.
         sub_value: The sub value field.
         type: Direct relation pointing to the type node.

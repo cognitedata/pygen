@@ -51,8 +51,10 @@ class CogniteFileQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_category: Whether to retrieve the category for each Cognite file or not.
-            retrieve_source: Whether to retrieve the source for each Cognite file or not.
+            retrieve_category: Whether to retrieve the category
+            for each Cognite file or not.
+            retrieve_source: Whether to retrieve the source
+            for each Cognite file or not.
 
         Returns:
             The list of the source nodes of the query.

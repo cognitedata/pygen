@@ -127,9 +127,10 @@ class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
             max_distance_edge: The maximum value of the distance to filter on.
             external_id_prefix_edge: The prefix of the external ID to filter on.
             space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of wind turbine edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of wind turbine edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
 
         Returns:
             WindTurbineQueryAPI: The query API for the wind turbine.

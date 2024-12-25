@@ -89,8 +89,8 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of images 360 edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of images 360 edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested images 360 edges.

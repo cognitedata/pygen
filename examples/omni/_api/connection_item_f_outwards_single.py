@@ -51,8 +51,8 @@ class ConnectionItemFOutwardsSingleAPI(EdgePropertyAPI):
             max_start_time: The maximum value of the start time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of outwards single edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of outwards single edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested outwards single edges.

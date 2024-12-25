@@ -49,7 +49,8 @@ class CogniteActivityQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_source: Whether to retrieve the source for each Cognite activity or not.
+            retrieve_source: Whether to retrieve the source
+            for each Cognite activity or not.
 
         Returns:
             The list of the source nodes of the query.
