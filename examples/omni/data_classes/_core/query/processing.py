@@ -1,4 +1,3 @@
-import copy
 import warnings
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
@@ -123,58 +122,109 @@ class QueryResultCleaner:
 
 
 class QueryUnpacker:
-    def __init__(self, builder: Sequence[QueryStep]):
-        self._builder = builder
+    """Unpacks the results of a query into a list of nested dictionaries.
+
+    Args:
+        steps: The steps of the query to unpack.
+        unpack_edges: If True, all edges are unpacked and included in the result. If False, only
+            edges with properties are included in the result. Default is True. See example below.
+
+    Example:
+        Unpacking query steps with edges:
+
+        ```python
+        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        print(result)
+        >>> [{
+        >>>    "name": "Node A",
+        >>>    "externalId": "A",
+        >>>    "outwards": [{
+        >>>        "type": "Edge Type",
+        >>>        "node": [{
+        >>>            "name": "Node B",
+        >>>            "externalId": "B"
+        >>>        }]
+        >>>    }]
+        >>> }]
+        ```
+
+        Unpacking query steps with edges, but skipping the edges:
+
+        ```python
+        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        print(result)
+        >>> [{
+        >>>    "name": "Node A",
+        >>>    "externalId": "A",
+        >>>    "outwards": [{
+        >>>        "name": "Node B",
+        >>>        "externalId": "B"
+        >>>    }]
+        >>> }]
+        ```
+
+    """
+
+    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True):
+        self._steps = steps
+        self._unpack_edges = unpack_edges
 
     def unpack(self) -> list[dict[str, Any]]:
-        nodes_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]] = (
-            defaultdict(list)
-        )
-        for step in reversed(self._builder):
-            source_property: str | None = None
-            if step.view_property:
-                source_property = step.view_property.property
+        # The unpacked nodes/edges are stored in the dictionary below
+        # dict[Step Name, list[Connection Property, dict[Source Node ID, list[Target Node]]]]
+        # This is used for each step, to look up the connected nodes/edges.
+        nodes_by_step_name: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        fist_step = self._steps[0]
+        output: list[dict[str, Any]] = []
+        # The steps are organized in a tree structure, where each step has a reference to a previous step.
+        # The unpacking is done in reverse order, starting with the last step, i.e., the leaf steps. This
+        # is such that when parent steps are unpacked, they can reference the already unpacked child steps.
+        for step in reversed(self._steps):
             if node_expression := step.node_expression:
-                unpacked = self._unpack_node(step, node_expression, nodes_by_from)
-                nodes_by_from[step.from_].append((source_property, unpacked))
+                unpacked = self._unpack_node(step, node_expression, nodes_by_step_name.get(step.name, []))
             elif edge_expression := step.edge_expression:
-                step_properties = set(step.selected_properties or [])
-                unpacked_edge: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
-                for edge in step.edge_results:
-                    start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
-                    end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
-                    dumped = self.flatten_dump(edge, step_properties)
-                    if edge_expression.direction == "outwards":
-                        source_node = start_node
-                        target_node = end_node
-                    else:
-                        source_node = end_node
-                        target_node = start_node
-                    for nested_prop, nested_by_id in nodes_by_from.get(step.name, []):
-                        if target_node in nested_by_id:
-                            dumped[nested_prop] = nested_by_id[target_node]
-
-                    unpacked_edge[source_node].append(dumped)
-                nodes_by_from[step.from_].append((source_property, unpacked_edge))
+                unpacked = self._unpack_edge(step, edge_expression, nodes_by_step_name.get(step.name, []))
             else:
                 raise TypeError("Unexpected step")
-        # The type ignore below is incorrect, but set for now to be able to run
-        # mypy. Todo: Fix this.
-        return [item[0] for item in nodes_by_from[None][0][1].values()]  # type: ignore[misc]
+
+            if step is fist_step:
+                output = [item for items in unpacked.values() for item in items]
+            elif (connection_property := step.connection_property) and (step.from_ is not None):
+                nodes_by_step_name[step.from_].append((connection_property.property, unpacked))
+            else:
+                raise ValueError(
+                    f"Connection property missing in step {step!r}. This is requires for unpacking"
+                    "for all steps except the first step."
+                )
+
+        return output
 
     @classmethod
     def flatten_dump(
-        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, connection_property: str | None = None
-    ) -> dict[str | None, Any]:
+        cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, direct_property: str | None = None
+    ) -> dict[str, Any]:
+        """Dumps the node/edge into a flat dictionary.
+
+        Args:
+            node: The node or edge to dump.
+            selected_properties: The properties to include in the dump. If None, all properties are included.
+            direct_property: Assumed to be the property ID of a direct relation. If present, the value
+                of this property will be converted to a NodeId or a list of NodeIds. The motivation for this is
+                to be able to easily connect this node/edge to other nodes/edges in the result set.
+
+        Returns:
+            A dictionary with the properties of the node or edge
+
+        """
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
-        item: dict[str | None, Any] = {
+        item: dict[str, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
         for _, props_by_view_id in dumped_properties.items():
             for __, props in props_by_view_id.items():
                 for key, value in props.items():
-                    if key == connection_property:
+                    if key == direct_property:
                         if isinstance(value, dict):
                             item[key] = dm.NodeId.load(value)
                         elif isinstance(value, list):
@@ -189,45 +239,97 @@ class QueryUnpacker:
         self,
         step: QueryStep,
         node_expression: dm.query.NodeResultSetExpression,
-        results_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]],
-    ) -> dict[dm.NodeId, list[dict[str | None, Any]]]:
-        step_properties = set(step.selected_properties or [])
-        connection_property: str | None = None
+        connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        step_properties = set(step.selected_properties or []) or None
+        direct_property: str | None = None
         if node_expression.through and node_expression.direction == "inwards":
-            connection_property = node_expression.through.property
-        unpacked: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
+            direct_property = node_expression.through.property
+
+        unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
-            dumped = self.flatten_dump(node, step_properties, connection_property)
-            for nested_prop, nested_by_id in results_by_from.get(step.name, []):
-                if neste_item := nested_by_id.get(node_id):
-                    # Reverse or Edge
-                    dumped[nested_prop] = neste_item
-                elif nested_prop in dumped:
-                    # Direct relation
-                    identifier = dumped.pop(nested_prop)
+            dumped = self.flatten_dump(node, step_properties, direct_property)
+            # Add all nodes from the subsequent steps that are connected to this node
+            for connection_property, node_targets_by_source in connections:
+                if node_targets := node_targets_by_source.get(node_id):
+                    # Reverse direct relation or Edge
+                    dumped[connection_property] = node_targets
+                elif connection_property in dumped:
+                    # Direct relation.
+                    identifier = dumped.pop(connection_property)
                     if isinstance(identifier, dict):
                         other_id = dm.NodeId.load(identifier)
-                        if other_id in nested_by_id:
-                            dumped[nested_prop] = nested_by_id[other_id]
+                        if other_id in node_targets_by_source:
+                            dumped[connection_property] = node_targets_by_source[other_id]
+                        else:
+                            warnings.warn(
+                                f"Node {other_id} not found in {node_targets_by_source.keys()}",
+                                UserWarning,
+                                stacklevel=2,
+                            )
+                            dumped[connection_property] = identifier
                     elif isinstance(identifier, list):
-                        dumped[nested_prop] = []
+                        dumped[connection_property] = []
                         for item in identifier:
                             other_id = dm.NodeId.load(item)
-                            if other_id in nested_by_id:
-                                dumped[nested_prop].extend(nested_by_id[other_id])
+                            if other_id in node_targets_by_source:
+                                dumped[connection_property].extend(node_targets_by_source[other_id])
+                            else:
+                                warnings.warn(
+                                    f"Node {other_id} not found in {node_targets_by_source.keys()}",
+                                    UserWarning,
+                                    stacklevel=2,
+                                )
+                                dumped[connection_property].append(item)
                 else:
                     warnings.warn(
-                        f"Nested property {nested_prop} not found in {dumped.keys()}", UserWarning, stacklevel=2
+                        f"Property {connection_property!r} not found {node_id!r}. Expected to be in {dumped.keys()}",
+                        UserWarning,
+                        stacklevel=2,
                     )
 
-            if connection_property is None:
-                unpacked[node_id].append(dumped)
+            if direct_property is None:
+                unpacked_by_source[node_id].append(dumped)
             else:
-                reverse = dumped.pop(connection_property)
+                reverse = dumped.pop(direct_property)
                 if isinstance(reverse, dm.NodeId):
-                    unpacked[reverse].append(dumped)
+                    unpacked_by_source[reverse].append(dumped)
                 elif isinstance(reverse, list):
                     for item in reverse:
-                        unpacked[item].append(copy.deepcopy(dumped))
-        return unpacked
+                        unpacked_by_source[item].append(dumped)
+        return unpacked_by_source
+
+    def _unpack_edge(
+        self,
+        step: QueryStep,
+        edge_expression: dm.query.EdgeResultSetExpression,
+        connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        step_properties = set(step.selected_properties or []) or None
+        unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+        for edge in step.edge_results:
+            start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
+            end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
+            if edge_expression.direction == "outwards":
+                source_node = start_node
+                target_node = end_node
+            else:
+                source_node = end_node
+                target_node = start_node
+
+            if self._unpack_edges or bool(edge.properties):
+                dumped = self.flatten_dump(edge, step_properties)
+                for connection_property, node_targets_by_source in connections:
+                    if target_node in node_targets_by_source:
+                        dumped[connection_property] = node_targets_by_source[target_node]
+
+                unpacked_by_source[source_node].append(dumped)
+            else:
+                for _, node_targets_by_source in connections:
+                    if target_node in node_targets_by_source:
+                        # Skipping the edge, instead adding the target node to the source node
+                        # such that the target node(s) can be connected to the source node.
+                        unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
+
+        return unpacked_by_source
