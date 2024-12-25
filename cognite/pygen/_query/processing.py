@@ -1,4 +1,3 @@
-import copy
 import warnings
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
@@ -247,7 +246,7 @@ class QueryUnpacker:
                     unpacked_by_source[reverse].append(dumped)
                 elif isinstance(reverse, list):
                     for item in reverse:
-                        unpacked_by_source[item].append(copy.deepcopy(dumped))
+                        unpacked_by_source[item].append(dumped)
         return unpacked_by_source
 
     def _unpack_edge(
