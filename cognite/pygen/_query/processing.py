@@ -122,36 +122,50 @@ class QueryResultCleaner:
 
 
 class QueryUnpacker:
-    """Unpacks the results of a query into a list of nested dictionaries."""
+    """Unpacks the results of a query into a list of nested dictionaries.
 
-    def __init__(self, builder: Sequence[QueryStep], unpack_edges: bool = False):
-        self._builder = builder
+    Args:
+        steps: The steps of the query to unpack.
+        unpack_edges: If True, all edges are unpacked and included in the result. If False, only
+            edges with properties are included in the result. Default is True. See example below.
+
+    """
+
+    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True):
+        self._steps = steps
         self._unpack_edges = unpack_edges
 
     def unpack(self) -> list[dict[str, Any]]:
-        nodes_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]] = (
-            defaultdict(list)
-        )
-        for step in reversed(self._builder):
-            connection_property: str | None = None
-            if step.connection_property:
-                connection_property = step.connection_property.property
-
+        nodes_by_from: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        fist_step = self._steps[0]
+        output: list[dict[str, Any]] = []
+        # The steps are organized in a tree structure, where each step has a reference to a previous step.
+        # The unpacking is done in reverse order, starting with the last step, i.e., the leaf steps. This
+        # is such that when parent steps are unpacked, they can reference the already unpacked child steps.
+        for step in reversed(self._steps):
             if node_expression := step.node_expression:
                 unpacked = self._unpack_node(step, node_expression, nodes_by_from.get(step.name, []))
             elif edge_expression := step.edge_expression:
                 unpacked = self._unpack_edge(step, edge_expression, nodes_by_from.get(step.name, []))
             else:
                 raise TypeError("Unexpected step")
-            nodes_by_from[step.from_].append((connection_property, unpacked))
-        # The type ignore below is incorrect, but set for now to be able to run
-        # mypy. Todo: Fix this.
-        return [item[0] for item in nodes_by_from[None][0][1].values()]  # type: ignore[misc]
+
+            if step is fist_step:
+                output = [item for items in unpacked.values() for item in items]
+            elif (connection_property := step.connection_property) and (step.from_ is not None):
+                nodes_by_from[step.from_].append((connection_property.property, unpacked))
+            else:
+                raise ValueError(
+                    f"Connection property missing in step {step!r}. This is requires for unpacking"
+                    "for all steps except the first step."
+                )
+
+        return output
 
     @classmethod
     def flatten_dump(
         cls, node: dm.Node | dm.Edge, selected_properties: set[str] | None, direct_property: str | None = None
-    ) -> dict[str | None, Any]:
+    ) -> dict[str, Any]:
         """Dumps the node/edge into a flat dictionary.
 
         Args:
@@ -167,7 +181,7 @@ class QueryUnpacker:
         """
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
-        item: dict[str | None, Any] = {
+        item: dict[str, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
         for _, props_by_view_id in dumped_properties.items():
@@ -188,14 +202,14 @@ class QueryUnpacker:
         self,
         step: QueryStep,
         node_expression: dm.query.NodeResultSetExpression,
-        connections: list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]],
-    ) -> dict[dm.NodeId, list[dict[str | None, Any]]]:
+        connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
         step_properties = set(step.selected_properties or []) or None
         direct_property: str | None = None
         if node_expression.through and node_expression.direction == "inwards":
             direct_property = node_expression.through.property
 
-        unpacked_by_source: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
+        unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
             dumped = self.flatten_dump(node, step_properties, direct_property)
@@ -253,10 +267,10 @@ class QueryUnpacker:
         self,
         step: QueryStep,
         edge_expression: dm.query.EdgeResultSetExpression,
-        connections: list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]],
-    ) -> dict[dm.NodeId, list[dict[str | None, Any]]]:
+        connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
+    ) -> dict[dm.NodeId, list[dict[str, Any]]]:
         step_properties = set(step.selected_properties or []) or None
-        unpacked_by_source: dict[dm.NodeId, list[dict[str | None, Any]]] = defaultdict(list)
+        unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for edge in step.edge_results:
             start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
             end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
