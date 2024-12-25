@@ -136,7 +136,9 @@ class QueryUnpacker:
         self._unpack_edges = unpack_edges
 
     def unpack(self) -> list[dict[str, Any]]:
-        nodes_by_from: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
+        # The unpacked nodes/edges are stored in the dictionary below
+        # dict[Step Name, list[Connection Property, dict[Source Node ID, list[Target Node]]]]
+        nodes_by_step_name: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
         fist_step = self._steps[0]
         output: list[dict[str, Any]] = []
         # The steps are organized in a tree structure, where each step has a reference to a previous step.
@@ -144,16 +146,16 @@ class QueryUnpacker:
         # is such that when parent steps are unpacked, they can reference the already unpacked child steps.
         for step in reversed(self._steps):
             if node_expression := step.node_expression:
-                unpacked = self._unpack_node(step, node_expression, nodes_by_from.get(step.name, []))
+                unpacked = self._unpack_node(step, node_expression, nodes_by_step_name.get(step.name, []))
             elif edge_expression := step.edge_expression:
-                unpacked = self._unpack_edge(step, edge_expression, nodes_by_from.get(step.name, []))
+                unpacked = self._unpack_edge(step, edge_expression, nodes_by_step_name.get(step.name, []))
             else:
                 raise TypeError("Unexpected step")
 
             if step is fist_step:
                 output = [item for items in unpacked.values() for item in items]
             elif (connection_property := step.connection_property) and (step.from_ is not None):
-                nodes_by_from[step.from_].append((connection_property.property, unpacked))
+                nodes_by_step_name[step.from_].append((connection_property.property, unpacked))
             else:
                 raise ValueError(
                     f"Connection property missing in step {step!r}. This is requires for unpacking"
@@ -291,6 +293,8 @@ class QueryUnpacker:
             else:
                 for _, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
+                        # Skipping the edge, instead adding the target node to the source node
+                        # such that the target node(s) can be connected to the source node.
                         unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
 
         return unpacked_by_source
