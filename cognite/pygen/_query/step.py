@@ -256,7 +256,7 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
-        if self._user_selected_properties and self._root_properties:
+        if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
             selected_properties = self._root_properties
