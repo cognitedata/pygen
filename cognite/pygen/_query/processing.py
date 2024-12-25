@@ -135,17 +135,17 @@ class QueryUnpacker:
         ```python
         result = QueryUnpacker(steps, unpack_edges=True).unpack()
         print(result)
-        >>> [{
-        >>>    "name": "Node A",
-        >>>    "externalId": "A",
-        >>>    "outwards": [{
-        >>>        "type": "Edge Type",
-        >>>        "node": [{
-        >>>            "name": "Node B",
-        >>>            "externalId": "B"
-        >>>        }]
-        >>>    }]
-        >>> }]
+        [{
+            "name": "Node A",
+            "externalId": "A",
+            "outwards": [{
+                "type": "Edge Type",
+                "node": [{
+                    "name": "Node B",
+                    "externalId": "B"
+                }]
+            }]
+         }]
         ```
 
         Unpacking query steps with edges, but skipping the edges:
@@ -153,14 +153,14 @@ class QueryUnpacker:
         ```python
         result = QueryUnpacker(steps, unpack_edges=True).unpack()
         print(result)
-        >>> [{
-        >>>    "name": "Node A",
-        >>>    "externalId": "A",
-        >>>    "outwards": [{
-        >>>        "name": "Node B",
-        >>>        "externalId": "B"
-        >>>    }]
-        >>> }]
+        [{
+           "name": "Node A",
+           "externalId": "A",
+           "outwards": [{
+               "name": "Node B",
+               "externalId": "B"
+           }]
+        }]
         ```
 
     """
