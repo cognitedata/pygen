@@ -260,7 +260,9 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import Cognite360ImageWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image = Cognite360ImageWrite(external_id="my_cognite_360_image", ...)
+                >>> cognite_360_image = Cognite360ImageWrite(
+                ...     external_id="my_cognite_360_image", ...
+                ... )
                 >>> result = client.cognite_360_image.apply(cognite_360_image)
 
         """
@@ -480,7 +482,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -1159,8 +1161,10 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 images to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 images to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -1349,8 +1353,10 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 images to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 images to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
@@ -1358,7 +1364,8 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
                 specify the direction for each field as well as how to handle null values.
             retrieve_connections: Whether to retrieve `back`, `bottom`, `collection_360`, `front`, `left`, `right`, `station_360` and `top`
                 for the Cognite 360 images. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the
+                identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite 360 images

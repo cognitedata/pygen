@@ -144,7 +144,9 @@ class CognitePointCloudModelAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import CognitePointCloudModelWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_model = CognitePointCloudModelWrite(external_id="my_cognite_point_cloud_model", ...)
+                >>> cognite_point_cloud_model = CognitePointCloudModelWrite(
+                ...     external_id="my_cognite_point_cloud_model", ...
+                ... )
                 >>> result = client.cognite_point_cloud_model.apply(cognite_point_cloud_model)
 
         """
@@ -269,7 +271,7 @@ class CognitePointCloudModelAPI(
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -520,8 +522,10 @@ class CognitePointCloudModelAPI(
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite point cloud models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite point cloud models to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -592,8 +596,10 @@ class CognitePointCloudModelAPI(
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite point cloud models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite point cloud models to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
@@ -601,7 +607,8 @@ class CognitePointCloudModelAPI(
                 specify the direction for each field as well as how to handle null values.
             retrieve_connections: Whether to retrieve `revisions` and `thumbnail`
                 for the Cognite point cloud models. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the
+                identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite point cloud models

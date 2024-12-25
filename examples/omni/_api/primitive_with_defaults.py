@@ -135,7 +135,9 @@ class PrimitiveWithDefaultsAPI(
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import PrimitiveWithDefaultsWrite
                 >>> client = OmniClient()
-                >>> primitive_with_default = PrimitiveWithDefaultsWrite(external_id="my_primitive_with_default", ...)
+                >>> primitive_with_default = PrimitiveWithDefaultsWrite(
+                ...     external_id="my_primitive_with_default", ...
+                ... )
                 >>> result = client.primitive_with_defaults.apply(primitive_with_default)
 
         """
@@ -257,7 +259,7 @@ class PrimitiveWithDefaultsAPI(
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -491,8 +493,10 @@ class PrimitiveWithDefaultsAPI(
             default_string_prefix: The prefix of the default string to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive with defaults to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive with defaults to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -561,8 +565,10 @@ class PrimitiveWithDefaultsAPI(
             default_string_prefix: The prefix of the default string to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive with defaults to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive with defaults to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

@@ -137,7 +137,9 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import RotorWrite
                 >>> client = WindTurbineClient()
-                >>> rotor = RotorWrite(external_id="my_rotor", ...)
+                >>> rotor = RotorWrite(
+                ...     external_id="my_rotor", ...
+                ... )
                 >>> result = client.rotor.apply(rotor)
 
         """
@@ -263,7 +265,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -498,8 +500,10 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             rpm_low_speed_shaft: The rpm low speed shaft to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of rotors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of rotors to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -565,11 +569,14 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             rpm_low_speed_shaft: The rpm low speed shaft to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of rotors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of rotors to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             retrieve_connections: Whether to retrieve `rotor_speed_controller`, `rpm_low_speed_shaft` and `wind_turbine`
                 for the rotors. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the
+                identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested rotors

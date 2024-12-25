@@ -145,7 +145,9 @@ class SensorTimeSeriesAPI(
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import SensorTimeSeriesWrite
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series = SensorTimeSeriesWrite(external_id="my_sensor_time_series", ...)
+                >>> sensor_time_series = SensorTimeSeriesWrite(
+                ...     external_id="my_sensor_time_series", ...
+                ... )
                 >>> result = client.sensor_time_series.apply(sensor_time_series)
 
         """
@@ -275,7 +277,7 @@ class SensorTimeSeriesAPI(
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -535,8 +537,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -617,8 +621,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

@@ -168,7 +168,9 @@ class CogniteDescribableNodeAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import CogniteDescribableNodeWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_describable_node = CogniteDescribableNodeWrite(external_id="my_cognite_describable_node", ...)
+                >>> cognite_describable_node = CogniteDescribableNodeWrite(
+                ...     external_id="my_cognite_describable_node", ...
+                ... )
                 >>> result = client.cognite_describable_node.apply(cognite_describable_node)
 
         """
@@ -372,7 +374,7 @@ class CogniteDescribableNodeAPI(
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -579,8 +581,10 @@ class CogniteDescribableNodeAPI(
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite describable nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite describable nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -640,8 +644,10 @@ class CogniteDescribableNodeAPI(
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite describable nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite describable nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

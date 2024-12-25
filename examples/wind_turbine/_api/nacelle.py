@@ -222,7 +222,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import NacelleWrite
                 >>> client = WindTurbineClient()
-                >>> nacelle = NacelleWrite(external_id="my_nacelle", ...)
+                >>> nacelle = NacelleWrite(
+                ...     external_id="my_nacelle", ...
+                ... )
                 >>> result = client.nacelle.apply(nacelle)
 
         """
@@ -420,7 +422,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -1007,8 +1009,10 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             yaw_error: The yaw error to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of nacelles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of nacelles to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -1154,11 +1158,14 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             yaw_error: The yaw error to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of nacelles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of nacelles to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             retrieve_connections: Whether to retrieve `acc_from_back_side_y`, `acc_from_back_side_z`, `gearbox`, `generator`, `high_speed_shaft`, `main_shaft`, `power_inverter`, `wind_turbine`, `yaw_direction` and `yaw_error`
                 for the nacelles. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the
+                identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested nacelles
