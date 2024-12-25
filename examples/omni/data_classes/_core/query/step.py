@@ -179,20 +179,49 @@ class QueryStep:
 
 
 class QueryStepFactory:
+    """QueryStepFactory is a factory class that creates query steps.
+
+    Args:
+        create_step_name: A function that creates a unique name for a step.
+        view_id: The view ID to query. Either view_id or view must be set.
+        view: The view to query. Either view_id or view must be set.
+        user_selected_properties: The user selected properties to retrieve. Defaults to None, which indicates that all
+            properties should be retrieved.
+
+    """
+
     def __init__(
         self,
-        view: dm.View,
-        user_selected_properties: SelectedProperties,
         create_step_name: Callable[[str | None], str],
+        view_id: dm.ViewId | None = None,
+        view: dm.View | None = None,
+        user_selected_properties: SelectedProperties | None = None,
+        edge_connection_property: str = "node",
     ) -> None:
-        self._view = view
-        self._view_id = view.as_id()
-        self._user_selected_properties = user_selected_properties
+        if sum(1 for x in (view_id, view) if x is not None) != 1:
+            raise ValueError("Either view_id or view must be set")
         self._create_step_name = create_step_name
+        if view_id is not None:
+            self._view_id = view_id
+        elif view is not None:
+            self._view_id = view.as_id()
+        else:
+            raise ValueError("Either view_id or view must be set")
+        self._view = view
+        self._user_selected_properties = user_selected_properties
         self._root_name: str | None = None
+        self._edge_connection_property = edge_connection_property
+
+    @property
+    def root_name(self) -> str:
+        if self._root_name is None:
+            raise ValueError("Root step is not created")
+        return self._root_name
 
     @cached_property
-    def _root_properties(self) -> list[str]:
+    def _root_properties(self) -> list[str] | None:
+        if self._user_selected_properties is None:
+            return None
         root_properties: list[str] = []
         for prop in self._user_selected_properties:
             if isinstance(prop, str):
@@ -205,6 +234,8 @@ class QueryStepFactory:
     @cached_property
     def connection_properties(self) -> dict[str, ViewProperty]:
         output: dict[str, ViewProperty] = {}
+        if self._root_properties is None or self._view is None:
+            raise ValueError("View or user selected properties is required for finding" " connection properties")
         for prop in self._root_properties:
             definition = self._view.properties.get(prop)
             if not definition:
@@ -222,7 +253,9 @@ class QueryStepFactory:
         }
 
     @cached_property
-    def _nested_properties_by_property(self) -> dict[str, list[str | dict[str, list[str]]]]:
+    def _nested_properties_by_property(self) -> dict[str, list[str | dict[str, list[str]]]] | None:
+        if self._user_selected_properties is None:
+            return None
         nested_properties_by_property: dict[str, list[str | dict[str, list[str]]]] = {}
         for prop in self._user_selected_properties:
             if isinstance(prop, dict):
@@ -231,7 +264,14 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
-        skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
+        if self._root_properties:
+            skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
+            select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
+            selected_properties = self._root_properties
+        else:
+            select = dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])])
+            selected_properties = None
+
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
@@ -241,8 +281,8 @@ class QueryStepFactory:
             dm.query.NodeResultSetExpression(
                 filter=dm.filters.And(filter, has_data) if filter else has_data,
             ),
-            select=self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id),
-            selected_properties=self._root_properties,
+            select=select,
+            selected_properties=selected_properties,
             view_id=self._view_id,
             max_retrieve_limit=-1 if limit is None else limit,
             raw_filter=filter,
@@ -251,60 +291,69 @@ class QueryStepFactory:
     def from_connection(
         self, connection_id: str, connection: ViewProperty, reverse_views: dict[dm.ViewId, dm.View]
     ) -> list[QueryStep]:
-        if self._root_name is None:
-            raise ValueError("Root step is not created")
         connection_property = ViewPropertyId(self._view_id, connection_id)
-        selected_properties = self._nested_properties_by_property.get(connection_id, ["*"])
+        selected_properties: list[str | dict[str, list[str]]] = ["*"]
+        if (nested := self._nested_properties_by_property) and connection_id in nested:
+            selected_properties = nested[connection_id]
+
         if isinstance(connection, dm.EdgeConnection):
-            return self._from_edge(connection, connection_property, selected_properties)
+            return self.from_edge(connection.source, connection.direction, connection_property, selected_properties)
         elif isinstance(connection, ReverseDirectRelation):
+            connection_type: Literal["reverse-list"] | None = (
+                "reverse-list" if self._is_listable(connection.through, reverse_views) else None
+            )
             validated = self._validate_flat_properties(selected_properties)
-            return self._from_reverse_relation(connection, connection_property, validated, reverse_views)
+            return self.from_reverse_relation(
+                connection.source, connection.through, connection_type, connection_property, validated
+            )
         elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self._from_direct_relation(connection, connection_property, validated)
+            return self.from_direct_relation(connection.source, connection_property, validated)
         else:
             warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
         return []
 
-    def _from_direct_relation(
+    def from_direct_relation(
         self,
-        connection: dm.MappedProperty,
+        source: dm.ViewId | None,
         connection_property: ViewPropertyId,
-        selected_properties: list[str],
+        selected_properties: list[str] | None = None,
     ) -> list[QueryStep]:
-        query_properties = self._create_query_properties(selected_properties, None)
-        if connection.source is None:
+        if source is None:
             raise ValueError("Source view not found")
+        selected_properties = selected_properties or ["*"]
+        query_properties = self._create_query_properties(selected_properties, None)
         return [
             QueryStep(
-                self._create_step_name(self._root_name),
+                self._create_step_name(self.root_name),
                 dm.query.NodeResultSetExpression(
-                    from_=self._root_name,
+                    from_=self.root_name,
                     direction="outwards",
                     through=self._view_id.as_property_ref(connection_property.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, connection.source),
+                select=self._create_select(query_properties, source),
                 selected_properties=selected_properties,
-                view_id=connection.source,
+                view_id=source,
             )
         ]
 
-    def _from_edge(
+    def from_edge(
         self,
-        connection: dm.EdgeConnection,
+        source: dm.ViewId,
+        direction: Literal["outwards", "inwards"],
         connection_property: ViewPropertyId,
-        selected_properties: list[str | dict[str, list[str]]],
+        selected_properties: list[str | dict[str, list[str]]] | None = None,
     ) -> list[QueryStep]:
+        selected_properties = selected_properties or ["*"]
         edge_name = self._create_step_name(self._root_name)
         steps = [
             QueryStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=self._root_name,
-                    direction=connection.direction,
-                    chain_to="source" if connection.direction == "outwards" else "destination",
+                    direction=direction,
+                    chain_to="source" if direction == "outwards" else "destination",
                 ),
                 selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
                 connection_property=connection_property,
@@ -315,9 +364,9 @@ class QueryStepFactory:
             (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
         )
         if isinstance(node_properties, dict):
-            selected_node_properties = node_properties["node"]
+            selected_node_properties = node_properties[self._edge_connection_property]
             query_properties = self._create_query_properties(selected_node_properties, None)
-            target_view = connection.source
+            target_view = source
 
             step = QueryStep(
                 self._create_step_name(edge_name),
@@ -327,45 +376,44 @@ class QueryStepFactory:
                 ),
                 select=self._create_select(query_properties, target_view),
                 selected_properties=selected_node_properties,
-                connection_property=ViewPropertyId(target_view, "node"),
+                connection_property=ViewPropertyId(target_view, self._edge_connection_property),
                 view_id=target_view,
             )
             steps.append(step)
         return steps
 
-    def _from_reverse_relation(
+    def from_reverse_relation(
         self,
-        connection: ReverseDirectRelation,
+        source: dm.ViewId,
+        through: dm.PropertyId,
+        connection_type: Literal["reverse-list"] | None,
         connection_property: ViewPropertyId,
-        selected_properties: list[str],
-        reverse_views: dict[dm.ViewId, dm.View],
+        selected_properties: list[str] | None = None,
     ) -> list[QueryStep]:
-        connection_type: Literal["reverse-list"] | None = (
-            "reverse-list" if self._is_listable(connection.through, reverse_views) else None
-        )
-        query_properties = self._create_query_properties(selected_properties, connection.through.property)
-        try:
-            other_view = reverse_views[connection.source]
-        except KeyError:
-            raise ValueError(f"View {connection.source} not found in {reverse_views.keys()}") from None
+        query_properties = self._create_query_properties(selected_properties, through.property)
+        other_view_id = source
         return [
             QueryStep(
                 self._create_step_name(self._root_name),
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,
                     direction="inwards",
-                    through=other_view.as_property_ref(connection.through.property),
+                    through=other_view_id.as_property_ref(through.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, other_view.as_id()),
+                select=self._create_select(query_properties, other_view_id),
                 selected_properties=selected_properties,
-                view_id=connection.source,
+                view_id=source,
                 connection_type=connection_type,
             )
         ]
 
     @classmethod
-    def _create_query_properties(cls, properties: list[str], connection_id: str | None = None) -> list[str]:
+    def _create_query_properties(
+        cls, properties: list[str] | None, connection_id: str | None = None
+    ) -> list[str] | None:
+        if properties is None:
+            return None
         include_connection_prop = "*" not in properties
         nested_properties: list[str] = []
         for prop_id in properties:
@@ -374,6 +422,7 @@ class QueryStepFactory:
             if prop_id == connection_id:
                 include_connection_prop = False
             nested_properties.append(prop_id)
+
         if include_connection_prop and connection_id:
             nested_properties.append(connection_id)
         return nested_properties
@@ -385,7 +434,8 @@ class QueryStepFactory:
         )
 
     @staticmethod
-    def _create_select(properties: list[str], view_id: dm.ViewId) -> dm.query.Select:
+    def _create_select(properties: list[str] | None, view_id: dm.ViewId) -> dm.query.Select:
+        properties = properties or ["*"]
         return dm.query.Select([dm.query.SourceSelector(view_id, properties)])
 
     @staticmethod
