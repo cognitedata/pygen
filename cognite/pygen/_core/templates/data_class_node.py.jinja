@@ -361,7 +361,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                         else:
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
+                                stacklevel=2
                             )
                     {% endfor %}
                     {% for field in data_class.one_to_one_edges_with_properties %}
@@ -376,7 +377,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                         else:
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
+                                stacklevel=2
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
@@ -409,7 +411,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                 else:
                     warnings.warn(
                         f"Expected one direct relation for '{{ field.name }}' in {% raw %}{{% endraw %}{{  field.reverse_property.name }}.as_id(){% raw %}}{% endraw %}."
-                        f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}."
+                        f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}.",
+                        stacklevel=2
                     )
             {% endfor %}
             {% for field in data_class.one_to_many_reverse_direct_relations %}

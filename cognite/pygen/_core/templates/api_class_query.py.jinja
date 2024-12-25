@@ -16,6 +16,13 @@ from {{ top_level_package }}.data_classes import (
     {{ field.destination_class.read_name }},
     {% endfor %}
 )
+from {{ top_level_package }}.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
+    EdgeQueryStep,
+    NodeQueryStep,
+    DataClassQueryBuilder,
+)
 {% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
     {{ edge_api.end_class.read_name }},
@@ -23,12 +30,7 @@ from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} imp
 )
 {% endfor %}
 from {{ top_level_package }}._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
     QueryAPI,
-    T_DomainModelList,
     {% if not query_api.is_only_one_to_many_edges  %}
     _create_edge_filter,
     {% endif %}
