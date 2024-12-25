@@ -109,8 +109,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             f'<text x="{i * w + 40}" y="{h}" dy="-10">{node}</text>' for i, node in enumerate(nodes)
         )
         arrows = "    \n".join(
-            '<path id="arrow-line"  marker-end="url(#head)" '
-            f'stroke-width="2" fill="none" stroke="black" d="M{i*w+40},{h}, {i*w + 150} {h}" />'
+            f'<path id="arrow-line"  marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="M{i*w+40},{h}, {i*w + 150} {h}" />'
             for i in range(len(edges))
         )
         arrow_text = "    \n".join(

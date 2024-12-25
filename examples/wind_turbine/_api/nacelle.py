@@ -1156,7 +1156,8 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             space: The space to filter on.
             limit: Maximum number of nacelles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `acc_from_back_side_y`, `acc_from_back_side_z`, `gearbox`, `generator`, `high_speed_shaft`, `main_shaft`, `power_inverter`, `wind_turbine`, `yaw_direction` and `yaw_error` for the nacelles. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `acc_from_back_side_y`, `acc_from_back_side_z`, `gearbox`, `generator`, `high_speed_shaft`, `main_shaft`, `power_inverter`, `wind_turbine`, `yaw_direction` and `yaw_error`
+                for the nacelles. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:

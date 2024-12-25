@@ -52,11 +52,11 @@ def as_pygen_node_id(value: DomainModel | dm.NodeId | str) -> dm.NodeId | str:
 
 
 def are_nodes_equal(node1: DomainModel | str | dm.NodeId, node2: DomainModel | str | dm.NodeId) -> bool:
-    if isinstance(node1, (str, dm.NodeId)):
+    if isinstance(node1, str | dm.NodeId):
         node1_id = node1
     else:
         node1_id = node1.as_id() if node1.space != DEFAULT_INSTANCE_SPACE else node1.external_id
-    if isinstance(node2, (str, dm.NodeId)):
+    if isinstance(node2, str | dm.NodeId):
         node2_id = node2
     else:
         node2_id = node2.as_id() if node2.space != DEFAULT_INSTANCE_SPACE else node2.external_id

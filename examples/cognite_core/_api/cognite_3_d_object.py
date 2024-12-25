@@ -736,7 +736,8 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `asset`, `cad_nodes`, `images_360` and `point_cloud_volumes` for the Cognite 3D objects. Defaults to 'skip'.
+            retrieve_connections: Whether to retrieve `asset`, `cad_nodes`, `images_360` and `point_cloud_volumes`
+                for the Cognite 3D objects. Defaults to 'skip'.
                 'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
