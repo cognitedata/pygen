@@ -138,6 +138,7 @@ class QueryUnpacker:
     def unpack(self) -> list[dict[str, Any]]:
         # The unpacked nodes/edges are stored in the dictionary below
         # dict[Step Name, list[Connection Property, dict[Source Node ID, list[Target Node]]]]
+        # This is used for each step, to look up the connected nodes/edges.
         nodes_by_step_name: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
         fist_step = self._steps[0]
         output: list[dict[str, Any]] = []
