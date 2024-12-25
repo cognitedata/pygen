@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, cast
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -11,10 +11,10 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
-
-from omni._api._core import DEFAULT_LIMIT_READ
 from omni.data_classes._cdf_external_references import _create_cdf_external_reference_filter
-from omni.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
+from omni.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
+from omni._api._core import DEFAULT_LIMIT_READ
+
 
 ColumnNames = Literal["file", "sequence", "timeseries"]
 

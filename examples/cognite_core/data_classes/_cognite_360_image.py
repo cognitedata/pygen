@@ -3,58 +3,66 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
-from pydantic import Field, field_validator, model_validator
+from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
+from pydantic import field_validator, model_validator
 
-from cognite_core.data_classes._cognite_3_d_transformation_node import (
-    Cognite3DTransformationNode,
-    Cognite3DTransformationNodeWrite,
-)
-from cognite_core.data_classes._cognite_cube_map import CogniteCubeMap, CogniteCubeMapWrite
 from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
+    DomainModelList,
     DomainRelation,
-    FloatFilter,
+    DomainRelationWrite,
     GraphQLCore,
-    NodeQueryCore,
-    QueryCore,
     ResourcesWrite,
-    StringFilter,
     T_DomainModelList,
-    TimestampFilter,
     as_direct_relation_reference,
     as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
     is_tuple_id,
+    select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
+    FloatFilter,
+    TimestampFilter,
 )
+from cognite_core.data_classes._cognite_3_d_transformation_node import (
+    Cognite3DTransformationNode,
+    Cognite3DTransformationNodeWrite,
+)
+from cognite_core.data_classes._cognite_cube_map import CogniteCubeMap, CogniteCubeMapWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_360_image_collection import (
         Cognite360ImageCollection,
-        Cognite360ImageCollectionGraphQL,
         Cognite360ImageCollectionList,
+        Cognite360ImageCollectionGraphQL,
         Cognite360ImageCollectionWrite,
         Cognite360ImageCollectionWriteList,
     )
     from cognite_core.data_classes._cognite_360_image_station import (
         Cognite360ImageStation,
-        Cognite360ImageStationGraphQL,
         Cognite360ImageStationList,
+        Cognite360ImageStationGraphQL,
         Cognite360ImageStationWrite,
         Cognite360ImageStationWriteList,
     )
     from cognite_core.data_classes._cognite_file import (
-        CogniteFileGraphQL,
+        CogniteFile,
         CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
         CogniteFileWriteList,
     )
 

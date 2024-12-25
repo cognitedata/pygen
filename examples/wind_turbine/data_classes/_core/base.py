@@ -5,29 +5,31 @@ import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections.abc import Callable, Collection, Iterator, Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from typing import (
-    Any,
+    Callable,
+    cast,
     ClassVar,
     Generic,
     Optional,
-    SupportsIndex,
+    Any,
+    Iterator,
     TypeVar,
-    Union,
-    cast,
     overload,
+    Union,
+    SupportsIndex,
 )
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
-    FileMetadataList,
+    TimeSeriesWriteList,
     FileMetadataWriteList,
-    SequenceList,
     SequenceWriteList,
     TimeSeriesList,
-    TimeSeriesWriteList,
+    FileMetadataList,
+    SequenceList,
 )
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
@@ -563,9 +565,9 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
         end_node: DomainModelWrite | str | dm.NodeId,
         edge_type: dm.DirectRelationReference,
     ) -> dm.EdgeApply:
-        if isinstance(start_node, (DomainModelWrite, dm.NodeId)):
+        if isinstance(start_node, DomainModelWrite | dm.NodeId):
             space = start_node.space
-        elif isinstance(end_node, (DomainModelWrite, dm.NodeId)):
+        elif isinstance(end_node, DomainModelWrite | dm.NodeId):
             space = end_node.space
         else:
             space = DEFAULT_INSTANCE_SPACE

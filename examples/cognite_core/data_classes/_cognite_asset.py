@@ -3,82 +3,99 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
-from pydantic import Field, field_validator, model_validator
+from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
+from pydantic import field_validator, model_validator
 
-from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
-from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
-from cognite_core.data_classes._cognite_visualizable import CogniteVisualizable, CogniteVisualizableWrite
 from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
+    DomainModelList,
     DomainRelation,
+    DomainRelationWrite,
     GraphQLCore,
-    NodeQueryCore,
-    QueryCore,
     ResourcesWrite,
-    StringFilter,
     T_DomainModelList,
-    TimestampFilter,
     as_direct_relation_reference,
     as_instance_dict_id,
+    as_node_id,
     as_pygen_node_id,
+    are_nodes_equal,
     is_tuple_id,
+    select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
+    TimestampFilter,
 )
+from cognite_core.data_classes._cognite_visualizable import CogniteVisualizable, CogniteVisualizableWrite
+from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_3_d_object import (
-        Cognite3DObjectGraphQL,
+        Cognite3DObject,
         Cognite3DObjectList,
+        Cognite3DObjectGraphQL,
+        Cognite3DObjectWrite,
         Cognite3DObjectWriteList,
     )
     from cognite_core.data_classes._cognite_activity import (
         CogniteActivity,
-        CogniteActivityGraphQL,
         CogniteActivityList,
+        CogniteActivityGraphQL,
+        CogniteActivityWrite,
+        CogniteActivityWriteList,
     )
     from cognite_core.data_classes._cognite_asset_class import (
         CogniteAssetClass,
-        CogniteAssetClassGraphQL,
         CogniteAssetClassList,
+        CogniteAssetClassGraphQL,
         CogniteAssetClassWrite,
         CogniteAssetClassWriteList,
     )
     from cognite_core.data_classes._cognite_asset_type import (
         CogniteAssetType,
-        CogniteAssetTypeGraphQL,
         CogniteAssetTypeList,
+        CogniteAssetTypeGraphQL,
         CogniteAssetTypeWrite,
         CogniteAssetTypeWriteList,
     )
     from cognite_core.data_classes._cognite_equipment import (
         CogniteEquipment,
-        CogniteEquipmentGraphQL,
         CogniteEquipmentList,
+        CogniteEquipmentGraphQL,
+        CogniteEquipmentWrite,
+        CogniteEquipmentWriteList,
     )
     from cognite_core.data_classes._cognite_file import (
         CogniteFile,
-        CogniteFileGraphQL,
         CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
+        CogniteFileWriteList,
     )
     from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystemGraphQL,
+        CogniteSourceSystem,
         CogniteSourceSystemList,
+        CogniteSourceSystemGraphQL,
+        CogniteSourceSystemWrite,
         CogniteSourceSystemWriteList,
     )
     from cognite_core.data_classes._cognite_time_series import (
         CogniteTimeSeries,
-        CogniteTimeSeriesGraphQL,
         CogniteTimeSeriesList,
+        CogniteTimeSeriesGraphQL,
+        CogniteTimeSeriesWrite,
+        CogniteTimeSeriesWriteList,
     )
 
 

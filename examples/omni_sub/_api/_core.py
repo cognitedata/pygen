@@ -2,40 +2,43 @@ from __future__ import annotations
 
 from abc import ABC
 from collections import defaultdict
-from collections.abc import Iterator, Sequence
+from collections.abc import Sequence
 from itertools import groupby
 from typing import (
-    Any,
-    ClassVar,
     Generic,
     Literal,
+    Any,
+    Iterator,
     Protocol,
     SupportsIndex,
     TypeVar,
     overload,
+    ClassVar,
 )
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
+from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
 
 from omni_sub import data_classes
 from omni_sub.data_classes._core import (
-    DataClassQueryBuilder,
     DomainModel,
     DomainModelWrite,
+    PageInfo,
     GraphQLCore,
     GraphQLList,
-    PageInfo,
     ResourcesWriteResult,
     T_DomainModel,
-    T_DomainModelList,
     T_DomainModelWrite,
     T_DomainModelWriteList,
+    T_DomainModelList,
     T_DomainRelation,
-    T_DomainRelationList,
     T_DomainRelationWrite,
+    T_DomainRelationList,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+    EdgeQueryStep,
 )
 
 DEFAULT_LIMIT_READ = 25

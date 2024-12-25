@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+import datetime
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
 
-from omni_multi._api._core import (
-    QueryAPI,
-)
+from cognite.client import data_modeling as dm, CogniteClient
+
 from omni_multi.data_classes import (
+    DomainModelCore,
     MainInterface,
 )
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
     T_DomainModelList,
+    EdgeQueryStep,
+    NodeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni_multi._api._core import (
+    QueryAPI,
+    _create_edge_filter,
 )
 
 

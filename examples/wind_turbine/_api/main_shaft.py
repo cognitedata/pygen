@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from wind_turbine.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    MainShaft,
+    MainShaftWrite,
+    MainShaftFields,
+    MainShaftList,
+    MainShaftWriteList,
+    MainShaftTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine.data_classes._main_shaft import (
+    MainShaftQuery,
+    _create_main_shaft_filter,
+)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.main_shaft_query import MainShaftQueryAPI
-from wind_turbine.data_classes import (
-    MainShaft,
-    MainShaftFields,
-    MainShaftList,
-    MainShaftTextFields,
-    MainShaftWrite,
-    MainShaftWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
-from wind_turbine.data_classes._main_shaft import (
-    MainShaftQuery,
-    _create_main_shaft_filter,
-)
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):

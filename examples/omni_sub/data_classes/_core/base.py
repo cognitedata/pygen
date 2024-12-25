@@ -5,29 +5,31 @@ import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections.abc import Callable, Collection, Iterator, Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from typing import (
-    Any,
+    Callable,
+    cast,
     ClassVar,
     Generic,
     Optional,
-    SupportsIndex,
+    Any,
+    Iterator,
     TypeVar,
-    Union,
-    cast,
     overload,
+    Union,
+    SupportsIndex,
 )
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
-    FileMetadataList,
+    TimeSeriesWriteList,
     FileMetadataWriteList,
-    SequenceList,
     SequenceWriteList,
     TimeSeriesList,
-    TimeSeriesWriteList,
+    FileMetadataList,
+    SequenceList,
 )
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,

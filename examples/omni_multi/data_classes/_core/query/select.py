@@ -3,31 +3,32 @@ from __future__ import annotations
 import difflib
 import warnings
 from typing import (
-    Any,
+    cast,
     ClassVar,
     Generic,
-    Literal,
+    Any,
     TypeVar,
     Union,
-    cast,
+    Literal,
 )
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
+from omni_multi.data_classes._core.query.filter_classes import Filtering
 from omni_multi.data_classes._core.base import (
-    DomainModel,
-    DomainModelCore,
     DomainModelList,
-    DomainRelation,
-    DomainRelationList,
     T_DomainList,
+    DomainRelationList,
+    DomainModelCore,
     T_DomainModelList,
+    DomainRelation,
+    DomainModel,
 )
 from omni_multi.data_classes._core.constants import DEFAULT_QUERY_LIMIT
-from omni_multi.data_classes._core.query.data_class_step import DataClassQueryBuilder, EdgeQueryStep, NodeQueryStep
-from omni_multi.data_classes._core.query.filter_classes import Filtering
 from omni_multi.data_classes._core.query.step import QueryStep
+from omni_multi.data_classes._core.query.data_class_step import NodeQueryStep, EdgeQueryStep, DataClassQueryBuilder
+
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
@@ -40,7 +41,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
     def __init__(
         self,
         created_types: set[type],
-        creation_path: list[QueryCore],
+        creation_path: "list[QueryCore]",
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         expression: dm.query.ResultSetExpression | None = None,
@@ -73,7 +74,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             nodes = [step._result_cls.__name__ for step in self._creation_path]
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
         elif self._connection_type == "reverse-list":
-            raise ValueError("Cannot query across a reverse-list connection.")
+            raise ValueError(f"Cannot query across a reverse-list connection.")
         error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
         attributes = [name for name in vars(self).keys() if not name.startswith("_")]
         if matches := difflib.get_close_matches(item, attributes):

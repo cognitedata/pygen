@@ -4,28 +4,31 @@ import datetime
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 
-from cognite_core._api._core import (
-    QueryAPI,
-)
 from cognite_core.data_classes import (
+    DomainModelCore,
     Cognite3DObject,
     Cognite360ImageAnnotation,
 )
-from cognite_core.data_classes._cognite_360_image import (
-    _create_cognite_360_image_filter,
-)
-from cognite_core.data_classes._cognite_360_image_annotation import (
-    _create_cognite_360_image_annotation_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
-    T_DomainModelList,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes._cognite_360_image import (
+    Cognite360Image,
+    _create_cognite_360_image_filter,
+)
+from cognite_core._api._core import (
+    QueryAPI,
+    _create_edge_filter,
+)
+
+from cognite_core.data_classes._cognite_360_image_annotation import (
+    _create_cognite_360_image_annotation_filter,
 )
 
 if TYPE_CHECKING:

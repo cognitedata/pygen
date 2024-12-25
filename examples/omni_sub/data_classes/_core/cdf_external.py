@@ -3,36 +3,27 @@ from __future__ import annotations
 import datetime
 from typing import (
     Annotated,
-    Any,
     Optional,
+    Any,
     no_type_check,
 )
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import Datapoints, SequenceColumn, SequenceColumnWrite
-from cognite.client.data_classes import (
-    FileMetadata as CogniteFileMetadata,
-)
-from cognite.client.data_classes import (
-    FileMetadataWrite as CogniteFileMetadataWrite,
-)
-from cognite.client.data_classes import (
-    Sequence as CogniteSequence,
-)
-from cognite.client.data_classes import (
-    SequenceWrite as CogniteSequenceWrite,
-)
+from cognite.client.data_classes import Datapoints, SequenceColumnWrite, SequenceColumn
 from cognite.client.data_classes import (
     TimeSeries as CogniteTimeSeries,
-)
-from cognite.client.data_classes import (
+    Sequence as CogniteSequence,
+    FileMetadata as CogniteFileMetadata,
     TimeSeriesWrite as CogniteTimeSeriesWrite,
+    SequenceWrite as CogniteSequenceWrite,
+    FileMetadataWrite as CogniteFileMetadataWrite,
 )
 from cognite.client.data_classes.sequences import ValueType
 from cognite.client.utils import datetime_to_ms
-from pydantic import BaseModel, BeforeValidator, field_validator, model_validator
+from pydantic import BaseModel, BeforeValidator, model_validator, field_validator
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
+
 
 TimeSeries = Annotated[
     CogniteTimeSeries,

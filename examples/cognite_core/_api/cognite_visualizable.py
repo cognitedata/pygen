@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteVisualizable,
+    CogniteVisualizableWrite,
+    CogniteVisualizableFields,
+    CogniteVisualizableList,
+    CogniteVisualizableWriteList,
+    CogniteVisualizableTextFields,
+    Cognite3DObject,
+    CogniteAsset,
+)
+from cognite_core.data_classes._cognite_visualizable import (
+    CogniteVisualizableQuery,
+    _create_cognite_visualizable_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_visualizable_query import CogniteVisualizableQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DObject,
-    CogniteAsset,
-    CogniteVisualizable,
-    CogniteVisualizableFields,
-    CogniteVisualizableList,
-    CogniteVisualizableTextFields,
-    CogniteVisualizableWrite,
-    CogniteVisualizableWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_visualizable import (
-    CogniteVisualizableQuery,
-    _create_cognite_visualizable_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class CogniteVisualizableAPI(

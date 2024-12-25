@@ -1,14 +1,37 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    PrimitiveRequired,
+    PrimitiveRequiredWrite,
+    PrimitiveRequiredFields,
+    PrimitiveRequiredList,
+    PrimitiveRequiredWriteList,
+    PrimitiveRequiredTextFields,
+)
+from omni.data_classes._primitive_required import (
+    PrimitiveRequiredQuery,
+    _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
+    _create_primitive_required_filter,
+)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,25 +39,6 @@ from omni._api._core import (
     SequenceNotStr,
 )
 from omni._api.primitive_required_query import PrimitiveRequiredQueryAPI
-from omni.data_classes import (
-    PrimitiveRequired,
-    PrimitiveRequiredFields,
-    PrimitiveRequiredList,
-    PrimitiveRequiredTextFields,
-    PrimitiveRequiredWrite,
-    PrimitiveRequiredWriteList,
-    ResourcesWriteResult,
-)
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
-from omni.data_classes._primitive_required import (
-    _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
-    PrimitiveRequiredQuery,
-    _create_primitive_required_filter,
-)
 
 
 class PrimitiveRequiredAPI(

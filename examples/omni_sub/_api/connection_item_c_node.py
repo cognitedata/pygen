@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_sub.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni_sub.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemCNode,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeFields,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeWriteList,
+    ConnectionItemCNodeTextFields,
+    ConnectionItemA,
+    ConnectionItemB,
+)
+from omni_sub.data_classes._connection_item_c_node import (
+    ConnectionItemCNodeQuery,
+    _create_connection_item_c_node_filter,
+)
 from omni_sub._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -17,27 +40,6 @@ from omni_sub._api._core import (
 from omni_sub._api.connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
 from omni_sub._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
 from omni_sub._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
-from omni_sub.data_classes import (
-    ConnectionItemA,
-    ConnectionItemB,
-    ConnectionItemCNode,
-    ConnectionItemCNodeFields,
-    ConnectionItemCNodeList,
-    ConnectionItemCNodeTextFields,
-    ConnectionItemCNodeWrite,
-    ConnectionItemCNodeWriteList,
-    ResourcesWriteResult,
-)
-from omni_sub.data_classes._connection_item_c_node import (
-    ConnectionItemCNodeQuery,
-    _create_connection_item_c_node_filter,
-)
-from omni_sub.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-)
 
 
 class ConnectionItemCNodeAPI(

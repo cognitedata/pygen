@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_multi.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni_multi.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SubInterface,
+    SubInterfaceWrite,
+    SubInterfaceFields,
+    SubInterfaceList,
+    SubInterfaceWriteList,
+    SubInterfaceTextFields,
+    Implementation1v2,
+)
+from omni_multi.data_classes._sub_interface import (
+    SubInterfaceQuery,
+    _SUBINTERFACE_PROPERTIES_BY_FIELD,
+    _create_sub_interface_filter,
+)
 from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,25 +38,6 @@ from omni_multi._api._core import (
     SequenceNotStr,
 )
 from omni_multi._api.sub_interface_query import SubInterfaceQueryAPI
-from omni_multi.data_classes import (
-    Implementation1v2,
-    ResourcesWriteResult,
-    SubInterface,
-    SubInterfaceFields,
-    SubInterfaceList,
-    SubInterfaceTextFields,
-    SubInterfaceWrite,
-    SubInterfaceWriteList,
-)
-from omni_multi.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
-from omni_multi.data_classes._sub_interface import (
-    _SUBINTERFACE_PROPERTIES_BY_FIELD,
-    SubInterfaceQuery,
-    _create_sub_interface_filter,
-)
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):

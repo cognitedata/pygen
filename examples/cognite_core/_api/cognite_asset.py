@@ -1,14 +1,45 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteAsset,
+    CogniteAssetWrite,
+    CogniteAssetFields,
+    CogniteAssetList,
+    CogniteAssetWriteList,
+    CogniteAssetTextFields,
+    Cognite3DObject,
+    CogniteActivity,
+    CogniteAssetClass,
+    CogniteAssetType,
+    CogniteEquipment,
+    CogniteFile,
+    CogniteSourceSystem,
+    CogniteTimeSeries,
+)
+from cognite_core.data_classes._cognite_asset import (
+    CogniteAssetQuery,
+    _COGNITEASSET_PROPERTIES_BY_FIELD,
+    _create_cognite_asset_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,34 +47,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_asset_query import CogniteAssetQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DObject,
-    CogniteActivity,
-    CogniteAsset,
-    CogniteAssetClass,
-    CogniteAssetFields,
-    CogniteAssetList,
-    CogniteAssetTextFields,
-    CogniteAssetType,
-    CogniteAssetWrite,
-    CogniteAssetWriteList,
-    CogniteEquipment,
-    CogniteFile,
-    CogniteSourceSystem,
-    CogniteTimeSeries,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_asset import (
-    _COGNITEASSET_PROPERTIES_BY_FIELD,
-    CogniteAssetQuery,
-    _create_cognite_asset_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList, CogniteAssetWriteList]):

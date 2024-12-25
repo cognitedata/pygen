@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemD,
+    ConnectionItemDWrite,
+    ConnectionItemDFields,
+    ConnectionItemDList,
+    ConnectionItemDWriteList,
+    ConnectionItemDTextFields,
+    ConnectionItemE,
+)
+from omni.data_classes._connection_item_d import (
+    ConnectionItemDQuery,
+    _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
+    _create_connection_item_d_filter,
+)
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,28 +40,6 @@ from omni._api._core import (
 )
 from omni._api.connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
 from omni._api.connection_item_d_query import ConnectionItemDQueryAPI
-from omni.data_classes import (
-    ConnectionItemD,
-    ConnectionItemDFields,
-    ConnectionItemDList,
-    ConnectionItemDTextFields,
-    ConnectionItemDWrite,
-    ConnectionItemDWriteList,
-    ConnectionItemE,
-    ResourcesWriteResult,
-)
-from omni.data_classes._connection_item_d import (
-    _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
-    ConnectionItemDQuery,
-    _create_connection_item_d_filter,
-)
-from omni.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-)
 
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):

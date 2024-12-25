@@ -1,14 +1,41 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteFile,
+    CogniteFileWrite,
+    CogniteFileFields,
+    CogniteFileList,
+    CogniteFileWriteList,
+    CogniteFileTextFields,
+    CogniteAsset,
+    CogniteEquipment,
+    CogniteFileCategory,
+    CogniteSourceSystem,
+)
+from cognite_core.data_classes._cognite_file import (
+    CogniteFileQuery,
+    _COGNITEFILE_PROPERTIES_BY_FIELD,
+    _create_cognite_file_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,30 +43,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_file_query import CogniteFileQueryAPI
-from cognite_core.data_classes import (
-    CogniteAsset,
-    CogniteEquipment,
-    CogniteFile,
-    CogniteFileCategory,
-    CogniteFileFields,
-    CogniteFileList,
-    CogniteFileTextFields,
-    CogniteFileWrite,
-    CogniteFileWriteList,
-    CogniteSourceSystem,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_file import (
-    _COGNITEFILE_PROPERTIES_BY_FIELD,
-    CogniteFileQuery,
-    _create_cognite_file_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, CogniteFileWriteList]):

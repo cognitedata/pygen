@@ -1,26 +1,42 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Literal, Optional, Union, no_type_check
+import warnings
+from collections.abc import Sequence
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from omni_sub.data_classes._core import (
     DataRecord,
+    DataRecordWrite,
+    DomainModel,
+    DomainModelCore,
     DomainModelWrite,
     DomainRelation,
+    DomainRelationWrite,
     DomainRelationList,
-    EdgeQueryCore,
+    DomainRelationWriteList,
     GraphQLCore,
+    ResourcesWrite,
+    DomainModelList,
+    T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
+    EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
-    T_DomainList,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
-    from omni_sub.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL
-    from omni_sub.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL
+    from omni_sub.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from omni_sub.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [
@@ -178,11 +194,13 @@ def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.Nod
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
 
 

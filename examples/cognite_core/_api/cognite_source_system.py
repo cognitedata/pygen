@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteSourceSystem,
+    CogniteSourceSystemWrite,
+    CogniteSourceSystemFields,
+    CogniteSourceSystemList,
+    CogniteSourceSystemWriteList,
+    CogniteSourceSystemTextFields,
+)
+from cognite_core.data_classes._cognite_source_system import (
+    CogniteSourceSystemQuery,
+    _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD,
+    _create_cognite_source_system_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,25 +38,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_source_system_query import CogniteSourceSystemQueryAPI
-from cognite_core.data_classes import (
-    CogniteSourceSystem,
-    CogniteSourceSystemFields,
-    CogniteSourceSystemList,
-    CogniteSourceSystemTextFields,
-    CogniteSourceSystemWrite,
-    CogniteSourceSystemWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_source_system import (
-    _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD,
-    CogniteSourceSystemQuery,
-    _create_cognite_source_system_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
 
 
 class CogniteSourceSystemAPI(

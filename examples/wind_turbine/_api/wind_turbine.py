@@ -1,13 +1,45 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from wind_turbine.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    WindTurbine,
+    WindTurbineWrite,
+    WindTurbineFields,
+    WindTurbineList,
+    WindTurbineWriteList,
+    WindTurbineTextFields,
+    Distance,
+    DistanceWrite,
+    DistanceList,
+    Blade,
+    DataSheet,
+    Distance,
+    Metmast,
+    Nacelle,
+    Rotor,
+)
+from wind_turbine.data_classes._wind_turbine import (
+    WindTurbineQuery,
+    _WINDTURBINE_PROPERTIES_BY_FIELD,
+    _create_wind_turbine_filter,
+)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,33 +48,6 @@ from wind_turbine._api._core import (
 )
 from wind_turbine._api.wind_turbine_metmast import WindTurbineMetmastAPI
 from wind_turbine._api.wind_turbine_query import WindTurbineQueryAPI
-from wind_turbine.data_classes import (
-    Blade,
-    DataSheet,
-    Distance,
-    Metmast,
-    Nacelle,
-    ResourcesWriteResult,
-    Rotor,
-    WindTurbine,
-    WindTurbineFields,
-    WindTurbineList,
-    WindTurbineTextFields,
-    WindTurbineWrite,
-    WindTurbineWriteList,
-)
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-)
-from wind_turbine.data_classes._wind_turbine import (
-    _WINDTURBINE_PROPERTIES_BY_FIELD,
-    WindTurbineQuery,
-    _create_wind_turbine_filter,
-)
 
 
 class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, WindTurbineWriteList]):

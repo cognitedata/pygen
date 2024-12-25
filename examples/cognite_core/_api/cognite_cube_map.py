@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteCubeMap,
+    CogniteCubeMapWrite,
+    CogniteCubeMapFields,
+    CogniteCubeMapList,
+    CogniteCubeMapWriteList,
+    CogniteCubeMapTextFields,
+    CogniteFile,
+    Cognite360Image,
+)
+from cognite_core.data_classes._cognite_cube_map import (
+    CogniteCubeMapQuery,
+    _create_cognite_cube_map_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_cube_map_query import CogniteCubeMapQueryAPI
-from cognite_core.data_classes import (
-    Cognite360Image,
-    CogniteCubeMap,
-    CogniteCubeMapFields,
-    CogniteCubeMapList,
-    CogniteCubeMapTextFields,
-    CogniteCubeMapWrite,
-    CogniteCubeMapWriteList,
-    CogniteFile,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_cube_map import (
-    CogniteCubeMapQuery,
-    _create_cognite_cube_map_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCubeMapList, CogniteCubeMapWriteList]):

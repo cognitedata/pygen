@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite360ImageCollection,
+    Cognite360ImageCollectionWrite,
+    Cognite360ImageCollectionFields,
+    Cognite360ImageCollectionList,
+    Cognite360ImageCollectionWriteList,
+    Cognite360ImageCollectionTextFields,
+    Cognite360ImageModel,
+)
+from cognite_core.data_classes._cognite_360_image_collection import (
+    Cognite360ImageCollectionQuery,
+    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
+    _create_cognite_360_image_collection_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_360_image_collection_query import Cognite360ImageCollectionQueryAPI
-from cognite_core.data_classes import (
-    Cognite360ImageCollection,
-    Cognite360ImageCollectionFields,
-    Cognite360ImageCollectionList,
-    Cognite360ImageCollectionTextFields,
-    Cognite360ImageCollectionWrite,
-    Cognite360ImageCollectionWriteList,
-    Cognite360ImageModel,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_360_image_collection import (
-    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
-    Cognite360ImageCollectionQuery,
-    _create_cognite_360_image_collection_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class Cognite360ImageCollectionAPI(

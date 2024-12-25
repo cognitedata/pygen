@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_sub.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from omni_sub.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemB,
+    ConnectionItemBWrite,
+    ConnectionItemBFields,
+    ConnectionItemBList,
+    ConnectionItemBWriteList,
+    ConnectionItemBTextFields,
+    ConnectionItemA,
+)
+from omni_sub.data_classes._connection_item_b import (
+    ConnectionItemBQuery,
+    _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
+    _create_connection_item_b_filter,
+)
 from omni_sub._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,29 +38,8 @@ from omni_sub._api._core import (
     SequenceNotStr,
 )
 from omni_sub._api.connection_item_b_inwards import ConnectionItemBInwardsAPI
-from omni_sub._api.connection_item_b_query import ConnectionItemBQueryAPI
 from omni_sub._api.connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
-from omni_sub.data_classes import (
-    ConnectionItemA,
-    ConnectionItemB,
-    ConnectionItemBFields,
-    ConnectionItemBList,
-    ConnectionItemBTextFields,
-    ConnectionItemBWrite,
-    ConnectionItemBWriteList,
-    ResourcesWriteResult,
-)
-from omni_sub.data_classes._connection_item_b import (
-    _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
-    ConnectionItemBQuery,
-    _create_connection_item_b_filter,
-)
-from omni_sub.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-)
+from omni_sub._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList, ConnectionItemBWriteList]):

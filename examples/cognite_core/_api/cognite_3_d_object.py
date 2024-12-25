@@ -1,13 +1,44 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite3DObject,
+    Cognite3DObjectWrite,
+    Cognite3DObjectFields,
+    Cognite3DObjectList,
+    Cognite3DObjectWriteList,
+    Cognite3DObjectTextFields,
+    Cognite360ImageAnnotation,
+    Cognite360ImageAnnotationWrite,
+    Cognite360ImageAnnotationList,
+    Cognite360Image,
+    Cognite360ImageAnnotation,
+    CogniteAsset,
+    CogniteCADNode,
+    CognitePointCloudVolume,
+)
+from cognite_core.data_classes._cognite_3_d_object import (
+    Cognite3DObjectQuery,
+    _COGNITE3DOBJECT_PROPERTIES_BY_FIELD,
+    _create_cognite_3_d_object_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,32 +47,6 @@ from cognite_core._api._core import (
 )
 from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImages360API
 from cognite_core._api.cognite_3_d_object_query import Cognite3DObjectQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DObject,
-    Cognite3DObjectFields,
-    Cognite3DObjectList,
-    Cognite3DObjectTextFields,
-    Cognite3DObjectWrite,
-    Cognite3DObjectWriteList,
-    Cognite360Image,
-    Cognite360ImageAnnotation,
-    CogniteAsset,
-    CogniteCADNode,
-    CognitePointCloudVolume,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_3_d_object import (
-    _COGNITE3DOBJECT_PROPERTIES_BY_FIELD,
-    Cognite3DObjectQuery,
-    _create_cognite_3_d_object_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-)
 
 
 class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3DObjectList, Cognite3DObjectWriteList]):

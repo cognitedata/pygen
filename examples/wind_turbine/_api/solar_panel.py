@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from wind_turbine.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SolarPanel,
+    SolarPanelWrite,
+    SolarPanelFields,
+    SolarPanelList,
+    SolarPanelWriteList,
+    SolarPanelTextFields,
+    SensorTimeSeries,
+)
+from wind_turbine.data_classes._solar_panel import (
+    SolarPanelQuery,
+    _SOLARPANEL_PROPERTIES_BY_FIELD,
+    _create_solar_panel_filter,
+)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.solar_panel_query import SolarPanelQueryAPI
-from wind_turbine.data_classes import (
-    ResourcesWriteResult,
-    SensorTimeSeries,
-    SolarPanel,
-    SolarPanelFields,
-    SolarPanelList,
-    SolarPanelTextFields,
-    SolarPanelWrite,
-    SolarPanelWriteList,
-)
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
-from wind_turbine.data_classes._solar_panel import (
-    _SOLARPANEL_PROPERTIES_BY_FIELD,
-    SolarPanelQuery,
-    _create_solar_panel_filter,
-)
 
 
 class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPanelWriteList]):

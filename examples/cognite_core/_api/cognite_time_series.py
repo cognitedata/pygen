@@ -1,14 +1,42 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteTimeSeries,
+    CogniteTimeSeriesWrite,
+    CogniteTimeSeriesFields,
+    CogniteTimeSeriesList,
+    CogniteTimeSeriesWriteList,
+    CogniteTimeSeriesTextFields,
+    CogniteActivity,
+    CogniteAsset,
+    CogniteEquipment,
+    CogniteSourceSystem,
+    CogniteUnit,
+)
+from cognite_core.data_classes._cognite_time_series import (
+    CogniteTimeSeriesQuery,
+    _COGNITETIMESERIES_PROPERTIES_BY_FIELD,
+    _create_cognite_time_series_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,31 +44,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_time_series_query import CogniteTimeSeriesQueryAPI
-from cognite_core.data_classes import (
-    CogniteActivity,
-    CogniteAsset,
-    CogniteEquipment,
-    CogniteSourceSystem,
-    CogniteTimeSeries,
-    CogniteTimeSeriesFields,
-    CogniteTimeSeriesList,
-    CogniteTimeSeriesTextFields,
-    CogniteTimeSeriesWrite,
-    CogniteTimeSeriesWriteList,
-    CogniteUnit,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_time_series import (
-    _COGNITETIMESERIES_PROPERTIES_BY_FIELD,
-    CogniteTimeSeriesQuery,
-    _create_cognite_time_series_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
 
 
 class CogniteTimeSeriesAPI(

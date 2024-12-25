@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteFileCategory,
+    CogniteFileCategoryWrite,
+    CogniteFileCategoryFields,
+    CogniteFileCategoryList,
+    CogniteFileCategoryWriteList,
+    CogniteFileCategoryTextFields,
+)
+from cognite_core.data_classes._cognite_file_category import (
+    CogniteFileCategoryQuery,
+    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
+    _create_cognite_file_category_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,25 +38,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_file_category_query import CogniteFileCategoryQueryAPI
-from cognite_core.data_classes import (
-    CogniteFileCategory,
-    CogniteFileCategoryFields,
-    CogniteFileCategoryList,
-    CogniteFileCategoryTextFields,
-    CogniteFileCategoryWrite,
-    CogniteFileCategoryWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_file_category import (
-    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
-    CogniteFileCategoryQuery,
-    _create_cognite_file_category_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
 
 
 class CogniteFileCategoryAPI(

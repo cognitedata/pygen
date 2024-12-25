@@ -1,13 +1,37 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from wind_turbine.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    HighSpeedShaft,
+    HighSpeedShaftWrite,
+    HighSpeedShaftFields,
+    HighSpeedShaftList,
+    HighSpeedShaftWriteList,
+    HighSpeedShaftTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine.data_classes._high_speed_shaft import (
+    HighSpeedShaftQuery,
+    _create_high_speed_shaft_filter,
+)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,27 +39,6 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.high_speed_shaft_query import HighSpeedShaftQueryAPI
-from wind_turbine.data_classes import (
-    HighSpeedShaft,
-    HighSpeedShaftFields,
-    HighSpeedShaftList,
-    HighSpeedShaftTextFields,
-    HighSpeedShaftWrite,
-    HighSpeedShaftWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
-from wind_turbine.data_classes._high_speed_shaft import (
-    HighSpeedShaftQuery,
-    _create_high_speed_shaft_filter,
-)
 
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList, HighSpeedShaftWriteList]):

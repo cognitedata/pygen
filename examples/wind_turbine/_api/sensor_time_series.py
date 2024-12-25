@@ -1,13 +1,36 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from wind_turbine.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SensorTimeSeries,
+    SensorTimeSeriesWrite,
+    SensorTimeSeriesFields,
+    SensorTimeSeriesList,
+    SensorTimeSeriesWriteList,
+    SensorTimeSeriesTextFields,
+)
+from wind_turbine.data_classes._sensor_time_series import (
+    SensorTimeSeriesQuery,
+    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
+    _create_sensor_time_series_filter,
+)
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -15,25 +38,6 @@ from wind_turbine._api._core import (
     SequenceNotStr,
 )
 from wind_turbine._api.sensor_time_series_query import SensorTimeSeriesQueryAPI
-from wind_turbine.data_classes import (
-    ResourcesWriteResult,
-    SensorTimeSeries,
-    SensorTimeSeriesFields,
-    SensorTimeSeriesList,
-    SensorTimeSeriesTextFields,
-    SensorTimeSeriesWrite,
-    SensorTimeSeriesWriteList,
-)
-from wind_turbine.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
-from wind_turbine.data_classes._sensor_time_series import (
-    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
-    SensorTimeSeriesQuery,
-    _create_sensor_time_series_filter,
-)
 
 
 class SensorTimeSeriesAPI(

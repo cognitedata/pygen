@@ -1,14 +1,38 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import overload, Literal
+import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes import (
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteSchedulable,
+    CogniteSchedulableWrite,
+    CogniteSchedulableFields,
+    CogniteSchedulableList,
+    CogniteSchedulableWriteList,
+    CogniteSchedulableTextFields,
+    CogniteActivity,
+)
+from cognite_core.data_classes._cognite_schedulable import (
+    CogniteSchedulableQuery,
+    _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD,
+    _create_cognite_schedulable_filter,
+)
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -16,26 +40,6 @@ from cognite_core._api._core import (
     SequenceNotStr,
 )
 from cognite_core._api.cognite_schedulable_query import CogniteSchedulableQueryAPI
-from cognite_core.data_classes import (
-    CogniteActivity,
-    CogniteSchedulable,
-    CogniteSchedulableFields,
-    CogniteSchedulableList,
-    CogniteSchedulableTextFields,
-    CogniteSchedulableWrite,
-    CogniteSchedulableWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_schedulable import (
-    _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD,
-    CogniteSchedulableQuery,
-    _create_cognite_schedulable_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
 
 
 class CogniteSchedulableAPI(
