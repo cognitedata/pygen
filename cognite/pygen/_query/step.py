@@ -179,20 +179,41 @@ class QueryStep:
 
 
 class QueryStepFactory:
+    """QueryStepFactory is a factory class that creates query steps.
+
+    Args:
+        create_step_name: A function that creates a unique name for a step.
+        view_id: The view ID to query. Either view_id or view must be set.
+        view: The view to query. Either view_id or view must be set.
+        user_selected_properties: The user selected properties to retrieve. Defaults to None, which indicates that all
+            properties should be retrieved.
+
+    """
+
     def __init__(
         self,
-        view: dm.View,
-        user_selected_properties: SelectedProperties,
         create_step_name: Callable[[str | None], str],
+        view_id: dm.ViewId | None = None,
+        view: dm.View | None = None,
+        user_selected_properties: SelectedProperties | None = None,
     ) -> None:
-        self._view = view
-        self._view_id = view.as_id()
-        self._user_selected_properties = user_selected_properties
+        if sum(1 for x in (view_id, view) if x is not None) != 1:
+            raise ValueError("Either view_id or view must be set")
         self._create_step_name = create_step_name
+        if view_id is not None:
+            self._view_id = view_id
+        elif view is not None:
+            self._view_id = view.as_id()
+        else:
+            raise ValueError("Either view_id or view must be set")
+        self._view = view
+        self._user_selected_properties = user_selected_properties
         self._root_name: str | None = None
 
     @cached_property
-    def _root_properties(self) -> list[str]:
+    def _root_properties(self) -> list[str] | None:
+        if self._user_selected_properties is None:
+            return None
         root_properties: list[str] = []
         for prop in self._user_selected_properties:
             if isinstance(prop, str):
@@ -205,6 +226,8 @@ class QueryStepFactory:
     @cached_property
     def connection_properties(self) -> dict[str, ViewProperty]:
         output: dict[str, ViewProperty] = {}
+        if self._root_properties is None or self._view is None:
+            raise ValueError("View or user selected properties is required for finding" " connection properties")
         for prop in self._root_properties:
             definition = self._view.properties.get(prop)
             if not definition:
@@ -223,6 +246,8 @@ class QueryStepFactory:
 
     @cached_property
     def _nested_properties_by_property(self) -> dict[str, list[str | dict[str, list[str]]]]:
+        if self._user_selected_properties is None:
+            raise ValueError("User selected properties is required for finding nested properties")
         nested_properties_by_property: dict[str, list[str | dict[str, list[str]]]] = {}
         for prop in self._user_selected_properties:
             if isinstance(prop, dict):
@@ -231,7 +256,14 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
-        skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
+        if self._user_selected_properties and self._root_properties:
+            skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
+            select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
+            selected_properties = self._root_properties
+        else:
+            select = dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])])
+            selected_properties = None
+
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
@@ -241,8 +273,8 @@ class QueryStepFactory:
             dm.query.NodeResultSetExpression(
                 filter=dm.filters.And(filter, has_data) if filter else has_data,
             ),
-            select=self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id),
-            selected_properties=self._root_properties,
+            select=select,
+            selected_properties=selected_properties,
             view_id=self._view_id,
             max_retrieve_limit=-1 if limit is None else limit,
             raw_filter=filter,
@@ -256,18 +288,18 @@ class QueryStepFactory:
         connection_property = ViewPropertyId(self._view_id, connection_id)
         selected_properties = self._nested_properties_by_property.get(connection_id, ["*"])
         if isinstance(connection, dm.EdgeConnection):
-            return self._from_edge(connection, connection_property, selected_properties)
+            return self.from_edge(connection, connection_property, selected_properties)
         elif isinstance(connection, ReverseDirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self._from_reverse_relation(connection, connection_property, validated, reverse_views)
+            return self.from_reverse_relation(connection, connection_property, validated, reverse_views)
         elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self._from_direct_relation(connection, connection_property, validated)
+            return self.from_direct_relation(connection, connection_property, validated)
         else:
             warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
         return []
 
-    def _from_direct_relation(
+    def from_direct_relation(
         self,
         connection: dm.MappedProperty,
         connection_property: ViewPropertyId,
@@ -291,7 +323,7 @@ class QueryStepFactory:
             )
         ]
 
-    def _from_edge(
+    def from_edge(
         self,
         connection: dm.EdgeConnection,
         connection_property: ViewPropertyId,
@@ -333,7 +365,7 @@ class QueryStepFactory:
             steps.append(step)
         return steps
 
-    def _from_reverse_relation(
+    def from_reverse_relation(
         self,
         connection: ReverseDirectRelation,
         connection_property: ViewPropertyId,
@@ -345,7 +377,7 @@ class QueryStepFactory:
         )
         query_properties = self._create_query_properties(selected_properties, connection.through.property)
         try:
-            other_view = reverse_views[connection.source]
+            other_view_id = connection.source
         except KeyError:
             raise ValueError(f"View {connection.source} not found in {reverse_views.keys()}") from None
         return [
@@ -354,10 +386,10 @@ class QueryStepFactory:
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,
                     direction="inwards",
-                    through=other_view.as_property_ref(connection.through.property),
+                    through=other_view_id.as_property_ref(connection.through.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, other_view.as_id()),
+                select=self._create_select(query_properties, other_view_id),
                 selected_properties=selected_properties,
                 view_id=connection.source,
                 connection_type=connection_type,

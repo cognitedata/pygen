@@ -266,7 +266,7 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryStepFactory(view, properties, builder.create_name)
+        factory = QueryStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
             result = self._client.data_modeling.instances.list(
