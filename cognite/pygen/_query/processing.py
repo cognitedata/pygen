@@ -123,8 +123,11 @@ class QueryResultCleaner:
 
 
 class QueryUnpacker:
-    def __init__(self, builder: Sequence[QueryStep]):
+    """Unpacks the results of a query into a list of nested dictionaries."""
+
+    def __init__(self, builder: Sequence[QueryStep], unpack_edges: bool = False):
         self._builder = builder
+        self._unpack_edges = unpack_edges
 
     def unpack(self) -> list[dict[str, Any]]:
         nodes_by_from: dict[str | None, list[tuple[str | None, dict[dm.NodeId, list[dict[str | None, Any]]]]]] = (

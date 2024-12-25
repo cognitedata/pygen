@@ -34,6 +34,7 @@ class QueryExecutor:
         # Used for aggregated logging of requests
         client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor"
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
+        self._unpack_edges: bool = True
 
     def execute_query(
         self,
