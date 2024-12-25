@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import textwrap
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
@@ -146,11 +147,17 @@ class Field:
         raise NotImplementedError
 
     @property
+    def line_width(self) -> int:
+        return 120 -10 - len(self.name)
+
+    @property
     def argument_documentation(self) -> str:
         if self.description:
-            return self.description
+            msg =  self.description
         else:
-            return f"The {self.doc_name} field."
+            msg = f"The {self.doc_name} field."
+
+        return ("\n" + " " * 12).join(textwrap.wrap(msg, width=self.line_width))
 
     # The properties below are overwritten in the child classes
     @property

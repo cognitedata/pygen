@@ -289,7 +289,8 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
         aliases: Alternative names for the node
         confidence: The confidence that the annotation is a good match
         description: Description of the instance
-        end_node_page_number: The number of the page on which this annotation is located in the endNode File if an endNode is present. The first page has number 1
+        end_node_page_number: The number of the page on which this annotation is located in the endNode
+            File if an endNode is present. The first page has number 1
 
         end_node_text: The text extracted from within the bounding box on the endNode. Only applicable if an endNode is defined
 
