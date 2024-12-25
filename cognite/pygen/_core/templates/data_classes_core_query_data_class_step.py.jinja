@@ -145,7 +145,7 @@ class DataClassQueryBuilder(QueryBuilder, Generic[T_DomainModelList]):
         else:
             raise ValueError(f"Invalid return_step: {self._return_step}")
 
-    def append(self, __object: QueryStep, /) -> None: #type: ignore[override]
+    def append(self, __object: QueryStep, /) -> None:  # type: ignore[override]
         # Extra validation to ensure all assumptions are met
         if len(self) == 0:
             if __object.from_ is not None:
