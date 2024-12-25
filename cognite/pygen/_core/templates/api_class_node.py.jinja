@@ -180,7 +180,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
+                >>> {{ data_class.variable }} = {{ data_class.write_name }}(
+                ...     external_id="my_{{ data_class.variable }}", ...
+                ... )
                 >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
 
         """
@@ -312,7 +314,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -497,8 +499,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -532,7 +536,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
     def select(self) -> {{ data_class.query_cls_name }}:
         """Start selecting from {{ data_class.doc_list_name}}."""
-        warnings.warn("The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2)
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return {{ data_class.query_cls_name }}(self._client)
 
     def list(
@@ -557,8 +563,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
@@ -569,7 +577,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% if data_class.has_connection_with_target %}
             retrieve_connections: Whether to retrieve {{ data_class.connections_docs }}
                 for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+                'skip' will not retrieve any connections, 'identifier' will only retrieve the
+                identifier of the connected items, and 'full' will retrieve the full connected items.
             {% endif %}
 
         Returns:
