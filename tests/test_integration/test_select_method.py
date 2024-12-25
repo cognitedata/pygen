@@ -29,8 +29,8 @@ def test_query_list_method(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
-def test_query_list_method_with_filter(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().outwards.name.prefix("A").list_connection_item_b(limit=5)
+def test_select_list_method_with_filter(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.select().outwards.name.prefix("A").list_connection_item_b(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemBList)
