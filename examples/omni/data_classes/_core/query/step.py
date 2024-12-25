@@ -263,7 +263,7 @@ class QueryStepFactory:
                 nested_properties_by_property[key] = value
         return nested_properties_by_property
 
-    def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
+    def root(self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None) -> QueryStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
@@ -280,6 +280,7 @@ class QueryStepFactory:
             self._root_name,
             dm.query.NodeResultSetExpression(
                 filter=dm.filters.And(filter, has_data) if filter else has_data,
+                sort=sort,
             ),
             select=select,
             selected_properties=selected_properties,
@@ -344,6 +345,7 @@ class QueryStepFactory:
         direction: Literal["outwards", "inwards"],
         connection_property: ViewPropertyId,
         selected_properties: list[str | dict[str, list[str]]] | None = None,
+        include_end_node: bool = True,
     ) -> list[QueryStep]:
         selected_properties = selected_properties or ["*"]
         edge_name = self._create_step_name(self._root_name)
@@ -359,6 +361,8 @@ class QueryStepFactory:
                 connection_property=connection_property,
             )
         ]
+        if not include_end_node:
+            return steps
 
         node_properties = next(
             (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None

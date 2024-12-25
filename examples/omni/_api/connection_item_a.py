@@ -8,12 +8,18 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cdf.modules.contextualization.cdf_p_and_id_parser.functions.contextualization_p_and_id_annotater.handler import \
+    ViewProperty
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStepFactory,
+    ViewPropertyId,
+    QueryUnpacker,
 )
 from omni.data_classes import (
     DomainModelCore,
@@ -667,66 +673,32 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(ConnectionItemAList)
-        has_data = dm.filters.HasData(views=[self._view_id])
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                ConnectionItemA,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
-        edge_outwards = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_outwards,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
-            )
-        )
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id)
+        step = factory.root(filter, self._create_sort(sort_by, direction, sort), limit) # type: ignore[arg-type]
+        builder.append(step)
+
+        builder.extend(factory.from_edge(
+            ConnectionItemB._view_id,
+            "outwards",
+            ViewPropertyId(self._view_id, "outwards"),
+            include_end_node=retrieve_connections == "full",
+        ))
+
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_outwards),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_outwards,
-                        filter=dm.filters.HasData(views=[ConnectionItemB._view_id]),
-                    ),
-                    ConnectionItemB,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("otherDirect"),
-                    ),
-                    ConnectionItemCNode,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("selfDirect"),
-                    ),
-                    ConnectionItemA,
-                )
-            )
+            builder.extend(factory.from_direct_relation(
+                ConnectionItemCNode._view_id,
+                ViewPropertyId(self._view_id, "otherDirect"),
+            ))
+
+            builder.extend(factory.from_direct_relation(
+                ConnectionItemA._view_id,
+                ViewPropertyId(self._view_id, "selfDirect"),
+            ))
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False).unpack()
+
+        return ConnectionItemAList([ConnectionItemA.model_validate(item)
+            for item in unpacked
+        ])
