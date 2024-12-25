@@ -43,8 +43,8 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
             {% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.description }}
             {% endfor %}
-            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested {{ edge_api.doc_name }} edges.

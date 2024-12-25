@@ -24,11 +24,12 @@ class FileContentAPI:
         """`Download files. <https://developer.cognite.com/api#tag/Files/operation/downloadLinks>`_
 
         This method will stream all files to disk, never keeping more than 2MB in memory per worker.
-        The files will be stored in the provided directory using the file name retrieved from the file metadata in CDF.
-        You can also choose to keep the directory structure from CDF so that the files will be stored in subdirectories
-        matching the directory attribute on the files. When missing, the (root) directory is used.
-        By default, duplicate file names to the same local folder will be resolved by only keeping one of the files.
-        You can choose to resolve this by appending a number to the file name using the resolve_duplicate_file_names argument.
+        The files will be stored in the provided directory using the file name retrieved from the
+        file metadata in CDF. You can also choose to keep the directory structure from CDF so that the files
+        will be stored in subdirectories matching the directory attribute on the files. When missing,
+        the (root) directory is used. By default, duplicate file names to the same local folder will be
+        resolved by only keeping one of the files. You can choose to resolve this by appending a number to the
+        file name using the resolve_duplicate_file_names argument.
 
         Warning:
             If you are downloading several files at once, be aware that file name collisions lead to all-but-one of
@@ -38,7 +39,8 @@ class FileContentAPI:
             directory (str | Path): Directory to download the file(s) to.
             keep_directory_structure (bool): Whether to keep the directory hierarchy in CDF,
                 creating subdirectories as needed below the given directory.
-            resolve_duplicate_file_names (bool): Whether to resolve duplicate file names by appending a number on duplicate file names
+            resolve_duplicate_file_names (bool): Whether to resolve duplicate file names by appending
+                a number on duplicate file names
             files_limit (int): Maximum number of files to download. Defaults to 5.
         """
         node_ids = self._get_node_ids(files_limit)

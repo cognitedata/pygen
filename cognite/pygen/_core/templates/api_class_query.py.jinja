@@ -92,11 +92,13 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
             {% for parm in edge_api.filter_parameters(False, include_end_node=True, suffix_edge=True) %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
             {% for field in data_class.one_to_one_direct_relations_with_source %}
-            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.
+            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }}
+                for each {{ data_class.doc_name }} or not.
             {% endfor %}
 
         Returns:
@@ -160,7 +162,8 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         {% if data_class.has_one_to_one_direct_relations_with_source %}
         Args:
             {% for field in data_class.one_to_one_direct_relations_with_source %}
-            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.
+            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }}
+            for each {{ data_class.doc_name }} or not.
             {% endfor %}
 
         {% endif %}

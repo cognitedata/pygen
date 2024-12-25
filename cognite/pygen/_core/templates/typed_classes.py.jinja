@@ -110,8 +110,10 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         {% for field in cls.container_fields_sorted() %}
         {{ field.name }}: {{ field.argument_documentation }}
         {% endfor %}
@@ -189,8 +191,10 @@ class {{ cls.read_name }}Apply({{ cls.typed_properties_name }}, {{ cls.typed_wri
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
         type (DirectRelationReference | tuple[str, str]): The type of edge.
-        start_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
-        end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
+        start_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference
+            consists of a space and an external-id.
+        end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference
+            consists of a space and an external-id.
         {% for field in cls.container_fields_sorted() %}
         {{ field.name }}: {{ field.argument_documentation }}
         {% endfor %}
@@ -240,11 +244,15 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         space: The space where the node is located.
         external_id: The external id of the {{ cls.doc_name }}.
         type (DirectRelationReference | tuple[str, str]): The type of edge.
-        start_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
-        end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference consists of a space and an external-id.
+        start_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference
+            consists of a space and an external-id.
+        end_node (DirectRelationReference | tuple[str, str]): Reference to the direct relation. The reference
+            consists of a space and an external-id.
         version (int): DMS version.
-        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
-        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970, Coordinated Universal Time (UTC), minus leap seconds.
+        last_updated_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
+        created_time (int): The number of milliseconds since 00:00:00 Thursday, 1 January 1970,
+            Coordinated Universal Time (UTC), minus leap seconds.
         {% for field in cls.container_fields_sorted() %}
         {{ field.name }}: {{ field.argument_documentation }}
         {% endfor %}
