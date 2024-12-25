@@ -64,11 +64,15 @@ class OmniSubClient:
 
         Args:
             items: One or more instances of the pygen generated data classes.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+            replace (bool): How do we behave when a property value exists? Do we replace all
+                matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
-            allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
+            allow_version_increase (bool): If set to true, the version of the instance will be increased
+                if the instance already exists.
                 If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
                 the version to increase.
         Returns:
@@ -129,9 +133,12 @@ class OmniSubClient:
 
         Args:
             items: One or more instances of the pygen generated data classes.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+            replace (bool): How do we behave when a property value exists? Do we replace all
+                matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing
+                values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -247,9 +254,10 @@ class OmniSubClient:
         return cls.azure_project(**toml_content)
 
     def _repr_html_(self) -> str:
-        return """<strong>OmniSubClient</strong> generated from data model ("sp_pygen_models", "OmniSub", "1")<br />
+        return """<strong>OmniSubClient(</strong> generated from data model
+("sp_pygen_models", "OmniSub", "1")<br />
 with the following APIs available<br />
-&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
+)&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_c_node<br />
 <br />
