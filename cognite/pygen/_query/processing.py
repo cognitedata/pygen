@@ -129,6 +129,40 @@ class QueryUnpacker:
         unpack_edges: If True, all edges are unpacked and included in the result. If False, only
             edges with properties are included in the result. Default is True. See example below.
 
+    Example:
+        Unpacking query steps with edges:
+
+        ```python
+        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        print(result)
+        >>> [{
+        >>>    "name": "Node A",
+        >>>    "externalId": "A",
+        >>>    "outwards": [{
+        >>>        "type": "Edge Type",
+        >>>        "node": [{
+        >>>            "name": "Node B",
+        >>>            "externalId": "B"
+        >>>        }]
+        >>>    }]
+        >>> }]
+        ```
+
+        Unpacking query steps with edges, but skipping the edges:
+
+        ```python
+        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        print(result)
+        >>> [{
+        >>>    "name": "Node A",
+        >>>    "externalId": "A",
+        >>>    "outwards": [{
+        >>>        "name": "Node B",
+        >>>        "externalId": "B"
+        >>>    }]
+        >>> }]
+        ```
+
     """
 
     def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True):
