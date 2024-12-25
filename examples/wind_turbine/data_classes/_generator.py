@@ -243,7 +243,8 @@ class Generator(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {main_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 

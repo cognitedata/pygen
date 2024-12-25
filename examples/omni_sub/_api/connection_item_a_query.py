@@ -6,12 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from omni_sub._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 from omni_sub.data_classes import (
@@ -20,6 +15,13 @@ from omni_sub.data_classes import (
 )
 from omni_sub.data_classes._connection_item_b import (
     _create_connection_item_b_filter,
+)
+from omni_sub.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    EdgeQueryStep,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 if TYPE_CHECKING:

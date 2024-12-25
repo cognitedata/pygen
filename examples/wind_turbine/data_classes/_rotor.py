@@ -243,7 +243,8 @@ class Rotor(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'wind_turbine' in {rotor.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}."
+                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}.",
+                        stacklevel=2,
                     )
 
 

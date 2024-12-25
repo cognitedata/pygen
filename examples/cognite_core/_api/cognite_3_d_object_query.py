@@ -8,12 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from cognite_core._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
     QueryAPI,
-    T_DomainModelList,
 )
 from cognite_core.data_classes import (
     Cognite3DObject,
@@ -24,6 +19,13 @@ from cognite_core.data_classes._cognite_360_image import (
 )
 from cognite_core.data_classes._cognite_360_image_annotation import (
     _create_cognite_360_image_annotation_filter,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    EdgeQueryStep,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 if TYPE_CHECKING:

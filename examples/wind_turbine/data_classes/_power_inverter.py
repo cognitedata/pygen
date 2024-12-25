@@ -262,7 +262,8 @@ class PowerInverter(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {power_inverter.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {power_inverter.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {power_inverter.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 

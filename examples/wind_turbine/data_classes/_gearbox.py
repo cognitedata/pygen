@@ -244,7 +244,8 @@ class Gearbox(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {gearbox.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 

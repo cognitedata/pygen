@@ -296,7 +296,8 @@ class ConnectionItemF(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'outwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}.",
+                                stacklevel=2,
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):

@@ -314,7 +314,8 @@ class ConnectionItemE(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'inwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}.",
+                                stacklevel=2,
                             )
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "multiProperty") and isinstance(
                         value, ConnectionEdgeA
@@ -327,7 +328,8 @@ class ConnectionItemE(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'inwards_single_property' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single_property!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single_property!s}.",
+                                stacklevel=2,
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
@@ -347,7 +349,8 @@ class ConnectionItemE(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}."
+                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}.",
+                        stacklevel=2,
                     )
             if isinstance(node, ConnectionItemD) and node.direct_multi is not None:
                 for direct_multi in node.direct_multi:

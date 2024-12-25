@@ -4,16 +4,18 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from cognite_core._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
     QueryAPI,
-    T_DomainModelList,
 )
 from cognite_core.data_classes import (
     Cognite3DObject,
     CogniteCADModel,
     CognitePointCloudVolume,
+)
+from cognite_core.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 

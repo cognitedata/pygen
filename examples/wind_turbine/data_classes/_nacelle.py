@@ -412,7 +412,8 @@ class Nacelle(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'wind_turbine' in {nacelle.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {nacelle.wind_turbine!s}."
+                        f"Ignoring new relation {node!s} in favor of {nacelle.wind_turbine!s}.",
+                        stacklevel=2,
                     )
 
 

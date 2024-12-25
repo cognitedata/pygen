@@ -346,7 +346,8 @@ class Cognite3DObject(CogniteDescribableNode):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'asset' in {object_3d.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {object_3d.asset!s}."
+                        f"Ignoring new relation {node!s} in favor of {object_3d.asset!s}.",
+                        stacklevel=2,
                     )
             if (
                 isinstance(node, CogniteCADNode)

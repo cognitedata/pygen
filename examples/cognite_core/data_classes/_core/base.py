@@ -35,7 +35,8 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel, Field, model_validator
+from cognite.client.utils import ms_to_datetime
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from cognite_core.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -210,9 +211,16 @@ class DataRecord(BaseModel):
     """
 
     version: int
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-    deleted_time: Optional[datetime.datetime] = None
+    last_updated_time: datetime.datetime = Field(alias="lastUpdatedTime")
+    created_time: datetime.datetime = Field(alias="createdTime")
+    deleted_time: Optional[datetime.datetime] = Field(None, alias="deletedTime")
+
+    @field_validator("created_time", "last_updated_time", "deleted_time", mode="before")
+    @classmethod
+    def parse_ms(cls, v: Any) -> Any:
+        if isinstance(v, int):
+            return ms_to_datetime(v)
+        return v
 
 
 class DomainModel(DomainModelCore, ABC):

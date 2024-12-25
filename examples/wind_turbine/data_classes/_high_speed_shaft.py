@@ -250,7 +250,8 @@ class HighSpeedShaft(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {high_speed_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 

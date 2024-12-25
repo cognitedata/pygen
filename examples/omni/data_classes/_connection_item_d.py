@@ -287,7 +287,8 @@ class ConnectionItemD(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'outwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}.",
+                                stacklevel=2,
                             )
 
 

@@ -4,14 +4,16 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from omni_multi._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
     QueryAPI,
-    T_DomainModelList,
 )
 from omni_multi.data_classes import (
     Implementation1v1,
+)
+from omni_multi.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    DataClassQueryBuilder,
+    NodeQueryStep,
+    T_DomainModelList,
 )
 
 
