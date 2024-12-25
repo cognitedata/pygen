@@ -265,13 +265,13 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, CogniteCADModel)
             ):
                 instance.model_3d = model_3d
             if (
-                isinstance(instance.object_3d, (dm.NodeId, str))
+                isinstance(instance.object_3d, dm.NodeId | str)
                 and (object_3d := nodes_by_id.get(instance.object_3d))
                 and isinstance(object_3d, Cognite3DObject)
             ):

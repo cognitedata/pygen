@@ -36,10 +36,8 @@ from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataClassQueryBuilder,
-    QueryBuilder,
-    QueryStepFactory,
-    QueryUnpacker,
-    ViewPropertyId,
+    EdgeQueryStep,
+    NodeQueryStep,
 )
 
 
@@ -667,36 +665,66 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 sort=sort,
             )
 
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id)
-        step = factory.root(filter, self._create_sort(sort_by, direction, sort), limit)  # type: ignore[arg-type]
-        builder.append(step)
-
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemB._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "outwards"),
-                include_end_node=retrieve_connections == "full",
+        builder = DataClassQueryBuilder(ConnectionItemAList)
+        has_data = dm.filters.HasData(views=[self._view_id])
+        builder.append(
+            NodeQueryStep(
+                builder.create_name(None),
+                dm.query.NodeResultSetExpression(
+                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
+                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                ),
+                ConnectionItemA,
+                max_retrieve_limit=limit,
+                raw_filter=filter_,
             )
         )
-
+        from_root = builder.get_from()
+        edge_outwards = builder.create_name(from_root)
+        builder.append(
+            EdgeQueryStep(
+                edge_outwards,
+                dm.query.EdgeResultSetExpression(
+                    from_=from_root,
+                    direction="outwards",
+                    chain_to="destination",
+                ),
+            )
+        )
         if retrieve_connections == "full":
-            builder.extend(
-                factory.from_direct_relation(
-                    ConnectionItemCNode._view_id,
-                    ViewPropertyId(self._view_id, "otherDirect"),
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(edge_outwards),
+                    dm.query.NodeResultSetExpression(
+                        from_=edge_outwards,
+                        filter=dm.filters.HasData(views=[ConnectionItemB._view_id]),
+                    ),
+                    ConnectionItemB,
                 )
             )
-
-            builder.extend(
-                factory.from_direct_relation(
-                    ConnectionItemA._view_id,
-                    ViewPropertyId(self._view_id, "selfDirect"),
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("otherDirect"),
+                    ),
+                    ConnectionItemCNode,
+                )
+            )
+            builder.append(
+                NodeQueryStep(
+                    builder.create_name(from_root),
+                    dm.query.NodeResultSetExpression(
+                        from_=from_root,
+                        filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
+                        direction="outwards",
+                        through=self._view_id.as_property_ref("selfDirect"),
+                    ),
+                    ConnectionItemA,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
-
-        return ConnectionItemAList([ConnectionItemA.model_validate(item) for item in unpacked])
+        return builder.unpack()

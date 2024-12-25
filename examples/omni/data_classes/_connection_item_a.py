@@ -220,13 +220,13 @@ class ConnectionItemA(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.other_direct, (dm.NodeId, str))
+                isinstance(instance.other_direct, dm.NodeId | str)
                 and (other_direct := nodes_by_id.get(instance.other_direct))
                 and isinstance(other_direct, ConnectionItemCNode)
             ):
                 instance.other_direct = other_direct
             if (
-                isinstance(instance.self_direct, (dm.NodeId, str))
+                isinstance(instance.self_direct, dm.NodeId | str)
                 and (self_direct := nodes_by_id.get(instance.self_direct))
                 and isinstance(self_direct, ConnectionItemA)
             ):

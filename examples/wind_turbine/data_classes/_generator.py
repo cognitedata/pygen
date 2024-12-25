@@ -214,13 +214,13 @@ class Generator(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.generator_speed_controller, (dm.NodeId, str))
+                isinstance(instance.generator_speed_controller, dm.NodeId | str)
                 and (generator_speed_controller := nodes_by_id.get(instance.generator_speed_controller))
                 and isinstance(generator_speed_controller, SensorTimeSeries)
             ):
                 instance.generator_speed_controller = generator_speed_controller
             if (
-                isinstance(instance.generator_speed_controller_reference, (dm.NodeId, str))
+                isinstance(instance.generator_speed_controller_reference, dm.NodeId | str)
                 and (
                     generator_speed_controller_reference := nodes_by_id.get(
                         instance.generator_speed_controller_reference

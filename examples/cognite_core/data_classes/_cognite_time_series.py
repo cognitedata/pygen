@@ -363,13 +363,13 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
 
         for instance in instances.values():
             if (
-                isinstance(instance.source, (dm.NodeId, str))
+                isinstance(instance.source, dm.NodeId | str)
                 and (source := nodes_by_id.get(instance.source))
                 and isinstance(source, CogniteSourceSystem)
             ):
                 instance.source = source
             if (
-                isinstance(instance.unit, (dm.NodeId, str))
+                isinstance(instance.unit, dm.NodeId | str)
                 and (unit := nodes_by_id.get(instance.unit))
                 and isinstance(unit, CogniteUnit)
             ):

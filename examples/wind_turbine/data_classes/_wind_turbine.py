@@ -279,13 +279,13 @@ class WindTurbine(GeneratingUnit):
 
         for instance in instances.values():
             if (
-                isinstance(instance.nacelle, (dm.NodeId, str))
+                isinstance(instance.nacelle, dm.NodeId | str)
                 and (nacelle := nodes_by_id.get(instance.nacelle))
                 and isinstance(nacelle, Nacelle)
             ):
                 instance.nacelle = nacelle
             if (
-                isinstance(instance.rotor, (dm.NodeId, str))
+                isinstance(instance.rotor, dm.NodeId | str)
                 and (rotor := nodes_by_id.get(instance.rotor))
                 and isinstance(rotor, Rotor)
             ):

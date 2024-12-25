@@ -207,37 +207,37 @@ class CogniteCubeMap(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.back, (dm.NodeId, str))
+                isinstance(instance.back, dm.NodeId | str)
                 and (back := nodes_by_id.get(instance.back))
                 and isinstance(back, CogniteFile)
             ):
                 instance.back = back
             if (
-                isinstance(instance.bottom, (dm.NodeId, str))
+                isinstance(instance.bottom, dm.NodeId | str)
                 and (bottom := nodes_by_id.get(instance.bottom))
                 and isinstance(bottom, CogniteFile)
             ):
                 instance.bottom = bottom
             if (
-                isinstance(instance.front, (dm.NodeId, str))
+                isinstance(instance.front, dm.NodeId | str)
                 and (front := nodes_by_id.get(instance.front))
                 and isinstance(front, CogniteFile)
             ):
                 instance.front = front
             if (
-                isinstance(instance.left, (dm.NodeId, str))
+                isinstance(instance.left, dm.NodeId | str)
                 and (left := nodes_by_id.get(instance.left))
                 and isinstance(left, CogniteFile)
             ):
                 instance.left = left
             if (
-                isinstance(instance.right, (dm.NodeId, str))
+                isinstance(instance.right, dm.NodeId | str)
                 and (right := nodes_by_id.get(instance.right))
                 and isinstance(right, CogniteFile)
             ):
                 instance.right = right
             if (
-                isinstance(instance.top, (dm.NodeId, str))
+                isinstance(instance.top, dm.NodeId | str)
                 and (top := nodes_by_id.get(instance.top))
                 and isinstance(top, CogniteFile)
             ):

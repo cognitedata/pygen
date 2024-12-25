@@ -235,31 +235,31 @@ class MainShaft(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.bending_x, (dm.NodeId, str))
+                isinstance(instance.bending_x, dm.NodeId | str)
                 and (bending_x := nodes_by_id.get(instance.bending_x))
                 and isinstance(bending_x, SensorTimeSeries)
             ):
                 instance.bending_x = bending_x
             if (
-                isinstance(instance.bending_y, (dm.NodeId, str))
+                isinstance(instance.bending_y, dm.NodeId | str)
                 and (bending_y := nodes_by_id.get(instance.bending_y))
                 and isinstance(bending_y, SensorTimeSeries)
             ):
                 instance.bending_y = bending_y
             if (
-                isinstance(instance.calculated_tilt_moment, (dm.NodeId, str))
+                isinstance(instance.calculated_tilt_moment, dm.NodeId | str)
                 and (calculated_tilt_moment := nodes_by_id.get(instance.calculated_tilt_moment))
                 and isinstance(calculated_tilt_moment, SensorTimeSeries)
             ):
                 instance.calculated_tilt_moment = calculated_tilt_moment
             if (
-                isinstance(instance.calculated_yaw_moment, (dm.NodeId, str))
+                isinstance(instance.calculated_yaw_moment, dm.NodeId | str)
                 and (calculated_yaw_moment := nodes_by_id.get(instance.calculated_yaw_moment))
                 and isinstance(calculated_yaw_moment, SensorTimeSeries)
             ):
                 instance.calculated_yaw_moment = calculated_yaw_moment
             if (
-                isinstance(instance.torque, (dm.NodeId, str))
+                isinstance(instance.torque, dm.NodeId | str)
                 and (torque := nodes_by_id.get(instance.torque))
                 and isinstance(torque, SensorTimeSeries)
             ):

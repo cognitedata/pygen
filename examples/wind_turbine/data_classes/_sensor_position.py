@@ -355,13 +355,13 @@ class SensorPosition(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.blade, (dm.NodeId, str))
+                isinstance(instance.blade, dm.NodeId | str)
                 and (blade := nodes_by_id.get(instance.blade))
                 and isinstance(blade, Blade)
             ):
                 instance.blade = blade
             if (
-                isinstance(instance.edgewise_bend_mom_crosstalk_corrected, (dm.NodeId, str))
+                isinstance(instance.edgewise_bend_mom_crosstalk_corrected, dm.NodeId | str)
                 and (
                     edgewise_bend_mom_crosstalk_corrected := nodes_by_id.get(
                         instance.edgewise_bend_mom_crosstalk_corrected
@@ -371,13 +371,13 @@ class SensorPosition(DomainModel):
             ):
                 instance.edgewise_bend_mom_crosstalk_corrected = edgewise_bend_mom_crosstalk_corrected
             if (
-                isinstance(instance.edgewise_bend_mom_offset, (dm.NodeId, str))
+                isinstance(instance.edgewise_bend_mom_offset, dm.NodeId | str)
                 and (edgewise_bend_mom_offset := nodes_by_id.get(instance.edgewise_bend_mom_offset))
                 and isinstance(edgewise_bend_mom_offset, SensorTimeSeries)
             ):
                 instance.edgewise_bend_mom_offset = edgewise_bend_mom_offset
             if (
-                isinstance(instance.edgewise_bend_mom_offset_crosstalk_corrected, (dm.NodeId, str))
+                isinstance(instance.edgewise_bend_mom_offset_crosstalk_corrected, dm.NodeId | str)
                 and (
                     edgewise_bend_mom_offset_crosstalk_corrected := nodes_by_id.get(
                         instance.edgewise_bend_mom_offset_crosstalk_corrected
@@ -387,19 +387,19 @@ class SensorPosition(DomainModel):
             ):
                 instance.edgewise_bend_mom_offset_crosstalk_corrected = edgewise_bend_mom_offset_crosstalk_corrected
             if (
-                isinstance(instance.edgewisewise_bend_mom, (dm.NodeId, str))
+                isinstance(instance.edgewisewise_bend_mom, dm.NodeId | str)
                 and (edgewisewise_bend_mom := nodes_by_id.get(instance.edgewisewise_bend_mom))
                 and isinstance(edgewisewise_bend_mom, SensorTimeSeries)
             ):
                 instance.edgewisewise_bend_mom = edgewisewise_bend_mom
             if (
-                isinstance(instance.flapwise_bend_mom, (dm.NodeId, str))
+                isinstance(instance.flapwise_bend_mom, dm.NodeId | str)
                 and (flapwise_bend_mom := nodes_by_id.get(instance.flapwise_bend_mom))
                 and isinstance(flapwise_bend_mom, SensorTimeSeries)
             ):
                 instance.flapwise_bend_mom = flapwise_bend_mom
             if (
-                isinstance(instance.flapwise_bend_mom_crosstalk_corrected, (dm.NodeId, str))
+                isinstance(instance.flapwise_bend_mom_crosstalk_corrected, dm.NodeId | str)
                 and (
                     flapwise_bend_mom_crosstalk_corrected := nodes_by_id.get(
                         instance.flapwise_bend_mom_crosstalk_corrected
@@ -409,13 +409,13 @@ class SensorPosition(DomainModel):
             ):
                 instance.flapwise_bend_mom_crosstalk_corrected = flapwise_bend_mom_crosstalk_corrected
             if (
-                isinstance(instance.flapwise_bend_mom_offset, (dm.NodeId, str))
+                isinstance(instance.flapwise_bend_mom_offset, dm.NodeId | str)
                 and (flapwise_bend_mom_offset := nodes_by_id.get(instance.flapwise_bend_mom_offset))
                 and isinstance(flapwise_bend_mom_offset, SensorTimeSeries)
             ):
                 instance.flapwise_bend_mom_offset = flapwise_bend_mom_offset
             if (
-                isinstance(instance.flapwise_bend_mom_offset_crosstalk_corrected, (dm.NodeId, str))
+                isinstance(instance.flapwise_bend_mom_offset_crosstalk_corrected, dm.NodeId | str)
                 and (
                     flapwise_bend_mom_offset_crosstalk_corrected := nodes_by_id.get(
                         instance.flapwise_bend_mom_offset_crosstalk_corrected

@@ -219,7 +219,7 @@ class Cognite360ImageModel(Cognite3DModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.thumbnail, (dm.NodeId, str))
+                isinstance(instance.thumbnail, dm.NodeId | str)
                 and (thumbnail := nodes_by_id.get(instance.thumbnail))
                 and isinstance(thumbnail, CogniteFile)
             ):

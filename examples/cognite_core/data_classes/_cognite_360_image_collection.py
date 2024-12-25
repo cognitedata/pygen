@@ -223,7 +223,7 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, Cognite360ImageModel)
             ):

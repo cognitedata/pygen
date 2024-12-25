@@ -217,7 +217,7 @@ class CogniteAssetType(CogniteDescribableNode):
 
         for instance in instances.values():
             if (
-                isinstance(instance.asset_class, (dm.NodeId, str))
+                isinstance(instance.asset_class, dm.NodeId | str)
                 and (asset_class := nodes_by_id.get(instance.asset_class))
                 and isinstance(asset_class, CogniteAssetClass)
             ):

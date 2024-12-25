@@ -239,7 +239,7 @@ class ConnectionItemD(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.direct_single, (dm.NodeId, str))
+                isinstance(instance.direct_single, dm.NodeId | str)
                 and (direct_single := nodes_by_id.get(instance.direct_single))
                 and isinstance(direct_single, ConnectionItemE)
             ):

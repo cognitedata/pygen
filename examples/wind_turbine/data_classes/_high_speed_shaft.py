@@ -219,19 +219,19 @@ class HighSpeedShaft(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.bending_moment_y, (dm.NodeId, str))
+                isinstance(instance.bending_moment_y, dm.NodeId | str)
                 and (bending_moment_y := nodes_by_id.get(instance.bending_moment_y))
                 and isinstance(bending_moment_y, SensorTimeSeries)
             ):
                 instance.bending_moment_y = bending_moment_y
             if (
-                isinstance(instance.bending_monent_x, (dm.NodeId, str))
+                isinstance(instance.bending_monent_x, dm.NodeId | str)
                 and (bending_monent_x := nodes_by_id.get(instance.bending_monent_x))
                 and isinstance(bending_monent_x, SensorTimeSeries)
             ):
                 instance.bending_monent_x = bending_monent_x
             if (
-                isinstance(instance.torque, (dm.NodeId, str))
+                isinstance(instance.torque, dm.NodeId | str)
                 and (torque := nodes_by_id.get(instance.torque))
                 and isinstance(torque, SensorTimeSeries)
             ):

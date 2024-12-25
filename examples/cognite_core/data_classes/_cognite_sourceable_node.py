@@ -234,7 +234,7 @@ class CogniteSourceableNode(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.source, (dm.NodeId, str))
+                isinstance(instance.source, dm.NodeId | str)
                 and (source := nodes_by_id.get(instance.source))
                 and isinstance(source, CogniteSourceSystem)
             ):

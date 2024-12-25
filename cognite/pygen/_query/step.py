@@ -263,7 +263,9 @@ class QueryStepFactory:
                 nested_properties_by_property[key] = value
         return nested_properties_by_property
 
-    def root(self, filter: dm.Filter | None = None, limit: int | None = None) -> QueryStep:
+    def root(
+        self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None
+    ) -> QueryStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
@@ -280,6 +282,7 @@ class QueryStepFactory:
             self._root_name,
             dm.query.NodeResultSetExpression(
                 filter=dm.filters.And(filter, has_data) if filter else has_data,
+                sort=sort,
             ),
             select=select,
             selected_properties=selected_properties,
@@ -321,7 +324,6 @@ class QueryStepFactory:
     ) -> list[QueryStep]:
         if source is None:
             raise ValueError("Source view not found")
-        selected_properties = selected_properties or ["*"]
         query_properties = self._create_query_properties(selected_properties, None)
         return [
             QueryStep(
@@ -344,8 +346,8 @@ class QueryStepFactory:
         direction: Literal["outwards", "inwards"],
         connection_property: ViewPropertyId,
         selected_properties: list[str | dict[str, list[str]]] | None = None,
+        include_end_node: bool = True,
     ) -> list[QueryStep]:
-        selected_properties = selected_properties or ["*"]
         edge_name = self._create_step_name(self._root_name)
         steps = [
             QueryStep(
@@ -355,31 +357,35 @@ class QueryStepFactory:
                     direction=direction,
                     chain_to="source" if direction == "outwards" else "destination",
                 ),
-                selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
+                selected_properties=[prop for prop in selected_properties or [] if isinstance(prop, str)] or None,
                 connection_property=connection_property,
             )
         ]
+        if not include_end_node:
+            return steps
 
         node_properties = next(
-            (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
+            (prop for prop in selected_properties or [] if isinstance(prop, dict) and "node" in prop), None
         )
-        if isinstance(node_properties, dict):
+        selected_node_properties: list[str] | None = None
+        if isinstance(node_properties, dict) and self._edge_connection_property in node_properties:
             selected_node_properties = node_properties[self._edge_connection_property]
-            query_properties = self._create_query_properties(selected_node_properties, None)
-            target_view = source
 
-            step = QueryStep(
-                self._create_step_name(edge_name),
-                dm.query.NodeResultSetExpression(
-                    from_=edge_name,
-                    filter=dm.filters.HasData(views=[target_view]),
-                ),
-                select=self._create_select(query_properties, target_view),
-                selected_properties=selected_node_properties,
-                connection_property=ViewPropertyId(target_view, self._edge_connection_property),
-                view_id=target_view,
-            )
-            steps.append(step)
+        query_properties = self._create_query_properties(selected_node_properties, None)
+        target_view = source
+
+        step = QueryStep(
+            self._create_step_name(edge_name),
+            dm.query.NodeResultSetExpression(
+                from_=edge_name,
+                filter=dm.filters.HasData(views=[target_view]),
+            ),
+            select=self._create_select(query_properties, target_view),
+            selected_properties=selected_node_properties,
+            connection_property=ViewPropertyId(target_view, self._edge_connection_property),
+            view_id=target_view,
+        )
+        steps.append(step)
         return steps
 
     def from_reverse_relation(

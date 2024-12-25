@@ -35,8 +35,7 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from cognite.client.utils._time import ms_to_datetime
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -200,7 +199,7 @@ class DomainModelCore(Core, ABC):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DataRecord(BaseModel, populate_by_name=True):
+class DataRecord(BaseModel):
     """The data record represents the metadata of a node.
 
     Args:
@@ -211,16 +210,9 @@ class DataRecord(BaseModel, populate_by_name=True):
     """
 
     version: int
-    last_updated_time: datetime.datetime = Field(alias="lastUpdatedTime")
-    created_time: datetime.datetime = Field(alias="createdTime")
-    deleted_time: Optional[datetime.datetime] = Field(None, alias="deletedTime")
-
-    @field_validator("created_time", "last_updated_time", "deleted_time", mode="before")
-    @classmethod
-    def datatime_ms(cls, value: Any) -> Any:
-        if isinstance(value, int):
-            return ms_to_datetime(value)
-        return value
+    last_updated_time: datetime.datetime
+    created_time: datetime.datetime
+    deleted_time: Optional[datetime.datetime] = None
 
 
 class DomainModel(DomainModelCore, ABC):

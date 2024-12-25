@@ -202,13 +202,13 @@ class SolarPanel(GeneratingUnit):
 
         for instance in instances.values():
             if (
-                isinstance(instance.efficiency, (dm.NodeId, str))
+                isinstance(instance.efficiency, dm.NodeId | str)
                 and (efficiency := nodes_by_id.get(instance.efficiency))
                 and isinstance(efficiency, SensorTimeSeries)
             ):
                 instance.efficiency = efficiency
             if (
-                isinstance(instance.orientation, (dm.NodeId, str))
+                isinstance(instance.orientation, dm.NodeId | str)
                 and (orientation := nodes_by_id.get(instance.orientation))
                 and isinstance(orientation, SensorTimeSeries)
             ):

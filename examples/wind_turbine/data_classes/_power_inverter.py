@@ -231,19 +231,19 @@ class PowerInverter(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.active_power_total, (dm.NodeId, str))
+                isinstance(instance.active_power_total, dm.NodeId | str)
                 and (active_power_total := nodes_by_id.get(instance.active_power_total))
                 and isinstance(active_power_total, SensorTimeSeries)
             ):
                 instance.active_power_total = active_power_total
             if (
-                isinstance(instance.apparent_power_total, (dm.NodeId, str))
+                isinstance(instance.apparent_power_total, dm.NodeId | str)
                 and (apparent_power_total := nodes_by_id.get(instance.apparent_power_total))
                 and isinstance(apparent_power_total, SensorTimeSeries)
             ):
                 instance.apparent_power_total = apparent_power_total
             if (
-                isinstance(instance.reactive_power_total, (dm.NodeId, str))
+                isinstance(instance.reactive_power_total, dm.NodeId | str)
                 and (reactive_power_total := nodes_by_id.get(instance.reactive_power_total))
                 and isinstance(reactive_power_total, SensorTimeSeries)
             ):

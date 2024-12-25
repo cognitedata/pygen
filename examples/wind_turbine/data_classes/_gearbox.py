@@ -213,19 +213,19 @@ class Gearbox(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.displacement_x, (dm.NodeId, str))
+                isinstance(instance.displacement_x, dm.NodeId | str)
                 and (displacement_x := nodes_by_id.get(instance.displacement_x))
                 and isinstance(displacement_x, SensorTimeSeries)
             ):
                 instance.displacement_x = displacement_x
             if (
-                isinstance(instance.displacement_y, (dm.NodeId, str))
+                isinstance(instance.displacement_y, dm.NodeId | str)
                 and (displacement_y := nodes_by_id.get(instance.displacement_y))
                 and isinstance(displacement_y, SensorTimeSeries)
             ):
                 instance.displacement_y = displacement_y
             if (
-                isinstance(instance.displacement_z, (dm.NodeId, str))
+                isinstance(instance.displacement_z, dm.NodeId | str)
                 and (displacement_z := nodes_by_id.get(instance.displacement_z))
                 and isinstance(displacement_z, SensorTimeSeries)
             ):

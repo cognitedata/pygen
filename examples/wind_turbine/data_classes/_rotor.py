@@ -218,13 +218,13 @@ class Rotor(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.rotor_speed_controller, (dm.NodeId, str))
+                isinstance(instance.rotor_speed_controller, dm.NodeId | str)
                 and (rotor_speed_controller := nodes_by_id.get(instance.rotor_speed_controller))
                 and isinstance(rotor_speed_controller, SensorTimeSeries)
             ):
                 instance.rotor_speed_controller = rotor_speed_controller
             if (
-                isinstance(instance.rpm_low_speed_shaft, (dm.NodeId, str))
+                isinstance(instance.rpm_low_speed_shaft, dm.NodeId | str)
                 and (rpm_low_speed_shaft := nodes_by_id.get(instance.rpm_low_speed_shaft))
                 and isinstance(rpm_low_speed_shaft, SensorTimeSeries)
             ):

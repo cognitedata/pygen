@@ -367,19 +367,19 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
 
         for instance in instances.values():
             if (
-                isinstance(instance.asset, (dm.NodeId, str))
+                isinstance(instance.asset, dm.NodeId | str)
                 and (asset := nodes_by_id.get(instance.asset))
                 and isinstance(asset, CogniteAsset)
             ):
                 instance.asset = asset
             if (
-                isinstance(instance.equipment_type, (dm.NodeId, str))
+                isinstance(instance.equipment_type, dm.NodeId | str)
                 and (equipment_type := nodes_by_id.get(instance.equipment_type))
                 and isinstance(equipment_type, CogniteEquipmentType)
             ):
                 instance.equipment_type = equipment_type
             if (
-                isinstance(instance.source, (dm.NodeId, str))
+                isinstance(instance.source, dm.NodeId | str)
                 and (source := nodes_by_id.get(instance.source))
                 and isinstance(source, CogniteSourceSystem)
             ):

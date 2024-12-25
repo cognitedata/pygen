@@ -398,37 +398,37 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
 
         for instance in instances.values():
             if (
-                isinstance(instance.asset_class, (dm.NodeId, str))
+                isinstance(instance.asset_class, dm.NodeId | str)
                 and (asset_class := nodes_by_id.get(instance.asset_class))
                 and isinstance(asset_class, CogniteAssetClass)
             ):
                 instance.asset_class = asset_class
             if (
-                isinstance(instance.object_3d, (dm.NodeId, str))
+                isinstance(instance.object_3d, dm.NodeId | str)
                 and (object_3d := nodes_by_id.get(instance.object_3d))
                 and isinstance(object_3d, Cognite3DObject)
             ):
                 instance.object_3d = object_3d
             if (
-                isinstance(instance.parent, (dm.NodeId, str))
+                isinstance(instance.parent, dm.NodeId | str)
                 and (parent := nodes_by_id.get(instance.parent))
                 and isinstance(parent, CogniteAsset)
             ):
                 instance.parent = parent
             if (
-                isinstance(instance.root, (dm.NodeId, str))
+                isinstance(instance.root, dm.NodeId | str)
                 and (root := nodes_by_id.get(instance.root))
                 and isinstance(root, CogniteAsset)
             ):
                 instance.root = root
             if (
-                isinstance(instance.source, (dm.NodeId, str))
+                isinstance(instance.source, dm.NodeId | str)
                 and (source := nodes_by_id.get(instance.source))
                 and isinstance(source, CogniteSourceSystem)
             ):
                 instance.source = source
             if (
-                isinstance(instance.type_, (dm.NodeId, str))
+                isinstance(instance.type_, dm.NodeId | str)
                 and (type_ := nodes_by_id.get(instance.type_))
                 and isinstance(type_, CogniteAssetType)
             ):
