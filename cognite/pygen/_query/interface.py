@@ -287,7 +287,7 @@ class QueryExecutor:
         for connection_id, connection in factory.connection_properties.items():
             builder.extend(factory.from_connection(connection_id, connection, reverse_views))
         _ = builder.execute_query(self._client, remove_not_connected=False)
-        return QueryUnpacker(builder).unpack()
+        return QueryUnpacker(builder, unpack_edges=self._unpack_edges).unpack()
 
     @classmethod
     def _prepare_list_result(

@@ -135,8 +135,8 @@ class QueryUnpacker:
         )
         for step in reversed(self._builder):
             source_property: str | None = None
-            if step.view_property:
-                source_property = step.view_property.property
+            if step.connection_property:
+                source_property = step.connection_property.property
             if node_expression := step.node_expression:
                 unpacked = self._unpack_node(step, node_expression, nodes_by_from)
                 nodes_by_from[step.from_].append((source_property, unpacked))

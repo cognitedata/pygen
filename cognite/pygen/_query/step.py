@@ -42,6 +42,32 @@ class ViewPropertyId(CogniteObject):
 
 
 class QueryStep:
+    """QueryStep represents a single step in a query execution.
+
+    It is used to keep track of the state of a query step, such as the current cursor, the total number of retrieved
+    instances, and the results of the query.
+
+    Args:
+        name: The unique name of the step.
+        expression: The node or edge expression passed to the API.
+        view_id: The view ID representing the view to query.
+        max_retrieve_limit: The maximum number of instances to retrieve. Defaults to -1. If set to -1, it will
+            continue to retrieve instances until there are no more instances to retrieve.
+        select: The selected properties to retrieve. If not set, it will default to all properties. None indicates
+            to not retrieve any properties from the view.
+        raw_filter: This is the same filter as the expression, but without the HasData filter. This is used to count
+            the total number of instances in the view such that the ETA can be calculated.
+        connection_type: The connection type. Defaults to None.
+            It is used to deal with the special case of reverse-list connections, which requires using the search
+            endpoint instead of the query endpoint.
+        connection_property: The property ID of the connection from the view referenced in the expression.from_
+            that is used to connect to the view in this step. Defaults to None, which indicates that this is the
+            root step.
+        selected_properties: The user selected properties to retrieve. Defaults to None, which indicates that all
+            properties should be retrieved.
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -51,7 +77,7 @@ class QueryStep:
         select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        view_property: ViewPropertyId | None = None,
+        connection_property: ViewPropertyId | None = None,
         selected_properties: list[str] | None = None,
     ):
         self.name = name
@@ -68,7 +94,7 @@ class QueryStep:
             self.select = select  # type: ignore[assignment]
         self.raw_filter = raw_filter
         self.connection_type = connection_type
-        self.view_property = view_property
+        self.connection_property = connection_property
         self.selected_properties = selected_properties
         self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
         self.cursor: str | None = None
@@ -227,24 +253,24 @@ class QueryStepFactory:
     ) -> list[QueryStep]:
         if self._root_name is None:
             raise ValueError("Root step is not created")
-        view_property = ViewPropertyId(self._view_id, connection_id)
+        connection_property = ViewPropertyId(self._view_id, connection_id)
         selected_properties = self._nested_properties_by_property.get(connection_id, ["*"])
         if isinstance(connection, dm.EdgeConnection):
-            return self._from_edge(connection, view_property, selected_properties)
+            return self._from_edge(connection, connection_property, selected_properties)
         elif isinstance(connection, ReverseDirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self._from_reverse_relation(connection, view_property, validated, reverse_views)
+            return self._from_reverse_relation(connection, connection_property, validated, reverse_views)
         elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self.from_direct_relation(connection, view_property, validated)
+            return self._from_direct_relation(connection, connection_property, validated)
         else:
             warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
         return []
 
-    def from_direct_relation(
+    def _from_direct_relation(
         self,
         connection: dm.MappedProperty,
-        view_property: ViewPropertyId,
+        connection_property: ViewPropertyId,
         selected_properties: list[str],
     ) -> list[QueryStep]:
         query_properties = self._create_query_properties(selected_properties, None)
@@ -256,9 +282,9 @@ class QueryStepFactory:
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,
                     direction="outwards",
-                    through=self._view_id.as_property_ref(view_property.property),
+                    through=self._view_id.as_property_ref(connection_property.property),
                 ),
-                view_property=view_property,
+                connection_property=connection_property,
                 select=self._create_select(query_properties, connection.source),
                 selected_properties=selected_properties,
                 view_id=connection.source,
@@ -268,22 +294,22 @@ class QueryStepFactory:
     def _from_edge(
         self,
         connection: dm.EdgeConnection,
-        view_property: ViewPropertyId,
+        connection_property: ViewPropertyId,
         selected_properties: list[str | dict[str, list[str]]],
     ) -> list[QueryStep]:
         edge_name = self._create_step_name(self._root_name)
-        steps = []
-        step = QueryStep(
-            edge_name,
-            dm.query.EdgeResultSetExpression(
-                from_=self._root_name,
-                direction=connection.direction,
-                chain_to="source" if connection.direction == "outwards" else "destination",
-            ),
-            selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
-            view_property=view_property,
-        )
-        steps.append(step)
+        steps = [
+            QueryStep(
+                edge_name,
+                dm.query.EdgeResultSetExpression(
+                    from_=self._root_name,
+                    direction=connection.direction,
+                    chain_to="source" if connection.direction == "outwards" else "destination",
+                ),
+                selected_properties=[prop for prop in selected_properties if isinstance(prop, str)],
+                connection_property=connection_property,
+            )
+        ]
 
         node_properties = next(
             (prop for prop in selected_properties if isinstance(prop, dict) and "node" in prop), None
@@ -301,7 +327,7 @@ class QueryStepFactory:
                 ),
                 select=self._create_select(query_properties, target_view),
                 selected_properties=selected_node_properties,
-                view_property=ViewPropertyId(target_view, "node"),
+                connection_property=ViewPropertyId(target_view, "node"),
                 view_id=target_view,
             )
             steps.append(step)
@@ -310,7 +336,7 @@ class QueryStepFactory:
     def _from_reverse_relation(
         self,
         connection: ReverseDirectRelation,
-        view_property: ViewPropertyId,
+        connection_property: ViewPropertyId,
         selected_properties: list[str],
         reverse_views: dict[dm.ViewId, dm.View],
     ) -> list[QueryStep]:
@@ -330,7 +356,7 @@ class QueryStepFactory:
                     direction="inwards",
                     through=other_view.as_property_ref(connection.through.property),
                 ),
-                view_property=view_property,
+                connection_property=connection_property,
                 select=self._create_select(query_properties, other_view.as_id()),
                 selected_properties=selected_properties,
                 view_id=connection.source,
