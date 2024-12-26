@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -41,7 +41,7 @@ class PrimitiveRequiredAPI(
     NodeAPI[PrimitiveRequired, PrimitiveRequiredWrite, PrimitiveRequiredList, PrimitiveRequiredWriteList]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequired", "1")
-    _properties_by_field = _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequired
     _class_list = PrimitiveRequiredList
     _class_write_list = PrimitiveRequiredWriteList

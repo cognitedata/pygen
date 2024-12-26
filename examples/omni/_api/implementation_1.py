@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -38,7 +38,7 @@ from omni.data_classes._implementation_1 import (
 
 class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List, Implementation1WriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "Implementation1", "1")
-    _properties_by_field = _IMPLEMENTATION1_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION1_PROPERTIES_BY_FIELD
     _class_type = Implementation1
     _class_list = Implementation1List
     _class_write_list = Implementation1WriteList

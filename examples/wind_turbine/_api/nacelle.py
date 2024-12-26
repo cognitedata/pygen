@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -45,7 +45,7 @@ from wind_turbine.data_classes._nacelle import (
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "Nacelle", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = Nacelle
     _class_list = NacelleList
     _class_write_list = NacelleWriteList

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -44,7 +44,7 @@ class ConnectionItemCNodeAPI(
     NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = ConnectionItemCNode
     _class_list = ConnectionItemCNodeList
     _class_write_list = ConnectionItemCNodeWriteList

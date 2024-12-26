@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -23,6 +23,7 @@ from cognite_core.data_classes import (
     Cognite3DTransformationNodeWrite,
     Cognite3DTransformationNodeWriteList,
     Cognite360Image,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_3_d_transformation_node import (
@@ -46,8 +47,8 @@ class Cognite3DTransformationNodeAPI(
     ]
 ):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
-    _properties_by_field = _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Cognite360Image": Cognite360Image,
     }
     _class_type = Cognite3DTransformationNode

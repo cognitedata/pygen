@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -43,7 +43,7 @@ class Cognite360ImageModelAPI(
     NodeAPI[Cognite360ImageModel, Cognite360ImageModelWrite, Cognite360ImageModelList, Cognite360ImageModelWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
-    _properties_by_field = _COGNITE360IMAGEMODEL_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE360IMAGEMODEL_PROPERTIES_BY_FIELD
     _class_type = Cognite360ImageModel
     _class_list = Cognite360ImageModelList
     _class_write_list = Cognite360ImageModelWriteList

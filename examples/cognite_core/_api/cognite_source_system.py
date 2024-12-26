@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ class CogniteSourceSystemAPI(
     NodeAPI[CogniteSourceSystem, CogniteSourceSystemWrite, CogniteSourceSystemList, CogniteSourceSystemWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
-    _properties_by_field = _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD
     _class_type = CogniteSourceSystem
     _class_list = CogniteSourceSystemList
     _class_write_list = CogniteSourceSystemWriteList

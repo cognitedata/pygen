@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -24,6 +24,7 @@ from cognite_core.data_classes import (
     CogniteVisualizableTextFields,
     CogniteVisualizableWrite,
     CogniteVisualizableWriteList,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_visualizable import (
@@ -42,8 +43,8 @@ class CogniteVisualizableAPI(
     NodeAPI[CogniteVisualizable, CogniteVisualizableWrite, CogniteVisualizableList, CogniteVisualizableWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
-    _properties_by_field = {}
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = {}
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "CogniteAsset": CogniteAsset,
     }
     _class_type = CogniteVisualizable

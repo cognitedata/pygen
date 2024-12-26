@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -43,7 +43,7 @@ from omni.data_classes._core import (
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
-    _properties_by_field = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemA
     _class_list = ConnectionItemAList
     _class_write_list = ConnectionItemAWriteList

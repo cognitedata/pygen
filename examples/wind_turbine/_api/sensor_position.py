@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -41,7 +41,7 @@ from wind_turbine.data_classes._sensor_position import (
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "SensorPosition", "1")
-    _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _SENSORPOSITION_PROPERTIES_BY_FIELD
     _class_type = SensorPosition
     _class_list = SensorPositionList
     _class_write_list = SensorPositionWriteList

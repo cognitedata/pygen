@@ -39,7 +39,7 @@ from omni_multi.data_classes._sub_interface import (
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
     _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
-    _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _SUBINTERFACE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Implementation1": Implementation1v2,
     }

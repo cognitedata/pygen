@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -49,7 +49,7 @@ class CognitePointCloudVolumeAPI(
     ]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1")
-    _properties_by_field = _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD
     _class_type = CognitePointCloudVolume
     _class_list = CognitePointCloudVolumeList
     _class_write_list = CognitePointCloudVolumeWriteList

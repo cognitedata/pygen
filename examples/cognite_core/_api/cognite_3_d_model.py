@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -26,6 +26,7 @@ from cognite_core.data_classes import (
     CogniteCADModel,
     CogniteFile,
     CognitePointCloudModel,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_3_d_model import (
@@ -43,8 +44,8 @@ from cognite_core.data_classes._core import (
 
 class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DModelList, Cognite3DModelWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DModel", "v1")
-    _properties_by_field = _COGNITE3DMODEL_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DMODEL_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Cognite360ImageModel": Cognite360ImageModel,
         "CogniteCADModel": CogniteCADModel,
         "CognitePointCloudModel": CognitePointCloudModel,

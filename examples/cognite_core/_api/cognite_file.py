@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -44,7 +44,7 @@ from cognite_core.data_classes._core import (
 
 class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, CogniteFileWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteFile", "v1")
-    _properties_by_field = _COGNITEFILE_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEFILE_PROPERTIES_BY_FIELD
     _class_type = CogniteFile
     _class_list = CogniteFileList
     _class_write_list = CogniteFileWriteList

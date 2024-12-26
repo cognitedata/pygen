@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -24,6 +24,7 @@ from cognite_core.data_classes import (
     CogniteSchedulableTextFields,
     CogniteSchedulableWrite,
     CogniteSchedulableWriteList,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_schedulable import (
@@ -42,8 +43,8 @@ class CogniteSchedulableAPI(
     NodeAPI[CogniteSchedulable, CogniteSchedulableWrite, CogniteSchedulableList, CogniteSchedulableWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
-    _properties_by_field = _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "CogniteActivity": CogniteActivity,
     }
     _class_type = CogniteSchedulable

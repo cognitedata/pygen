@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ from wind_turbine.data_classes._gearbox import (
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "Gearbox", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = Gearbox
     _class_list = GearboxList
     _class_write_list = GearboxWriteList

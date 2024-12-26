@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -41,7 +41,7 @@ class PrimitiveNullableAPI(
     NodeAPI[PrimitiveNullable, PrimitiveNullableWrite, PrimitiveNullableList, PrimitiveNullableWriteList]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "PrimitiveNullable", "1")
-    _properties_by_field = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD
     _class_type = PrimitiveNullable
     _class_list = PrimitiveNullableList
     _class_write_list = PrimitiveNullableWriteList

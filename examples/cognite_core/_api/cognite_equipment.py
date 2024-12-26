@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -48,7 +48,7 @@ class CogniteEquipmentAPI(
     NodeAPI[CogniteEquipment, CogniteEquipmentWrite, CogniteEquipmentList, CogniteEquipmentWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteEquipment", "v1")
-    _properties_by_field = _COGNITEEQUIPMENT_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEEQUIPMENT_PROPERTIES_BY_FIELD
     _class_type = CogniteEquipment
     _class_list = CogniteEquipmentList
     _class_write_list = CogniteEquipmentWriteList

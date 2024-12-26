@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -29,6 +29,7 @@ from cognite_core.data_classes import (
     CogniteSourceableNodeWriteList,
     CogniteSourceSystem,
     CogniteTimeSeries,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_sourceable_node import (
@@ -50,8 +51,8 @@ class CogniteSourceableNodeAPI(
     ]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
-    _properties_by_field = _COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "CogniteActivity": CogniteActivity,
         "CogniteAsset": CogniteAsset,
         "CogniteEquipment": CogniteEquipment,

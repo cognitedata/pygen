@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -39,7 +39,7 @@ class Implementation1v1API(
     NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List, Implementation1v1WriteList]
 ):
     _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
-    _properties_by_field = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
     _class_type = Implementation1v1
     _class_list = Implementation1v1List
     _class_write_list = Implementation1v1WriteList

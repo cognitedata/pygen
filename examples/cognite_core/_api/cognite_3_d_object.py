@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -46,7 +46,7 @@ from cognite_core.data_classes._core import (
 
 class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3DObjectList, Cognite3DObjectWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DObject", "v1")
-    _properties_by_field = _COGNITE3DOBJECT_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DOBJECT_PROPERTIES_BY_FIELD
     _class_type = Cognite3DObject
     _class_list = Cognite3DObjectList
     _class_write_list = Cognite3DObjectWriteList

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -44,7 +44,7 @@ from cognite_core.data_classes._core import (
 
 class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteActivityList, CogniteActivityWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteActivity", "v1")
-    _properties_by_field = _COGNITEACTIVITY_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEACTIVITY_PROPERTIES_BY_FIELD
     _class_type = CogniteActivity
     _class_list = CogniteActivityList
     _class_write_list = CogniteActivityWriteList

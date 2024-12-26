@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ from wind_turbine.data_classes._solar_panel import (
 
 class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPanelWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "SolarPanel", "1")
-    _properties_by_field = _SOLARPANEL_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _SOLARPANEL_PROPERTIES_BY_FIELD
     _class_type = SolarPanel
     _class_list = SolarPanelList
     _class_write_list = SolarPanelWriteList

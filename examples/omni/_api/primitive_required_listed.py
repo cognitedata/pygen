@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -45,7 +45,7 @@ class PrimitiveRequiredListedAPI(
     ]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
-    _properties_by_field = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequiredListed
     _class_list = PrimitiveRequiredListedList
     _class_write_list = PrimitiveRequiredListedWriteList

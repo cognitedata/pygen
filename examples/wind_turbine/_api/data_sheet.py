@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -39,7 +39,7 @@ from wind_turbine.data_classes._data_sheet import (
 
 class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "DataSheet", "1")
-    _properties_by_field = _DATASHEET_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _DATASHEET_PROPERTIES_BY_FIELD
     _class_type = DataSheet
     _class_list = DataSheetList
     _class_write_list = DataSheetWriteList

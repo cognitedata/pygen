@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ from wind_turbine.data_classes._main_shaft import (
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "MainShaft", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = MainShaft
     _class_list = MainShaftList
     _class_write_list = MainShaftWriteList

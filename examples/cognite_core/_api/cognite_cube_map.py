@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -24,6 +24,7 @@ from cognite_core.data_classes import (
     CogniteCubeMapWrite,
     CogniteCubeMapWriteList,
     CogniteFile,
+    DomainModel,
     ResourcesWriteResult,
 )
 from cognite_core.data_classes._cognite_cube_map import (
@@ -40,8 +41,8 @@ from cognite_core.data_classes._core import (
 
 class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCubeMapList, CogniteCubeMapWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteCubeMap", "v1")
-    _properties_by_field = {}
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = {}
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Cognite360Image": Cognite360Image,
     }
     _class_type = CogniteCubeMap

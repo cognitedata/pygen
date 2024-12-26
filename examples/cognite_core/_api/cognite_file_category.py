@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ class CogniteFileCategoryAPI(
     NodeAPI[CogniteFileCategory, CogniteFileCategoryWrite, CogniteFileCategoryList, CogniteFileCategoryWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
-    _properties_by_field = _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD
     _class_type = CogniteFileCategory
     _class_list = CogniteFileCategoryList
     _class_write_list = CogniteFileCategoryWriteList

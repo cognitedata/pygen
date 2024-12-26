@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -42,7 +42,7 @@ class CogniteCADRevisionAPI(
     NodeAPI[CogniteCADRevision, CogniteCADRevisionWrite, CogniteCADRevisionList, CogniteCADRevisionWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1")
-    _properties_by_field = _COGNITECADREVISION_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITECADREVISION_PROPERTIES_BY_FIELD
     _class_type = CogniteCADRevision
     _class_list = CogniteCADRevisionList
     _class_write_list = CogniteCADRevisionWriteList

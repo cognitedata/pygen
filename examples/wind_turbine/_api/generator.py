@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -40,7 +40,7 @@ from wind_turbine.data_classes._generator import (
 
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "Generator", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = Generator
     _class_list = GeneratorList
     _class_write_list = GeneratorWriteList

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -46,7 +46,7 @@ class CDFExternalReferencesListedAPI(
     ]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
-    _properties_by_field = _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferencesListed
     _class_list = CDFExternalReferencesListedList
     _class_write_list = CDFExternalReferencesListedWriteList

@@ -10,6 +10,9 @@ from omni_sub._api._core import (
     QueryAPI,
     _create_edge_filter,
 )
+from omni_sub.data_classes import (
+    ConnectionItemB,
+)
 from omni_sub.data_classes._connection_item_a import (
     _create_connection_item_a_filter,
 )
