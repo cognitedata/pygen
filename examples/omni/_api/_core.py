@@ -346,7 +346,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         for edge_type, values in groupby(edge_api_name_type_direction_view_id_penta or [], lambda x: x[2].as_tuple()):
             edges: dict[dm.EdgeId, dm.Edge] = {}
             value_list = list(values)
-            for edge_api, edge_name, edge_type, direction, view_id in value_list:
+            for edge_api, edge_name, edge_type, direction, _ in value_list:
                 is_type = dm.filters.Equals(
                     ["edge", "type"],
                     {"space": edge_type.space, "externalId": edge_type.external_id},
@@ -372,7 +372,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     node_id = edge.end_node.as_tuple() if direction == "outwards" else edge.start_node.as_tuple()
                     edge_by_end_node[node_id].append(edge)
 
-                for no, (edge_api, edge_name, _, direction, view_id) in enumerate(value_list):
+                for no, (_, edge_name, __, direction, view_id) in enumerate(value_list):
                     if not edge_by_end_node:
                         break
                     if no == len(value_list) - 1:
@@ -442,7 +442,7 @@ class NodeAPI(
         return ResourcesWriteResult(result.nodes, result.edges, time_series)
 
 
-class EdgeAPI(ABC):
+class EdgeAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -562,7 +562,7 @@ class GraphQLQueryResponse:
     def parse(self, response: dict[str, Any]) -> GraphQLList:
         if "errors" in response:
             raise RuntimeError(response["errors"])
-        _, data = list(response.items())[0]
+        _, data = next(iter(response.items()))
         self._parse_item(data)
         if "pageInfo" in data:
             self._output.page_info = PageInfo.load(data["pageInfo"])
