@@ -255,7 +255,8 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
 class PrimitiveWithDefaultsApply(PrimitiveWithDefaultsWrite):
     def __new__(cls, *args, **kwargs) -> PrimitiveWithDefaultsApply:
         warnings.warn(
-            "PrimitiveWithDefaultsApply is deprecated and will be removed in v1.0. Use PrimitiveWithDefaultsWrite instead."
+            "PrimitiveWithDefaultsApply is deprecated and will be removed in v1.0. "
+            "Use PrimitiveWithDefaultsWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "PrimitiveWithDefaults.",
             UserWarning,

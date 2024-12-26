@@ -597,7 +597,8 @@ class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWri
 class CogniteActivityApply(CogniteActivityWrite):
     def __new__(cls, *args, **kwargs) -> CogniteActivityApply:
         warnings.warn(
-            "CogniteActivityApply is deprecated and will be removed in v1.0. Use CogniteActivityWrite instead."
+            "CogniteActivityApply is deprecated and will be removed in v1.0. "
+            "Use CogniteActivityWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteActivity.",
             UserWarning,

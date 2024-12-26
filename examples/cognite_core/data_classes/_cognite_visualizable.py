@@ -251,7 +251,8 @@ class CogniteVisualizableWrite(DomainModelWrite):
 class CogniteVisualizableApply(CogniteVisualizableWrite):
     def __new__(cls, *args, **kwargs) -> CogniteVisualizableApply:
         warnings.warn(
-            "CogniteVisualizableApply is deprecated and will be removed in v1.0. Use CogniteVisualizableWrite instead."
+            "CogniteVisualizableApply is deprecated and will be removed in v1.0. "
+            "Use CogniteVisualizableWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteVisualizable.",
             UserWarning,

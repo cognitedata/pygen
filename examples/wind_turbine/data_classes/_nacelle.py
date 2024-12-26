@@ -624,7 +624,8 @@ class NacelleWrite(DomainModelWrite):
 class NacelleApply(NacelleWrite):
     def __new__(cls, *args, **kwargs) -> NacelleApply:
         warnings.warn(
-            "NacelleApply is deprecated and will be removed in v1.0. Use NacelleWrite instead."
+            "NacelleApply is deprecated and will be removed in v1.0. "
+            "Use NacelleWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Nacelle.",
             UserWarning,

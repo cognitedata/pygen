@@ -340,7 +340,8 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
 class ConnectionItemCNodeApply(ConnectionItemCNodeWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemCNodeApply:
         warnings.warn(
-            "ConnectionItemCNodeApply is deprecated and will be removed in v1.0. Use ConnectionItemCNodeWrite instead."
+            "ConnectionItemCNodeApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemCNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemCNode.",
             UserWarning,

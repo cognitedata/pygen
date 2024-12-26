@@ -237,7 +237,8 @@ class CogniteDescribableNodeWrite(DomainModelWrite):
 class CogniteDescribableNodeApply(CogniteDescribableNodeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteDescribableNodeApply:
         warnings.warn(
-            "CogniteDescribableNodeApply is deprecated and will be removed in v1.0. Use CogniteDescribableNodeWrite instead."
+            "CogniteDescribableNodeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteDescribableNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteDescribableNode.",
             UserWarning,

@@ -577,7 +577,8 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
 class Cognite360ImageApply(Cognite360ImageWrite):
     def __new__(cls, *args, **kwargs) -> Cognite360ImageApply:
         warnings.warn(
-            "Cognite360ImageApply is deprecated and will be removed in v1.0. Use Cognite360ImageWrite instead."
+            "Cognite360ImageApply is deprecated and will be removed in v1.0. "
+            "Use Cognite360ImageWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite360Image.",
             UserWarning,

@@ -420,7 +420,8 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
 class CogniteCADNodeApply(CogniteCADNodeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteCADNodeApply:
         warnings.warn(
-            "CogniteCADNodeApply is deprecated and will be removed in v1.0. Use CogniteCADNodeWrite instead."
+            "CogniteCADNodeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteCADNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteCADNode.",
             UserWarning,

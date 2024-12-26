@@ -308,7 +308,8 @@ class Cognite3DModelWrite(CogniteDescribableNodeWrite):
 class Cognite3DModelApply(Cognite3DModelWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DModelApply:
         warnings.warn(
-            "Cognite3DModelApply is deprecated and will be removed in v1.0. Use Cognite3DModelWrite instead."
+            "Cognite3DModelApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DModelWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DModel.",
             UserWarning,

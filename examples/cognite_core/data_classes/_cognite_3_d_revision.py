@@ -292,7 +292,8 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
 class Cognite3DRevisionApply(Cognite3DRevisionWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DRevisionApply:
         warnings.warn(
-            "Cognite3DRevisionApply is deprecated and will be removed in v1.0. Use Cognite3DRevisionWrite instead."
+            "Cognite3DRevisionApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DRevisionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DRevision.",
             UserWarning,

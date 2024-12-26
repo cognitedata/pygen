@@ -258,7 +258,8 @@ class DataSheetWrite(DomainModelWrite):
 class DataSheetApply(DataSheetWrite):
     def __new__(cls, *args, **kwargs) -> DataSheetApply:
         warnings.warn(
-            "DataSheetApply is deprecated and will be removed in v1.0. Use DataSheetWrite instead."
+            "DataSheetApply is deprecated and will be removed in v1.0. "
+            "Use DataSheetWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "DataSheet.",
             UserWarning,

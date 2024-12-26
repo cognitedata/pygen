@@ -440,7 +440,8 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
 class CognitePointCloudVolumeApply(CognitePointCloudVolumeWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudVolumeApply:
         warnings.warn(
-            "CognitePointCloudVolumeApply is deprecated and will be removed in v1.0. Use CognitePointCloudVolumeWrite instead."
+            "CognitePointCloudVolumeApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudVolumeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudVolume.",
             UserWarning,

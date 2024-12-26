@@ -313,7 +313,8 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
 class CognitePointCloudModelApply(CognitePointCloudModelWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudModelApply:
         warnings.warn(
-            "CognitePointCloudModelApply is deprecated and will be removed in v1.0. Use CognitePointCloudModelWrite instead."
+            "CognitePointCloudModelApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudModelWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudModel.",
             UserWarning,

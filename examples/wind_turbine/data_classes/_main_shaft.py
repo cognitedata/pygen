@@ -417,7 +417,8 @@ class MainShaftWrite(DomainModelWrite):
 class MainShaftApply(MainShaftWrite):
     def __new__(cls, *args, **kwargs) -> MainShaftApply:
         warnings.warn(
-            "MainShaftApply is deprecated and will be removed in v1.0. Use MainShaftWrite instead."
+            "MainShaftApply is deprecated and will be removed in v1.0. "
+            "Use MainShaftWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "MainShaft.",
             UserWarning,

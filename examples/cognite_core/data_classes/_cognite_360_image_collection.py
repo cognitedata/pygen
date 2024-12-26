@@ -318,7 +318,8 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
 class Cognite360ImageCollectionApply(Cognite360ImageCollectionWrite):
     def __new__(cls, *args, **kwargs) -> Cognite360ImageCollectionApply:
         warnings.warn(
-            "Cognite360ImageCollectionApply is deprecated and will be removed in v1.0. Use Cognite360ImageCollectionWrite instead."
+            "Cognite360ImageCollectionApply is deprecated and will be removed in v1.0. "
+            "Use Cognite360ImageCollectionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite360ImageCollection.",
             UserWarning,

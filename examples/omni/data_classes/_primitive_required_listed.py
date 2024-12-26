@@ -307,7 +307,8 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
 class PrimitiveRequiredListedApply(PrimitiveRequiredListedWrite):
     def __new__(cls, *args, **kwargs) -> PrimitiveRequiredListedApply:
         warnings.warn(
-            "PrimitiveRequiredListedApply is deprecated and will be removed in v1.0. Use PrimitiveRequiredListedWrite instead."
+            "PrimitiveRequiredListedApply is deprecated and will be removed in v1.0. "
+            "Use PrimitiveRequiredListedWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "PrimitiveRequiredListed.",
             UserWarning,

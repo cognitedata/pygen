@@ -284,7 +284,8 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
 class CognitePointCloudRevisionApply(CognitePointCloudRevisionWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudRevisionApply:
         warnings.warn(
-            "CognitePointCloudRevisionApply is deprecated and will be removed in v1.0. Use CognitePointCloudRevisionWrite instead."
+            "CognitePointCloudRevisionApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudRevisionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudRevision.",
             UserWarning,

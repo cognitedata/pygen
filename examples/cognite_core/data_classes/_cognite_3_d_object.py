@@ -484,7 +484,8 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
 class Cognite3DObjectApply(Cognite3DObjectWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DObjectApply:
         warnings.warn(
-            "Cognite3DObjectApply is deprecated and will be removed in v1.0. Use Cognite3DObjectWrite instead."
+            "Cognite3DObjectApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DObjectWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DObject.",
             UserWarning,

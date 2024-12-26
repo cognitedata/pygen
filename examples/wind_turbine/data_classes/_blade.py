@@ -258,7 +258,8 @@ class BladeWrite(DomainModelWrite):
 class BladeApply(BladeWrite):
     def __new__(cls, *args, **kwargs) -> BladeApply:
         warnings.warn(
-            "BladeApply is deprecated and will be removed in v1.0. Use BladeWrite instead."
+            "BladeApply is deprecated and will be removed in v1.0. "
+            "Use BladeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Blade.",
             UserWarning,

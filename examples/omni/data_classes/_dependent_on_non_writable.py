@@ -312,7 +312,8 @@ class DependentOnNonWritableWrite(DomainModelWrite):
 class DependentOnNonWritableApply(DependentOnNonWritableWrite):
     def __new__(cls, *args, **kwargs) -> DependentOnNonWritableApply:
         warnings.warn(
-            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. Use DependentOnNonWritableWrite instead."
+            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. "
+            "Use DependentOnNonWritableWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "DependentOnNonWritable.",
             UserWarning,

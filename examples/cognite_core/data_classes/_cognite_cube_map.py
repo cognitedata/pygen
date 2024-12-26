@@ -376,7 +376,8 @@ class CogniteCubeMapWrite(DomainModelWrite):
 class CogniteCubeMapApply(CogniteCubeMapWrite):
     def __new__(cls, *args, **kwargs) -> CogniteCubeMapApply:
         warnings.warn(
-            "CogniteCubeMapApply is deprecated and will be removed in v1.0. Use CogniteCubeMapWrite instead."
+            "CogniteCubeMapApply is deprecated and will be removed in v1.0. "
+            "Use CogniteCubeMapWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteCubeMap.",
             UserWarning,

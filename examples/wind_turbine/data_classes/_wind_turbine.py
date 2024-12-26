@@ -499,7 +499,8 @@ class WindTurbineWrite(GeneratingUnitWrite):
 class WindTurbineApply(WindTurbineWrite):
     def __new__(cls, *args, **kwargs) -> WindTurbineApply:
         warnings.warn(
-            "WindTurbineApply is deprecated and will be removed in v1.0. Use WindTurbineWrite instead."
+            "WindTurbineApply is deprecated and will be removed in v1.0. "
+            "Use WindTurbineWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "WindTurbine.",
             UserWarning,

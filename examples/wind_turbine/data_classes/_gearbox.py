@@ -351,7 +351,8 @@ class GearboxWrite(DomainModelWrite):
 class GearboxApply(GearboxWrite):
     def __new__(cls, *args, **kwargs) -> GearboxApply:
         warnings.warn(
-            "GearboxApply is deprecated and will be removed in v1.0. Use GearboxWrite instead."
+            "GearboxApply is deprecated and will be removed in v1.0. "
+            "Use GearboxWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Gearbox.",
             UserWarning,

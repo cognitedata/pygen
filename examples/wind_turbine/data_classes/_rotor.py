@@ -342,7 +342,8 @@ class RotorWrite(DomainModelWrite):
 class RotorApply(RotorWrite):
     def __new__(cls, *args, **kwargs) -> RotorApply:
         warnings.warn(
-            "RotorApply is deprecated and will be removed in v1.0. Use RotorWrite instead."
+            "RotorApply is deprecated and will be removed in v1.0. "
+            "Use RotorWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Rotor.",
             UserWarning,

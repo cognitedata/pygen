@@ -676,7 +676,8 @@ class SensorPositionWrite(DomainModelWrite):
 class SensorPositionApply(SensorPositionWrite):
     def __new__(cls, *args, **kwargs) -> SensorPositionApply:
         warnings.warn(
-            "SensorPositionApply is deprecated and will be removed in v1.0. Use SensorPositionWrite instead."
+            "SensorPositionApply is deprecated and will be removed in v1.0. "
+            "Use SensorPositionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "SensorPosition.",
             UserWarning,

@@ -408,7 +408,8 @@ class ConnectionItemDWrite(DomainModelWrite):
 class ConnectionItemDApply(ConnectionItemDWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemDApply:
         warnings.warn(
-            "ConnectionItemDApply is deprecated and will be removed in v1.0. Use ConnectionItemDWrite instead."
+            "ConnectionItemDApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemDWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemD.",
             UserWarning,

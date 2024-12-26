@@ -269,7 +269,8 @@ class CDFExternalReferencesWrite(DomainModelWrite):
 class CDFExternalReferencesApply(CDFExternalReferencesWrite):
     def __new__(cls, *args, **kwargs) -> CDFExternalReferencesApply:
         warnings.warn(
-            "CDFExternalReferencesApply is deprecated and will be removed in v1.0. Use CDFExternalReferencesWrite instead."
+            "CDFExternalReferencesApply is deprecated and will be removed in v1.0. "
+            "Use CDFExternalReferencesWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CDFExternalReferences.",
             UserWarning,

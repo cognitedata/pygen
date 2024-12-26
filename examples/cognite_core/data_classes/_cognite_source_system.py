@@ -253,7 +253,8 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
 class CogniteSourceSystemApply(CogniteSourceSystemWrite):
     def __new__(cls, *args, **kwargs) -> CogniteSourceSystemApply:
         warnings.warn(
-            "CogniteSourceSystemApply is deprecated and will be removed in v1.0. Use CogniteSourceSystemWrite instead."
+            "CogniteSourceSystemApply is deprecated and will be removed in v1.0. "
+            "Use CogniteSourceSystemWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteSourceSystem.",
             UserWarning,

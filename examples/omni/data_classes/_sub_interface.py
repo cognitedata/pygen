@@ -205,7 +205,8 @@ class SubInterfaceWrite(MainInterfaceWrite):
 class SubInterfaceApply(SubInterfaceWrite):
     def __new__(cls, *args, **kwargs) -> SubInterfaceApply:
         warnings.warn(
-            "SubInterfaceApply is deprecated and will be removed in v1.0. Use SubInterfaceWrite instead."
+            "SubInterfaceApply is deprecated and will be removed in v1.0. "
+            "Use SubInterfaceWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "SubInterface.",
             UserWarning,

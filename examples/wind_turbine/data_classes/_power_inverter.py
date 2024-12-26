@@ -375,7 +375,8 @@ class PowerInverterWrite(DomainModelWrite):
 class PowerInverterApply(PowerInverterWrite):
     def __new__(cls, *args, **kwargs) -> PowerInverterApply:
         warnings.warn(
-            "PowerInverterApply is deprecated and will be removed in v1.0. Use PowerInverterWrite instead."
+            "PowerInverterApply is deprecated and will be removed in v1.0. "
+            "Use PowerInverterWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "PowerInverter.",
             UserWarning,

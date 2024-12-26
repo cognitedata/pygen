@@ -661,7 +661,8 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
 class CogniteAssetApply(CogniteAssetWrite):
     def __new__(cls, *args, **kwargs) -> CogniteAssetApply:
         warnings.warn(
-            "CogniteAssetApply is deprecated and will be removed in v1.0. Use CogniteAssetWrite instead."
+            "CogniteAssetApply is deprecated and will be removed in v1.0. "
+            "Use CogniteAssetWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteAsset.",
             UserWarning,

@@ -589,7 +589,8 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
 class CogniteEquipmentApply(CogniteEquipmentWrite):
     def __new__(cls, *args, **kwargs) -> CogniteEquipmentApply:
         warnings.warn(
-            "CogniteEquipmentApply is deprecated and will be removed in v1.0. Use CogniteEquipmentWrite instead."
+            "CogniteEquipmentApply is deprecated and will be removed in v1.0. "
+            "Use CogniteEquipmentWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteEquipment.",
             UserWarning,

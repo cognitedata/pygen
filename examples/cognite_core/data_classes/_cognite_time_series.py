@@ -586,7 +586,8 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
 class CogniteTimeSeriesApply(CogniteTimeSeriesWrite):
     def __new__(cls, *args, **kwargs) -> CogniteTimeSeriesApply:
         warnings.warn(
-            "CogniteTimeSeriesApply is deprecated and will be removed in v1.0. Use CogniteTimeSeriesWrite instead."
+            "CogniteTimeSeriesApply is deprecated and will be removed in v1.0. "
+            "Use CogniteTimeSeriesWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteTimeSeries.",
             UserWarning,

@@ -628,7 +628,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
 class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
     def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
         warnings.warn(
-            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. Use {{ data_class.write_name }} instead."
+            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. "
+            "Use {{ data_class.write_name }} instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "{{ data_class.read_name }}.",
             UserWarning,

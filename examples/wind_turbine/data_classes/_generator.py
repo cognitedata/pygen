@@ -350,7 +350,8 @@ class GeneratorWrite(DomainModelWrite):
 class GeneratorApply(GeneratorWrite):
     def __new__(cls, *args, **kwargs) -> GeneratorApply:
         warnings.warn(
-            "GeneratorApply is deprecated and will be removed in v1.0. Use GeneratorWrite instead."
+            "GeneratorApply is deprecated and will be removed in v1.0. "
+            "Use GeneratorWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Generator.",
             UserWarning,

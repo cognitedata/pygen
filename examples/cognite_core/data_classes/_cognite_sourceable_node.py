@@ -356,7 +356,8 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
 class CogniteSourceableNodeApply(CogniteSourceableNodeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteSourceableNodeApply:
         warnings.warn(
-            "CogniteSourceableNodeApply is deprecated and will be removed in v1.0. Use CogniteSourceableNodeWrite instead."
+            "CogniteSourceableNodeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteSourceableNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteSourceableNode.",
             UserWarning,
