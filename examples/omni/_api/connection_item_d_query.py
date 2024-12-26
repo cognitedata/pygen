@@ -15,7 +15,6 @@ from omni.data_classes import (
     ConnectionItemE,
 )
 from omni.data_classes._connection_item_e import (
-    ConnectionItemE,
     _create_connection_item_e_filter,
 )
 from omni.data_classes._core import (

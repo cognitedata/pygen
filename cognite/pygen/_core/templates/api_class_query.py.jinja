@@ -25,7 +25,6 @@ from {{ top_level_package }}.data_classes._core import (
 )
 {% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
-    {{ edge_api.end_class.read_name }},
     {{ edge_api.end_class.filter_name }},
 )
 {% endfor %}
