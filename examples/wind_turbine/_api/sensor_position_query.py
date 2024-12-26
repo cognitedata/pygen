@@ -58,24 +58,33 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_blade: Whether to retrieve the blade
-            for each sensor position or not.
-            retrieve_edgewise_bend_mom_crosstalk_corrected: Whether to retrieve the edgewise bend mom crosstalk corrected
-            for each sensor position or not.
-            retrieve_edgewise_bend_mom_offset: Whether to retrieve the edgewise bend mom offset
-            for each sensor position or not.
-            retrieve_edgewise_bend_mom_offset_crosstalk_corrected: Whether to retrieve the edgewise bend mom offset crosstalk corrected
-            for each sensor position or not.
-            retrieve_edgewisewise_bend_mom: Whether to retrieve the edgewisewise bend mom
-            for each sensor position or not.
-            retrieve_flapwise_bend_mom: Whether to retrieve the flapwise bend mom
-            for each sensor position or not.
-            retrieve_flapwise_bend_mom_crosstalk_corrected: Whether to retrieve the flapwise bend mom crosstalk corrected
-            for each sensor position or not.
-            retrieve_flapwise_bend_mom_offset: Whether to retrieve the flapwise bend mom offset
-            for each sensor position or not.
-            retrieve_flapwise_bend_mom_offset_crosstalk_corrected: Whether to retrieve the flapwise bend mom offset crosstalk corrected
-            for each sensor position or not.
+            retrieve_blade: Whether to retrieve the
+                blade for each
+                sensor position or not.
+            retrieve_edgewise_bend_mom_crosstalk_corrected: Whether to retrieve the
+                edgewise bend mom crosstalk corrected for each
+                sensor position or not.
+            retrieve_edgewise_bend_mom_offset: Whether to retrieve the
+                edgewise bend mom offset for each
+                sensor position or not.
+            retrieve_edgewise_bend_mom_offset_crosstalk_corrected: Whether to retrieve the
+                edgewise bend mom offset crosstalk corrected for each
+                sensor position or not.
+            retrieve_edgewisewise_bend_mom: Whether to retrieve the
+                edgewisewise bend mom for each
+                sensor position or not.
+            retrieve_flapwise_bend_mom: Whether to retrieve the
+                flapwise bend mom for each
+                sensor position or not.
+            retrieve_flapwise_bend_mom_crosstalk_corrected: Whether to retrieve the
+                flapwise bend mom crosstalk corrected for each
+                sensor position or not.
+            retrieve_flapwise_bend_mom_offset: Whether to retrieve the
+                flapwise bend mom offset for each
+                sensor position or not.
+            retrieve_flapwise_bend_mom_offset_crosstalk_corrected: Whether to retrieve the
+                flapwise bend mom offset crosstalk corrected for each
+                sensor position or not.
 
         Returns:
             The list of the source nodes of the query.

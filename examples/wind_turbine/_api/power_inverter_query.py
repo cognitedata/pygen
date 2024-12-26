@@ -51,12 +51,15 @@ class PowerInverterQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_active_power_total: Whether to retrieve the active power total
-            for each power inverter or not.
-            retrieve_apparent_power_total: Whether to retrieve the apparent power total
-            for each power inverter or not.
-            retrieve_reactive_power_total: Whether to retrieve the reactive power total
-            for each power inverter or not.
+            retrieve_active_power_total: Whether to retrieve the
+                active power total for each
+                power inverter or not.
+            retrieve_apparent_power_total: Whether to retrieve the
+                apparent power total for each
+                power inverter or not.
+            retrieve_reactive_power_total: Whether to retrieve the
+                reactive power total for each
+                power inverter or not.
 
         Returns:
             The list of the source nodes of the query.

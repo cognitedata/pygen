@@ -49,8 +49,9 @@ class CogniteVisualizableQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_object_3d: Whether to retrieve the object 3d
-            for each Cognite visualizable or not.
+            retrieve_object_3d: Whether to retrieve the
+                object 3d for each
+                Cognite visualizable or not.
 
         Returns:
             The list of the source nodes of the query.

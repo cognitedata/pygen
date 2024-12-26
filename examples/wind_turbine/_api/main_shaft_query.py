@@ -53,16 +53,21 @@ class MainShaftQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_bending_x: Whether to retrieve the bending x
-            for each main shaft or not.
-            retrieve_bending_y: Whether to retrieve the bending y
-            for each main shaft or not.
-            retrieve_calculated_tilt_moment: Whether to retrieve the calculated tilt moment
-            for each main shaft or not.
-            retrieve_calculated_yaw_moment: Whether to retrieve the calculated yaw moment
-            for each main shaft or not.
-            retrieve_torque: Whether to retrieve the torque
-            for each main shaft or not.
+            retrieve_bending_x: Whether to retrieve the
+                bending x for each
+                main shaft or not.
+            retrieve_bending_y: Whether to retrieve the
+                bending y for each
+                main shaft or not.
+            retrieve_calculated_tilt_moment: Whether to retrieve the
+                calculated tilt moment for each
+                main shaft or not.
+            retrieve_calculated_yaw_moment: Whether to retrieve the
+                calculated yaw moment for each
+                main shaft or not.
+            retrieve_torque: Whether to retrieve the
+                torque for each
+                main shaft or not.
 
         Returns:
             The list of the source nodes of the query.

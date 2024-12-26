@@ -131,10 +131,12 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_other_direct: Whether to retrieve the other direct
-            for each connection item a or not.
-            retrieve_self_direct: Whether to retrieve the self direct
-            for each connection item a or not.
+            retrieve_other_direct: Whether to retrieve the
+                other direct for each
+                connection item a or not.
+            retrieve_self_direct: Whether to retrieve the
+                self direct for each
+                connection item a or not.
 
         Returns:
             The list of the source nodes of the query.

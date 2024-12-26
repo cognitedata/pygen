@@ -57,18 +57,24 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_asset_class: Whether to retrieve the asset clas
-            for each Cognite asset or not.
-            retrieve_object_3d: Whether to retrieve the object 3d
-            for each Cognite asset or not.
-            retrieve_parent: Whether to retrieve the parent
-            for each Cognite asset or not.
-            retrieve_root: Whether to retrieve the root
-            for each Cognite asset or not.
-            retrieve_source: Whether to retrieve the source
-            for each Cognite asset or not.
-            retrieve_type_: Whether to retrieve the type
-            for each Cognite asset or not.
+            retrieve_asset_class: Whether to retrieve the
+                asset clas for each
+                Cognite asset or not.
+            retrieve_object_3d: Whether to retrieve the
+                object 3d for each
+                Cognite asset or not.
+            retrieve_parent: Whether to retrieve the
+                parent for each
+                Cognite asset or not.
+            retrieve_root: Whether to retrieve the
+                root for each
+                Cognite asset or not.
+            retrieve_source: Whether to retrieve the
+                source for each
+                Cognite asset or not.
+            retrieve_type_: Whether to retrieve the
+                type for each
+                Cognite asset or not.
 
         Returns:
             The list of the source nodes of the query.

@@ -50,10 +50,12 @@ class SolarPanelQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_efficiency: Whether to retrieve the efficiency
-            for each solar panel or not.
-            retrieve_orientation: Whether to retrieve the orientation
-            for each solar panel or not.
+            retrieve_efficiency: Whether to retrieve the
+                efficiency for each
+                solar panel or not.
+            retrieve_orientation: Whether to retrieve the
+                orientation for each
+                solar panel or not.
 
         Returns:
             The list of the source nodes of the query.

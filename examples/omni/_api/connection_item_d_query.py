@@ -147,8 +147,9 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_direct_single: Whether to retrieve the direct single
-            for each connection item d or not.
+            retrieve_direct_single: Whether to retrieve the
+                direct single for each
+                connection item d or not.
 
         Returns:
             The list of the source nodes of the query.

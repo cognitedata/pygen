@@ -144,10 +144,12 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_nacelle: Whether to retrieve the nacelle
-            for each wind turbine or not.
-            retrieve_rotor: Whether to retrieve the rotor
-            for each wind turbine or not.
+            retrieve_nacelle: Whether to retrieve the
+                nacelle for each
+                wind turbine or not.
+            retrieve_rotor: Whether to retrieve the
+                rotor for each
+                wind turbine or not.
 
         Returns:
             The list of the source nodes of the query.
