@@ -38,7 +38,9 @@ class ConnectionItemEInwardsSingleAPI(EdgeAPI):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_e = client.connection_item_e.inwards_single_edge.list("my_connection_item_e", limit=5)
+                >>> connection_item_e = client.connection_item_e.inwards_single_edge.list(
+                ...     "my_connection_item_e", limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(

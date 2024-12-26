@@ -53,7 +53,9 @@ class MetmastWindTurbinesAPI(EdgePropertyAPI):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmast = client.metmast.wind_turbines_edge.list("my_metmast", limit=5)
+                >>> metmast = client.metmast.wind_turbines_edge.list(
+                ...     "my_metmast", limit=5
+                ... )
 
         """
         filter_ = _create_distance_filter(

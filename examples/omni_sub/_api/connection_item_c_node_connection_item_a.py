@@ -34,7 +34,9 @@ class ConnectionItemCNodeConnectionItemAAPI(EdgeAPI):
                 >>> from omni_sub import OmniSubClient
                 >>> from cognite.client import data_modeling as dm
                 >>> client = OmniSubClient()
-                >>> connection_item_c_node = client.connection_item_c_node.connection_item_a_edge.list(dm.NodeId("my_space", "my_connection_item_a"), limit=5)
+                >>> connection_item_c_node = client.connection_item_c_node.connection_item_a_edge.list(
+                ...     dm.NodeId("my_space", "my_connection_item_a"), limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(

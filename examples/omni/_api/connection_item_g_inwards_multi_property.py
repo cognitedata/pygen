@@ -63,7 +63,9 @@ class ConnectionItemGInwardsMultiPropertyAPI(EdgePropertyAPI):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_g = client.connection_item_g.inwards_multi_property_edge.list("my_connection_item_g", limit=5)
+                >>> connection_item_g = client.connection_item_g.inwards_multi_property_edge.list(
+                ...     "my_connection_item_g", limit=5
+                ... )
 
         """
         filter_ = _create_connection_edge_a_filter(

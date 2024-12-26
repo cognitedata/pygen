@@ -38,7 +38,9 @@ class DependentOnNonWritableToNonWritableAPI(EdgeAPI):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> dependent_on_non_writable = client.dependent_on_non_writable.to_non_writable_edge.list("my_dependent_on_non_writable", limit=5)
+                >>> dependent_on_non_writable = client.dependent_on_non_writable.to_non_writable_edge.list(
+                ...     "my_dependent_on_non_writable", limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(
