@@ -196,7 +196,9 @@ class {{ timeseries_api.query_class}}:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_array(start="2w-ago")
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(
+                ...     external_id="my_{{ timeseries_api.parent_attribute }}"
+                ... ).retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -303,7 +305,9 @@ class {{ timeseries_api.query_class}}:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_dataframe(start="2w-ago")
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(
+                ...     external_id="my_{{ timeseries_api.parent_attribute }}"
+                ... ).retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
