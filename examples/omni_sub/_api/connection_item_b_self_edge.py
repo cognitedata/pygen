@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from cognite.client import data_modeling as dm
 
 from omni_sub._api._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter

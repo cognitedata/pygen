@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union, no_type_check
+from collections.abc import Sequence
+from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
-from pydantic import model_validator
+from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import field_validator, model_validator
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -14,18 +14,27 @@ from wind_turbine.data_classes._core import (
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
-    FloatFilter,
+    DomainModelList,
+    DomainRelation,
+    DomainRelationWrite,
     GraphQLCore,
-    NodeQueryCore,
-    QueryCore,
     ResourcesWrite,
-    StringFilter,
     T_DomainModelList,
     as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
+    FloatFilter,
 )
+
 
 __all__ = [
     "GeneratingUnit",
@@ -317,6 +326,7 @@ class _GeneratingUnitQuery(NodeQueryCore[T_DomainModelList, GeneratingUnitList])
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
+
         super().__init__(
             created_types,
             creation_path,

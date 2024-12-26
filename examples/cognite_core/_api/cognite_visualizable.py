@@ -14,29 +14,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_visualizable_query import CogniteVisualizableQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DObject,
-    CogniteAsset,
-    CogniteVisualizable,
-    CogniteVisualizableFields,
-    CogniteVisualizableList,
-    CogniteVisualizableTextFields,
-    CogniteVisualizableWrite,
-    CogniteVisualizableWriteList,
-    DomainModel,
-    ResourcesWriteResult,
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from cognite_core.data_classes._cognite_visualizable import (
     CogniteVisualizableQuery,
     _create_cognite_visualizable_filter,
 )
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteVisualizable,
+    CogniteVisualizableWrite,
+    CogniteVisualizableFields,
+    CogniteVisualizableList,
+    CogniteVisualizableWriteList,
+    CogniteVisualizableTextFields,
+    Cognite3DObject,
+    CogniteAsset,
 )
+from cognite_core._api.cognite_visualizable_query import CogniteVisualizableQueryAPI
 
 
 class CogniteVisualizableAPI(

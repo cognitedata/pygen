@@ -1,9 +1,10 @@
-import datetime
-import difflib
 from collections.abc import Callable
+
+import difflib
 from typing import Any
 
 import pandas as pd
+import datetime
 from cognite.client import CogniteClient
 from cognite.client.data_classes.data_modeling.ids import NodeId
 from cognite.client.data_classes.datapoints import Aggregate

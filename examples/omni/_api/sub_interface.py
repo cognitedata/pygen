@@ -14,30 +14,34 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.sub_interface_query import SubInterfaceQueryAPI
-from omni.data_classes import (
-    DomainModel,
-    Implementation1,
-    Implementation1NonWriteable,
-    Implementation2,
-    ResourcesWriteResult,
-    SubInterface,
-    SubInterfaceFields,
-    SubInterfaceList,
-    SubInterfaceTextFields,
-    SubInterfaceWrite,
-    SubInterfaceWriteList,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._sub_interface import (
-    _SUBINTERFACE_PROPERTIES_BY_FIELD,
     SubInterfaceQuery,
+    _SUBINTERFACE_PROPERTIES_BY_FIELD,
     _create_sub_interface_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SubInterface,
+    SubInterfaceWrite,
+    SubInterfaceFields,
+    SubInterfaceList,
+    SubInterfaceWriteList,
+    SubInterfaceTextFields,
+    Implementation1,
+    Implementation1NonWriteable,
+    Implementation2,
+)
+from omni._api.sub_interface_query import SubInterfaceQueryAPI
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):

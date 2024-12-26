@@ -15,31 +15,35 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_file_query import CogniteFileQueryAPI
-from cognite_core.data_classes import (
-    CogniteAsset,
-    CogniteEquipment,
-    CogniteFile,
-    CogniteFileCategory,
-    CogniteFileFields,
-    CogniteFileList,
-    CogniteFileTextFields,
-    CogniteFileWrite,
-    CogniteFileWriteList,
-    CogniteSourceSystem,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_file import (
-    _COGNITEFILE_PROPERTIES_BY_FIELD,
-    CogniteFileQuery,
-    _create_cognite_file_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_file import (
+    CogniteFileQuery,
+    _COGNITEFILE_PROPERTIES_BY_FIELD,
+    _create_cognite_file_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteFile,
+    CogniteFileWrite,
+    CogniteFileFields,
+    CogniteFileList,
+    CogniteFileWriteList,
+    CogniteFileTextFields,
+    CogniteAsset,
+    CogniteEquipment,
+    CogniteFileCategory,
+    CogniteSourceSystem,
+)
+from cognite_core._api.cognite_file_query import CogniteFileQueryAPI
 
 
 class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, CogniteFileWriteList]):

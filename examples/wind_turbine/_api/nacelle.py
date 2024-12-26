@@ -14,33 +14,37 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.nacelle_query import NacelleQueryAPI
-from wind_turbine.data_classes import (
-    Gearbox,
-    Generator,
-    HighSpeedShaft,
-    MainShaft,
-    Nacelle,
-    NacelleFields,
-    NacelleList,
-    NacelleTextFields,
-    NacelleWrite,
-    NacelleWriteList,
-    PowerInverter,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-    WindTurbine,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._nacelle import (
     NacelleQuery,
     _create_nacelle_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Nacelle,
+    NacelleWrite,
+    NacelleFields,
+    NacelleList,
+    NacelleWriteList,
+    NacelleTextFields,
+    Gearbox,
+    Generator,
+    HighSpeedShaft,
+    MainShaft,
+    PowerInverter,
+    SensorTimeSeries,
+    WindTurbine,
+)
+from wind_turbine._api.nacelle_query import NacelleQueryAPI
 
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):

@@ -14,26 +14,31 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_asset_class_query import CogniteAssetClassQueryAPI
-from cognite_core.data_classes import (
-    CogniteAssetClass,
-    CogniteAssetClassFields,
-    CogniteAssetClassList,
-    CogniteAssetClassTextFields,
-    CogniteAssetClassWrite,
-    CogniteAssetClassWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_asset_class import (
-    _COGNITEASSETCLASS_PROPERTIES_BY_FIELD,
-    CogniteAssetClassQuery,
-    _create_cognite_asset_clas_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_asset_class import (
+    CogniteAssetClassQuery,
+    _COGNITEASSETCLASS_PROPERTIES_BY_FIELD,
+    _create_cognite_asset_clas_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteAssetClass,
+    CogniteAssetClassWrite,
+    CogniteAssetClassFields,
+    CogniteAssetClassList,
+    CogniteAssetClassWriteList,
+    CogniteAssetClassTextFields,
+)
+from cognite_core._api.cognite_asset_class_query import CogniteAssetClassQueryAPI
 
 
 class CogniteAssetClassAPI(

@@ -14,30 +14,34 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_point_cloud_volume_query import CognitePointCloudVolumeQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DObject,
-    CogniteCADModel,
-    CogniteCADRevision,
-    CognitePointCloudVolume,
-    CognitePointCloudVolumeFields,
-    CognitePointCloudVolumeList,
-    CognitePointCloudVolumeTextFields,
-    CognitePointCloudVolumeWrite,
-    CognitePointCloudVolumeWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_point_cloud_volume import (
-    _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD,
-    CognitePointCloudVolumeQuery,
-    _create_cognite_point_cloud_volume_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_point_cloud_volume import (
+    CognitePointCloudVolumeQuery,
+    _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD,
+    _create_cognite_point_cloud_volume_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CognitePointCloudVolume,
+    CognitePointCloudVolumeWrite,
+    CognitePointCloudVolumeFields,
+    CognitePointCloudVolumeList,
+    CognitePointCloudVolumeWriteList,
+    CognitePointCloudVolumeTextFields,
+    Cognite3DObject,
+    CogniteCADModel,
+    CogniteCADRevision,
+)
+from cognite_core._api.cognite_point_cloud_volume_query import CognitePointCloudVolumeQueryAPI
 
 
 class CognitePointCloudVolumeAPI(

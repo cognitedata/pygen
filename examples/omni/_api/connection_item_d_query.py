@@ -1,28 +1,29 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 
-from omni._api._core import (
-    QueryAPI,
-    _create_edge_filter,
-)
 from omni.data_classes import (
+    DomainModelCore,
     ConnectionItemD,
     ConnectionItemE,
+)
+from omni.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
+    EdgeQueryStep,
+    NodeQueryStep,
+    DataClassQueryBuilder,
 )
 from omni.data_classes._connection_item_e import (
     _create_connection_item_e_filter,
 )
-from omni.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
-    T_DomainModelList,
+from omni._api._core import (
+    QueryAPI,
+    _create_edge_filter,
 )
 
 if TYPE_CHECKING:

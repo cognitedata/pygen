@@ -14,29 +14,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_cube_map_query import CogniteCubeMapQueryAPI
-from cognite_core.data_classes import (
-    Cognite360Image,
-    CogniteCubeMap,
-    CogniteCubeMapFields,
-    CogniteCubeMapList,
-    CogniteCubeMapTextFields,
-    CogniteCubeMapWrite,
-    CogniteCubeMapWriteList,
-    CogniteFile,
-    DomainModel,
-    ResourcesWriteResult,
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from cognite_core.data_classes._cognite_cube_map import (
     CogniteCubeMapQuery,
     _create_cognite_cube_map_filter,
 )
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteCubeMap,
+    CogniteCubeMapWrite,
+    CogniteCubeMapFields,
+    CogniteCubeMapList,
+    CogniteCubeMapWriteList,
+    CogniteCubeMapTextFields,
+    CogniteFile,
+    Cognite360Image,
 )
+from cognite_core._api.cognite_cube_map_query import CogniteCubeMapQueryAPI
 
 
 class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCubeMapList, CogniteCubeMapWriteList]):

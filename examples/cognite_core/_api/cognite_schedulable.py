@@ -15,28 +15,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_schedulable_query import CogniteSchedulableQueryAPI
-from cognite_core.data_classes import (
-    CogniteActivity,
-    CogniteSchedulable,
-    CogniteSchedulableFields,
-    CogniteSchedulableList,
-    CogniteSchedulableTextFields,
-    CogniteSchedulableWrite,
-    CogniteSchedulableWriteList,
-    DomainModel,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_schedulable import (
-    _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD,
-    CogniteSchedulableQuery,
-    _create_cognite_schedulable_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_schedulable import (
+    CogniteSchedulableQuery,
+    _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD,
+    _create_cognite_schedulable_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteSchedulable,
+    CogniteSchedulableWrite,
+    CogniteSchedulableFields,
+    CogniteSchedulableList,
+    CogniteSchedulableWriteList,
+    CogniteSchedulableTextFields,
+    CogniteActivity,
+)
+from cognite_core._api.cognite_schedulable_query import CogniteSchedulableQueryAPI
 
 
 class CogniteSchedulableAPI(

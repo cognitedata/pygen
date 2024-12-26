@@ -15,30 +15,34 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_360_image_query import Cognite360ImageQueryAPI
-from cognite_core.data_classes import (
-    Cognite360Image,
-    Cognite360ImageCollection,
-    Cognite360ImageFields,
-    Cognite360ImageList,
-    Cognite360ImageStation,
-    Cognite360ImageTextFields,
-    Cognite360ImageWrite,
-    Cognite360ImageWriteList,
-    CogniteFile,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_360_image import (
-    _COGNITE360IMAGE_PROPERTIES_BY_FIELD,
-    Cognite360ImageQuery,
-    _create_cognite_360_image_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_360_image import (
+    Cognite360ImageQuery,
+    _COGNITE360IMAGE_PROPERTIES_BY_FIELD,
+    _create_cognite_360_image_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite360Image,
+    Cognite360ImageWrite,
+    Cognite360ImageFields,
+    Cognite360ImageList,
+    Cognite360ImageWriteList,
+    Cognite360ImageTextFields,
+    Cognite360ImageCollection,
+    Cognite360ImageStation,
+    CogniteFile,
+)
+from cognite_core._api.cognite_360_image_query import Cognite360ImageQueryAPI
 
 
 class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite360ImageList, Cognite360ImageWriteList]):

@@ -14,29 +14,33 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.generating_unit_query import GeneratingUnitQueryAPI
-from wind_turbine.data_classes import (
-    DomainModel,
-    GeneratingUnit,
-    GeneratingUnitFields,
-    GeneratingUnitList,
-    GeneratingUnitTextFields,
-    GeneratingUnitWrite,
-    GeneratingUnitWriteList,
-    ResourcesWriteResult,
-    SolarPanel,
-    WindTurbine,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._generating_unit import (
-    _GENERATINGUNIT_PROPERTIES_BY_FIELD,
     GeneratingUnitQuery,
+    _GENERATINGUNIT_PROPERTIES_BY_FIELD,
     _create_generating_unit_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    GeneratingUnit,
+    GeneratingUnitWrite,
+    GeneratingUnitFields,
+    GeneratingUnitList,
+    GeneratingUnitWriteList,
+    GeneratingUnitTextFields,
+    SolarPanel,
+    WindTurbine,
+)
+from wind_turbine._api.generating_unit_query import GeneratingUnitQueryAPI
 
 
 class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingUnitList, GeneratingUnitWriteList]):

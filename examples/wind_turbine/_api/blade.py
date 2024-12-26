@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.blade_query import BladeQueryAPI
-from wind_turbine.data_classes import (
-    Blade,
-    BladeFields,
-    BladeList,
-    BladeTextFields,
-    BladeWrite,
-    BladeWriteList,
-    ResourcesWriteResult,
-    SensorPosition,
-)
-from wind_turbine.data_classes._blade import (
-    _BLADE_PROPERTIES_BY_FIELD,
-    BladeQuery,
-    _create_blade_filter,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from wind_turbine.data_classes._blade import (
+    BladeQuery,
+    _BLADE_PROPERTIES_BY_FIELD,
+    _create_blade_filter,
+)
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Blade,
+    BladeWrite,
+    BladeFields,
+    BladeList,
+    BladeWriteList,
+    BladeTextFields,
+    SensorPosition,
+)
+from wind_turbine._api.blade_query import BladeQueryAPI
 
 
 class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):

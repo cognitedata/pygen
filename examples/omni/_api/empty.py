@@ -15,26 +15,31 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.empty_query import EmptyQueryAPI
-from omni.data_classes import (
-    Empty,
-    EmptyFields,
-    EmptyList,
-    EmptyTextFields,
-    EmptyWrite,
-    EmptyWriteList,
-    ResourcesWriteResult,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._empty import (
-    _EMPTY_PROPERTIES_BY_FIELD,
     EmptyQuery,
+    _EMPTY_PROPERTIES_BY_FIELD,
     _create_empty_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Empty,
+    EmptyWrite,
+    EmptyFields,
+    EmptyList,
+    EmptyWriteList,
+    EmptyTextFields,
+)
+from omni._api.empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):

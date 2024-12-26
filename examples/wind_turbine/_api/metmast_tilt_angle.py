@@ -13,8 +13,8 @@ from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
 
 from wind_turbine._api._core import DEFAULT_LIMIT_READ
-from wind_turbine.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
 from wind_turbine.data_classes._metmast import _create_metmast_filter
+from wind_turbine.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
 
 ColumnNames = Literal["position", "temperature", "tilt_angle", "wind_speed"]
 

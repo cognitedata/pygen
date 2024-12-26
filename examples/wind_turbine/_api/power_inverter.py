@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.power_inverter_query import PowerInverterQueryAPI
-from wind_turbine.data_classes import (
-    Nacelle,
-    PowerInverter,
-    PowerInverterFields,
-    PowerInverterList,
-    PowerInverterTextFields,
-    PowerInverterWrite,
-    PowerInverterWriteList,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._power_inverter import (
     PowerInverterQuery,
     _create_power_inverter_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    PowerInverter,
+    PowerInverterWrite,
+    PowerInverterFields,
+    PowerInverterList,
+    PowerInverterWriteList,
+    PowerInverterTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine._api.power_inverter_query import PowerInverterQueryAPI
 
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterList, PowerInverterWriteList]):

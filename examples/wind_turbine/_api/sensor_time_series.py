@@ -14,26 +14,31 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.sensor_time_series_query import SensorTimeSeriesQueryAPI
-from wind_turbine.data_classes import (
-    ResourcesWriteResult,
-    SensorTimeSeries,
-    SensorTimeSeriesFields,
-    SensorTimeSeriesList,
-    SensorTimeSeriesTextFields,
-    SensorTimeSeriesWrite,
-    SensorTimeSeriesWriteList,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._sensor_time_series import (
-    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
     SensorTimeSeriesQuery,
+    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
     _create_sensor_time_series_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SensorTimeSeries,
+    SensorTimeSeriesWrite,
+    SensorTimeSeriesFields,
+    SensorTimeSeriesList,
+    SensorTimeSeriesWriteList,
+    SensorTimeSeriesTextFields,
+)
+from wind_turbine._api.sensor_time_series_query import SensorTimeSeriesQueryAPI
 
 
 class SensorTimeSeriesAPI(

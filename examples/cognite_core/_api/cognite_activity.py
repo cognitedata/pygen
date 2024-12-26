@@ -15,31 +15,35 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_activity_query import CogniteActivityQueryAPI
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes._cognite_activity import (
+    CogniteActivityQuery,
+    _COGNITEACTIVITY_PROPERTIES_BY_FIELD,
+    _create_cognite_activity_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
     CogniteActivity,
+    CogniteActivityWrite,
     CogniteActivityFields,
     CogniteActivityList,
-    CogniteActivityTextFields,
-    CogniteActivityWrite,
     CogniteActivityWriteList,
+    CogniteActivityTextFields,
     CogniteAsset,
     CogniteEquipment,
     CogniteSourceSystem,
     CogniteTimeSeries,
-    ResourcesWriteResult,
 )
-from cognite_core.data_classes._cognite_activity import (
-    _COGNITEACTIVITY_PROPERTIES_BY_FIELD,
-    CogniteActivityQuery,
-    _create_cognite_activity_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
+from cognite_core._api.cognite_activity_query import CogniteActivityQueryAPI
 
 
 class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteActivityList, CogniteActivityWriteList]):

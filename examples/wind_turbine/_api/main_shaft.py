@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.main_shaft_query import MainShaftQueryAPI
-from wind_turbine.data_classes import (
-    MainShaft,
-    MainShaftFields,
-    MainShaftList,
-    MainShaftTextFields,
-    MainShaftWrite,
-    MainShaftWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._main_shaft import (
     MainShaftQuery,
     _create_main_shaft_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    MainShaft,
+    MainShaftWrite,
+    MainShaftFields,
+    MainShaftList,
+    MainShaftWriteList,
+    MainShaftTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine._api.main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):

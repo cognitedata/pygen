@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.high_speed_shaft_query import HighSpeedShaftQueryAPI
-from wind_turbine.data_classes import (
-    HighSpeedShaft,
-    HighSpeedShaftFields,
-    HighSpeedShaftList,
-    HighSpeedShaftTextFields,
-    HighSpeedShaftWrite,
-    HighSpeedShaftWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._high_speed_shaft import (
     HighSpeedShaftQuery,
     _create_high_speed_shaft_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    HighSpeedShaft,
+    HighSpeedShaftWrite,
+    HighSpeedShaftFields,
+    HighSpeedShaftList,
+    HighSpeedShaftWriteList,
+    HighSpeedShaftTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine._api.high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedShaftList, HighSpeedShaftWriteList]):

@@ -14,29 +14,33 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_cad_model_query import CogniteCADModelQueryAPI
-from cognite_core.data_classes import (
-    CogniteCADModel,
-    CogniteCADModelFields,
-    CogniteCADModelList,
-    CogniteCADModelTextFields,
-    CogniteCADModelWrite,
-    CogniteCADModelWriteList,
-    CogniteCADRevision,
-    CogniteFile,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_cad_model import (
-    _COGNITECADMODEL_PROPERTIES_BY_FIELD,
-    CogniteCADModelQuery,
-    _create_cognite_cad_model_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_cad_model import (
+    CogniteCADModelQuery,
+    _COGNITECADMODEL_PROPERTIES_BY_FIELD,
+    _create_cognite_cad_model_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteCADModel,
+    CogniteCADModelWrite,
+    CogniteCADModelFields,
+    CogniteCADModelList,
+    CogniteCADModelWriteList,
+    CogniteCADModelTextFields,
+    CogniteCADRevision,
+    CogniteFile,
+)
+from cognite_core._api.cognite_cad_model_query import CogniteCADModelQueryAPI
 
 
 class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteCADModelList, CogniteCADModelWriteList]):

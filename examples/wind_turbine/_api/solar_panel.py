@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.solar_panel_query import SolarPanelQueryAPI
-from wind_turbine.data_classes import (
-    ResourcesWriteResult,
-    SensorTimeSeries,
-    SolarPanel,
-    SolarPanelFields,
-    SolarPanelList,
-    SolarPanelTextFields,
-    SolarPanelWrite,
-    SolarPanelWriteList,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._solar_panel import (
-    _SOLARPANEL_PROPERTIES_BY_FIELD,
     SolarPanelQuery,
+    _SOLARPANEL_PROPERTIES_BY_FIELD,
     _create_solar_panel_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SolarPanel,
+    SolarPanelWrite,
+    SolarPanelFields,
+    SolarPanelList,
+    SolarPanelWriteList,
+    SolarPanelTextFields,
+    SensorTimeSeries,
+)
+from wind_turbine._api.solar_panel_query import SolarPanelQueryAPI
 
 
 class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPanelWriteList]):

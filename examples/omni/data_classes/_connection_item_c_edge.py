@@ -1,27 +1,43 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Literal, Optional, Union, no_type_check
+import warnings
+from collections.abc import Sequence
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
+    DataRecordWrite,
+    DomainModel,
+    DomainModelCore,
     DomainModelWrite,
     DomainRelation,
+    DomainRelationWrite,
     DomainRelationList,
-    EdgeQueryCore,
+    DomainRelationWriteList,
     GraphQLCore,
+    ResourcesWrite,
+    DomainModelList,
+    T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
+    EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
-    T_DomainList,
+    StringFilter,
 )
 
 if TYPE_CHECKING:
-    from omni.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL
-    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL
+    from omni.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
+    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [

@@ -3,39 +3,48 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
-from cognite_core.data_classes._cognite_describable_edge import CogniteDescribableEdge, CogniteDescribableEdgeWrite
-from cognite_core.data_classes._cognite_sourceable_edge import CogniteSourceableEdge, CogniteSourceableEdgeWrite
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
     DomainModel,
+    DomainModelCore,
     DomainModelWrite,
-    DomainRelationList,
+    DomainRelation,
     DomainRelationWrite,
+    DomainRelationList,
     DomainRelationWriteList,
-    EdgeQueryCore,
-    FloatFilter,
     GraphQLCore,
+    ResourcesWrite,
+    DomainModelList,
+    T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
+    EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
-    ResourcesWrite,
     StringFilter,
-    T_DomainList,
+    FloatFilter,
     TimestampFilter,
-    as_instance_dict_id,
-    is_tuple_id,
 )
+from cognite_core.data_classes._cognite_describable_edge import CogniteDescribableEdge, CogniteDescribableEdgeWrite
+from cognite_core.data_classes._cognite_sourceable_edge import CogniteSourceableEdge, CogniteSourceableEdgeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_source_system import (
+        CogniteSourceSystem,
         CogniteSourceSystemGraphQL,
+        CogniteSourceSystemWrite,
     )
 
 

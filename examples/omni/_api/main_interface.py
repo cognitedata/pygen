@@ -14,29 +14,33 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.main_interface_query import MainInterfaceQueryAPI
-from omni.data_classes import (
-    DomainModel,
-    Implementation1,
-    MainInterface,
-    MainInterfaceFields,
-    MainInterfaceList,
-    MainInterfaceTextFields,
-    MainInterfaceWrite,
-    MainInterfaceWriteList,
-    ResourcesWriteResult,
-    SubInterface,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._main_interface import (
-    _MAININTERFACE_PROPERTIES_BY_FIELD,
     MainInterfaceQuery,
+    _MAININTERFACE_PROPERTIES_BY_FIELD,
     _create_main_interface_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    MainInterface,
+    MainInterfaceWrite,
+    MainInterfaceFields,
+    MainInterfaceList,
+    MainInterfaceWriteList,
+    MainInterfaceTextFields,
+    Implementation1,
+    SubInterface,
+)
+from omni._api.main_interface_query import MainInterfaceQueryAPI
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):

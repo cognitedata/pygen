@@ -15,34 +15,37 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_sourceable_node_query import CogniteSourceableNodeQueryAPI
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes._cognite_sourceable_node import (
+    CogniteSourceableNodeQuery,
+    _COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD,
+    _create_cognite_sourceable_node_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteSourceableNode,
+    CogniteSourceableNodeWrite,
+    CogniteSourceableNodeFields,
+    CogniteSourceableNodeList,
+    CogniteSourceableNodeWriteList,
+    CogniteSourceableNodeTextFields,
+    CogniteSourceSystem,
     CogniteActivity,
     CogniteAsset,
     CogniteEquipment,
     CogniteFile,
-    CogniteSourceableNode,
-    CogniteSourceableNodeFields,
-    CogniteSourceableNodeList,
-    CogniteSourceableNodeTextFields,
-    CogniteSourceableNodeWrite,
-    CogniteSourceableNodeWriteList,
-    CogniteSourceSystem,
     CogniteTimeSeries,
-    DomainModel,
-    ResourcesWriteResult,
 )
-from cognite_core.data_classes._cognite_sourceable_node import (
-    _COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD,
-    CogniteSourceableNodeQuery,
-    _create_cognite_sourceable_node_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
+from cognite_core._api.cognite_sourceable_node_query import CogniteSourceableNodeQueryAPI
 
 
 class CogniteSourceableNodeAPI(

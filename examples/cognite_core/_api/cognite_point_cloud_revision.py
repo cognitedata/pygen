@@ -14,28 +14,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_point_cloud_revision_query import CognitePointCloudRevisionQueryAPI
-from cognite_core.data_classes import (
-    CognitePointCloudModel,
-    CognitePointCloudRevision,
-    CognitePointCloudRevisionFields,
-    CognitePointCloudRevisionList,
-    CognitePointCloudRevisionTextFields,
-    CognitePointCloudRevisionWrite,
-    CognitePointCloudRevisionWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_point_cloud_revision import (
-    _COGNITEPOINTCLOUDREVISION_PROPERTIES_BY_FIELD,
-    CognitePointCloudRevisionQuery,
-    _create_cognite_point_cloud_revision_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_point_cloud_revision import (
+    CognitePointCloudRevisionQuery,
+    _COGNITEPOINTCLOUDREVISION_PROPERTIES_BY_FIELD,
+    _create_cognite_point_cloud_revision_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CognitePointCloudRevision,
+    CognitePointCloudRevisionWrite,
+    CognitePointCloudRevisionFields,
+    CognitePointCloudRevisionList,
+    CognitePointCloudRevisionWriteList,
+    CognitePointCloudRevisionTextFields,
+    CognitePointCloudModel,
+)
+from cognite_core._api.cognite_point_cloud_revision_query import CognitePointCloudRevisionQueryAPI
 
 
 class CognitePointCloudRevisionAPI(

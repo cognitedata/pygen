@@ -14,30 +14,33 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
-from omni._api.connection_item_d_query import ConnectionItemDQueryAPI
-from omni.data_classes import (
-    ConnectionItemD,
-    ConnectionItemDFields,
-    ConnectionItemDList,
-    ConnectionItemDTextFields,
-    ConnectionItemDWrite,
-    ConnectionItemDWriteList,
-    ConnectionItemE,
-    ResourcesWriteResult,
-)
-from omni.data_classes._connection_item_d import (
-    _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
-    ConnectionItemDQuery,
-    _create_connection_item_d_filter,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from omni.data_classes._connection_item_d import (
+    ConnectionItemDQuery,
+    _CONNECTIONITEMD_PROPERTIES_BY_FIELD,
+    _create_connection_item_d_filter,
+)
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemD,
+    ConnectionItemDWrite,
+    ConnectionItemDFields,
+    ConnectionItemDList,
+    ConnectionItemDWriteList,
+    ConnectionItemDTextFields,
+    ConnectionItemE,
+)
+from omni._api.connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
+from omni._api.connection_item_d_query import ConnectionItemDQueryAPI
 
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):

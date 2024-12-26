@@ -14,27 +14,32 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.cdf_external_references_listed_query import CDFExternalReferencesListedQueryAPI
-from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
-from omni.data_classes import (
-    CDFExternalReferencesListed,
-    CDFExternalReferencesListedFields,
-    CDFExternalReferencesListedList,
-    CDFExternalReferencesListedTextFields,
-    CDFExternalReferencesListedWrite,
-    CDFExternalReferencesListedWriteList,
-    ResourcesWriteResult,
-)
-from omni.data_classes._cdf_external_references_listed import (
-    _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
-    CDFExternalReferencesListedQuery,
-    _create_cdf_external_references_listed_filter,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni.data_classes._cdf_external_references_listed import (
+    CDFExternalReferencesListedQuery,
+    _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD,
+    _create_cdf_external_references_listed_filter,
+)
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CDFExternalReferencesListed,
+    CDFExternalReferencesListedWrite,
+    CDFExternalReferencesListedFields,
+    CDFExternalReferencesListedList,
+    CDFExternalReferencesListedWriteList,
+    CDFExternalReferencesListedTextFields,
+)
+from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
+from omni._api.cdf_external_references_listed_query import CDFExternalReferencesListedQueryAPI
 
 
 class CDFExternalReferencesListedAPI(

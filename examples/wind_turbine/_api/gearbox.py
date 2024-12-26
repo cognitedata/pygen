@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.gearbox_query import GearboxQueryAPI
-from wind_turbine.data_classes import (
-    Gearbox,
-    GearboxFields,
-    GearboxList,
-    GearboxTextFields,
-    GearboxWrite,
-    GearboxWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._gearbox import (
     GearboxQuery,
     _create_gearbox_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Gearbox,
+    GearboxWrite,
+    GearboxFields,
+    GearboxList,
+    GearboxWriteList,
+    GearboxTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine._api.gearbox_query import GearboxQueryAPI
 
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):

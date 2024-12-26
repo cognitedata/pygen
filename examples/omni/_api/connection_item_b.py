@@ -14,31 +14,34 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.connection_item_b_inwards import ConnectionItemBInwardsAPI
-from omni._api.connection_item_b_query import ConnectionItemBQueryAPI
-from omni._api.connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
-from omni.data_classes import (
-    ConnectionItemA,
-    ConnectionItemB,
-    ConnectionItemBFields,
-    ConnectionItemBList,
-    ConnectionItemBTextFields,
-    ConnectionItemBWrite,
-    ConnectionItemBWriteList,
-    ResourcesWriteResult,
-)
-from omni.data_classes._connection_item_b import (
-    _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
-    ConnectionItemBQuery,
-    _create_connection_item_b_filter,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from omni.data_classes._connection_item_b import (
+    ConnectionItemBQuery,
+    _CONNECTIONITEMB_PROPERTIES_BY_FIELD,
+    _create_connection_item_b_filter,
+)
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemB,
+    ConnectionItemBWrite,
+    ConnectionItemBFields,
+    ConnectionItemBList,
+    ConnectionItemBWriteList,
+    ConnectionItemBTextFields,
+    ConnectionItemA,
+)
+from omni._api.connection_item_b_inwards import ConnectionItemBInwardsAPI
+from omni._api.connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
+from omni._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList, ConnectionItemBWriteList]):

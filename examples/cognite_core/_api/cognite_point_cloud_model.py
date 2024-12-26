@@ -14,29 +14,33 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_point_cloud_model_query import CognitePointCloudModelQueryAPI
-from cognite_core.data_classes import (
-    CogniteFile,
-    CognitePointCloudModel,
-    CognitePointCloudModelFields,
-    CognitePointCloudModelList,
-    CognitePointCloudModelTextFields,
-    CognitePointCloudModelWrite,
-    CognitePointCloudModelWriteList,
-    CognitePointCloudRevision,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_point_cloud_model import (
-    _COGNITEPOINTCLOUDMODEL_PROPERTIES_BY_FIELD,
-    CognitePointCloudModelQuery,
-    _create_cognite_point_cloud_model_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_point_cloud_model import (
+    CognitePointCloudModelQuery,
+    _COGNITEPOINTCLOUDMODEL_PROPERTIES_BY_FIELD,
+    _create_cognite_point_cloud_model_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CognitePointCloudModel,
+    CognitePointCloudModelWrite,
+    CognitePointCloudModelFields,
+    CognitePointCloudModelList,
+    CognitePointCloudModelWriteList,
+    CognitePointCloudModelTextFields,
+    CogniteFile,
+    CognitePointCloudRevision,
+)
+from cognite_core._api.cognite_point_cloud_model_query import CognitePointCloudModelQueryAPI
 
 
 class CognitePointCloudModelAPI(

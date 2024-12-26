@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from cognite.client import data_modeling as dm
 
-from wind_turbine._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 from wind_turbine.data_classes import (
     Distance,
     DistanceList,
     DistanceWrite,
 )
-from wind_turbine.data_classes._core import DEFAULT_INSTANCE_SPACE
 from wind_turbine.data_classes._distance import _create_distance_filter
+
+from wind_turbine._api._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
+from wind_turbine.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WindTurbineMetmastAPI(EdgePropertyAPI):

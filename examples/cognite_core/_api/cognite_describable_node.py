@@ -14,25 +14,40 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_describable_node_query import CogniteDescribableNodeQueryAPI
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes._cognite_describable_node import (
+    CogniteDescribableNodeQuery,
+    _COGNITEDESCRIBABLENODE_PROPERTIES_BY_FIELD,
+    _create_cognite_describable_node_filter,
+)
 from cognite_core.data_classes import (
-    Cognite3DModel,
-    Cognite3DObject,
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteDescribableNode,
+    CogniteDescribableNodeWrite,
+    CogniteDescribableNodeFields,
+    CogniteDescribableNodeList,
+    CogniteDescribableNodeWriteList,
+    CogniteDescribableNodeTextFields,
     Cognite360ImageCollection,
     Cognite360ImageModel,
     Cognite360ImageStation,
+    Cognite3DModel,
+    Cognite3DObject,
     CogniteActivity,
     CogniteAsset,
     CogniteAssetClass,
     CogniteAssetType,
     CogniteCADModel,
     CogniteCADNode,
-    CogniteDescribableNode,
-    CogniteDescribableNodeFields,
-    CogniteDescribableNodeList,
-    CogniteDescribableNodeTextFields,
-    CogniteDescribableNodeWrite,
-    CogniteDescribableNodeWriteList,
     CogniteEquipment,
     CogniteEquipmentType,
     CogniteFile,
@@ -42,19 +57,8 @@ from cognite_core.data_classes import (
     CogniteSourceSystem,
     CogniteTimeSeries,
     CogniteUnit,
-    DomainModel,
-    ResourcesWriteResult,
 )
-from cognite_core.data_classes._cognite_describable_node import (
-    _COGNITEDESCRIBABLENODE_PROPERTIES_BY_FIELD,
-    CogniteDescribableNodeQuery,
-    _create_cognite_describable_node_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-)
+from cognite_core._api.cognite_describable_node_query import CogniteDescribableNodeQueryAPI
 
 
 class CogniteDescribableNodeAPI(

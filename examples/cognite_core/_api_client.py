@@ -12,14 +12,14 @@ from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeri
 
 from cognite_core import data_classes
 from cognite_core._api import (
-    Cognite3DModelAPI,
-    Cognite3DObjectAPI,
-    Cognite3DRevisionAPI,
-    Cognite3DTransformationNodeAPI,
     Cognite360ImageAPI,
     Cognite360ImageCollectionAPI,
     Cognite360ImageModelAPI,
     Cognite360ImageStationAPI,
+    Cognite3DModelAPI,
+    Cognite3DObjectAPI,
+    Cognite3DRevisionAPI,
+    Cognite3DTransformationNodeAPI,
     CogniteActivityAPI,
     CogniteAssetAPI,
     CogniteAssetClassAPI,
@@ -37,8 +37,8 @@ from cognite_core._api import (
     CognitePointCloudRevisionAPI,
     CognitePointCloudVolumeAPI,
     CogniteSchedulableAPI,
-    CogniteSourceableNodeAPI,
     CogniteSourceSystemAPI,
+    CogniteSourceableNodeAPI,
     CogniteTimeSeriesAPI,
     CogniteUnitAPI,
     CogniteVisualizableAPI,

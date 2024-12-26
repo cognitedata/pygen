@@ -14,26 +14,31 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_unit_query import CogniteUnitQueryAPI
-from cognite_core.data_classes import (
-    CogniteUnit,
-    CogniteUnitFields,
-    CogniteUnitList,
-    CogniteUnitTextFields,
-    CogniteUnitWrite,
-    CogniteUnitWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_unit import (
-    _COGNITEUNIT_PROPERTIES_BY_FIELD,
-    CogniteUnitQuery,
-    _create_cognite_unit_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_unit import (
+    CogniteUnitQuery,
+    _COGNITEUNIT_PROPERTIES_BY_FIELD,
+    _create_cognite_unit_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteUnit,
+    CogniteUnitWrite,
+    CogniteUnitFields,
+    CogniteUnitList,
+    CogniteUnitWriteList,
+    CogniteUnitTextFields,
+)
+from cognite_core._api.cognite_unit_query import CogniteUnitQueryAPI
 
 
 class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, CogniteUnitWriteList]):

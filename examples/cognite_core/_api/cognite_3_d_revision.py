@@ -14,32 +14,35 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_3_d_revision_query import Cognite3DRevisionQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DModel,
-    Cognite3DRevision,
-    Cognite3DRevisionFields,
-    Cognite3DRevisionList,
-    Cognite3DRevisionTextFields,
-    Cognite3DRevisionWrite,
-    Cognite3DRevisionWriteList,
-    Cognite360ImageCollection,
-    CogniteCADRevision,
-    CognitePointCloudRevision,
-    DomainModel,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_3_d_revision import (
-    _COGNITE3DREVISION_PROPERTIES_BY_FIELD,
-    Cognite3DRevisionQuery,
-    _create_cognite_3_d_revision_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_3_d_revision import (
+    Cognite3DRevisionQuery,
+    _COGNITE3DREVISION_PROPERTIES_BY_FIELD,
+    _create_cognite_3_d_revision_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite3DRevision,
+    Cognite3DRevisionWrite,
+    Cognite3DRevisionFields,
+    Cognite3DRevisionList,
+    Cognite3DRevisionWriteList,
+    Cognite3DRevisionTextFields,
+    Cognite3DModel,
+    Cognite360ImageCollection,
+    CogniteCADRevision,
+    CognitePointCloudRevision,
+)
+from cognite_core._api.cognite_3_d_revision_query import Cognite3DRevisionQueryAPI
 
 
 class Cognite3DRevisionAPI(

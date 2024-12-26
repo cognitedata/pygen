@@ -14,31 +14,37 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
-from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
-from omni.data_classes import (
-    ConnectionEdgeA,
-    ConnectionItemF,
-    ConnectionItemG,
-    ConnectionItemGFields,
-    ConnectionItemGList,
-    ConnectionItemGTextFields,
-    ConnectionItemGWrite,
-    ConnectionItemGWriteList,
-    ResourcesWriteResult,
-)
-from omni.data_classes._connection_item_g import (
-    _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
-    ConnectionItemGQuery,
-    _create_connection_item_g_filter,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from omni.data_classes._connection_item_g import (
+    ConnectionItemGQuery,
+    _CONNECTIONITEMG_PROPERTIES_BY_FIELD,
+    _create_connection_item_g_filter,
+)
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemG,
+    ConnectionItemGWrite,
+    ConnectionItemGFields,
+    ConnectionItemGList,
+    ConnectionItemGWriteList,
+    ConnectionItemGTextFields,
+    ConnectionEdgeA,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAList,
+    ConnectionEdgeA,
+    ConnectionItemF,
+)
+from omni._api.connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
+from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList, ConnectionItemGWriteList]):

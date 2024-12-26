@@ -14,28 +14,32 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.generator_query import GeneratorQueryAPI
-from wind_turbine.data_classes import (
-    Generator,
-    GeneratorFields,
-    GeneratorList,
-    GeneratorTextFields,
-    GeneratorWrite,
-    GeneratorWriteList,
-    Nacelle,
-    ResourcesWriteResult,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._generator import (
     GeneratorQuery,
     _create_generator_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Generator,
+    GeneratorWrite,
+    GeneratorFields,
+    GeneratorList,
+    GeneratorWriteList,
+    GeneratorTextFields,
+    Nacelle,
+    SensorTimeSeries,
+)
+from wind_turbine._api.generator_query import GeneratorQueryAPI
 
 
 class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWriteList]):

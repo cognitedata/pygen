@@ -15,26 +15,31 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.primitive_nullable_query import PrimitiveNullableQueryAPI
-from omni.data_classes import (
-    PrimitiveNullable,
-    PrimitiveNullableFields,
-    PrimitiveNullableList,
-    PrimitiveNullableTextFields,
-    PrimitiveNullableWrite,
-    PrimitiveNullableWriteList,
-    ResourcesWriteResult,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._primitive_nullable import (
-    _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
     PrimitiveNullableQuery,
+    _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD,
     _create_primitive_nullable_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    PrimitiveNullable,
+    PrimitiveNullableWrite,
+    PrimitiveNullableFields,
+    PrimitiveNullableList,
+    PrimitiveNullableWriteList,
+    PrimitiveNullableTextFields,
+)
+from omni._api.primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
 class PrimitiveNullableAPI(

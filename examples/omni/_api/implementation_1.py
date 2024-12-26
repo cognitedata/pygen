@@ -14,26 +14,31 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.implementation_1_query import Implementation1QueryAPI
-from omni.data_classes import (
-    Implementation1,
-    Implementation1Fields,
-    Implementation1List,
-    Implementation1TextFields,
-    Implementation1Write,
-    Implementation1WriteList,
-    ResourcesWriteResult,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._implementation_1 import (
-    _IMPLEMENTATION1_PROPERTIES_BY_FIELD,
     Implementation1Query,
+    _IMPLEMENTATION1_PROPERTIES_BY_FIELD,
     _create_implementation_1_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Implementation1,
+    Implementation1Write,
+    Implementation1Fields,
+    Implementation1List,
+    Implementation1WriteList,
+    Implementation1TextFields,
+)
+from omni._api.implementation_1_query import Implementation1QueryAPI
 
 
 class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implementation1List, Implementation1WriteList]):

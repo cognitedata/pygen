@@ -14,33 +14,39 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
-from omni._api.connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
-from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
-from omni.data_classes import (
-    ConnectionEdgeA,
-    ConnectionItemD,
-    ConnectionItemE,
-    ConnectionItemEFields,
-    ConnectionItemEList,
-    ConnectionItemETextFields,
-    ConnectionItemEWrite,
-    ConnectionItemEWriteList,
-    ConnectionItemF,
-    ResourcesWriteResult,
-)
-from omni.data_classes._connection_item_e import (
-    _CONNECTIONITEME_PROPERTIES_BY_FIELD,
-    ConnectionItemEQuery,
-    _create_connection_item_e_filter,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from omni.data_classes._connection_item_e import (
+    ConnectionItemEQuery,
+    _CONNECTIONITEME_PROPERTIES_BY_FIELD,
+    _create_connection_item_e_filter,
+)
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemE,
+    ConnectionItemEWrite,
+    ConnectionItemEFields,
+    ConnectionItemEList,
+    ConnectionItemEWriteList,
+    ConnectionItemETextFields,
+    ConnectionEdgeA,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAList,
+    ConnectionEdgeA,
+    ConnectionItemD,
+    ConnectionItemF,
+)
+from omni._api.connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
+from omni._api.connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
+from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, ConnectionItemEList, ConnectionItemEWriteList]):

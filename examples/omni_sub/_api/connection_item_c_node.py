@@ -14,30 +14,33 @@ from omni_sub._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni_sub._api.connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
-from omni_sub._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
-from omni_sub._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
-from omni_sub.data_classes import (
-    ConnectionItemA,
-    ConnectionItemB,
-    ConnectionItemCNode,
-    ConnectionItemCNodeFields,
-    ConnectionItemCNodeList,
-    ConnectionItemCNodeTextFields,
-    ConnectionItemCNodeWrite,
-    ConnectionItemCNodeWriteList,
-    ResourcesWriteResult,
+from omni_sub.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from omni_sub.data_classes._connection_item_c_node import (
     ConnectionItemCNodeQuery,
     _create_connection_item_c_node_filter,
 )
-from omni_sub.data_classes._core import (
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
-    NodeQueryStep,
+from omni_sub.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    ConnectionItemCNode,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeFields,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeWriteList,
+    ConnectionItemCNodeTextFields,
+    ConnectionItemA,
+    ConnectionItemB,
 )
+from omni_sub._api.connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
+from omni_sub._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
+from omni_sub._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 
 
 class ConnectionItemCNodeAPI(

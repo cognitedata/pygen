@@ -15,26 +15,31 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.data_sheet_query import DataSheetQueryAPI
-from wind_turbine.data_classes import (
-    DataSheet,
-    DataSheetFields,
-    DataSheetList,
-    DataSheetTextFields,
-    DataSheetWrite,
-    DataSheetWriteList,
-    ResourcesWriteResult,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._data_sheet import (
-    _DATASHEET_PROPERTIES_BY_FIELD,
     DataSheetQuery,
+    _DATASHEET_PROPERTIES_BY_FIELD,
     _create_data_sheet_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    DataSheet,
+    DataSheetWrite,
+    DataSheetFields,
+    DataSheetList,
+    DataSheetWriteList,
+    DataSheetTextFields,
+)
+from wind_turbine._api.data_sheet_query import DataSheetQueryAPI
 
 
 class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWriteList]):

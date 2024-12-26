@@ -14,26 +14,31 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_equipment_type_query import CogniteEquipmentTypeQueryAPI
-from cognite_core.data_classes import (
-    CogniteEquipmentType,
-    CogniteEquipmentTypeFields,
-    CogniteEquipmentTypeList,
-    CogniteEquipmentTypeTextFields,
-    CogniteEquipmentTypeWrite,
-    CogniteEquipmentTypeWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_equipment_type import (
-    _COGNITEEQUIPMENTTYPE_PROPERTIES_BY_FIELD,
-    CogniteEquipmentTypeQuery,
-    _create_cognite_equipment_type_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_equipment_type import (
+    CogniteEquipmentTypeQuery,
+    _COGNITEEQUIPMENTTYPE_PROPERTIES_BY_FIELD,
+    _create_cognite_equipment_type_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteEquipmentType,
+    CogniteEquipmentTypeWrite,
+    CogniteEquipmentTypeFields,
+    CogniteEquipmentTypeList,
+    CogniteEquipmentTypeWriteList,
+    CogniteEquipmentTypeTextFields,
+)
+from cognite_core._api.cognite_equipment_type_query import CogniteEquipmentTypeQueryAPI
 
 
 class CogniteEquipmentTypeAPI(

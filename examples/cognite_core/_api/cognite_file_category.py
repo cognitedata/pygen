@@ -14,26 +14,31 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_file_category_query import CogniteFileCategoryQueryAPI
-from cognite_core.data_classes import (
-    CogniteFileCategory,
-    CogniteFileCategoryFields,
-    CogniteFileCategoryList,
-    CogniteFileCategoryTextFields,
-    CogniteFileCategoryWrite,
-    CogniteFileCategoryWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_file_category import (
-    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
-    CogniteFileCategoryQuery,
-    _create_cognite_file_category_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_file_category import (
+    CogniteFileCategoryQuery,
+    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
+    _create_cognite_file_category_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteFileCategory,
+    CogniteFileCategoryWrite,
+    CogniteFileCategoryFields,
+    CogniteFileCategoryList,
+    CogniteFileCategoryWriteList,
+    CogniteFileCategoryTextFields,
+)
+from cognite_core._api.cognite_file_category_query import CogniteFileCategoryQueryAPI
 
 
 class CogniteFileCategoryAPI(

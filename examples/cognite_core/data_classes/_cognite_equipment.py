@@ -3,73 +3,84 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union, no_type_check
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
-from pydantic import Field, field_validator, model_validator
+from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
+from pydantic import field_validator, model_validator
 
-from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
-from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
 from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
     DataRecord,
     DataRecordGraphQL,
     DataRecordWrite,
     DomainModel,
-    DomainModelList,
     DomainModelWrite,
     DomainModelWriteList,
+    DomainModelList,
     DomainRelation,
+    DomainRelationWrite,
     GraphQLCore,
-    NodeQueryCore,
-    QueryCore,
     ResourcesWrite,
-    StringFilter,
     T_DomainModelList,
-    TimestampFilter,
     as_direct_relation_reference,
     as_instance_dict_id,
+    as_node_id,
     as_pygen_node_id,
+    are_nodes_equal,
     is_tuple_id,
+    select_best_node,
+    QueryCore,
+    NodeQueryCore,
+    StringFilter,
+    TimestampFilter,
 )
+from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_activity import (
         CogniteActivity,
-        CogniteActivityGraphQL,
         CogniteActivityList,
+        CogniteActivityGraphQL,
+        CogniteActivityWrite,
+        CogniteActivityWriteList,
     )
     from cognite_core.data_classes._cognite_asset import (
         CogniteAsset,
-        CogniteAssetGraphQL,
         CogniteAssetList,
+        CogniteAssetGraphQL,
         CogniteAssetWrite,
         CogniteAssetWriteList,
     )
     from cognite_core.data_classes._cognite_equipment_type import (
         CogniteEquipmentType,
-        CogniteEquipmentTypeGraphQL,
         CogniteEquipmentTypeList,
+        CogniteEquipmentTypeGraphQL,
         CogniteEquipmentTypeWrite,
         CogniteEquipmentTypeWriteList,
     )
     from cognite_core.data_classes._cognite_file import (
         CogniteFile,
-        CogniteFileGraphQL,
         CogniteFileList,
+        CogniteFileGraphQL,
         CogniteFileWrite,
         CogniteFileWriteList,
     )
     from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystemGraphQL,
+        CogniteSourceSystem,
         CogniteSourceSystemList,
+        CogniteSourceSystemGraphQL,
+        CogniteSourceSystemWrite,
         CogniteSourceSystemWriteList,
     )
     from cognite_core.data_classes._cognite_time_series import (
         CogniteTimeSeries,
-        CogniteTimeSeriesGraphQL,
         CogniteTimeSeriesList,
+        CogniteTimeSeriesGraphQL,
+        CogniteTimeSeriesWrite,
+        CogniteTimeSeriesWriteList,
     )
 
 

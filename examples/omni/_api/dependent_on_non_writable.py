@@ -14,30 +14,33 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
-from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
-from omni.data_classes import (
-    DependentOnNonWritable,
-    DependentOnNonWritableFields,
-    DependentOnNonWritableList,
-    DependentOnNonWritableTextFields,
-    DependentOnNonWritableWrite,
-    DependentOnNonWritableWriteList,
-    Implementation1NonWriteable,
-    ResourcesWriteResult,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    EdgeQueryStep,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from omni.data_classes._dependent_on_non_writable import (
-    _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
     DependentOnNonWritableQuery,
+    _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
     _create_dependent_on_non_writable_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    DependentOnNonWritable,
+    DependentOnNonWritableWrite,
+    DependentOnNonWritableFields,
+    DependentOnNonWritableList,
+    DependentOnNonWritableWriteList,
+    DependentOnNonWritableTextFields,
+    Implementation1NonWriteable,
+)
+from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
+from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(

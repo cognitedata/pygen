@@ -1,30 +1,41 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, ClassVar, Literal, Optional, Union, no_type_check
+from collections.abc import Sequence
+from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
 
-from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DataRecord,
     DataRecordWrite,
+    DomainModel,
+    DomainModelCore,
     DomainModelWrite,
     DomainRelation,
-    DomainRelationList,
     DomainRelationWrite,
+    DomainRelationList,
     DomainRelationWriteList,
-    EdgeQueryCore,
-    FloatFilter,
     GraphQLCore,
+    ResourcesWrite,
+    DomainModelList,
+    T_DomainList,
+    as_direct_relation_reference,
+    as_instance_dict_id,
+    as_node_id,
+    as_pygen_node_id,
+    are_nodes_equal,
+    is_tuple_id,
+    select_best_node,
+    EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
-    ResourcesWrite,
     StringFilter,
-    T_DomainList,
+    FloatFilter,
 )
+
 
 __all__ = [
     "Cognite3DTransformationEdge",
@@ -523,6 +534,7 @@ class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTra
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
     ):
+
         super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(

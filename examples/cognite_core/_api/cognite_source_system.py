@@ -14,26 +14,31 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_source_system_query import CogniteSourceSystemQueryAPI
-from cognite_core.data_classes import (
-    CogniteSourceSystem,
-    CogniteSourceSystemFields,
-    CogniteSourceSystemList,
-    CogniteSourceSystemTextFields,
-    CogniteSourceSystemWrite,
-    CogniteSourceSystemWriteList,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_source_system import (
-    _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD,
-    CogniteSourceSystemQuery,
-    _create_cognite_source_system_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_source_system import (
+    CogniteSourceSystemQuery,
+    _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD,
+    _create_cognite_source_system_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteSourceSystem,
+    CogniteSourceSystemWrite,
+    CogniteSourceSystemFields,
+    CogniteSourceSystemList,
+    CogniteSourceSystemWriteList,
+    CogniteSourceSystemTextFields,
+)
+from cognite_core._api.cognite_source_system_query import CogniteSourceSystemQueryAPI
 
 
 class CogniteSourceSystemAPI(

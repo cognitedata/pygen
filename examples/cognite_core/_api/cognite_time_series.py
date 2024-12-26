@@ -15,32 +15,36 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_time_series_query import CogniteTimeSeriesQueryAPI
+from cognite_core.data_classes._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
+)
+from cognite_core.data_classes._cognite_time_series import (
+    CogniteTimeSeriesQuery,
+    _COGNITETIMESERIES_PROPERTIES_BY_FIELD,
+    _create_cognite_time_series_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    CogniteTimeSeries,
+    CogniteTimeSeriesWrite,
+    CogniteTimeSeriesFields,
+    CogniteTimeSeriesList,
+    CogniteTimeSeriesWriteList,
+    CogniteTimeSeriesTextFields,
     CogniteActivity,
     CogniteAsset,
     CogniteEquipment,
     CogniteSourceSystem,
-    CogniteTimeSeries,
-    CogniteTimeSeriesFields,
-    CogniteTimeSeriesList,
-    CogniteTimeSeriesTextFields,
-    CogniteTimeSeriesWrite,
-    CogniteTimeSeriesWriteList,
     CogniteUnit,
-    ResourcesWriteResult,
 )
-from cognite_core.data_classes._cognite_time_series import (
-    _COGNITETIMESERIES_PROPERTIES_BY_FIELD,
-    CogniteTimeSeriesQuery,
-    _create_cognite_time_series_filter,
-)
-from cognite_core.data_classes._core import (
-    DEFAULT_INSTANCE_SPACE,
-    DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-)
+from cognite_core._api.cognite_time_series_query import CogniteTimeSeriesQueryAPI
 
 
 class CogniteTimeSeriesAPI(

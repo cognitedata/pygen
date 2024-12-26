@@ -14,25 +14,30 @@ from omni_multi._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni_multi._api.implementation_1_v_1_query import Implementation1v1QueryAPI
-from omni_multi.data_classes import (
-    Implementation1v1,
-    Implementation1v1Fields,
-    Implementation1v1List,
-    Implementation1v1TextFields,
-    Implementation1v1Write,
-    Implementation1v1WriteList,
-    ResourcesWriteResult,
-)
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni_multi.data_classes._implementation_1_v_1 import (
-    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
     Implementation1v1Query,
+    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
     _create_implementation_1_v_1_filter,
 )
+from omni_multi.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Implementation1v1,
+    Implementation1v1Write,
+    Implementation1v1Fields,
+    Implementation1v1List,
+    Implementation1v1WriteList,
+    Implementation1v1TextFields,
+)
+from omni_multi._api.implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
 class Implementation1v1API(

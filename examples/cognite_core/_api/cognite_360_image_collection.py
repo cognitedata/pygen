@@ -14,28 +14,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_360_image_collection_query import Cognite360ImageCollectionQueryAPI
-from cognite_core.data_classes import (
-    Cognite360ImageCollection,
-    Cognite360ImageCollectionFields,
-    Cognite360ImageCollectionList,
-    Cognite360ImageCollectionTextFields,
-    Cognite360ImageCollectionWrite,
-    Cognite360ImageCollectionWriteList,
-    Cognite360ImageModel,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_360_image_collection import (
-    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
-    Cognite360ImageCollectionQuery,
-    _create_cognite_360_image_collection_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_360_image_collection import (
+    Cognite360ImageCollectionQuery,
+    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
+    _create_cognite_360_image_collection_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite360ImageCollection,
+    Cognite360ImageCollectionWrite,
+    Cognite360ImageCollectionFields,
+    Cognite360ImageCollectionList,
+    Cognite360ImageCollectionWriteList,
+    Cognite360ImageCollectionTextFields,
+    Cognite360ImageModel,
+)
+from cognite_core._api.cognite_360_image_collection_query import Cognite360ImageCollectionQueryAPI
 
 
 class Cognite360ImageCollectionAPI(

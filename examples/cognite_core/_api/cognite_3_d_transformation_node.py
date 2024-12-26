@@ -14,28 +14,32 @@ from cognite_core._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from cognite_core._api.cognite_3_d_transformation_node_query import Cognite3DTransformationNodeQueryAPI
-from cognite_core.data_classes import (
-    Cognite3DTransformationNode,
-    Cognite3DTransformationNodeFields,
-    Cognite3DTransformationNodeList,
-    Cognite3DTransformationNodeTextFields,
-    Cognite3DTransformationNodeWrite,
-    Cognite3DTransformationNodeWriteList,
-    Cognite360Image,
-    DomainModel,
-    ResourcesWriteResult,
-)
-from cognite_core.data_classes._cognite_3_d_transformation_node import (
-    _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD,
-    Cognite3DTransformationNodeQuery,
-    _create_cognite_3_d_transformation_node_filter,
-)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_3_d_transformation_node import (
+    Cognite3DTransformationNodeQuery,
+    _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD,
+    _create_cognite_3_d_transformation_node_filter,
+)
+from cognite_core.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    Cognite3DTransformationNode,
+    Cognite3DTransformationNodeWrite,
+    Cognite3DTransformationNodeFields,
+    Cognite3DTransformationNodeList,
+    Cognite3DTransformationNodeWriteList,
+    Cognite3DTransformationNodeTextFields,
+    Cognite360Image,
+)
+from cognite_core._api.cognite_3_d_transformation_node_query import Cognite3DTransformationNodeQueryAPI
 
 
 class Cognite3DTransformationNodeAPI(

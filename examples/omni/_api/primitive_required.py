@@ -15,26 +15,31 @@ from omni._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from omni._api.primitive_required_query import PrimitiveRequiredQueryAPI
-from omni.data_classes import (
-    PrimitiveRequired,
-    PrimitiveRequiredFields,
-    PrimitiveRequiredList,
-    PrimitiveRequiredTextFields,
-    PrimitiveRequiredWrite,
-    PrimitiveRequiredWriteList,
-    ResourcesWriteResult,
-)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+    NodeQueryStep,
+    EdgeQueryStep,
     DataClassQueryBuilder,
 )
 from omni.data_classes._primitive_required import (
-    _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
     PrimitiveRequiredQuery,
+    _PRIMITIVEREQUIRED_PROPERTIES_BY_FIELD,
     _create_primitive_required_filter,
 )
+from omni.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    PrimitiveRequired,
+    PrimitiveRequiredWrite,
+    PrimitiveRequiredFields,
+    PrimitiveRequiredList,
+    PrimitiveRequiredWriteList,
+    PrimitiveRequiredTextFields,
+)
+from omni._api.primitive_required_query import PrimitiveRequiredQueryAPI
 
 
 class PrimitiveRequiredAPI(

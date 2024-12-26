@@ -14,29 +14,33 @@ from wind_turbine._api._core import (
     NodeAPI,
     SequenceNotStr,
 )
-from wind_turbine._api.sensor_position_query import SensorPositionQueryAPI
-from wind_turbine.data_classes import (
-    Blade,
-    ResourcesWriteResult,
-    SensorPosition,
-    SensorPositionFields,
-    SensorPositionList,
-    SensorPositionTextFields,
-    SensorPositionWrite,
-    SensorPositionWriteList,
-    SensorTimeSeries,
-)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    DataClassQueryBuilder,
     NodeQueryStep,
+    EdgeQueryStep,
+    DataClassQueryBuilder,
 )
 from wind_turbine.data_classes._sensor_position import (
-    _SENSORPOSITION_PROPERTIES_BY_FIELD,
     SensorPositionQuery,
+    _SENSORPOSITION_PROPERTIES_BY_FIELD,
     _create_sensor_position_filter,
 )
+from wind_turbine.data_classes import (
+    DomainModel,
+    DomainModelCore,
+    DomainModelWrite,
+    ResourcesWriteResult,
+    SensorPosition,
+    SensorPositionWrite,
+    SensorPositionFields,
+    SensorPositionList,
+    SensorPositionWriteList,
+    SensorPositionTextFields,
+    Blade,
+    SensorTimeSeries,
+)
+from wind_turbine._api.sensor_position_query import SensorPositionQueryAPI
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):
