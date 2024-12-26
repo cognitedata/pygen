@@ -49,7 +49,7 @@ from {{ top_level_package }}.data_classes._core import (
 from {{ top_level_package }}.data_classes.{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif +%}
 {% endfor %}
 {% endif %}
-{% for class_ in unique_start_classes -%}
+{% for class_ in unique_start_classes %}
 from {{ top_level_package }}.data_classes.{{class_.file_name }} import {{ class_.write_name }}
 {% endfor %}
 {% for classes in unique_end_classes %}
@@ -72,9 +72,9 @@ __all__ =
     "{{ data_class.read_name }}Apply",{% endif %}
     "{{ data_class.read_list_name }}",{% if data_class.is_writable or data_class.is_interface %}
     "{{ data_class.write_list_name }}",
-    "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %},
-    "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %},
-    "{{ data_class.text_field_names }}"{% endif %}
+    "{{ data_class.read_name }}ApplyList",{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+    "{{ data_class.field_names }}",{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
+    "{{ data_class.text_field_names }}",{% endif %}
 ]
 
 
