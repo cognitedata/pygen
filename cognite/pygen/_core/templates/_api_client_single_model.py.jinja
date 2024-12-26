@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
-from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 
+from {{ top_level_package }} import data_classes
 from {{ top_level_package }}._api import (
     {% for api in api_classes %}
     {% if not api.data_class.is_edge_class %}
@@ -15,9 +18,8 @@ from {{ top_level_package }}._api import (
     {% endif %}
     {% endfor %}
 )
-from {{ top_level_package }}._api._core import SequenceNotStr, GraphQLQueryResponse
+from {{ top_level_package }}._api._core import GraphQLQueryResponse, SequenceNotStr
 from {{ top_level_package }}.data_classes._core import {% if has_default_instance_space %}DEFAULT_INSTANCE_SPACE, {% endif %}GraphQLList
-from {{ top_level_package }} import data_classes
 
 
 class {{ client_name }}:
