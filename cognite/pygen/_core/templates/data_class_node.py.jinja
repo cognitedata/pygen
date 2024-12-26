@@ -33,7 +33,7 @@ from cognite.client.data_classes import (
 {% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}
 {% endif %}
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from {{ top_level_package }}.data_classes._core import (
     {% if has_default_instance_space %}
@@ -81,6 +81,7 @@ from {{ top_level_package }}.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -244,6 +245,12 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     {% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}
     {% endfor %}
+    {% if data_class.has_single_connection_fields %}
+    @field_validator({{ data_class.single_connection_names }}, mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+    {% endif %}
 
 {% if data_class.is_writable or data_class.is_interface %}
     # We do the ignore argument type as we let pydantic handle the type checking

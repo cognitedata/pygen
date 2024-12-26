@@ -5,7 +5,8 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from pydantic import field_validator, model_validator, Field, ValidationInfo
+from pydantic import Field
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,

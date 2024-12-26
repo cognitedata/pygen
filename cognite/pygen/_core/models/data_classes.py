@@ -552,6 +552,16 @@ class DataClass:
         """Container fields that are writable."""
         return (field_ for field_ in self.container_fields if field_.is_write_field)
 
+    @property
+    def has_single_connection_fields(self) -> bool:
+        """Check if the data class has any single connection fields."""
+        return any(isinstance(field_, OneToOneConnectionField) for field_ in self)
+
+    @property
+    def single_connection_names(self) -> str:
+        """The names of all single connection fields."""
+        return ", ".join(f'"{field_.name}"' for field_ in self.fields_of_type(OneToOneConnectionField))
+
     def container_fields_sorted(self, include: 'Literal["all", "only-self"] | DataClass' = "all") -> list[Field]:
         """Return all container fields sorted by type."""
 
