@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from cognite_core.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_asset_type import (
+    CogniteAssetTypeQuery,
+    _COGNITEASSETTYPE_PROPERTIES_BY_FIELD,
+    _create_cognite_asset_type_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -27,17 +39,6 @@ from cognite_core.data_classes import (
     CogniteAssetTypeTextFields,
     CogniteAssetClass,
 )
-from cognite_core.data_classes._cognite_asset_type import (
-    CogniteAssetTypeQuery,
-    _COGNITEASSETTYPE_PROPERTIES_BY_FIELD,
-    _create_cognite_asset_type_filter,
-)
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from cognite_core._api.cognite_asset_type_query import CogniteAssetTypeQueryAPI
 
 
@@ -45,7 +46,7 @@ class CogniteAssetTypeAPI(
     NodeAPI[CogniteAssetType, CogniteAssetTypeWrite, CogniteAssetTypeList, CogniteAssetTypeWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
-    _properties_by_field = _COGNITEASSETTYPE_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEASSETTYPE_PROPERTIES_BY_FIELD
     _class_type = CogniteAssetType
     _class_list = CogniteAssetTypeList
     _class_write_list = CogniteAssetTypeWriteList
@@ -90,8 +91,10 @@ class CogniteAssetTypeAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset types to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite asset types to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for Cognite asset types.
@@ -129,15 +132,15 @@ class CogniteAssetTypeAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite asset types.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_asset_type and creates them including the edges
-        between the nodes. For example, if any of `asset_class` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            cognite_asset_type: Cognite asset type or sequence of Cognite asset types to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cognite_asset_type: Cognite asset type or
+                sequence of Cognite asset types to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -149,7 +152,9 @@ class CogniteAssetTypeAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import CogniteAssetTypeWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_type = CogniteAssetTypeWrite(external_id="my_cognite_asset_type", ...)
+                >>> cognite_asset_type = CogniteAssetTypeWrite(
+                ...     external_id="my_cognite_asset_type", ...
+                ... )
                 >>> result = client.cognite_asset_type.apply(cognite_asset_type)
 
         """
@@ -226,7 +231,9 @@ class CogniteAssetTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_type = client.cognite_asset_type.retrieve("my_cognite_asset_type")
+                >>> cognite_asset_type = client.cognite_asset_type.retrieve(
+                ...     "my_cognite_asset_type"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -275,12 +282,14 @@ class CogniteAssetTypeAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset types to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite asset types to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -292,7 +301,9 @@ class CogniteAssetTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_types = client.cognite_asset_type.search('my_cognite_asset_type')
+                >>> cognite_asset_types = client.cognite_asset_type.search(
+                ...     'my_cognite_asset_type'
+                ... )
 
         """
         filter_ = _create_cognite_asset_type_filter(
@@ -469,8 +480,10 @@ class CogniteAssetTypeAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset types to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite asset types to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -555,8 +568,10 @@ class CogniteAssetTypeAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset types to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite asset types to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -639,15 +654,18 @@ class CogniteAssetTypeAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset types to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite asset types to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `asset_class` for the Cognite asset types. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `asset_class` for the Cognite asset types. Defaults to
+            'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite asset types

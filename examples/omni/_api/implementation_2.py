@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from omni.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni.data_classes._implementation_2 import (
+    Implementation2Query,
+    _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
+    _create_implementation_2_filter,
+)
 from omni.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,23 +38,12 @@ from omni.data_classes import (
     Implementation2WriteList,
     Implementation2TextFields,
 )
-from omni.data_classes._implementation_2 import (
-    Implementation2Query,
-    _IMPLEMENTATION2_PROPERTIES_BY_FIELD,
-    _create_implementation_2_filter,
-)
-from omni._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from omni._api.implementation_2_query import Implementation2QueryAPI
 
 
 class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implementation2List, Implementation2WriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "Implementation2", "1")
-    _properties_by_field = _IMPLEMENTATION2_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION2_PROPERTIES_BY_FIELD
     _class_type = Implementation2
     _class_list = Implementation2List
     _class_write_list = Implementation2WriteList
@@ -70,8 +71,10 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             sub_value_prefix: The prefix of the sub value to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 2 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for implementation 2.
@@ -105,10 +108,14 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
         """Add or update (upsert) implementation 2.
 
         Args:
-            implementation_2: Implementation 2 or sequence of implementation 2 to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            implementation_2: Implementation 2 or
+                sequence of implementation 2 to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -120,7 +127,9 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import Implementation2Write
                 >>> client = OmniClient()
-                >>> implementation_2 = Implementation2Write(external_id="my_implementation_2", ...)
+                >>> implementation_2 = Implementation2Write(
+                ...     external_id="my_implementation_2", ...
+                ... )
                 >>> result = client.implementation_2.apply(implementation_2)
 
         """
@@ -197,7 +206,9 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_2 = client.implementation_2.retrieve("my_implementation_2")
+                >>> implementation_2 = client.implementation_2.retrieve(
+                ...     "my_implementation_2"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -229,12 +240,14 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             sub_value_prefix: The prefix of the sub value to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 2 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -246,7 +259,9 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_2_list = client.implementation_2.search('my_implementation_2')
+                >>> implementation_2_list = client.implementation_2.search(
+                ...     'my_implementation_2'
+                ... )
 
         """
         filter_ = _create_implementation_2_filter(
@@ -365,8 +380,10 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             sub_value_prefix: The prefix of the sub value to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 2 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -429,8 +446,10 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             sub_value_prefix: The prefix of the sub value to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 2 to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -490,8 +509,10 @@ class Implementation2API(NodeAPI[Implementation2, Implementation2Write, Implemen
             sub_value_prefix: The prefix of the sub value to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 2 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 2 to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

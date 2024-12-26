@@ -177,7 +177,7 @@ class CogniteVisualizable(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.object_3d, (dm.NodeId, str))
+                isinstance(instance.object_3d, dm.NodeId | str)
                 and (object_3d := nodes_by_id.get(instance.object_3d))
                 and isinstance(object_3d, Cognite3DObject)
             ):
@@ -256,7 +256,8 @@ class CogniteVisualizableWrite(DomainModelWrite):
 class CogniteVisualizableApply(CogniteVisualizableWrite):
     def __new__(cls, *args, **kwargs) -> CogniteVisualizableApply:
         warnings.warn(
-            "CogniteVisualizableApply is deprecated and will be removed in v1.0. Use CogniteVisualizableWrite instead."
+            "CogniteVisualizableApply is deprecated and will be removed in v1.0. "
+            "Use CogniteVisualizableWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteVisualizable.",
             UserWarning,

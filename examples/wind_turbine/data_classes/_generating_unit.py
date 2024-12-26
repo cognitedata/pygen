@@ -234,7 +234,8 @@ class GeneratingUnitWrite(DomainModelWrite):
 class GeneratingUnitApply(GeneratingUnitWrite):
     def __new__(cls, *args, **kwargs) -> GeneratingUnitApply:
         warnings.warn(
-            "GeneratingUnitApply is deprecated and will be removed in v1.0. Use GeneratingUnitWrite instead."
+            "GeneratingUnitApply is deprecated and will be removed in v1.0. "
+            "Use GeneratingUnitWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "GeneratingUnit.",
             UserWarning,

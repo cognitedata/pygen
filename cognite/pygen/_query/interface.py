@@ -266,7 +266,7 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryStepFactory(view, properties, builder.create_name)
+        factory = QueryStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
             result = self._client.data_modeling.instances.list(
@@ -283,7 +283,7 @@ class QueryExecutor:
             for prop in factory.reverse_properties.values()
             if isinstance(prop.through.source, dm.ViewId)
         }
-        builder.append(factory.root(filter, limit))
+        builder.append(factory.root(filter, limit=limit))
         for connection_id, connection in factory.connection_properties.items():
             builder.extend(factory.from_connection(connection_id, connection, reverse_views))
         _ = builder.execute_query(self._client, remove_not_connected=False)

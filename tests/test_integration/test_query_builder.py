@@ -3,7 +3,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import data_classes as dc
-from omni._api._core import DataClassQueryBuilder, EdgeQueryStep, NodeQueryStep
+from omni.data_classes._core import DataClassQueryBuilder, EdgeQueryStep, NodeQueryStep
 
 
 class TestQueryBuilder:

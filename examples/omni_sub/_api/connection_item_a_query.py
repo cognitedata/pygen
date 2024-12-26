@@ -12,17 +12,18 @@ from omni_sub.data_classes import (
     ConnectionItemCNode,
     ConnectionItemA,
 )
-from omni_sub.data_classes._connection_item_b import (
-    ConnectionItemB,
-    _create_connection_item_b_filter,
-)
-from omni_sub._api._core import (
+from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni_sub.data_classes._connection_item_b import (
+    _create_connection_item_b_filter,
+)
+from omni_sub._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -70,17 +71,20 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outward edges of the connection item a.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of outward edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
-            retrieve_other_direct: Whether to retrieve the other direct for each connection item a or not.
-            retrieve_self_direct: Whether to retrieve the self direct for each connection item a or not.
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of outward edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
+            retrieve_other_direct: Whether to retrieve the other direct
+                for each connection item a or not.
+            retrieve_self_direct: Whether to retrieve the self direct
+                for each connection item a or not.
 
         Returns:
             ConnectionItemBQueryAPI: The query API for the connection item b.
@@ -130,8 +134,12 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_other_direct: Whether to retrieve the other direct for each connection item a or not.
-            retrieve_self_direct: Whether to retrieve the self direct for each connection item a or not.
+            retrieve_other_direct: Whether to retrieve the
+                other direct for each
+                connection item a or not.
+            retrieve_self_direct: Whether to retrieve the
+                self direct for each
+                connection item a or not.
 
         Returns:
             The list of the source nodes of the query.

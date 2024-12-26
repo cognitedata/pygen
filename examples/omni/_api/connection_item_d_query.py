@@ -11,17 +11,18 @@ from omni.data_classes import (
     ConnectionItemD,
     ConnectionItemE,
 )
-from omni.data_classes._connection_item_e import (
-    ConnectionItemE,
-    _create_connection_item_e_filter,
-)
-from omni._api._core import (
+from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni.data_classes._connection_item_e import (
+    _create_connection_item_e_filter,
+)
+from omni._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -84,18 +85,20 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outwards single edges of the connection item d.
 
         Args:
-            direct_list_no_source: The direct list no source to filter on.
-            direct_no_source: The direct no source to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of outwards single edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
-            retrieve_direct_single: Whether to retrieve the direct single for each connection item d or not.
+            direct_list_no_source:
+            direct_no_source:
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of outwards single edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
+            retrieve_direct_single: Whether to retrieve the direct single
+                for each connection item d or not.
 
         Returns:
             ConnectionItemEQueryAPI: The query API for the connection item e.
@@ -144,7 +147,9 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_direct_single: Whether to retrieve the direct single for each connection item d or not.
+            retrieve_direct_single: Whether to retrieve the
+                direct single for each
+                connection item d or not.
 
         Returns:
             The list of the source nodes of the query.

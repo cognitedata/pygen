@@ -208,7 +208,7 @@ class CogniteCADRevision(Cognite3DRevision, protected_namespaces=()):
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, CogniteCADModel)
             ):
@@ -292,7 +292,8 @@ class CogniteCADRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
 class CogniteCADRevisionApply(CogniteCADRevisionWrite):
     def __new__(cls, *args, **kwargs) -> CogniteCADRevisionApply:
         warnings.warn(
-            "CogniteCADRevisionApply is deprecated and will be removed in v1.0. Use CogniteCADRevisionWrite instead."
+            "CogniteCADRevisionApply is deprecated and will be removed in v1.0. "
+            "Use CogniteCADRevisionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteCADRevision.",
             UserWarning,

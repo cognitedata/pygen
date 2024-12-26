@@ -251,7 +251,8 @@ class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
 class Cognite360ImageStationApply(Cognite360ImageStationWrite):
     def __new__(cls, *args, **kwargs) -> Cognite360ImageStationApply:
         warnings.warn(
-            "Cognite360ImageStationApply is deprecated and will be removed in v1.0. Use Cognite360ImageStationWrite instead."
+            "Cognite360ImageStationApply is deprecated and will be removed in v1.0. "
+            "Use Cognite360ImageStationWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite360ImageStation.",
             UserWarning,

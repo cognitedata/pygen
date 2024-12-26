@@ -208,7 +208,8 @@ class MainInterfaceWrite(DomainModelWrite):
 class MainInterfaceApply(MainInterfaceWrite):
     def __new__(cls, *args, **kwargs) -> MainInterfaceApply:
         warnings.warn(
-            "MainInterfaceApply is deprecated and will be removed in v1.0. Use MainInterfaceWrite instead."
+            "MainInterfaceApply is deprecated and will be removed in v1.0. "
+            "Use MainInterfaceWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "MainInterface.",
             UserWarning,

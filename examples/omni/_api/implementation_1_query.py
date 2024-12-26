@@ -10,13 +10,15 @@ from omni.data_classes import (
     DomainModelCore,
     Implementation1,
 )
-from omni._api._core import (
+from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 

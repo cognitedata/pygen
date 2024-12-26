@@ -294,7 +294,8 @@ class CogniteUnitWrite(CogniteDescribableNodeWrite):
 class CogniteUnitApply(CogniteUnitWrite):
     def __new__(cls, *args, **kwargs) -> CogniteUnitApply:
         warnings.warn(
-            "CogniteUnitApply is deprecated and will be removed in v1.0. Use CogniteUnitWrite instead."
+            "CogniteUnitApply is deprecated and will be removed in v1.0. "
+            "Use CogniteUnitWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteUnit.",
             UserWarning,

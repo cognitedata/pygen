@@ -322,7 +322,8 @@ class EmptyWrite(DomainModelWrite):
 class EmptyApply(EmptyWrite):
     def __new__(cls, *args, **kwargs) -> EmptyApply:
         warnings.warn(
-            "EmptyApply is deprecated and will be removed in v1.0. Use EmptyWrite instead."
+            "EmptyApply is deprecated and will be removed in v1.0. "
+            "Use EmptyWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Empty.",
             UserWarning,

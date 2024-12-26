@@ -217,13 +217,13 @@ class Generator(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.generator_speed_controller, (dm.NodeId, str))
+                isinstance(instance.generator_speed_controller, dm.NodeId | str)
                 and (generator_speed_controller := nodes_by_id.get(instance.generator_speed_controller))
                 and isinstance(generator_speed_controller, SensorTimeSeries)
             ):
                 instance.generator_speed_controller = generator_speed_controller
             if (
-                isinstance(instance.generator_speed_controller_reference, (dm.NodeId, str))
+                isinstance(instance.generator_speed_controller_reference, dm.NodeId | str)
                 and (
                     generator_speed_controller_reference := nodes_by_id.get(
                         instance.generator_speed_controller_reference
@@ -246,7 +246,8 @@ class Generator(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {main_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 
@@ -352,7 +353,8 @@ class GeneratorWrite(DomainModelWrite):
 class GeneratorApply(GeneratorWrite):
     def __new__(cls, *args, **kwargs) -> GeneratorApply:
         warnings.warn(
-            "GeneratorApply is deprecated and will be removed in v1.0. Use GeneratorWrite instead."
+            "GeneratorApply is deprecated and will be removed in v1.0. "
+            "Use GeneratorWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Generator.",
             UserWarning,

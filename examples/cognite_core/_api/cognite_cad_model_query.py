@@ -11,13 +11,15 @@ from cognite_core.data_classes import (
     CogniteCADModel,
     CogniteFile,
 )
-from cognite_core._api._core import (
+from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from cognite_core._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -53,7 +55,9 @@ class CogniteCADModelQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_thumbnail: Whether to retrieve the thumbnail for each Cognite cad model or not.
+            retrieve_thumbnail: Whether to retrieve the
+                thumbnail for each
+                Cognite cad model or not.
 
         Returns:
             The list of the source nodes of the query.

@@ -281,7 +281,8 @@ class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
 class CogniteFileCategoryApply(CogniteFileCategoryWrite):
     def __new__(cls, *args, **kwargs) -> CogniteFileCategoryApply:
         warnings.warn(
-            "CogniteFileCategoryApply is deprecated and will be removed in v1.0. Use CogniteFileCategoryWrite instead."
+            "CogniteFileCategoryApply is deprecated and will be removed in v1.0. "
+            "Use CogniteFileCategoryWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteFileCategory.",
             UserWarning,

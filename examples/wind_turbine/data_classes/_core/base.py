@@ -37,7 +37,8 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
     PropertyValue,
 )
-from pydantic import BaseModel, Field, model_validator
+from cognite.client.utils import ms_to_datetime
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from wind_turbine.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
@@ -201,7 +202,7 @@ class DomainModelCore(Core, ABC):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DataRecord(BaseModel):
+class DataRecord(BaseModel, populate_by_name=True):
     """The data record represents the metadata of a node.
 
     Args:
@@ -212,9 +213,16 @@ class DataRecord(BaseModel):
     """
 
     version: int
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-    deleted_time: Optional[datetime.datetime] = None
+    last_updated_time: datetime.datetime = Field(alias="lastUpdatedTime")
+    created_time: datetime.datetime = Field(alias="createdTime")
+    deleted_time: Optional[datetime.datetime] = Field(None, alias="deletedTime")
+
+    @field_validator("created_time", "last_updated_time", "deleted_time", mode="before")
+    @classmethod
+    def parse_ms(cls, v: Any) -> Any:
+        if isinstance(v, int):
+            return ms_to_datetime(v)
+        return v
 
 
 class DomainModel(DomainModelCore, ABC):
@@ -247,9 +255,12 @@ class DataRecordWrite(BaseModel):
 
     Args:
         existing_version: Fail the ingestion request if the node version is greater than or equal to this value.
-            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
-            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
-            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge
+            (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the
+            item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing
+            the ingestion request.
     """
 
     existing_version: Optional[int] = None
@@ -557,9 +568,9 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
         end_node: DomainModelWrite | str | dm.NodeId,
         edge_type: dm.DirectRelationReference,
     ) -> dm.EdgeApply:
-        if isinstance(start_node, (DomainModelWrite, dm.NodeId)):
+        if isinstance(start_node, DomainModelWrite | dm.NodeId):
             space = start_node.space
-        elif isinstance(end_node, (DomainModelWrite, dm.NodeId)):
+        elif isinstance(end_node, DomainModelWrite | dm.NodeId):
             space = end_node.space
         else:
             space = DEFAULT_INSTANCE_SPACE

@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from cognite_core.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_360_image_collection import (
+    Cognite360ImageCollectionQuery,
+    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
+    _create_cognite_360_image_collection_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,17 +38,6 @@ from cognite_core.data_classes import (
     Cognite360ImageCollectionWriteList,
     Cognite360ImageCollectionTextFields,
     Cognite360ImageModel,
-)
-from cognite_core.data_classes._cognite_360_image_collection import (
-    Cognite360ImageCollectionQuery,
-    _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD,
-    _create_cognite_360_image_collection_filter,
-)
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
 )
 from cognite_core._api.cognite_360_image_collection_query import Cognite360ImageCollectionQueryAPI
 
@@ -50,7 +51,7 @@ class Cognite360ImageCollectionAPI(
     ]
 ):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
-    _properties_by_field = _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD
     _class_type = Cognite360ImageCollection
     _class_list = Cognite360ImageCollectionList
     _class_write_list = Cognite360ImageCollectionWriteList
@@ -89,8 +90,10 @@ class Cognite360ImageCollectionAPI(
             published: The published to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for Cognite 360 image collections.
@@ -125,15 +128,15 @@ class Cognite360ImageCollectionAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite 360 image collections.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_360_image_collection and creates them including the edges
-        between the nodes. For example, if any of `model_3d` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            cognite_360_image_collection: Cognite 360 image collection or sequence of Cognite 360 image collections to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cognite_360_image_collection: Cognite 360 image collection or
+                sequence of Cognite 360 image collections to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -145,7 +148,9 @@ class Cognite360ImageCollectionAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import Cognite360ImageCollectionWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_collection = Cognite360ImageCollectionWrite(external_id="my_cognite_360_image_collection", ...)
+                >>> cognite_360_image_collection = Cognite360ImageCollectionWrite(
+                ...     external_id="my_cognite_360_image_collection", ...
+                ... )
                 >>> result = client.cognite_360_image_collection.apply(cognite_360_image_collection)
 
         """
@@ -222,7 +227,9 @@ class Cognite360ImageCollectionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_collection = client.cognite_360_image_collection.retrieve("my_cognite_360_image_collection")
+                >>> cognite_360_image_collection = client.cognite_360_image_collection.retrieve(
+                ...     "my_cognite_360_image_collection"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -267,12 +274,14 @@ class Cognite360ImageCollectionAPI(
             published: The published to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -284,7 +293,9 @@ class Cognite360ImageCollectionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_collections = client.cognite_360_image_collection.search('my_cognite_360_image_collection')
+                >>> cognite_360_image_collections = client.cognite_360_image_collection.search(
+                ...     'my_cognite_360_image_collection'
+                ... )
 
         """
         filter_ = _create_cognite_360_image_collection_filter(
@@ -451,8 +462,10 @@ class Cognite360ImageCollectionAPI(
             published: The published to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -530,8 +543,10 @@ class Cognite360ImageCollectionAPI(
             published: The published to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 image collections to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -605,15 +620,18 @@ class Cognite360ImageCollectionAPI(
             published: The published to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 360 image collections to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 360 image collections to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `model_3d` for the Cognite 360 image collections. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `model_3d` for the Cognite 360 image collections. Defaults to
+            'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite 360 image collections

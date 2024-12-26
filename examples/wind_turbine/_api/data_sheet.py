@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -16,7 +22,13 @@ from wind_turbine.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from wind_turbine.data_classes._data_sheet import (
+    DataSheetQuery,
+    _DATASHEET_PROPERTIES_BY_FIELD,
+    _create_data_sheet_filter,
+)
 from wind_turbine.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -27,23 +39,12 @@ from wind_turbine.data_classes import (
     DataSheetWriteList,
     DataSheetTextFields,
 )
-from wind_turbine.data_classes._data_sheet import (
-    DataSheetQuery,
-    _DATASHEET_PROPERTIES_BY_FIELD,
-    _create_data_sheet_filter,
-)
-from wind_turbine._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from wind_turbine._api.data_sheet_query import DataSheetQueryAPI
 
 
 class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "DataSheet", "1")
-    _properties_by_field = _DATASHEET_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _DATASHEET_PROPERTIES_BY_FIELD
     _class_type = DataSheet
     _class_list = DataSheetList
     _class_write_list = DataSheetWriteList
@@ -85,8 +86,10 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             max_uploaded_time: The maximum value of the uploaded time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of data sheets to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for data sheets.
@@ -127,10 +130,14 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
         """Add or update (upsert) data sheets.
 
         Args:
-            data_sheet: Data sheet or sequence of data sheets to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            data_sheet: Data sheet or
+                sequence of data sheets to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -142,7 +149,9 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import DataSheetWrite
                 >>> client = WindTurbineClient()
-                >>> data_sheet = DataSheetWrite(external_id="my_data_sheet", ...)
+                >>> data_sheet = DataSheetWrite(
+                ...     external_id="my_data_sheet", ...
+                ... )
                 >>> result = client.data_sheet.apply(data_sheet)
 
         """
@@ -219,7 +228,9 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> data_sheet = client.data_sheet.retrieve("my_data_sheet")
+                >>> data_sheet = client.data_sheet.retrieve(
+                ...     "my_data_sheet"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -265,12 +276,14 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             max_uploaded_time: The maximum value of the uploaded time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of data sheets to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -282,7 +295,9 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> data_sheets = client.data_sheet.search('my_data_sheet')
+                >>> data_sheets = client.data_sheet.search(
+                ...     'my_data_sheet'
+                ... )
 
         """
         filter_ = _create_data_sheet_filter(
@@ -443,8 +458,10 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             max_uploaded_time: The maximum value of the uploaded time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of data sheets to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -528,8 +545,10 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             max_uploaded_time: The maximum value of the uploaded time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of data sheets to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -610,8 +629,10 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             max_uploaded_time: The maximum value of the uploaded time to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of data sheets to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

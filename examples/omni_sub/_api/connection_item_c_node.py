@@ -1,20 +1,31 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_sub._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni_sub.data_classes._connection_item_c_node import (
+    ConnectionItemCNodeQuery,
+    _create_connection_item_c_node_filter,
+)
 from omni_sub.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -27,16 +38,6 @@ from omni_sub.data_classes import (
     ConnectionItemA,
     ConnectionItemB,
 )
-from omni_sub.data_classes._connection_item_c_node import (
-    ConnectionItemCNodeQuery,
-    _create_connection_item_c_node_filter,
-)
-from omni_sub._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from omni_sub._api.connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
 from omni_sub._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
 from omni_sub._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
@@ -46,7 +47,7 @@ class ConnectionItemCNodeAPI(
     NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
-    _properties_by_field = {}
+    _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = ConnectionItemCNode
     _class_list = ConnectionItemCNodeList
     _class_write_list = ConnectionItemCNodeWriteList
@@ -69,8 +70,10 @@ class ConnectionItemCNodeAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for connection item c nodes.
@@ -99,15 +102,15 @@ class ConnectionItemCNodeAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item c nodes.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_c_node and creates them including the edges
-        between the nodes. For example, if any of `connection_item_a` or `connection_item_b` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            connection_item_c_node: Connection item c node or sequence of connection item c nodes to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            connection_item_c_node: Connection item c node or
+                sequence of connection item c nodes to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -119,7 +122,9 @@ class ConnectionItemCNodeAPI(
                 >>> from omni_sub import OmniSubClient
                 >>> from omni_sub.data_classes import ConnectionItemCNodeWrite
                 >>> client = OmniSubClient()
-                >>> connection_item_c_node = ConnectionItemCNodeWrite(external_id="my_connection_item_c_node", ...)
+                >>> connection_item_c_node = ConnectionItemCNodeWrite(
+                ...     external_id="my_connection_item_c_node", ...
+                ... )
                 >>> result = client.connection_item_c_node.apply(connection_item_c_node)
 
         """
@@ -192,7 +197,9 @@ class ConnectionItemCNodeAPI(
 
                 >>> from omni_sub import OmniSubClient
                 >>> client = OmniSubClient()
-                >>> connection_item_c_node = client.connection_item_c_node.retrieve("my_connection_item_c_node")
+                >>> connection_item_c_node = client.connection_item_c_node.retrieve(
+                ...     "my_connection_item_c_node"
+                ... )
 
         """
         return self._retrieve(
@@ -236,12 +243,14 @@ class ConnectionItemCNodeAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -253,7 +262,9 @@ class ConnectionItemCNodeAPI(
 
                 >>> from omni_sub import OmniSubClient
                 >>> client = OmniSubClient()
-                >>> connection_item_c_nodes = client.connection_item_c_node.search('my_connection_item_c_node')
+                >>> connection_item_c_nodes = client.connection_item_c_node.search(
+                ...     'my_connection_item_c_node'
+                ... )
 
         """
         filter_ = _create_connection_item_c_node_filter(
@@ -338,8 +349,10 @@ class ConnectionItemCNodeAPI(
             property: The property to perform aggregation on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item c nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -386,8 +399,10 @@ class ConnectionItemCNodeAPI(
             interval: The interval to use for the histogram bins.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item c nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -433,10 +448,13 @@ class ConnectionItemCNodeAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection item c nodes. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            limit: Maximum number of connection item c nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection
+            item c nodes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
+            the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested connection item c nodes

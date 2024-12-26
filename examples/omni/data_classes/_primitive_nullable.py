@@ -320,7 +320,8 @@ class PrimitiveNullableWrite(DomainModelWrite):
 class PrimitiveNullableApply(PrimitiveNullableWrite):
     def __new__(cls, *args, **kwargs) -> PrimitiveNullableApply:
         warnings.warn(
-            "PrimitiveNullableApply is deprecated and will be removed in v1.0. Use PrimitiveNullableWrite instead."
+            "PrimitiveNullableApply is deprecated and will be removed in v1.0. "
+            "Use PrimitiveNullableWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "PrimitiveNullable.",
             UserWarning,

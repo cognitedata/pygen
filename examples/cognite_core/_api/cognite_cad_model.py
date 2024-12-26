@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from cognite_core.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_cad_model import (
+    CogniteCADModelQuery,
+    _COGNITECADMODEL_PROPERTIES_BY_FIELD,
+    _create_cognite_cad_model_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -28,23 +40,12 @@ from cognite_core.data_classes import (
     CogniteCADRevision,
     CogniteFile,
 )
-from cognite_core.data_classes._cognite_cad_model import (
-    CogniteCADModelQuery,
-    _COGNITECADMODEL_PROPERTIES_BY_FIELD,
-    _create_cognite_cad_model_filter,
-)
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from cognite_core._api.cognite_cad_model_query import CogniteCADModelQueryAPI
 
 
 class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteCADModelList, CogniteCADModelWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteCADModel", "v1")
-    _properties_by_field = _COGNITECADMODEL_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITECADMODEL_PROPERTIES_BY_FIELD
     _class_type = CogniteCADModel
     _class_list = CogniteCADModelList
     _class_write_list = CogniteCADModelWriteList
@@ -81,8 +82,10 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite cad models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite cad models to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for Cognite cad models.
@@ -116,15 +119,15 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite cad models.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_cad_model and creates them including the edges
-        between the nodes. For example, if any of `thumbnail` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            cognite_cad_model: Cognite cad model or sequence of Cognite cad models to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cognite_cad_model: Cognite cad model or
+                sequence of Cognite cad models to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -136,7 +139,9 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import CogniteCADModelWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_model = CogniteCADModelWrite(external_id="my_cognite_cad_model", ...)
+                >>> cognite_cad_model = CogniteCADModelWrite(
+                ...     external_id="my_cognite_cad_model", ...
+                ... )
                 >>> result = client.cognite_cad_model.apply(cognite_cad_model)
 
         """
@@ -213,7 +218,9 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_model = client.cognite_cad_model.retrieve("my_cognite_cad_model")
+                >>> cognite_cad_model = client.cognite_cad_model.retrieve(
+                ...     "my_cognite_cad_model"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -254,12 +261,14 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite cad models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite cad models to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -271,7 +280,9 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_models = client.cognite_cad_model.search('my_cognite_cad_model')
+                >>> cognite_cad_models = client.cognite_cad_model.search(
+                ...     'my_cognite_cad_model'
+                ... )
 
         """
         filter_ = _create_cognite_cad_model_filter(
@@ -424,8 +435,10 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite cad models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite cad models to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -498,8 +511,10 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite cad models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite cad models to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -570,15 +585,18 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             thumbnail: The thumbnail to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite cad models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite cad models to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `revisions` and `thumbnail` for the Cognite cad models. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `revisions` and `thumbnail` for the Cognite cad models. Defaults
+            to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite cad models

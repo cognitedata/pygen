@@ -13,13 +13,15 @@ from wind_turbine.data_classes import (
     SensorTimeSeries,
     SensorTimeSeries,
 )
-from wind_turbine._api._core import (
+from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from wind_turbine._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -57,9 +59,15 @@ class GearboxQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_displacement_x: Whether to retrieve the displacement x for each gearbox or not.
-            retrieve_displacement_y: Whether to retrieve the displacement y for each gearbox or not.
-            retrieve_displacement_z: Whether to retrieve the displacement z for each gearbox or not.
+            retrieve_displacement_x: Whether to retrieve the
+                displacement x for each
+                gearbox or not.
+            retrieve_displacement_y: Whether to retrieve the
+                displacement y for each
+                gearbox or not.
+            retrieve_displacement_z: Whether to retrieve the
+                displacement z for each
+                gearbox or not.
 
         Returns:
             The list of the source nodes of the query.

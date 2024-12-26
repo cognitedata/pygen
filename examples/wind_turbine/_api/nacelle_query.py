@@ -19,13 +19,15 @@ from wind_turbine.data_classes import (
     SensorTimeSeries,
     SensorTimeSeries,
 )
-from wind_turbine._api._core import (
+from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from wind_turbine._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -69,15 +71,33 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_acc_from_back_side_y: Whether to retrieve the acc from back side y for each nacelle or not.
-            retrieve_acc_from_back_side_z: Whether to retrieve the acc from back side z for each nacelle or not.
-            retrieve_gearbox: Whether to retrieve the gearbox for each nacelle or not.
-            retrieve_generator: Whether to retrieve the generator for each nacelle or not.
-            retrieve_high_speed_shaft: Whether to retrieve the high speed shaft for each nacelle or not.
-            retrieve_main_shaft: Whether to retrieve the main shaft for each nacelle or not.
-            retrieve_power_inverter: Whether to retrieve the power inverter for each nacelle or not.
-            retrieve_yaw_direction: Whether to retrieve the yaw direction for each nacelle or not.
-            retrieve_yaw_error: Whether to retrieve the yaw error for each nacelle or not.
+            retrieve_acc_from_back_side_y: Whether to retrieve the
+                acc from back side y for each
+                nacelle or not.
+            retrieve_acc_from_back_side_z: Whether to retrieve the
+                acc from back side z for each
+                nacelle or not.
+            retrieve_gearbox: Whether to retrieve the
+                gearbox for each
+                nacelle or not.
+            retrieve_generator: Whether to retrieve the
+                generator for each
+                nacelle or not.
+            retrieve_high_speed_shaft: Whether to retrieve the
+                high speed shaft for each
+                nacelle or not.
+            retrieve_main_shaft: Whether to retrieve the
+                main shaft for each
+                nacelle or not.
+            retrieve_power_inverter: Whether to retrieve the
+                power inverter for each
+                nacelle or not.
+            retrieve_yaw_direction: Whether to retrieve the
+                yaw direction for each
+                nacelle or not.
+            retrieve_yaw_error: Whether to retrieve the
+                yaw error for each
+                nacelle or not.
 
         Returns:
             The list of the source nodes of the query.

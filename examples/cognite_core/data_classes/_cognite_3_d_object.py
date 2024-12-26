@@ -357,7 +357,8 @@ class Cognite3DObject(CogniteDescribableNode):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'asset' in {object_3d.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {object_3d.asset!s}."
+                        f"Ignoring new relation {node!s} in favor of {object_3d.asset!s}.",
+                        stacklevel=2,
                     )
             if (
                 isinstance(node, CogniteCADNode)
@@ -494,7 +495,8 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
 class Cognite3DObjectApply(Cognite3DObjectWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DObjectApply:
         warnings.warn(
-            "Cognite3DObjectApply is deprecated and will be removed in v1.0. Use Cognite3DObjectWrite instead."
+            "Cognite3DObjectApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DObjectWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DObject.",
             UserWarning,

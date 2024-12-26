@@ -298,7 +298,8 @@ class ConnectionItemF(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'outwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}.",
+                                stacklevel=2,
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
@@ -413,7 +414,8 @@ class ConnectionItemFWrite(DomainModelWrite):
 class ConnectionItemFApply(ConnectionItemFWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemFApply:
         warnings.warn(
-            "ConnectionItemFApply is deprecated and will be removed in v1.0. Use ConnectionItemFWrite instead."
+            "ConnectionItemFApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemFWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemF.",
             UserWarning,

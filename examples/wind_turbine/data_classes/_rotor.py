@@ -223,13 +223,13 @@ class Rotor(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.rotor_speed_controller, (dm.NodeId, str))
+                isinstance(instance.rotor_speed_controller, dm.NodeId | str)
                 and (rotor_speed_controller := nodes_by_id.get(instance.rotor_speed_controller))
                 and isinstance(rotor_speed_controller, SensorTimeSeries)
             ):
                 instance.rotor_speed_controller = rotor_speed_controller
             if (
-                isinstance(instance.rpm_low_speed_shaft, (dm.NodeId, str))
+                isinstance(instance.rpm_low_speed_shaft, dm.NodeId | str)
                 and (rpm_low_speed_shaft := nodes_by_id.get(instance.rpm_low_speed_shaft))
                 and isinstance(rpm_low_speed_shaft, SensorTimeSeries)
             ):
@@ -248,7 +248,8 @@ class Rotor(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'wind_turbine' in {rotor.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}."
+                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}.",
+                        stacklevel=2,
                     )
 
 
@@ -346,7 +347,8 @@ class RotorWrite(DomainModelWrite):
 class RotorApply(RotorWrite):
     def __new__(cls, *args, **kwargs) -> RotorApply:
         warnings.warn(
-            "RotorApply is deprecated and will be removed in v1.0. Use RotorWrite instead."
+            "RotorApply is deprecated and will be removed in v1.0. "
+            "Use RotorWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Rotor.",
             UserWarning,

@@ -230,7 +230,7 @@ class DependentOnNonWritable(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "toNonWritable") and isinstance(
-                        value, (Implementation1NonWriteable, str, dm.NodeId)
+                        value, Implementation1NonWriteable | str | dm.NodeId
                     ):
                         to_non_writable.append(value)
 
@@ -318,7 +318,8 @@ class DependentOnNonWritableWrite(DomainModelWrite):
 class DependentOnNonWritableApply(DependentOnNonWritableWrite):
     def __new__(cls, *args, **kwargs) -> DependentOnNonWritableApply:
         warnings.warn(
-            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. Use DependentOnNonWritableWrite instead."
+            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. "
+            "Use DependentOnNonWritableWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "DependentOnNonWritable.",
             UserWarning,

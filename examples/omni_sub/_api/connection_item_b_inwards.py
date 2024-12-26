@@ -23,8 +23,8 @@ class ConnectionItemBInwardsAPI(EdgeAPI):
             to_connection_item_a: ID of the target connection item a.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of inward edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of inward edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested inward edges.
@@ -36,7 +36,9 @@ class ConnectionItemBInwardsAPI(EdgeAPI):
                 >>> from omni_sub import OmniSubClient
                 >>> from cognite.client import data_modeling as dm
                 >>> client = OmniSubClient()
-                >>> connection_item_b = client.connection_item_b.inwards_edge.list(dm.NodeId("my_space", "my_connection_item_a"), limit=5)
+                >>> connection_item_b = client.connection_item_b.inwards_edge.list(
+                ...     dm.NodeId("my_space", "my_connection_item_a"), limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(

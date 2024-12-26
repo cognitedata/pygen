@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from cognite_core.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_file_category import (
+    CogniteFileCategoryQuery,
+    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
+    _create_cognite_file_category_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,17 +38,6 @@ from cognite_core.data_classes import (
     CogniteFileCategoryWriteList,
     CogniteFileCategoryTextFields,
 )
-from cognite_core.data_classes._cognite_file_category import (
-    CogniteFileCategoryQuery,
-    _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD,
-    _create_cognite_file_category_filter,
-)
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from cognite_core._api.cognite_file_category_query import CogniteFileCategoryQueryAPI
 
 
@@ -44,7 +45,7 @@ class CogniteFileCategoryAPI(
     NodeAPI[CogniteFileCategory, CogniteFileCategoryWrite, CogniteFileCategoryList, CogniteFileCategoryWriteList]
 ):
     _view_id = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
-    _properties_by_field = _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD
     _class_type = CogniteFileCategory
     _class_list = CogniteFileCategoryList
     _class_write_list = CogniteFileCategoryWriteList
@@ -84,8 +85,10 @@ class CogniteFileCategoryAPI(
             standard_reference_prefix: The prefix of the standard reference to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite file categories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite file categories to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for Cognite file categories.
@@ -125,10 +128,14 @@ class CogniteFileCategoryAPI(
         """Add or update (upsert) Cognite file categories.
 
         Args:
-            cognite_file_category: Cognite file category or sequence of Cognite file categories to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cognite_file_category: Cognite file category or
+                sequence of Cognite file categories to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -140,7 +147,9 @@ class CogniteFileCategoryAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import CogniteFileCategoryWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_file_category = CogniteFileCategoryWrite(external_id="my_cognite_file_category", ...)
+                >>> cognite_file_category = CogniteFileCategoryWrite(
+                ...     external_id="my_cognite_file_category", ...
+                ... )
                 >>> result = client.cognite_file_category.apply(cognite_file_category)
 
         """
@@ -217,7 +226,9 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_file_category = client.cognite_file_category.retrieve("my_cognite_file_category")
+                >>> cognite_file_category = client.cognite_file_category.retrieve(
+                ...     "my_cognite_file_category"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -261,12 +272,14 @@ class CogniteFileCategoryAPI(
             standard_reference_prefix: The prefix of the standard reference to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite file categories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite file categories to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -278,7 +291,9 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_file_categories = client.cognite_file_category.search('my_cognite_file_category')
+                >>> cognite_file_categories = client.cognite_file_category.search(
+                ...     'my_cognite_file_category'
+                ... )
 
         """
         filter_ = _create_cognite_file_category_filter(
@@ -433,8 +448,10 @@ class CogniteFileCategoryAPI(
             standard_reference_prefix: The prefix of the standard reference to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite file categories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite file categories to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -515,8 +532,10 @@ class CogniteFileCategoryAPI(
             standard_reference_prefix: The prefix of the standard reference to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite file categories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite file categories to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -594,8 +613,10 @@ class CogniteFileCategoryAPI(
             standard_reference_prefix: The prefix of the standard reference to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite file categories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite file categories to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

@@ -222,19 +222,19 @@ class HighSpeedShaft(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.bending_moment_y, (dm.NodeId, str))
+                isinstance(instance.bending_moment_y, dm.NodeId | str)
                 and (bending_moment_y := nodes_by_id.get(instance.bending_moment_y))
                 and isinstance(bending_moment_y, SensorTimeSeries)
             ):
                 instance.bending_moment_y = bending_moment_y
             if (
-                isinstance(instance.bending_monent_x, (dm.NodeId, str))
+                isinstance(instance.bending_monent_x, dm.NodeId | str)
                 and (bending_monent_x := nodes_by_id.get(instance.bending_monent_x))
                 and isinstance(bending_monent_x, SensorTimeSeries)
             ):
                 instance.bending_monent_x = bending_monent_x
             if (
-                isinstance(instance.torque, (dm.NodeId, str))
+                isinstance(instance.torque, dm.NodeId | str)
                 and (torque := nodes_by_id.get(instance.torque))
                 and isinstance(torque, SensorTimeSeries)
             ):
@@ -253,7 +253,8 @@ class HighSpeedShaft(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {high_speed_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 
@@ -361,7 +362,8 @@ class HighSpeedShaftWrite(DomainModelWrite):
 class HighSpeedShaftApply(HighSpeedShaftWrite):
     def __new__(cls, *args, **kwargs) -> HighSpeedShaftApply:
         warnings.warn(
-            "HighSpeedShaftApply is deprecated and will be removed in v1.0. Use HighSpeedShaftWrite instead."
+            "HighSpeedShaftApply is deprecated and will be removed in v1.0. "
+            "Use HighSpeedShaftWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "HighSpeedShaft.",
             UserWarning,

@@ -10,13 +10,15 @@ from omni_multi.data_classes import (
     DomainModelCore,
     SubInterface,
 )
-from omni_multi._api._core import (
+from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni_multi._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 

@@ -235,7 +235,8 @@ class Implementation1v1Write(DomainModelWrite):
 class Implementation1v1Apply(Implementation1v1Write):
     def __new__(cls, *args, **kwargs) -> Implementation1v1Apply:
         warnings.warn(
-            "Implementation1v1Apply is deprecated and will be removed in v1.0. Use Implementation1v1Write instead."
+            "Implementation1v1Apply is deprecated and will be removed in v1.0. "
+            "Use Implementation1v1Write instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Implementation1v1.",
             UserWarning,

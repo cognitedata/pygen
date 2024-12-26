@@ -350,55 +350,55 @@ class Nacelle(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.acc_from_back_side_y, (dm.NodeId, str))
+                isinstance(instance.acc_from_back_side_y, dm.NodeId | str)
                 and (acc_from_back_side_y := nodes_by_id.get(instance.acc_from_back_side_y))
                 and isinstance(acc_from_back_side_y, SensorTimeSeries)
             ):
                 instance.acc_from_back_side_y = acc_from_back_side_y
             if (
-                isinstance(instance.acc_from_back_side_z, (dm.NodeId, str))
+                isinstance(instance.acc_from_back_side_z, dm.NodeId | str)
                 and (acc_from_back_side_z := nodes_by_id.get(instance.acc_from_back_side_z))
                 and isinstance(acc_from_back_side_z, SensorTimeSeries)
             ):
                 instance.acc_from_back_side_z = acc_from_back_side_z
             if (
-                isinstance(instance.gearbox, (dm.NodeId, str))
+                isinstance(instance.gearbox, dm.NodeId | str)
                 and (gearbox := nodes_by_id.get(instance.gearbox))
                 and isinstance(gearbox, Gearbox)
             ):
                 instance.gearbox = gearbox
             if (
-                isinstance(instance.generator, (dm.NodeId, str))
+                isinstance(instance.generator, dm.NodeId | str)
                 and (generator := nodes_by_id.get(instance.generator))
                 and isinstance(generator, Generator)
             ):
                 instance.generator = generator
             if (
-                isinstance(instance.high_speed_shaft, (dm.NodeId, str))
+                isinstance(instance.high_speed_shaft, dm.NodeId | str)
                 and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft))
                 and isinstance(high_speed_shaft, HighSpeedShaft)
             ):
                 instance.high_speed_shaft = high_speed_shaft
             if (
-                isinstance(instance.main_shaft, (dm.NodeId, str))
+                isinstance(instance.main_shaft, dm.NodeId | str)
                 and (main_shaft := nodes_by_id.get(instance.main_shaft))
                 and isinstance(main_shaft, MainShaft)
             ):
                 instance.main_shaft = main_shaft
             if (
-                isinstance(instance.power_inverter, (dm.NodeId, str))
+                isinstance(instance.power_inverter, dm.NodeId | str)
                 and (power_inverter := nodes_by_id.get(instance.power_inverter))
                 and isinstance(power_inverter, PowerInverter)
             ):
                 instance.power_inverter = power_inverter
             if (
-                isinstance(instance.yaw_direction, (dm.NodeId, str))
+                isinstance(instance.yaw_direction, dm.NodeId | str)
                 and (yaw_direction := nodes_by_id.get(instance.yaw_direction))
                 and isinstance(yaw_direction, SensorTimeSeries)
             ):
                 instance.yaw_direction = yaw_direction
             if (
-                isinstance(instance.yaw_error, (dm.NodeId, str))
+                isinstance(instance.yaw_error, dm.NodeId | str)
                 and (yaw_error := nodes_by_id.get(instance.yaw_error))
                 and isinstance(yaw_error, SensorTimeSeries)
             ):
@@ -417,7 +417,8 @@ class Nacelle(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'wind_turbine' in {nacelle.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {nacelle.wind_turbine!s}."
+                        f"Ignoring new relation {node!s} in favor of {nacelle.wind_turbine!s}.",
+                        stacklevel=2,
                     )
 
 
@@ -628,7 +629,8 @@ class NacelleWrite(DomainModelWrite):
 class NacelleApply(NacelleWrite):
     def __new__(cls, *args, **kwargs) -> NacelleApply:
         warnings.warn(
-            "NacelleApply is deprecated and will be removed in v1.0. Use NacelleWrite instead."
+            "NacelleApply is deprecated and will be removed in v1.0. "
+            "Use NacelleWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Nacelle.",
             UserWarning,

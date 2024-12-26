@@ -208,7 +208,7 @@ class CognitePointCloudRevision(Cognite3DRevision, protected_namespaces=()):
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, CognitePointCloudModel)
             ):
@@ -292,7 +292,8 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
 class CognitePointCloudRevisionApply(CognitePointCloudRevisionWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudRevisionApply:
         warnings.warn(
-            "CognitePointCloudRevisionApply is deprecated and will be removed in v1.0. Use CognitePointCloudRevisionWrite instead."
+            "CognitePointCloudRevisionApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudRevisionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudRevision.",
             UserWarning,

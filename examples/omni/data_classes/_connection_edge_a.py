@@ -257,7 +257,8 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 class ConnectionEdgeAApply(ConnectionEdgeAWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionEdgeAApply:
         warnings.warn(
-            "ConnectionEdgeAApply is deprecated and will be removed in v1.0. Use ConnectionEdgeAWrite instead."
+            "ConnectionEdgeAApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionEdgeAWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionEdgeA.",
             UserWarning,
@@ -405,16 +406,18 @@ def _validate_end_node(
     start_node: DomainModelWrite,
     end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
 ) -> None:
-    if isinstance(end_node, (str, dm.NodeId)):
+    if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
 
 

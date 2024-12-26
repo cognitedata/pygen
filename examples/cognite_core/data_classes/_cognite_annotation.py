@@ -119,12 +119,15 @@ class CogniteAnnotationGraphQL(GraphQLCore):
         description: Description of the instance
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -215,12 +218,15 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
         description: Description of the instance
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -279,12 +285,15 @@ class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeW
         description: Description of the instance
         name: Name of the instance
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -395,7 +404,8 @@ class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeW
 class CogniteAnnotationApply(CogniteAnnotationWrite):
     def __new__(cls, *args, **kwargs) -> CogniteAnnotationApply:
         warnings.warn(
-            "CogniteAnnotationApply is deprecated and will be removed in v1.0. Use CogniteAnnotationWrite instead."
+            "CogniteAnnotationApply is deprecated and will be removed in v1.0. "
+            "Use CogniteAnnotationWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteAnnotation.",
             UserWarning,
@@ -598,16 +608,18 @@ _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainM
 
 
 def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, (str, dm.NodeId)):
+    if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
 
 

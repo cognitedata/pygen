@@ -16,13 +16,15 @@ from cognite_core.data_classes import (
     CogniteFile,
     CogniteFile,
 )
-from cognite_core._api._core import (
+from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from cognite_core._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -63,12 +65,24 @@ class CogniteCubeMapQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_back: Whether to retrieve the back for each Cognite cube map or not.
-            retrieve_bottom: Whether to retrieve the bottom for each Cognite cube map or not.
-            retrieve_front: Whether to retrieve the front for each Cognite cube map or not.
-            retrieve_left: Whether to retrieve the left for each Cognite cube map or not.
-            retrieve_right: Whether to retrieve the right for each Cognite cube map or not.
-            retrieve_top: Whether to retrieve the top for each Cognite cube map or not.
+            retrieve_back: Whether to retrieve the
+                back for each
+                Cognite cube map or not.
+            retrieve_bottom: Whether to retrieve the
+                bottom for each
+                Cognite cube map or not.
+            retrieve_front: Whether to retrieve the
+                front for each
+                Cognite cube map or not.
+            retrieve_left: Whether to retrieve the
+                left for each
+                Cognite cube map or not.
+            retrieve_right: Whether to retrieve the
+                right for each
+                Cognite cube map or not.
+            retrieve_top: Whether to retrieve the
+                top for each
+                Cognite cube map or not.
 
         Returns:
             The list of the source nodes of the query.

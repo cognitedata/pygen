@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import textwrap
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
@@ -148,9 +149,20 @@ class Field:
     @property
     def argument_documentation(self) -> str:
         if self.description:
-            return self.description
+            msg = self.description
         else:
-            return f"The {self.doc_name} field."
+            msg = f"The {self.doc_name} field."
+        line_width = 120 - 10 - len(self.name) - 1
+        return ("\n" + " " * 12).join(textwrap.wrap(msg, width=line_width))
+
+    @property
+    def argument_documentation_method(self) -> str:
+        if self.description:
+            msg = self.description
+        else:
+            msg = f"The {self.doc_name} field."
+        line_width = 120 - 14 - len(self.name) - 1
+        return ("\n" + " " * 16).join(textwrap.wrap(msg, width=line_width))
 
     # The properties below are overwritten in the child classes
     @property

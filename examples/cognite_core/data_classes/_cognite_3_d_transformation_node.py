@@ -323,7 +323,8 @@ class Cognite3DTransformationNodeWrite(DomainModelWrite):
 class Cognite3DTransformationNodeApply(Cognite3DTransformationNodeWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DTransformationNodeApply:
         warnings.warn(
-            "Cognite3DTransformationNodeApply is deprecated and will be removed in v1.0. Use Cognite3DTransformationNodeWrite instead."
+            "Cognite3DTransformationNodeApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DTransformationNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DTransformationNode.",
             UserWarning,

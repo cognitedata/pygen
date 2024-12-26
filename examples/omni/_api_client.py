@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
-from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList, FileMetadataList, SequenceList
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 
+from omni import data_classes
 from omni._api import (
     CDFExternalReferencesAPI,
     CDFExternalReferencesListedAPI,
@@ -31,9 +34,8 @@ from omni._api import (
     PrimitiveWithDefaultsAPI,
     SubInterfaceAPI,
 )
-from omni._api._core import SequenceNotStr, GraphQLQueryResponse
+from omni._api._core import GraphQLQueryResponse, SequenceNotStr
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE, GraphQLList
-from omni import data_classes
 
 
 class OmniClient:
@@ -98,11 +100,15 @@ class OmniClient:
 
         Args:
             items: One or more instances of the pygen generated data classes.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+            replace (bool): How do we behave when a property value exists? Do we replace all
+                matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
-            allow_version_increase (bool): If set to true, the version of the instance will be increased if the instance already exists.
+            allow_version_increase (bool): If set to true, the version of the instance will be increased
+                if the instance already exists.
                 If you get an error: 'A version conflict caused the ingest to fail', you can set this to true to allow
                 the version to increase.
         Returns:
@@ -163,9 +169,12 @@ class OmniClient:
 
         Args:
             items: One or more instances of the pygen generated data classes.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method will, by default, skip properties that are set to None. However, if you want to set properties to None,
+            replace (bool): How do we behave when a property value exists? Do we replace all
+                matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing
+                values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method will, by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -276,9 +285,10 @@ class OmniClient:
         return cls.azure_project(**toml_content)
 
     def _repr_html_(self) -> str:
-        return """<strong>OmniClient</strong> generated from data model ("sp_pygen_models", "Omni", "1")<br />
+        return """<strong>OmniClient(</strong> generated from data model
+("sp_pygen_models", "Omni", "1")<br />
 with the following APIs available<br />
-&nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references<br />
+)&nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cdf_external_references_listed<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_a<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_b<br />

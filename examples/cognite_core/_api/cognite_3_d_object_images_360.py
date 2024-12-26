@@ -90,8 +90,8 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of images 360 edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of images 360 edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested images 360 edges.
@@ -102,7 +102,9 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_object = client.cognite_3_d_object.images_360_edge.list("my_cognite_3_d_object", limit=5)
+                >>> cognite_3_d_object = client.cognite_3_d_object.images_360_edge.list(
+                ...     "my_cognite_3_d_object", limit=5
+                ... )
 
         """
         filter_ = _create_cognite_360_image_annotation_filter(

@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from cognite_core.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from cognite_core.data_classes._cognite_3_d_transformation_node import (
+    Cognite3DTransformationNodeQuery,
+    _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD,
+    _create_cognite_3_d_transformation_node_filter,
+)
 from cognite_core.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,17 +38,6 @@ from cognite_core.data_classes import (
     Cognite3DTransformationNodeWriteList,
     Cognite3DTransformationNodeTextFields,
     Cognite360Image,
-)
-from cognite_core.data_classes._cognite_3_d_transformation_node import (
-    Cognite3DTransformationNodeQuery,
-    _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD,
-    _create_cognite_3_d_transformation_node_filter,
-)
-from cognite_core._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
 )
 from cognite_core._api.cognite_3_d_transformation_node_query import Cognite3DTransformationNodeQueryAPI
 
@@ -50,8 +51,8 @@ class Cognite3DTransformationNodeAPI(
     ]
 ):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
-    _properties_by_field = _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Cognite360Image": Cognite360Image,
     }
     _class_type = Cognite3DTransformationNode
@@ -109,8 +110,10 @@ class Cognite3DTransformationNodeAPI(
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for Cognite 3D transformation nodes.
@@ -158,10 +161,14 @@ class Cognite3DTransformationNodeAPI(
         """Add or update (upsert) Cognite 3D transformation nodes.
 
         Args:
-            cognite_3_d_transformation_node: Cognite 3d transformation node or sequence of Cognite 3D transformation nodes to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cognite_3_d_transformation_node: Cognite 3d transformation node or
+                sequence of Cognite 3D transformation nodes to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -173,7 +180,9 @@ class Cognite3DTransformationNodeAPI(
                 >>> from cognite_core import CogniteCoreClient
                 >>> from cognite_core.data_classes import Cognite3DTransformationNodeWrite
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_transformation_node = Cognite3DTransformationNodeWrite(external_id="my_cognite_3_d_transformation_node", ...)
+                >>> cognite_3_d_transformation_node = Cognite3DTransformationNodeWrite(
+                ...     external_id="my_cognite_3_d_transformation_node", ...
+                ... )
                 >>> result = client.cognite_3_d_transformation_node.apply(cognite_3_d_transformation_node)
 
         """
@@ -260,7 +269,9 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_transformation_node = client.cognite_3_d_transformation_node.retrieve("my_cognite_3_d_transformation_node")
+                >>> cognite_3_d_transformation_node = client.cognite_3_d_transformation_node.retrieve(
+                ...     "my_cognite_3_d_transformation_node"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -322,12 +333,14 @@ class Cognite3DTransformationNodeAPI(
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -339,7 +352,9 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_transformation_nodes = client.cognite_3_d_transformation_node.search('my_cognite_3_d_transformation_node')
+                >>> cognite_3_d_transformation_nodes = client.cognite_3_d_transformation_node.search(
+                ...     'my_cognite_3_d_transformation_node'
+                ... )
 
         """
         filter_ = _create_cognite_3_d_transformation_node_filter(
@@ -532,8 +547,10 @@ class Cognite3DTransformationNodeAPI(
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -634,8 +651,10 @@ class Cognite3DTransformationNodeAPI(
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 3D transformation nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -737,8 +756,10 @@ class Cognite3DTransformationNodeAPI(
             max_translation_z: The maximum value of the translation z to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of Cognite 3D transformation nodes to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

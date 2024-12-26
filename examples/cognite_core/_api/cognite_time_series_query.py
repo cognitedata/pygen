@@ -12,13 +12,15 @@ from cognite_core.data_classes import (
     CogniteSourceSystem,
     CogniteUnit,
 )
-from cognite_core._api._core import (
+from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from cognite_core._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -55,8 +57,12 @@ class CogniteTimeSeriesQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_source: Whether to retrieve the source for each Cognite time series or not.
-            retrieve_unit: Whether to retrieve the unit for each Cognite time series or not.
+            retrieve_source: Whether to retrieve the
+                source for each
+                Cognite time series or not.
+            retrieve_unit: Whether to retrieve the
+                unit for each
+                Cognite time series or not.
 
         Returns:
             The list of the source nodes of the query.

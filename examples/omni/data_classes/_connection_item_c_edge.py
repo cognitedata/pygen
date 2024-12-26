@@ -42,11 +42,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ConnectionItemCEdge",
-    "ConnectionItemCEdgeWrite",
-    "ConnectionItemCEdgeApply",
     "ConnectionItemCEdgeList",
-    "ConnectionItemCEdgeWriteList",
-    "ConnectionItemCEdgeApplyList",
 ]
 
 
@@ -212,16 +208,18 @@ _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainM
 
 
 def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, (str, dm.NodeId)):
+    if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
 
 

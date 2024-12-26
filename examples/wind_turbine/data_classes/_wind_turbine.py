@@ -282,13 +282,13 @@ class WindTurbine(GeneratingUnit):
 
         for instance in instances.values():
             if (
-                isinstance(instance.nacelle, (dm.NodeId, str))
+                isinstance(instance.nacelle, dm.NodeId | str)
                 and (nacelle := nodes_by_id.get(instance.nacelle))
                 and isinstance(nacelle, Nacelle)
             ):
                 instance.nacelle = nacelle
             if (
-                isinstance(instance.rotor, (dm.NodeId, str))
+                isinstance(instance.rotor, dm.NodeId | str)
                 and (rotor := nodes_by_id.get(instance.rotor))
                 and isinstance(rotor, Rotor)
             ):
@@ -502,7 +502,8 @@ class WindTurbineWrite(GeneratingUnitWrite):
 class WindTurbineApply(WindTurbineWrite):
     def __new__(cls, *args, **kwargs) -> WindTurbineApply:
         warnings.warn(
-            "WindTurbineApply is deprecated and will be removed in v1.0. Use WindTurbineWrite instead."
+            "WindTurbineApply is deprecated and will be removed in v1.0. "
+            "Use WindTurbineWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "WindTurbine.",
             UserWarning,

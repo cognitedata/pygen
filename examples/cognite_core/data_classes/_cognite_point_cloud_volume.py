@@ -113,8 +113,8 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
@@ -217,8 +217,8 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
@@ -287,13 +287,13 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, CogniteCADModel)
             ):
                 instance.model_3d = model_3d
             if (
-                isinstance(instance.object_3d, (dm.NodeId, str))
+                isinstance(instance.object_3d, dm.NodeId | str)
                 and (object_3d := nodes_by_id.get(instance.object_3d))
                 and isinstance(object_3d, Cognite3DObject)
             ):
@@ -321,8 +321,8 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         data_record: The data record of the Cognite point cloud volume node.
         aliases: Alternative names for the node
         description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats (property volume)
-
+        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
+            (property volume)
         model_3d: Direct relation to Cognite3DModel instance
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
@@ -446,7 +446,8 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
 class CognitePointCloudVolumeApply(CognitePointCloudVolumeWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudVolumeApply:
         warnings.warn(
-            "CognitePointCloudVolumeApply is deprecated and will be removed in v1.0. Use CognitePointCloudVolumeWrite instead."
+            "CognitePointCloudVolumeApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudVolumeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudVolume.",
             UserWarning,

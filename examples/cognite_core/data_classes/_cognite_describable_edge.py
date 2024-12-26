@@ -259,7 +259,8 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
 class CogniteDescribableEdgeApply(CogniteDescribableEdgeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteDescribableEdgeApply:
         warnings.warn(
-            "CogniteDescribableEdgeApply is deprecated and will be removed in v1.0. Use CogniteDescribableEdgeWrite instead."
+            "CogniteDescribableEdgeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteDescribableEdgeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteDescribableEdge.",
             UserWarning,
@@ -388,16 +389,18 @@ _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainM
 
 
 def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, (str, dm.NodeId)):
+    if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
     if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
     if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
 
 

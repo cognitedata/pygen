@@ -240,7 +240,7 @@ class ConnectionItemD(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.direct_single, (dm.NodeId, str))
+                isinstance(instance.direct_single, dm.NodeId | str)
                 and (direct_single := nodes_by_id.get(instance.direct_single))
                 and isinstance(direct_single, ConnectionItemE)
             ):
@@ -279,7 +279,7 @@ class ConnectionItemD(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle") and isinstance(
-                        value, (ConnectionItemE, str, dm.NodeId)
+                        value, ConnectionItemE | str | dm.NodeId
                     ):
                         if instance.outwards_single is None:
                             instance.outwards_single = value
@@ -288,7 +288,8 @@ class ConnectionItemD(DomainModel):
                         else:
                             warnings.warn(
                                 f"Expected one edge for 'outwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.outwards_single!s}.",
+                                stacklevel=2,
                             )
 
 
@@ -408,7 +409,8 @@ class ConnectionItemDWrite(DomainModelWrite):
 class ConnectionItemDApply(ConnectionItemDWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemDApply:
         warnings.warn(
-            "ConnectionItemDApply is deprecated and will be removed in v1.0. Use ConnectionItemDWrite instead."
+            "ConnectionItemDApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemDWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemD.",
             UserWarning,

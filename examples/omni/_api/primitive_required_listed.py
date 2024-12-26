@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -16,7 +22,13 @@ from omni.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni.data_classes._primitive_required_listed import (
+    PrimitiveRequiredListedQuery,
+    _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD,
+    _create_primitive_required_listed_filter,
+)
 from omni.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,17 +38,6 @@ from omni.data_classes import (
     PrimitiveRequiredListedList,
     PrimitiveRequiredListedWriteList,
     PrimitiveRequiredListedTextFields,
-)
-from omni.data_classes._primitive_required_listed import (
-    PrimitiveRequiredListedQuery,
-    _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD,
-    _create_primitive_required_listed_filter,
-)
-from omni._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
 )
 from omni._api.primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
 
@@ -50,7 +51,7 @@ class PrimitiveRequiredListedAPI(
     ]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
-    _properties_by_field = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequiredListed
     _class_list = PrimitiveRequiredListedList
     _class_write_list = PrimitiveRequiredListedWriteList
@@ -70,8 +71,10 @@ class PrimitiveRequiredListedAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive required listeds to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for primitive required listeds.
@@ -101,10 +104,14 @@ class PrimitiveRequiredListedAPI(
         """Add or update (upsert) primitive required listeds.
 
         Args:
-            primitive_required_listed: Primitive required listed or sequence of primitive required listeds to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            primitive_required_listed: Primitive required listed or
+                sequence of primitive required listeds to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -116,7 +123,9 @@ class PrimitiveRequiredListedAPI(
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import PrimitiveRequiredListedWrite
                 >>> client = OmniClient()
-                >>> primitive_required_listed = PrimitiveRequiredListedWrite(external_id="my_primitive_required_listed", ...)
+                >>> primitive_required_listed = PrimitiveRequiredListedWrite(
+                ...     external_id="my_primitive_required_listed", ...
+                ... )
                 >>> result = client.primitive_required_listed.apply(primitive_required_listed)
 
         """
@@ -193,7 +202,9 @@ class PrimitiveRequiredListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required_listed = client.primitive_required_listed.retrieve("my_primitive_required_listed")
+                >>> primitive_required_listed = client.primitive_required_listed.retrieve(
+                ...     "my_primitive_required_listed"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -217,12 +228,14 @@ class PrimitiveRequiredListedAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive required listeds to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -234,7 +247,9 @@ class PrimitiveRequiredListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required_listeds = client.primitive_required_listed.search('my_primitive_required_listed')
+                >>> primitive_required_listeds = client.primitive_required_listed.search(
+                ...     'my_primitive_required_listed'
+                ... )
 
         """
         filter_ = _create_primitive_required_listed_filter(
@@ -337,8 +352,10 @@ class PrimitiveRequiredListedAPI(
             search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive required listeds to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -391,8 +408,10 @@ class PrimitiveRequiredListedAPI(
             search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive required listeds to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -440,8 +459,10 @@ class PrimitiveRequiredListedAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required listeds to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of primitive required listeds to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

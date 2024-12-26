@@ -12,13 +12,15 @@ from wind_turbine.data_classes import (
     SensorTimeSeries,
     SensorTimeSeries,
 )
-from wind_turbine._api._core import (
+from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from wind_turbine._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -55,8 +57,12 @@ class GeneratorQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_generator_speed_controller: Whether to retrieve the generator speed controller for each generator or not.
-            retrieve_generator_speed_controller_reference: Whether to retrieve the generator speed controller reference for each generator or not.
+            retrieve_generator_speed_controller: Whether to retrieve the
+                generator speed controller for each
+                generator or not.
+            retrieve_generator_speed_controller_reference: Whether to retrieve the
+                generator speed controller reference for each
+                generator or not.
 
         Returns:
             The list of the source nodes of the query.

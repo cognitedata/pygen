@@ -13,13 +13,15 @@ from wind_turbine.data_classes import (
     SensorTimeSeries,
     SensorTimeSeries,
 )
-from wind_turbine._api._core import (
+from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from wind_turbine._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -57,9 +59,15 @@ class HighSpeedShaftQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_bending_moment_y: Whether to retrieve the bending moment y for each high speed shaft or not.
-            retrieve_bending_monent_x: Whether to retrieve the bending monent x for each high speed shaft or not.
-            retrieve_torque: Whether to retrieve the torque for each high speed shaft or not.
+            retrieve_bending_moment_y: Whether to retrieve the
+                bending moment y for each
+                high speed shaft or not.
+            retrieve_bending_monent_x: Whether to retrieve the
+                bending monent x for each
+                high speed shaft or not.
+            retrieve_torque: Whether to retrieve the
+                torque for each
+                high speed shaft or not.
 
         Returns:
             The list of the source nodes of the query.

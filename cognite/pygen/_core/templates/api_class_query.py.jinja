@@ -16,19 +16,20 @@ from {{ top_level_package }}.data_classes import (
     {{ field.destination_class.read_name }},
     {% endfor %}
 )
+from {{ top_level_package }}.data_classes._core import (
+    DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
+    EdgeQueryStep,
+    NodeQueryStep,
+    DataClassQueryBuilder,
+)
 {% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
-    {{ edge_api.end_class.read_name }},
     {{ edge_api.end_class.filter_name }},
 )
 {% endfor %}
 from {{ top_level_package }}._api._core import (
-    DEFAULT_QUERY_LIMIT,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
     QueryAPI,
-    T_DomainModelList,
     {% if not query_api.is_only_one_to_many_edges  %}
     _create_edge_filter,
     {% endif %}
@@ -88,13 +89,15 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
 
         Args:
             {% for parm in edge_api.filter_parameters(False, include_end_node=True, suffix_edge=True) %}
-            {{ parm.name }}: {{ parm.description }}
+            {{ parm.name }}: {{ parm.argument_documentation_method }}
             {% endfor %}
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
             {% for field in data_class.one_to_one_direct_relations_with_source %}
-            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.
+            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }}
+                for each {{ data_class.doc_name }} or not.
             {% endfor %}
 
         Returns:
@@ -158,7 +161,9 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         {% if data_class.has_one_to_one_direct_relations_with_source %}
         Args:
             {% for field in data_class.one_to_one_direct_relations_with_source %}
-            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.
+            retrieve_{{ field.name }}: Whether to retrieve the
+                {{ field.doc_name }} for each
+                {{ data_class.doc_name }} or not.
             {% endfor %}
 
         {% endif %}

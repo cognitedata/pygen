@@ -3,14 +3,24 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime
 {% endif %}
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from {{ top_level_package }}._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    {% if data_class.is_writable %}
+    NodeAPI,
+    {% else %}
+    NodeReadAPI,
+    {% endif %}
+    SequenceNotStr,
+)
 from {{ top_level_package }}.data_classes._core import (
     {% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,
@@ -20,7 +30,15 @@ from {{ top_level_package }}.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
+    {{ data_class.query_cls_name }},
+    {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
+    {{ data_class.properties_dict_name }},
+    {%  endif %}
+    {{ data_class.filter_name }},
+)
 from {{ top_level_package }}.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -48,23 +66,6 @@ from {{ top_level_package }}.data_classes import (
     {{ child.read_name }},
     {% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
-    {{ data_class.query_cls_name }},
-    {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
-    {{ data_class.properties_dict_name }},
-    {%  endif %}
-    {{ data_class.filter_name }},
-)
-from {{ top_level_package }}._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    {% if data_class.is_writable %}
-    NodeAPI,
-    {% else %}
-    NodeReadAPI,
-    {% endif %}
-    SequenceNotStr,
-)
 {% for class_ in edge_apis %}
 {% if class_.field.is_write_field %}
 from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}
@@ -78,9 +79,9 @@ from {{ top_level_package }}._api.{{ query_api.file_name }} import {{ query_api.
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    _properties_by_field = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif +%}
+    _properties_by_field: ClassVar[dict[str, str]] = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif +%}
     {% if data_class.direct_children %}
-    _direct_children_by_external_id = {{'{'}}
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {{'{'}}
         {% for child in data_class.direct_children %}
         "{{ child.view_id.external_id }}": {{ child.read_name }},
         {% endfor %}
@@ -118,8 +119,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for {{ data_class.doc_list_name}}.
@@ -150,18 +153,16 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         write_none: bool = False,
     ) -> ResourcesWriteResult:
         """Add or update (upsert) {{data_class.doc_list_name}}.
-        {% if data_class.has_writable_connection_fields %}
-
-        Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
-        between the nodes. For example, if any of {{ data_class.connections_docs_write }} are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-        {% endif %}
 
         Args:
-            {{ data_class.variable }}: {{ data_class.doc_name.capitalize() }} or sequence of {{ data_class.doc_list_name }} to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            {{ data_class.variable }}: {{ data_class.doc_name.capitalize() }} or
+                sequence of {{ data_class.doc_list_name }} to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -173,7 +174,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
+                >>> {{ data_class.variable }} = {{ data_class.write_name }}(
+                ...     external_id="my_{{ data_class.variable }}", ...
+                ... )
                 >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
 
         """
@@ -248,7 +251,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
+                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve(
+                ...     "my_{{ data_class.variable }}"
+                ... )
 
         """
         {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
@@ -298,12 +303,14 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -315,7 +322,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search('my_{{ data_class.variable }}')
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search(
+                ...     'my_{{ data_class.variable }}'
+                ... )
 
         """
         filter_ = {{ data_class.filter_name }}(
@@ -422,8 +431,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -486,8 +497,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -521,7 +534,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
     def select(self) -> {{ data_class.query_cls_name }}:
         """Start selecting from {{ data_class.doc_list_name}}."""
-        warnings.warn("The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2)
+        warnings.warn(
+            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
+        )
         return {{ data_class.query_cls_name }}(self._client)
 
     def list(
@@ -546,8 +561,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
@@ -556,8 +573,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 specify the direction for each field as well as how to handle null values.
             {% endif %}
             {% if data_class.has_connection_with_target %}
-            retrieve_connections: Whether to retrieve {{ data_class.connections_docs }} for the {{ data_class.doc_list_name }}. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            {{ retrieve_connections_doc }}
             {% endif %}
 
         Returns:

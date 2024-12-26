@@ -230,7 +230,8 @@ class Implementation1v2Write(SubInterfaceWrite):
 class Implementation1v2Apply(Implementation1v2Write):
     def __new__(cls, *args, **kwargs) -> Implementation1v2Apply:
         warnings.warn(
-            "Implementation1v2Apply is deprecated and will be removed in v1.0. Use Implementation1v2Write instead."
+            "Implementation1v2Apply is deprecated and will be removed in v1.0. "
+            "Use Implementation1v2Write instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Implementation1v2.",
             UserWarning,

@@ -28,8 +28,8 @@ class ConnectionItemBInwardsAPI(EdgeAPI):
             to_connection_item_a_space: Location of the connection item as.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of inward edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of inward edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested inward edges.
@@ -40,7 +40,9 @@ class ConnectionItemBInwardsAPI(EdgeAPI):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_b = client.connection_item_b.inwards_edge.list("my_connection_item_b", limit=5)
+                >>> connection_item_b = client.connection_item_b.inwards_edge.list(
+                ...     "my_connection_item_b", limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(

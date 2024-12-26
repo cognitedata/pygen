@@ -386,7 +386,8 @@ class MetmastWrite(DomainModelWrite):
 class MetmastApply(MetmastWrite):
     def __new__(cls, *args, **kwargs) -> MetmastApply:
         warnings.warn(
-            "MetmastApply is deprecated and will be removed in v1.0. Use MetmastWrite instead."
+            "MetmastApply is deprecated and will be removed in v1.0. "
+            "Use MetmastWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Metmast.",
             UserWarning,

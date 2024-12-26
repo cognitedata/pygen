@@ -226,7 +226,7 @@ class CognitePointCloudModel(Cognite3DModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.thumbnail, (dm.NodeId, str))
+                isinstance(instance.thumbnail, dm.NodeId | str)
                 and (thumbnail := nodes_by_id.get(instance.thumbnail))
                 and isinstance(thumbnail, CogniteFile)
             ):
@@ -322,7 +322,8 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
 class CognitePointCloudModelApply(CognitePointCloudModelWrite):
     def __new__(cls, *args, **kwargs) -> CognitePointCloudModelApply:
         warnings.warn(
-            "CognitePointCloudModelApply is deprecated and will be removed in v1.0. Use CognitePointCloudModelWrite instead."
+            "CognitePointCloudModelApply is deprecated and will be removed in v1.0. "
+            "Use CognitePointCloudModelWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CognitePointCloudModel.",
             UserWarning,

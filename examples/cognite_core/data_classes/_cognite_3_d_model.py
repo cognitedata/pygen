@@ -215,7 +215,7 @@ class Cognite3DModel(CogniteDescribableNode):
 
         for instance in instances.values():
             if (
-                isinstance(instance.thumbnail, (dm.NodeId, str))
+                isinstance(instance.thumbnail, dm.NodeId | str)
                 and (thumbnail := nodes_by_id.get(instance.thumbnail))
                 and isinstance(thumbnail, CogniteFile)
             ):
@@ -314,7 +314,8 @@ class Cognite3DModelWrite(CogniteDescribableNodeWrite):
 class Cognite3DModelApply(Cognite3DModelWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DModelApply:
         warnings.warn(
-            "Cognite3DModelApply is deprecated and will be removed in v1.0. Use Cognite3DModelWrite instead."
+            "Cognite3DModelApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DModelWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DModel.",
             UserWarning,

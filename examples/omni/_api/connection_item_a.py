@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from omni.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni.data_classes._connection_item_a import (
+    ConnectionItemAQuery,
+    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
+    _create_connection_item_a_filter,
+)
 from omni.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -28,24 +40,13 @@ from omni.data_classes import (
     ConnectionItemB,
     ConnectionItemCNode,
 )
-from omni.data_classes._connection_item_a import (
-    ConnectionItemAQuery,
-    _CONNECTIONITEMA_PROPERTIES_BY_FIELD,
-    _create_connection_item_a_filter,
-)
-from omni._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from omni._api.connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from omni._api.connection_item_a_query import ConnectionItemAQueryAPI
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, ConnectionItemAList, ConnectionItemAWriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
-    _properties_by_field = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _CONNECTIONITEMA_PROPERTIES_BY_FIELD
     _class_type = ConnectionItemA
     _class_list = ConnectionItemAList
     _class_write_list = ConnectionItemAWriteList
@@ -89,8 +90,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item as to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item as to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for connection item as.
@@ -123,15 +126,15 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item as.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_a and creates them including the edges
-        between the nodes. For example, if any of `other_direct`, `outwards` or `self_direct` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            connection_item_a: Connection item a or sequence of connection item as to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            connection_item_a: Connection item a or
+                sequence of connection item as to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -143,7 +146,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import ConnectionItemAWrite
                 >>> client = OmniClient()
-                >>> connection_item_a = ConnectionItemAWrite(external_id="my_connection_item_a", ...)
+                >>> connection_item_a = ConnectionItemAWrite(
+                ...     external_id="my_connection_item_a", ...
+                ... )
                 >>> result = client.connection_item_a.apply(connection_item_a)
 
         """
@@ -220,7 +225,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_a = client.connection_item_a.retrieve("my_connection_item_a")
+                >>> connection_item_a = client.connection_item_a.retrieve(
+                ...     "my_connection_item_a"
+                ... )
 
         """
         return self._retrieve(
@@ -279,12 +286,14 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item as to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item as to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -296,7 +305,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_as = client.connection_item_a.search('my_connection_item_a')
+                >>> connection_item_as = client.connection_item_a.search(
+                ...     'my_connection_item_a'
+                ... )
 
         """
         filter_ = _create_connection_item_a_filter(
@@ -471,8 +482,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item as to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item as to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -549,8 +562,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item as to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item as to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -625,15 +640,18 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             self_direct: The self direct to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item as to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of connection item as to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `other_direct`, `outwards` and `self_direct` for the connection item as. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `other_direct`, `outwards` and `self_direct` for the connection
+            item as. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the
+            identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested connection item as

@@ -253,11 +253,11 @@ class ConnectionItemCNode(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, (ConnectionItemA, str, dm.NodeId)
+                        value, ConnectionItemA | str | dm.NodeId
                     ):
                         connection_item_a.append(value)
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, (ConnectionItemB, str, dm.NodeId)
+                        value, ConnectionItemB | str | dm.NodeId
                     ):
                         connection_item_b.append(value)
 
@@ -351,7 +351,8 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
 class ConnectionItemCNodeApply(ConnectionItemCNodeWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemCNodeApply:
         warnings.warn(
-            "ConnectionItemCNodeApply is deprecated and will be removed in v1.0. Use ConnectionItemCNodeWrite instead."
+            "ConnectionItemCNodeApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemCNodeWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemCNode.",
             UserWarning,

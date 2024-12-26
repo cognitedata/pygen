@@ -203,7 +203,7 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
 
         for instance in instances.values():
             if (
-                isinstance(instance.model_3d, (dm.NodeId, str))
+                isinstance(instance.model_3d, dm.NodeId | str)
                 and (model_3d := nodes_by_id.get(instance.model_3d))
                 and isinstance(model_3d, Cognite3DModel)
             ):
@@ -297,7 +297,8 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
 class Cognite3DRevisionApply(Cognite3DRevisionWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DRevisionApply:
         warnings.warn(
-            "Cognite3DRevisionApply is deprecated and will be removed in v1.0. Use Cognite3DRevisionWrite instead."
+            "Cognite3DRevisionApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DRevisionWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DRevision.",
             UserWarning,

@@ -10,13 +10,15 @@ from cognite_core.data_classes import (
     DomainModelCore,
     CogniteAssetClass,
 )
-from cognite_core._api._core import (
+from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from cognite_core._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 

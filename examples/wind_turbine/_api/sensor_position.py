@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from wind_turbine.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from wind_turbine.data_classes._sensor_position import (
+    SensorPositionQuery,
+    _SENSORPOSITION_PROPERTIES_BY_FIELD,
+    _create_sensor_position_filter,
+)
 from wind_turbine.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -28,23 +40,12 @@ from wind_turbine.data_classes import (
     Blade,
     SensorTimeSeries,
 )
-from wind_turbine.data_classes._sensor_position import (
-    SensorPositionQuery,
-    _SENSORPOSITION_PROPERTIES_BY_FIELD,
-    _create_sensor_position_filter,
-)
-from wind_turbine._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from wind_turbine._api.sensor_position_query import SensorPositionQueryAPI
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPositionList, SensorPositionWriteList]):
     _view_id = dm.ViewId("sp_pygen_power", "SensorPosition", "1")
-    _properties_by_field = _SENSORPOSITION_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _SENSORPOSITION_PROPERTIES_BY_FIELD
     _class_type = SensorPosition
     _class_list = SensorPositionList
     _class_write_list = SensorPositionWriteList
@@ -149,8 +150,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor positions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor positions to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for sensor positions.
@@ -190,15 +193,15 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
     ) -> ResourcesWriteResult:
         """Add or update (upsert) sensor positions.
 
-        Note: This method iterates through all nodes and timeseries linked to sensor_position and creates them including the edges
-        between the nodes. For example, if any of `blade`, `edgewise_bend_mom_crosstalk_corrected`, `edgewise_bend_mom_offset`, `edgewise_bend_mom_offset_crosstalk_corrected`, `edgewisewise_bend_mom`, `flapwise_bend_mom`, `flapwise_bend_mom_crosstalk_corrected`, `flapwise_bend_mom_offset` or `flapwise_bend_mom_offset_crosstalk_corrected` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
-
         Args:
-            sensor_position: Sensor position or sequence of sensor positions to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            sensor_position: Sensor position or
+                sequence of sensor positions to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -210,7 +213,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import SensorPositionWrite
                 >>> client = WindTurbineClient()
-                >>> sensor_position = SensorPositionWrite(external_id="my_sensor_position", ...)
+                >>> sensor_position = SensorPositionWrite(
+                ...     external_id="my_sensor_position", ...
+                ... )
                 >>> result = client.sensor_position.apply(sensor_position)
 
         """
@@ -287,7 +292,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_position = client.sensor_position.retrieve("my_sensor_position")
+                >>> sensor_position = client.sensor_position.retrieve(
+                ...     "my_sensor_position"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -396,12 +403,14 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor positions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor positions to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -413,7 +422,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_positions = client.sensor_position.search('my_sensor_position')
+                >>> sensor_positions = client.sensor_position.search(
+                ...     'my_sensor_position'
+                ... )
 
         """
         filter_ = _create_sensor_position_filter(
@@ -816,8 +827,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor positions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor positions to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -960,8 +973,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor positions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor positions to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -1106,15 +1121,21 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             max_position: The maximum value of the position to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor positions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor positions to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `blade`, `edgewise_bend_mom_crosstalk_corrected`, `edgewise_bend_mom_offset`, `edgewise_bend_mom_offset_crosstalk_corrected`, `edgewisewise_bend_mom`, `flapwise_bend_mom`, `flapwise_bend_mom_crosstalk_corrected`, `flapwise_bend_mom_offset` and `flapwise_bend_mom_offset_crosstalk_corrected` for the sensor positions. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `blade`, `edgewise_bend_mom_crosstalk_corrected`,
+            `edgewise_bend_mom_offset`, `edgewise_bend_mom_offset_crosstalk_corrected`, `edgewisewise_bend_mom`,
+            `flapwise_bend_mom`, `flapwise_bend_mom_crosstalk_corrected`, `flapwise_bend_mom_offset` and
+            `flapwise_bend_mom_offset_crosstalk_corrected` for the sensor positions. Defaults to 'skip'.'skip' will not
+            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
+            will retrieve the full connected items.
 
         Returns:
             List of requested sensor positions

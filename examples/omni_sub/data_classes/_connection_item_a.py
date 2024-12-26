@@ -252,7 +252,7 @@ class ConnectionItemA(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectional") and isinstance(
-                        value, (ConnectionItemB, dm.NodeId)
+                        value, ConnectionItemB | dm.NodeId
                     ):
                         outwards.append(value)
 
@@ -368,7 +368,8 @@ class ConnectionItemAWrite(DomainModelWrite):
 class ConnectionItemAApply(ConnectionItemAWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionItemAApply:
         warnings.warn(
-            "ConnectionItemAApply is deprecated and will be removed in v1.0. Use ConnectionItemAWrite instead."
+            "ConnectionItemAApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionItemAWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionItemA.",
             UserWarning,

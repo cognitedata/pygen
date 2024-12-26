@@ -11,21 +11,21 @@ from omni.data_classes import (
     ConnectionItemE,
     ConnectionEdgeA,
 )
-from omni.data_classes._connection_item_d import (
-    ConnectionItemD,
-    _create_connection_item_d_filter,
-)
-from omni.data_classes._connection_item_f import (
-    ConnectionItemF,
-    _create_connection_item_f_filter,
-)
-from omni._api._core import (
+from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni.data_classes._connection_item_d import (
+    _create_connection_item_d_filter,
+)
+from omni.data_classes._connection_item_f import (
+    _create_connection_item_f_filter,
+)
+from omni._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -92,17 +92,18 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the inwards single edges of the connection item e.
 
         Args:
-            direct_multi: The direct multi to filter on.
-            direct_single: The direct single to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of inwards single edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            direct_multi:
+            direct_single:
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of inwards single edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
 
         Returns:
             ConnectionItemDQueryAPI: The query API for the connection item d.
@@ -170,22 +171,23 @@ class ConnectionItemEQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the inwards single property edges of the connection item e.
 
         Args:
-            direct_list: The direct list to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            min_end_time_edge: The minimum value of the end time to filter on.
-            max_end_time_edge: The maximum value of the end time to filter on.
-            name_edge: The name to filter on.
-            name_prefix_edge: The prefix of the name to filter on.
-            min_start_time_edge: The minimum value of the start time to filter on.
-            max_start_time_edge: The maximum value of the start time to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of inwards single property edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            direct_list:
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            min_end_time_edge:
+            max_end_time_edge:
+            name_edge:
+            name_prefix_edge:
+            min_start_time_edge:
+            max_start_time_edge:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of inwards single property edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
 
         Returns:
             ConnectionItemFQueryAPI: The query API for the connection item f.

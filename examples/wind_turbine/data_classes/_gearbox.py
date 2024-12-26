@@ -216,19 +216,19 @@ class Gearbox(DomainModel):
 
         for instance in instances.values():
             if (
-                isinstance(instance.displacement_x, (dm.NodeId, str))
+                isinstance(instance.displacement_x, dm.NodeId | str)
                 and (displacement_x := nodes_by_id.get(instance.displacement_x))
                 and isinstance(displacement_x, SensorTimeSeries)
             ):
                 instance.displacement_x = displacement_x
             if (
-                isinstance(instance.displacement_y, (dm.NodeId, str))
+                isinstance(instance.displacement_y, dm.NodeId | str)
                 and (displacement_y := nodes_by_id.get(instance.displacement_y))
                 and isinstance(displacement_y, SensorTimeSeries)
             ):
                 instance.displacement_y = displacement_y
             if (
-                isinstance(instance.displacement_z, (dm.NodeId, str))
+                isinstance(instance.displacement_z, dm.NodeId | str)
                 and (displacement_z := nodes_by_id.get(instance.displacement_z))
                 and isinstance(displacement_z, SensorTimeSeries)
             ):
@@ -247,7 +247,8 @@ class Gearbox(DomainModel):
                 else:
                     warnings.warn(
                         f"Expected one direct relation for 'nacelle' in {gearbox.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}."
+                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}.",
+                        stacklevel=2,
                     )
 
 
@@ -353,7 +354,8 @@ class GearboxWrite(DomainModelWrite):
 class GearboxApply(GearboxWrite):
     def __new__(cls, *args, **kwargs) -> GearboxApply:
         warnings.warn(
-            "GearboxApply is deprecated and will be removed in v1.0. Use GearboxWrite instead."
+            "GearboxApply is deprecated and will be removed in v1.0. "
+            "Use GearboxWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Gearbox.",
             UserWarning,

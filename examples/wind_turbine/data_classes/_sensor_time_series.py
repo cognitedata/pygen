@@ -305,7 +305,8 @@ class SensorTimeSeriesWrite(DomainModelWrite):
 class SensorTimeSeriesApply(SensorTimeSeriesWrite):
     def __new__(cls, *args, **kwargs) -> SensorTimeSeriesApply:
         warnings.warn(
-            "SensorTimeSeriesApply is deprecated and will be removed in v1.0. Use SensorTimeSeriesWrite instead."
+            "SensorTimeSeriesApply is deprecated and will be removed in v1.0. "
+            "Use SensorTimeSeriesWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "SensorTimeSeries.",
             UserWarning,

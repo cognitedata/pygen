@@ -225,7 +225,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             properties = [self._properties_by_field.get(prop, prop) for prop in properties]
 
         is_single_aggregate = False
-        if isinstance(aggregate, (str, dm.aggregations.MetricAggregation)):
+        if isinstance(aggregate, str | dm.aggregations.MetricAggregation):
             aggregate = [aggregate]
             is_single_aggregate = True
 
@@ -351,7 +351,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         for edge_type, values in groupby(edge_api_name_type_direction_view_id_penta or [], lambda x: x[2].as_tuple()):
             edges: dict[dm.EdgeId, dm.Edge] = {}
             value_list = list(values)
-            for edge_api, edge_name, edge_type, direction, view_id in value_list:
+            for edge_api, _, edge_type, direction, __ in value_list:
                 is_type = dm.filters.Equals(
                     ["edge", "type"],
                     {"space": edge_type.space, "externalId": edge_type.external_id},
@@ -377,7 +377,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     node_id = edge.end_node.as_tuple() if direction == "outwards" else edge.start_node.as_tuple()
                     edge_by_end_node[node_id].append(edge)
 
-                for no, (edge_api, edge_name, _, direction, view_id) in enumerate(value_list):
+                for no, (___, edge_name, ____, direction, view_id) in enumerate(value_list):
                     if not edge_by_end_node:
                         break
                     if no == len(value_list) - 1:
@@ -447,7 +447,7 @@ class NodeAPI(
         return ResourcesWriteResult(result.nodes, result.edges, time_series)
 
 
-class EdgeAPI(ABC):
+class EdgeAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -561,7 +561,7 @@ def _create_edge_filter(
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if space and isinstance(space, str):
         filters.append(dm.filters.Equals(["edge", "space"], value=space))
-    if space and isinstance(space, list):
+    if space and (space, list):
         filters.append(dm.filters.In(["edge", "space"], values=space))
     if filter:
         filters.append(filter)
@@ -576,7 +576,7 @@ class GraphQLQueryResponse:
     def parse(self, response: dict[str, Any]) -> GraphQLList:
         if "errors" in response:
             raise RuntimeError(response["errors"])
-        _, data = list(response.items())[0]
+        _, data = next(iter(response.items()))
         self._parse_item(data)
         if "pageInfo" in data:
             self._output.page_info = PageInfo.load(data["pageInfo"])
@@ -590,7 +590,7 @@ class GraphQLQueryResponse:
             try:
                 item = self._data_class_by_type[data["__typename"]].model_validate(data)
             except KeyError:
-                raise ValueError(f"Could not find class for type {data['__typename']}")
+                raise ValueError(f"Could not find class for type {data['__typename']}") from None
             else:
                 self._output.append(item)
         else:

@@ -287,7 +287,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         {% if data_class.has_edges_or_direct_relations_with_target %}
         for instance in instances.values():
             {% for field in data_class.one_to_one_direct_relations_with_source %}
-            if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}(dm.NodeId, str){% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
+            if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}dm.NodeId | str{% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
                     {{ field.name }}, {{ field.destination_class.read_name }}
             ):
                 instance.{{ field.name }} = {{ field.name }}
@@ -338,7 +338,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
 
                     {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
+                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
                     ):
                         {{ field.name }}.append(value)
                     {% endfor %}
@@ -352,7 +352,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                     {% endfor %}
                     {% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
+                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
@@ -361,7 +361,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                         else:
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
+                                stacklevel=2
                             )
                     {% endfor %}
                     {% for field in data_class.one_to_one_edges_with_properties %}
@@ -376,7 +377,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                         else:
                             warnings.warn(
                                 f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}."
+                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
+                                stacklevel=2
                             )
 
                         if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
@@ -409,7 +411,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                 else:
                     warnings.warn(
                         f"Expected one direct relation for '{{ field.name }}' in {% raw %}{{% endraw %}{{  field.reverse_property.name }}.as_id(){% raw %}}{% endraw %}."
-                        f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}."
+                        f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}.",
+                        stacklevel=2
                     )
             {% endfor %}
             {% for field in data_class.one_to_many_reverse_direct_relations %}
@@ -625,7 +628,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
 class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
     def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
         warnings.warn(
-            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. Use {{ data_class.write_name }} instead."
+            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. "
+            "Use {{ data_class.write_name }} instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "{{ data_class.read_name }}.",
             UserWarning,

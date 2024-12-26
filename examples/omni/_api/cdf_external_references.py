@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from omni.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni.data_classes._cdf_external_references import (
+    CDFExternalReferencesQuery,
+    _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
+    _create_cdf_external_reference_filter,
+)
 from omni.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -25,17 +37,6 @@ from omni.data_classes import (
     CDFExternalReferencesList,
     CDFExternalReferencesWriteList,
     CDFExternalReferencesTextFields,
-)
-from omni.data_classes._cdf_external_references import (
-    CDFExternalReferencesQuery,
-    _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD,
-    _create_cdf_external_reference_filter,
-)
-from omni._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
 )
 from omni._api.cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
 from omni._api.cdf_external_references_query import CDFExternalReferencesQueryAPI
@@ -47,7 +48,7 @@ class CDFExternalReferencesAPI(
     ]
 ):
     _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
-    _properties_by_field = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferences
     _class_list = CDFExternalReferencesList
     _class_write_list = CDFExternalReferencesWriteList
@@ -69,8 +70,10 @@ class CDFExternalReferencesAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of cdf external references to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for cdf external references.
@@ -100,10 +103,14 @@ class CDFExternalReferencesAPI(
         """Add or update (upsert) cdf external references.
 
         Args:
-            cdf_external_reference: Cdf external reference or sequence of cdf external references to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            cdf_external_reference: Cdf external reference or
+                sequence of cdf external references to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -115,7 +122,9 @@ class CDFExternalReferencesAPI(
                 >>> from omni import OmniClient
                 >>> from omni.data_classes import CDFExternalReferencesWrite
                 >>> client = OmniClient()
-                >>> cdf_external_reference = CDFExternalReferencesWrite(external_id="my_cdf_external_reference", ...)
+                >>> cdf_external_reference = CDFExternalReferencesWrite(
+                ...     external_id="my_cdf_external_reference", ...
+                ... )
                 >>> result = client.cdf_external_references.apply(cdf_external_reference)
 
         """
@@ -192,7 +201,9 @@ class CDFExternalReferencesAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_reference = client.cdf_external_references.retrieve("my_cdf_external_reference")
+                >>> cdf_external_reference = client.cdf_external_references.retrieve(
+                ...     "my_cdf_external_reference"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -216,12 +227,14 @@ class CDFExternalReferencesAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of cdf external references to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -233,7 +246,9 @@ class CDFExternalReferencesAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references = client.cdf_external_references.search('my_cdf_external_reference')
+                >>> cdf_external_references = client.cdf_external_references.search(
+                ...     'my_cdf_external_reference'
+                ... )
 
         """
         filter_ = _create_cdf_external_reference_filter(
@@ -318,8 +333,10 @@ class CDFExternalReferencesAPI(
             property: The property to perform aggregation on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of cdf external references to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -366,8 +383,10 @@ class CDFExternalReferencesAPI(
             interval: The interval to use for the histogram bins.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of cdf external references to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -415,8 +434,10 @@ class CDFExternalReferencesAPI(
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of cdf external references to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

@@ -1,20 +1,32 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_multi._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from omni_multi.data_classes._implementation_1_v_1 import (
+    Implementation1v1Query,
+    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
+    _create_implementation_1_v_1_filter,
+)
 from omni_multi.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -25,17 +37,6 @@ from omni_multi.data_classes import (
     Implementation1v1WriteList,
     Implementation1v1TextFields,
 )
-from omni_multi.data_classes._implementation_1_v_1 import (
-    Implementation1v1Query,
-    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
-    _create_implementation_1_v_1_filter,
-)
-from omni_multi._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from omni_multi._api.implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
@@ -43,7 +44,7 @@ class Implementation1v1API(
     NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List, Implementation1v1WriteList]
 ):
     _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
-    _properties_by_field = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
     _class_type = Implementation1v1
     _class_list = Implementation1v1List
     _class_write_list = Implementation1v1WriteList
@@ -75,8 +76,10 @@ class Implementation1v1API(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for implementation 1 v 1.
@@ -112,10 +115,14 @@ class Implementation1v1API(
         """Add or update (upsert) implementation 1 v 1.
 
         Args:
-            implementation_1_v_1: Implementation 1 v 1 or sequence of implementation 1 v 1 to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            implementation_1_v_1: Implementation 1 v 1 or
+                sequence of implementation 1 v 1 to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -127,7 +134,9 @@ class Implementation1v1API(
                 >>> from omni_multi import OmniMultiClient
                 >>> from omni_multi.data_classes import Implementation1v1Write
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1 = Implementation1v1Write(external_id="my_implementation_1_v_1", ...)
+                >>> implementation_1_v_1 = Implementation1v1Write(
+                ...     external_id="my_implementation_1_v_1", ...
+                ... )
                 >>> result = client.implementation_1_v_1.apply(implementation_1_v_1)
 
         """
@@ -200,7 +209,9 @@ class Implementation1v1API(
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1 = client.implementation_1_v_1.retrieve("my_implementation_1_v_1")
+                >>> implementation_1_v_1 = client.implementation_1_v_1.retrieve(
+                ...     "my_implementation_1_v_1"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -236,12 +247,14 @@ class Implementation1v1API(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -253,7 +266,9 @@ class Implementation1v1API(
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1_list = client.implementation_1_v_1.search('my_implementation_1_v_1')
+                >>> implementation_1_v_1_list = client.implementation_1_v_1.search(
+                ...     'my_implementation_1_v_1'
+                ... )
 
         """
         filter_ = _create_implementation_1_v_1_filter(
@@ -384,8 +399,10 @@ class Implementation1v1API(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -454,8 +471,10 @@ class Implementation1v1API(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 1 v 1 to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -521,8 +540,10 @@ class Implementation1v1API(
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of implementation 1 v 1 to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

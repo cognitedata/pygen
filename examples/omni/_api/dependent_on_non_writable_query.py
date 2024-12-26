@@ -10,17 +10,18 @@ from omni.data_classes import (
     DomainModelCore,
     DependentOnNonWritable,
 )
-from omni.data_classes._implementation_1_non_writeable import (
-    Implementation1NonWriteable,
-    _create_implementation_1_non_writeable_filter,
-)
-from omni._api._core import (
+from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from omni.data_classes._implementation_1_non_writeable import (
+    _create_implementation_1_non_writeable_filter,
+)
+from omni._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -70,19 +71,20 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the to non writable edges of the dependent on non writable.
 
         Args:
-            main_value: The main value to filter on.
-            main_value_prefix: The prefix of the main value to filter on.
-            sub_value: The sub value to filter on.
-            sub_value_prefix: The prefix of the sub value to filter on.
-            value_1: The value 1 to filter on.
-            value_1_prefix: The prefix of the value 1 to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of to non writable edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
+            main_value:
+            main_value_prefix:
+            sub_value:
+            sub_value_prefix:
+            value_1:
+            value_1_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of to non writable edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
 
         Returns:
             Implementation1NonWriteableQueryAPI: The query API for the implementation 1 non writeable.

@@ -151,12 +151,15 @@ class CogniteActivityGraphQL(GraphQLCore):
         scheduled_end_time: The planned end time of an activity (or similar that extends this)
         scheduled_start_time: The planned start time of an activity (or similar that extends this)
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         start_time: The actual start time of an activity (or similar that extends this)
         tags: Text based labels for generic use, limited to 1000
         time_series: A list of time series the activity is related to.
@@ -286,12 +289,15 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
         scheduled_end_time: The planned end time of an activity (or similar that extends this)
         scheduled_start_time: The planned start time of an activity (or similar that extends this)
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         start_time: The actual start time of an activity (or similar that extends this)
         tags: Text based labels for generic use, limited to 1000
         time_series: A list of time series the activity is related to.
@@ -375,7 +381,7 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
 
         for instance in instances.values():
             if (
-                isinstance(instance.source, (dm.NodeId, str))
+                isinstance(instance.source, dm.NodeId | str)
                 and (source := nodes_by_id.get(instance.source))
                 and isinstance(source, CogniteSourceSystem)
             ):
@@ -430,12 +436,15 @@ class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWri
         scheduled_end_time: The planned end time of an activity (or similar that extends this)
         scheduled_start_time: The planned start time of an activity (or similar that extends this)
         source: Direct relation to a source system
-        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext is expected to not be set.
+        source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
+            is expected to not be set.
         source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_created_user: User identifier from the source system on who created the source data. This identifier is
+            not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         start_time: The actual start time of an activity (or similar that extends this)
         tags: Text based labels for generic use, limited to 1000
         time_series: A list of time series the activity is related to.
@@ -596,7 +605,8 @@ class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWri
 class CogniteActivityApply(CogniteActivityWrite):
     def __new__(cls, *args, **kwargs) -> CogniteActivityApply:
         warnings.warn(
-            "CogniteActivityApply is deprecated and will be removed in v1.0. Use CogniteActivityWrite instead."
+            "CogniteActivityApply is deprecated and will be removed in v1.0. "
+            "Use CogniteActivityWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteActivity.",
             UserWarning,

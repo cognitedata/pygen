@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import overload, Literal
 import warnings
+from collections.abc import Sequence
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from wind_turbine._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+)
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -15,7 +21,13 @@ from wind_turbine.data_classes._core import (
     EdgeQueryStep,
     DataClassQueryBuilder,
 )
+from wind_turbine.data_classes._sensor_time_series import (
+    SensorTimeSeriesQuery,
+    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
+    _create_sensor_time_series_filter,
+)
 from wind_turbine.data_classes import (
+    DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
@@ -26,17 +38,6 @@ from wind_turbine.data_classes import (
     SensorTimeSeriesWriteList,
     SensorTimeSeriesTextFields,
 )
-from wind_turbine.data_classes._sensor_time_series import (
-    SensorTimeSeriesQuery,
-    _SENSORTIMESERIES_PROPERTIES_BY_FIELD,
-    _create_sensor_time_series_filter,
-)
-from wind_turbine._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    NodeAPI,
-    SequenceNotStr,
-)
 from wind_turbine._api.sensor_time_series_query import SensorTimeSeriesQueryAPI
 
 
@@ -44,7 +45,7 @@ class SensorTimeSeriesAPI(
     NodeAPI[SensorTimeSeries, SensorTimeSeriesWrite, SensorTimeSeriesList, SensorTimeSeriesWriteList]
 ):
     _view_id = dm.ViewId("sp_pygen_power", "SensorTimeSeries", "1")
-    _properties_by_field = _SENSORTIMESERIES_PROPERTIES_BY_FIELD
+    _properties_by_field: ClassVar[dict[str, str]] = _SENSORTIMESERIES_PROPERTIES_BY_FIELD
     _class_type = SensorTimeSeries
     _class_list = SensorTimeSeriesList
     _class_write_list = SensorTimeSeriesWriteList
@@ -86,8 +87,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             A query API for sensor time series.
@@ -128,10 +131,14 @@ class SensorTimeSeriesAPI(
         """Add or update (upsert) sensor time series.
 
         Args:
-            sensor_time_series: Sensor time series or sequence of sensor time series to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+            sensor_time_series: Sensor time series or
+                sequence of sensor time series to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and
+                existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)?
+                Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None.
+                However, if you want to set properties to None,
                 you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
@@ -143,7 +150,9 @@ class SensorTimeSeriesAPI(
                 >>> from wind_turbine import WindTurbineClient
                 >>> from wind_turbine.data_classes import SensorTimeSeriesWrite
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series = SensorTimeSeriesWrite(external_id="my_sensor_time_series", ...)
+                >>> sensor_time_series = SensorTimeSeriesWrite(
+                ...     external_id="my_sensor_time_series", ...
+                ... )
                 >>> result = client.sensor_time_series.apply(sensor_time_series)
 
         """
@@ -220,7 +229,9 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series = client.sensor_time_series.retrieve("my_sensor_time_series")
+                >>> sensor_time_series = client.sensor_time_series.retrieve(
+                ...     "my_sensor_time_series"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -266,12 +277,14 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                This will override the sort_by and direction. This allows you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
@@ -283,7 +296,9 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series_list = client.sensor_time_series.search('my_sensor_time_series')
+                >>> sensor_time_series_list = client.sensor_time_series.search(
+                ...     'my_sensor_time_series'
+                ... )
 
         """
         filter_ = _create_sensor_time_series_filter(
@@ -444,8 +459,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
+                your own filtering which will be ANDed with the filter above.
 
         Returns:
             Aggregation results.
@@ -529,8 +546,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -611,8 +630,10 @@ class SensorTimeSeriesAPI(
             standard_name_prefix: The prefix of the standard name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of sensor time series to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             sort_by: The property to sort by.
             direction: The direction to sort by, either 'ascending' or 'descending'.
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.

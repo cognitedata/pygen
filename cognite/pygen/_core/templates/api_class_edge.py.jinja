@@ -43,8 +43,8 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
             {% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.description }}
             {% endfor %}
-            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested {{ edge_api.doc_name }} edges.
@@ -58,7 +58,9 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
                 >>> from cognite.client import data_modeling as dm
                 {% endif %}
                 >>> client = {{ client_name }}()
-                >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list({% if has_default_instance_space %}"my_{{ edge_api.start_class.variable }}"{% else %}dm.NodeId("my_space", "my_connection_item_a"){% endif %}, limit=5)
+                >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list(
+                ...     {% if has_default_instance_space %}"my_{{ edge_api.start_class.variable }}"{% else %}dm.NodeId("my_space", "my_connection_item_a"){% endif %}, limit=5
+                ... )
 
         """
         filter_ = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(

@@ -28,8 +28,8 @@ class ConnectionItemCNodeConnectionItemBAPI(EdgeAPI):
             to_connection_item_b_space: Location of the connection item bs.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of connection item b edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of connection item b edges to return. Defaults to 25.
+                Set to -1, float("inf") or None to return all items.
 
         Returns:
             The requested connection item b edges.
@@ -40,7 +40,9 @@ class ConnectionItemCNodeConnectionItemBAPI(EdgeAPI):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_c_node = client.connection_item_c_node.connection_item_b_edge.list("my_connection_item_c_node", limit=5)
+                >>> connection_item_c_node = client.connection_item_c_node.connection_item_b_edge.list(
+                ...     "my_connection_item_c_node", limit=5
+                ... )
 
         """
         filter_ = _create_edge_filter(

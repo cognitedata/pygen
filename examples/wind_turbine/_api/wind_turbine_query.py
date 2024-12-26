@@ -13,17 +13,18 @@ from wind_turbine.data_classes import (
     Nacelle,
     Rotor,
 )
-from wind_turbine.data_classes._metmast import (
-    Metmast,
-    _create_metmast_filter,
-)
-from wind_turbine._api._core import (
+from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from wind_turbine.data_classes._metmast import (
+    _create_metmast_filter,
+)
+from wind_turbine._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -77,19 +78,22 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the metmast edges of the wind turbine.
 
         Args:
-            min_position: The minimum value of the position to filter on.
-            max_position: The maximum value of the position to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            min_distance_edge: The minimum value of the distance to filter on.
-            max_distance_edge: The maximum value of the distance to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
-            filter: (Advanced) Filter applied to node. If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of metmast edges to return. Defaults to 3. Set to -1, float("inf") or None
-                to return all items.
-            retrieve_nacelle: Whether to retrieve the nacelle for each wind turbine or not.
-            retrieve_rotor: Whether to retrieve the rotor for each wind turbine or not.
+            min_position:
+            max_position:
+            external_id_prefix:
+            space:
+            min_distance_edge:
+            max_distance_edge:
+            external_id_prefix_edge:
+            space_edge:
+            filter: (Advanced) Filter applied to node. If the filtering available in the
+                above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            limit: Maximum number of metmast edges to return.
+                Defaults to 3. Set to -1, float("inf") or None to return all items.
+            retrieve_nacelle: Whether to retrieve the nacelle
+                for each wind turbine or not.
+            retrieve_rotor: Whether to retrieve the rotor
+                for each wind turbine or not.
 
         Returns:
             MetmastQueryAPI: The query API for the metmast.
@@ -144,8 +148,12 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_nacelle: Whether to retrieve the nacelle for each wind turbine or not.
-            retrieve_rotor: Whether to retrieve the rotor for each wind turbine or not.
+            retrieve_nacelle: Whether to retrieve the
+                nacelle for each
+                wind turbine or not.
+            retrieve_rotor: Whether to retrieve the
+                rotor for each
+                wind turbine or not.
 
         Returns:
             The list of the source nodes of the query.

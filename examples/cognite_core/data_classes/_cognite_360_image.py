@@ -131,7 +131,8 @@ class Cognite360ImageGraphQL(GraphQLCore):
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system
@@ -266,7 +267,8 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system
@@ -337,49 +339,49 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
 
         for instance in instances.values():
             if (
-                isinstance(instance.back, (dm.NodeId, str))
+                isinstance(instance.back, dm.NodeId | str)
                 and (back := nodes_by_id.get(instance.back))
                 and isinstance(back, CogniteFile)
             ):
                 instance.back = back
             if (
-                isinstance(instance.bottom, (dm.NodeId, str))
+                isinstance(instance.bottom, dm.NodeId | str)
                 and (bottom := nodes_by_id.get(instance.bottom))
                 and isinstance(bottom, CogniteFile)
             ):
                 instance.bottom = bottom
             if (
-                isinstance(instance.collection_360, (dm.NodeId, str))
+                isinstance(instance.collection_360, dm.NodeId | str)
                 and (collection_360 := nodes_by_id.get(instance.collection_360))
                 and isinstance(collection_360, Cognite360ImageCollection)
             ):
                 instance.collection_360 = collection_360
             if (
-                isinstance(instance.front, (dm.NodeId, str))
+                isinstance(instance.front, dm.NodeId | str)
                 and (front := nodes_by_id.get(instance.front))
                 and isinstance(front, CogniteFile)
             ):
                 instance.front = front
             if (
-                isinstance(instance.left, (dm.NodeId, str))
+                isinstance(instance.left, dm.NodeId | str)
                 and (left := nodes_by_id.get(instance.left))
                 and isinstance(left, CogniteFile)
             ):
                 instance.left = left
             if (
-                isinstance(instance.right, (dm.NodeId, str))
+                isinstance(instance.right, dm.NodeId | str)
                 and (right := nodes_by_id.get(instance.right))
                 and isinstance(right, CogniteFile)
             ):
                 instance.right = right
             if (
-                isinstance(instance.station_360, (dm.NodeId, str))
+                isinstance(instance.station_360, dm.NodeId | str)
                 and (station_360 := nodes_by_id.get(instance.station_360))
                 and isinstance(station_360, Cognite360ImageStation)
             ):
                 instance.station_360 = station_360
             if (
-                isinstance(instance.top, (dm.NodeId, str))
+                isinstance(instance.top, dm.NodeId | str)
                 and (top := nodes_by_id.get(instance.top))
                 and isinstance(top, CogniteFile)
             ):
@@ -407,7 +409,8 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
         scale_x: The scaling factor applied to the object along the X-axis
         scale_y: The scaling factor applied to the object along the Y-axis
         scale_z: The scaling factor applied to the object along the Z-axis
-        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the same station
+        station_360: Direct relation to Cognite3DGroup instance that groups different Cognite360Image instances to the
+            same station
         taken_at: The timestamp when the 6 photos were taken
         top: Direct relation to a file holding the top projection of the cube map
         translation_x: The displacement of the object along the X-axis in the 3D coordinate system
@@ -582,7 +585,8 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
 class Cognite360ImageApply(Cognite360ImageWrite):
     def __new__(cls, *args, **kwargs) -> Cognite360ImageApply:
         warnings.warn(
-            "Cognite360ImageApply is deprecated and will be removed in v1.0. Use Cognite360ImageWrite instead."
+            "Cognite360ImageApply is deprecated and will be removed in v1.0. "
+            "Use Cognite360ImageWrite instead. "
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite360Image.",
             UserWarning,

@@ -11,13 +11,15 @@ from cognite_core.data_classes import (
     Cognite3DRevision,
     Cognite3DModel,
 )
-from cognite_core._api._core import (
+from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModelList,
     EdgeQueryStep,
     NodeQueryStep,
     DataClassQueryBuilder,
+)
+from cognite_core._api._core import (
     QueryAPI,
-    T_DomainModelList,
     _create_edge_filter,
 )
 
@@ -53,7 +55,9 @@ class Cognite3DRevisionQueryAPI(QueryAPI[T_DomainModelList]):
         """Execute query and return the result.
 
         Args:
-            retrieve_model_3d: Whether to retrieve the model 3d for each Cognite 3D revision or not.
+            retrieve_model_3d: Whether to retrieve the
+                model 3d for each
+                Cognite 3D revision or not.
 
         Returns:
             The list of the source nodes of the query.
