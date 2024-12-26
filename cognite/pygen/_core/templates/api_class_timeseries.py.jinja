@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Literal, cast
+from typing import Literal
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -11,12 +11,13 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client.utils._time import ZoneInfo
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
-from {{ top_level_package }}.data_classes._core import QueryStep, DataClassQueryBuilder, DomainModelList
-from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ
 
+from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
+from {{ top_level_package }}.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
 
 ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]
+
 
 class {{ timeseries_api.query_class}}:
     def __init__(

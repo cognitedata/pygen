@@ -3,14 +3,24 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime
 {% endif %}
+import warnings
 from collections.abc import Sequence
 from typing import ClassVar, Literal, overload
-import warnings
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from {{ top_level_package }}._api._core import (
+    DEFAULT_LIMIT_READ,
+    Aggregations,
+    {% if data_class.is_writable %}
+    NodeAPI,
+    {% else %}
+    NodeReadAPI,
+    {% endif %}
+    SequenceNotStr,
+)
 from {{ top_level_package }}.data_classes._core import (
     {% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,
@@ -19,6 +29,13 @@ from {{ top_level_package }}.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+)
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
+    {{ data_class.query_cls_name }},
+    {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
+    {{ data_class.properties_dict_name }},
+    {%  endif %}
+    {{ data_class.filter_name }},
 )
 from {{ top_level_package }}.data_classes import (
     DomainModel,
@@ -48,23 +65,6 @@ from {{ top_level_package }}.data_classes import (
     {% for child in data_class.direct_children %}
     {{ child.read_name }},
     {% endfor %}
-)
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
-    {{ data_class.query_cls_name }},
-    {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}
-    {{ data_class.properties_dict_name }},
-    {%  endif %}
-    {{ data_class.filter_name }},
-)
-from {{ top_level_package }}._api._core import (
-    DEFAULT_LIMIT_READ,
-    Aggregations,
-    {% if data_class.is_writable %}
-    NodeAPI,
-    {% else %}
-    NodeReadAPI,
-    {% endif %}
-    SequenceNotStr,
 )
 {% for class_ in edge_apis %}
 {% if class_.field.is_write_field %}
