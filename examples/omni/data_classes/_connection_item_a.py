@@ -5,8 +5,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
-from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, Field, ValidationInfo
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,6 +29,7 @@ from omni.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -181,6 +181,11 @@ class ConnectionItemA(DomainModel):
     )
     outwards: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, str, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
+
+    @field_validator("other_direct", "self_direct", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
