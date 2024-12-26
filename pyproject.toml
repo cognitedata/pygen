@@ -19,7 +19,7 @@ include = '\.py$'
 # See https://beta.ruff.rs/docs/rules for an overview of ruff rules
 line-length = 120
 target-version = "py310"
-exclude = ["scripts"]
+exclude = ["examples", "scripts"]
 fix = true
 
 [tool.ruff.lint]
