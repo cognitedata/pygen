@@ -578,7 +578,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 specify the direction for each field as well as how to handle null values.
             {% endif %}
             {% if data_class.has_connection_with_target %}
-            {{ method_text_wrap(f"retrieve_connections: Whether to retrieve {data_class.connections_docs} for the {data_class.doc_list_name}. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.") }}
+            {{ method_text_wrap(f"retrieve_connections: Whether to retrieve {} for the {}. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items." % (data_class.connections_docs, data_class.doc_list_name) }}
             {% endif %}
 
         Returns:
