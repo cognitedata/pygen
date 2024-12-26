@@ -12,7 +12,6 @@ from cognite.client.data_classes.data_modeling.instances import (
 
 
 class _CDFExternalReferencesListedProperties:
-
     @classmethod
     def get_source(cls) -> ViewId:
         return ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")

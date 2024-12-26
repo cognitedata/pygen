@@ -941,12 +941,15 @@ class APIGenerator:
             newline = "\n" + " " * 12
             return newline.join(textwrap.wrap(text, width=120 - 12))
 
-        retrieve_connections_doc = method_text_wrap(
-            f"retrieve_connections: Whether to retrieve {self.data_class.connections_docs} "
-            f"for the {self.data_class.doc_list_name}. Defaults to 'skip'.'skip' will not retrieve any "
-            "connections, 'identifier' will only retrieve the identifier of the connected items, "
-            "and 'full' will retrieve the full connected items."
-        )
+        if self.data_class.has_connection_with_target:
+            retrieve_connections_doc = method_text_wrap(
+                f"retrieve_connections: Whether to retrieve {self.data_class.connections_docs} "
+                f"for the {self.data_class.doc_list_name}. Defaults to 'skip'.'skip' will not retrieve any "
+                "connections, 'identifier' will only retrieve the identifier of the connected items, "
+                "and 'full' will retrieve the full connected items."
+            )
+        else:
+            retrieve_connections_doc = ""
 
         return (
             type_api.render(

@@ -452,10 +452,9 @@ class ConnectionItemCNodeAPI(
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b`
-                for the connection item c nodes. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection
+            item c nodes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
+            the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested connection item c nodes

@@ -649,9 +649,8 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
             retrieve_connections: Whether to retrieve `displacement_x`, `displacement_y`, `displacement_z` and `nacelle`
-                for the gearboxes. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            for the gearboxes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested gearboxes

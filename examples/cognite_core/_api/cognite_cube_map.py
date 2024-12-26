@@ -881,10 +881,9 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `back`, `bottom`, `front`, `left`, `right` and `top`
-                for the Cognite cube maps. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `back`, `bottom`, `front`, `left`, `right` and `top` for the
+            Cognite cube maps. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite cube maps

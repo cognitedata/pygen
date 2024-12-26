@@ -1073,10 +1073,9 @@ class CogniteTimeSeriesAPI(
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit`
-                for the Cognite time series. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
+            Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested Cognite time series

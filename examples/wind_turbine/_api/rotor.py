@@ -576,9 +576,8 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
             retrieve_connections: Whether to retrieve `rotor_speed_controller`, `rpm_low_speed_shaft` and `wind_turbine`
-                for the rotors. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            for the rotors. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
+            the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested rotors

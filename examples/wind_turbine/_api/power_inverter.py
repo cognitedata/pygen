@@ -648,10 +648,10 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `active_power_total`, `apparent_power_total`, `nacelle` and `reactive_power_total`
-                for the power inverters. Defaults to 'skip'.
-                'skip' will not retrieve any connections, 'identifier' will only retrieve the
-                identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `active_power_total`, `apparent_power_total`, `nacelle` and
+            `reactive_power_total` for the power inverters. Defaults to 'skip'.'skip' will not retrieve any connections,
+            'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
+            connected items.
 
         Returns:
             List of requested power inverters
