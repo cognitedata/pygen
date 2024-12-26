@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_3_d_object import (
     Cognite3DObjectQuery,
@@ -116,7 +120,8 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -192,9 +197,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         )
         return self._apply(cognite_3_d_object, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more Cognite 3D object.
 
         Args:
@@ -224,20 +227,14 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Cognite3DObject | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite3DObject | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Cognite3DObjectList: ...
+    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite3DObjectList:
+        ...
 
-    def retrieve(
-        self,
-        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
-        space: str = DEFAULT_INSTANCE_SPACE,
-    ) -> Cognite3DObject | Cognite3DObjectList | None:
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite3DObject | Cognite3DObjectList | None:
         """Retrieve one or more Cognite 3D objects by id(s).
 
         Args:
@@ -270,7 +267,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                     "outwards",
                     dm.ViewId("cdf_cdm", "Cognite360Image", "v1"),
                 ),
-            ],
+                                               ]
         )
 
     def search(
@@ -443,11 +440,9 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields],
         property: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         query: str | None = None,
@@ -476,11 +471,9 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         property: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         query: str | None = None,
@@ -785,7 +778,6 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -795,80 +787,77 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(Cognite3DObjectList)
-        has_data = dm.filters.HasData(views=[self._view_id])
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Cognite3DObject,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
-        edge_images_360 = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_images_360,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
-                Cognite360ImageAnnotation,
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        builder.append(factory.root(
+            filter=filter_,
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            limit=limit,
+            has_container_fields=True,
+        ))
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemB._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "images360"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
             )
         )
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_images_360),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_images_360,
-                        filter=dm.filters.HasData(views=[Cognite360Image._view_id]),
-                    ),
-                    Cognite360Image,
+            builder.extend(
+            factory.from_reverse_relation(
+                CogniteAsset._view_id,
+                {
+    "source": {
+        "space": "cdf_cdm",
+        "external_id": "CogniteAsset",
+        "version": "v1",
+        "type": "view"
+    },
+    "identifier": "object3D"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "asset"),
+                has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="inwards",
-                        through=CogniteAsset._view_id.as_property_ref("object3D"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+            factory.from_reverse_relation(
+                CogniteCADNode._view_id,
+                {
+    "source": {
+        "space": "cdf_cdm",
+        "external_id": "CogniteCADNode",
+        "version": "v1",
+        "type": "view"
+    },
+    "identifier": "object3D"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "cadNodes"),
+                has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteCADNode._view_id]),
-                        direction="inwards",
-                        through=CogniteCADNode._view_id.as_property_ref("object3D"),
-                    ),
-                    CogniteCADNode,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CognitePointCloudVolume._view_id]),
-                        direction="inwards",
-                        through=CognitePointCloudVolume._view_id.as_property_ref("object3D"),
-                    ),
-                    CognitePointCloudVolume,
+            builder.extend(
+            factory.from_reverse_relation(
+                CognitePointCloudVolume._view_id,
+                {
+    "source": {
+        "space": "cdf_cdm",
+        "external_id": "CognitePointCloudVolume",
+        "version": "v1",
+        "type": "view"
+    },
+    "identifier": "object3D"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "pointCloudVolumes"),
+                has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return Cognite3DObjectList([Cognite3DObject.model_validate(item) for item in unpacked])
+

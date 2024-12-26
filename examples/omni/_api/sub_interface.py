@@ -20,6 +20,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._sub_interface import (
     SubInterfaceQuery,
@@ -565,7 +569,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

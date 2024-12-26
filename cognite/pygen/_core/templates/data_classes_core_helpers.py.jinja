@@ -104,8 +104,10 @@ def select_best_node(node1: T_DomainModel | dm.NodeId, node2: T_DomainModel | dm
 def parse_single_connection(value: Any, field_name: str | None) -> Any:
     if isinstance(value, list):
         if len(value) > 1:
-            warnings.warn(f"Expected a single connection {field_name or 'MISSING'}, "
-                          f"got {len(value)} connections. Using the first one.")
+            warnings.warn(
+                f"Expected a single connection {field_name or 'MISSING'}, "
+                f"got {len(value)} connections. Using the first one."
+            )
         value = value[0]
     if isinstance(value, dict) and len(value) == 2 and "space" in value and "externalId" in value:
         {% if has_default_instance_space %}

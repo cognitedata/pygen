@@ -20,6 +20,10 @@ from wind_turbine.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._blade import (
     BladeQuery,
@@ -52,6 +56,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
+
     def __call__(
         self,
         is_damaged: bool | None = None,
@@ -80,7 +85,8 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -143,9 +149,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         )
         return self._apply(blade, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more blade.
 
         Args:
@@ -175,20 +179,14 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Blade | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> Blade | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> BladeList: ...
+    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> BladeList:
+        ...
 
-    def retrieve(
-        self,
-        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
-        space: str = DEFAULT_INSTANCE_SPACE,
-    ) -> Blade | BladeList | None:
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> Blade | BladeList | None:
         """Retrieve one or more blades by id(s).
 
         Args:
@@ -209,7 +207,13 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                                               ]
+        )
 
     def search(
         self,
@@ -316,11 +320,9 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: BladeFields | SequenceNotStr[BladeFields],
         property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
@@ -336,11 +338,9 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: BladeFields | SequenceNotStr[BladeFields] | None = None,
         property: BladeFields | SequenceNotStr[BladeFields] | None = None,
         query: str | None = None,
@@ -528,7 +528,6 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -538,34 +537,34 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(BladeList)
-        has_data = dm.filters.HasData(views=[self._view_id])
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Blade,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        builder.append(factory.root(
+            filter=filter_,
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            limit=limit,
+            has_container_fields=True,
+        ))
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorPosition._view_id]),
-                        direction="inwards",
-                        through=SensorPosition._view_id.as_property_ref("blade"),
-                    ),
-                    SensorPosition,
+            builder.extend(
+            factory.from_reverse_relation(
+                SensorPosition._view_id,
+                {
+    "source": {
+        "space": "sp_pygen_power",
+        "external_id": "SensorPosition",
+        "version": "1",
+        "type": "view"
+    },
+    "identifier": "blade"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "sensor_positions"),
+                has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return BladeList([Blade.model_validate(item) for item in unpacked])
+

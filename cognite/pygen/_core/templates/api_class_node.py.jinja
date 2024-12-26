@@ -642,19 +642,20 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         {% endif %}
         {% endfor %}
+{% if has_direct_or_reverse_relation_with_target %}
         if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_reverse_direct_relation %}
             builder.extend(
             factory.from_reverse_relation(
                 {{field.destination_class.read_name }}._view_id,
-                {{ field.through }},
+                through={{ field.through_object_str }},
                 {% if field.reverse_property.is_one_to_many %}
                 connection_type="reverse-list",
                 {% else %}
                 connection_type=None,
                 {% endif %}
-                ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
                 {% if field.destination_class.has_container_fields %}
                 has_container_fields=True,
                 {% else %}
@@ -679,6 +680,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             )
             {% endif %}
             {% endfor %}
+{% endif %}
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()

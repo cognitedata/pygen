@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_360_image_station import (
     Cognite360ImageStationQuery,
@@ -555,7 +559,6 @@ class Cognite360ImageStationAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

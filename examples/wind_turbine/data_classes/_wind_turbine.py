@@ -10,7 +10,7 @@ from cognite.client.data_classes import (
     SequenceWrite as CogniteSequenceWrite,
 )
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -40,6 +40,7 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -224,6 +225,11 @@ class WindTurbine(GeneratingUnit):
     power_curve: Union[SequenceRead, str, None] = Field(None, alias="powerCurve")
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
+
+    @field_validator("nacelle", "rotor", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check

@@ -19,6 +19,10 @@ from omni_multi.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni_multi.data_classes._implementation_1_v_2 import (
     Implementation1v2Query,
@@ -574,7 +578,6 @@ class Implementation1v2API(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

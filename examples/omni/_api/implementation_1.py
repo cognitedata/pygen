@@ -20,6 +20,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._implementation_1 import (
     Implementation1Query,
@@ -613,7 +617,6 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 from cognite.client import data_modeling as dm
+
 from omni_multi.data_classes._core.base import DomainModel, T_DomainModel
 
 
@@ -62,3 +64,16 @@ def select_best_node(node1: T_DomainModel | dm.NodeId, node2: T_DomainModel | dm
         return node2  # type: ignore[return-value]
     else:
         return node1
+
+
+def parse_single_connection(value: Any, field_name: str | None) -> Any:
+    if isinstance(value, list):
+        if len(value) > 1:
+            warnings.warn(
+                f"Expected a single connection {field_name or 'MISSING'}, "
+                f"got {len(value)} connections. Using the first one."
+            )
+        value = value[0]
+    if isinstance(value, dict) and len(value) == 2 and "space" in value and "externalId" in value:
+        return dm.NodeId(space=value["space"], external_id=value["externalId"])
+    return value

@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_360_image_model import (
     Cognite360ImageModelQuery,
@@ -43,9 +47,7 @@ from cognite_core.data_classes import (
 from cognite_core._api.cognite_360_image_model_query import Cognite360ImageModelQueryAPI
 
 
-class Cognite360ImageModelAPI(
-    NodeAPI[Cognite360ImageModel, Cognite360ImageModelWrite, Cognite360ImageModelList, Cognite360ImageModelWriteList]
-):
+class Cognite360ImageModelAPI(NodeAPI[Cognite360ImageModel, Cognite360ImageModelWrite, Cognite360ImageModelList, Cognite360ImageModelWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITE360IMAGEMODEL_PROPERTIES_BY_FIELD
     _class_type = Cognite360ImageModel
@@ -55,20 +57,14 @@ class Cognite360ImageModelAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
+
     def __call__(
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -94,7 +90,8 @@ class Cognite360ImageModelAPI(
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -159,9 +156,7 @@ class Cognite360ImageModelAPI(
         )
         return self._apply(cognite_360_image_model, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more Cognite 360 image model.
 
         Args:
@@ -191,20 +186,14 @@ class Cognite360ImageModelAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Cognite360ImageModel | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite360ImageModel | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> Cognite360ImageModelList: ...
+    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite360ImageModelList:
+        ...
 
-    def retrieve(
-        self,
-        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
-        space: str = DEFAULT_INSTANCE_SPACE,
-    ) -> Cognite360ImageModel | Cognite360ImageModelList | None:
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> Cognite360ImageModel | Cognite360ImageModelList | None:
         """Retrieve one or more Cognite 360 image models by id(s).
 
         Args:
@@ -225,7 +214,13 @@ class Cognite360ImageModelAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                                               ]
+        )
 
     def search(
         self,
@@ -235,14 +230,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -320,14 +308,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -346,14 +327,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -363,11 +337,9 @@ class Cognite360ImageModelAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite360ImageModelFields | SequenceNotStr[Cognite360ImageModelFields],
         property: Cognite360ImageModelFields | SequenceNotStr[Cognite360ImageModelFields] | None = None,
         query: str | None = None,
@@ -376,14 +348,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -392,11 +357,9 @@ class Cognite360ImageModelAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite360ImageModelFields | SequenceNotStr[Cognite360ImageModelFields] | None = None,
         property: Cognite360ImageModelFields | SequenceNotStr[Cognite360ImageModelFields] | None = None,
         query: str | None = None,
@@ -405,14 +368,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -486,14 +442,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -560,14 +509,7 @@ class Cognite360ImageModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -623,7 +565,6 @@ class Cognite360ImageModelAPI(
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -633,46 +574,41 @@ class Cognite360ImageModelAPI(
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(Cognite360ImageModelList)
-        has_data = dm.filters.HasData(views=[self._view_id])
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Cognite360ImageModel,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        builder.append(factory.root(
+            filter=filter_,
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            limit=limit,
+            has_container_fields=True,
+        ))
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Cognite360ImageCollection._view_id]),
-                        direction="inwards",
-                        through=Cognite360ImageCollection._view_id.as_property_ref("model3D"),
-                    ),
-                    Cognite360ImageCollection,
+            builder.extend(
+            factory.from_reverse_relation(
+                Cognite360ImageCollection._view_id,
+                {
+    "source": {
+        "space": "cdf_cdm",
+        "external_id": "Cognite3DRevision",
+        "version": "v1",
+        "type": "view"
+    },
+    "identifier": "model3D"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "collections"),
+                has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("thumbnail"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "thumbnail"),
+                    has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return Cognite360ImageModelList([Cognite360ImageModel.model_validate(item) for item in unpacked])
+

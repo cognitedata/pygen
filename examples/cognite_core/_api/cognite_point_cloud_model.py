@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_point_cloud_model import (
     CognitePointCloudModelQuery,
@@ -43,11 +47,7 @@ from cognite_core.data_classes import (
 from cognite_core._api.cognite_point_cloud_model_query import CognitePointCloudModelQueryAPI
 
 
-class CognitePointCloudModelAPI(
-    NodeAPI[
-        CognitePointCloudModel, CognitePointCloudModelWrite, CognitePointCloudModelList, CognitePointCloudModelWriteList
-    ]
-):
+class CognitePointCloudModelAPI(NodeAPI[CognitePointCloudModel, CognitePointCloudModelWrite, CognitePointCloudModelList, CognitePointCloudModelWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CognitePointCloudModel", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEPOINTCLOUDMODEL_PROPERTIES_BY_FIELD
     _class_type = CognitePointCloudModel
@@ -57,20 +57,14 @@ class CognitePointCloudModelAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
+
     def __call__(
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -96,7 +90,8 @@ class CognitePointCloudModelAPI(
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. "
+            "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -161,9 +156,7 @@ class CognitePointCloudModelAPI(
         )
         return self._apply(cognite_point_cloud_model, replace, write_none)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more Cognite point cloud model.
 
         Args:
@@ -193,20 +186,14 @@ class CognitePointCloudModelAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> CognitePointCloudModel | None: ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> CognitePointCloudModel | None:
+        ...
 
     @overload
-    def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> CognitePointCloudModelList: ...
+    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CognitePointCloudModelList:
+        ...
 
-    def retrieve(
-        self,
-        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
-        space: str = DEFAULT_INSTANCE_SPACE,
-    ) -> CognitePointCloudModel | CognitePointCloudModelList | None:
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CognitePointCloudModel | CognitePointCloudModelList | None:
         """Retrieve one or more Cognite point cloud models by id(s).
 
         Args:
@@ -227,7 +214,13 @@ class CognitePointCloudModelAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_view_id_penta=[
+                                               ]
+        )
 
     def search(
         self,
@@ -237,14 +230,7 @@ class CognitePointCloudModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -317,21 +303,12 @@ class CognitePointCloudModelAPI(
         group_by: None = None,
         property: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None
-        ) = None,
+        search_property: CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -345,21 +322,12 @@ class CognitePointCloudModelAPI(
         group_by: None = None,
         property: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None
-        ) = None,
+        search_property: CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -369,29 +337,18 @@ class CognitePointCloudModelAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields],
         property: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None
-        ) = None,
+        search_property: CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -400,29 +357,18 @@ class CognitePointCloudModelAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields] | None = None,
         property: CognitePointCloudModelFields | SequenceNotStr[CognitePointCloudModelFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None
-        ) = None,
+        search_property: CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -491,21 +437,12 @@ class CognitePointCloudModelAPI(
         property: CognitePointCloudModelFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None
-        ) = None,
+        search_property: CognitePointCloudModelTextFields | SequenceNotStr[CognitePointCloudModelTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -572,14 +509,7 @@ class CognitePointCloudModelAPI(
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -635,7 +565,6 @@ class CognitePointCloudModelAPI(
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -645,46 +574,41 @@ class CognitePointCloudModelAPI(
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(CognitePointCloudModelList)
-        has_data = dm.filters.HasData(views=[self._view_id])
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                CognitePointCloudModel,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        builder.append(factory.root(
+            filter=filter_,
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            limit=limit,
+            has_container_fields=True,
+        ))
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CognitePointCloudRevision._view_id]),
-                        direction="inwards",
-                        through=CognitePointCloudRevision._view_id.as_property_ref("model3D"),
-                    ),
-                    CognitePointCloudRevision,
+            builder.extend(
+            factory.from_reverse_relation(
+                CognitePointCloudRevision._view_id,
+                {
+    "source": {
+        "space": "cdf_cdm",
+        "external_id": "Cognite3DRevision",
+        "version": "v1",
+        "type": "view"
+    },
+    "identifier": "model3D"
+},
+                connection_type=None,
+                ViewPropertyId(self._view_id, "revisions"),
+                has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("thumbnail"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "thumbnail"),
+                    has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return CognitePointCloudModelList([CognitePointCloudModel.model_validate(item) for item in unpacked])
+

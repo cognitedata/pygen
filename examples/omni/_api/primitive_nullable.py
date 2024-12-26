@@ -21,6 +21,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._primitive_nullable import (
     PrimitiveNullableQuery,
@@ -742,7 +746,6 @@ class PrimitiveNullableAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

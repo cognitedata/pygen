@@ -20,6 +20,10 @@ from wind_turbine.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._generating_unit import (
     GeneratingUnitQuery,
@@ -593,7 +597,6 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

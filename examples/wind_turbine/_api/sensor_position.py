@@ -20,6 +20,10 @@ from wind_turbine.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._sensor_position import (
     SensorPositionQuery,
@@ -1166,7 +1170,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -1176,130 +1179,81 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(SensorPositionList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                SensorPosition,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Blade._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("blade"),
-                    ),
-                    Blade,
+            builder.extend(
+                factory.from_direct_relation(
+                    Blade._view_id,
+                    ViewPropertyId(self._view_id, "blade"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "edgewise_bend_mom_crosstalk_corrected"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("edgewise_bend_mom_offset"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "edgewise_bend_mom_offset"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "edgewise_bend_mom_offset_crosstalk_corrected"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("edgewisewise_bend_mom"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "edgewisewise_bend_mom"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("flapwise_bend_mom"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "flapwise_bend_mom"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "flapwise_bend_mom_crosstalk_corrected"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("flapwise_bend_mom_offset"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "flapwise_bend_mom_offset"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "flapwise_bend_mom_offset_crosstalk_corrected"),
+                    has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return SensorPositionList([SensorPosition.model_validate(item) for item in unpacked])

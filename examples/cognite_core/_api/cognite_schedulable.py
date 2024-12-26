@@ -21,6 +21,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_schedulable import (
     CogniteSchedulableQuery,
@@ -616,7 +620,6 @@ class CogniteSchedulableAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

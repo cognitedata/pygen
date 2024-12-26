@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_cad_node import (
     CogniteCADNodeQuery,
@@ -806,7 +810,6 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -816,58 +819,39 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(CogniteCADNodeList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                CogniteCADNode,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteCADModel._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("model3D"),
-                    ),
-                    CogniteCADModel,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteCADModel._view_id,
+                    ViewPropertyId(self._view_id, "model3D"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Cognite3DObject._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("object3D"),
-                    ),
-                    Cognite3DObject,
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite3DObject._view_id,
+                    ViewPropertyId(self._view_id, "object3D"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteCADRevision._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("revisions"),
-                    ),
-                    CogniteCADRevision,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteCADRevision._view_id,
+                    ViewPropertyId(self._view_id, "revisions"),
+                    has_container_fields=True,
                 )
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return CogniteCADNodeList([CogniteCADNode.model_validate(item) for item in unpacked])

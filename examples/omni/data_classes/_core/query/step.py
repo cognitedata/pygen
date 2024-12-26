@@ -264,7 +264,11 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(
-        self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None, has_container_fields: bool = True
+        self,
+        filter: dm.Filter | None = None,
+        sort: list[dm.InstanceSort] | None = None,
+        limit: int | None = None,
+        has_container_fields: bool = True,
     ) -> QueryStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
@@ -348,7 +352,7 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str | dict[str, list[str]]] | None = None,
         include_end_node: bool = True,
-            has_container_fields: bool = True,
+        has_container_fields: bool = True,
     ) -> list[QueryStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [

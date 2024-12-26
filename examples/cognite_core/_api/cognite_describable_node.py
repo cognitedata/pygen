@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import (
     CogniteDescribableNodeQuery,
@@ -685,7 +689,6 @@ class CogniteDescribableNodeAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

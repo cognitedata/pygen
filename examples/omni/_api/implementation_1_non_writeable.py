@@ -20,6 +20,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._implementation_1_non_writeable import (
     Implementation1NonWriteableQuery,
@@ -540,7 +544,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

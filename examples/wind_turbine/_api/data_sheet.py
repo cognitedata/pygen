@@ -21,6 +21,10 @@ from wind_turbine.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._data_sheet import (
     DataSheetQuery,
@@ -668,7 +672,6 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

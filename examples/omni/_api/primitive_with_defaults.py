@@ -20,6 +20,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._primitive_with_defaults import (
     PrimitiveWithDefaultsQuery,
@@ -609,7 +613,6 @@ class PrimitiveWithDefaultsAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

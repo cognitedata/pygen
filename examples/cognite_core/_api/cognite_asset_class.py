@@ -20,6 +20,10 @@ from cognite_core.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_asset_class import (
     CogniteAssetClassQuery,
@@ -615,7 +619,6 @@ class CogniteAssetClassAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

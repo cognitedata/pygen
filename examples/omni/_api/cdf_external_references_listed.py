@@ -20,6 +20,10 @@ from omni.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._cdf_external_references_listed import (
     CDFExternalReferencesListedQuery,
@@ -467,7 +471,6 @@ class CDFExternalReferencesListedAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,
