@@ -8,6 +8,7 @@ These are responsible for:
 from __future__ import annotations
 
 import itertools
+import textwrap
 import warnings
 from collections import defaultdict
 from collections.abc import Callable, Iterator, Sequence
@@ -936,6 +937,10 @@ class APIGenerator:
 
         unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
 
+        def method_text_wrap(text: str) -> str:
+            newline = "\n" + " " * 12
+            return newline.join(textwrap.wrap(text, width=120-12))
+
         return (
             type_api.render(
                 top_level_package=self.top_level_package,
@@ -951,6 +956,7 @@ class APIGenerator:
                 # ft = field types
                 ft=fields,
                 dm=dm,
+                method_text_wrap=method_text_wrap
             )
             + "\n"
         )
