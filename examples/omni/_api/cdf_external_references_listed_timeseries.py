@@ -197,7 +197,9 @@ class CDFExternalReferencesListedTimeseriesQuery:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_listed_datapoints = client.cdf_external_references_listed.timeseries(external_id="my_timeseries").retrieve_array(start="2w-ago")
+                >>> cdf_external_references_listed_datapoints = client.cdf_external_references_listed.timeseries(
+                ...     external_id="my_timeseries"
+                ... ).retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -304,7 +306,9 @@ class CDFExternalReferencesListedTimeseriesQuery:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_listed_datapoints = client.cdf_external_references_listed.timeseries(external_id="my_timeseries").retrieve_dataframe(start="2w-ago")
+                >>> cdf_external_references_listed_datapoints = client.cdf_external_references_listed.timeseries(
+                ...     external_id="my_timeseries"
+                ... ).retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
