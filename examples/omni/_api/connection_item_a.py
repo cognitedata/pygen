@@ -690,17 +690,21 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-            limit=limit,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
         builder.extend(
             factory.from_edge(
                 ConnectionItemB._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "outwards"),
                 include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
             )
         )
         if retrieve_connections == "full":
@@ -708,19 +712,17 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 factory.from_direct_relation(
                     ConnectionItemCNode._view_id,
                     ViewPropertyId(self._view_id, "otherDirect"),
+                    has_container_fields=False,
                 )
             )
             builder.extend(
                 factory.from_direct_relation(
                     ConnectionItemA._view_id,
                     ViewPropertyId(self._view_id, "selfDirect"),
+                    has_container_fields=True,
                 )
             )
-
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
-        return ConnectionItemAList([
-            ConnectionItemA.model_validate(item) for item in unpacked
-        ])
-
+        return ConnectionItemAList([ConnectionItemA.model_validate(item) for item in unpacked])

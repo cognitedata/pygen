@@ -599,7 +599,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
             filter,
         )
-
 {% if data_class.has_connection_with_target %}
         if retrieve_connections == "skip":
             return self._list(
@@ -626,7 +625,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             has_container_fields=False,
             {% endif %}
         ))
-
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
         {% if field.is_edge %}
         builder.extend(
@@ -684,9 +682,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
-        return {{ data_class.read_list_name }}([
-            {{ data_class.read_name }}.model_validate(item) for item in unpacked
-        ])
+        return {{ data_class.read_list_name }}([{{ data_class.read_name }}.model_validate(item) for item in unpacked])
         {% else %}
         return self._list(
             limit=limit,
