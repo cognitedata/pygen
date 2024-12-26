@@ -277,6 +277,7 @@ class QueryStepFactory:
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
+        full_filter: dm.Filter | None
         if has_container_fields:
             has_data = dm.filters.HasData(views=[self._view_id])
             full_filter = dm.filters.And(filter, has_data) if filter else has_data
@@ -285,7 +286,7 @@ class QueryStepFactory:
         return QueryStep(
             self._root_name,
             dm.query.NodeResultSetExpression(
-                filter=filter,
+                filter=full_filter,
                 sort=sort,
             ),
             select=select,
