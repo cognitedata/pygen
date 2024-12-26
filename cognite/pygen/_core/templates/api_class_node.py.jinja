@@ -629,62 +629,42 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 "{{ field.edge_direction}}",
                 ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
                 include_end_node=retrieve_connections == "full",
+                {% if field.destination_class.has_container_fields %}
+                has_container_fields=True,
+                {% endif %}
             )
         )
         {% endif %}
         {% endfor %}
         if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
-            {% if field.is_edge %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name( edge_{{ field.name }}),
-                    dm.query.NodeResultSetExpression(
-                        from_= edge_{{ field.name }},
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{ field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                    ),
-                    {{ field.destination_class.read_name }},
-                )
-            )
-            {% endif %}
-            {% endfor %}
-            {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_reverse_direct_relation %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                        direction="inwards",
-                        through={{field.destination_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
-                    ),
-                    {{field.destination_class.read_name }},
-                    {% if field.reverse_property.is_one_to_many %}
-                    connection_type="reverse-list",
-                    {% endif %}
+            builder.extend(
+            factory.from_reverse_relation(
+                {{field.destination_class.read_name }}._view_id,
+                {{ field.through }},
+                {% if field.reverse_property.is_one_to_many %}
+                connection_type="reverse-list",
+                {% else %}
+                connection_type=None,
+                {% endif %}
+                ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                {% if field.destination_class.has_container_fields %}
+                has_container_fields=True,
+                {% endif %}
                 )
             )
             {% endif %}
             {% endfor %}
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_direct_relation and field.destination_class %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("{{ field.prop_name }}"),
-                    ),
-                    {{field.destination_class.read_name }},
+            builder.extend(
+                factory.from_direct_relation(
+                    {{field.destination_class.read_name }}._view_id,
+                    ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                    {% if not field.destination_class.has_container_fields %}
+                    has_container_fields=False,
+                    {% endif %}
                 )
             )
             {% endif %}
