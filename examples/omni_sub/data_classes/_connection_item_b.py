@@ -221,11 +221,11 @@ class ConnectionItemB(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectional") and isinstance(
-                        value, (ConnectionItemA, dm.NodeId)
+                        value, ConnectionItemA | dm.NodeId
                     ):
                         inwards.append(value)
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "reflexive") and isinstance(
-                        value, (ConnectionItemB, dm.NodeId)
+                        value, ConnectionItemB | dm.NodeId
                     ):
                         self_edge.append(value)
 

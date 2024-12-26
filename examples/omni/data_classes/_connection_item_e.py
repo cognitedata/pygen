@@ -305,7 +305,7 @@ class ConnectionItemE(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle") and isinstance(
-                        value, (ConnectionItemD, str, dm.NodeId)
+                        value, ConnectionItemD | str | dm.NodeId
                     ):
                         if instance.inwards_single is None:
                             instance.inwards_single = value

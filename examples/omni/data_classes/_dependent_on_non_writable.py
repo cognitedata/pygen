@@ -224,7 +224,7 @@ class DependentOnNonWritable(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "toNonWritable") and isinstance(
-                        value, (Implementation1NonWriteable, str, dm.NodeId)
+                        value, Implementation1NonWriteable | str | dm.NodeId
                     ):
                         to_non_writable.append(value)
 

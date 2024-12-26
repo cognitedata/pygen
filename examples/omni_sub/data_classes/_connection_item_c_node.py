@@ -242,11 +242,11 @@ class ConnectionItemCNode(DomainModel):
                     edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
 
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, (ConnectionItemA, dm.NodeId)
+                        value, ConnectionItemA | dm.NodeId
                     ):
                         connection_item_a.append(value)
                     if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, (ConnectionItemB, dm.NodeId)
+                        value, ConnectionItemB | dm.NodeId
                     ):
                         connection_item_b.append(value)
 
