@@ -235,13 +235,6 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite 360 images.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_360_image
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `back`, `bottom`, `collection_360`, `front`, `left`, `right`, `station_360` or `top`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_360_image: Cognite 360 image or
                 sequence of Cognite 360 images to upsert.

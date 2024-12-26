@@ -102,7 +102,9 @@ class MetmastTiltAngleQuery:
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmast_datapoints = client.metmast.tilt_angle(external_id="my_tilt_angle").retrieve(start="2w-ago")
+                >>> metmast_datapoints = client.metmast.tilt_angle(
+                ...         external_id="my_tilt_angle"
+                ...     ).retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:

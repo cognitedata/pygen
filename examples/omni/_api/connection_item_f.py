@@ -117,13 +117,6 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item fs.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_f
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `direct_list`, `outwards_multi` or `outwards_single`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             connection_item_f: Connection item f or
                 sequence of connection item fs to upsert.

@@ -120,13 +120,6 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item as.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_a
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `other_direct`, `outwards` or `self_direct`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             connection_item_a: Connection item a or
                 sequence of connection item as to upsert.

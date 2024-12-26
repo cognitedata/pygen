@@ -195,13 +195,6 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite files.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_file
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `assets`, `category` or `source`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_file: Cognite file or
                 sequence of Cognite files to upsert.

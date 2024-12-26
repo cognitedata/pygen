@@ -99,13 +99,6 @@ class ConnectionItemCNodeAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item c nodes.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_c_node
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `connection_item_a` or `connection_item_b`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             connection_item_c_node: Connection item c node or
                 sequence of connection item c nodes to upsert.

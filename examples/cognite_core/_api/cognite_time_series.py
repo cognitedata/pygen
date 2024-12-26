@@ -196,13 +196,6 @@ class CogniteTimeSeriesAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite time series.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_time_series
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `assets`, `equipment`, `source` or `unit`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_time_series: Cognite time series or
                 sequence of Cognite time series to upsert.

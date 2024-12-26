@@ -102,7 +102,9 @@ class MetmastTemperatureQuery:
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmast_datapoints = client.metmast.temperature(external_id="my_temperature").retrieve(start="2w-ago")
+                >>> metmast_datapoints = client.metmast.temperature(
+                ...         external_id="my_temperature"
+                ...     ).retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:

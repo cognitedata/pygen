@@ -112,13 +112,6 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
     ) -> ResourcesWriteResult:
         """Add or update (upsert) generators.
 
-        Note: This method iterates through all nodes and timeseries linked to generator
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `generator_speed_controller` or `generator_speed_controller_reference`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             generator: Generator or
                 sequence of generators to upsert.

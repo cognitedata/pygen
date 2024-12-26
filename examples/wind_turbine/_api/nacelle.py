@@ -197,13 +197,6 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
     ) -> ResourcesWriteResult:
         """Add or update (upsert) nacelles.
 
-        Note: This method iterates through all nodes and timeseries linked to nacelle
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `acc_from_back_side_y`, `acc_from_back_side_z`, `gearbox`, `generator`, `high_speed_shaft`, `main_shaft`, `power_inverter`, `yaw_direction` or `yaw_error`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             nacelle: Nacelle or
                 sequence of nacelles to upsert.

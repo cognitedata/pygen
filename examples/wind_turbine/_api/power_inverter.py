@@ -122,13 +122,6 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
     ) -> ResourcesWriteResult:
         """Add or update (upsert) power inverters.
 
-        Note: This method iterates through all nodes and timeseries linked to power_inverter
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `active_power_total`, `apparent_power_total` or `reactive_power_total`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             power_inverter: Power inverter or
                 sequence of power inverters to upsert.

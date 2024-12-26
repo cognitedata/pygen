@@ -156,13 +156,6 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite cube maps.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_cube_map
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `back`, `bottom`, `front`, `left`, `right` or `top`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_cube_map: Cognite cube map or
                 sequence of Cognite cube maps to upsert.

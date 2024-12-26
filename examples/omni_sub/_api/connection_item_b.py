@@ -103,13 +103,6 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
     ) -> ResourcesWriteResult:
         """Add or update (upsert) connection item bs.
 
-        Note: This method iterates through all nodes and timeseries linked to connection_item_b
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `inwards` or `self_edge`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             connection_item_b: Connection item b or
                 sequence of connection item bs to upsert.

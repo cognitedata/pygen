@@ -189,13 +189,6 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
     ) -> ResourcesWriteResult:
         """Add or update (upsert) sensor positions.
 
-        Note: This method iterates through all nodes and timeseries linked to sensor_position
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `blade`, `edgewise_bend_mom_crosstalk_corrected`, `edgewise_bend_mom_offset`, `edgewise_bend_mom_offset_crosstalk_corrected`, `edgewisewise_bend_mom`, `flapwise_bend_mom`, `flapwise_bend_mom_crosstalk_corrected`, `flapwise_bend_mom_offset` or `flapwise_bend_mom_offset_crosstalk_corrected`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             sensor_position: Sensor position or
                 sequence of sensor positions to upsert.

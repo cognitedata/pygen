@@ -148,13 +148,6 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite 3D objects.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_3_d_object
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `images_360`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_3_d_object: Cognite 3d object or
                 sequence of Cognite 3D objects to upsert.

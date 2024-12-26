@@ -115,13 +115,6 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite cad models.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_cad_model
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `thumbnail`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_cad_model: Cognite cad model or
                 sequence of Cognite cad models to upsert.

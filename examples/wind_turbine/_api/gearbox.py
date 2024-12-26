@@ -122,13 +122,6 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
     ) -> ResourcesWriteResult:
         """Add or update (upsert) gearboxes.
 
-        Note: This method iterates through all nodes and timeseries linked to gearbox
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `displacement_x`, `displacement_y` or `displacement_z`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             gearbox: Gearbox or
                 sequence of gearboxes to upsert.

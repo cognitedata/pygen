@@ -156,13 +156,6 @@ class CogniteSourceableNodeAPI(
     ) -> ResourcesWriteResult:
         """Add or update (upsert) Cognite sourceable nodes.
 
-        Note: This method iterates through all nodes and timeseries linked to cognite_sourceable_node
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `source`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             cognite_sourceable_node: Cognite sourceable node or
                 sequence of Cognite sourceable nodes to upsert.

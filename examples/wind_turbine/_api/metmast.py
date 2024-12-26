@@ -109,13 +109,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
     ) -> ResourcesWriteResult:
         """Add or update (upsert) metmasts.
 
-        Note: This method iterates through all nodes and timeseries linked to metmast
-        and creates them including the edges
-        between the nodes. For example, if any of
-        `wind_turbines`
-        are set, then these nodes as well as any nodes linked to them, and all the edges linking
-        these nodes will be created.
-
         Args:
             metmast: Metmast or
                 sequence of metmasts to upsert.
