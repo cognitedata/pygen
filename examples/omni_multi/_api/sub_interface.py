@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Literal, overload
+from typing import ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -16,6 +16,7 @@ from omni_multi._api._core import (
 )
 from omni_multi._api.sub_interface_query import SubInterfaceQueryAPI
 from omni_multi.data_classes import (
+    DomainModel,
     Implementation1v2,
     ResourcesWriteResult,
     SubInterface,
@@ -39,7 +40,7 @@ from omni_multi.data_classes._sub_interface import (
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
     _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
     _properties_by_field = _SUBINTERFACE_PROPERTIES_BY_FIELD
-    _direct_children_by_external_id = {
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
         "Implementation1": Implementation1v2,
     }
     _class_type = SubInterface
