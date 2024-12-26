@@ -79,9 +79,9 @@ from {{ top_level_package }}._api.{{ query_api.file_name }} import {{ query_api.
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
     _view_id = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    _properties_by_field: ClassVar[dict[str, type[DomainModel]]] = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif +%}
+    _properties_by_field: ClassVar[dict[str, str]] = {% if not data_class.has_only_one_to_many_edges and data_class.has_field_of_type(ft.BasePrimitiveField) %}{{ data_class.properties_dict_name }}{% else %}{% raw %}{}{% endraw %}{% endif +%}
     {% if data_class.direct_children %}
-    _direct_children_by_external_id = {{'{'}}
+    _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {{'{'}}
         {% for child in data_class.direct_children %}
         "{{ child.view_id.external_id }}": {{ child.read_name }},
         {% endfor %}
