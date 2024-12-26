@@ -514,7 +514,9 @@ class {{ timeseries_api.name}}:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(limit=5).retrieve()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(
+                ...     limit=5
+                ... ).retrieve()
 
         """
         warnings.warn(

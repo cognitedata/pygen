@@ -251,7 +251,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
+                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve(
+                ...     "my_{{ data_class.variable }}"
+                ... )
 
         """
         {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
@@ -320,7 +322,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search('my_{{ data_class.variable }}')
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search(
+                ...     'my_{{ data_class.variable }}'
+                ... )
 
         """
         filter_ = {{ data_class.filter_name }}(
