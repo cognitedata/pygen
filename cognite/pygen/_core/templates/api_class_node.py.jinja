@@ -615,10 +615,16 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
         builder.append(factory.root(
-            filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
-            limit=limit,{% not if data_class.has_container_fields %}
-            has_container_fields=False,{% endif %}
+            filter=filter_,
+            {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            {% endif %}
+            limit=limit,
+            {% if data_class.has_container_fields %}
+            has_container_fields=True,
+            {% else %}
+            has_container_fields=False,
+            {% endif %}
         ))
 
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
@@ -631,6 +637,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 include_end_node=retrieve_connections == "full",
                 {% if field.destination_class.has_container_fields %}
                 has_container_fields=True,
+                {% else %}
+                has_container_fields=False,
                 {% endif %}
             )
         )
@@ -651,6 +659,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
                 {% if field.destination_class.has_container_fields %}
                 has_container_fields=True,
+                {% else %}
+                has_container_fields=False,
                 {% endif %}
                 )
             )
@@ -662,7 +672,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 factory.from_direct_relation(
                     {{field.destination_class.read_name }}._view_id,
                     ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
-                    {% if not field.destination_class.has_container_fields %}
+                    {% if field.destination_class.has_container_fields %}
+                    has_container_fields=True,
+                    {% else %}
                     has_container_fields=False,
                     {% endif %}
                 )

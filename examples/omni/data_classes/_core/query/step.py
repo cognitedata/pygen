@@ -277,16 +277,10 @@ class QueryStepFactory:
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
-        full_filter: dm.Filter | None
-        if has_container_fields:
-            has_data = dm.filters.HasData(views=[self._view_id])
-            full_filter = dm.filters.And(filter, has_data) if filter else has_data
-        else:
-            full_filter = filter
         return QueryStep(
             self._root_name,
             dm.query.NodeResultSetExpression(
-                filter=full_filter,
+                filter=self._full_filter(filter, has_container_fields, self._view_id),
                 sort=sort,
             ),
             select=select,
@@ -326,6 +320,7 @@ class QueryStepFactory:
         source: dm.ViewId | None,
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
+        has_container_fields: bool = True,
     ) -> list[QueryStep]:
         if source is None:
             raise ValueError("Source view not found")
@@ -334,6 +329,7 @@ class QueryStepFactory:
             QueryStep(
                 self._create_step_name(self.root_name),
                 dm.query.NodeResultSetExpression(
+                    filter=self._full_filter(None, has_container_fields, source),
                     from_=self.root_name,
                     direction="outwards",
                     through=self._view_id.as_property_ref(connection_property.property),
@@ -352,6 +348,7 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str | dict[str, list[str]]] | None = None,
         include_end_node: bool = True,
+            has_container_fields: bool = True,
     ) -> list[QueryStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [
@@ -383,7 +380,7 @@ class QueryStepFactory:
             self._create_step_name(edge_name),
             dm.query.NodeResultSetExpression(
                 from_=edge_name,
-                filter=dm.filters.HasData(views=[target_view]),
+                filter=self._full_filter(None, has_container_fields, target_view),
             ),
             select=self._create_select(query_properties, target_view),
             selected_properties=selected_node_properties,
@@ -400,6 +397,7 @@ class QueryStepFactory:
         connection_type: Literal["reverse-list"] | None,
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
+        has_container_fields: bool = True,
     ) -> list[QueryStep]:
         query_properties = self._create_query_properties(selected_properties, through.property)
         other_view_id = source
@@ -409,6 +407,7 @@ class QueryStepFactory:
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,
                     direction="inwards",
+                    filter=self._full_filter(None, has_container_fields, other_view_id),
                     through=other_view_id.as_property_ref(through.property),
                 ),
                 connection_property=connection_property,
@@ -474,3 +473,11 @@ class QueryStepFactory:
             else:
                 raise ValueError(f"Direct relations do not support nested properties. Got {prop}")
         return output
+
+    @staticmethod
+    def _full_filter(filter: dm.Filter | None, has_container_fields: bool, view_id: dm.ViewId) -> dm.Filter | None:
+        if has_container_fields:
+            has_data = dm.filters.HasData(views=[view_id])
+            return dm.filters.And(filter, has_data) if filter else has_data
+
+        return filter
