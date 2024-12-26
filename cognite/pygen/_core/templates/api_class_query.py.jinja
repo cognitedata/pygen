@@ -90,7 +90,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
 
         Args:
             {% for parm in edge_api.filter_parameters(False, include_end_node=True, suffix_edge=True) %}
-            {{ parm.name }}: {{ parm.description }}
+            {{ parm.name }}: {{ parm.argument_documentation_method }}
             {% endfor %}
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.

@@ -157,8 +157,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }}
         and creates them including the edges
-        between the nodes. For example, if any of {{ data_class.connections_docs_write }} are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        {{ data_class.connections_docs_write }}
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
         {% endif %}
 
         Args:

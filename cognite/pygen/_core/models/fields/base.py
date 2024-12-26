@@ -147,17 +147,22 @@ class Field:
         raise NotImplementedError
 
     @property
-    def line_width(self) -> int:
-        return 120 - 10 - len(self.name)
-
-    @property
     def argument_documentation(self) -> str:
         if self.description:
             msg = self.description
         else:
             msg = f"The {self.doc_name} field."
+        line_width = 120 - 10 - len(self.name) - 1
+        return ("\n" + " " * 12).join(textwrap.wrap(msg, width=line_width))
 
-        return ("\n" + " " * 12).join(textwrap.wrap(msg, width=self.line_width))
+    @property
+    def argument_documentation_method(self) -> str:
+        if self.description:
+            msg = self.description
+        else:
+            msg = f"The {self.doc_name} field."
+        line_width = 120 - 14 - len(self.name) - 1
+        return ("\n" + " " * 16).join(textwrap.wrap(msg, width=line_width))
 
     # The properties below are overwritten in the child classes
     @property
