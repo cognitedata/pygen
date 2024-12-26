@@ -204,7 +204,7 @@ class DomainModelCore(Core, ABC):
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
-class DataRecord(BaseModel):
+class DataRecord(BaseModel, populate_by_name=True):
     """The data record represents the metadata of a node.
 
     Args:
