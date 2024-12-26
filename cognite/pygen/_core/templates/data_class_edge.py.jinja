@@ -66,7 +66,16 @@ if TYPE_CHECKING:
 {% endif %}
 
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_name }}Apply", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.read_name }}ApplyList"{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ =
+    "{{ data_class.read_name }}",{% if data_class.is_writable or data_class.is_interface %}
+    "{{ data_class.write_name }}",
+    "{{ data_class.read_name }}Apply",{% endif %}
+    "{{ data_class.read_list_name }}",{% if data_class.is_writable or data_class.is_interface %}
+    "{{ data_class.write_list_name }}",
+    "{{ data_class.read_name }}ApplyList"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %},
+    "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %},
+    "{{ data_class.text_field_names }}"{% endif %}
+]
 
 
 {{ data_class.text_field_names }} = Literal["external_id", {{ data_class.text_fields_literals }}]
