@@ -248,7 +248,8 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
 class CogniteDescribableEdgeApply(CogniteDescribableEdgeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteDescribableEdgeApply:
         warnings.warn(
-            "CogniteDescribableEdgeApply is deprecated and will be removed in v1.0. Use CogniteDescribableEdgeWrite instead."
+            "CogniteDescribableEdgeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteDescribableEdgeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteDescribableEdge.",
             UserWarning,

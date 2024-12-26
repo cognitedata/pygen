@@ -325,7 +325,8 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
 class Cognite3DTransformationEdgeApply(Cognite3DTransformationEdgeWrite):
     def __new__(cls, *args, **kwargs) -> Cognite3DTransformationEdgeApply:
         warnings.warn(
-            "Cognite3DTransformationEdgeApply is deprecated and will be removed in v1.0. Use Cognite3DTransformationEdgeWrite instead."
+            "Cognite3DTransformationEdgeApply is deprecated and will be removed in v1.0. "
+            "Use Cognite3DTransformationEdgeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite3DTransformationEdge.",
             UserWarning,

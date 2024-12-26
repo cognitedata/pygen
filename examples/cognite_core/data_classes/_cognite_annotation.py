@@ -395,7 +395,8 @@ class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeW
 class CogniteAnnotationApply(CogniteAnnotationWrite):
     def __new__(cls, *args, **kwargs) -> CogniteAnnotationApply:
         warnings.warn(
-            "CogniteAnnotationApply is deprecated and will be removed in v1.0. Use CogniteAnnotationWrite instead."
+            "CogniteAnnotationApply is deprecated and will be removed in v1.0. "
+            "Use CogniteAnnotationWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteAnnotation.",
             UserWarning,

@@ -425,7 +425,8 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
 class Cognite360ImageAnnotationApply(Cognite360ImageAnnotationWrite):
     def __new__(cls, *args, **kwargs) -> Cognite360ImageAnnotationApply:
         warnings.warn(
-            "Cognite360ImageAnnotationApply is deprecated and will be removed in v1.0. Use Cognite360ImageAnnotationWrite instead."
+            "Cognite360ImageAnnotationApply is deprecated and will be removed in v1.0. "
+            "Use Cognite360ImageAnnotationWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Cognite360ImageAnnotation.",
             UserWarning,

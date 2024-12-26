@@ -346,7 +346,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         for edge_type, values in groupby(edge_api_name_type_direction_view_id_penta or [], lambda x: x[2].as_tuple()):
             edges: dict[dm.EdgeId, dm.Edge] = {}
             value_list = list(values)
-            for edge_api, edge_name, edge_type, direction, _ in value_list:
+            for edge_api, _, edge_type, direction, __ in value_list:
                 is_type = dm.filters.Equals(
                     ["edge", "type"],
                     {"space": edge_type.space, "externalId": edge_type.external_id},

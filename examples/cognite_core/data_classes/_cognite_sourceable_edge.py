@@ -327,7 +327,8 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
 class CogniteSourceableEdgeApply(CogniteSourceableEdgeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteSourceableEdgeApply:
         warnings.warn(
-            "CogniteSourceableEdgeApply is deprecated and will be removed in v1.0. Use CogniteSourceableEdgeWrite instead."
+            "CogniteSourceableEdgeApply is deprecated and will be removed in v1.0. "
+            "Use CogniteSourceableEdgeWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteSourceableEdge.",
             UserWarning,

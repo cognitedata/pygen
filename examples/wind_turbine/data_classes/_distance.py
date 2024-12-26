@@ -217,7 +217,8 @@ class DistanceWrite(DomainRelationWrite):
 class DistanceApply(DistanceWrite):
     def __new__(cls, *args, **kwargs) -> DistanceApply:
         warnings.warn(
-            "DistanceApply is deprecated and will be removed in v1.0. Use DistanceWrite instead."
+            "DistanceApply is deprecated and will be removed in v1.0. "
+            "Use DistanceWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "Distance.",
             UserWarning,

@@ -594,7 +594,8 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
 class CogniteDiagramAnnotationApply(CogniteDiagramAnnotationWrite):
     def __new__(cls, *args, **kwargs) -> CogniteDiagramAnnotationApply:
         warnings.warn(
-            "CogniteDiagramAnnotationApply is deprecated and will be removed in v1.0. Use CogniteDiagramAnnotationWrite instead."
+            "CogniteDiagramAnnotationApply is deprecated and will be removed in v1.0. "
+            "Use CogniteDiagramAnnotationWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "CogniteDiagramAnnotation.",
             UserWarning,

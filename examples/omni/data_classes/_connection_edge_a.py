@@ -248,7 +248,8 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
 class ConnectionEdgeAApply(ConnectionEdgeAWrite):
     def __new__(cls, *args, **kwargs) -> ConnectionEdgeAApply:
         warnings.warn(
-            "ConnectionEdgeAApply is deprecated and will be removed in v1.0. Use ConnectionEdgeAWrite instead."
+            "ConnectionEdgeAApply is deprecated and will be removed in v1.0. "
+            "Use ConnectionEdgeAWrite instead."
             "The motivation for this change is that Write is a more descriptive name for the writing version of the"
             "ConnectionEdgeA.",
             UserWarning,
