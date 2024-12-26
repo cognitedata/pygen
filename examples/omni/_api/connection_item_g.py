@@ -89,8 +89,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -152,7 +151,9 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         )
         return self._apply(connection_item_g, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more connection item g.
 
         Args:
@@ -182,14 +183,20 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemG | None:
-        ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ConnectionItemG | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemGList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> ConnectionItemGList: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> ConnectionItemG | ConnectionItemGList | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+    ) -> ConnectionItemG | ConnectionItemGList | None:
         """Retrieve one or more connection item gs by id(s).
 
         Args:
@@ -222,7 +229,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                     "inwards",
                     dm.ViewId("sp_pygen_models", "ConnectionItemF", "1"),
                 ),
-                                               ]
+            ],
         )
 
     def search(
@@ -325,9 +332,11 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields],
         property: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         query: str | None = None,
@@ -342,9 +351,11 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         property: ConnectionItemGFields | SequenceNotStr[ConnectionItemGFields] | None = None,
         query: str | None = None,
@@ -534,24 +545,24 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-            limit=limit,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                ConnectionItemF._view_id,
                 "inwards",
                 ViewPropertyId(self._view_id, "inwardsMultiProperty"),
                 include_end_node=retrieve_connections == "full",
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
         return ConnectionItemGList([ConnectionItemG.model_validate(item) for item in unpacked])
-

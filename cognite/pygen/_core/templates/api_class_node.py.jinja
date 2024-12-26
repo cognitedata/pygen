@@ -629,7 +629,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% if field.is_edge %}
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                {{field.destination_class.read_name }}._view_id,
                 "{{ field.edge_direction}}",
                 ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
                 include_end_node=retrieve_connections == "full",
@@ -642,7 +642,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         {% endif %}
         {% endfor %}
-{% if has_direct_or_reverse_relation_with_target %}
+{% if data_class.has_direct_or_reverse_relation_with_target %}
         if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_reverse_direct_relation %}

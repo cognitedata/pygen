@@ -60,11 +60,24 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
         self,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -74,7 +87,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -135,8 +155,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -222,7 +241,9 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         )
         return self._apply(cognite_file, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more Cognite file.
 
         Args:
@@ -252,14 +273,20 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteFile | None:
-        ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogniteFile | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteFileList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogniteFileList: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteFile | CogniteFileList | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+    ) -> CogniteFile | CogniteFileList | None:
         """Retrieve one or more Cognite files by id(s).
 
         Args:
@@ -280,20 +307,28 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                                               ]
-        )
+        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
 
     def search(
         self,
         query: str,
         properties: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -303,7 +338,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -433,8 +475,22 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         property: CogniteFileFields | SequenceNotStr[CogniteFileFields] | None = None,
         query: str | None = None,
         search_property: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -444,7 +500,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -473,8 +536,22 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         property: CogniteFileFields | SequenceNotStr[CogniteFileFields] | None = None,
         query: str | None = None,
         search_property: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -484,7 +561,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -508,15 +592,31 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteFileFields | SequenceNotStr[CogniteFileFields],
         property: CogniteFileFields | SequenceNotStr[CogniteFileFields] | None = None,
         query: str | None = None,
         search_property: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -526,7 +626,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -549,15 +656,31 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteFileFields | SequenceNotStr[CogniteFileFields] | None = None,
         property: CogniteFileFields | SequenceNotStr[CogniteFileFields] | None = None,
         query: str | None = None,
         search_property: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -567,7 +690,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -693,8 +823,22 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         interval: float,
         query: str | None = None,
         search_property: CogniteFileTextFields | SequenceNotStr[CogniteFileTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -704,7 +848,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -823,8 +974,22 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
     def list(
         self,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        category: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         directory: str | list[str] | None = None,
@@ -834,7 +999,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         mime_type_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -957,28 +1129,22 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-            limit=limit,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
-            factory.from_reverse_relation(
-                CogniteEquipment._view_id,
-                {
-    "source": {
-        "space": "cdf_cdm",
-        "external_id": "CogniteEquipment",
-        "version": "v1",
-        "type": "view"
-    },
-    "identifier": "files"
-},
-                connection_type="reverse-list",
-                ViewPropertyId(self._view_id, "equipment"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CogniteEquipment._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteEquipment", "v1"), "files"),
+                    connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "equipment"),
+                    has_container_fields=True,
                 )
             )
             builder.extend(
@@ -1006,4 +1172,3 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
         return CogniteFileList([CogniteFile.model_validate(item) for item in unpacked])
-

@@ -47,7 +47,11 @@ from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWr
 from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
-class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList]):
+class DependentOnNonWritableAPI(
+    NodeAPI[
+        DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList
+    ]
+):
     _view_id = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
     _class_type = DependentOnNonWritable
@@ -85,8 +89,7 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -148,7 +151,9 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
         )
         return self._apply(dependent_on_non_writable, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more dependent on non writable.
 
         Args:
@@ -178,14 +183,20 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | None:
-        ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> DependentOnNonWritable | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritableList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> DependentOnNonWritableList: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | DependentOnNonWritableList | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+    ) -> DependentOnNonWritable | DependentOnNonWritableList | None:
         """Retrieve one or more dependent on non writables by id(s).
 
         Args:
@@ -218,7 +229,7 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
                     "outwards",
                     dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1"),
                 ),
-                                               ]
+            ],
         )
 
     def search(
@@ -293,7 +304,9 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -309,7 +322,9 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -321,13 +336,17 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields],
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -338,13 +357,17 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -409,7 +432,9 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
         property: DependentOnNonWritableFields,
         interval: float,
         query: str | None = None,
-        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
+        search_property: (
+            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
+        ) = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -530,24 +555,24 @@ class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWr
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-            limit=limit,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                Implementation1NonWriteable._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "toNonWritable"),
                 include_end_node=retrieve_connections == "full",
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
         return DependentOnNonWritableList([DependentOnNonWritable.model_validate(item) for item in unpacked])
-

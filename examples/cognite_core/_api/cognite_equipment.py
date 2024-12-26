@@ -52,7 +52,9 @@ from cognite_core.data_classes import (
 from cognite_core._api.cognite_equipment_query import CogniteEquipmentQueryAPI
 
 
-class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, CogniteEquipmentList, CogniteEquipmentWriteList]):
+class CogniteEquipmentAPI(
+    NodeAPI[CogniteEquipment, CogniteEquipmentWrite, CogniteEquipmentList, CogniteEquipmentWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteEquipment", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEEQUIPMENT_PROPERTIES_BY_FIELD
     _class_type = CogniteEquipment
@@ -62,21 +64,48 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     def __call__(
         self,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -133,8 +162,7 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -218,7 +246,9 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         )
         return self._apply(cognite_equipment, replace, write_none)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more Cognite equipment.
 
         Args:
@@ -248,14 +278,20 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteEquipment | None:
-        ...
+    def retrieve(
+        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogniteEquipment | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteEquipmentList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogniteEquipmentList: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE) -> CogniteEquipment | CogniteEquipmentList | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+    ) -> CogniteEquipment | CogniteEquipmentList | None:
         """Retrieve one or more Cognite equipments by id(s).
 
         Args:
@@ -276,30 +312,52 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                                               ]
-        )
+        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
 
     def search(
         self,
         query: str,
         properties: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -423,18 +481,46 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         property: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields] | None = None,
         query: str | None = None,
         search_property: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -461,18 +547,46 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         property: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields] | None = None,
         query: str | None = None,
         search_property: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -494,25 +608,55 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields],
         property: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields] | None = None,
         query: str | None = None,
         search_property: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -533,25 +677,55 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields] | None = None,
         property: CogniteEquipmentFields | SequenceNotStr[CogniteEquipmentFields] | None = None,
         query: str | None = None,
         search_property: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -671,18 +845,46 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         interval: float,
         query: str | None = None,
         search_property: CogniteEquipmentTextFields | SequenceNotStr[CogniteEquipmentTextFields] | None = None,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -795,18 +997,46 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
 
     def list(
         self,
-        asset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        asset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment_type: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        files: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment_type: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        files: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         manufacturer: str | list[str] | None = None,
         manufacturer_prefix: str | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         serial_number: str | list[str] | None = None,
         serial_number_prefix: str | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -924,45 +1154,31 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-            limit=limit,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
-            factory.from_reverse_relation(
-                CogniteActivity._view_id,
-                {
-    "source": {
-        "space": "cdf_cdm",
-        "external_id": "CogniteActivity",
-        "version": "v1",
-        "type": "view"
-    },
-    "identifier": "equipment"
-},
-                connection_type="reverse-list",
-                ViewPropertyId(self._view_id, "activities"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CogniteActivity._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteActivity", "v1"), "equipment"),
+                    connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "activities"),
+                    has_container_fields=True,
                 )
             )
             builder.extend(
-            factory.from_reverse_relation(
-                CogniteTimeSeries._view_id,
-                {
-    "source": {
-        "space": "cdf_cdm",
-        "external_id": "CogniteTimeSeries",
-        "version": "v1",
-        "type": "view"
-    },
-    "identifier": "equipment"
-},
-                connection_type="reverse-list",
-                ViewPropertyId(self._view_id, "timeSeries"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CogniteTimeSeries._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteTimeSeries", "v1"), "equipment"),
+                    connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "timeSeries"),
+                    has_container_fields=True,
                 )
             )
             builder.extend(
@@ -997,4 +1213,3 @@ class CogniteEquipmentAPI(NodeAPI[CogniteEquipment, CogniteEquipmentWrite, Cogni
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
         return CogniteEquipmentList([CogniteEquipment.model_validate(item) for item in unpacked])
-

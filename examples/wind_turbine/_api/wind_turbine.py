@@ -963,7 +963,7 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
         )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                Metmast._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "metmast"),
                 include_end_node=retrieve_connections == "full",

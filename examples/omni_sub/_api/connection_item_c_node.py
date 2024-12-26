@@ -47,7 +47,9 @@ from omni_sub._api.connection_item_c_node_connection_item_b import ConnectionIte
 from omni_sub._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 
 
-class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]):
+class ConnectionItemCNodeAPI(
+    NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
+):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = ConnectionItemCNode
@@ -82,8 +84,7 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
 
         """
         warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
+            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
             UserWarning,
             stacklevel=2,
         )
@@ -173,14 +174,18 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str) -> ConnectionItemCNode | None:
-        ...
+    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str) -> ConnectionItemCNode | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str) -> ConnectionItemCNodeList:
-        ...
+    def retrieve(
+        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str
+    ) -> ConnectionItemCNodeList: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str,
+    ) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
         """Retrieve one or more connection item c nodes by id(s).
 
         Args:
@@ -220,7 +225,7 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
                     "outwards",
                     dm.ViewId("sp_pygen_models", "ConnectionItemB", "1"),
                 ),
-                                               ]
+            ],
         )
 
     def search(
@@ -309,9 +314,11 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields],
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
@@ -322,9 +329,11 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
@@ -477,14 +486,16 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
 
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
-        builder.append(factory.root(
-            filter=filter_,
-            limit=limit,
-            has_container_fields=False,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=False,
+            )
+        )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                ConnectionItemA._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "connectionItemA"),
                 include_end_node=retrieve_connections == "full",
@@ -500,9 +511,7 @@ class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWri
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
         return ConnectionItemCNodeList([ConnectionItemCNode.model_validate(item) for item in unpacked])
-

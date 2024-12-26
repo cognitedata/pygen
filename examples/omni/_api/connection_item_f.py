@@ -640,7 +640,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                ConnectionItemG._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "outwardsMulti"),
                 include_end_node=retrieve_connections == "full",
@@ -649,7 +649,7 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         )
         builder.extend(
             factory.from_edge(
-                ConnectionItemB._view_id,
+                ConnectionItemE._view_id,
                 "outwards",
                 ViewPropertyId(self._view_id, "outwardsSingle"),
                 include_end_node=retrieve_connections == "full",
