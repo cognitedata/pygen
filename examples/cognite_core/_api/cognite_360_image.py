@@ -334,7 +334,9 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image = client.cognite_360_image.retrieve("my_cognite_360_image")
+                >>> cognite_360_image = client.cognite_360_image.retrieve(
+                ...     "my_cognite_360_image"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -489,7 +491,9 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_images = client.cognite_360_image.search('my_cognite_360_image')
+                >>> cognite_360_images = client.cognite_360_image.search(
+                ...     'my_cognite_360_image'
+                ... )
 
         """
         filter_ = _create_cognite_360_image_filter(

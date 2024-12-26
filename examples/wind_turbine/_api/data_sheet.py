@@ -223,7 +223,9 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> data_sheet = client.data_sheet.retrieve("my_data_sheet")
+                >>> data_sheet = client.data_sheet.retrieve(
+                ...     "my_data_sheet"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -288,7 +290,9 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> data_sheets = client.data_sheet.search('my_data_sheet')
+                >>> data_sheets = client.data_sheet.search(
+                ...     'my_data_sheet'
+                ... )
 
         """
         filter_ = _create_data_sheet_filter(

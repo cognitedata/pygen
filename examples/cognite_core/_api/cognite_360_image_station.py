@@ -205,7 +205,9 @@ class Cognite360ImageStationAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_station = client.cognite_360_image_station.retrieve("my_cognite_360_image_station")
+                >>> cognite_360_image_station = client.cognite_360_image_station.retrieve(
+                ...     "my_cognite_360_image_station"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -256,7 +258,9 @@ class Cognite360ImageStationAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_stations = client.cognite_360_image_station.search('my_cognite_360_image_station')
+                >>> cognite_360_image_stations = client.cognite_360_image_station.search(
+                ...     'my_cognite_360_image_station'
+                ... )
 
         """
         filter_ = _create_cognite_360_image_station_filter(

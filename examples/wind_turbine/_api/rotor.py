@@ -211,7 +211,9 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> rotor = client.rotor.retrieve("my_rotor")
+                >>> rotor = client.rotor.retrieve(
+                ...     "my_rotor"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -272,7 +274,9 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> rotors = client.rotor.search('my_rotor')
+                >>> rotors = client.rotor.search(
+                ...     'my_rotor'
+                ... )
 
         """
         filter_ = _create_rotor_filter(

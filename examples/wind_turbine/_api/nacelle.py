@@ -296,7 +296,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> nacelle = client.nacelle.retrieve("my_nacelle")
+                >>> nacelle = client.nacelle.retrieve(
+                ...     "my_nacelle"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -429,7 +431,9 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> nacelles = client.nacelle.search('my_nacelle')
+                >>> nacelles = client.nacelle.search(
+                ...     'my_nacelle'
+                ... )
 
         """
         filter_ = _create_nacelle_filter(

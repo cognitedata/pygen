@@ -241,7 +241,9 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> main_shaft = client.main_shaft.retrieve("my_main_shaft")
+                >>> main_shaft = client.main_shaft.retrieve(
+                ...     "my_main_shaft"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -329,7 +331,9 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> main_shafts = client.main_shaft.search('my_main_shaft')
+                >>> main_shafts = client.main_shaft.search(
+                ...     'my_main_shaft'
+                ... )
 
         """
         filter_ = _create_main_shaft_filter(

@@ -221,7 +221,9 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> gearbox = client.gearbox.retrieve("my_gearbox")
+                >>> gearbox = client.gearbox.retrieve(
+                ...     "my_gearbox"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -291,7 +293,9 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> gearboxes = client.gearbox.search('my_gearbox')
+                >>> gearboxes = client.gearbox.search(
+                ...     'my_gearbox'
+                ... )
 
         """
         filter_ = _create_gearbox_filter(

@@ -213,7 +213,9 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> sub_interface = client.sub_interface.retrieve("my_sub_interface")
+                >>> sub_interface = client.sub_interface.retrieve(
+                ...     "my_sub_interface"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -264,7 +266,9 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> sub_interfaces = client.sub_interface.search('my_sub_interface')
+                >>> sub_interfaces = client.sub_interface.search(
+                ...     'my_sub_interface'
+                ... )
 
         """
         filter_ = _create_sub_interface_filter(

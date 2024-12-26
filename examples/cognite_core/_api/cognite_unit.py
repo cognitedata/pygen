@@ -225,7 +225,9 @@ class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_unit = client.cognite_unit.retrieve("my_cognite_unit")
+                >>> cognite_unit = client.cognite_unit.retrieve(
+                ...     "my_cognite_unit"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -292,7 +294,9 @@ class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_units = client.cognite_unit.search('my_cognite_unit')
+                >>> cognite_units = client.cognite_unit.search(
+                ...     'my_cognite_unit'
+                ... )
 
         """
         filter_ = _create_cognite_unit_filter(

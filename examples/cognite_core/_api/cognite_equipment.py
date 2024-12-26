@@ -299,7 +299,9 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipment = client.cognite_equipment.retrieve("my_cognite_equipment")
+                >>> cognite_equipment = client.cognite_equipment.retrieve(
+                ...     "my_cognite_equipment"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -418,7 +420,9 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipments = client.cognite_equipment.search('my_cognite_equipment')
+                >>> cognite_equipments = client.cognite_equipment.search(
+                ...     'my_cognite_equipment'
+                ... )
 
         """
         filter_ = _create_cognite_equipment_filter(

@@ -248,7 +248,9 @@ class CognitePointCloudVolumeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_volume = client.cognite_point_cloud_volume.retrieve("my_cognite_point_cloud_volume")
+                >>> cognite_point_cloud_volume = client.cognite_point_cloud_volume.retrieve(
+                ...     "my_cognite_point_cloud_volume"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -330,7 +332,9 @@ class CognitePointCloudVolumeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_volumes = client.cognite_point_cloud_volume.search('my_cognite_point_cloud_volume')
+                >>> cognite_point_cloud_volumes = client.cognite_point_cloud_volume.search(
+                ...     'my_cognite_point_cloud_volume'
+                ... )
 
         """
         filter_ = _create_cognite_point_cloud_volume_filter(

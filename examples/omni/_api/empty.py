@@ -235,7 +235,9 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> empty = client.empty.retrieve("my_empty")
+                >>> empty = client.empty.retrieve(
+                ...     "my_empty"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -308,7 +310,9 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> empties = client.empty.search('my_empty')
+                >>> empties = client.empty.search(
+                ...     'my_empty'
+                ... )
 
         """
         filter_ = _create_empty_filter(

@@ -295,7 +295,9 @@ class CogniteTimeSeriesAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_time_series = client.cognite_time_series.retrieve("my_cognite_time_series")
+                >>> cognite_time_series = client.cognite_time_series.retrieve(
+                ...     "my_cognite_time_series"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -412,7 +414,9 @@ class CogniteTimeSeriesAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_time_series_list = client.cognite_time_series.search('my_cognite_time_series')
+                >>> cognite_time_series_list = client.cognite_time_series.search(
+                ...     'my_cognite_time_series'
+                ... )
 
         """
         filter_ = _create_cognite_time_series_filter(

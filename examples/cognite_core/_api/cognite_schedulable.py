@@ -231,7 +231,9 @@ class CogniteSchedulableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_schedulable = client.cognite_schedulable.retrieve("my_cognite_schedulable")
+                >>> cognite_schedulable = client.cognite_schedulable.retrieve(
+                ...     "my_cognite_schedulable"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -290,7 +292,9 @@ class CogniteSchedulableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_schedulables = client.cognite_schedulable.search('my_cognite_schedulable')
+                >>> cognite_schedulables = client.cognite_schedulable.search(
+                ...     'my_cognite_schedulable'
+                ... )
 
         """
         filter_ = _create_cognite_schedulable_filter(

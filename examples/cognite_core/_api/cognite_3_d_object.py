@@ -247,7 +247,9 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_object = client.cognite_3_d_object.retrieve("my_cognite_3_d_object")
+                >>> cognite_3_d_object = client.cognite_3_d_object.retrieve(
+                ...     "my_cognite_3_d_object"
+                ... )
 
         """
         return self._retrieve(
@@ -335,7 +337,9 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_objects = client.cognite_3_d_object.search('my_cognite_3_d_object')
+                >>> cognite_3_d_objects = client.cognite_3_d_object.search(
+                ...     'my_cognite_3_d_object'
+                ... )
 
         """
         filter_ = _create_cognite_3_d_object_filter(

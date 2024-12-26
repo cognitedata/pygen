@@ -204,7 +204,9 @@ class Implementation1v2API(
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_2 = client.implementation_1_v_2.retrieve("my_implementation_1_v_2")
+                >>> implementation_1_v_2 = client.implementation_1_v_2.retrieve(
+                ...     "my_implementation_1_v_2"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -259,7 +261,9 @@ class Implementation1v2API(
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_2_list = client.implementation_1_v_2.search('my_implementation_1_v_2')
+                >>> implementation_1_v_2_list = client.implementation_1_v_2.search(
+                ...     'my_implementation_1_v_2'
+                ... )
 
         """
         filter_ = _create_implementation_1_v_2_filter(

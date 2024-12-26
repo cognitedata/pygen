@@ -517,7 +517,9 @@ class MetmastWindSpeedAPI:
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmasts = client.metmast.wind_speed(limit=5).retrieve()
+                >>> metmasts = client.metmast.wind_speed(
+                ...     limit=5
+                ... ).retrieve()
 
         """
         warnings.warn(

@@ -223,7 +223,9 @@ class Cognite360ImageCollectionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_collection = client.cognite_360_image_collection.retrieve("my_cognite_360_image_collection")
+                >>> cognite_360_image_collection = client.cognite_360_image_collection.retrieve(
+                ...     "my_cognite_360_image_collection"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -287,7 +289,9 @@ class Cognite360ImageCollectionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_360_image_collections = client.cognite_360_image_collection.search('my_cognite_360_image_collection')
+                >>> cognite_360_image_collections = client.cognite_360_image_collection.search(
+                ...     'my_cognite_360_image_collection'
+                ... )
 
         """
         filter_ = _create_cognite_360_image_collection_filter(

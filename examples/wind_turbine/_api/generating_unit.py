@@ -224,7 +224,9 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> generating_unit = client.generating_unit.retrieve("my_generating_unit")
+                >>> generating_unit = client.generating_unit.retrieve(
+                ...     "my_generating_unit"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -279,7 +281,9 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> generating_units = client.generating_unit.search('my_generating_unit')
+                >>> generating_units = client.generating_unit.search(
+                ...     'my_generating_unit'
+                ... )
 
         """
         filter_ = _create_generating_unit_filter(

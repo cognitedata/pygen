@@ -196,7 +196,9 @@ class PrimitiveNullableListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_nullable_listed = client.primitive_nullable_listed.retrieve("my_primitive_nullable_listed")
+                >>> primitive_nullable_listed = client.primitive_nullable_listed.retrieve(
+                ...     "my_primitive_nullable_listed"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -239,7 +241,9 @@ class PrimitiveNullableListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_nullable_listeds = client.primitive_nullable_listed.search('my_primitive_nullable_listed')
+                >>> primitive_nullable_listeds = client.primitive_nullable_listed.search(
+                ...     'my_primitive_nullable_listed'
+                ... )
 
         """
         filter_ = _create_primitive_nullable_listed_filter(

@@ -215,7 +215,9 @@ class CogniteAssetClassAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_clas = client.cognite_asset_class.retrieve("my_cognite_asset_clas")
+                >>> cognite_asset_clas = client.cognite_asset_class.retrieve(
+                ...     "my_cognite_asset_clas"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -274,7 +276,9 @@ class CogniteAssetClassAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_class = client.cognite_asset_class.search('my_cognite_asset_clas')
+                >>> cognite_asset_class = client.cognite_asset_class.search(
+                ...     'my_cognite_asset_clas'
+                ... )
 
         """
         filter_ = _create_cognite_asset_clas_filter(

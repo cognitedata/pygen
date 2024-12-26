@@ -199,7 +199,9 @@ class CDFExternalReferencesListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_listed = client.cdf_external_references_listed.retrieve("my_cdf_external_references_listed")
+                >>> cdf_external_references_listed = client.cdf_external_references_listed.retrieve(
+                ...     "my_cdf_external_references_listed"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -244,7 +246,9 @@ class CDFExternalReferencesListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_listeds = client.cdf_external_references_listed.search('my_cdf_external_references_listed')
+                >>> cdf_external_references_listeds = client.cdf_external_references_listed.search(
+                ...     'my_cdf_external_references_listed'
+                ... )
 
         """
         filter_ = _create_cdf_external_references_listed_filter(

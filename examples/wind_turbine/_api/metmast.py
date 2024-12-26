@@ -208,7 +208,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmast = client.metmast.retrieve("my_metmast")
+                >>> metmast = client.metmast.retrieve(
+                ...     "my_metmast"
+                ... )
 
         """
         return self._retrieve(
@@ -268,7 +270,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmasts = client.metmast.search('my_metmast')
+                >>> metmasts = client.metmast.search(
+                ...     'my_metmast'
+                ... )
 
         """
         filter_ = _create_metmast_filter(

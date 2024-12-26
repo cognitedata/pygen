@@ -214,7 +214,9 @@ class PrimitiveWithDefaultsAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_with_default = client.primitive_with_defaults.retrieve("my_primitive_with_default")
+                >>> primitive_with_default = client.primitive_with_defaults.retrieve(
+                ...     "my_primitive_with_default"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -271,7 +273,9 @@ class PrimitiveWithDefaultsAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_with_defaults = client.primitive_with_defaults.search('my_primitive_with_default')
+                >>> primitive_with_defaults = client.primitive_with_defaults.search(
+                ...     'my_primitive_with_default'
+                ... )
 
         """
         filter_ = _create_primitive_with_default_filter(

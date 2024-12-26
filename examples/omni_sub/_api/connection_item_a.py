@@ -215,7 +215,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
                 >>> from omni_sub import OmniSubClient
                 >>> client = OmniSubClient()
-                >>> connection_item_a = client.connection_item_a.retrieve("my_connection_item_a")
+                >>> connection_item_a = client.connection_item_a.retrieve(
+                ...     "my_connection_item_a"
+                ... )
 
         """
         return self._retrieve(
@@ -291,7 +293,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
                 >>> from omni_sub import OmniSubClient
                 >>> client = OmniSubClient()
-                >>> connection_item_as = client.connection_item_a.search('my_connection_item_a')
+                >>> connection_item_as = client.connection_item_a.search(
+                ...     'my_connection_item_a'
+                ... )
 
         """
         filter_ = _create_connection_item_a_filter(

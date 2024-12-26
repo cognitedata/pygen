@@ -264,7 +264,9 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> wind_turbine = client.wind_turbine.retrieve("my_wind_turbine")
+                >>> wind_turbine = client.wind_turbine.retrieve(
+                ...     "my_wind_turbine"
+                ... )
 
         """
         return self._retrieve(
@@ -372,7 +374,9 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> wind_turbines = client.wind_turbine.search('my_wind_turbine')
+                >>> wind_turbines = client.wind_turbine.search(
+                ...     'my_wind_turbine'
+                ... )
 
         """
         filter_ = _create_wind_turbine_filter(

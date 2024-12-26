@@ -237,7 +237,9 @@ class PrimitiveRequiredAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required = client.primitive_required.retrieve("my_primitive_required")
+                >>> primitive_required = client.primitive_required.retrieve(
+                ...     "my_primitive_required"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -310,7 +312,9 @@ class PrimitiveRequiredAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_requireds = client.primitive_required.search('my_primitive_required')
+                >>> primitive_requireds = client.primitive_required.search(
+                ...     'my_primitive_required'
+                ... )
 
         """
         filter_ = _create_primitive_required_filter(

@@ -221,7 +221,9 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_d = client.connection_item_d.retrieve("my_connection_item_d")
+                >>> connection_item_d = client.connection_item_d.retrieve(
+                ...     "my_connection_item_d"
+                ... )
 
         """
         return self._retrieve(
@@ -299,7 +301,9 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_ds = client.connection_item_d.search('my_connection_item_d')
+                >>> connection_item_ds = client.connection_item_d.search(
+                ...     'my_connection_item_d'
+                ... )
 
         """
         filter_ = _create_connection_item_d_filter(

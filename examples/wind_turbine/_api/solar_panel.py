@@ -229,7 +229,9 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> solar_panel = client.solar_panel.retrieve("my_solar_panel")
+                >>> solar_panel = client.solar_panel.retrieve(
+                ...     "my_solar_panel"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -302,7 +304,9 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> solar_panels = client.solar_panel.search('my_solar_panel')
+                >>> solar_panels = client.solar_panel.search(
+                ...     'my_solar_panel'
+                ... )
 
         """
         filter_ = _create_solar_panel_filter(

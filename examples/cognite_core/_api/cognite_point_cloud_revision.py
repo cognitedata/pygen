@@ -217,7 +217,9 @@ class CognitePointCloudRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_revision = client.cognite_point_cloud_revision.retrieve("my_cognite_point_cloud_revision")
+                >>> cognite_point_cloud_revision = client.cognite_point_cloud_revision.retrieve(
+                ...     "my_cognite_point_cloud_revision"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -277,7 +279,9 @@ class CognitePointCloudRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_revisions = client.cognite_point_cloud_revision.search('my_cognite_point_cloud_revision')
+                >>> cognite_point_cloud_revisions = client.cognite_point_cloud_revision.search(
+                ...     'my_cognite_point_cloud_revision'
+                ... )
 
         """
         filter_ = _create_cognite_point_cloud_revision_filter(

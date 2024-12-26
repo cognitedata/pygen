@@ -221,7 +221,9 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> high_speed_shaft = client.high_speed_shaft.retrieve("my_high_speed_shaft")
+                >>> high_speed_shaft = client.high_speed_shaft.retrieve(
+                ...     "my_high_speed_shaft"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -291,7 +293,9 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> high_speed_shafts = client.high_speed_shaft.search('my_high_speed_shaft')
+                >>> high_speed_shafts = client.high_speed_shaft.search(
+                ...     'my_high_speed_shaft'
+                ... )
 
         """
         filter_ = _create_high_speed_shaft_filter(

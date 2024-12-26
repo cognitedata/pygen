@@ -323,7 +323,9 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset = client.cognite_asset.retrieve("my_cognite_asset")
+                >>> cognite_asset = client.cognite_asset.retrieve(
+                ...     "my_cognite_asset"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -465,7 +467,9 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_assets = client.cognite_asset.search('my_cognite_asset')
+                >>> cognite_assets = client.cognite_asset.search(
+                ...     'my_cognite_asset'
+                ... )
 
         """
         filter_ = _create_cognite_asset_filter(

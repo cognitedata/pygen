@@ -227,7 +227,9 @@ class CogniteEquipmentTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipment_type = client.cognite_equipment_type.retrieve("my_cognite_equipment_type")
+                >>> cognite_equipment_type = client.cognite_equipment_type.retrieve(
+                ...     "my_cognite_equipment_type"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -294,7 +296,9 @@ class CogniteEquipmentTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipment_types = client.cognite_equipment_type.search('my_cognite_equipment_type')
+                >>> cognite_equipment_types = client.cognite_equipment_type.search(
+                ...     'my_cognite_equipment_type'
+                ... )
 
         """
         filter_ = _create_cognite_equipment_type_filter(

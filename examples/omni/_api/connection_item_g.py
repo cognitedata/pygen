@@ -202,7 +202,9 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_g = client.connection_item_g.retrieve("my_connection_item_g")
+                >>> connection_item_g = client.connection_item_g.retrieve(
+                ...     "my_connection_item_g"
+                ... )
 
         """
         return self._retrieve(
@@ -262,7 +264,9 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_gs = client.connection_item_g.search('my_connection_item_g')
+                >>> connection_item_gs = client.connection_item_g.search(
+                ...     'my_connection_item_g'
+                ... )
 
         """
         filter_ = _create_connection_item_g_filter(

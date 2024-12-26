@@ -214,7 +214,9 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_model = client.cognite_cad_model.retrieve("my_cognite_cad_model")
+                >>> cognite_cad_model = client.cognite_cad_model.retrieve(
+                ...     "my_cognite_cad_model"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -274,7 +276,9 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_models = client.cognite_cad_model.search('my_cognite_cad_model')
+                >>> cognite_cad_models = client.cognite_cad_model.search(
+                ...     'my_cognite_cad_model'
+                ... )
 
         """
         filter_ = _create_cognite_cad_model_filter(

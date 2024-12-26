@@ -517,7 +517,9 @@ class MetmastTemperatureAPI:
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmasts = client.metmast.temperature(limit=5).retrieve()
+                >>> metmasts = client.metmast.temperature(
+                ...     limit=5
+                ... ).retrieve()
 
         """
         warnings.warn(

@@ -217,7 +217,9 @@ class CogniteVisualizableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_visualizable = client.cognite_visualizable.retrieve("my_cognite_visualizable")
+                >>> cognite_visualizable = client.cognite_visualizable.retrieve(
+                ...     "my_cognite_visualizable"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -269,7 +271,9 @@ class CogniteVisualizableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_visualizables = client.cognite_visualizable.search('my_cognite_visualizable')
+                >>> cognite_visualizables = client.cognite_visualizable.search(
+                ...     'my_cognite_visualizable'
+                ... )
 
         """
         filter_ = _create_cognite_visualizable_filter(

@@ -288,7 +288,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_position = client.sensor_position.retrieve("my_sensor_position")
+                >>> sensor_position = client.sensor_position.retrieve(
+                ...     "my_sensor_position"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -416,7 +418,9 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_positions = client.sensor_position.search('my_sensor_position')
+                >>> sensor_positions = client.sensor_position.search(
+                ...     'my_sensor_position'
+                ... )
 
         """
         filter_ = _create_sensor_position_filter(

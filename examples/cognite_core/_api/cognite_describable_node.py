@@ -336,7 +336,9 @@ class CogniteDescribableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_describable_node = client.cognite_describable_node.retrieve("my_cognite_describable_node")
+                >>> cognite_describable_node = client.cognite_describable_node.retrieve(
+                ...     "my_cognite_describable_node"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -387,7 +389,9 @@ class CogniteDescribableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_describable_nodes = client.cognite_describable_node.search('my_cognite_describable_node')
+                >>> cognite_describable_nodes = client.cognite_describable_node.search(
+                ...     'my_cognite_describable_node'
+                ... )
 
         """
         filter_ = _create_cognite_describable_node_filter(

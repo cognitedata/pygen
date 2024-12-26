@@ -211,7 +211,9 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> generator = client.generator.retrieve("my_generator")
+                >>> generator = client.generator.retrieve(
+                ...     "my_generator"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -272,7 +274,9 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> generators = client.generator.search('my_generator')
+                >>> generators = client.generator.search(
+                ...     'my_generator'
+                ... )
 
         """
         filter_ = _create_generator_filter(

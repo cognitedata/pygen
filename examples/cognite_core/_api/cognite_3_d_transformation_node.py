@@ -265,7 +265,9 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_transformation_node = client.cognite_3_d_transformation_node.retrieve("my_cognite_3_d_transformation_node")
+                >>> cognite_3_d_transformation_node = client.cognite_3_d_transformation_node.retrieve(
+                ...     "my_cognite_3_d_transformation_node"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -346,7 +348,9 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_transformation_nodes = client.cognite_3_d_transformation_node.search('my_cognite_3_d_transformation_node')
+                >>> cognite_3_d_transformation_nodes = client.cognite_3_d_transformation_node.search(
+                ...     'my_cognite_3_d_transformation_node'
+                ... )
 
         """
         filter_ = _create_cognite_3_d_transformation_node_filter(

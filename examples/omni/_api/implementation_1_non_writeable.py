@@ -157,7 +157,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_1_non_writeable = client.implementation_1_non_writeable.retrieve("my_implementation_1_non_writeable")
+                >>> implementation_1_non_writeable = client.implementation_1_non_writeable.retrieve(
+                ...     "my_implementation_1_non_writeable"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -214,7 +216,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_1_non_writeables = client.implementation_1_non_writeable.search('my_implementation_1_non_writeable')
+                >>> implementation_1_non_writeables = client.implementation_1_non_writeable.search(
+                ...     'my_implementation_1_non_writeable'
+                ... )
 
         """
         filter_ = _create_implementation_1_non_writeable_filter(

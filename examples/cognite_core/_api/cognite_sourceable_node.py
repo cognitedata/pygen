@@ -280,7 +280,9 @@ class CogniteSourceableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_sourceable_node = client.cognite_sourceable_node.retrieve("my_cognite_sourceable_node")
+                >>> cognite_sourceable_node = client.cognite_sourceable_node.retrieve(
+                ...     "my_cognite_sourceable_node"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -356,7 +358,9 @@ class CogniteSourceableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_sourceable_nodes = client.cognite_sourceable_node.search('my_cognite_sourceable_node')
+                >>> cognite_sourceable_nodes = client.cognite_sourceable_node.search(
+                ...     'my_cognite_sourceable_node'
+                ... )
 
         """
         filter_ = _create_cognite_sourceable_node_filter(

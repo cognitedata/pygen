@@ -215,7 +215,9 @@ class CogniteSourceSystemAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_source_system = client.cognite_source_system.retrieve("my_cognite_source_system")
+                >>> cognite_source_system = client.cognite_source_system.retrieve(
+                ...     "my_cognite_source_system"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -274,7 +276,9 @@ class CogniteSourceSystemAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_source_systems = client.cognite_source_system.search('my_cognite_source_system')
+                >>> cognite_source_systems = client.cognite_source_system.search(
+                ...     'my_cognite_source_system'
+                ... )
 
         """
         filter_ = _create_cognite_source_system_filter(

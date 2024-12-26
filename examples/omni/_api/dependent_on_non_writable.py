@@ -205,7 +205,9 @@ class DependentOnNonWritableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> dependent_on_non_writable = client.dependent_on_non_writable.retrieve("my_dependent_on_non_writable")
+                >>> dependent_on_non_writable = client.dependent_on_non_writable.retrieve(
+                ...     "my_dependent_on_non_writable"
+                ... )
 
         """
         return self._retrieve(
@@ -265,7 +267,9 @@ class DependentOnNonWritableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> dependent_on_non_writables = client.dependent_on_non_writable.search('my_dependent_on_non_writable')
+                >>> dependent_on_non_writables = client.dependent_on_non_writable.search(
+                ...     'my_dependent_on_non_writable'
+                ... )
 
         """
         filter_ = _create_dependent_on_non_writable_filter(

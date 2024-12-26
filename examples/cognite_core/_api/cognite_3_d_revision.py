@@ -234,7 +234,9 @@ class Cognite3DRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_revision = client.cognite_3_d_revision.retrieve("my_cognite_3_d_revision")
+                >>> cognite_3_d_revision = client.cognite_3_d_revision.retrieve(
+                ...     "my_cognite_3_d_revision"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -288,7 +290,9 @@ class Cognite3DRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_revisions = client.cognite_3_d_revision.search('my_cognite_3_d_revision')
+                >>> cognite_3_d_revisions = client.cognite_3_d_revision.search(
+                ...     'my_cognite_3_d_revision'
+                ... )
 
         """
         filter_ = _create_cognite_3_d_revision_filter(

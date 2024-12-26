@@ -265,7 +265,9 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cube_map = client.cognite_cube_map.retrieve("my_cognite_cube_map")
+                >>> cognite_cube_map = client.cognite_cube_map.retrieve(
+                ...     "my_cognite_cube_map"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -362,7 +364,9 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cube_maps = client.cognite_cube_map.search('my_cognite_cube_map')
+                >>> cognite_cube_maps = client.cognite_cube_map.search(
+                ...     'my_cognite_cube_map'
+                ... )
 
         """
         filter_ = _create_cognite_cube_map_filter(

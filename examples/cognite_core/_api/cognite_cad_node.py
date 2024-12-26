@@ -241,7 +241,9 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_node = client.cognite_cad_node.retrieve("my_cognite_cad_node")
+                >>> cognite_cad_node = client.cognite_cad_node.retrieve(
+                ...     "my_cognite_cad_node"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -323,7 +325,9 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_nodes = client.cognite_cad_node.search('my_cognite_cad_node')
+                >>> cognite_cad_nodes = client.cognite_cad_node.search(
+                ...     'my_cognite_cad_node'
+                ... )
 
         """
         filter_ = _create_cognite_cad_node_filter(

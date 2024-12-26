@@ -207,7 +207,9 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> main_interface = client.main_interface.retrieve("my_main_interface")
+                >>> main_interface = client.main_interface.retrieve(
+                ...     "my_main_interface"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -254,7 +256,9 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> main_interfaces = client.main_interface.search('my_main_interface')
+                >>> main_interfaces = client.main_interface.search(
+                ...     'my_main_interface'
+                ... )
 
         """
         filter_ = _create_main_interface_filter(

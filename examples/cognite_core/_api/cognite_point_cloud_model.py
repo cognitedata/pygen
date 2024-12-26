@@ -218,7 +218,9 @@ class CognitePointCloudModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_model = client.cognite_point_cloud_model.retrieve("my_cognite_point_cloud_model")
+                >>> cognite_point_cloud_model = client.cognite_point_cloud_model.retrieve(
+                ...     "my_cognite_point_cloud_model"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -278,7 +280,9 @@ class CognitePointCloudModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_point_cloud_models = client.cognite_point_cloud_model.search('my_cognite_point_cloud_model')
+                >>> cognite_point_cloud_models = client.cognite_point_cloud_model.search(
+                ...     'my_cognite_point_cloud_model'
+                ... )
 
         """
         filter_ = _create_cognite_point_cloud_model_filter(

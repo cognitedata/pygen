@@ -294,7 +294,9 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_file = client.cognite_file.retrieve("my_cognite_file")
+                >>> cognite_file = client.cognite_file.retrieve(
+                ...     "my_cognite_file"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -410,7 +412,9 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_files = client.cognite_file.search('my_cognite_file')
+                >>> cognite_files = client.cognite_file.search(
+                ...     'my_cognite_file'
+                ... )
 
         """
         filter_ = _create_cognite_file_filter(

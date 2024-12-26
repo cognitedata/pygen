@@ -307,7 +307,9 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_activity = client.cognite_activity.retrieve("my_cognite_activity")
+                >>> cognite_activity = client.cognite_activity.retrieve(
+                ...     "my_cognite_activity"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -434,7 +436,9 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_activities = client.cognite_activity.search('my_cognite_activity')
+                >>> cognite_activities = client.cognite_activity.search(
+                ...     'my_cognite_activity'
+                ... )
 
         """
         filter_ = _create_cognite_activity_filter(

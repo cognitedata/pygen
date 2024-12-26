@@ -200,7 +200,9 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> blade = client.blade.retrieve("my_blade")
+                >>> blade = client.blade.retrieve(
+                ...     "my_blade"
+                ... )
 
         """
         return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
@@ -249,7 +251,9 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> blades = client.blade.search('my_blade')
+                >>> blades = client.blade.search(
+                ...     'my_blade'
+                ... )
 
         """
         filter_ = _create_blade_filter(

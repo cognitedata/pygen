@@ -517,7 +517,9 @@ class MetmastTiltAngleAPI:
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> metmasts = client.metmast.tilt_angle(limit=5).retrieve()
+                >>> metmasts = client.metmast.tilt_angle(
+                ...     limit=5
+                ... ).retrieve()
 
         """
         warnings.warn(

@@ -213,7 +213,9 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_1 = client.implementation_1.retrieve("my_implementation_1")
+                >>> implementation_1 = client.implementation_1.retrieve(
+                ...     "my_implementation_1"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -272,7 +274,9 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> implementation_1_list = client.implementation_1.search('my_implementation_1')
+                >>> implementation_1_list = client.implementation_1.search(
+                ...     'my_implementation_1'
+                ... )
 
         """
         filter_ = _create_implementation_1_filter(

@@ -513,7 +513,9 @@ class CDFExternalReferencesListedTimeseriesAPI:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_listeds = client.cdf_external_references_listed.timeseries(limit=5).retrieve()
+                >>> cdf_external_references_listeds = client.cdf_external_references_listed.timeseries(
+                ...     limit=5
+                ... ).retrieve()
 
         """
         warnings.warn(

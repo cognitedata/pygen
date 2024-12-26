@@ -224,7 +224,9 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series = client.sensor_time_series.retrieve("my_sensor_time_series")
+                >>> sensor_time_series = client.sensor_time_series.retrieve(
+                ...     "my_sensor_time_series"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -289,7 +291,9 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> sensor_time_series_list = client.sensor_time_series.search('my_sensor_time_series')
+                >>> sensor_time_series_list = client.sensor_time_series.search(
+                ...     'my_sensor_time_series'
+                ... )
 
         """
         filter_ = _create_sensor_time_series_filter(

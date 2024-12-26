@@ -238,7 +238,9 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_model = client.cognite_3_d_model.retrieve("my_cognite_3_d_model")
+                >>> cognite_3_d_model = client.cognite_3_d_model.retrieve(
+                ...     "my_cognite_3_d_model"
+                ... )
 
         """
         return self._retrieve(external_id, space, as_child_class=as_child_class)
@@ -298,7 +300,9 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_3_d_models = client.cognite_3_d_model.search('my_cognite_3_d_model')
+                >>> cognite_3_d_models = client.cognite_3_d_model.search(
+                ...     'my_cognite_3_d_model'
+                ... )
 
         """
         filter_ = _create_cognite_3_d_model_filter(

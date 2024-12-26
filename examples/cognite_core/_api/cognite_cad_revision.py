@@ -212,7 +212,9 @@ class CogniteCADRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_revision = client.cognite_cad_revision.retrieve("my_cognite_cad_revision")
+                >>> cognite_cad_revision = client.cognite_cad_revision.retrieve(
+                ...     "my_cognite_cad_revision"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -270,7 +272,9 @@ class CogniteCADRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_cad_revisions = client.cognite_cad_revision.search('my_cognite_cad_revision')
+                >>> cognite_cad_revisions = client.cognite_cad_revision.search(
+                ...     'my_cognite_cad_revision'
+                ... )
 
         """
         filter_ = _create_cognite_cad_revision_filter(

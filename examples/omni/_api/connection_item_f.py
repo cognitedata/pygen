@@ -216,7 +216,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_f = client.connection_item_f.retrieve("my_connection_item_f")
+                >>> connection_item_f = client.connection_item_f.retrieve(
+                ...     "my_connection_item_f"
+                ... )
 
         """
         return self._retrieve(
@@ -292,7 +294,9 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_fs = client.connection_item_f.search('my_connection_item_f')
+                >>> connection_item_fs = client.connection_item_f.search(
+                ...     'my_connection_item_f'
+                ... )
 
         """
         filter_ = _create_connection_item_f_filter(

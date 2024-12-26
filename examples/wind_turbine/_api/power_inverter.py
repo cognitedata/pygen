@@ -221,7 +221,9 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> power_inverter = client.power_inverter.retrieve("my_power_inverter")
+                >>> power_inverter = client.power_inverter.retrieve(
+                ...     "my_power_inverter"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -291,7 +293,9 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> power_inverters = client.power_inverter.search('my_power_inverter')
+                >>> power_inverters = client.power_inverter.search(
+                ...     'my_power_inverter'
+                ... )
 
         """
         filter_ = _create_power_inverter_filter(

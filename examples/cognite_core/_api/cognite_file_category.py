@@ -221,7 +221,9 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_file_category = client.cognite_file_category.retrieve("my_cognite_file_category")
+                >>> cognite_file_category = client.cognite_file_category.retrieve(
+                ...     "my_cognite_file_category"
+                ... )
 
         """
         return self._retrieve(external_id, space)
@@ -284,7 +286,9 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_file_categories = client.cognite_file_category.search('my_cognite_file_category')
+                >>> cognite_file_categories = client.cognite_file_category.search(
+                ...     'my_cognite_file_category'
+                ... )
 
         """
         filter_ = _create_cognite_file_category_filter(

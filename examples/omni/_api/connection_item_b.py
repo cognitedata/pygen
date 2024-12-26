@@ -203,7 +203,9 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_b = client.connection_item_b.retrieve("my_connection_item_b")
+                >>> connection_item_b = client.connection_item_b.retrieve(
+                ...     "my_connection_item_b"
+                ... )
 
         """
         return self._retrieve(
@@ -270,7 +272,9 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> connection_item_bs = client.connection_item_b.search('my_connection_item_b')
+                >>> connection_item_bs = client.connection_item_b.search(
+                ...     'my_connection_item_b'
+                ... )
 
         """
         filter_ = _create_connection_item_b_filter(
