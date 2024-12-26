@@ -25,11 +25,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ConnectionItemCEdge",
-    "ConnectionItemCEdgeWrite",
-    "ConnectionItemCEdgeApply",
     "ConnectionItemCEdgeList",
-    "ConnectionItemCEdgeWriteList",
-    "ConnectionItemCEdgeApplyList",
 ]
 
 
