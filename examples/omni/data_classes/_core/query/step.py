@@ -264,7 +264,7 @@ class QueryStepFactory:
         return nested_properties_by_property
 
     def root(
-        self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None
+        self, filter: dm.Filter | None = None, sort: list[dm.InstanceSort] | None = None, limit: int | None = None, has_container_fields: bool = True
     ) -> QueryStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
@@ -277,11 +277,15 @@ class QueryStepFactory:
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        if has_container_fields:
+            has_data = dm.filters.HasData(views=[self._view_id])
+            full_filter = dm.filters.And(filter, has_data) if filter else has_data
+        else:
+            full_filter = filter
         return QueryStep(
             self._root_name,
             dm.query.NodeResultSetExpression(
-                filter=dm.filters.And(filter, has_data) if filter else has_data,
+                filter=filter,
                 sort=sort,
             ),
             select=select,

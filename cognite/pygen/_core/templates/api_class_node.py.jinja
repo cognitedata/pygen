@@ -29,6 +29,10 @@ from {{ top_level_package }}.data_classes._core import (
     NodeQueryStep,
     EdgeQueryStep,
     DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.query_cls_name }},
@@ -608,43 +612,23 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 {% endif %}
             )
 
-        builder = DataClassQueryBuilder({{ data_class.read_list_name }})
-        {% if data_class.has_container_fields %}
-        has_data = dm.filters.HasData(views=[self._view_id])
-        {% endif %}
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    {% if data_class.has_container_fields %}
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    {% else %}
-                    filter=filter_,
-                    {% endif %}
-                    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                    {% endif %}
-                ),
-                {{ data_class.read_name }},
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        builder.append(factory.root(
+            filter=filter_,{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]{% endif %}
+            limit=limit,{% not if data_class.has_container_fields %}
+            has_container_fields=False,{% endif %}
+        ))
+
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
         {% if field.is_edge %}
-        edge_{{ field.name }} = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_{{ field.name }},
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="{{ field.edge_direction}}",
-                    chain_to="destination",
-                ),
-                {% if field.is_edge_with_properties %}
-                {{ field.edge_class.read_name }},
-                {% endif %}
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemB._view_id,
+                "{{ field.edge_direction}}",
+                ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                include_end_node=retrieve_connections == "full",
             )
         )
         {% endif %}
@@ -707,7 +691,10 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        return {{ data_class.read_list_name }}([
+            {{ data_class.read_name }}.model_validate(item) for item in unpacked
+        ])
         {% else %}
         return self._list(
             limit=limit,
