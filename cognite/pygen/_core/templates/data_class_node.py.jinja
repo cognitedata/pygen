@@ -338,7 +338,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
 
                     {% for field in data_class.one_to_many_edges_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
+                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
                     ):
                         {{ field.name }}.append(value)
                     {% endfor %}
@@ -352,7 +352,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
                     {% endfor %}
                     {% for field in data_class.one_to_one_edge_without_properties %}
                     if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, ({{ field.destination_class.read_name }}{% if has_default_instance_space %}, str{% endif %}, dm.NodeId)
+                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
                     ):
                         if instance.{{ field.name }} is None:
                             instance.{{ field.name }} = value
