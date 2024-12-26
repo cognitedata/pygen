@@ -226,8 +226,10 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
         Note: This method iterates through all nodes and timeseries linked to cognite_asset
         and creates them including the edges
-        between the nodes. For example, if any of `asset_class`, `object_3d`, `parent`, `source` or `type_` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `asset_class`, `object_3d`, `parent`, `source` or `type_`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             cognite_asset: Cognite asset or

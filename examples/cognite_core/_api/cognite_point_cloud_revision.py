@@ -120,8 +120,10 @@ class CognitePointCloudRevisionAPI(
 
         Note: This method iterates through all nodes and timeseries linked to cognite_point_cloud_revision
         and creates them including the edges
-        between the nodes. For example, if any of `model_3d` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `model_3d`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             cognite_point_cloud_revision: Cognite point cloud revision or

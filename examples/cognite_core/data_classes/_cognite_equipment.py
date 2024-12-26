@@ -159,8 +159,8 @@ class CogniteEquipmentGraphQL(GraphQLCore):
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the equipment.
     """
@@ -297,8 +297,8 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         time_series: An automatically updated list of time series related to the equipment.
     """
@@ -443,8 +443,8 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
     """
 

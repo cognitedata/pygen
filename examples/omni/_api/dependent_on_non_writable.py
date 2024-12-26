@@ -108,8 +108,10 @@ class DependentOnNonWritableAPI(
 
         Note: This method iterates through all nodes and timeseries linked to dependent_on_non_writable
         and creates them including the edges
-        between the nodes. For example, if any of `to_non_writable` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `to_non_writable`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             dependent_on_non_writable: Dependent on non writable or

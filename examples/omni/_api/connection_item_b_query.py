@@ -86,14 +86,14 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the inward edges of the connection item b.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            other_direct: The other direct to filter on.
-            self_direct: The self direct to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            name:
+            name_prefix:
+            other_direct:
+            self_direct:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of inward edges to return.
@@ -151,12 +151,12 @@ class ConnectionItemBQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the self edge edges of the connection item b.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of self edge edges to return.

@@ -124,8 +124,10 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
 
         Note: This method iterates through all nodes and timeseries linked to connection_item_d
         and creates them including the edges
-        between the nodes. For example, if any of `direct_multi`, `direct_single` or `outwards_single` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `direct_multi`, `direct_single` or `outwards_single`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             connection_item_d: Connection item d or

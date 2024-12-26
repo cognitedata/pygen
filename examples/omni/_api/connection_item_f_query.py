@@ -80,18 +80,18 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outwards multi edges of the connection item f.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            min_end_time_edge: The minimum value of the end time to filter on.
-            max_end_time_edge: The maximum value of the end time to filter on.
-            name_edge: The name to filter on.
-            name_prefix_edge: The prefix of the name to filter on.
-            min_start_time_edge: The minimum value of the start time to filter on.
-            max_start_time_edge: The maximum value of the start time to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            min_end_time_edge:
+            max_end_time_edge:
+            name_edge:
+            name_prefix_edge:
+            min_start_time_edge:
+            max_start_time_edge:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of outwards multi edges to return.
@@ -178,20 +178,20 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outwards single edges of the connection item f.
 
         Args:
-            direct_list_no_source: The direct list no source to filter on.
-            direct_no_source: The direct no source to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            min_end_time_edge: The minimum value of the end time to filter on.
-            max_end_time_edge: The maximum value of the end time to filter on.
-            name_edge: The name to filter on.
-            name_prefix_edge: The prefix of the name to filter on.
-            min_start_time_edge: The minimum value of the start time to filter on.
-            max_start_time_edge: The maximum value of the start time to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            direct_list_no_source:
+            direct_no_source:
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            min_end_time_edge:
+            max_end_time_edge:
+            name_edge:
+            name_prefix_edge:
+            min_start_time_edge:
+            max_start_time_edge:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of outwards single edges to return.

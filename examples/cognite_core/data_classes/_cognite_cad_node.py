@@ -101,8 +101,8 @@ class CogniteCADNodeGraphQL(GraphQLCore, protected_namespaces=()):
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
-        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications to
-            know how many nodes exists below this node in the hierarchy
+        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
+            to know how many nodes exists below this node in the hierarchy
         tags: Text based labels for generic use, limited to 1000
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
@@ -202,8 +202,8 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
-        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications to
-            know how many nodes exists below this node in the hierarchy
+        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
+            to know how many nodes exists below this node in the hierarchy
         tags: Text based labels for generic use, limited to 1000
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
@@ -304,8 +304,8 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
         name: Name of the instance
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
-        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications to
-            know how many nodes exists below this node in the hierarchy
+        sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
+            to know how many nodes exists below this node in the hierarchy
         tags: Text based labels for generic use, limited to 1000
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index

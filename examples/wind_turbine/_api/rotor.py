@@ -114,8 +114,10 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
         Note: This method iterates through all nodes and timeseries linked to rotor
         and creates them including the edges
-        between the nodes. For example, if any of `rotor_speed_controller` or `rpm_low_speed_shaft` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `rotor_speed_controller` or `rpm_low_speed_shaft`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             rotor: Rotor or

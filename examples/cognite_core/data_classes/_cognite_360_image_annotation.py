@@ -129,8 +129,8 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -236,8 +236,8 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
@@ -307,8 +307,8 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
             not guaranteed to match the user identifiers in CDF
         source_id: Identifier from the source system
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """

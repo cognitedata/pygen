@@ -202,8 +202,10 @@ class CogniteEquipmentAPI(
 
         Note: This method iterates through all nodes and timeseries linked to cognite_equipment
         and creates them including the edges
-        between the nodes. For example, if any of `asset`, `equipment_type`, `files` or `source` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `asset`, `equipment_type`, `files` or `source`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             cognite_equipment: Cognite equipment or

@@ -109,24 +109,24 @@ class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the wind turbine edges of the metmast.
 
         Args:
-            blades: The blade to filter on.
-            min_capacity: The minimum value of the capacity to filter on.
-            max_capacity: The maximum value of the capacity to filter on.
-            datasheets: The datasheet to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            nacelle: The nacelle to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            rotor: The rotor to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            min_distance_edge: The minimum value of the distance to filter on.
-            max_distance_edge: The maximum value of the distance to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            blades:
+            min_capacity:
+            max_capacity:
+            datasheets:
+            description:
+            description_prefix:
+            nacelle:
+            name:
+            name_prefix:
+            rotor:
+            windfarm:
+            windfarm_prefix:
+            external_id_prefix:
+            space:
+            min_distance_edge:
+            max_distance_edge:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of wind turbine edges to return.

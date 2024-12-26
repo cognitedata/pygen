@@ -156,8 +156,8 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.
@@ -289,8 +289,8 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.
@@ -434,8 +434,8 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         source_id: Identifier from the source system
         source_unit: The unit specified in the source system.
         source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This identifier
-            is not guaranteed to match the user identifiers in CDF
+        source_updated_user: User identifier from the source system on who last updated the source data. This
+            identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the data type of the data points.
         unit: The unit of the time series.

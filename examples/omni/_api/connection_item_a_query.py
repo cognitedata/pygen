@@ -68,12 +68,12 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
         """Query along the outward edges of the connection item a.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            external_id_prefix_edge: The prefix of the external ID to filter on.
-            space_edge: The space to filter on.
+            name:
+            name_prefix:
+            external_id_prefix:
+            space:
+            external_id_prefix_edge:
+            space_edge:
             filter: (Advanced) Filter applied to node. If the filtering available in the
                 above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             limit: Maximum number of outward edges to return.

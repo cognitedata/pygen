@@ -167,8 +167,10 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
         Note: This method iterates through all nodes and timeseries linked to wind_turbine
         and creates them including the edges
-        between the nodes. For example, if any of `blades`, `datasheets`, `metmast`, `nacelle` or `rotor` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `blades`, `datasheets`, `metmast`, `nacelle` or `rotor`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             wind_turbine: Wind turbine or

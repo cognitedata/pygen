@@ -124,8 +124,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
         Note: This method iterates through all nodes and timeseries linked to high_speed_shaft
         and creates them including the edges
-        between the nodes. For example, if any of `bending_moment_y`, `bending_monent_x` or `torque` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        between the nodes. For example, if any of
+        `bending_moment_y`, `bending_monent_x` or `torque`
+        are set, then these nodes as well as any nodes linked to them, and all the edges linking
+        these nodes will be created.
 
         Args:
             high_speed_shaft: High speed shaft or
