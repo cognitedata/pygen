@@ -830,7 +830,7 @@ class CogniteSourceableNodeAPI(
             )
 
         builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
             factory.root(
                 filter=filter_,
@@ -849,5 +849,7 @@ class CogniteSourceableNodeAPI(
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        unpacked = QueryUnpacker(
+            builder, unpack_edges=False, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
+        ).unpack()
         return CogniteSourceableNodeList([CogniteSourceableNode.model_validate(item) for item in unpacked])

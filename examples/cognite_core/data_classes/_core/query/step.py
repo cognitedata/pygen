@@ -353,6 +353,7 @@ class QueryStepFactory:
         selected_properties: list[str | dict[str, list[str]]] | None = None,
         include_end_node: bool = True,
         has_container_fields: bool = True,
+        edge_view: dm.ViewId | None = None,
     ) -> list[QueryStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [
@@ -363,6 +364,7 @@ class QueryStepFactory:
                     direction=direction,
                     chain_to="source" if direction == "outwards" else "destination",
                 ),
+                view_id=edge_view,
                 selected_properties=[prop for prop in selected_properties or [] if isinstance(prop, str)] or None,
                 connection_property=connection_property,
             )

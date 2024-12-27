@@ -166,7 +166,14 @@ class QueryUnpacker:
 
     """
 
-    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True, as_data_record: bool = False, edge_type_key: str="type", node_type_key: str="type") -> None:
+    def __init__(
+        self,
+        steps: Sequence[QueryStep],
+        unpack_edges: bool = True,
+        as_data_record: bool = False,
+        edge_type_key: str = "type",
+        node_type_key: str = "type",
+    ) -> None:
         self._steps = steps
         self._unpack_edges = unpack_edges
         self._as_data_record = as_data_record

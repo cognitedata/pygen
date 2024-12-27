@@ -41,6 +41,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from wind_turbine.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
+from wind_turbine.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -228,6 +229,11 @@ class DataRecord(BaseModel, populate_by_name=True):
 class DomainModel(DomainModelCore, ABC):
     data_record: DataRecord
     node_type: Optional[dm.DirectRelationReference] = None
+
+    @field_validator("node_type", mode="before")
+    @classmethod
+    def parse_type(cls, value: Any) -> Any:
+        return as_direct_relation_reference(value)
 
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)
@@ -496,9 +502,19 @@ T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWrit
 
 class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
-    start_node: dm.DirectRelationReference
-    end_node: Any
+    start_node: dm.DirectRelationReference = Field(alias="startNode")
+    end_node: Any = Field(alias="endNode")
     data_record: DataRecord
+
+    @field_validator("start_node", "edge_type", mode="before")
+    @classmethod
+    def parse_direct_relation(cls, value: Any) -> Any:
+        return as_direct_relation_reference(value)
+
+    @field_validator("end_node", mode="before")
+    @classmethod
+    def parse_single_connection(cls, value: Any) -> Any:
+        return parse_single_connection(value, "end_node")
 
     def as_id(self) -> dm.EdgeId:
         return dm.EdgeId(space=self.space, external_id=self.external_id)
