@@ -179,7 +179,7 @@ class CogniteCubeMap(DomainModel):
 
     @field_validator("back", "bottom", "front", "left", "right", "top", mode="before")
     @classmethod
-    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
     # We do the ignore argument type as we let pydantic handle the type checking

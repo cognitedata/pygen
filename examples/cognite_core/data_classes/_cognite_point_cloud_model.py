@@ -192,8 +192,15 @@ class CognitePointCloudModel(Cognite3DModel):
 
     @field_validator("thumbnail", mode="before")
     @classmethod
-    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
+
+    @field_validator("revisions", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
 
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check

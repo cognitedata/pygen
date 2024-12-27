@@ -166,6 +166,13 @@ class ConnectionItemB(DomainModel):
         default=None, repr=False, alias="selfEdge"
     )
 
+    @field_validator("inwards", "self_edge", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> ConnectionItemBWrite:

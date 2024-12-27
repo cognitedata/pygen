@@ -256,6 +256,8 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     @field_validator({{ data_class.multi_connection_names }}, mode="before")
     @classmethod
     def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
         return [parse_single_connection(item, info.field_name) for item in value]
     {% endif %}
 

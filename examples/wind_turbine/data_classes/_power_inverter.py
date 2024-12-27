@@ -191,7 +191,7 @@ class PowerInverter(DomainModel):
 
     @field_validator("active_power_total", "apparent_power_total", "nacelle", "reactive_power_total", mode="before")
     @classmethod
-    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
     # We do the ignore argument type as we let pydantic handle the type checking
