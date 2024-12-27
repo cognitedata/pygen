@@ -513,7 +513,7 @@ class DomainRelation(DomainModelCore):
 
     @field_validator("end_node", mode="before")
     @classmethod
-    def parse_single_connection(cls, value: Any) -> Any:
+    def parse_end_node(cls, value: Any) -> Any:
         return parse_single_connection(value, "end_node")
 
     def as_id(self) -> dm.EdgeId:

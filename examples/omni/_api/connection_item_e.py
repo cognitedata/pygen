@@ -750,8 +750,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     has_container_fields=True,
                 )
             )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
+        builder.execute_query(self._client, remove_not_connected=True)
         unpacked = QueryUnpacker(
             builder, unpack_edges=False, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
         ).unpack()
