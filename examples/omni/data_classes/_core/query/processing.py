@@ -166,10 +166,12 @@ class QueryUnpacker:
 
     """
 
-    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True, as_data_record: bool = False) -> None:
+    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True, as_data_record: bool = False, edge_type_key: str="type", node_type_key: str="type") -> None:
         self._steps = steps
         self._unpack_edges = unpack_edges
         self._as_data_record = as_data_record
+        self._edge_type_key = edge_type_key
+        self._node_type_key = node_type_key
 
     def unpack(self) -> list[dict[str, Any]]:
         # The unpacked nodes/edges are stored in the dictionary below
@@ -265,6 +267,7 @@ class QueryUnpacker:
         for node in step.node_results:
             node_id = node.as_id()
             dumped = self.flatten_dump(node, step_properties, direct_property, self._as_data_record)
+            dumped[self._node_type_key] = dumped.pop("type")
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
@@ -332,9 +335,10 @@ class QueryUnpacker:
             else:
                 source_node = end_node
                 target_node = start_node
-
-            if self._unpack_edges or bool(edge.properties):
+            # step.view_id means that the edge has properties
+            if self._unpack_edges or step.view_id:
                 dumped = self.flatten_dump(edge, step_properties, as_data_record=self._as_data_record)
+                dumped[self._edge_type_key] = dumped.pop("type")
                 for connection_property, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         dumped[connection_property] = node_targets_by_source[target_node]

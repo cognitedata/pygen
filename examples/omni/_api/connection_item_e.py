@@ -703,7 +703,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             )
 
         builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="endNode")
+        factory = QueryStepFactory(builder.create_name,  view_id=self._view_id, edge_connection_property="endNode")
         builder.append(
             factory.root(
                 filter=filter_,
@@ -728,6 +728,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 ViewPropertyId(self._view_id, "inwardsSingleProperty"),
                 include_end_node=retrieve_connections == "full",
                 has_container_fields=True,
+                edge_view=ConnectionEdgeA._view_id,
             )
         )
         if retrieve_connections == "full":
@@ -751,5 +752,5 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             )
         # We know that that all nodes are connected as it is not possible to filter on connections
         builder.execute_query(self._client, remove_not_connected=False)
-        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True).unpack()
+        unpacked = QueryUnpacker(builder, unpack_edges=False, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type").unpack()
         return ConnectionItemEList([ConnectionItemE.model_validate(item) for item in unpacked])

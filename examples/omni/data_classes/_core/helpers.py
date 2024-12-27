@@ -1,27 +1,30 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from cognite.client import data_modeling as dm
 
-from omni.data_classes._core.base import DomainModel, T_DomainModel
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
+if TYPE_CHECKING:
+    from omni.data_classes._core.base import DomainModel, T_DomainModel
 
 def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
     return dm.NodeId(space=value.space, external_id=value.external_id)
 
 
 def as_direct_relation_reference(
-    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | None
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | dict[str, Any] | None
 ) -> dm.DirectRelationReference | None:
     if value is None or isinstance(value, dm.DirectRelationReference):
         return value
-    if isinstance(value, dm.NodeId):
+    elif isinstance(value, dm.NodeId):
         return dm.DirectRelationReference(space=value.space, external_id=value.external_id)
-    if isinstance(value, tuple):
+    elif isinstance(value, tuple):
         return dm.DirectRelationReference(space=value[0], external_id=value[1])
+    elif isinstance(value, dict) and "space" in value and "externalId" in value:
+        return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
     raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
 
 
