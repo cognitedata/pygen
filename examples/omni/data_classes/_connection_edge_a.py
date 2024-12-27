@@ -142,7 +142,7 @@ class ConnectionEdgeA(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId]
+    end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId] = Field(alias="endNode")
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")

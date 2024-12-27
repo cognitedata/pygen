@@ -41,7 +41,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
-from omni.data_classes._core.helpers import as_direct_relation_reference
+from omni.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -507,10 +507,15 @@ class DomainRelation(DomainModelCore, populate_by_name=True):
     end_node: Any = Field(alias="endNode")
     data_record: DataRecord
 
-    @field_validator("start_node", "end_node", mode="before")
+    @field_validator("start_node", "edge_type", mode="before")
     @classmethod
     def parse_direct_relation(cls, value: Any) -> Any:
         return as_direct_relation_reference(value)
+
+    @field_validator("end_node", mode="before")
+    @classmethod
+    def parse_single_connection(cls, value: Any) -> Any:
+        return parse_single_connection(value, "end_node")
 
     def as_id(self) -> dm.EdgeId:
         return dm.EdgeId(space=self.space, external_id=self.external_id)

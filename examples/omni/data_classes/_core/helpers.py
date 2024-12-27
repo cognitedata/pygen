@@ -25,6 +25,8 @@ def as_direct_relation_reference(
         return dm.DirectRelationReference(space=value[0], external_id=value[1])
     elif isinstance(value, dict) and "space" in value and "externalId" in value:
         return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
+    elif isinstance(value, dict) and "space" in value and "external_id" in value:
+        return dm.DirectRelationReference(space=value["space"], external_id=value["external_id"])
     raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
 
 
