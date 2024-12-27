@@ -235,7 +235,6 @@ class DomainModel(DomainModelCore, ABC):
     def parse_type(cls, value: Any) -> Any:
         return as_direct_relation_reference(value)
 
-
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)
 
@@ -501,7 +500,7 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
 T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
 
 
-class DomainRelation(DomainModelCore, populate_by_name=True):
+class DomainRelation(DomainModelCore):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference = Field(alias="startNode")
     end_node: Any = Field(alias="endNode")

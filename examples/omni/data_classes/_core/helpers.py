@@ -10,6 +10,7 @@ from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 if TYPE_CHECKING:
     from omni.data_classes._core.base import DomainModel, T_DomainModel
 
+
 def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
     return dm.NodeId(space=value.space, external_id=value.external_id)
 
