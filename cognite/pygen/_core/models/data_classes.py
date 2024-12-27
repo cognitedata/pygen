@@ -568,9 +568,19 @@ class DataClass:
         return any(isinstance(field_, OneToOneConnectionField) for field_ in self)
 
     @property
+    def has_multi_connection_fields(self) -> bool:
+        """Check if the data class has any multi connection fields."""
+        return any(isinstance(field_, OneToManyConnectionField) for field_ in self)
+
+    @property
     def single_connection_names(self) -> str:
         """The names of all single connection fields."""
         return ", ".join(f'"{field_.name}"' for field_ in self.fields_of_type(OneToOneConnectionField))
+
+    @property
+    def multi_connection_names(self) -> str:
+        """The names of all multi connection fields."""
+        return ", ".join(f'"{field_.name}"' for field_ in self.fields_of_type(OneToManyConnectionField))
 
     def container_fields_sorted(self, include: 'Literal["all", "only-self"] | DataClass' = "all") -> list[Field]:
         """Return all container fields sorted by type."""

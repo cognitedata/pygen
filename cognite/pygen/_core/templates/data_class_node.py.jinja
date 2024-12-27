@@ -248,8 +248,15 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     {% if data_class.has_single_connection_fields %}
     @field_validator({{ data_class.single_connection_names }}, mode="before")
     @classmethod
-    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
+    {% endif %}
+
+    {% if data_class.has_multi_connection_fields %}
+    @field_validator({{ data_class.multi_connection_names }}, mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        return [parse_single_connection(item, info.field_name) for item in value]
     {% endif %}
 
 {% if data_class.is_writable or data_class.is_interface %}
