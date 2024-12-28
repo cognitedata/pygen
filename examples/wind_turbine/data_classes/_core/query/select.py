@@ -250,6 +250,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     name=name,
                     expression=cast(dm.query.EdgeResultSetExpression, item._expression),
                     connection_property=item._connection_property,
+                    view_id=item._view_id,
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
