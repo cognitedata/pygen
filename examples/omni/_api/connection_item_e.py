@@ -750,8 +750,9 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     has_container_fields=True,
                 )
             )
-        builder.execute_query(self._client, remove_not_connected=True)
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(
-            builder, unpack_edges=False, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
+            builder, edges=unpack_edges, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
         ).unpack()
         return ConnectionItemEList([ConnectionItemE.model_validate(item) for item in unpacked])
