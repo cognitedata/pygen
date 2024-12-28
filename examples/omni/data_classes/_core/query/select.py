@@ -178,7 +178,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         return self._result_list_cls_end([self._result_cls.model_validate(item) for item in unpacked])
 
     def _dump_yaml(self) -> str:
-        return self._create_query(DEFAULT_QUERY_LIMIT, self._result_list_cls)._dump_yaml()
+        return self._create_query(DEFAULT_QUERY_LIMIT)._dump_yaml()
 
     def _create_query(
         self,
