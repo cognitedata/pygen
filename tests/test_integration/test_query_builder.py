@@ -2,9 +2,8 @@ import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
-
 from omni import data_classes as dc
-from omni.data_classes._core import QueryBuilder, QueryStep, ViewPropertyId, QueryUnpacker
+from omni.data_classes._core import QueryBuilder, QueryStep, QueryUnpacker, ViewPropertyId
 
 
 class TestQueryBuilder:
@@ -38,7 +37,7 @@ class TestQueryBuilder:
                     direction="inwards",
                 ),
                 view_id=dc.ConnectionItemD._view_id,
-                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directInverseSingle"),
+                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directReverseSingle"),
             )
         )
         builder.append(
@@ -100,6 +99,7 @@ class TestQueryBuilder:
                     ),
                 ),
                 view_id=dc.ConnectionItemCNode._view_id,
+                connection_property=ViewPropertyId(item_a, "otherDirect"),
             )
         )
         edge_name = builder.create_name(from_a)
@@ -111,6 +111,7 @@ class TestQueryBuilder:
                     chain_to="destination",
                     direction="outwards",
                 ),
+                connection_property=ViewPropertyId(item_a, "outwards"),
             )
         )
         builder.append(
@@ -119,13 +120,15 @@ class TestQueryBuilder:
                 dm.query.NodeResultSetExpression(
                     from_=edge_name,
                 ),
-                dc.ConnectionItemB._view_id,
+                view_id=dc.ConnectionItemB._view_id,
+                connection_property=ViewPropertyId(item_a, "end_node"),
             )
         )
 
         # Act
         builder.execute_query(cognite_client)
-        result = builder.unpack()
+        unpacked = QueryUnpacker(builder).unpack()
+        result = dc.ConnectionItemAList([dc.ConnectionItemA.model_validate(item) for item in unpacked])
 
         # Assert
         assert isinstance(result, dc.ConnectionItemAList)
@@ -159,7 +162,7 @@ class TestQueryBuilder:
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_f]),
                 ),
-                dc.ConnectionItemF,
+                view_id=item_f,
                 max_retrieve_limit=1,
             )
         )
@@ -174,7 +177,8 @@ class TestQueryBuilder:
                     direction="outwards",
                     filter=filters.HasData(views=[edge_view]),
                 ),
-                dc.ConnectionEdgeA,
+                view_id=edge_view,
+                connection_property=ViewPropertyId(item_f, "outwardsMulti"),
             )
         )
         item_g = omni_views["ConnectionItemG"].as_id()
@@ -186,12 +190,14 @@ class TestQueryBuilder:
                     from_=from_edge,
                     filter=filters.HasData(views=[item_g]),
                 ),
-                dc.ConnectionItemG,
+                view_id=dc.ConnectionItemG._view_id,
+                connection_property=ViewPropertyId(edge_view, "end_node"),
             )
         )
 
         builder.execute_query(cognite_client)
-        result = builder.unpack()
+        unpacked = QueryUnpacker(builder).unpack()
+        result = dc.ConnectionItemFList([dc.ConnectionItemF.model_validate(item) for item in unpacked])
 
         assert isinstance(result, dc.ConnectionItemFList)
         assert builder[0].total_retrieved == len(result) > 0
