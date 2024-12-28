@@ -285,7 +285,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
             UserWarning,
             stacklevel=2,
         )
-        return self.as_write(){% if data_class.has_dependencies %}
+        return self.as_write()
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
