@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -32,9 +32,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
     TimestampFilter,
 )
@@ -316,6 +318,18 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator("source", "unit", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("activities", "assets", "equipment", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteTimeSeriesWrite:
@@ -362,61 +376,6 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteTimeSeries],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_activity import CogniteActivity
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_equipment import CogniteEquipment
-        from ._cognite_source_system import CogniteSourceSystem
-        from ._cognite_unit import CogniteUnit
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-            if (
-                isinstance(instance.unit, dm.NodeId | str)
-                and (unit := nodes_by_id.get(instance.unit))
-                and isinstance(unit, CogniteUnit)
-            ):
-                instance.unit = unit
-            if instance.assets:
-                new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for asset in instance.assets:
-                    if isinstance(asset, CogniteAsset):
-                        new_assets.append(asset)
-                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
-                        new_assets.append(other)
-                    else:
-                        new_assets.append(asset)
-                instance.assets = new_assets
-            if instance.equipment:
-                new_equipment: list[CogniteEquipment | str | dm.NodeId] = []
-                for equipment in instance.equipment:
-                    if isinstance(equipment, CogniteEquipment):
-                        new_equipment.append(equipment)
-                    elif (other := nodes_by_id.get(equipment)) and isinstance(other, CogniteEquipment):
-                        new_equipment.append(other)
-                    else:
-                        new_equipment.append(equipment)
-                instance.equipment = new_equipment
-        for node in nodes_by_id.values():
-            if isinstance(node, CogniteActivity) and node.time_series is not None:
-                for time_series in node.time_series:
-                    if this_instance := instances.get(as_pygen_node_id(time_series)):
-                        if this_instance.activities is None:
-                            this_instance.activities = [node]
-                        else:
-                            this_instance.activities.append(node)
 
 
 class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
@@ -873,6 +832,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -890,6 +850,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -905,6 +866,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                     direction="inwards",
                 ),
                 connection_name="activities",
+                connection_property=ViewPropertyId(self._view_id, "activities"),
                 connection_type="reverse-list",
             )
 
@@ -919,6 +881,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                     direction="outwards",
                 ),
                 connection_name="assets",
+                connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -932,6 +895,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                     direction="outwards",
                 ),
                 connection_name="equipment",
+                connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -945,6 +909,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         if _CogniteUnitQuery not in created_types:
@@ -958,6 +923,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                     direction="outwards",
                 ),
                 connection_name="unit",
+                connection_property=ViewPropertyId(self._view_id, "unit"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

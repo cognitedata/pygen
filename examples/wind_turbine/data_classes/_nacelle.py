@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -288,6 +290,24 @@ class Nacelle(DomainModel):
     yaw_direction: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_error: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator(
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "wind_turbine",
+        "yaw_direction",
+        "yaw_error",
+        mode="before",
+    )
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> NacelleWrite:
@@ -332,94 +352,6 @@ class Nacelle(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Nacelle],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._gearbox import Gearbox
-        from ._generator import Generator
-        from ._high_speed_shaft import HighSpeedShaft
-        from ._main_shaft import MainShaft
-        from ._power_inverter import PowerInverter
-        from ._sensor_time_series import SensorTimeSeries
-        from ._wind_turbine import WindTurbine
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.acc_from_back_side_y, dm.NodeId | str)
-                and (acc_from_back_side_y := nodes_by_id.get(instance.acc_from_back_side_y))
-                and isinstance(acc_from_back_side_y, SensorTimeSeries)
-            ):
-                instance.acc_from_back_side_y = acc_from_back_side_y
-            if (
-                isinstance(instance.acc_from_back_side_z, dm.NodeId | str)
-                and (acc_from_back_side_z := nodes_by_id.get(instance.acc_from_back_side_z))
-                and isinstance(acc_from_back_side_z, SensorTimeSeries)
-            ):
-                instance.acc_from_back_side_z = acc_from_back_side_z
-            if (
-                isinstance(instance.gearbox, dm.NodeId | str)
-                and (gearbox := nodes_by_id.get(instance.gearbox))
-                and isinstance(gearbox, Gearbox)
-            ):
-                instance.gearbox = gearbox
-            if (
-                isinstance(instance.generator, dm.NodeId | str)
-                and (generator := nodes_by_id.get(instance.generator))
-                and isinstance(generator, Generator)
-            ):
-                instance.generator = generator
-            if (
-                isinstance(instance.high_speed_shaft, dm.NodeId | str)
-                and (high_speed_shaft := nodes_by_id.get(instance.high_speed_shaft))
-                and isinstance(high_speed_shaft, HighSpeedShaft)
-            ):
-                instance.high_speed_shaft = high_speed_shaft
-            if (
-                isinstance(instance.main_shaft, dm.NodeId | str)
-                and (main_shaft := nodes_by_id.get(instance.main_shaft))
-                and isinstance(main_shaft, MainShaft)
-            ):
-                instance.main_shaft = main_shaft
-            if (
-                isinstance(instance.power_inverter, dm.NodeId | str)
-                and (power_inverter := nodes_by_id.get(instance.power_inverter))
-                and isinstance(power_inverter, PowerInverter)
-            ):
-                instance.power_inverter = power_inverter
-            if (
-                isinstance(instance.yaw_direction, dm.NodeId | str)
-                and (yaw_direction := nodes_by_id.get(instance.yaw_direction))
-                and isinstance(yaw_direction, SensorTimeSeries)
-            ):
-                instance.yaw_direction = yaw_direction
-            if (
-                isinstance(instance.yaw_error, dm.NodeId | str)
-                and (yaw_error := nodes_by_id.get(instance.yaw_error))
-                and isinstance(yaw_error, SensorTimeSeries)
-            ):
-                instance.yaw_error = yaw_error
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, WindTurbine)
-                and node.nacelle is not None
-                and (nacelle := instances.get(as_pygen_node_id(node.nacelle)))
-            ):
-                if nacelle.wind_turbine is None:
-                    nacelle.wind_turbine = node
-                elif are_nodes_equal(node, nacelle.wind_turbine):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'wind_turbine' in {nacelle.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {nacelle.wind_turbine!s}.",
-                        stacklevel=2,
-                    )
 
 
 class NacelleWrite(DomainModelWrite):
@@ -1067,6 +999,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -1086,6 +1019,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -1101,6 +1035,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="acc_from_back_side_y",
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1114,6 +1049,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="acc_from_back_side_z",
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_z"),
             )
 
         if _GearboxQuery not in created_types:
@@ -1127,6 +1063,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="gearbox",
+                connection_property=ViewPropertyId(self._view_id, "gearbox"),
             )
 
         if _GeneratorQuery not in created_types:
@@ -1140,6 +1077,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="generator",
+                connection_property=ViewPropertyId(self._view_id, "generator"),
             )
 
         if _HighSpeedShaftQuery not in created_types:
@@ -1153,6 +1091,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="high_speed_shaft",
+                connection_property=ViewPropertyId(self._view_id, "high_speed_shaft"),
             )
 
         if _MainShaftQuery not in created_types:
@@ -1166,6 +1105,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="main_shaft",
+                connection_property=ViewPropertyId(self._view_id, "main_shaft"),
             )
 
         if _PowerInverterQuery not in created_types:
@@ -1179,6 +1119,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="power_inverter",
+                connection_property=ViewPropertyId(self._view_id, "power_inverter"),
             )
 
         if _WindTurbineQuery not in created_types:
@@ -1192,6 +1133,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="inwards",
                 ),
                 connection_name="wind_turbine",
+                connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1205,6 +1147,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="yaw_direction",
+                connection_property=ViewPropertyId(self._view_id, "yaw_direction"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1218,6 +1161,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="yaw_error",
+                connection_property=ViewPropertyId(self._view_id, "yaw_error"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

@@ -18,9 +18,10 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_360_image import (
     Cognite360ImageQuery,
@@ -145,7 +146,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Cognite360ImageQueryAPI[Cognite360ImageList]:
+    ) -> Cognite360ImageQueryAPI[Cognite360Image, Cognite360ImageList]:
         """Query starting at Cognite 360 images.
 
         Args:
@@ -228,8 +229,9 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Cognite360ImageList)
-        return Cognite360ImageQueryAPI(self._client, builder, filter_, limit)
+        return Cognite360ImageQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -1416,7 +1418,6 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -1426,118 +1427,74 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(Cognite360ImageList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Cognite360Image,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("back"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "back"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("bottom"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "bottom"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Cognite360ImageCollection._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("collection360"),
-                    ),
-                    Cognite360ImageCollection,
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite360ImageCollection._view_id,
+                    ViewPropertyId(self._view_id, "collection360"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("front"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "front"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("left"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "left"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("right"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "right"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Cognite360ImageStation._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("station360"),
-                    ),
-                    Cognite360ImageStation,
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite360ImageStation._view_id,
+                    ViewPropertyId(self._view_id, "station360"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("top"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "top"),
+                    has_container_fields=True,
                 )
             )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return Cognite360ImageList([Cognite360Image.model_validate(item) for item in unpacked])

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from omni.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -167,6 +169,13 @@ class DependentOnNonWritable(DomainModel):
         default=None, repr=False, alias="toNonWritable"
     )
 
+    @field_validator("to_non_writable", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
@@ -194,47 +203,6 @@ class DependentOnNonWritable(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, DependentOnNonWritable],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._implementation_1_non_writeable import Implementation1NonWriteable
-
-        for instance in instances.values():
-            if edges := edges_by_source_node.get(instance.as_id()):
-                to_non_writable: list[Implementation1NonWriteable | str | dm.NodeId] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "toNonWritable") and isinstance(
-                        value, Implementation1NonWriteable | str | dm.NodeId
-                    ):
-                        to_non_writable.append(value)
-
-                instance.to_non_writable = to_non_writable or None
 
 
 class DependentOnNonWritableWrite(DomainModelWrite):
@@ -408,6 +376,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -421,6 +390,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -436,6 +406,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
                     chain_to="destination",
                 ),
                 connection_name="to_non_writable",
+                connection_property=ViewPropertyId(self._view_id, "toNonWritable"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

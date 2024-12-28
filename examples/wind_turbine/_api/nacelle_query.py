@@ -21,10 +21,11 @@ from wind_turbine.data_classes import (
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from wind_turbine._api._core import (
     QueryAPI,
@@ -32,27 +33,31 @@ from wind_turbine._api._core import (
 )
 
 
-class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
+class NacelleQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_power", "Nacelle", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=Nacelle,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -126,7 +131,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_acc_from_back_side_y(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -134,13 +139,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_y"),
             ),
         )
 
     def _query_append_acc_from_back_side_z(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -148,13 +154,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_z"),
             ),
         )
 
     def _query_append_gearbox(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -162,13 +169,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Gearbox._view_id]),
                 ),
-                result_cls=Gearbox,
+                view_id=Gearbox._view_id,
+                connection_property=ViewPropertyId(self._view_id, "gearbox"),
             ),
         )
 
     def _query_append_generator(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -176,13 +184,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Generator._view_id]),
                 ),
-                result_cls=Generator,
+                view_id=Generator._view_id,
+                connection_property=ViewPropertyId(self._view_id, "generator"),
             ),
         )
 
     def _query_append_high_speed_shaft(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -190,13 +199,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[HighSpeedShaft._view_id]),
                 ),
-                result_cls=HighSpeedShaft,
+                view_id=HighSpeedShaft._view_id,
+                connection_property=ViewPropertyId(self._view_id, "high_speed_shaft"),
             ),
         )
 
     def _query_append_main_shaft(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -204,13 +214,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[MainShaft._view_id]),
                 ),
-                result_cls=MainShaft,
+                view_id=MainShaft._view_id,
+                connection_property=ViewPropertyId(self._view_id, "main_shaft"),
             ),
         )
 
     def _query_append_power_inverter(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -218,13 +229,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[PowerInverter._view_id]),
                 ),
-                result_cls=PowerInverter,
+                view_id=PowerInverter._view_id,
+                connection_property=ViewPropertyId(self._view_id, "power_inverter"),
             ),
         )
 
     def _query_append_yaw_direction(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -232,13 +244,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "yaw_direction"),
             ),
         )
 
     def _query_append_yaw_error(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -246,6 +259,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "yaw_error"),
             ),
         )

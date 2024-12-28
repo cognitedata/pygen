@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -179,6 +181,11 @@ class Cognite3DModel(CogniteDescribableNode):
     thumbnail: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
 
+    @field_validator("thumbnail", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> Cognite3DModelWrite:
@@ -203,23 +210,6 @@ class Cognite3DModel(CogniteDescribableNode):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite3DModel],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_file import CogniteFile
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.thumbnail, dm.NodeId | str)
-                and (thumbnail := nodes_by_id.get(instance.thumbnail))
-                and isinstance(thumbnail, CogniteFile)
-            ):
-                instance.thumbnail = thumbnail
 
 
 class Cognite3DModelWrite(CogniteDescribableNodeWrite):
@@ -429,6 +419,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -442,6 +433,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -457,6 +449,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
                     direction="outwards",
                 ),
                 connection_name="thumbnail",
+                connection_property=ViewPropertyId(self._view_id, "thumbnail"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

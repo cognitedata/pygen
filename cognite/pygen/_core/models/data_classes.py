@@ -513,6 +513,16 @@ class DataClass:
         )
 
     @property
+    def has_direct_or_reverse_relation_with_target(self) -> bool:
+        """Whether the data class has any fields that are direct or reverse relations."""
+        return any(
+            isinstance(field_, BaseConnectionField)
+            and (field_.is_direct_relation or field_.is_reverse_direct_relation)
+            and field_.destination_class
+            for field_ in self
+        )
+
+    @property
     def has_reverse_direct_relations(self) -> bool:
         """Whether the data class has any fields that are reverse direct relations."""
         return any(isinstance(field_, BaseConnectionField) and field_.is_reverse_direct_relation for field_ in self)
@@ -551,6 +561,26 @@ class DataClass:
     def container_fields_writable(self) -> Iterable[Field]:
         """Container fields that are writable."""
         return (field_ for field_ in self.container_fields if field_.is_write_field)
+
+    @property
+    def has_single_connection_fields(self) -> bool:
+        """Check if the data class has any single connection fields."""
+        return any(isinstance(field_, OneToOneConnectionField) for field_ in self)
+
+    @property
+    def has_multi_connection_fields(self) -> bool:
+        """Check if the data class has any multi connection fields."""
+        return any(isinstance(field_, OneToManyConnectionField) for field_ in self)
+
+    @property
+    def single_connection_names(self) -> str:
+        """The names of all single connection fields."""
+        return ", ".join(f'"{field_.name}"' for field_ in self.fields_of_type(OneToOneConnectionField))
+
+    @property
+    def multi_connection_names(self) -> str:
+        """The names of all multi connection fields."""
+        return ", ".join(f'"{field_.name}"' for field_ in self.fields_of_type(OneToManyConnectionField))
 
     def container_fields_sorted(self, include: 'Literal["all", "only-self"] | DataClass' = "all") -> list[Field]:
         """Return all container fields sorted by type."""

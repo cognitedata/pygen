@@ -14,7 +14,7 @@ from cognite.client.utils._time import ZoneInfo
 
 from wind_turbine._api._core import DEFAULT_LIMIT_READ
 from wind_turbine.data_classes._metmast import _create_metmast_filter
-from wind_turbine.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
+from wind_turbine.data_classes._core import QueryBuilder, QueryStep
 
 ColumnNames = Literal["position", "temperature", "tilt_angle", "wind_speed"]
 
@@ -615,7 +615,7 @@ def _retrieve_timeseries_external_ids_with_extra_wind_speed(
     has_property = dm.filters.Exists(property=view_id.as_property_ref("wind_speed"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    builder = DataClassQueryBuilder[DomainModelList](None)
+    builder = QueryBuilder()
     builder.append(
         QueryStep(
             name="nodes",

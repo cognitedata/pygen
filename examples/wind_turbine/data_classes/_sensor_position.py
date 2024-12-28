@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 
@@ -287,6 +289,22 @@ class SensorPosition(DomainModel):
     )
     position: Optional[float] = None
 
+    @field_validator(
+        "blade",
+        "edgewise_bend_mom_crosstalk_corrected",
+        "edgewise_bend_mom_offset",
+        "edgewise_bend_mom_offset_crosstalk_corrected",
+        "edgewisewise_bend_mom",
+        "flapwise_bend_mom",
+        "flapwise_bend_mom_crosstalk_corrected",
+        "flapwise_bend_mom_offset",
+        "flapwise_bend_mom_offset_crosstalk_corrected",
+        mode="before",
+    )
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> SensorPositionWrite:
@@ -347,88 +365,6 @@ class SensorPosition(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, SensorPosition],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._blade import Blade
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.blade, dm.NodeId | str)
-                and (blade := nodes_by_id.get(instance.blade))
-                and isinstance(blade, Blade)
-            ):
-                instance.blade = blade
-            if (
-                isinstance(instance.edgewise_bend_mom_crosstalk_corrected, dm.NodeId | str)
-                and (
-                    edgewise_bend_mom_crosstalk_corrected := nodes_by_id.get(
-                        instance.edgewise_bend_mom_crosstalk_corrected
-                    )
-                )
-                and isinstance(edgewise_bend_mom_crosstalk_corrected, SensorTimeSeries)
-            ):
-                instance.edgewise_bend_mom_crosstalk_corrected = edgewise_bend_mom_crosstalk_corrected
-            if (
-                isinstance(instance.edgewise_bend_mom_offset, dm.NodeId | str)
-                and (edgewise_bend_mom_offset := nodes_by_id.get(instance.edgewise_bend_mom_offset))
-                and isinstance(edgewise_bend_mom_offset, SensorTimeSeries)
-            ):
-                instance.edgewise_bend_mom_offset = edgewise_bend_mom_offset
-            if (
-                isinstance(instance.edgewise_bend_mom_offset_crosstalk_corrected, dm.NodeId | str)
-                and (
-                    edgewise_bend_mom_offset_crosstalk_corrected := nodes_by_id.get(
-                        instance.edgewise_bend_mom_offset_crosstalk_corrected
-                    )
-                )
-                and isinstance(edgewise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)
-            ):
-                instance.edgewise_bend_mom_offset_crosstalk_corrected = edgewise_bend_mom_offset_crosstalk_corrected
-            if (
-                isinstance(instance.edgewisewise_bend_mom, dm.NodeId | str)
-                and (edgewisewise_bend_mom := nodes_by_id.get(instance.edgewisewise_bend_mom))
-                and isinstance(edgewisewise_bend_mom, SensorTimeSeries)
-            ):
-                instance.edgewisewise_bend_mom = edgewisewise_bend_mom
-            if (
-                isinstance(instance.flapwise_bend_mom, dm.NodeId | str)
-                and (flapwise_bend_mom := nodes_by_id.get(instance.flapwise_bend_mom))
-                and isinstance(flapwise_bend_mom, SensorTimeSeries)
-            ):
-                instance.flapwise_bend_mom = flapwise_bend_mom
-            if (
-                isinstance(instance.flapwise_bend_mom_crosstalk_corrected, dm.NodeId | str)
-                and (
-                    flapwise_bend_mom_crosstalk_corrected := nodes_by_id.get(
-                        instance.flapwise_bend_mom_crosstalk_corrected
-                    )
-                )
-                and isinstance(flapwise_bend_mom_crosstalk_corrected, SensorTimeSeries)
-            ):
-                instance.flapwise_bend_mom_crosstalk_corrected = flapwise_bend_mom_crosstalk_corrected
-            if (
-                isinstance(instance.flapwise_bend_mom_offset, dm.NodeId | str)
-                and (flapwise_bend_mom_offset := nodes_by_id.get(instance.flapwise_bend_mom_offset))
-                and isinstance(flapwise_bend_mom_offset, SensorTimeSeries)
-            ):
-                instance.flapwise_bend_mom_offset = flapwise_bend_mom_offset
-            if (
-                isinstance(instance.flapwise_bend_mom_offset_crosstalk_corrected, dm.NodeId | str)
-                and (
-                    flapwise_bend_mom_offset_crosstalk_corrected := nodes_by_id.get(
-                        instance.flapwise_bend_mom_offset_crosstalk_corrected
-                    )
-                )
-                and isinstance(flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)
-            ):
-                instance.flapwise_bend_mom_offset_crosstalk_corrected = flapwise_bend_mom_offset_crosstalk_corrected
 
 
 class SensorPositionWrite(DomainModelWrite):
@@ -1190,6 +1126,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -1204,6 +1141,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -1219,6 +1157,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="blade",
+                connection_property=ViewPropertyId(self._view_id, "blade"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1232,6 +1171,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1245,6 +1185,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_offset",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1258,6 +1199,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_offset_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1271,6 +1213,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewisewise_bend_mom",
+                connection_property=ViewPropertyId(self._view_id, "edgewisewise_bend_mom"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1284,6 +1227,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1297,6 +1241,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1310,6 +1255,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_offset",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1323,6 +1269,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_offset_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset_crosstalk_corrected"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

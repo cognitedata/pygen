@@ -13,7 +13,7 @@ from cognite.client.data_classes import (
     Sequence as CogniteSequence,
     SequenceWrite as CogniteSequenceWrite,
 )
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -47,9 +47,11 @@ from omni.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 
@@ -337,6 +339,7 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -349,6 +352,7 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )

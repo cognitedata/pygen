@@ -18,9 +18,10 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_asset import (
     CogniteAssetQuery,
@@ -140,7 +141,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CogniteAssetQueryAPI[CogniteAssetList]:
+    ) -> CogniteAssetQueryAPI[CogniteAsset, CogniteAssetList]:
         """Query starting at Cognite assets.
 
         Args:
@@ -217,8 +218,9 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(CogniteAssetList)
-        return CogniteAssetQueryAPI(self._client, builder, filter_, limit)
+        return CogniteAssetQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -1325,7 +1327,6 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -1335,169 +1336,112 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(CogniteAssetList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                CogniteAsset,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteActivity._view_id]),
-                        direction="inwards",
-                        through=CogniteActivity._view_id.as_property_ref("assets"),
-                    ),
-                    CogniteActivity,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteActivity._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteActivity", "v1"), "assets"),
                     connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "activities"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="inwards",
-                        through=CogniteAsset._view_id.as_property_ref("parent"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteAsset._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "parent"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "children"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteEquipment._view_id]),
-                        direction="inwards",
-                        through=CogniteEquipment._view_id.as_property_ref("asset"),
-                    ),
-                    CogniteEquipment,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteEquipment._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteEquipment", "v1"), "asset"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "equipment"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteFile._view_id]),
-                        direction="inwards",
-                        through=CogniteFile._view_id.as_property_ref("assets"),
-                    ),
-                    CogniteFile,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteFile._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteFile", "v1"), "assets"),
                     connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "files"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteTimeSeries._view_id]),
-                        direction="inwards",
-                        through=CogniteTimeSeries._view_id.as_property_ref("assets"),
-                    ),
-                    CogniteTimeSeries,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteTimeSeries._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteTimeSeries", "v1"), "assets"),
                     connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "timeSeries"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAssetClass._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("assetClass"),
-                    ),
-                    CogniteAssetClass,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAssetClass._view_id,
+                    ViewPropertyId(self._view_id, "assetClass"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Cognite3DObject._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("object3D"),
-                    ),
-                    Cognite3DObject,
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite3DObject._view_id,
+                    ViewPropertyId(self._view_id, "object3D"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("parent"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAsset._view_id,
+                    ViewPropertyId(self._view_id, "parent"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("path"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAsset._view_id,
+                    ViewPropertyId(self._view_id, "path"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("root"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAsset._view_id,
+                    ViewPropertyId(self._view_id, "root"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteSourceSystem._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("source"),
-                    ),
-                    CogniteSourceSystem,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteSourceSystem._view_id,
+                    ViewPropertyId(self._view_id, "source"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAssetType._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("type"),
-                    ),
-                    CogniteAssetType,
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAssetType._view_id,
+                    ViewPropertyId(self._view_id, "type"),
+                    has_container_fields=True,
                 )
             )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return CogniteAssetList([CogniteAsset.model_validate(item) for item in unpacked])

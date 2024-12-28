@@ -60,17 +60,6 @@ def test_generate_data_class_core_query_init(omni_multi_api_generator: MultiAPIG
     assert actual == expected
 
 
-def test_generate_data_class_core_query_data_class_step(omni_multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = OmniFiles.data_core_query_data_class_step.read_text()
-
-    # Act
-    actual = omni_multi_api_generator.generate_data_class_core_query_data_classes_step()
-
-    # Assert
-    assert actual == expected
-
-
 def test_generate_data_class_core_query_filter_classes(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniFiles.data_core_query_filter_classes.read_text()

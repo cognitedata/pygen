@@ -12,10 +12,11 @@ from omni_multi.data_classes import (
 )
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from omni_multi._api._core import (
     QueryAPI,
@@ -23,27 +24,31 @@ from omni_multi._api._core import (
 )
 
 
-class Implementation1v2QueryAPI(QueryAPI[T_DomainModelList]):
+class Implementation1v2QueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("pygen-models", "Implementation1", "2")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=Implementation1v2,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 

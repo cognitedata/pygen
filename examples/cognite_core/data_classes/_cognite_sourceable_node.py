@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -31,9 +31,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     TimestampFilter,
 )
 
@@ -208,6 +210,11 @@ class CogniteSourceableNode(DomainModel):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
+    @field_validator("source", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteSourceableNodeWrite:
@@ -233,23 +240,6 @@ class CogniteSourceableNode(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteSourceableNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_source_system import CogniteSourceSystem
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
 
 
 class CogniteSourceableNodeWrite(DomainModelWrite):
@@ -516,6 +506,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -529,6 +520,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -544,6 +536,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

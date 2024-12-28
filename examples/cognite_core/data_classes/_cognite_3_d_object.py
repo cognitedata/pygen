@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -265,6 +267,18 @@ class Cognite3DObject(CogniteDescribableNode):
     z_max: Optional[float] = Field(None, alias="zMax")
     z_min: Optional[float] = Field(None, alias="zMin")
 
+    @field_validator("asset", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("cad_nodes", "images_360", "point_cloud_volumes", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> Cognite3DObjectWrite:
@@ -296,87 +310,6 @@ class Cognite3DObject(CogniteDescribableNode):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite3DObject],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_360_image_annotation import Cognite360ImageAnnotation
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_cad_node import CogniteCADNode
-        from ._cognite_point_cloud_volume import CognitePointCloudVolume
-
-        for instance in instances.values():
-            if edges := edges_by_source_node.get(instance.as_id()):
-                images_360: list[Cognite360ImageAnnotation] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("cdf_cdm", "image-360-annotation") and isinstance(
-                        value, Cognite360ImageAnnotation
-                    ):
-                        images_360.append(value)
-                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]
-
-                instance.images_360 = images_360
-
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, CogniteAsset)
-                and node.object_3d is not None
-                and (object_3d := instances.get(as_pygen_node_id(node.object_3d)))
-            ):
-                if object_3d.asset is None:
-                    object_3d.asset = node
-                elif are_nodes_equal(node, object_3d.asset):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'asset' in {object_3d.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {object_3d.asset!s}.",
-                        stacklevel=2,
-                    )
-            if (
-                isinstance(node, CogniteCADNode)
-                and node.object_3d is not None
-                and (object_3d := instances.get(as_pygen_node_id(node.object_3d)))
-            ):
-                if object_3d.cad_nodes is None:
-                    object_3d.cad_nodes = []
-                object_3d.cad_nodes.append(node)
-
-            if (
-                isinstance(node, CognitePointCloudVolume)
-                and node.object_3d is not None
-                and (object_3d := instances.get(as_pygen_node_id(node.object_3d)))
-            ):
-                if object_3d.point_cloud_volumes is None:
-                    object_3d.point_cloud_volumes = []
-                object_3d.point_cloud_volumes.append(node)
 
 
 class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
@@ -657,6 +590,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -674,6 +608,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -689,6 +624,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="asset",
+                connection_property=ViewPropertyId(self._view_id, "asset"),
             )
 
         if _CogniteCADNodeQuery not in created_types:
@@ -702,6 +638,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="cad_nodes",
+                connection_property=ViewPropertyId(self._view_id, "cadNodes"),
             )
 
         if _Cognite360ImageAnnotationQuery not in created_types:
@@ -716,6 +653,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     chain_to="destination",
                 ),
                 connection_name="images_360",
+                connection_property=ViewPropertyId(self._view_id, "images360"),
             )
 
         if _CognitePointCloudVolumeQuery not in created_types:
@@ -729,6 +667,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="point_cloud_volumes",
+                connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

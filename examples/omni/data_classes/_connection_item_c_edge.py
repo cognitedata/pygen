@@ -33,6 +33,7 @@ from omni.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -237,11 +238,21 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -249,6 +260,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         if _ConnectionItemAQuery not in created_types:
@@ -261,7 +273,8 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "connection_item_a",
+                connection_name="connection_item_a",
+                connection_property=ViewPropertyId(self._view_id, "connectionItemA"),
             )
 
         if _ConnectionItemBQuery not in created_types:
@@ -274,5 +287,6 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                     direction="outwards",
                     chain_to="destination",
                 ),
-                "connection_item_b",
+                connection_name="connection_item_b",
+                connection_property=ViewPropertyId(self._view_id, "connectionItemB"),
             )

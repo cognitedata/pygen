@@ -44,6 +44,7 @@ FIELD_NAMES = (
         "config",
         "create_external_id_if_factory",
         "dump",
+        "parse_type",
     }
 )
 PARAMETER_NAMES = {

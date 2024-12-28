@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -194,6 +196,13 @@ class MainShaft(DomainModel):
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
     torque: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator(
+        "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "nacelle", "torque", mode="before"
+    )
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> MainShaftWrite:
@@ -225,65 +234,6 @@ class MainShaft(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, MainShaft],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.bending_x, dm.NodeId | str)
-                and (bending_x := nodes_by_id.get(instance.bending_x))
-                and isinstance(bending_x, SensorTimeSeries)
-            ):
-                instance.bending_x = bending_x
-            if (
-                isinstance(instance.bending_y, dm.NodeId | str)
-                and (bending_y := nodes_by_id.get(instance.bending_y))
-                and isinstance(bending_y, SensorTimeSeries)
-            ):
-                instance.bending_y = bending_y
-            if (
-                isinstance(instance.calculated_tilt_moment, dm.NodeId | str)
-                and (calculated_tilt_moment := nodes_by_id.get(instance.calculated_tilt_moment))
-                and isinstance(calculated_tilt_moment, SensorTimeSeries)
-            ):
-                instance.calculated_tilt_moment = calculated_tilt_moment
-            if (
-                isinstance(instance.calculated_yaw_moment, dm.NodeId | str)
-                and (calculated_yaw_moment := nodes_by_id.get(instance.calculated_yaw_moment))
-                and isinstance(calculated_yaw_moment, SensorTimeSeries)
-            ):
-                instance.calculated_yaw_moment = calculated_yaw_moment
-            if (
-                isinstance(instance.torque, dm.NodeId | str)
-                and (torque := nodes_by_id.get(instance.torque))
-                and isinstance(torque, SensorTimeSeries)
-            ):
-                instance.torque = torque
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.generator is not None
-                and (generator := instances.get(as_pygen_node_id(node.generator)))
-            ):
-                if generator.nacelle is None:
-                    generator.nacelle = node
-                elif are_nodes_equal(node, generator.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {generator.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {generator.nacelle!s}.",
-                        stacklevel=2,
-                    )
 
 
 class MainShaftWrite(DomainModelWrite):
@@ -691,6 +641,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -705,6 +656,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -720,6 +672,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="outwards",
                 ),
                 connection_name="bending_x",
+                connection_property=ViewPropertyId(self._view_id, "bending_x"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -733,6 +686,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="outwards",
                 ),
                 connection_name="bending_y",
+                connection_property=ViewPropertyId(self._view_id, "bending_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -746,6 +700,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="outwards",
                 ),
                 connection_name="calculated_tilt_moment",
+                connection_property=ViewPropertyId(self._view_id, "calculated_tilt_moment"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -759,6 +714,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="outwards",
                 ),
                 connection_name="calculated_yaw_moment",
+                connection_property=ViewPropertyId(self._view_id, "calculated_yaw_moment"),
             )
 
         if _NacelleQuery not in created_types:
@@ -772,6 +728,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -785,6 +742,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                     direction="outwards",
                 ),
                 connection_name="torque",
+                connection_property=ViewPropertyId(self._view_id, "torque"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

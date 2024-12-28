@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -186,6 +188,11 @@ class CogniteAssetType(CogniteDescribableNode):
     code: Optional[str] = None
     standard: Optional[str] = None
 
+    @field_validator("asset_class", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteAssetTypeWrite:
@@ -211,23 +218,6 @@ class CogniteAssetType(CogniteDescribableNode):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteAssetType],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_asset_class import CogniteAssetClass
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.asset_class, dm.NodeId | str)
-                and (asset_class := nodes_by_id.get(instance.asset_class))
-                and isinstance(asset_class, CogniteAssetClass)
-            ):
-                instance.asset_class = asset_class
 
 
 class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
@@ -467,6 +457,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -480,6 +471,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -495,6 +487,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
                     direction="outwards",
                 ),
                 connection_name="asset_class",
+                connection_property=ViewPropertyId(self._view_id, "assetClass"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

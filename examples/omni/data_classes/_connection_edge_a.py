@@ -34,6 +34,7 @@ from omni.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
     TimestampFilter,
 )
 from omni.data_classes._connection_item_f import ConnectionItemFWrite
@@ -435,12 +436,22 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         from ._connection_item_e import _ConnectionItemEQuery
         from ._connection_item_f import _ConnectionItemFQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -448,6 +459,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

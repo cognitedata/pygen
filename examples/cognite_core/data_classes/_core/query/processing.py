@@ -1,7 +1,7 @@
 import warnings
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
-from typing import Any
+from typing import Any, Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
@@ -127,14 +127,21 @@ class QueryUnpacker:
 
     Args:
         steps: The steps of the query to unpack.
-        unpack_edges: If True, all edges are unpacked and included in the result. If False, only
-            edges with properties are included in the result. Default is True. See example below.
+        edges: Whether to skip, include identifier, or include the full edges in the unpacking. Note that
+            this is only for edges without properties. If the edge has properties, they are always included.
+            See example below for more information.
+        as_data_record: If True, the created time/last updated time properties are in a nested dictionary
+            called "data_record". Default is False.
+        edge_type_key: The key to use for the edge type. Default is "type". In pygen generated SDKs, this is set
+            to 'edge_type'.
+        node_type_key: The key to use for the node type. Default is "type". In pygen generated SDKs, this is set
+            to 'node_type'.
 
     Example:
-        Unpacking query steps with edges:
+        Unpacking query steps including edges:
 
         ```python
-        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        result = QueryUnpacker(steps, edges="include").unpack()
         print(result)
         [{
             "name": "Node A",
@@ -149,10 +156,25 @@ class QueryUnpacker:
          }]
         ```
 
-        Unpacking query steps with edges, but skipping the edges:
+        Unpacking query steps, including edge identifiers:
 
         ```python
-        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        result = QueryUnpacker(steps, edges="skip").unpack()
+        print(result)
+        [{
+           "name": "Node A",
+           "externalId": "A",
+           "outwards": [{
+               "space": "space",
+               "externalId": "B"
+           }]
+        }]
+        ```
+
+        Unpacking query steps, but skipping the edges:
+
+        ```python
+        result = QueryUnpacker(steps, edges="skip").unpack()
         print(result)
         [{
            "name": "Node A",
@@ -166,10 +188,19 @@ class QueryUnpacker:
 
     """
 
-    def __init__(self, steps: Sequence[QueryStep], unpack_edges: bool = True, as_data_record: bool = False) -> None:
+    def __init__(
+        self,
+        steps: Sequence[QueryStep],
+        edges: Literal["skip", "identifier", "include"] = "skip",
+        as_data_record: bool = True,
+        edge_type_key: str = "edge_type",
+        node_type_key: str = "node_type",
+    ) -> None:
         self._steps = steps
-        self._unpack_edges = unpack_edges
+        self._edges = edges
         self._as_data_record = as_data_record
+        self._edge_type_key = edge_type_key
+        self._node_type_key = node_type_key
 
     def unpack(self) -> list[dict[str, Any]]:
         # The unpacked nodes/edges are stored in the dictionary below
@@ -208,6 +239,7 @@ class QueryUnpacker:
         selected_properties: set[str] | None,
         direct_property: str | None = None,
         as_data_record: bool = False,
+        type_key: str = "type",
     ) -> dict[str, Any]:
         """Dumps the node/edge into a flat dictionary.
 
@@ -218,6 +250,7 @@ class QueryUnpacker:
                 of this property will be converted to a NodeId or a list of NodeIds. The motivation for this is
                 to be able to easily connect this node/edge to other nodes/edges in the result set.
             as_data_record: If True, node properties are dumped as data records. Default is False.
+            type_key: The key to use for the type. Default is "type".
 
         Returns:
             A dictionary with the properties of the node or edge
@@ -225,6 +258,9 @@ class QueryUnpacker:
         """
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
+        if "type" in dumped:
+            dumped[type_key] = dumped.pop("type")
+
         item: dict[str, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
@@ -264,7 +300,9 @@ class QueryUnpacker:
         unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
-            dumped = self.flatten_dump(node, step_properties, direct_property, self._as_data_record)
+            dumped = self.flatten_dump(
+                node, step_properties, direct_property, self._as_data_record, self._node_type_key
+            )
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
@@ -297,12 +335,6 @@ class QueryUnpacker:
                                     stacklevel=2,
                                 )
                                 dumped[connection_property].append(item)
-                else:
-                    warnings.warn(
-                        f"Property {connection_property!r} not found {node_id!r}. Expected to be in {dumped.keys()}",
-                        UserWarning,
-                        stacklevel=2,
-                    )
 
             if direct_property is None:
                 unpacked_by_source[node_id].append(dumped)
@@ -332,19 +364,26 @@ class QueryUnpacker:
             else:
                 source_node = end_node
                 target_node = start_node
-
-            if self._unpack_edges or bool(edge.properties):
-                dumped = self.flatten_dump(edge, step_properties, as_data_record=self._as_data_record)
+            # step.view_id means that the edge has properties
+            if self._edges == "include" or step.view_id:
+                dumped = self.flatten_dump(
+                    edge, step_properties, as_data_record=self._as_data_record, type_key=self._edge_type_key
+                )
                 for connection_property, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         dumped[connection_property] = node_targets_by_source[target_node]
 
                 unpacked_by_source[source_node].append(dumped)
-            else:
+            elif self._edges == "identifier":
+                dumped = edge.as_id().dump(include_instance_type=False)
+                unpacked_by_source[source_node].append(dumped)
+            elif self._edges == "skip":
                 for _, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         # Skipping the edge, instead adding the target node to the source node
                         # such that the target node(s) can be connected to the source node.
                         unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
+            else:
+                raise ValueError(f"Unexpected value for edges: {self._edges}")
 
         return unpacked_by_source

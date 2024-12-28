@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -176,6 +178,11 @@ class Gearbox(DomainModel):
     displacement_z: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
 
+    @field_validator("displacement_x", "displacement_y", "displacement_z", "nacelle", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> GearboxWrite:
@@ -203,53 +210,6 @@ class Gearbox(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Gearbox],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.displacement_x, dm.NodeId | str)
-                and (displacement_x := nodes_by_id.get(instance.displacement_x))
-                and isinstance(displacement_x, SensorTimeSeries)
-            ):
-                instance.displacement_x = displacement_x
-            if (
-                isinstance(instance.displacement_y, dm.NodeId | str)
-                and (displacement_y := nodes_by_id.get(instance.displacement_y))
-                and isinstance(displacement_y, SensorTimeSeries)
-            ):
-                instance.displacement_y = displacement_y
-            if (
-                isinstance(instance.displacement_z, dm.NodeId | str)
-                and (displacement_z := nodes_by_id.get(instance.displacement_z))
-                and isinstance(displacement_z, SensorTimeSeries)
-            ):
-                instance.displacement_z = displacement_z
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.gearbox is not None
-                and (gearbox := instances.get(as_pygen_node_id(node.gearbox)))
-            ):
-                if gearbox.nacelle is None:
-                    gearbox.nacelle = node
-                elif are_nodes_equal(node, gearbox.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {gearbox.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}.",
-                        stacklevel=2,
-                    )
 
 
 class GearboxWrite(DomainModelWrite):
@@ -546,6 +506,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -560,6 +521,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -575,6 +537,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                     direction="outwards",
                 ),
                 connection_name="displacement_x",
+                connection_property=ViewPropertyId(self._view_id, "displacement_x"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -588,6 +551,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                     direction="outwards",
                 ),
                 connection_name="displacement_y",
+                connection_property=ViewPropertyId(self._view_id, "displacement_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -601,6 +565,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                     direction="outwards",
                 ),
                 connection_name="displacement_z",
+                connection_property=ViewPropertyId(self._view_id, "displacement_z"),
             )
 
         if _NacelleQuery not in created_types:
@@ -614,6 +579,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

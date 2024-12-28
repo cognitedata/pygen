@@ -21,10 +21,11 @@ from wind_turbine.data_classes import (
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from wind_turbine._api._core import (
     QueryAPI,
@@ -32,27 +33,31 @@ from wind_turbine._api._core import (
 )
 
 
-class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
+class SensorPositionQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_power", "SensorPosition", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=SensorPosition,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -126,7 +131,7 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_blade(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -134,13 +139,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Blade._view_id]),
                 ),
-                result_cls=Blade,
+                view_id=Blade._view_id,
+                connection_property=ViewPropertyId(self._view_id, "blade"),
             ),
         )
 
     def _query_append_edgewise_bend_mom_crosstalk_corrected(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -148,13 +154,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_crosstalk_corrected"),
             ),
         )
 
     def _query_append_edgewise_bend_mom_offset(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -162,13 +169,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset"),
             ),
         )
 
     def _query_append_edgewise_bend_mom_offset_crosstalk_corrected(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -176,13 +184,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset_crosstalk_corrected"),
             ),
         )
 
     def _query_append_edgewisewise_bend_mom(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -190,13 +199,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "edgewisewise_bend_mom"),
             ),
         )
 
     def _query_append_flapwise_bend_mom(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -204,13 +214,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom"),
             ),
         )
 
     def _query_append_flapwise_bend_mom_crosstalk_corrected(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -218,13 +229,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_crosstalk_corrected"),
             ),
         )
 
     def _query_append_flapwise_bend_mom_offset(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -232,13 +244,14 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset"),
             ),
         )
 
     def _query_append_flapwise_bend_mom_offset_crosstalk_corrected(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -246,6 +259,7 @@ class SensorPositionQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
                 ),
-                result_cls=SensorTimeSeries,
+                view_id=SensorTimeSeries._view_id,
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset_crosstalk_corrected"),
             ),
         )

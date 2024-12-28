@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -173,6 +175,11 @@ class SolarPanel(GeneratingUnit):
     efficiency: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     orientation: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator("efficiency", "orientation", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> SolarPanelWrite:
@@ -196,29 +203,6 @@ class SolarPanel(GeneratingUnit):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, SolarPanel],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.efficiency, dm.NodeId | str)
-                and (efficiency := nodes_by_id.get(instance.efficiency))
-                and isinstance(efficiency, SensorTimeSeries)
-            ):
-                instance.efficiency = efficiency
-            if (
-                isinstance(instance.orientation, dm.NodeId | str)
-                and (orientation := nodes_by_id.get(instance.orientation))
-                and isinstance(orientation, SensorTimeSeries)
-            ):
-                instance.orientation = orientation
 
 
 class SolarPanelWrite(GeneratingUnitWrite):
@@ -481,6 +465,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -494,6 +479,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -509,6 +495,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                     direction="outwards",
                 ),
                 connection_name="efficiency",
+                connection_property=ViewPropertyId(self._view_id, "efficiency"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -522,6 +509,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                     direction="outwards",
                 ),
                 connection_name="orientation",
+                connection_property=ViewPropertyId(self._view_id, "orientation"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

@@ -235,6 +235,17 @@ class BaseConnectionField(Field, ABC):
         )
 
     @property
+    def through_object_str(self) -> str:
+        """Returns the through property as a string."""
+        if self.through is None:
+            raise ValueError("Bug in Pygen: Missing through property")
+        view_id = cast(dm.ViewId, self.through.source)
+        return (
+            f'dm.PropertyId(dm.ViewId("{view_id.space}", "{view_id.external_id}", "{view_id.version}"), '
+            f'"{self.through.property}")'
+        )
+
+    @property
     def is_one_to_many(self) -> bool:
         """Returns True if the connection is a one-to-many connection."""
         raise NotImplementedError()

@@ -12,10 +12,11 @@ from omni.data_classes import (
 )
 from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from omni.data_classes._implementation_1_non_writeable import (
     _create_implementation_1_non_writeable_filter,
@@ -29,27 +30,31 @@ if TYPE_CHECKING:
     from omni._api.implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
-class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
+class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=DependentOnNonWritable,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -67,7 +72,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> Implementation1NonWriteableQueryAPI[T_DomainModelList]:
+    ) -> Implementation1NonWriteableQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the to non writable edges of the dependent on non writable.
 
         Args:
@@ -99,7 +104,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -107,12 +112,13 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                 ),
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "toNonWritable"),
             )
         )
 
         view_id = Implementation1NonWriteableQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_implementation_1_non_writeable_filter(
+        node_filter = _create_implementation_1_non_writeable_filter(
             view_id,
             main_value,
             main_value_prefix,
@@ -124,7 +130,15 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return Implementation1NonWriteableQueryAPI(self._client, self._builder, node_filer, limit)
+        return Implementation1NonWriteableQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def query(
         self,

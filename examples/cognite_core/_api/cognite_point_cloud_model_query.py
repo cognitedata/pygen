@@ -13,10 +13,11 @@ from cognite_core.data_classes import (
 )
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from cognite_core._api._core import (
     QueryAPI,
@@ -24,27 +25,31 @@ from cognite_core._api._core import (
 )
 
 
-class CognitePointCloudModelQueryAPI(QueryAPI[T_DomainModelList]):
+class CognitePointCloudModelQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("cdf_cdm", "CognitePointCloudModel", "v1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=CognitePointCloudModel,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -70,7 +75,7 @@ class CognitePointCloudModelQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_thumbnail(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -78,6 +83,7 @@ class CognitePointCloudModelQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteFile._view_id]),
                 ),
-                result_cls=CogniteFile,
+                view_id=CogniteFile._view_id,
+                connection_property=ViewPropertyId(self._view_id, "thumbnail"),
             ),
         )

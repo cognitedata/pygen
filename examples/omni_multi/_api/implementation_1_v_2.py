@@ -16,9 +16,10 @@ from omni_multi._api._core import (
 )
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni_multi.data_classes._implementation_1_v_2 import (
     Implementation1v2Query,
@@ -64,7 +65,7 @@ class Implementation1v2API(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Implementation1v2QueryAPI[Implementation1v2List]:
+    ) -> Implementation1v2QueryAPI[Implementation1v2, Implementation1v2List]:
         """Query starting at implementation 1 v 2.
 
         Args:
@@ -103,8 +104,9 @@ class Implementation1v2API(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Implementation1v2List)
-        return Implementation1v2QueryAPI(self._client, builder, filter_, limit)
+        return Implementation1v2QueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -574,7 +576,6 @@ class Implementation1v2API(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

@@ -32,6 +32,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from wind_turbine.data_classes._wind_turbine import WindTurbineWrite
@@ -377,11 +378,21 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         from ._metmast import _MetmastQuery
         from ._wind_turbine import _WindTurbineQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -389,6 +400,7 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

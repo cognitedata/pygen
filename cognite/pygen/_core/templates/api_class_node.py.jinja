@@ -26,9 +26,10 @@ from {{ top_level_package }}.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     {% endif %}
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.query_cls_name }},
@@ -112,7 +113,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% endfor %}
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> {{ query_api.name }}[{{ data_class.read_list_name }}]:
+    ) -> {{ query_api.name }}[{{ data_class.read_name }}, {{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
 
         Args:
@@ -142,8 +143,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder({{ data_class.read_list_name }})
-        return {{ query_api.name }}(self._client, builder, filter_, limit)
+        return {{ query_api.name }}(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
 {% if data_class.is_writable %}
     def apply(
@@ -595,7 +597,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
             filter,
         )
-
 {% if data_class.has_connection_with_target %}
         if retrieve_connections == "skip":
             return self._list(
@@ -608,106 +609,83 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 {% endif %}
             )
 
-        builder = DataClassQueryBuilder({{ data_class.read_list_name }})
-        {% if data_class.has_container_fields %}
-        has_data = dm.filters.HasData(views=[self._view_id])
-        {% endif %}
-        builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    {% if data_class.has_container_fields %}
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    {% else %}
-                    filter=filter_,
-                    {% endif %}
-                    {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                    {% endif %}
-                ),
-                {{ data_class.read_name }},
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
-            )
-        )
-        from_root = builder.get_from()
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(factory.root(
+            filter=filter_,
+            {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            {% endif %}
+            limit=limit,
+            {% if data_class.has_container_fields %}
+            has_container_fields=True,
+            {% else %}
+            has_container_fields=False,
+            {% endif %}
+        ))
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
         {% if field.is_edge %}
-        edge_{{ field.name }} = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_{{ field.name }},
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="{{ field.edge_direction}}",
-                    chain_to="destination",
-                ),
-                {% if field.is_edge_with_properties %}
-                {{ field.edge_class.read_name }},
+        builder.extend(
+            factory.from_edge(
+                {{field.destination_class.read_name }}._view_id,
+                "{{ field.edge_direction}}",
+                ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                include_end_node=retrieve_connections == "full",
+                {% if field.destination_class.has_container_fields %}
+                has_container_fields=True,
+                {% else %}
+                has_container_fields=False,
+                {% endif %}
+                {% if field.edge_class %}
+                edge_view={{ field.edge_class.read_name }}._view_id,
                 {% endif %}
             )
         )
         {% endif %}
         {% endfor %}
+{% if data_class.has_direct_or_reverse_relation_with_target %}
         if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
-            {% if field.is_edge %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name( edge_{{ field.name }}),
-                    dm.query.NodeResultSetExpression(
-                        from_= edge_{{ field.name }},
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{ field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                    ),
-                    {{ field.destination_class.read_name }},
-                )
-            )
-            {% endif %}
-            {% endfor %}
-            {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_reverse_direct_relation %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                        direction="inwards",
-                        through={{field.destination_class.read_name }}._view_id.as_property_ref("{{ field.reverse_property.prop_name }}"),
-                    ),
-                    {{field.destination_class.read_name }},
-                    {% if field.reverse_property.is_one_to_many %}
-                    connection_type="reverse-list",
-                    {% endif %}
+            builder.extend(
+            factory.from_reverse_relation(
+                {{field.destination_class.read_name }}._view_id,
+                through={{ field.through_object_str }},
+                {% if field.reverse_property.is_one_to_many %}
+                connection_type="reverse-list",
+                {% else %}
+                connection_type=None,
+                {% endif %}
+                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                {% if field.destination_class.has_container_fields %}
+                has_container_fields=True,
+                {% else %}
+                has_container_fields=False,
+                {% endif %}
                 )
             )
             {% endif %}
             {% endfor %}
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_direct_relation and field.destination_class %}
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        {% if field.destination_class.has_container_fields %}
-                        filter=dm.filters.HasData(views=[{{field.destination_class.read_name }}._view_id]),
-                        {% endif %}
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("{{ field.prop_name }}"),
-                    ),
-                    {{field.destination_class.read_name }},
+            builder.extend(
+                factory.from_direct_relation(
+                    {{field.destination_class.read_name }}._view_id,
+                    ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                    {% if field.destination_class.has_container_fields %}
+                    has_container_fields=True,
+                    {% else %}
+                    has_container_fields=False,
+                    {% endif %}
                 )
             )
             {% endif %}
             {% endfor %}
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+{% endif %}
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return {{ data_class.read_list_name }}([{{ data_class.read_name }}.model_validate(item) for item in unpacked])
         {% else %}
         return self._list(
             limit=limit,

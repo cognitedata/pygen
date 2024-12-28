@@ -13,10 +13,11 @@ from wind_turbine.data_classes import (
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from wind_turbine.data_classes._wind_turbine import (
     _create_wind_turbine_filter,
@@ -34,27 +35,31 @@ if TYPE_CHECKING:
     from wind_turbine._api.wind_turbine_query import WindTurbineQueryAPI
 
 
-class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
+class MetmastQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_power", "Metmast", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=Metmast,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -108,7 +113,7 @@ class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> WindTurbineQueryAPI[T_DomainModelList]:
+    ) -> WindTurbineQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the wind turbine edges of the metmast.
 
         Args:
@@ -152,21 +157,22 @@ class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="inwards",
                 ),
-                result_cls=Distance,
+                view_id=Distance._view_id,
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "wind_turbines"),
             )
         )
 
         view_id = WindTurbineQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_wind_turbine_filter(
+        node_filter = _create_wind_turbine_filter(
             view_id,
             blades,
             min_capacity,
@@ -184,7 +190,15 @@ class MetmastQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return WindTurbineQueryAPI(self._client, self._builder, node_filer, limit)
+        return WindTurbineQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def query(
         self,

@@ -17,9 +17,10 @@ from omni._api._core import (
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._implementation_1_non_writeable import (
     Implementation1NonWriteableQuery,
@@ -60,7 +61,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Implementation1NonWriteableQueryAPI[Implementation1NonWriteableList]:
+    ) -> Implementation1NonWriteableQueryAPI[Implementation1NonWriteable, Implementation1NonWriteableList]:
         """Query starting at implementation 1 non writeables.
 
         Args:
@@ -99,8 +100,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Implementation1NonWriteableList)
-        return Implementation1NonWriteableQueryAPI(self._client, builder, filter_, limit)
+        return Implementation1NonWriteableQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
@@ -540,7 +542,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

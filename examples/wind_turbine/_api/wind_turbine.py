@@ -17,9 +17,10 @@ from wind_turbine._api._core import (
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._wind_turbine import (
     WindTurbineQuery,
@@ -109,7 +110,7 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> WindTurbineQueryAPI[WindTurbineList]:
+    ) -> WindTurbineQueryAPI[WindTurbine, WindTurbineList]:
         """Query starting at wind turbines.
 
         Args:
@@ -160,8 +161,9 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(WindTurbineList)
-        return WindTurbineQueryAPI(self._client, builder, filter_, limit)
+        return WindTurbineQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -938,7 +940,6 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -948,92 +949,56 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(WindTurbineList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                WindTurbine,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
-        edge_metmast = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_metmast,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
-                Distance,
+        builder.extend(
+            factory.from_edge(
+                Metmast._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "metmast"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+                edge_view=Distance._view_id,
             )
         )
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_metmast),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_metmast,
-                        filter=dm.filters.HasData(views=[Metmast._view_id]),
-                    ),
-                    Metmast,
+            builder.extend(
+                factory.from_direct_relation(
+                    Blade._view_id,
+                    ViewPropertyId(self._view_id, "blades"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Blade._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("blades"),
-                    ),
-                    Blade,
+            builder.extend(
+                factory.from_direct_relation(
+                    DataSheet._view_id,
+                    ViewPropertyId(self._view_id, "datasheets"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[DataSheet._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("datasheets"),
-                    ),
-                    DataSheet,
+            builder.extend(
+                factory.from_direct_relation(
+                    Nacelle._view_id,
+                    ViewPropertyId(self._view_id, "nacelle"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Nacelle._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("nacelle"),
-                    ),
-                    Nacelle,
+            builder.extend(
+                factory.from_direct_relation(
+                    Rotor._view_id,
+                    ViewPropertyId(self._view_id, "rotor"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Rotor._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("rotor"),
-                    ),
-                    Rotor,
-                )
-            )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return WindTurbineList([WindTurbine.model_validate(item) for item in unpacked])

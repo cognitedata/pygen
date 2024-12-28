@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -176,6 +178,11 @@ class CogniteCubeMap(DomainModel):
     right: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     top: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator("back", "bottom", "front", "left", "right", "top", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteCubeMapWrite:
@@ -200,53 +207,6 @@ class CogniteCubeMap(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteCubeMap],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_file import CogniteFile
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.back, dm.NodeId | str)
-                and (back := nodes_by_id.get(instance.back))
-                and isinstance(back, CogniteFile)
-            ):
-                instance.back = back
-            if (
-                isinstance(instance.bottom, dm.NodeId | str)
-                and (bottom := nodes_by_id.get(instance.bottom))
-                and isinstance(bottom, CogniteFile)
-            ):
-                instance.bottom = bottom
-            if (
-                isinstance(instance.front, dm.NodeId | str)
-                and (front := nodes_by_id.get(instance.front))
-                and isinstance(front, CogniteFile)
-            ):
-                instance.front = front
-            if (
-                isinstance(instance.left, dm.NodeId | str)
-                and (left := nodes_by_id.get(instance.left))
-                and isinstance(left, CogniteFile)
-            ):
-                instance.left = left
-            if (
-                isinstance(instance.right, dm.NodeId | str)
-                and (right := nodes_by_id.get(instance.right))
-                and isinstance(right, CogniteFile)
-            ):
-                instance.right = right
-            if (
-                isinstance(instance.top, dm.NodeId | str)
-                and (top := nodes_by_id.get(instance.top))
-                and isinstance(top, CogniteFile)
-            ):
-                instance.top = top
 
 
 class CogniteCubeMapWrite(DomainModelWrite):
@@ -606,6 +566,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -619,6 +580,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -634,6 +596,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="back",
+                connection_property=ViewPropertyId(self._view_id, "back"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -647,6 +610,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="bottom",
+                connection_property=ViewPropertyId(self._view_id, "bottom"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -660,6 +624,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="front",
+                connection_property=ViewPropertyId(self._view_id, "front"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -673,6 +638,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="left",
+                connection_property=ViewPropertyId(self._view_id, "left"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -686,6 +652,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="right",
+                connection_property=ViewPropertyId(self._view_id, "right"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -699,6 +666,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="top",
+                connection_property=ViewPropertyId(self._view_id, "top"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

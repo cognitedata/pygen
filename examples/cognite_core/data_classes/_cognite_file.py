@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -32,9 +32,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
     TimestampFilter,
 )
@@ -314,6 +316,18 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
     mime_type: Optional[str] = Field(None, alias="mimeType")
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
+    @field_validator("category", "source", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("assets", "equipment", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteFileWrite:
@@ -351,50 +365,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteFile],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_equipment import CogniteEquipment
-        from ._cognite_file_category import CogniteFileCategory
-        from ._cognite_source_system import CogniteSourceSystem
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.category, dm.NodeId | str)
-                and (category := nodes_by_id.get(instance.category))
-                and isinstance(category, CogniteFileCategory)
-            ):
-                instance.category = category
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-            if instance.assets:
-                new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for asset in instance.assets:
-                    if isinstance(asset, CogniteAsset):
-                        new_assets.append(asset)
-                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
-                        new_assets.append(other)
-                    else:
-                        new_assets.append(asset)
-                instance.assets = new_assets
-        for node in nodes_by_id.values():
-            if isinstance(node, CogniteEquipment) and node.files is not None:
-                for files in node.files:
-                    if this_instance := instances.get(as_pygen_node_id(files)):
-                        if this_instance.equipment is None:
-                            this_instance.equipment = [node]
-                        else:
-                            this_instance.equipment.append(node)
 
 
 class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
@@ -822,6 +792,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -838,6 +809,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -853,6 +825,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="assets",
+                connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
         if _CogniteFileCategoryQuery not in created_types:
@@ -866,6 +839,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="category",
+                connection_property=ViewPropertyId(self._view_id, "category"),
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -879,6 +853,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="inwards",
                 ),
                 connection_name="equipment",
+                connection_property=ViewPropertyId(self._view_id, "equipment"),
                 connection_type="reverse-list",
             )
 
@@ -893,6 +868,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

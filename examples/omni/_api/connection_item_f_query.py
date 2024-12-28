@@ -13,10 +13,11 @@ from omni.data_classes import (
 )
 from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from omni.data_classes._connection_item_g import (
     _create_connection_item_g_filter,
@@ -38,27 +39,31 @@ if TYPE_CHECKING:
     from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
 
 
-class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
+class ConnectionItemFQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=ConnectionItemF,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -78,7 +83,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemGQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemGQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outwards multi edges of the connection item f.
 
         Args:
@@ -120,21 +125,22 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls=ConnectionEdgeA,
+                view_id=ConnectionEdgeA._view_id,
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "outwardsMulti"),
             )
         )
 
         view_id = ConnectionItemGQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_g_filter(
+        node_filter = _create_connection_item_g_filter(
             view_id,
             name,
             name_prefix,
@@ -142,7 +148,15 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemGQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemGQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def outwards_single(
         self,
@@ -176,7 +190,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemEQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemEQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outwards single edges of the connection item f.
 
         Args:
@@ -220,21 +234,22 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls=ConnectionEdgeA,
+                view_id=ConnectionEdgeA._view_id,
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "outwardsSingle"),
             )
         )
 
         view_id = ConnectionItemEQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_e_filter(
+        node_filter = _create_connection_item_e_filter(
             view_id,
             direct_list_no_source,
             direct_no_source,
@@ -244,7 +259,15 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemEQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemEQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def query(
         self,

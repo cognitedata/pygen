@@ -17,9 +17,10 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_file_category import (
     CogniteFileCategoryQuery,
@@ -69,7 +70,7 @@ class CogniteFileCategoryAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CogniteFileCategoryQueryAPI[CogniteFileCategoryList]:
+    ) -> CogniteFileCategoryQueryAPI[CogniteFileCategory, CogniteFileCategoryList]:
         """Query starting at Cognite file categories.
 
         Args:
@@ -116,8 +117,9 @@ class CogniteFileCategoryAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(CogniteFileCategoryList)
-        return CogniteFileCategoryQueryAPI(self._client, builder, filter_, limit)
+        return CogniteFileCategoryQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -651,7 +653,6 @@ class CogniteFileCategoryAPI(
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

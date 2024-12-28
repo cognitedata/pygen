@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
@@ -29,9 +29,11 @@ from omni_sub.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -179,6 +181,18 @@ class ConnectionItemA(DomainModel):
     outwards: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
 
+    @field_validator("other_direct", "self_direct", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("outwards", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
@@ -207,56 +221,6 @@ class ConnectionItemA(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId, ConnectionItemA],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._connection_item_b import ConnectionItemB
-        from ._connection_item_c_node import ConnectionItemCNode
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.other_direct, dm.NodeId)
-                and (other_direct := nodes_by_id.get(instance.other_direct))
-                and isinstance(other_direct, ConnectionItemCNode)
-            ):
-                instance.other_direct = other_direct
-            if (
-                isinstance(instance.self_direct, dm.NodeId)
-                and (self_direct := nodes_by_id.get(instance.self_direct))
-                and isinstance(self_direct, ConnectionItemA)
-            ):
-                instance.self_direct = self_direct
-            if edges := edges_by_source_node.get(instance.as_id()):
-                outwards: list[ConnectionItemB | dm.NodeId] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId = as_node_id(other_end)
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectional") and isinstance(
-                        value, ConnectionItemB | dm.NodeId
-                    ):
-                        outwards.append(value)
-
-                instance.outwards = outwards or None
 
 
 class ConnectionItemAWrite(DomainModelWrite):
@@ -531,6 +495,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -545,6 +510,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -560,6 +526,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     direction="outwards",
                 ),
                 connection_name="other_direct",
+                connection_property=ViewPropertyId(self._view_id, "otherDirect"),
             )
 
         if _ConnectionItemBQuery not in created_types:
@@ -573,6 +540,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     chain_to="destination",
                 ),
                 connection_name="outwards",
+                connection_property=ViewPropertyId(self._view_id, "outwards"),
             )
 
         if _ConnectionItemAQuery not in created_types:
@@ -586,6 +554,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     direction="outwards",
                 ),
                 connection_name="self_direct",
+                connection_property=ViewPropertyId(self._view_id, "selfDirect"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

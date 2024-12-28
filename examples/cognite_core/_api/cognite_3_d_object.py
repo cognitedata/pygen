@@ -17,9 +17,10 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_3_d_object import (
     Cognite3DObjectQuery,
@@ -84,7 +85,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Cognite3DObjectQueryAPI[Cognite3DObjectList]:
+    ) -> Cognite3DObjectQueryAPI[Cognite3DObject, Cognite3DObjectList]:
         """Query starting at Cognite 3D objects.
 
         Args:
@@ -143,8 +144,9 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Cognite3DObjectList)
-        return Cognite3DObjectQueryAPI(self._client, builder, filter_, limit)
+        return Cognite3DObjectQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -785,7 +787,6 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -795,80 +796,55 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(Cognite3DObjectList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Cognite3DObject,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
-        edge_images_360 = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_images_360,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
-                Cognite360ImageAnnotation,
+        builder.extend(
+            factory.from_edge(
+                Cognite360Image._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "images360"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+                edge_view=Cognite360ImageAnnotation._view_id,
             )
         )
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_images_360),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_images_360,
-                        filter=dm.filters.HasData(views=[Cognite360Image._view_id]),
-                    ),
-                    Cognite360Image,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteAsset._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "asset"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
-                        direction="inwards",
-                        through=CogniteAsset._view_id.as_property_ref("object3D"),
-                    ),
-                    CogniteAsset,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteCADNode._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADNode", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "cadNodes"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CogniteCADNode._view_id]),
-                        direction="inwards",
-                        through=CogniteCADNode._view_id.as_property_ref("object3D"),
-                    ),
-                    CogniteCADNode,
+            builder.extend(
+                factory.from_reverse_relation(
+                    CognitePointCloudVolume._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[CognitePointCloudVolume._view_id]),
-                        direction="inwards",
-                        through=CognitePointCloudVolume._view_id.as_property_ref("object3D"),
-                    ),
-                    CognitePointCloudVolume,
-                )
-            )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return Cognite3DObjectList([Cognite3DObject.model_validate(item) for item in unpacked])

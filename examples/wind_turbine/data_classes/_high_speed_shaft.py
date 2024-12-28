@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -180,6 +182,11 @@ class HighSpeedShaft(DomainModel):
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
     torque: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
 
+    @field_validator("bending_moment_y", "bending_monent_x", "nacelle", "torque", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> HighSpeedShaftWrite:
@@ -209,53 +216,6 @@ class HighSpeedShaft(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, HighSpeedShaft],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.bending_moment_y, dm.NodeId | str)
-                and (bending_moment_y := nodes_by_id.get(instance.bending_moment_y))
-                and isinstance(bending_moment_y, SensorTimeSeries)
-            ):
-                instance.bending_moment_y = bending_moment_y
-            if (
-                isinstance(instance.bending_monent_x, dm.NodeId | str)
-                and (bending_monent_x := nodes_by_id.get(instance.bending_monent_x))
-                and isinstance(bending_monent_x, SensorTimeSeries)
-            ):
-                instance.bending_monent_x = bending_monent_x
-            if (
-                isinstance(instance.torque, dm.NodeId | str)
-                and (torque := nodes_by_id.get(instance.torque))
-                and isinstance(torque, SensorTimeSeries)
-            ):
-                instance.torque = torque
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.high_speed_shaft is not None
-                and (high_speed_shaft := instances.get(as_pygen_node_id(node.high_speed_shaft)))
-            ):
-                if high_speed_shaft.nacelle is None:
-                    high_speed_shaft.nacelle = node
-                elif are_nodes_equal(node, high_speed_shaft.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {high_speed_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}.",
-                        stacklevel=2,
-                    )
 
 
 class HighSpeedShaftWrite(DomainModelWrite):
@@ -545,6 +505,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -559,6 +520,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -574,6 +536,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="bending_moment_y",
+                connection_property=ViewPropertyId(self._view_id, "bending_moment_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -587,6 +550,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="bending_monent_x",
+                connection_property=ViewPropertyId(self._view_id, "bending_monent_x"),
             )
 
         if _NacelleQuery not in created_types:
@@ -600,6 +564,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -613,6 +578,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="torque",
+                connection_property=ViewPropertyId(self._view_id, "torque"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

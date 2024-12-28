@@ -17,9 +17,10 @@ from wind_turbine._api._core import (
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._nacelle import (
     NacelleQuery,
@@ -143,7 +144,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> NacelleQueryAPI[NacelleList]:
+    ) -> NacelleQueryAPI[Nacelle, NacelleList]:
         """Query starting at nacelles.
 
         Args:
@@ -190,8 +191,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(NacelleList)
-        return NacelleQueryAPI(self._client, builder, filter_, limit)
+        return NacelleQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,
@@ -1198,148 +1198,95 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
                 filter=filter_,
             )
 
-        builder = DataClassQueryBuilder(NacelleList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                ),
-                Nacelle,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[WindTurbine._view_id]),
-                        direction="inwards",
-                        through=WindTurbine._view_id.as_property_ref("nacelle"),
-                    ),
-                    WindTurbine,
+            builder.extend(
+                factory.from_reverse_relation(
+                    WindTurbine._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "WindTurbine", "1"), "nacelle"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("acc_from_back_side_y"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "acc_from_back_side_y"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("acc_from_back_side_z"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "acc_from_back_side_z"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Gearbox._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("gearbox"),
-                    ),
-                    Gearbox,
+            builder.extend(
+                factory.from_direct_relation(
+                    Gearbox._view_id,
+                    ViewPropertyId(self._view_id, "gearbox"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[Generator._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("generator"),
-                    ),
-                    Generator,
+            builder.extend(
+                factory.from_direct_relation(
+                    Generator._view_id,
+                    ViewPropertyId(self._view_id, "generator"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[HighSpeedShaft._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("high_speed_shaft"),
-                    ),
-                    HighSpeedShaft,
+            builder.extend(
+                factory.from_direct_relation(
+                    HighSpeedShaft._view_id,
+                    ViewPropertyId(self._view_id, "high_speed_shaft"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[MainShaft._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("main_shaft"),
-                    ),
-                    MainShaft,
+            builder.extend(
+                factory.from_direct_relation(
+                    MainShaft._view_id,
+                    ViewPropertyId(self._view_id, "main_shaft"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[PowerInverter._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("power_inverter"),
-                    ),
-                    PowerInverter,
+            builder.extend(
+                factory.from_direct_relation(
+                    PowerInverter._view_id,
+                    ViewPropertyId(self._view_id, "power_inverter"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("yaw_direction"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "yaw_direction"),
+                    has_container_fields=True,
                 )
             )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorTimeSeries._view_id]),
-                        direction="outwards",
-                        through=self._view_id.as_property_ref("yaw_error"),
-                    ),
-                    SensorTimeSeries,
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "yaw_error"),
+                    has_container_fields=True,
                 )
             )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return NacelleList([Nacelle.model_validate(item) for item in unpacked])

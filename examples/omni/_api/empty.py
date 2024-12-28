@@ -18,9 +18,10 @@ from omni._api._core import (
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni.data_classes._empty import (
     EmptyQuery,
@@ -73,7 +74,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> EmptyQueryAPI[EmptyList]:
+    ) -> EmptyQueryAPI[Empty, EmptyList]:
         """Query starting at empties.
 
         Args:
@@ -130,8 +131,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(EmptyList)
-        return EmptyQueryAPI(self._client, builder, filter_, limit)
+        return EmptyQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,
@@ -740,7 +740,6 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,

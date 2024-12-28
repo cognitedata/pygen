@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -176,6 +178,11 @@ class Generator(DomainModel):
     )
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
 
+    @field_validator("generator_speed_controller", "generator_speed_controller_reference", "nacelle", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> GeneratorWrite:
@@ -204,51 +211,6 @@ class Generator(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Generator],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.generator_speed_controller, dm.NodeId | str)
-                and (generator_speed_controller := nodes_by_id.get(instance.generator_speed_controller))
-                and isinstance(generator_speed_controller, SensorTimeSeries)
-            ):
-                instance.generator_speed_controller = generator_speed_controller
-            if (
-                isinstance(instance.generator_speed_controller_reference, dm.NodeId | str)
-                and (
-                    generator_speed_controller_reference := nodes_by_id.get(
-                        instance.generator_speed_controller_reference
-                    )
-                )
-                and isinstance(generator_speed_controller_reference, SensorTimeSeries)
-            ):
-                instance.generator_speed_controller_reference = generator_speed_controller_reference
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.main_shaft is not None
-                and (main_shaft := instances.get(as_pygen_node_id(node.main_shaft)))
-            ):
-                if main_shaft.nacelle is None:
-                    main_shaft.nacelle = node
-                elif are_nodes_equal(node, main_shaft.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {main_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}.",
-                        stacklevel=2,
-                    )
 
 
 class GeneratorWrite(DomainModelWrite):
@@ -534,6 +496,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -548,6 +511,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -563,6 +527,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="outwards",
                 ),
                 connection_name="generator_speed_controller",
+                connection_property=ViewPropertyId(self._view_id, "generator_speed_controller"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -576,6 +541,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="outwards",
                 ),
                 connection_name="generator_speed_controller_reference",
+                connection_property=ViewPropertyId(self._view_id, "generator_speed_controller_reference"),
             )
 
         if _NacelleQuery not in created_types:
@@ -589,6 +555,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

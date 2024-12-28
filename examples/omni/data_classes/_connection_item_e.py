@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from omni.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -236,6 +238,20 @@ class ConnectionItemE(DomainModel):
     inwards_single_property: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="inwardsSingleProperty")
     name: Optional[str] = None
 
+    @field_validator(
+        "direct_no_source", "direct_reverse_single", "inwards_single", "inwards_single_property", mode="before"
+    )
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("direct_list_no_source", "direct_reverse_multi", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> ConnectionItemEWrite:
@@ -269,96 +285,6 @@ class ConnectionItemE(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, ConnectionItemE],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._connection_edge_a import ConnectionEdgeA
-        from ._connection_item_d import ConnectionItemD
-
-        for instance in instances.values():
-            if edges := edges_by_source_node.get(instance.as_id()):
-                for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle") and isinstance(
-                        value, ConnectionItemD | str | dm.NodeId
-                    ):
-                        if instance.inwards_single is None:
-                            instance.inwards_single = value
-                        elif are_nodes_equal(value, instance.inwards_single):
-                            instance.inwards_single = select_best_node(value, instance.inwards_single)
-                        else:
-                            warnings.warn(
-                                f"Expected one edge for 'inwards_single' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single!s}.",
-                                stacklevel=2,
-                            )
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "multiProperty") and isinstance(
-                        value, ConnectionEdgeA
-                    ):
-                        if instance.inwards_single_property is None:
-                            instance.inwards_single_property = value
-                        elif instance.inwards_single_property == value:
-                            # This is the same edge, so we don't need to do anything...
-                            ...
-                        else:
-                            warnings.warn(
-                                f"Expected one edge for 'inwards_single_property' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.inwards_single_property!s}.",
-                                stacklevel=2,
-                            )
-
-                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]
-
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, ConnectionItemD)
-                and node.direct_single is not None
-                and (direct_single := instances.get(as_pygen_node_id(node.direct_single)))
-            ):
-                if direct_single.direct_reverse_single is None:
-                    direct_single.direct_reverse_single = node
-                elif are_nodes_equal(node, direct_single.direct_reverse_single):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'direct_reverse_single' in {direct_single.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {direct_single.direct_reverse_single!s}.",
-                        stacklevel=2,
-                    )
-            if isinstance(node, ConnectionItemD) and node.direct_multi is not None:
-                for direct_multi in node.direct_multi:
-                    if this_instance := instances.get(as_pygen_node_id(direct_multi)):
-                        if this_instance.direct_reverse_multi is None:
-                            this_instance.direct_reverse_multi = [node]
-                        else:
-                            this_instance.direct_reverse_multi.append(node)
 
 
 class ConnectionItemEWrite(DomainModelWrite):
@@ -676,6 +602,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -691,6 +618,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -706,6 +634,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                 ),
                 connection_name="direct_reverse_multi",
+                connection_property=ViewPropertyId(self._view_id, "directReverseMulti"),
                 connection_type="reverse-list",
             )
 
@@ -720,6 +649,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                 ),
                 connection_name="direct_reverse_single",
+                connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
             )
 
         if _ConnectionItemDQuery not in created_types:
@@ -733,6 +663,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     chain_to="destination",
                 ),
                 connection_name="inwards_single",
+                connection_property=ViewPropertyId(self._view_id, "inwardsSingle"),
             )
 
         if _ConnectionEdgeAQuery not in created_types:
@@ -747,6 +678,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     chain_to="destination",
                 ),
                 connection_name="inwards_single_property",
+                connection_property=ViewPropertyId(self._view_id, "inwardsSingleProperty"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

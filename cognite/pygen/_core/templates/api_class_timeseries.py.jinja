@@ -14,7 +14,7 @@ from cognite.client.utils._time import ZoneInfo
 
 from {{ top_level_package }}._api._core import DEFAULT_LIMIT_READ
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
-from {{ top_level_package }}.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
+from {{ top_level_package }}.data_classes._core import QueryBuilder, QueryStep
 
 ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]
 
@@ -607,7 +607,7 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries_api.variable }}(
     has_property = dm.filters.Exists(property=view_id.as_property_ref("{{ timeseries_api.prop_name }}"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    builder = DataClassQueryBuilder[DomainModelList](None)
+    builder = QueryBuilder()
     builder.append(
         QueryStep(
             name="nodes",

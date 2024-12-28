@@ -16,9 +16,10 @@ from omni_sub._api._core import (
 )
 from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from omni_sub.data_classes._connection_item_c_node import (
     ConnectionItemCNodeQuery,
@@ -64,7 +65,7 @@ class ConnectionItemCNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> ConnectionItemCNodeQueryAPI[ConnectionItemCNodeList]:
+    ) -> ConnectionItemCNodeQueryAPI[ConnectionItemCNode, ConnectionItemCNodeList]:
         """Query starting at connection item c nodes.
 
         Args:
@@ -91,8 +92,9 @@ class ConnectionItemCNodeAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(ConnectionItemCNodeList)
-        return ConnectionItemCNodeQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemCNodeQueryAPI(
+            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
+        )
 
     def apply(
         self,
@@ -474,69 +476,40 @@ class ConnectionItemCNodeAPI(
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
                 filter=filter_,
             )
 
-        builder = DataClassQueryBuilder(ConnectionItemCNodeList)
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=filter_,
-                ),
-                ConnectionItemCNode,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=False,
             )
         )
-        from_root = builder.get_from()
-        edge_connection_item_a = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_connection_item_a,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemA._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "connectionItemA"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
             )
         )
-        edge_connection_item_b = builder.create_name(from_root)
-        builder.append(
-            EdgeQueryStep(
-                edge_connection_item_b,
-                dm.query.EdgeResultSetExpression(
-                    from_=from_root,
-                    direction="outwards",
-                    chain_to="destination",
-                ),
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemB._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "connectionItemB"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_connection_item_a),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_connection_item_a,
-                        filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
-                    ),
-                    ConnectionItemA,
-                )
-            )
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(edge_connection_item_b),
-                    dm.query.NodeResultSetExpression(
-                        from_=edge_connection_item_b,
-                        filter=dm.filters.HasData(views=[ConnectionItemB._view_id]),
-                    ),
-                    ConnectionItemB,
-                )
-            )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return ConnectionItemCNodeList([ConnectionItemCNode.model_validate(item) for item in unpacked])

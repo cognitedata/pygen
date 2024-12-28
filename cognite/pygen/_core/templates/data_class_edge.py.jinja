@@ -40,6 +40,7 @@ from {{ top_level_package }}.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
     {% if data_class.has_filtering_fields %}
     {{ data_class.filtering_import }}
     {% endif %}
@@ -413,6 +414,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         {% for dependency_class in data_class.dependencies %}
         {% if dependency_class.file_name != data_class.file_name %}
@@ -420,7 +422,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         {% endif %}
         {% endfor %}
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -428,6 +430,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node")
             )
 
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
@@ -454,7 +457,8 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                     chain_to="destination",
                 ),
                 {% endif %}
-                "{{ field.name }}",
+                connection_name="{{ field.name }}",
+                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
             )
         {% endif %}
 

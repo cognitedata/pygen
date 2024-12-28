@@ -15,10 +15,11 @@ from wind_turbine.data_classes import (
 )
 from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from wind_turbine.data_classes._metmast import (
     _create_metmast_filter,
@@ -36,27 +37,31 @@ if TYPE_CHECKING:
     from wind_turbine._api.metmast_query import MetmastQueryAPI
 
 
-class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
+class WindTurbineQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_power", "WindTurbine", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=WindTurbine,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -74,7 +79,7 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
         retrieve_nacelle: bool = False,
         retrieve_rotor: bool = False,
-    ) -> MetmastQueryAPI[T_DomainModelList]:
+    ) -> MetmastQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the metmast edges of the wind turbine.
 
         Args:
@@ -112,21 +117,22 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
                     direction="outwards",
                 ),
-                result_cls=Distance,
+                view_id=Distance._view_id,
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "metmast"),
             )
         )
 
         view_id = MetmastQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_metmast_filter(
+        node_filter = _create_metmast_filter(
             view_id,
             min_position,
             max_position,
@@ -138,7 +144,15 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_nacelle(from_)
         if retrieve_rotor:
             self._query_append_rotor(from_)
-        return MetmastQueryAPI(self._client, self._builder, node_filer, limit)
+        return MetmastQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def query(
         self,
@@ -168,7 +182,7 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_nacelle(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -176,13 +190,14 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Nacelle._view_id]),
                 ),
-                result_cls=Nacelle,
+                view_id=Nacelle._view_id,
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             ),
         )
 
     def _query_append_rotor(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -190,6 +205,7 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Rotor._view_id]),
                 ),
-                result_cls=Rotor,
+                view_id=Rotor._view_id,
+                connection_property=ViewPropertyId(self._view_id, "rotor"),
             ),
         )

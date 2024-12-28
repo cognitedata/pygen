@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -225,6 +227,18 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
     sub_tree_sizes: Optional[list[int]] = Field(None, alias="subTreeSizes")
     tree_indexes: Optional[list[int]] = Field(None, alias="treeIndexes")
 
+    @field_validator("model_3d", "object_3d", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("revisions", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> CogniteCADNodeWrite:
@@ -257,41 +271,6 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteCADNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_3_d_object import Cognite3DObject
-        from ._cognite_cad_model import CogniteCADModel
-        from ._cognite_cad_revision import CogniteCADRevision
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.model_3d, dm.NodeId | str)
-                and (model_3d := nodes_by_id.get(instance.model_3d))
-                and isinstance(model_3d, CogniteCADModel)
-            ):
-                instance.model_3d = model_3d
-            if (
-                isinstance(instance.object_3d, dm.NodeId | str)
-                and (object_3d := nodes_by_id.get(instance.object_3d))
-                and isinstance(object_3d, Cognite3DObject)
-            ):
-                instance.object_3d = object_3d
-            if instance.revisions:
-                new_revisions: list[CogniteCADRevision | str | dm.NodeId] = []
-                for revision in instance.revisions:
-                    if isinstance(revision, CogniteCADRevision):
-                        new_revisions.append(revision)
-                    elif (other := nodes_by_id.get(revision)) and isinstance(other, CogniteCADRevision):
-                        new_revisions.append(other)
-                    else:
-                        new_revisions.append(revision)
-                instance.revisions = new_revisions
 
 
 class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
@@ -609,6 +588,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -624,6 +604,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -639,6 +620,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
                     direction="outwards",
                 ),
                 connection_name="model_3d",
+                connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
         if _Cognite3DObjectQuery not in created_types:
@@ -652,6 +634,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
                     direction="outwards",
                 ),
                 connection_name="object_3d",
+                connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
         if _CogniteCADRevisionQuery not in created_types:
@@ -665,6 +648,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
                     direction="outwards",
                 ),
                 connection_name="revisions",
+                connection_property=ViewPropertyId(self._view_id, "revisions"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

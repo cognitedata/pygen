@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from cognite_core.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -193,6 +195,11 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
 
     node_type: Union[dm.DirectRelationReference, None] = None
 
+    @field_validator("model_3d", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> Cognite360ImageCollectionWrite:
@@ -219,23 +226,6 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite360ImageCollection],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_360_image_model import Cognite360ImageModel
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.model_3d, dm.NodeId | str)
-                and (model_3d := nodes_by_id.get(instance.model_3d))
-                and isinstance(model_3d, Cognite360ImageModel)
-            ):
-                instance.model_3d = model_3d
 
 
 class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevisionWrite, protected_namespaces=()):
@@ -444,6 +434,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -457,6 +448,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -472,6 +464,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
                     direction="outwards",
                 ),
                 connection_name="model_3d",
+                connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

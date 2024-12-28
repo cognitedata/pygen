@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -182,6 +184,11 @@ class Rotor(DomainModel):
     rpm_low_speed_shaft: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     wind_turbine: Optional[WindTurbine] = Field(default=None, repr=False)
 
+    @field_validator("rotor_speed_controller", "rpm_low_speed_shaft", "wind_turbine", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> RotorWrite:
@@ -210,47 +217,6 @@ class Rotor(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Rotor],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_time_series import SensorTimeSeries
-        from ._wind_turbine import WindTurbine
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.rotor_speed_controller, dm.NodeId | str)
-                and (rotor_speed_controller := nodes_by_id.get(instance.rotor_speed_controller))
-                and isinstance(rotor_speed_controller, SensorTimeSeries)
-            ):
-                instance.rotor_speed_controller = rotor_speed_controller
-            if (
-                isinstance(instance.rpm_low_speed_shaft, dm.NodeId | str)
-                and (rpm_low_speed_shaft := nodes_by_id.get(instance.rpm_low_speed_shaft))
-                and isinstance(rpm_low_speed_shaft, SensorTimeSeries)
-            ):
-                instance.rpm_low_speed_shaft = rpm_low_speed_shaft
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, WindTurbine)
-                and node.rotor is not None
-                and (rotor := instances.get(as_pygen_node_id(node.rotor)))
-            ):
-                if rotor.wind_turbine is None:
-                    rotor.wind_turbine = node
-                elif are_nodes_equal(node, rotor.wind_turbine):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'wind_turbine' in {rotor.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}.",
-                        stacklevel=2,
-                    )
 
 
 class RotorWrite(DomainModelWrite):
@@ -522,6 +488,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -536,6 +503,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -551,6 +519,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="outwards",
                 ),
                 connection_name="rotor_speed_controller",
+                connection_property=ViewPropertyId(self._view_id, "rotor_speed_controller"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -564,6 +533,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="outwards",
                 ),
                 connection_name="rpm_low_speed_shaft",
+                connection_property=ViewPropertyId(self._view_id, "rpm_low_speed_shaft"),
             )
 
         if _WindTurbineQuery not in created_types:
@@ -577,6 +547,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="inwards",
                 ),
                 connection_name="wind_turbine",
+                connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

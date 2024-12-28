@@ -442,9 +442,6 @@ class MultiAPIGenerator:
         sdk[data_classes_dir / "_core" / "filecontent_api.py"] = self.generate_data_class_core_filecontent_api_file()
 
         sdk[data_classes_dir / "_core" / "query" / "__init__.py"] = self.generate_data_class_core_query_init()
-        sdk[data_classes_dir / "_core" / "query" / "data_class_step.py"] = (
-            self.generate_data_class_core_query_data_classes_step()
-        )
         sdk[data_classes_dir / "_core" / "query" / "filter_classes.py"] = (
             self.generate_data_class_core_query_filter_classes()
         )
@@ -556,17 +553,6 @@ class MultiAPIGenerator:
 
     def generate_data_class_core_query_filter_classes(self) -> str:
         data_class_core = self.env.get_template("data_classes_core_query_filter_classes.py.jinja")
-
-        return (
-            data_class_core.render(
-                has_default_instance_space=self.has_default_instance_space,
-                top_level_package=self.top_level_package,
-            )
-            + "\n"
-        )
-
-    def generate_data_class_core_query_data_classes_step(self) -> str:
-        data_class_core = self.env.get_template("data_classes_core_query_data_class_step.py.jinja")
 
         return (
             data_class_core.render(

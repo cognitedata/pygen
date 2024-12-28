@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
     TimestampFilter,
 )
 
@@ -546,10 +547,20 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -557,6 +568,7 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -569,7 +581,8 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
                     through=self._view_id.as_property_ref("source"),
                     direction="outwards",
                 ),
-                "source",
+                connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

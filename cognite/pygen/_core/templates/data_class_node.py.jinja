@@ -33,7 +33,7 @@ from cognite.client.data_classes import (
 {% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}
 {% endif %}
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from {{ top_level_package }}.data_classes._core import (
     {% if has_default_instance_space %}
@@ -81,9 +81,11 @@ from {{ top_level_package }}.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     {% if data_class.has_filtering_fields %}
     {{ data_class.filtering_import }}
     {% endif %}
@@ -244,6 +246,21 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     {% for field in data_class.read_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}
     {% endfor %}
+    {% if data_class.has_single_connection_fields %}
+    @field_validator({{ data_class.single_connection_names }}, mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+    {% endif %}
+
+    {% if data_class.has_multi_connection_fields %}
+    @field_validator({{ data_class.multi_connection_names }}, mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+    {% endif %}
 
 {% if data_class.is_writable or data_class.is_interface %}
     # We do the ignore argument type as we let pydantic handle the type checking
@@ -268,179 +285,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
             UserWarning,
             stacklevel=2,
         )
-        return self.as_write(){% if data_class.has_dependencies %}
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, {{ data_class.read_name }}],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId{% if has_default_instance_space %} | str{% endif %}, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        {% if data_class.has_dependencies_not_self %}
-        {% for dependency_class in data_class.dependencies %}
-        {% if dependency_class.file_name != data_class.file_name %}
-        from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-        {% if data_class.has_edges_or_direct_relations_with_target %}
-        for instance in instances.values():
-            {% for field in data_class.one_to_one_direct_relations_with_source %}
-            if isinstance(instance.{{ field.name }}, {% if has_default_instance_space %}dm.NodeId | str{% else %}dm.NodeId{% endif %}) and ({{ field.name }} := nodes_by_id.get(instance.{{ field.name }})) and isinstance(
-                    {{ field.name }}, {{ field.destination_class.read_name }}
-            ):
-                instance.{{ field.name }} = {{ field.name }}
-            {% endfor %}
-            {% for field in data_class.one_to_many_direct_relations_with_source %}
-            if instance.{{ field.name }}:
-                new_{{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
-                for {{ field.variable }} in instance.{{ field.name }}:
-                    if isinstance({{ field.variable }}, {{ field.destination_class.read_name }}):
-                        new_{{ field.name }}.append({{ field.variable }})
-                    elif (other := nodes_by_id.get({{ field.variable }})) and isinstance(
-                        other, {{ field.destination_class.read_name }}
-                    ):
-                        new_{{ field.name }}.append(other)
-                    else:
-                        new_{{ field.name }}.append({{ field.variable }})
-                instance.{{ field.name }} = new_{{ field.name }}
-            {% endfor %}
-            {% if data_class.has_edges %}
-            if edges := edges_by_source_node.get(instance.as_id()):
-                {% for field in data_class.one_to_many_edges_without_properties %}
-                {{ field.name }}: list[{{ field.destination_class.read_name }}{% if has_default_instance_space %} | str{% endif %} | dm.NodeId] = []
-                {% endfor %}
-                {% for field in data_class.one_to_many_edges_with_properties %}
-                {{ field.name }}: list[{{ field.edge_class.read_name }}] = []
-                {% endfor %}
-                for edge in edges:
-                    value: DomainModel | DomainRelation{% if has_default_instance_space %} | str{% endif %} | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination:{% if has_default_instance_space %} dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        ){% else %} dm.NodeId = as_node_id(other_end){% endif +%}
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    {% for field in data_class.one_to_many_edges_without_properties %}
-                    if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
-                    ):
-                        {{ field.name }}.append(value)
-                    {% endfor %}
-                    {% for field in data_class.one_to_many_edges_with_properties %}
-                    if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.edge_class.read_name }}
-                    ):
-                        {{ field.name }}.append(value)
-                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]
-                    {% endfor %}
-                    {% for field in data_class.one_to_one_edge_without_properties %}
-                    if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.destination_class.read_name }}{% if has_default_instance_space %}| str{% endif %}| dm.NodeId
-                    ):
-                        if instance.{{ field.name }} is None:
-                            instance.{{ field.name }} = value
-                        elif are_nodes_equal(value, instance.{{ field.name }}):
-                            instance.{{ field.name }} = select_best_node(value, instance.{{ field.name }})
-                        else:
-                            warnings.warn(
-                                f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
-                                stacklevel=2
-                            )
-                    {% endfor %}
-                    {% for field in data_class.one_to_one_edges_with_properties %}
-                    if edge_type == {{ field.edge_type_str }} and isinstance(
-                        value, {{ field.edge_class.read_name }}
-                    ):
-                        if instance.{{ field.name }} is None:
-                            instance.{{ field.name }} = value
-                        elif instance.{{ field.name }} == value:
-                            # This is the same edge, so we don't need to do anything...
-                            ...
-                        else:
-                            warnings.warn(
-                                f"Expected one edge for '{{ field.name }}' in {instance.as_id()}."
-                                f"Ignoring new edge {value!s} in favor of {instance.{{ field.name }}!s}.",
-                                stacklevel=2
-                            )
-
-                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]
-
-                    {% endfor %}
-
-                {% for field in data_class.one_to_many_edges_without_properties %}
-                instance.{{ field.name }} = {{ field.name }} or None
-                {% endfor %}
-                {% for field in data_class.one_to_many_edges_with_properties %}
-                instance.{{ field.name }} = {{ field.name }}
-                {% endfor %}
-
-            {% endif %}
-        {% endif %}
-        {% if data_class.has_reverse_direct_relations %}
-        for node in nodes_by_id.values():
-            {% for field in data_class.one_to_one_reverse_direct_relation %}
-            if (
-                isinstance(node, {{ field.destination_class.read_name }})
-                and node.{{ field.reverse_property.name }} is not None
-                and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{ field.reverse_property.name }})))
-            ):
-                if {{  field.reverse_property.name }}.{{ field.name }} is None:
-                    {{  field.reverse_property.name }}.{{ field.name }} = node
-                elif are_nodes_equal(node, {{  field.reverse_property.name }}.{{ field.name }}):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for '{{ field.name }}' in {% raw %}{{% endraw %}{{  field.reverse_property.name }}.as_id(){% raw %}}{% endraw %}."
-                        f"Ignoring new relation {node!s} in favor of {% raw %}{{% endraw %}{{  field.reverse_property.name }}.{{ field.name }}!s{% raw %}}{% endraw %}.",
-                        stacklevel=2
-                    )
-            {% endfor %}
-            {% for field in data_class.one_to_many_reverse_direct_relations %}
-            {% if field.reverse_property.is_one_to_one %}
-            if (
-                isinstance(node, {{ field.destination_class.read_name }})
-                and node.{{  field.reverse_property.name }} is not None
-                and ({{  field.reverse_property.name }} := instances.get(as_pygen_node_id(node.{{  field.reverse_property.name }})))
-            ):
-                if {{  field.reverse_property.name }}.{{ field.name }} is None:
-                    {{  field.reverse_property.name }}.{{ field.name }} = []
-                {{ field.reverse_property.name }}.{{ field.name }}.append(node)
-            {% else %}
-            if (
-                isinstance(node, {{ field.destination_class.read_name }})
-                and node.{{  field.reverse_property.name }} is not None
-            ):
-                for {{  field.reverse_property.name }} in node.{{  field.reverse_property.name }}:
-                    if this_instance := instances.get(as_pygen_node_id({{  field.reverse_property.name }})):
-                        if this_instance.{{ field.name }} is None:
-                            this_instance.{{ field.name }} = [node]
-                        else:
-                            this_instance.{{ field.name }}.append(node)
-            {% endif %}
-            
-            {% endfor %}
-        {% endif %}
-{% endif %}
+        return self.as_write()
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
@@ -720,6 +565,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -737,6 +583,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -769,6 +616,7 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
                 ),
                 {% endif %}
                 connection_name="{{ field.name }}",
+                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
                 {% if field.is_reverse_direct_relation and field.reverse_property.is_one_to_many %}
                 connection_type="reverse-list",
                 {% endif %}

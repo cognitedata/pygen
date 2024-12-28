@@ -10,7 +10,7 @@ from cognite.client.data_classes import (
     SequenceWrite as CogniteSequenceWrite,
 )
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -40,9 +40,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -225,6 +227,18 @@ class WindTurbine(GeneratingUnit):
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
 
+    @field_validator("nacelle", "rotor", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
+
+    @field_validator("blades", "datasheets", "metmast", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> WindTurbineWrite:
@@ -266,85 +280,6 @@ class WindTurbine(GeneratingUnit):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, WindTurbine],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._blade import Blade
-        from ._data_sheet import DataSheet
-        from ._distance import Distance
-        from ._nacelle import Nacelle
-        from ._rotor import Rotor
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.nacelle, dm.NodeId | str)
-                and (nacelle := nodes_by_id.get(instance.nacelle))
-                and isinstance(nacelle, Nacelle)
-            ):
-                instance.nacelle = nacelle
-            if (
-                isinstance(instance.rotor, dm.NodeId | str)
-                and (rotor := nodes_by_id.get(instance.rotor))
-                and isinstance(rotor, Rotor)
-            ):
-                instance.rotor = rotor
-            if instance.blades:
-                new_blades: list[Blade | str | dm.NodeId] = []
-                for blade in instance.blades:
-                    if isinstance(blade, Blade):
-                        new_blades.append(blade)
-                    elif (other := nodes_by_id.get(blade)) and isinstance(other, Blade):
-                        new_blades.append(other)
-                    else:
-                        new_blades.append(blade)
-                instance.blades = new_blades
-            if instance.datasheets:
-                new_datasheets: list[DataSheet | str | dm.NodeId] = []
-                for datasheet in instance.datasheets:
-                    if isinstance(datasheet, DataSheet):
-                        new_datasheets.append(datasheet)
-                    elif (other := nodes_by_id.get(datasheet)) and isinstance(other, DataSheet):
-                        new_datasheets.append(other)
-                    else:
-                        new_datasheets.append(datasheet)
-                instance.datasheets = new_datasheets
-            if edges := edges_by_source_node.get(instance.as_id()):
-                metmast: list[Distance] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance") and isinstance(
-                        value, Distance
-                    ):
-                        metmast.append(value)
-                        if end_node := nodes_by_id.get(as_pygen_node_id(value.end_node)):
-                            value.end_node = end_node  # type: ignore[assignment]
-
-                instance.metmast = metmast
 
 
 class WindTurbineWrite(GeneratingUnitWrite):
@@ -730,6 +665,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -748,6 +684,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -763,6 +700,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="blades",
+                connection_property=ViewPropertyId(self._view_id, "blades"),
             )
 
         if _DataSheetQuery not in created_types:
@@ -776,6 +714,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="datasheets",
+                connection_property=ViewPropertyId(self._view_id, "datasheets"),
             )
 
         if _DistanceQuery not in created_types:
@@ -790,6 +729,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     chain_to="destination",
                 ),
                 connection_name="metmast",
+                connection_property=ViewPropertyId(self._view_id, "metmast"),
             )
 
         if _NacelleQuery not in created_types:
@@ -803,6 +743,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         if _RotorQuery not in created_types:
@@ -816,6 +757,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="rotor",
+                connection_property=ViewPropertyId(self._view_id, "rotor"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

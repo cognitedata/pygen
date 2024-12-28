@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optiona
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator, model_validator
+from pydantic import field_validator, model_validator, ValidationInfo
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,9 +30,11 @@ from wind_turbine.data_classes._core import (
     are_nodes_equal,
     is_tuple_id,
     select_best_node,
+    parse_single_connection,
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
 )
 
@@ -166,6 +168,13 @@ class Blade(DomainModel):
     name: Optional[str] = None
     sensor_positions: Optional[list[SensorPosition]] = Field(default=None, repr=False)
 
+    @field_validator("sensor_positions", mode="before")
+    @classmethod
+    def parse_list(cls, value: Any, info: ValidationInfo) -> Any:
+        if value is None:
+            return None
+        return [parse_single_connection(item, info.field_name) for item in value]
+
     # We do the ignore argument type as we let pydantic handle the type checking
     @no_type_check
     def as_write(self) -> BladeWrite:
@@ -186,25 +195,6 @@ class Blade(DomainModel):
             stacklevel=2,
         )
         return self.as_write()
-
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Blade],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_position import SensorPosition
-
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, SensorPosition)
-                and node.blade is not None
-                and (blade := instances.get(as_pygen_node_id(node.blade)))
-            ):
-                if blade.sensor_positions is None:
-                    blade.sensor_positions = []
-                blade.sensor_positions.append(node)
 
 
 class BladeWrite(DomainModelWrite):
@@ -355,6 +345,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -368,6 +359,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -383,6 +375,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
                     direction="inwards",
                 ),
                 connection_name="sensor_positions",
+                connection_property=ViewPropertyId(self._view_id, "sensor_positions"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

@@ -17,9 +17,10 @@ from wind_turbine._api._core import (
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
+    QueryStepFactory,
+    QueryBuilder,
+    QueryUnpacker,
+    ViewPropertyId,
 )
 from wind_turbine.data_classes._blade import (
     BladeQuery,
@@ -61,7 +62,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> BladeQueryAPI[BladeList]:
+    ) -> BladeQueryAPI[Blade, BladeList]:
         """Query starting at blades.
 
         Args:
@@ -94,8 +95,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(BladeList)
-        return BladeQueryAPI(self._client, builder, filter_, limit)
+        return BladeQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,
@@ -528,7 +528,6 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
             space,
             filter,
         )
-
         if retrieve_connections == "skip":
             return self._list(
                 limit=limit,
@@ -538,34 +537,27 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 sort=sort,
             )
 
-        builder = DataClassQueryBuilder(BladeList)
-        has_data = dm.filters.HasData(views=[self._view_id])
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
-            NodeQueryStep(
-                builder.create_name(None),
-                dm.query.NodeResultSetExpression(
-                    filter=dm.filters.And(filter_, has_data) if filter_ else has_data,
-                    sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                ),
-                Blade,
-                max_retrieve_limit=limit,
-                raw_filter=filter_,
+            factory.root(
+                filter=filter_,
+                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+                limit=limit,
+                has_container_fields=True,
             )
         )
-        from_root = builder.get_from()
         if retrieve_connections == "full":
-            builder.append(
-                NodeQueryStep(
-                    builder.create_name(from_root),
-                    dm.query.NodeResultSetExpression(
-                        from_=from_root,
-                        filter=dm.filters.HasData(views=[SensorPosition._view_id]),
-                        direction="inwards",
-                        through=SensorPosition._view_id.as_property_ref("blade"),
-                    ),
-                    SensorPosition,
+            builder.extend(
+                factory.from_reverse_relation(
+                    SensorPosition._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "SensorPosition", "1"), "blade"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "sensor_positions"),
+                    has_container_fields=True,
                 )
             )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
-        return builder.unpack()
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return BladeList([Blade.model_validate(item) for item in unpacked])
