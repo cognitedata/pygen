@@ -120,7 +120,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
 
         view_id = ConnectionItemBQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_b_filter(
+        node_filter = _create_connection_item_b_filter(
             view_id,
             name,
             name_prefix,
@@ -138,7 +138,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
             self._result_cls,
             self._result_list_cls,
             ViewPropertyId(self._view_id, "end_node"),
-            node_filer,
+            node_filter,
             limit
         )
 
