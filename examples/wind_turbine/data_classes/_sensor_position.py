@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 
@@ -1207,6 +1208,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -1221,6 +1223,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -1236,6 +1239,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="blade",
+                connection_property=ViewPropertyId(self._view_id, "blade"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1249,6 +1253,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1262,6 +1267,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_offset",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1275,6 +1281,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewise_bend_mom_offset_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1288,6 +1295,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="edgewisewise_bend_mom",
+                connection_property=ViewPropertyId(self._view_id, "edgewisewise_bend_mom"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1301,6 +1309,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1314,6 +1323,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_crosstalk_corrected"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1327,6 +1337,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_offset",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1340,6 +1351,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                     direction="outwards",
                 ),
                 connection_name="flapwise_bend_mom_offset_crosstalk_corrected",
+                connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset_crosstalk_corrected"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

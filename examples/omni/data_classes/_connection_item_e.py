@@ -34,6 +34,7 @@ from omni.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -691,6 +692,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -706,6 +708,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -721,6 +724,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                 ),
                 connection_name="direct_reverse_multi",
+                connection_property=ViewPropertyId(self._view_id, "directReverseMulti"),
                 connection_type="reverse-list",
             )
 
@@ -735,6 +739,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     direction="inwards",
                 ),
                 connection_name="direct_reverse_single",
+                connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
             )
 
         if _ConnectionItemDQuery not in created_types:
@@ -748,6 +753,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     chain_to="destination",
                 ),
                 connection_name="inwards_single",
+                connection_property=ViewPropertyId(self._view_id, "inwardsSingle"),
             )
 
         if _ConnectionEdgeAQuery not in created_types:
@@ -762,6 +768,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                     chain_to="destination",
                 ),
                 connection_name="inwards_single_property",
+                connection_property=ViewPropertyId(self._view_id, "inwardsSingleProperty"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

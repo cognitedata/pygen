@@ -44,6 +44,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -743,6 +744,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -761,6 +763,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -776,6 +779,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="blades",
+                connection_property=ViewPropertyId(self._view_id, "blades"),
             )
 
         if _DataSheetQuery not in created_types:
@@ -789,6 +793,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="datasheets",
+                connection_property=ViewPropertyId(self._view_id, "datasheets"),
             )
 
         if _DistanceQuery not in created_types:
@@ -803,6 +808,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     chain_to="destination",
                 ),
                 connection_name="metmast",
+                connection_property=ViewPropertyId(self._view_id, "metmast"),
             )
 
         if _NacelleQuery not in created_types:
@@ -816,6 +822,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         if _RotorQuery not in created_types:
@@ -829,6 +836,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                     direction="outwards",
                 ),
                 connection_name="rotor",
+                connection_property=ViewPropertyId(self._view_id, "rotor"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

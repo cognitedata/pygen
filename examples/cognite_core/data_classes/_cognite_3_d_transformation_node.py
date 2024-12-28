@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 
@@ -447,6 +448,7 @@ class _Cognite3DTransformationNodeQuery(NodeQueryCore[T_DomainModelList, Cognite
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -459,6 +461,7 @@ class _Cognite3DTransformationNodeQuery(NodeQueryCore[T_DomainModelList, Cognite
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )

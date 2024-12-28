@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     QueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
     IntFilter,
     TimestampFilter,
@@ -924,12 +925,22 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
+        connection_property: ViewPropertyId,
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
     ):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -937,6 +948,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -949,7 +961,8 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
                     through=self._view_id.as_property_ref("source"),
                     direction="outwards",
                 ),
-                "source",
+                connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

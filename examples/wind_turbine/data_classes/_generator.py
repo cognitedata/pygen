@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -540,6 +541,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -554,6 +556,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -569,6 +572,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="outwards",
                 ),
                 connection_name="generator_speed_controller",
+                connection_property=ViewPropertyId(self._view_id, "generator_speed_controller"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -582,6 +586,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="outwards",
                 ),
                 connection_name="generator_speed_controller_reference",
+                connection_property=ViewPropertyId(self._view_id, "generator_speed_controller_reference"),
             )
 
         if _NacelleQuery not in created_types:
@@ -595,6 +600,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

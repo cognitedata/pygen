@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_3_d_model import Cognite3DModel, Cognite3DModelWrite
 
@@ -463,6 +464,7 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -477,6 +479,7 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -492,6 +495,7 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
                     direction="inwards",
                 ),
                 connection_name="revisions",
+                connection_property=ViewPropertyId(self._view_id, "revisions"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -505,6 +509,7 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
                     direction="outwards",
                 ),
                 connection_name="thumbnail",
+                connection_property=ViewPropertyId(self._view_id, "thumbnail"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

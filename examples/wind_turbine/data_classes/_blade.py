@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
 )
 
@@ -363,6 +364,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -376,6 +378,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -391,6 +394,7 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
                     direction="inwards",
                 ),
                 connection_name="sensor_positions",
+                connection_property=ViewPropertyId(self._view_id, "sensor_positions"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

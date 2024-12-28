@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
     IntFilter,
 )
@@ -406,6 +407,7 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -419,6 +421,7 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -434,6 +437,7 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
                     direction="outwards",
                 ),
                 connection_name="model_3d",
+                connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

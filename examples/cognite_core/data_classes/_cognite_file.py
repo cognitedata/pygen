@@ -36,6 +36,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     BooleanFilter,
     TimestampFilter,
 )
@@ -835,6 +836,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -851,6 +853,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -866,6 +869,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="assets",
+                connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
         if _CogniteFileCategoryQuery not in created_types:
@@ -879,6 +883,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="category",
+                connection_property=ViewPropertyId(self._view_id, "category"),
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -892,6 +897,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="inwards",
                 ),
                 connection_name="equipment",
+                connection_property=ViewPropertyId(self._view_id, "equipment"),
                 connection_type="reverse-list",
             )
 
@@ -906,6 +912,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

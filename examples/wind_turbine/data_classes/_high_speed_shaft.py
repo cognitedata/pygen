@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -551,6 +552,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -565,6 +567,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -580,6 +583,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="bending_moment_y",
+                connection_property=ViewPropertyId(self._view_id, "bending_moment_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -593,6 +597,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="bending_monent_x",
+                connection_property=ViewPropertyId(self._view_id, "bending_monent_x"),
             )
 
         if _NacelleQuery not in created_types:
@@ -606,6 +611,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="inwards",
                 ),
                 connection_name="nacelle",
+                connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -619,6 +625,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
                     direction="outwards",
                 ),
                 connection_name="torque",
+                connection_property=ViewPropertyId(self._view_id, "torque"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

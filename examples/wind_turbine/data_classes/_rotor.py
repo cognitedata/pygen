@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -528,6 +529,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -542,6 +544,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -557,6 +560,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="outwards",
                 ),
                 connection_name="rotor_speed_controller",
+                connection_property=ViewPropertyId(self._view_id, "rotor_speed_controller"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -570,6 +574,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="outwards",
                 ),
                 connection_name="rpm_low_speed_shaft",
+                connection_property=ViewPropertyId(self._view_id, "rpm_low_speed_shaft"),
             )
 
         if _WindTurbineQuery not in created_types:
@@ -583,6 +588,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                     direction="inwards",
                 ),
                 connection_name="wind_turbine",
+                connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

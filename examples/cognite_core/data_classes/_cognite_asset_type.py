@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -473,6 +474,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -486,6 +488,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -501,6 +504,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
                     direction="outwards",
                 ),
                 connection_name="asset_class",
+                connection_property=ViewPropertyId(self._view_id, "assetClass"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

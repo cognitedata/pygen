@@ -35,6 +35,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_visualizable import CogniteVisualizable, CogniteVisualizableWrite
@@ -1073,6 +1074,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -1093,6 +1095,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -1108,6 +1111,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="activities",
+                connection_property=ViewPropertyId(self._view_id, "activities"),
                 connection_type="reverse-list",
             )
 
@@ -1122,6 +1126,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="asset_class",
+                connection_property=ViewPropertyId(self._view_id, "assetClass"),
             )
 
         if _CogniteAssetQuery not in created_types:
@@ -1135,6 +1140,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="children",
+                connection_property=ViewPropertyId(self._view_id, "children"),
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -1148,6 +1154,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="equipment",
+                connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -1161,6 +1168,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="files",
+                connection_property=ViewPropertyId(self._view_id, "files"),
                 connection_type="reverse-list",
             )
 
@@ -1175,6 +1183,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="object_3d",
+                connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
         if _CogniteAssetQuery not in created_types:
@@ -1188,6 +1197,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="parent",
+                connection_property=ViewPropertyId(self._view_id, "parent"),
             )
 
         if _CogniteAssetQuery not in created_types:
@@ -1201,6 +1211,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="path",
+                connection_property=ViewPropertyId(self._view_id, "path"),
             )
 
         if _CogniteAssetQuery not in created_types:
@@ -1214,6 +1225,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="root",
+                connection_property=ViewPropertyId(self._view_id, "root"),
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -1227,6 +1239,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         if _CogniteTimeSeriesQuery not in created_types:
@@ -1240,6 +1253,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="inwards",
                 ),
                 connection_name="time_series",
+                connection_property=ViewPropertyId(self._view_id, "timeSeries"),
                 connection_type="reverse-list",
             )
 
@@ -1254,6 +1268,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                     direction="outwards",
                 ),
                 connection_name="type_",
+                connection_property=ViewPropertyId(self._view_id, "type"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

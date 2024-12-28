@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -642,6 +643,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -657,6 +659,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -672,6 +675,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                     direction="outwards",
                 ),
                 connection_name="model_3d",
+                connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
         if _Cognite3DObjectQuery not in created_types:
@@ -685,6 +689,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                     direction="outwards",
                 ),
                 connection_name="object_3d",
+                connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
         if _CogniteCADRevisionQuery not in created_types:
@@ -698,6 +703,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                     direction="outwards",
                 ),
                 connection_name="revisions",
+                connection_property=ViewPropertyId(self._view_id, "revisions"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -1086,6 +1087,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -1105,6 +1107,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -1120,6 +1123,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="acc_from_back_side_y",
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_y"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1133,6 +1137,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="acc_from_back_side_z",
+                connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_z"),
             )
 
         if _GearboxQuery not in created_types:
@@ -1146,6 +1151,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="gearbox",
+                connection_property=ViewPropertyId(self._view_id, "gearbox"),
             )
 
         if _GeneratorQuery not in created_types:
@@ -1159,6 +1165,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="generator",
+                connection_property=ViewPropertyId(self._view_id, "generator"),
             )
 
         if _HighSpeedShaftQuery not in created_types:
@@ -1172,6 +1179,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="high_speed_shaft",
+                connection_property=ViewPropertyId(self._view_id, "high_speed_shaft"),
             )
 
         if _MainShaftQuery not in created_types:
@@ -1185,6 +1193,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="main_shaft",
+                connection_property=ViewPropertyId(self._view_id, "main_shaft"),
             )
 
         if _PowerInverterQuery not in created_types:
@@ -1198,6 +1207,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="power_inverter",
+                connection_property=ViewPropertyId(self._view_id, "power_inverter"),
             )
 
         if _WindTurbineQuery not in created_types:
@@ -1211,6 +1221,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="inwards",
                 ),
                 connection_name="wind_turbine",
+                connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1224,6 +1235,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="yaw_direction",
+                connection_property=ViewPropertyId(self._view_id, "yaw_direction"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -1237,6 +1249,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                     direction="outwards",
                 ),
                 connection_name="yaw_error",
+                connection_property=ViewPropertyId(self._view_id, "yaw_error"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

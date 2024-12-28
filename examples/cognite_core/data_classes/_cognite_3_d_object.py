@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -670,6 +671,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -687,6 +689,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -702,6 +705,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="asset",
+                connection_property=ViewPropertyId(self._view_id, "asset"),
             )
 
         if _CogniteCADNodeQuery not in created_types:
@@ -715,6 +719,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="cad_nodes",
+                connection_property=ViewPropertyId(self._view_id, "cadNodes"),
             )
 
         if _Cognite360ImageAnnotationQuery not in created_types:
@@ -729,6 +734,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     chain_to="destination",
                 ),
                 connection_name="images_360",
+                connection_property=ViewPropertyId(self._view_id, "images360"),
             )
 
         if _CognitePointCloudVolumeQuery not in created_types:
@@ -742,6 +748,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                     direction="inwards",
                 ),
                 connection_name="point_cloud_volumes",
+                connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

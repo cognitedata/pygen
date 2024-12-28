@@ -34,6 +34,7 @@ from omni.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -593,6 +594,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -606,6 +608,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -621,6 +624,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     direction="outwards",
                 ),
                 connection_name="direct_multi",
+                connection_property=ViewPropertyId(self._view_id, "directMulti"),
             )
 
         if _ConnectionItemEQuery not in created_types:
@@ -634,6 +638,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     direction="outwards",
                 ),
                 connection_name="direct_single",
+                connection_property=ViewPropertyId(self._view_id, "directSingle"),
             )
 
         if _ConnectionItemEQuery not in created_types:
@@ -647,6 +652,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                     chain_to="destination",
                 ),
                 connection_name="outwards_single",
+                connection_property=ViewPropertyId(self._view_id, "outwardsSingle"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

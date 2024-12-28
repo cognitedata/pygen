@@ -35,6 +35,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -933,6 +934,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -949,6 +951,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -964,6 +967,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                     direction="outwards",
                 ),
                 connection_name="assets",
+                connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
         if _CogniteEquipmentQuery not in created_types:
@@ -977,6 +981,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                     direction="outwards",
                 ),
                 connection_name="equipment",
+                connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -990,6 +995,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                     direction="outwards",
                 ),
                 connection_name="source",
+                connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
         if _CogniteTimeSeriesQuery not in created_types:
@@ -1003,6 +1009,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                     direction="outwards",
                 ),
                 connection_name="time_series",
+                connection_property=ViewPropertyId(self._view_id, "timeSeries"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

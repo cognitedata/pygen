@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -612,6 +613,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -625,6 +627,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -640,6 +643,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="back",
+                connection_property=ViewPropertyId(self._view_id, "back"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -653,6 +657,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="bottom",
+                connection_property=ViewPropertyId(self._view_id, "bottom"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -666,6 +671,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="front",
+                connection_property=ViewPropertyId(self._view_id, "front"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -679,6 +685,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="left",
+                connection_property=ViewPropertyId(self._view_id, "left"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -692,6 +699,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="right",
+                connection_property=ViewPropertyId(self._view_id, "right"),
             )
 
         if _CogniteFileQuery not in created_types:
@@ -705,6 +713,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                     direction="outwards",
                 ),
                 connection_name="top",
+                connection_property=ViewPropertyId(self._view_id, "top"),
             )
 
         self.space = StringFilter(self, ["node", "space"])

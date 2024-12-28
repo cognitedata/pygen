@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -487,6 +488,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
         result_list_cls: type[T_DomainModelList],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.ResultSetExpression | None = None,
     ):
@@ -500,6 +502,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
             expression,
             dm.filters.HasData(views=[self._view_id]),
             connection_name,
+            connection_property,
             connection_type,
             reverse_expression,
         )
@@ -515,6 +518,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                     direction="outwards",
                 ),
                 connection_name="efficiency",
+                connection_property=ViewPropertyId(self._view_id, "efficiency"),
             )
 
         if _SensorTimeSeriesQuery not in created_types:
@@ -528,6 +532,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                     direction="outwards",
                 ),
                 connection_name="orientation",
+                connection_property=ViewPropertyId(self._view_id, "orientation"),
             )
 
         self.space = StringFilter(self, ["node", "space"])
