@@ -7,8 +7,8 @@ from wind_turbine import WindTurbineClient
 from tests.constants import CORE_SDK
 
 
-def test_query_across_direct_relation(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().other_direct.list_full(limit=5)
+def test_select_across_direct_relation(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.select().other_direct.list_full(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemAList)
