@@ -191,10 +191,10 @@ class QueryUnpacker:
     def __init__(
         self,
         steps: Sequence[QueryStep],
-        edges: Literal["skip", "identifier", "include"] = "include",
-        as_data_record: bool = False,
-        edge_type_key: str = "type",
-        node_type_key: str = "type",
+        edges: Literal["skip", "identifier", "include"] = "skip",
+        as_data_record: bool = True,
+        edge_type_key: str = "edge_type",
+        node_type_key: str = "node_type",
     ) -> None:
         self._steps = steps
         self._edges = edges

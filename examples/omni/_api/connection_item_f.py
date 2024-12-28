@@ -666,7 +666,5 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(
-            builder, edges=unpack_edges, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
-        ).unpack()
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
         return ConnectionItemFList([ConnectionItemF.model_validate(item) for item in unpacked])
