@@ -14,7 +14,7 @@ from cognite.client.utils._time import ZoneInfo
 
 from omni._api._core import DEFAULT_LIMIT_READ
 from omni.data_classes._cdf_external_references import _create_cdf_external_reference_filter
-from omni.data_classes._core import QueryStep, QueryBuilder
+from omni.data_classes._core import QueryBuilder, QueryStep
 
 ColumnNames = Literal["file", "sequence", "timeseries"]
 

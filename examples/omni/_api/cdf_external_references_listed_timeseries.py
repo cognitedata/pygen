@@ -14,7 +14,7 @@ from cognite.client.utils._time import ZoneInfo
 
 from omni._api._core import DEFAULT_LIMIT_READ
 from omni.data_classes._cdf_external_references_listed import _create_cdf_external_references_listed_filter
-from omni.data_classes._core import DataClassQueryBuilder, DomainModelList, QueryStep
+from omni.data_classes._core import QueryBuilder, QueryStep
 
 ColumnNames = Literal["files", "sequences", "timeseries"]
 
@@ -603,7 +603,7 @@ def _retrieve_timeseries_external_ids_with_extra_timesery(
     has_property = dm.filters.Exists(property=view_id.as_property_ref("timeseries"))
     filter_ = dm.filters.And(filter_, has_data, has_property) if filter_ else dm.filters.And(has_data, has_property)
 
-    builder = DataClassQueryBuilder[DomainModelList](None)
+    builder = QueryBuilder()
     builder.append(
         QueryStep(
             name="nodes",
