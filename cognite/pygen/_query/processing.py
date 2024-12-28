@@ -239,6 +239,7 @@ class QueryUnpacker:
         selected_properties: set[str] | None,
         direct_property: str | None = None,
         as_data_record: bool = False,
+        type_key: str = "type",
     ) -> dict[str, Any]:
         """Dumps the node/edge into a flat dictionary.
 
@@ -249,6 +250,7 @@ class QueryUnpacker:
                 of this property will be converted to a NodeId or a list of NodeIds. The motivation for this is
                 to be able to easily connect this node/edge to other nodes/edges in the result set.
             as_data_record: If True, node properties are dumped as data records. Default is False.
+            type_key: The key to use for the type. Default is "type".
 
         Returns:
             A dictionary with the properties of the node or edge
@@ -256,6 +258,9 @@ class QueryUnpacker:
         """
         dumped = node.dump()
         dumped_properties = dumped.pop("properties", {})
+        if "type" in dumped:
+            dumped[type_key] = dumped.pop("type")
+
         item: dict[str, Any] = {
             key: value for key, value in dumped.items() if selected_properties is None or key in selected_properties
         }
@@ -295,9 +300,9 @@ class QueryUnpacker:
         unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         for node in step.node_results:
             node_id = node.as_id()
-            dumped = self.flatten_dump(node, step_properties, direct_property, self._as_data_record)
-            if "type" in dumped:
-                dumped[self._node_type_key] = dumped.pop("type")
+            dumped = self.flatten_dump(
+                node, step_properties, direct_property, self._as_data_record, self._node_type_key
+            )
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
@@ -361,8 +366,9 @@ class QueryUnpacker:
                 target_node = start_node
             # step.view_id means that the edge has properties
             if self._edges == "include" or step.view_id:
-                dumped = self.flatten_dump(edge, step_properties, as_data_record=self._as_data_record)
-                dumped[self._edge_type_key] = dumped.pop("type")
+                dumped = self.flatten_dump(
+                    edge, step_properties, as_data_record=self._as_data_record, type_key=self._edge_type_key
+                )
                 for connection_property, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         dumped[connection_property] = node_targets_by_source[target_node]
