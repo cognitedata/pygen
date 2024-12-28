@@ -376,9 +376,9 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
-        connection_property: ViewPropertyId,
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
+        connection_property: ViewPropertyId | None = None,
     ):
         from ._metmast import _MetmastQuery
         from ._wind_turbine import _WindTurbineQuery
