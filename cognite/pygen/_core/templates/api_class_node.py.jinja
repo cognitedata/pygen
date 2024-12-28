@@ -113,7 +113,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% endfor %}
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> {{ query_api.name }}[{{ data_class.read_list_name }}]:
+    ) -> {{ query_api.name }}[{{ data_class.read_name }}, {{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
 
         Args:

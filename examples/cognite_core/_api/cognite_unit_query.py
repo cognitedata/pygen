@@ -12,10 +12,10 @@ from cognite_core.data_classes import (
 )
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
 )
 from cognite_core._api._core import (
     QueryAPI,
@@ -23,20 +23,23 @@ from cognite_core._api._core import (
 )
 
 
-class CogniteUnitQueryAPI(QueryAPI[T_DomainModelList]):
+class CogniteUnitQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteUnit", "v1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewProperty | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -44,6 +47,8 @@ class CogniteUnitQueryAPI(QueryAPI[T_DomainModelList]):
                 ),
                 result_cls=CogniteUnit,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 

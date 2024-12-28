@@ -22,7 +22,7 @@ from {{ top_level_package }}.data_classes._core import (
     T_DomainModel,
     T_DomainModelList,
     QueryBuilder,
-
+    QueryStep,
 )
 {% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
@@ -60,7 +60,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
         builder: QueryBuilder,
         result_cls: type[T_DomainModel],
         result_list_cls: type[T_DomainModelList],
-        connection_property: ViewProperty | None = None,
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
@@ -73,7 +73,6 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls={{ data_class.read_name }},
                 max_retrieve_limit=limit,
                 view_id=self._view_id,
                 connection_property=connection_property,
@@ -134,10 +133,10 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
                     direction="{{ edge_api.direction }}",
                 ),
                 {% if edge_api.has_edge_class %}
-                result_cls= {{ edge_api.edge_class.read_name }},
+                view_id= {{ edge_api.edge_class.read_name }}._view_id,
                 {% endif %}
                 max_retrieve_limit=limit,
-                connection_property=ViewPropertyId(self._view_id, "{{ edge_api.field.prop_name }}")
+                connection_property=ViewPropertyId(self._view_id, "{{ edge_api.field.prop_name }}"),
             )
         )
 
@@ -161,7 +160,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
             self._result_list_cls,
             ViewPropertyId(self._view_id, "end_node"),
             node_filter,
-            limit
+            limit,
         ))
         {% endfor %}
 
@@ -209,7 +208,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
                     {% endif %}
                 ),
                 view_id={{ field.destination_class.read_name }}._view_id,
-                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}")
+                connection_property=ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
             ),
         )
     {% endfor %}
