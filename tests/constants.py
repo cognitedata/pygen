@@ -167,7 +167,6 @@ class OmniFiles:
     data_core_cdf_external = core_data / "cdf_external.py"
     core_query_data = core_data / "query"
     data_core_query_init = core_query_data / "__init__.py"
-    data_core_query_data_class_step = core_query_data / "data_class_step.py"
     data_core_query_filter_classes = core_query_data / "filter_classes.py"
     data_core_query_select = core_query_data / "select.py"
 
