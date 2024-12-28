@@ -17,9 +17,6 @@ from omni._api._core import (
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -69,7 +66,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Implementation1QueryAPI[Implementation1List]:
+    ) -> Implementation1QueryAPI[Implementation1, Implementation1List]:
         """Query starting at implementation 1.
 
         Args:
@@ -112,8 +109,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Implementation1List)
-        return Implementation1QueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,

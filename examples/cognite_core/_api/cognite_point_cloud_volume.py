@@ -17,9 +17,6 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -101,7 +98,7 @@ class CognitePointCloudVolumeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CognitePointCloudVolumeQueryAPI[CognitePointCloudVolumeList]:
+    ) -> CognitePointCloudVolumeQueryAPI[CognitePointCloudVolume, CognitePointCloudVolumeList]:
         """Query starting at Cognite point cloud volumes.
 
         Args:
@@ -146,8 +143,7 @@ class CognitePointCloudVolumeAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(CognitePointCloudVolumeList)
-        return CognitePointCloudVolumeQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,

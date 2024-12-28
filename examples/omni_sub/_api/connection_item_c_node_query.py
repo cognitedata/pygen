@@ -12,10 +12,11 @@ from omni_sub.data_classes import (
 )
 from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from omni_sub.data_classes._connection_item_a import (
     _create_connection_item_a_filter,
@@ -33,27 +34,31 @@ if TYPE_CHECKING:
     from omni_sub._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
-class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
+class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=ConnectionItemCNode,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -111,7 +116,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -119,12 +124,13 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                 ),
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "connectionItemA"),
             )
         )
 
         view_id = ConnectionItemAQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_a_filter(
+        node_filter = _create_connection_item_a_filter(
             view_id,
             name,
             name_prefix,
@@ -134,7 +140,15 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemAQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemAQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def connection_item_b(
         self,
@@ -174,7 +188,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -182,12 +196,13 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                 ),
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "connectionItemB"),
             )
         )
 
         view_id = ConnectionItemBQueryAPI._view_id
         has_data = dm.filters.HasData(views=[view_id])
-        node_filer = _create_connection_item_b_filter(
+        node_filter = _create_connection_item_b_filter(
             view_id,
             name,
             name_prefix,
@@ -195,7 +210,15 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemBQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filter,
+            limit,
+        )
 
     def query(
         self,

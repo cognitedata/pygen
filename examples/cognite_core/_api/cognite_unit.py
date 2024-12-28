@@ -70,7 +70,7 @@ class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, Cog
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CogniteUnitQueryAPI[CogniteUnitList]:
+    ) -> CogniteUnitQueryAPI[CogniteUnit, CogniteUnitList]:
         """Query starting at Cognite units.
 
         Args:

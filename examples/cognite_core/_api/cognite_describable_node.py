@@ -17,9 +17,6 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -111,7 +108,7 @@ class CogniteDescribableNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CogniteDescribableNodeQueryAPI[CogniteDescribableNodeList]:
+    ) -> CogniteDescribableNodeQueryAPI[CogniteDescribableNode, CogniteDescribableNodeList]:
         """Query starting at Cognite describable nodes.
 
         Args:
@@ -146,8 +143,7 @@ class CogniteDescribableNodeAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(CogniteDescribableNodeList)
-        return CogniteDescribableNodeQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,

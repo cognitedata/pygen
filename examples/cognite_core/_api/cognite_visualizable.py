@@ -72,7 +72,7 @@ class CogniteVisualizableAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CogniteVisualizableQueryAPI[CogniteVisualizableList]:
+    ) -> CogniteVisualizableQueryAPI[CogniteVisualizable, CogniteVisualizableList]:
         """Query starting at Cognite visualizables.
 
         Args:

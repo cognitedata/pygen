@@ -17,9 +17,6 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -90,7 +87,7 @@ class Cognite3DTransformationNodeAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Cognite3DTransformationNodeQueryAPI[Cognite3DTransformationNodeList]:
+    ) -> Cognite3DTransformationNodeQueryAPI[Cognite3DTransformationNode, Cognite3DTransformationNodeList]:
         """Query starting at Cognite 3D transformation nodes.
 
         Args:
@@ -153,8 +150,7 @@ class Cognite3DTransformationNodeAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Cognite3DTransformationNodeList)
-        return Cognite3DTransformationNodeQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,

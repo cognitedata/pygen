@@ -17,9 +17,6 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -82,7 +79,7 @@ class Cognite360ImageCollectionAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> Cognite360ImageCollectionQueryAPI[Cognite360ImageCollectionList]:
+    ) -> Cognite360ImageCollectionQueryAPI[Cognite360ImageCollection, Cognite360ImageCollectionList]:
         """Query starting at Cognite 360 image collections.
 
         Args:
@@ -121,8 +118,7 @@ class Cognite360ImageCollectionAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(Cognite360ImageCollectionList)
-        return Cognite360ImageCollectionQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,

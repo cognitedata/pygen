@@ -17,6 +17,7 @@ from cognite_core.data_classes._core import (
     T_DomainModel,
     T_DomainModelList,
     QueryBuilder,
+    QueryStep,
 )
 from cognite_core._api._core import (
     QueryAPI,
@@ -33,7 +34,7 @@ class CogniteVisualizableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         builder: QueryBuilder,
         result_cls: type[T_DomainModel],
         result_list_cls: type[T_DomainModelList],
-        connection_property: ViewProperty | None = None,
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
@@ -46,7 +47,6 @@ class CogniteVisualizableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=CogniteVisualizable,
                 max_retrieve_limit=limit,
                 view_id=self._view_id,
                 connection_property=connection_property,

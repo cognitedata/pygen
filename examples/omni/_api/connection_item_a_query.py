@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from cdf.modules.contextualization.cdf_p_and_id_parser.functions.contextualization_p_and_id_annotater.handler import \
-    ViewProperty
 from omni.data_classes import (
     DomainModelCore,
     ConnectionItemA,
@@ -16,9 +14,9 @@ from omni.data_classes import (
 )
 from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
     T_DomainModel,
     T_DomainModelList,
-    ViewPropertyId,
     QueryBuilder,
     QueryStep,
 )
@@ -43,7 +41,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         builder: QueryBuilder,
         result_cls: type[T_DomainModel],
         result_list_cls: type[T_DomainModelList],
-        connection_property: ViewProperty | None = None,
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
@@ -114,7 +112,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
                     direction="outwards",
                 ),
                 max_retrieve_limit=limit,
-                connection_property=ViewPropertyId(self._view_id, "outwards")
+                connection_property=ViewPropertyId(self._view_id, "outwards"),
             )
         )
 
@@ -139,7 +137,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
             self._result_list_cls,
             ViewPropertyId(self._view_id, "end_node"),
             node_filter,
-            limit
+            limit,
         )
 
     def query(
@@ -193,6 +191,6 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
                     filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
                 ),
                 view_id=ConnectionItemA._view_id,
-                connection_property=ViewPropertyId(self._view_id, "selfDirect")
+                connection_property=ViewPropertyId(self._view_id, "selfDirect"),
             ),
         )

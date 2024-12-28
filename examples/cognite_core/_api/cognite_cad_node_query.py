@@ -14,10 +14,11 @@ from cognite_core.data_classes import (
 )
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from cognite_core._api._core import (
     QueryAPI,
@@ -25,27 +26,31 @@ from cognite_core._api._core import (
 )
 
 
-class CogniteCADNodeQueryAPI(QueryAPI[T_DomainModelList]):
+class CogniteCADNodeQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteCADNode", "v1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=CogniteCADNode,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -77,7 +82,7 @@ class CogniteCADNodeQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_model_3d(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -85,13 +90,14 @@ class CogniteCADNodeQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteCADModel._view_id]),
                 ),
-                result_cls=CogniteCADModel,
+                view_id=CogniteCADModel._view_id,
+                connection_property=ViewPropertyId(self._view_id, "model3D"),
             ),
         )
 
     def _query_append_object_3d(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -99,6 +105,7 @@ class CogniteCADNodeQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Cognite3DObject._view_id]),
                 ),
-                result_cls=Cognite3DObject,
+                view_id=Cognite3DObject._view_id,
+                connection_property=ViewPropertyId(self._view_id, "object3D"),
             ),
         )

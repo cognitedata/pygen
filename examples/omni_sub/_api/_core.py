@@ -36,9 +36,8 @@ from omni_sub.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
-    DataClassQueryBuilder,
-    NodeQueryStep,
-    EdgeQueryStep,
+    QueryBuilder,
+    QueryUnpacker,
 )
 
 DEFAULT_LIMIT_READ = 25
@@ -471,18 +470,25 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
 
 
-class QueryAPI(Generic[T_DomainModelList]):
+class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
     ):
         self._client = client
         self._builder = builder
+        self._result_cls = result_cls
+        self._result_list_cls = result_list_cls
 
     def _query(self) -> T_DomainModelList:
         self._builder.execute_query(self._client, remove_not_connected=True)
-        return self._builder.unpack()
+        unpacked = QueryUnpacker(
+            self._builder, edges="skip", as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
+        ).unpack()
+        return self._result_list_cls([self._result_cls.model_validate(node) for node in unpacked])
 
 
 def _create_edge_filter(

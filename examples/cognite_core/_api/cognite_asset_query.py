@@ -18,10 +18,11 @@ from cognite_core.data_classes import (
 )
 from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    ViewPropertyId,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    QueryBuilder,
+    QueryStep,
 )
 from cognite_core._api._core import (
     QueryAPI,
@@ -29,27 +30,31 @@ from cognite_core._api._core import (
 )
 
 
-class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
+class CogniteAssetQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewPropertyId | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=CogniteAsset,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -105,7 +110,7 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_asset_class(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -113,13 +118,14 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteAssetClass._view_id]),
                 ),
-                result_cls=CogniteAssetClass,
+                view_id=CogniteAssetClass._view_id,
+                connection_property=ViewPropertyId(self._view_id, "assetClass"),
             ),
         )
 
     def _query_append_object_3d(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -127,13 +133,14 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[Cognite3DObject._view_id]),
                 ),
-                result_cls=Cognite3DObject,
+                view_id=Cognite3DObject._view_id,
+                connection_property=ViewPropertyId(self._view_id, "object3D"),
             ),
         )
 
     def _query_append_parent(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -141,13 +148,14 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
                 ),
-                result_cls=CogniteAsset,
+                view_id=CogniteAsset._view_id,
+                connection_property=ViewPropertyId(self._view_id, "parent"),
             ),
         )
 
     def _query_append_root(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -155,13 +163,14 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteAsset._view_id]),
                 ),
-                result_cls=CogniteAsset,
+                view_id=CogniteAsset._view_id,
+                connection_property=ViewPropertyId(self._view_id, "root"),
             ),
         )
 
     def _query_append_source(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -169,13 +178,14 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteSourceSystem._view_id]),
                 ),
-                result_cls=CogniteSourceSystem,
+                view_id=CogniteSourceSystem._view_id,
+                connection_property=ViewPropertyId(self._view_id, "source"),
             ),
         )
 
     def _query_append_type_(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -183,6 +193,7 @@ class CogniteAssetQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[CogniteAssetType._view_id]),
                 ),
-                result_cls=CogniteAssetType,
+                view_id=CogniteAssetType._view_id,
+                connection_property=ViewPropertyId(self._view_id, "type"),
             ),
         )

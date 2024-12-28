@@ -18,9 +18,6 @@ from omni._api._core import (
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
-    NodeQueryStep,
-    EdgeQueryStep,
-    DataClassQueryBuilder,
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,
@@ -69,7 +66,7 @@ class PrimitiveNullableListedAPI(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> PrimitiveNullableListedQueryAPI[PrimitiveNullableListedList]:
+    ) -> PrimitiveNullableListedQueryAPI[PrimitiveNullableListed, PrimitiveNullableListedList]:
         """Query starting at primitive nullable listeds.
 
         Args:
@@ -96,8 +93,7 @@ class PrimitiveNullableListedAPI(
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = DataClassQueryBuilder(PrimitiveNullableListedList)
-        return PrimitiveNullableListedQueryAPI(self._client, builder, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, filter_, limit)
 
     def apply(
         self,
