@@ -188,7 +188,6 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     ) -> QueryBuilder:
         builder = QueryBuilder()
         from_: str | None = None
-        is_first: bool = True
         is_last_reverse_list = False
         for item in self._creation_path:
             if is_last_reverse_list:
@@ -198,35 +197,11 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     "To do this query, you need to reimplement the data model and use an edge to "
                     "implement this connection instead of a reverse direct relation"
                 )
-            if return_step == "first":
-                if is_first and item._has_limit_1():
-                    if limit != DEFAULT_QUERY_LIMIT:
-                        warnings.warn(
-                            "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
-                        )
-                    max_retrieve_limit = 1
-                elif is_first:
-                    max_retrieve_limit = limit
-                else:
-                    max_retrieve_limit = -1
-            elif return_step == "last":
-                is_last = item is self._creation_path[-1]
-                if is_last and item._has_limit_1():
-                    if limit != DEFAULT_QUERY_LIMIT:
-                        warnings.warn(
-                            "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
-                        )
-                    max_retrieve_limit = 1
-                elif is_last:
-                    max_retrieve_limit = limit
-                else:
-                    max_retrieve_limit = -1
-            else:
-                raise ValueError("Bug in Pygen. Invalid return_step. Please report")
 
+            max_retrieve_limit = self._get_max_retrieve_limit(item, limit, return_step)
             name = builder.create_name(from_)
-            step: QueryStep
             if isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.NodeResultSetExpression):
+                # Root step or direct/reverse direct step
                 step = QueryStep(
                     name=name,
                     expression=item._expression,
@@ -234,7 +209,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     connection_type=item._connection_type,
                     view_id=item._view_id,
                 )
-                if not is_first:
+                if not item is self._creation_path[0]:
                     if not item._connection_property:
                         raise ValueError("Bug in pygen. Connection name is missing when building a query")
                     step.connection_property = item._connection_property
@@ -243,6 +218,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 step.expression.sort = item._create_sort()
                 builder.append(step)
             elif isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.EdgeResultSetExpression):
+                # Edge without properties
                 edge_name = name
                 if not item._connection_property:
                     raise ValueError("Bug in pygen. Connection name is missing when building a query")
@@ -252,7 +228,6 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     expression=item._expression,
                     max_retrieve_limit=max_retrieve_limit,
                     connection_property=connection_property,
-                    view_id=item._view_id,
                 )
                 step.expression.from_ = from_
                 builder.append(step)
@@ -270,9 +245,11 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 builder.append(node_step)
             elif isinstance(item, EdgeQueryCore):
+                # Edge with properties
                 step = QueryStep(
                     name=name,
                     expression=cast(dm.query.EdgeResultSetExpression, item._expression),
+                    connection_property=item._connection_property,
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
@@ -282,9 +259,35 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
 
             is_last_reverse_list = item._connection_type == "reverse-list"
-            is_first = False
             from_ = name
         return builder
+
+    def _get_max_retrieve_limit(self, item: QueryCore, limit: int, return_step: Literal["first", "last"] | None = None) -> int:
+        is_first = item is self._creation_path[0]
+        if return_step == "first":
+            if is_first and item._has_limit_1():
+                if limit != DEFAULT_QUERY_LIMIT:
+                    warnings.warn(
+                        "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
+                    )
+                return 1
+            elif is_first:
+                return limit
+            else:
+                return -1
+        elif return_step == "last":
+            is_last = item is self._creation_path[-1]
+            if is_last and item._has_limit_1():
+                if limit != DEFAULT_QUERY_LIMIT:
+                    warnings.warn(
+                        "When selecting earliest and latest, the limit is ignored.", UserWarning, stacklevel=2
+                    )
+                return 1
+            elif is_last:
+                return limit
+            else:
+                return -1
+        raise ValueError("Bug in Pygen. Invalid return_step. Please report")
 
 
 class EdgeQueryCore(QueryCore[T_DomainList, T_DomainListEnd]):

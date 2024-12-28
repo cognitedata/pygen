@@ -65,9 +65,9 @@ def test_query_list_method_with_filter_query(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
-def test_query_list_full_inwards_edge(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_b.query().inwards.name.prefix("M").list_full(limit=5)
-    items_reversed = omni_client.connection_item_a.query().name.prefix("M").outwards.list_connection_item_b(limit=5)
+def test_select_list_full_inwards_edge(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_b.select().inwards.name.prefix("M").list_full(limit=5)
+    items_reversed = omni_client.connection_item_a.select().name.prefix("M").outwards.list_connection_item_b(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemBList)
@@ -153,8 +153,8 @@ def test_query_end_on_reverse_direct_relation_to_list(omni_client: OmniClient) -
     assert items.dump()
 
 
-def test_query_list_across_edge_with_limit(turbine_client: WindTurbineClient) -> None:
-    items = turbine_client.wind_turbine.query().name.equals("hornsea_1_mill_1").metmast.end_node.list_full(limit=5)
+def test_select_list_across_edge_with_limit(turbine_client: WindTurbineClient) -> None:
+    items = turbine_client.wind_turbine.select().name.equals("hornsea_1_mill_1").metmast.end_node.list_full(limit=5)
 
     assert len(items) > 0
     assert items.dump()
