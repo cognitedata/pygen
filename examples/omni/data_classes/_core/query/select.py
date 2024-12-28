@@ -26,9 +26,9 @@ from omni.data_classes._core.base import (
     DomainModel,
 )
 from omni.data_classes._core.constants import DEFAULT_QUERY_LIMIT
-from omni.data_classes._core.query.step import QueryStep, ViewPropertyId
 from omni.data_classes._core.query.builder import QueryBuilder
 from omni.data_classes._core.query.processing import QueryUnpacker
+from omni.data_classes._core.query.step import QueryStep, ViewPropertyId
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
