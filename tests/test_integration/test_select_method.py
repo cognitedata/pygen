@@ -21,8 +21,8 @@ def test_select_across_direct_relation(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
-def test_query_list_method(omni_client: OmniClient) -> None:
-    items = omni_client.connection_item_a.query().other_direct.list_connection_item_c_node(limit=5)
+def test_select_list_end_cls_method(omni_client: OmniClient) -> None:
+    items = omni_client.connection_item_a.select().other_direct.list_connection_item_c_node(limit=5)
 
     assert len(items) > 0
     assert isinstance(items, dc.ConnectionItemCNodeList)

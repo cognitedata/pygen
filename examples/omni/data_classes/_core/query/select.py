@@ -173,7 +173,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             step.select = None
         builder.execute_query(self._client, remove_not_connected=False)
         unpacked = QueryUnpacker(
-            builder, edges="skip", as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
+            builder[-1:], edges="skip", as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
         ).unpack()
         return self._result_list_cls_end([self._result_cls.model_validate(item) for item in unpacked])  # type: ignore[return-value]
 
