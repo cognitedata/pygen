@@ -34,6 +34,7 @@ from omni.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
+    ViewPropertyId,
 )
 
 if TYPE_CHECKING:
@@ -582,6 +583,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                     direction="outwards",
                 ),
                 connection_name="other_direct",
+                connection_property=ViewPropertyId(self._view_id, "otherDirect"),
             )
 
         if _ConnectionItemBQuery not in created_types:
