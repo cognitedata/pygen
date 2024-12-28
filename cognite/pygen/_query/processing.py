@@ -127,14 +127,21 @@ class QueryUnpacker:
 
     Args:
         steps: The steps of the query to unpack.
-        unpack_edges: If True, all edges are unpacked and included in the result. If False, only
-            edges with properties are included in the result. Default is True. See example below.
+        edges: Whether to skip, include identifier, or include the full edges in the unpacking. Note that
+            this is only for edges without properties. If the edge has properties, they are always included.
+            See example below for more information.
+        as_data_record: If True, the created time/last updated time properties are in a nested dictionary
+            called "data_record". Default is False.
+        edge_type_key: The key to use for the edge type. Default is "type". In pygen generated SDKs, this is set
+            to 'edge_type'.
+        node_type_key: The key to use for the node type. Default is "type". In pygen generated SDKs, this is set
+            to 'node_type'.
 
     Example:
-        Unpacking query steps with edges:
+        Unpacking query steps including edges:
 
         ```python
-        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        result = QueryUnpacker(steps, edges="include").unpack()
         print(result)
         [{
             "name": "Node A",
@@ -149,10 +156,25 @@ class QueryUnpacker:
          }]
         ```
 
-        Unpacking query steps with edges, but skipping the edges:
+        Unpacking query steps, including edge identifiers:
 
         ```python
-        result = QueryUnpacker(steps, unpack_edges=True).unpack()
+        result = QueryUnpacker(steps, edges="skip").unpack()
+        print(result)
+        [{
+           "name": "Node A",
+           "externalId": "A",
+           "outwards": [{
+               "space": "space",
+               "externalId": "B"
+           }]
+        }]
+        ```
+
+        Unpacking query steps, but skipping the edges:
+
+        ```python
+        result = QueryUnpacker(steps, edges="skip").unpack()
         print(result)
         [{
            "name": "Node A",
@@ -169,13 +191,13 @@ class QueryUnpacker:
     def __init__(
         self,
         steps: Sequence[QueryStep],
-        unpack_edges: bool = True,
+        edges: Literal["skip", "identifier", "include"] = "include",
         as_data_record: bool = False,
         edge_type_key: str = "type",
         node_type_key: str = "type",
     ) -> None:
         self._steps = steps
-        self._unpack_edges = unpack_edges
+        self._edges = edges
         self._as_data_record = as_data_record
         self._edge_type_key = edge_type_key
         self._node_type_key = node_type_key
@@ -343,7 +365,7 @@ class QueryUnpacker:
                 source_node = end_node
                 target_node = start_node
             # step.view_id means that the edge has properties
-            if self._unpack_edges or step.view_id:
+            if self._edges == "include" or step.view_id:
                 dumped = self.flatten_dump(edge, step_properties, as_data_record=self._as_data_record)
                 dumped[self._edge_type_key] = dumped.pop("type")
                 for connection_property, node_targets_by_source in connections:
@@ -351,11 +373,16 @@ class QueryUnpacker:
                         dumped[connection_property] = node_targets_by_source[target_node]
 
                 unpacked_by_source[source_node].append(dumped)
-            else:
+            elif self._edges == "identifier":
+                dumped = edge.as_id().dump(include_instance_type=False)
+                unpacked_by_source[source_node].append(dumped)
+            elif self._edges == "skip":
                 for _, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
                         # Skipping the edge, instead adding the target node to the source node
                         # such that the target node(s) can be connected to the source node.
                         unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
+            else:
+                raise ValueError(f"Unexpected value for edges: {self._edges}")
 
         return unpacked_by_source
