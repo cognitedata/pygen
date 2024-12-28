@@ -330,12 +330,6 @@ class QueryUnpacker:
                                     stacklevel=2,
                                 )
                                 dumped[connection_property].append(item)
-                else:
-                    warnings.warn(
-                        f"Property {connection_property!r} not found {node_id!r}. Expected to be in {dumped.keys()}",
-                        UserWarning,
-                        stacklevel=2,
-                    )
 
             if direct_property is None:
                 unpacked_by_source[node_id].append(dumped)
