@@ -488,9 +488,7 @@ class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
 
     def _query(self) -> T_DomainModelList:
         self._builder.execute_query(self._client, remove_not_connected=True)
-        unpacked = QueryUnpacker(
-            self._builder, edges="skip", as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
-        ).unpack()
+        unpacked = QueryUnpacker(self._builder).unpack()
         return self._result_list_cls([self._result_cls.model_validate(node) for node in unpacked])
 
 

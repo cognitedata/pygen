@@ -76,21 +76,21 @@ class TestQueryBuilder:
         # Arrange
         item_a = omni_views["ConnectionItemA"].as_id()
 
-        builder = DataClassQueryBuilder(dc.ConnectionItemAList)
+        builder = QueryBuilder()
 
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_a]),
                 ),
-                dc.ConnectionItemA,
+                view_id=dc.ConnectionItemA._view_id,
                 max_retrieve_limit=5,
             )
         )
         from_a = builder.get_from()
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(from_a),
                 dm.query.NodeResultSetExpression(
                     from_=from_a,
@@ -99,12 +99,12 @@ class TestQueryBuilder:
                         "otherDirect",
                     ),
                 ),
-                dc.ConnectionItemCNode,
+                view_id=dc.ConnectionItemCNode._view_id,
             )
         )
         edge_name = builder.create_name(from_a)
         builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=from_a,
@@ -114,12 +114,12 @@ class TestQueryBuilder:
             )
         )
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(edge_name),
                 dm.query.NodeResultSetExpression(
                     from_=edge_name,
                 ),
-                dc.ConnectionItemB,
+                dc.ConnectionItemB._view_id,
             )
         )
 
@@ -152,9 +152,9 @@ class TestQueryBuilder:
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client
     ) -> None:
         item_f = omni_views["ConnectionItemF"].as_id()
-        builder = DataClassQueryBuilder(dc.ConnectionItemFList)
+        builder = QueryBuilder(dc.ConnectionItemFList)
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_f]),
@@ -166,7 +166,7 @@ class TestQueryBuilder:
         from_f = builder.get_from()
         edge_view = omni_views["ConnectionEdgeA"].as_id()
         builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 builder.create_name(from_f),
                 dm.query.EdgeResultSetExpression(
                     from_=from_f,
@@ -180,7 +180,7 @@ class TestQueryBuilder:
         item_g = omni_views["ConnectionItemG"].as_id()
         from_edge = builder.get_from()
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(from_edge),
                 dm.query.NodeResultSetExpression(
                     from_=from_edge,
