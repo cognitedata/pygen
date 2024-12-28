@@ -196,25 +196,6 @@ class Blade(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Blade],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_position import SensorPosition
-
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, SensorPosition)
-                and node.blade is not None
-                and (blade := instances.get(as_pygen_node_id(node.blade)))
-            ):
-                if blade.sensor_positions is None:
-                    blade.sensor_positions = []
-                blade.sensor_positions.append(node)
-
 
 class BladeWrite(DomainModelWrite):
     """This represents the writing version of blade.

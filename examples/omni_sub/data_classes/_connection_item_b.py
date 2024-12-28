@@ -204,49 +204,6 @@ class ConnectionItemB(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId, ConnectionItemB],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._connection_item_a import ConnectionItemA
-
-        for instance in instances.values():
-            if edges := edges_by_source_node.get(instance.as_id()):
-                inwards: list[ConnectionItemA | dm.NodeId] = []
-                self_edge: list[ConnectionItemB | dm.NodeId] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId = as_node_id(other_end)
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "bidirectional") and isinstance(
-                        value, ConnectionItemA | dm.NodeId
-                    ):
-                        inwards.append(value)
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "reflexive") and isinstance(
-                        value, ConnectionItemB | dm.NodeId
-                    ):
-                        self_edge.append(value)
-
-                instance.inwards = inwards or None
-                instance.self_edge = self_edge or None
-
 
 class ConnectionItemBWrite(DomainModelWrite):
     """This represents the writing version of connection item b.

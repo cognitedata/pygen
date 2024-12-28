@@ -382,66 +382,6 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteEquipment],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_activity import CogniteActivity
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_equipment_type import CogniteEquipmentType
-        from ._cognite_file import CogniteFile
-        from ._cognite_source_system import CogniteSourceSystem
-        from ._cognite_time_series import CogniteTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.asset, dm.NodeId | str)
-                and (asset := nodes_by_id.get(instance.asset))
-                and isinstance(asset, CogniteAsset)
-            ):
-                instance.asset = asset
-            if (
-                isinstance(instance.equipment_type, dm.NodeId | str)
-                and (equipment_type := nodes_by_id.get(instance.equipment_type))
-                and isinstance(equipment_type, CogniteEquipmentType)
-            ):
-                instance.equipment_type = equipment_type
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-            if instance.files:
-                new_files: list[CogniteFile | str | dm.NodeId] = []
-                for file in instance.files:
-                    if isinstance(file, CogniteFile):
-                        new_files.append(file)
-                    elif (other := nodes_by_id.get(file)) and isinstance(other, CogniteFile):
-                        new_files.append(other)
-                    else:
-                        new_files.append(file)
-                instance.files = new_files
-        for node in nodes_by_id.values():
-            if isinstance(node, CogniteActivity) and node.equipment is not None:
-                for equipment in node.equipment:
-                    if this_instance := instances.get(as_pygen_node_id(equipment)):
-                        if this_instance.activities is None:
-                            this_instance.activities = [node]
-                        else:
-                            this_instance.activities.append(node)
-
-            if isinstance(node, CogniteTimeSeries) and node.equipment is not None:
-                for equipment in node.equipment:
-                    if this_instance := instances.get(as_pygen_node_id(equipment)):
-                        if this_instance.time_series is None:
-                            this_instance.time_series = [node]
-                        else:
-                            this_instance.time_series.append(node)
-
 
 class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
     """This represents the writing version of Cognite equipment.

@@ -217,53 +217,6 @@ class HighSpeedShaft(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, HighSpeedShaft],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.bending_moment_y, dm.NodeId | str)
-                and (bending_moment_y := nodes_by_id.get(instance.bending_moment_y))
-                and isinstance(bending_moment_y, SensorTimeSeries)
-            ):
-                instance.bending_moment_y = bending_moment_y
-            if (
-                isinstance(instance.bending_monent_x, dm.NodeId | str)
-                and (bending_monent_x := nodes_by_id.get(instance.bending_monent_x))
-                and isinstance(bending_monent_x, SensorTimeSeries)
-            ):
-                instance.bending_monent_x = bending_monent_x
-            if (
-                isinstance(instance.torque, dm.NodeId | str)
-                and (torque := nodes_by_id.get(instance.torque))
-                and isinstance(torque, SensorTimeSeries)
-            ):
-                instance.torque = torque
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.high_speed_shaft is not None
-                and (high_speed_shaft := instances.get(as_pygen_node_id(node.high_speed_shaft)))
-            ):
-                if high_speed_shaft.nacelle is None:
-                    high_speed_shaft.nacelle = node
-                elif are_nodes_equal(node, high_speed_shaft.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {high_speed_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {high_speed_shaft.nacelle!s}.",
-                        stacklevel=2,
-                    )
-
 
 class HighSpeedShaftWrite(DomainModelWrite):
     """This represents the writing version of high speed shaft.

@@ -366,50 +366,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteFile],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_equipment import CogniteEquipment
-        from ._cognite_file_category import CogniteFileCategory
-        from ._cognite_source_system import CogniteSourceSystem
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.category, dm.NodeId | str)
-                and (category := nodes_by_id.get(instance.category))
-                and isinstance(category, CogniteFileCategory)
-            ):
-                instance.category = category
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-            if instance.assets:
-                new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for asset in instance.assets:
-                    if isinstance(asset, CogniteAsset):
-                        new_assets.append(asset)
-                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
-                        new_assets.append(other)
-                    else:
-                        new_assets.append(asset)
-                instance.assets = new_assets
-        for node in nodes_by_id.values():
-            if isinstance(node, CogniteEquipment) and node.files is not None:
-                for files in node.files:
-                    if this_instance := instances.get(as_pygen_node_id(files)):
-                        if this_instance.equipment is None:
-                            this_instance.equipment = [node]
-                        else:
-                            this_instance.equipment.append(node)
-
 
 class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
     """This represents the writing version of Cognite file.

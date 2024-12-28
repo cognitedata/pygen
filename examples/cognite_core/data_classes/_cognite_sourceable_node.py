@@ -241,23 +241,6 @@ class CogniteSourceableNode(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteSourceableNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_source_system import CogniteSourceSystem
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-
 
 class CogniteSourceableNodeWrite(DomainModelWrite):
     """This represents the writing version of Cognite sourceable node.

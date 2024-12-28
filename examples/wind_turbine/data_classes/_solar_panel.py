@@ -204,29 +204,6 @@ class SolarPanel(GeneratingUnit):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, SolarPanel],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.efficiency, dm.NodeId | str)
-                and (efficiency := nodes_by_id.get(instance.efficiency))
-                and isinstance(efficiency, SensorTimeSeries)
-            ):
-                instance.efficiency = efficiency
-            if (
-                isinstance(instance.orientation, dm.NodeId | str)
-                and (orientation := nodes_by_id.get(instance.orientation))
-                and isinstance(orientation, SensorTimeSeries)
-            ):
-                instance.orientation = orientation
-
 
 class SolarPanelWrite(GeneratingUnitWrite):
     """This represents the writing version of solar panel.

@@ -199,23 +199,6 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite3DRevision],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_3_d_model import Cognite3DModel
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.model_3d, dm.NodeId | str)
-                and (model_3d := nodes_by_id.get(instance.model_3d))
-                and isinstance(model_3d, Cognite3DModel)
-            ):
-                instance.model_3d = model_3d
-
 
 class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
     """This represents the writing version of Cognite 3D revision.

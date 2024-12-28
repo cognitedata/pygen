@@ -211,53 +211,6 @@ class Gearbox(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Gearbox],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.displacement_x, dm.NodeId | str)
-                and (displacement_x := nodes_by_id.get(instance.displacement_x))
-                and isinstance(displacement_x, SensorTimeSeries)
-            ):
-                instance.displacement_x = displacement_x
-            if (
-                isinstance(instance.displacement_y, dm.NodeId | str)
-                and (displacement_y := nodes_by_id.get(instance.displacement_y))
-                and isinstance(displacement_y, SensorTimeSeries)
-            ):
-                instance.displacement_y = displacement_y
-            if (
-                isinstance(instance.displacement_z, dm.NodeId | str)
-                and (displacement_z := nodes_by_id.get(instance.displacement_z))
-                and isinstance(displacement_z, SensorTimeSeries)
-            ):
-                instance.displacement_z = displacement_z
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.gearbox is not None
-                and (gearbox := instances.get(as_pygen_node_id(node.gearbox)))
-            ):
-                if gearbox.nacelle is None:
-                    gearbox.nacelle = node
-                elif are_nodes_equal(node, gearbox.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {gearbox.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {gearbox.nacelle!s}.",
-                        stacklevel=2,
-                    )
-
 
 class GearboxWrite(DomainModelWrite):
     """This represents the writing version of gearbox.

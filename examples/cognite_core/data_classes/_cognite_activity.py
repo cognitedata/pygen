@@ -381,56 +381,6 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteActivity],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_asset import CogniteAsset
-        from ._cognite_equipment import CogniteEquipment
-        from ._cognite_source_system import CogniteSourceSystem
-        from ._cognite_time_series import CogniteTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.source, dm.NodeId | str)
-                and (source := nodes_by_id.get(instance.source))
-                and isinstance(source, CogniteSourceSystem)
-            ):
-                instance.source = source
-            if instance.assets:
-                new_assets: list[CogniteAsset | str | dm.NodeId] = []
-                for asset in instance.assets:
-                    if isinstance(asset, CogniteAsset):
-                        new_assets.append(asset)
-                    elif (other := nodes_by_id.get(asset)) and isinstance(other, CogniteAsset):
-                        new_assets.append(other)
-                    else:
-                        new_assets.append(asset)
-                instance.assets = new_assets
-            if instance.equipment:
-                new_equipment: list[CogniteEquipment | str | dm.NodeId] = []
-                for equipment in instance.equipment:
-                    if isinstance(equipment, CogniteEquipment):
-                        new_equipment.append(equipment)
-                    elif (other := nodes_by_id.get(equipment)) and isinstance(other, CogniteEquipment):
-                        new_equipment.append(other)
-                    else:
-                        new_equipment.append(equipment)
-                instance.equipment = new_equipment
-            if instance.time_series:
-                new_time_series: list[CogniteTimeSeries | str | dm.NodeId] = []
-                for time_series in instance.time_series:
-                    if isinstance(time_series, CogniteTimeSeries):
-                        new_time_series.append(time_series)
-                    elif (other := nodes_by_id.get(time_series)) and isinstance(other, CogniteTimeSeries):
-                        new_time_series.append(other)
-                    else:
-                        new_time_series.append(time_series)
-                instance.time_series = new_time_series
-
 
 class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite, CogniteSchedulableWrite):
     """This represents the writing version of Cognite activity.

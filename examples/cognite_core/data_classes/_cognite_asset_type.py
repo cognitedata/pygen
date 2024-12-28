@@ -219,23 +219,6 @@ class CogniteAssetType(CogniteDescribableNode):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteAssetType],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_asset_class import CogniteAssetClass
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.asset_class, dm.NodeId | str)
-                and (asset_class := nodes_by_id.get(instance.asset_class))
-                and isinstance(asset_class, CogniteAssetClass)
-            ):
-                instance.asset_class = asset_class
-
 
 class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite asset type.

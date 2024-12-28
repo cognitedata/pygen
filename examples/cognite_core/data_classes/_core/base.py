@@ -189,16 +189,6 @@ class DomainModelCore(Core, ABC):
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | dm.EdgeId | str, Self],
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        # This is used when unpacking a query result and should be overridden in the subclasses
-        return None
-
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 

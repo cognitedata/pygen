@@ -235,65 +235,6 @@ class MainShaft(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, MainShaft],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.bending_x, dm.NodeId | str)
-                and (bending_x := nodes_by_id.get(instance.bending_x))
-                and isinstance(bending_x, SensorTimeSeries)
-            ):
-                instance.bending_x = bending_x
-            if (
-                isinstance(instance.bending_y, dm.NodeId | str)
-                and (bending_y := nodes_by_id.get(instance.bending_y))
-                and isinstance(bending_y, SensorTimeSeries)
-            ):
-                instance.bending_y = bending_y
-            if (
-                isinstance(instance.calculated_tilt_moment, dm.NodeId | str)
-                and (calculated_tilt_moment := nodes_by_id.get(instance.calculated_tilt_moment))
-                and isinstance(calculated_tilt_moment, SensorTimeSeries)
-            ):
-                instance.calculated_tilt_moment = calculated_tilt_moment
-            if (
-                isinstance(instance.calculated_yaw_moment, dm.NodeId | str)
-                and (calculated_yaw_moment := nodes_by_id.get(instance.calculated_yaw_moment))
-                and isinstance(calculated_yaw_moment, SensorTimeSeries)
-            ):
-                instance.calculated_yaw_moment = calculated_yaw_moment
-            if (
-                isinstance(instance.torque, dm.NodeId | str)
-                and (torque := nodes_by_id.get(instance.torque))
-                and isinstance(torque, SensorTimeSeries)
-            ):
-                instance.torque = torque
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.generator is not None
-                and (generator := instances.get(as_pygen_node_id(node.generator)))
-            ):
-                if generator.nacelle is None:
-                    generator.nacelle = node
-                elif are_nodes_equal(node, generator.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {generator.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {generator.nacelle!s}.",
-                        stacklevel=2,
-                    )
-
 
 class MainShaftWrite(DomainModelWrite):
     """This represents the writing version of main shaft.

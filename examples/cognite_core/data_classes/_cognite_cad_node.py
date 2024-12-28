@@ -272,41 +272,6 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteCADNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_3_d_object import Cognite3DObject
-        from ._cognite_cad_model import CogniteCADModel
-        from ._cognite_cad_revision import CogniteCADRevision
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.model_3d, dm.NodeId | str)
-                and (model_3d := nodes_by_id.get(instance.model_3d))
-                and isinstance(model_3d, CogniteCADModel)
-            ):
-                instance.model_3d = model_3d
-            if (
-                isinstance(instance.object_3d, dm.NodeId | str)
-                and (object_3d := nodes_by_id.get(instance.object_3d))
-                and isinstance(object_3d, Cognite3DObject)
-            ):
-                instance.object_3d = object_3d
-            if instance.revisions:
-                new_revisions: list[CogniteCADRevision | str | dm.NodeId] = []
-                for revision in instance.revisions:
-                    if isinstance(revision, CogniteCADRevision):
-                        new_revisions.append(revision)
-                    elif (other := nodes_by_id.get(revision)) and isinstance(other, CogniteCADRevision):
-                        new_revisions.append(other)
-                    else:
-                        new_revisions.append(revision)
-                instance.revisions = new_revisions
-
 
 class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
     """This represents the writing version of Cognite cad node.

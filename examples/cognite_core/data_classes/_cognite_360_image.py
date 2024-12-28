@@ -333,67 +333,6 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite360Image],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_360_image_collection import Cognite360ImageCollection
-        from ._cognite_360_image_station import Cognite360ImageStation
-        from ._cognite_file import CogniteFile
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.back, dm.NodeId | str)
-                and (back := nodes_by_id.get(instance.back))
-                and isinstance(back, CogniteFile)
-            ):
-                instance.back = back
-            if (
-                isinstance(instance.bottom, dm.NodeId | str)
-                and (bottom := nodes_by_id.get(instance.bottom))
-                and isinstance(bottom, CogniteFile)
-            ):
-                instance.bottom = bottom
-            if (
-                isinstance(instance.collection_360, dm.NodeId | str)
-                and (collection_360 := nodes_by_id.get(instance.collection_360))
-                and isinstance(collection_360, Cognite360ImageCollection)
-            ):
-                instance.collection_360 = collection_360
-            if (
-                isinstance(instance.front, dm.NodeId | str)
-                and (front := nodes_by_id.get(instance.front))
-                and isinstance(front, CogniteFile)
-            ):
-                instance.front = front
-            if (
-                isinstance(instance.left, dm.NodeId | str)
-                and (left := nodes_by_id.get(instance.left))
-                and isinstance(left, CogniteFile)
-            ):
-                instance.left = left
-            if (
-                isinstance(instance.right, dm.NodeId | str)
-                and (right := nodes_by_id.get(instance.right))
-                and isinstance(right, CogniteFile)
-            ):
-                instance.right = right
-            if (
-                isinstance(instance.station_360, dm.NodeId | str)
-                and (station_360 := nodes_by_id.get(instance.station_360))
-                and isinstance(station_360, Cognite360ImageStation)
-            ):
-                instance.station_360 = station_360
-            if (
-                isinstance(instance.top, dm.NodeId | str)
-                and (top := nodes_by_id.get(instance.top))
-                and isinstance(top, CogniteFile)
-            ):
-                instance.top = top
-
 
 class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite):
     """This represents the writing version of Cognite 360 image.

@@ -211,23 +211,6 @@ class Cognite3DModel(CogniteDescribableNode):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite3DModel],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_file import CogniteFile
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.thumbnail, dm.NodeId | str)
-                and (thumbnail := nodes_by_id.get(instance.thumbnail))
-                and isinstance(thumbnail, CogniteFile)
-            ):
-                instance.thumbnail = thumbnail
-
 
 class Cognite3DModelWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite 3D model.

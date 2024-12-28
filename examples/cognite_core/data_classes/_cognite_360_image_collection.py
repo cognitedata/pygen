@@ -227,23 +227,6 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Cognite360ImageCollection],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_360_image_model import Cognite360ImageModel
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.model_3d, dm.NodeId | str)
-                and (model_3d := nodes_by_id.get(instance.model_3d))
-                and isinstance(model_3d, Cognite360ImageModel)
-            ):
-                instance.model_3d = model_3d
-
 
 class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevisionWrite, protected_namespaces=()):
     """This represents the writing version of Cognite 360 image collection.

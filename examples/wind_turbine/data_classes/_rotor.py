@@ -218,47 +218,6 @@ class Rotor(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Rotor],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._sensor_time_series import SensorTimeSeries
-        from ._wind_turbine import WindTurbine
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.rotor_speed_controller, dm.NodeId | str)
-                and (rotor_speed_controller := nodes_by_id.get(instance.rotor_speed_controller))
-                and isinstance(rotor_speed_controller, SensorTimeSeries)
-            ):
-                instance.rotor_speed_controller = rotor_speed_controller
-            if (
-                isinstance(instance.rpm_low_speed_shaft, dm.NodeId | str)
-                and (rpm_low_speed_shaft := nodes_by_id.get(instance.rpm_low_speed_shaft))
-                and isinstance(rpm_low_speed_shaft, SensorTimeSeries)
-            ):
-                instance.rpm_low_speed_shaft = rpm_low_speed_shaft
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, WindTurbine)
-                and node.rotor is not None
-                and (rotor := instances.get(as_pygen_node_id(node.rotor)))
-            ):
-                if rotor.wind_turbine is None:
-                    rotor.wind_turbine = node
-                elif are_nodes_equal(node, rotor.wind_turbine):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'wind_turbine' in {rotor.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {rotor.wind_turbine!s}.",
-                        stacklevel=2,
-                    )
-
 
 class RotorWrite(DomainModelWrite):
     """This represents the writing version of rotor.

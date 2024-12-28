@@ -229,53 +229,6 @@ class PowerInverter(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, PowerInverter],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.active_power_total, dm.NodeId | str)
-                and (active_power_total := nodes_by_id.get(instance.active_power_total))
-                and isinstance(active_power_total, SensorTimeSeries)
-            ):
-                instance.active_power_total = active_power_total
-            if (
-                isinstance(instance.apparent_power_total, dm.NodeId | str)
-                and (apparent_power_total := nodes_by_id.get(instance.apparent_power_total))
-                and isinstance(apparent_power_total, SensorTimeSeries)
-            ):
-                instance.apparent_power_total = apparent_power_total
-            if (
-                isinstance(instance.reactive_power_total, dm.NodeId | str)
-                and (reactive_power_total := nodes_by_id.get(instance.reactive_power_total))
-                and isinstance(reactive_power_total, SensorTimeSeries)
-            ):
-                instance.reactive_power_total = reactive_power_total
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.power_inverter is not None
-                and (power_inverter := instances.get(as_pygen_node_id(node.power_inverter)))
-            ):
-                if power_inverter.nacelle is None:
-                    power_inverter.nacelle = node
-                elif are_nodes_equal(node, power_inverter.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {power_inverter.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {power_inverter.nacelle!s}.",
-                        stacklevel=2,
-                    )
-
 
 class PowerInverterWrite(DomainModelWrite):
     """This represents the writing version of power inverter.

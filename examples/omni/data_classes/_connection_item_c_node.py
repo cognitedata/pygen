@@ -225,54 +225,6 @@ class ConnectionItemCNode(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, ConnectionItemCNode],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._connection_item_a import ConnectionItemA
-        from ._connection_item_b import ConnectionItemB
-
-        for instance in instances.values():
-            if edges := edges_by_source_node.get(instance.as_id()):
-                connection_item_a: list[ConnectionItemA | str | dm.NodeId] = []
-                connection_item_b: list[ConnectionItemB | str | dm.NodeId] = []
-                for edge in edges:
-                    value: DomainModel | DomainRelation | str | dm.NodeId
-                    if isinstance(edge, DomainRelation):
-                        value = edge
-                    else:
-                        other_end: dm.DirectRelationReference = (
-                            edge.end_node
-                            if edge.start_node.space == instance.space
-                            and edge.start_node.external_id == instance.external_id
-                            else edge.start_node
-                        )
-                        destination: dm.NodeId | str = (
-                            as_node_id(other_end)
-                            if other_end.space != DEFAULT_INSTANCE_SPACE
-                            else other_end.external_id
-                        )
-                        if destination in nodes_by_id:
-                            value = nodes_by_id[destination]
-                        else:
-                            value = destination
-                    edge_type = edge.edge_type if isinstance(edge, DomainRelation) else edge.type
-
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, ConnectionItemA | str | dm.NodeId
-                    ):
-                        connection_item_a.append(value)
-                    if edge_type == dm.DirectRelationReference("sp_pygen_models", "unidirectional") and isinstance(
-                        value, ConnectionItemB | str | dm.NodeId
-                    ):
-                        connection_item_b.append(value)
-
-                instance.connection_item_a = connection_item_a or None
-                instance.connection_item_b = connection_item_b or None
-
 
 class ConnectionItemCNodeWrite(DomainModelWrite):
     """This represents the writing version of connection item c node.

@@ -208,53 +208,6 @@ class CogniteCubeMap(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, CogniteCubeMap],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._cognite_file import CogniteFile
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.back, dm.NodeId | str)
-                and (back := nodes_by_id.get(instance.back))
-                and isinstance(back, CogniteFile)
-            ):
-                instance.back = back
-            if (
-                isinstance(instance.bottom, dm.NodeId | str)
-                and (bottom := nodes_by_id.get(instance.bottom))
-                and isinstance(bottom, CogniteFile)
-            ):
-                instance.bottom = bottom
-            if (
-                isinstance(instance.front, dm.NodeId | str)
-                and (front := nodes_by_id.get(instance.front))
-                and isinstance(front, CogniteFile)
-            ):
-                instance.front = front
-            if (
-                isinstance(instance.left, dm.NodeId | str)
-                and (left := nodes_by_id.get(instance.left))
-                and isinstance(left, CogniteFile)
-            ):
-                instance.left = left
-            if (
-                isinstance(instance.right, dm.NodeId | str)
-                and (right := nodes_by_id.get(instance.right))
-                and isinstance(right, CogniteFile)
-            ):
-                instance.right = right
-            if (
-                isinstance(instance.top, dm.NodeId | str)
-                and (top := nodes_by_id.get(instance.top))
-                and isinstance(top, CogniteFile)
-            ):
-                instance.top = top
-
 
 class CogniteCubeMapWrite(DomainModelWrite):
     """This represents the writing version of Cognite cube map.

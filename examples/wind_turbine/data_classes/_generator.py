@@ -212,51 +212,6 @@ class Generator(DomainModel):
         )
         return self.as_write()
 
-    @classmethod
-    def _update_connections(
-        cls,
-        instances: dict[dm.NodeId | str, Generator],  # type: ignore[override]
-        nodes_by_id: dict[dm.NodeId | str, DomainModel],
-        edges_by_source_node: dict[dm.NodeId, list[dm.Edge | DomainRelation]],
-    ) -> None:
-        from ._nacelle import Nacelle
-        from ._sensor_time_series import SensorTimeSeries
-
-        for instance in instances.values():
-            if (
-                isinstance(instance.generator_speed_controller, dm.NodeId | str)
-                and (generator_speed_controller := nodes_by_id.get(instance.generator_speed_controller))
-                and isinstance(generator_speed_controller, SensorTimeSeries)
-            ):
-                instance.generator_speed_controller = generator_speed_controller
-            if (
-                isinstance(instance.generator_speed_controller_reference, dm.NodeId | str)
-                and (
-                    generator_speed_controller_reference := nodes_by_id.get(
-                        instance.generator_speed_controller_reference
-                    )
-                )
-                and isinstance(generator_speed_controller_reference, SensorTimeSeries)
-            ):
-                instance.generator_speed_controller_reference = generator_speed_controller_reference
-        for node in nodes_by_id.values():
-            if (
-                isinstance(node, Nacelle)
-                and node.main_shaft is not None
-                and (main_shaft := instances.get(as_pygen_node_id(node.main_shaft)))
-            ):
-                if main_shaft.nacelle is None:
-                    main_shaft.nacelle = node
-                elif are_nodes_equal(node, main_shaft.nacelle):
-                    # This is the same node, so we don't need to do anything...
-                    ...
-                else:
-                    warnings.warn(
-                        f"Expected one direct relation for 'nacelle' in {main_shaft.as_id()}."
-                        f"Ignoring new relation {node!s} in favor of {main_shaft.nacelle!s}.",
-                        stacklevel=2,
-                    )
-
 
 class GeneratorWrite(DomainModelWrite):
     """This represents the writing version of generator.
