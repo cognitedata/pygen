@@ -21,7 +21,7 @@ class TestQueryBuilder:
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_e]),
                 ),
-                view_id=dc.ConnectionItemE._view_id,
+                view_id=item_e,
                 max_retrieve_limit=-1,
             )
         )
@@ -36,8 +36,8 @@ class TestQueryBuilder:
                     through=item_d.as_property_ref("directSingle"),
                     direction="inwards",
                 ),
-                view_id=dc.ConnectionItemD._view_id,
-                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directReverseSingle"),
+                view_id=item_d,
+                connection_property=ViewPropertyId(item_e, "directReverseSingle"),
             )
         )
         builder.append(
@@ -49,9 +49,9 @@ class TestQueryBuilder:
                     through=item_d.as_property_ref("directMulti"),
                     direction="inwards",
                 ),
-                view_id=dc.ConnectionItemD._view_id,
+                view_id=item_d,
                 connection_type="reverse-list",
-                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directInverseMulti"),
+                connection_property=ViewPropertyId(item_e, "directReverseMulti"),
             )
         )
         # Act
