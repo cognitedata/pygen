@@ -88,7 +88,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemAQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemAQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the connection item a edges of the connection item c node.
 
         Args:
@@ -162,7 +162,7 @@ class ConnectionItemCNodeQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemBQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemBQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the connection item b edges of the connection item c node.
 
         Args:

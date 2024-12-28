@@ -87,7 +87,7 @@ class ConnectionItemGQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemFQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemFQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the inwards multi property edges of the connection item g.
 
         Args:

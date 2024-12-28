@@ -83,7 +83,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemGQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemGQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outwards multi edges of the connection item f.
 
         Args:
@@ -190,7 +190,7 @@ class ConnectionItemFQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> ConnectionItemEQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemEQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outwards single edges of the connection item f.
 
         Args:

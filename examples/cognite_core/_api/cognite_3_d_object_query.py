@@ -183,7 +183,7 @@ class Cognite3DObjectQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> Cognite360ImageQueryAPI[T_DomainModelList]:
+    ) -> Cognite360ImageQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the images 360 edges of the Cognite 3D object.
 
         Args:

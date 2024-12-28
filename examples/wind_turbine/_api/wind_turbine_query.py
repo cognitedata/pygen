@@ -79,7 +79,7 @@ class WindTurbineQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
         retrieve_nacelle: bool = False,
         retrieve_rotor: bool = False,
-    ) -> MetmastQueryAPI[T_DomainModelList]:
+    ) -> MetmastQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the metmast edges of the wind turbine.
 
         Args:

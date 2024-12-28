@@ -113,7 +113,7 @@ class MetmastQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> WindTurbineQueryAPI[T_DomainModelList]:
+    ) -> WindTurbineQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the wind turbine edges of the metmast.
 
         Args:

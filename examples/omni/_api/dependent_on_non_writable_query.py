@@ -72,7 +72,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList])
         space_edge: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
-    ) -> Implementation1NonWriteableQueryAPI[T_DomainModelList]:
+    ) -> Implementation1NonWriteableQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the to non writable edges of the dependent on non writable.
 
         Args:

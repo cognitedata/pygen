@@ -86,7 +86,7 @@ class ConnectionItemDQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         filter: dm.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         retrieve_direct_single: bool = False,
-    ) -> ConnectionItemEQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemEQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outwards single edges of the connection item d.
 
         Args:

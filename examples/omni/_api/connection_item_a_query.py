@@ -72,7 +72,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
         retrieve_other_direct: bool = False,
         retrieve_self_direct: bool = False,
-    ) -> ConnectionItemBQueryAPI[T_DomainModelList]:
+    ) -> ConnectionItemBQueryAPI[T_DomainModel, T_DomainModelList]:
         """Query along the outward edges of the connection item a.
 
         Args:
