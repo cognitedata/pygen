@@ -3,5 +3,4 @@ from wind_turbine.data_classes._core.query.step import *  # noqa
 from wind_turbine.data_classes._core.query.processing import *  # noqa
 from wind_turbine.data_classes._core.query.builder import *  # noqa
 from wind_turbine.data_classes._core.query.filter_classes import *  # noqa
-from wind_turbine.data_classes._core.query.data_class_step import *  # noqa
 from wind_turbine.data_classes._core.query.select import *  # noqa
