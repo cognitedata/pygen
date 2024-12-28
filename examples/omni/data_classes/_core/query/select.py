@@ -262,7 +262,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             from_ = name
         return builder
 
-    def _get_max_retrieve_limit(self, item: QueryCore, limit: int, return_step: Literal["first", "last"] | None = None) -> int:
+    def _get_max_retrieve_limit(
+        self, item: QueryCore, limit: int, return_step: Literal["first", "last"] | None = None
+    ) -> int:
         is_first = item is self._creation_path[0]
         if return_step == "first":
             if is_first and item._has_limit_1():
