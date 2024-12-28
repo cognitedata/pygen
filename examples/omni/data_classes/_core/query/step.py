@@ -175,10 +175,7 @@ class QueryStep:
             return None
 
     def __repr__(self) -> str:
-        msg = f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)}"
-        if self.view_id:
-            msg += f", view_id={self.view_id!r}"
-        return msg + ")"
+        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
 
 
 class QueryStepFactory:
@@ -376,7 +373,7 @@ class QueryStepFactory:
             return steps
 
         node_properties = next(
-            (prop for prop in selected_properties or [] if isinstance(prop, dict) and self._edge_connection_property in prop), None
+            (prop for prop in selected_properties or [] if isinstance(prop, dict) and "node" in prop), None
         )
         selected_node_properties: list[str] | None = None
         if isinstance(node_properties, dict) and self._edge_connection_property in node_properties:
@@ -384,19 +381,17 @@ class QueryStepFactory:
 
         query_properties = self._create_query_properties(selected_node_properties, None)
         target_view = source
-        if edge_view is not None:
-            target_view = edge_view
 
         step = QueryStep(
             self._create_step_name(edge_name),
             dm.query.NodeResultSetExpression(
                 from_=edge_name,
-                filter=self._full_filter(None, has_container_fields, source),
+                filter=self._full_filter(None, has_container_fields, target_view),
             ),
-            select=self._create_select(query_properties, source),
+            select=self._create_select(query_properties, target_view),
             selected_properties=selected_node_properties,
             connection_property=ViewPropertyId(target_view, self._edge_connection_property),
-            view_id=source,
+            view_id=target_view,
         )
         steps.append(step)
         return steps

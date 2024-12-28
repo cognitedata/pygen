@@ -555,9 +555,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
                 edge_view=Distance._view_id,
             )
         )
-        # We know that that all nodes are connected as it is not possible to filter on connections
-        builder.execute_query(self._client, remove_not_connected=False)
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(
-            builder, unpack_edges=False, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
+            builder, edges=unpack_edges, as_data_record=True, edge_type_key="edge_type", node_type_key="node_type"
         ).unpack()
         return MetmastList([Metmast.model_validate(item) for item in unpacked])

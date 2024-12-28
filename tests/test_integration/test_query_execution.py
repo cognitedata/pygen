@@ -108,7 +108,7 @@ def test_query_edge_outwards_skip_edge(cognite_client: CogniteClient, omni_views
     item_a = omni_views["ConnectionItemA"]
     item_b = omni_views["ConnectionItemB"]
     executor = _QueryExecutor(cognite_client, views=[item_a, item_b])
-    executor._unpack_edges = False
+    executor._unpack_edges = "skip"
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",

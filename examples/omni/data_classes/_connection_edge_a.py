@@ -7,7 +7,6 @@ from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKIN
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
-from pydantic import field_validator
 
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -30,7 +29,6 @@ from omni.data_classes._core import (
     as_pygen_node_id,
     are_nodes_equal,
     is_tuple_id,
-    parse_single_connection,
     select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
