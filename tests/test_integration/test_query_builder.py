@@ -155,7 +155,7 @@ class TestQueryBuilder:
         self, cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client
     ) -> None:
         item_f = omni_views["ConnectionItemF"].as_id()
-        builder = QueryBuilder(dc.ConnectionItemFList)
+        builder = QueryBuilder()
         builder.append(
             QueryStep(
                 builder.create_name(None),
