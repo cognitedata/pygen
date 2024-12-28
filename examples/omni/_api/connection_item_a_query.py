@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, cast
 
 from cognite.client import data_modeling as dm, CogniteClient
 
+from cdf.modules.contextualization.cdf_p_and_id_parser.functions.contextualization_p_and_id_annotater.handler import \
+    ViewProperty
 from omni.data_classes import (
     DomainModelCore,
     ConnectionItemA,
@@ -14,10 +16,11 @@ from omni.data_classes import (
 )
 from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+    T_DomainModel,
     T_DomainModelList,
-    EdgeQueryStep,
-    NodeQueryStep,
-    DataClassQueryBuilder,
+    ViewPropertyId,
+    QueryBuilder,
+    QueryStep,
 )
 from omni.data_classes._connection_item_b import (
     _create_connection_item_b_filter,
@@ -31,27 +34,31 @@ if TYPE_CHECKING:
     from omni._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
-class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
+class ConnectionItemAQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     def __init__(
         self,
         client: CogniteClient,
-        builder: DataClassQueryBuilder[T_DomainModelList],
+        builder: QueryBuilder,
+        result_cls: type[T_DomainModel],
+        result_list_cls: type[T_DomainModelList],
+        connection_property: ViewProperty | None = None,
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder)
+        super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     filter=filter_,
                 ),
-                result_cls=ConnectionItemA,
                 max_retrieve_limit=limit,
+                view_id=self._view_id,
+                connection_property=connection_property,
             )
         )
 
@@ -99,7 +106,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
             space=space_edge,
         )
         self._builder.append(
-            EdgeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -107,6 +114,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                 ),
                 max_retrieve_limit=limit,
+                connection_property=ViewPropertyId(self._view_id, "outwards")
             )
         )
 
@@ -124,7 +132,15 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_other_direct(from_)
         if retrieve_self_direct:
             self._query_append_self_direct(from_)
-        return ConnectionItemBQueryAPI(self._client, self._builder, node_filer, limit)
+        return ConnectionItemBQueryAPI(
+            self._client,
+            self._builder,
+            self._result_cls,
+            self._result_list_cls,
+            ViewPropertyId(self._view_id, "end_node"),
+            node_filer,
+            limit
+        )
 
     def query(
         self,
@@ -154,20 +170,21 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
 
     def _query_append_other_direct(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
                     through=self._view_id.as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
-                result_cls=ConnectionItemCNode,
+                view_id=ConnectionItemCNode._view_id,
+                connection_property=ViewPropertyId(self._view_id, "otherDirect"),
             ),
         )
 
     def _query_append_self_direct(self, from_: str) -> None:
         self._builder.append(
-            NodeQueryStep(
+            QueryStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -175,6 +192,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                     direction="outwards",
                     filter=dm.filters.HasData(views=[ConnectionItemA._view_id]),
                 ),
-                result_cls=ConnectionItemA,
+                view_id=ConnectionItemA._view_id,
+                connection_property=ViewPropertyId(self._view_id, "selfDirect")
             ),
         )
