@@ -296,7 +296,8 @@ class QueryUnpacker:
         for node in step.node_results:
             node_id = node.as_id()
             dumped = self.flatten_dump(node, step_properties, direct_property, self._as_data_record)
-            dumped[self._node_type_key] = dumped.pop("type")
+            if "type" in dumped:
+                dumped[self._node_type_key] = dumped.pop("type")
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
