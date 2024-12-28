@@ -2,8 +2,9 @@ import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
+
 from omni import data_classes as dc
-from omni.data_classes._core import DataClassQueryBuilder, EdgeQueryStep, NodeQueryStep
+from omni.data_classes._core import QueryBuilder, QueryStep, ViewPropertyId, QueryUnpacker
 
 
 class TestQueryBuilder:
@@ -14,21 +15,21 @@ class TestQueryBuilder:
         item_e = omni_views["ConnectionItemE"].as_id()
         item_d = omni_views["ConnectionItemD"].as_id()
 
-        builder = DataClassQueryBuilder(dc.ConnectionItemEList)
+        builder = QueryBuilder()
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(None),
                 dm.query.NodeResultSetExpression(
                     filter=filters.HasData(views=[item_e]),
                 ),
-                dc.ConnectionItemE,
+                view_id=dc.ConnectionItemE._view_id,
                 max_retrieve_limit=-1,
             )
         )
         from_ = builder.get_from()
 
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(from_),
                 dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -36,11 +37,12 @@ class TestQueryBuilder:
                     through=item_d.as_property_ref("directSingle"),
                     direction="inwards",
                 ),
-                dc.ConnectionItemD,
+                view_id=dc.ConnectionItemD._view_id,
+                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directInverseSingle"),
             )
         )
         builder.append(
-            NodeQueryStep(
+            QueryStep(
                 builder.create_name(from_),
                 dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -48,13 +50,15 @@ class TestQueryBuilder:
                     through=item_d.as_property_ref("directMulti"),
                     direction="inwards",
                 ),
-                dc.ConnectionItemD,
+                view_id=dc.ConnectionItemD._view_id,
                 connection_type="reverse-list",
+                connection_property=ViewPropertyId(dc.ConnectionItemE._view_id, "directInverseMulti"),
             )
         )
         # Act
         builder.execute_query(cognite_client)
-        result = builder.unpack()
+        unpacked = QueryUnpacker(builder).unpack()
+        result = dc.ConnectionItemEList([dc.ConnectionItemE.model_validate(item) for item in unpacked])
 
         # Assert
         assert isinstance(result, dc.ConnectionItemEList)
