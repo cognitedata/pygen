@@ -86,7 +86,7 @@ def field_type_hints_test_cases():
     field = EndNodeField(
         name="end_node",
         doc_name="end node",
-        prop_name="end_node",
+        prop_name="endNode",
         description=None,
         pydantic_field="Field",
         edge_classes=[site_apply_edge, site_apply_edge2],

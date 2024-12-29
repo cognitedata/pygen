@@ -24,7 +24,6 @@ from wind_turbine.data_classes._core import (
     T_DomainList,
     as_direct_relation_reference,
     as_instance_dict_id,
-    parse_single_connection,
     as_node_id,
     as_read_args,
     as_write_args,
@@ -108,11 +107,6 @@ class Distance(DomainRelation):
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[Metmast, WindTurbine, str, dm.NodeId] = Field(alias="endNode")
     distance: Optional[float] = None
-
-    @field_validator("end_node")
-    @classmethod
-    def _parse_end_node(cls, value: Any) -> Any:
-        return parse_single_connection(value, "end_node")
 
     def as_write(self) -> DistanceWrite:
         """Convert this read version of distance to the writing version."""
