@@ -163,8 +163,13 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         else:
             return nodes[0]
 
-    def _query(self, filter_: dm.Filter | None, limit: int, sort: list[InstanceSort] | None,
-               retrieve_connections: Literal["skip", "identifier", "full"]) -> T_DomainModelList:
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None,
+    ) -> T_DomainModelList:
         raise NotImplementedError
 
     def _search(

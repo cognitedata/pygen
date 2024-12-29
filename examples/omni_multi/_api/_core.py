@@ -168,8 +168,8 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         self,
         filter_: dm.Filter | None,
         limit: int,
-        sort: list[InstanceSort] | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None,
     ) -> T_DomainModelList:
         raise NotImplementedError
 
