@@ -52,12 +52,16 @@ def as_direct_relation_reference(
 def as_instance_dict_id(value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
     if isinstance(value, str):
         return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
-    if isinstance(value, dm.NodeId):
+    elif isinstance(value, dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
-    if isinstance(value, tuple) and is_tuple_id(value):
+    elif isinstance(value, tuple) and is_tuple_id(value):
         return {"space": value[0], "externalId": value[1]}
-    if isinstance(value, dm.DirectRelationReference):
+    elif isinstance(value, dm.DirectRelationReference):
         return {"space": value.space, "externalId": value.external_id}
+    elif isinstance(value, dict) and "space" in value and "externalId" in value:
+        return {"space": value["space"], "externalId": value["externalId"]}
+    elif value is not None and hasattr(value, "space") and hasattr(value, "external_id"):
+        return {"space": value.space, "externalId": value.external_id} # type: ignore[union-attr]
     raise TypeError(f"Expected str, NodeId, tuple or DirectRelationReference, got {type(value)}")
 
 
