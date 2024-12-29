@@ -250,7 +250,7 @@ class DomainModel(DomainModelCore, ABC):
         if global_config.validate_retrieve:
             return cls.model_validate(args)
         else:
-            return cls.model_construct(**args)
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -405,7 +405,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         if global_config.validate_retrieve:
             return cls.model_validate(args)
         else:
-            return cls.model_construct(**args)
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
@@ -559,7 +559,7 @@ class DomainRelation(DomainModelCore):
         if global_config.validate_retrieve:
             return cls.model_validate(args)
         else:
-            return cls.model_construct(**args)
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
