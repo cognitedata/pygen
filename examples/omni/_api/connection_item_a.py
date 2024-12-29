@@ -240,20 +240,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.outwards_edge,
-                    "outwards",
-                    dm.DirectRelationReference("sp_pygen_models", "bidirectional"),
-                    "outwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemB", "1"),
-                ),
-            ],
-        )
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -725,17 +712,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             space,
             filter,
         )
+        sort_input =  self._create_sort(sort_by, direction, sort) # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-        return self._query(
-            filter_,
-            limit,
-            self._create_sort(sort_by, direction, sort), # type: ignore[arg-type]
-            retrieve_connections,
-        )
+            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, sort_input, retrieve_connections)
