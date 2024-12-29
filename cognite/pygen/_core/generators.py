@@ -115,6 +115,7 @@ class SDKGenerator:
         client_dir = Path()
         sdk = self._multi_api_generator.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
+        sdk[client_dir / "config.py"] = self._generate_config_file()
         return sdk
 
     def _generate_api_client_file(self) -> str:
