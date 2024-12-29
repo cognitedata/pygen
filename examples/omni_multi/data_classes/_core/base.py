@@ -578,17 +578,6 @@ class DomainRelationWrite(Core, extra="forbid"):
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
     end_node: Any
 
-    @abstractmethod
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        raise NotImplementedError()
-
     def _to_resources_write(
         self,
         cache: set[tuple[str, str]],

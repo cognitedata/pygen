@@ -217,69 +217,6 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.external_id and (self.space, self.external_id) in cache:
-            return resources
-
-        _validate_end_node(start_node, self.end_node)
-
-        if isinstance(self.end_node, DomainModelWrite):
-            end_node = self.end_node.as_direct_reference()
-        elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.end_node)
-        elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
-
-        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_edge = dm.EdgeApply(
-                space=self.space,
-                external_id=external_id,
-                type=edge_type,
-                start_node=start_node.as_direct_reference(),
-                end_node=end_node,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.edges.append(this_edge)
-            cache.add((self.space, external_id))
-
-        if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
-            resources.extend(other_resources)
-
-        return resources
-
 
 class CogniteDescribableEdgeApply(CogniteDescribableEdgeWrite):
     def __new__(cls, *args, **kwargs) -> CogniteDescribableEdgeApply:
