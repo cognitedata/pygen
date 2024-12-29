@@ -139,6 +139,10 @@ class SDKGenerator:
             + "\n"
         )
 
+    def _generate_config_file(self) -> str:
+        config = self._multi_api_generator.env.get_template("config.py.jinja")
+        return config.render() + "\n"
+
 
 def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
     """Given a list of views, return a dictionary of unique parents for each view.
