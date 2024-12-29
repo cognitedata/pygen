@@ -21,6 +21,16 @@ def test_select_across_direct_relation(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
+def test_select_filter_no_direct_relation(omni_client: OmniClient) -> None:
+    items = (
+        omni_client.connection_item_a.select().other_direct_filter.equals("ConnectionItemC:Sarah").list_full(limit=5)
+    )
+
+    assert len(items) == 0
+    in_correct_other = [item.other_direct for item in items if item.other_direct != "ConnectionItemC:Sarah"]
+    assert len(in_correct_other) == 0, f"Other direct relation should be set, got {in_correct_other}"
+
+
 def test_select_list_end_cls_method(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.select().other_direct.list_connection_item_c_node(limit=5)
 
