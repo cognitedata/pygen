@@ -32,8 +32,8 @@ from omni.data_classes._core import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
-    DirectRelationFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:

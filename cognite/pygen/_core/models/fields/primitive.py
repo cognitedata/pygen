@@ -122,6 +122,10 @@ class PrimitiveField(BasePrimitiveField):
             raise ValueError(f"type {self.type_} is not supported for filtering")
 
     @property
+    def filter_attribute(self) -> str:
+        return self.name
+
+    @property
     def default_code(self) -> str:
         if self.default is None:
             return "None"

@@ -490,3 +490,15 @@ class OneToOneConnectionField(BaseConnectionField):
         if self.is_direct_relation:
             return f"DirectRelationReference.load({self.name}) if {self.name} else None"
         return self.name
+
+    @property
+    def filtering_cls(self) -> str:
+        if self.is_direct_relation:
+            return "DirectRelationFilter"
+        raise TypeError("Only direct relations have filtering classes")
+
+    @property
+    def filter_attribute(self) -> str:
+        if self.is_direct_relation:
+            return f"{self.name}_filter"
+        raise TypeError("Only direct relations have filter attributes")
