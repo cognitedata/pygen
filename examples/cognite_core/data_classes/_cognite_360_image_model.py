@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_3_d_model import Cognite3DModel, Cognite3DModelWrite
 
@@ -399,12 +400,14 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.thumbnail_filter = DirectRelationFilter(self, self._view_id.as_property_ref("thumbnail"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
                 self.description,
                 self.name,
+                self.thumbnail_filter,
             ]
         )
 

@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -937,6 +938,38 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.acc_from_back_side_x_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_x")
+        )
+        self.acc_from_back_side_y_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_y")
+        )
+        self.acc_from_back_side_z_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_z")
+        )
+        self.gearbox_filter = DirectRelationFilter(self, self._view_id.as_property_ref("gearbox"))
+        self.generator_filter = DirectRelationFilter(self, self._view_id.as_property_ref("generator"))
+        self.high_speed_shaft_filter = DirectRelationFilter(self, self._view_id.as_property_ref("high_speed_shaft"))
+        self.main_shaft_filter = DirectRelationFilter(self, self._view_id.as_property_ref("main_shaft"))
+        self.power_inverter_filter = DirectRelationFilter(self, self._view_id.as_property_ref("power_inverter"))
+        self.yaw_direction_filter = DirectRelationFilter(self, self._view_id.as_property_ref("yaw_direction"))
+        self.yaw_error_filter = DirectRelationFilter(self, self._view_id.as_property_ref("yaw_error"))
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.acc_from_back_side_x_filter,
+                self.acc_from_back_side_y_filter,
+                self.acc_from_back_side_z_filter,
+                self.gearbox_filter,
+                self.generator_filter,
+                self.high_speed_shaft_filter,
+                self.main_shaft_filter,
+                self.power_inverter_filter,
+                self.yaw_direction_filter,
+                self.yaw_error_filter,
+            ]
+        )
 
     def list_nacelle(self, limit: int = DEFAULT_QUERY_LIMIT) -> NacelleList:
         return self._list(limit=limit)

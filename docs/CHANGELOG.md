@@ -14,6 +14,9 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## TBD
+### Added
+- Support for filtering on direct relations in the `.select()` method.
+
 ### Improved
 - When calling the `.upsert(...)` the `write_none` argument is now deprecated. Instead, `pygen` detects which
   properties that are explicitly set to `None` and only sends those properties to the CDF. This way you can

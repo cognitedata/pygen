@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -314,6 +315,14 @@ class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualiz
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.object_3d_filter,
+            ]
+        )
 
     def list_cognite_visualizable(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteVisualizableList:
         return self._list(limit=limit)

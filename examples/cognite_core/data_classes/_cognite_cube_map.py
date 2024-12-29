@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -554,6 +555,24 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.back_filter = DirectRelationFilter(self, self._view_id.as_property_ref("back"))
+        self.bottom_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bottom"))
+        self.front_filter = DirectRelationFilter(self, self._view_id.as_property_ref("front"))
+        self.left_filter = DirectRelationFilter(self, self._view_id.as_property_ref("left"))
+        self.right_filter = DirectRelationFilter(self, self._view_id.as_property_ref("right"))
+        self.top_filter = DirectRelationFilter(self, self._view_id.as_property_ref("top"))
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.back_filter,
+                self.bottom_filter,
+                self.front_filter,
+                self.left_filter,
+                self.right_filter,
+                self.top_filter,
+            ]
+        )
 
     def list_cognite_cube_map(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteCubeMapList:
         return self._list(limit=limit)

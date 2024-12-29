@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -604,6 +605,26 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.bending_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_x"))
+        self.bending_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_y"))
+        self.calculated_tilt_moment_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("calculated_tilt_moment")
+        )
+        self.calculated_yaw_moment_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("calculated_yaw_moment")
+        )
+        self.torque_filter = DirectRelationFilter(self, self._view_id.as_property_ref("torque"))
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.bending_x_filter,
+                self.bending_y_filter,
+                self.calculated_tilt_moment_filter,
+                self.calculated_yaw_moment_filter,
+                self.torque_filter,
+            ]
+        )
 
     def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
         return self._list(limit=limit)

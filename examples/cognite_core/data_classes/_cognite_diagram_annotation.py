@@ -35,6 +35,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
     IntFilter,
     TimestampFilter,
@@ -770,6 +771,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
         self.end_node_y_max = FloatFilter(self, self._view_id.as_property_ref("endNodeYMax"))
         self.end_node_y_min = FloatFilter(self, self._view_id.as_property_ref("endNodeYMin"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -795,6 +797,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
                 self.end_node_y_max,
                 self.end_node_y_min,
                 self.name,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,

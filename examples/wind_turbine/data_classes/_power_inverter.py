@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -500,6 +501,22 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.active_power_total_filter = DirectRelationFilter(self, self._view_id.as_property_ref("active_power_total"))
+        self.apparent_power_total_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("apparent_power_total")
+        )
+        self.reactive_power_total_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("reactive_power_total")
+        )
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.active_power_total_filter,
+                self.apparent_power_total_filter,
+                self.reactive_power_total_filter,
+            ]
+        )
 
     def list_power_inverter(self, limit: int = DEFAULT_QUERY_LIMIT) -> PowerInverterList:
         return self._list(limit=limit)

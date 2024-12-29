@@ -36,6 +36,7 @@ from cognite_core.data_classes._core import (
     StringFilter,
     ViewPropertyId,
     BooleanFilter,
+    DirectRelationFilter,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -714,11 +715,13 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.category_filter = DirectRelationFilter(self, self._view_id.as_property_ref("category"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.directory = StringFilter(self, self._view_id.as_property_ref("directory"))
         self.is_uploaded = BooleanFilter(self, self._view_id.as_property_ref("isUploaded"))
         self.mime_type = StringFilter(self, self._view_id.as_property_ref("mimeType"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -730,11 +733,13 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             [
                 self.space,
                 self.external_id,
+                self.category_filter,
                 self.description,
                 self.directory,
                 self.is_uploaded,
                 self.mime_type,
                 self.name,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,

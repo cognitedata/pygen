@@ -260,12 +260,21 @@ class DataClass:
     @property
     def has_filtering_fields(self) -> bool:
         """Check if the data class has any fields that support filtering."""
-        return any(field_.support_filtering for field_ in self.fields_of_type(PrimitiveField))
+        return any(
+            (isinstance(field_, PrimitiveField) and field_.support_filtering)
+            or (isinstance(field_, OneToOneConnectionField) and field_.is_direct_relation)
+            for field_ in self
+        )
 
     @property
-    def filtering_fields(self) -> Iterable[PrimitiveField]:
+    def filtering_fields(self) -> Iterable[Field]:
         """Return all fields that support filtering"""
-        return (field_ for field_ in self.fields_of_type(PrimitiveField) if field_.support_filtering)
+        return (
+            field_
+            for field_ in self
+            if (isinstance(field_, PrimitiveField) and field_.support_filtering)
+            or (isinstance(field_, OneToOneConnectionField) and field_.is_direct_relation)
+        )
 
     @property
     def filtering_import(self) -> str:
@@ -273,7 +282,8 @@ class DataClass:
         return "\n    ".join(
             # The string filter is always included, and is thus part of the jinja template
             f"{cls_name},"
-            for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))
+            # We know that all filtering fields have the same filtering class
+            for cls_name in sorted(set(field_.filtering_cls for field_ in self.filtering_fields))  # type: ignore[attr-defined]
             if cls_name != "StringFilter"
         )
 

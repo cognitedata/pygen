@@ -43,6 +43,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -607,7 +608,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self.nacelle_filter = DirectRelationFilter(self, self._view_id.as_property_ref("nacelle"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.rotor_filter = DirectRelationFilter(self, self._view_id.as_property_ref("rotor"))
         self.windfarm = StringFilter(self, self._view_id.as_property_ref("windfarm"))
         self._filter_classes.extend(
             [
@@ -615,7 +618,9 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 self.external_id,
                 self.capacity,
                 self.description,
+                self.nacelle_filter,
                 self.name,
+                self.rotor_filter,
                 self.windfarm,
             ]
         )

@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
 )
 
@@ -965,11 +966,43 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.blade_filter = DirectRelationFilter(self, self._view_id.as_property_ref("blade"))
+        self.edgewise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected")
+        )
+        self.edgewise_bend_mom_offset_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("edgewise_bend_mom_offset")
+        )
+        self.edgewise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected")
+        )
+        self.edgewisewise_bend_mom_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("edgewisewise_bend_mom")
+        )
+        self.flapwise_bend_mom_filter = DirectRelationFilter(self, self._view_id.as_property_ref("flapwise_bend_mom"))
+        self.flapwise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected")
+        )
+        self.flapwise_bend_mom_offset_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("flapwise_bend_mom_offset")
+        )
+        self.flapwise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected")
+        )
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.blade_filter,
+                self.edgewise_bend_mom_crosstalk_corrected_filter,
+                self.edgewise_bend_mom_offset_filter,
+                self.edgewise_bend_mom_offset_crosstalk_corrected_filter,
+                self.edgewisewise_bend_mom_filter,
+                self.flapwise_bend_mom_filter,
+                self.flapwise_bend_mom_crosstalk_corrected_filter,
+                self.flapwise_bend_mom_offset_filter,
+                self.flapwise_bend_mom_offset_crosstalk_corrected_filter,
                 self.position,
             ]
         )

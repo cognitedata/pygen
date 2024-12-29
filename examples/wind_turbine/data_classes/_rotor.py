@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -442,6 +443,20 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.rotor_speed_controller_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("rotor_speed_controller")
+        )
+        self.rpm_low_speed_shaft_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("rpm_low_speed_shaft")
+        )
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.rotor_speed_controller_filter,
+                self.rpm_low_speed_shaft_filter,
+            ]
+        )
 
     def list_rotor(self, limit: int = DEFAULT_QUERY_LIMIT) -> RotorList:
         return self._list(limit=limit)

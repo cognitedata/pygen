@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     StringFilter,
     ViewPropertyId,
     BooleanFilter,
+    DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 from cognite_core.data_classes._cognite_3_d_revision import Cognite3DRevision, Cognite3DRevisionWrite
@@ -371,6 +372,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
         self._filter_classes.extend(
@@ -378,6 +380,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
                 self.space,
                 self.external_id,
                 self.description,
+                self.model_3d_filter,
                 self.name,
                 self.published,
             ]

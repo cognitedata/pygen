@@ -35,6 +35,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
     TimestampFilter,
 )
@@ -535,6 +536,7 @@ class _CogniteAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteAnnotationList]
         self.confidence = FloatFilter(self, self._view_id.as_property_ref("confidence"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -548,6 +550,7 @@ class _CogniteAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteAnnotationList]
                 self.confidence,
                 self.description,
                 self.name,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,

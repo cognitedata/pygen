@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -398,6 +399,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.asset_class_filter = DirectRelationFilter(self, self._view_id.as_property_ref("assetClass"))
         self.code = StringFilter(self, self._view_id.as_property_ref("code"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
@@ -406,6 +408,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
             [
                 self.space,
                 self.external_id,
+                self.asset_class_filter,
                 self.code,
                 self.description,
                 self.name,
