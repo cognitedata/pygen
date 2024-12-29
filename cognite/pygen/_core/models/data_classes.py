@@ -606,15 +606,6 @@ class DataClass:
         )
 
     @property
-    def inwards_edges(self) -> Iterable[BaseConnectionField]:
-        """All inwards edges."""
-        return (
-            field_
-            for field_ in self
-            if isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "inwards"
-        )
-
-    @property
     def has_direct_relations_with_source(self) -> bool:
         """Check if the data class has any direct relations with source."""
         return any(
@@ -623,7 +614,7 @@ class DataClass:
         )
 
     @property
-    def direct_relations_with_source(self) -> str:
+    def direct_relations_with_source_comma_sep(self) -> str:
         """All direct relations with source."""
         return ", ".join(
             sorted(
