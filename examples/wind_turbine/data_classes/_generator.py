@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -183,25 +184,9 @@ class Generator(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> GeneratorWrite:
         """Convert this read version of generator to the writing version."""
-        return GeneratorWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            generator_speed_controller=(
-                self.generator_speed_controller.as_write()
-                if isinstance(self.generator_speed_controller, DomainModel)
-                else self.generator_speed_controller
-            ),
-            generator_speed_controller_reference=(
-                self.generator_speed_controller_reference.as_write()
-                if isinstance(self.generator_speed_controller_reference, DomainModel)
-                else self.generator_speed_controller_reference
-            ),
-        )
+        return GeneratorWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> GeneratorWrite:
         """Convert this read version of generator to the writing version."""

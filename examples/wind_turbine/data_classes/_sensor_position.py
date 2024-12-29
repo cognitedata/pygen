@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -305,57 +306,9 @@ class SensorPosition(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SensorPositionWrite:
         """Convert this read version of sensor position to the writing version."""
-        return SensorPositionWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blade=self.blade.as_write() if isinstance(self.blade, DomainModel) else self.blade,
-            edgewise_bend_mom_crosstalk_corrected=(
-                self.edgewise_bend_mom_crosstalk_corrected.as_write()
-                if isinstance(self.edgewise_bend_mom_crosstalk_corrected, DomainModel)
-                else self.edgewise_bend_mom_crosstalk_corrected
-            ),
-            edgewise_bend_mom_offset=(
-                self.edgewise_bend_mom_offset.as_write()
-                if isinstance(self.edgewise_bend_mom_offset, DomainModel)
-                else self.edgewise_bend_mom_offset
-            ),
-            edgewise_bend_mom_offset_crosstalk_corrected=(
-                self.edgewise_bend_mom_offset_crosstalk_corrected.as_write()
-                if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, DomainModel)
-                else self.edgewise_bend_mom_offset_crosstalk_corrected
-            ),
-            edgewisewise_bend_mom=(
-                self.edgewisewise_bend_mom.as_write()
-                if isinstance(self.edgewisewise_bend_mom, DomainModel)
-                else self.edgewisewise_bend_mom
-            ),
-            flapwise_bend_mom=(
-                self.flapwise_bend_mom.as_write()
-                if isinstance(self.flapwise_bend_mom, DomainModel)
-                else self.flapwise_bend_mom
-            ),
-            flapwise_bend_mom_crosstalk_corrected=(
-                self.flapwise_bend_mom_crosstalk_corrected.as_write()
-                if isinstance(self.flapwise_bend_mom_crosstalk_corrected, DomainModel)
-                else self.flapwise_bend_mom_crosstalk_corrected
-            ),
-            flapwise_bend_mom_offset=(
-                self.flapwise_bend_mom_offset.as_write()
-                if isinstance(self.flapwise_bend_mom_offset, DomainModel)
-                else self.flapwise_bend_mom_offset
-            ),
-            flapwise_bend_mom_offset_crosstalk_corrected=(
-                self.flapwise_bend_mom_offset_crosstalk_corrected.as_write()
-                if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, DomainModel)
-                else self.flapwise_bend_mom_offset_crosstalk_corrected
-            ),
-            position=self.position,
-        )
+        return SensorPositionWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> SensorPositionWrite:
         """Convert this read version of sensor position to the writing version."""

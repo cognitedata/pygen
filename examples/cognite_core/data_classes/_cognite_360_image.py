@@ -29,6 +29,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -294,35 +295,9 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite360ImageWrite:
         """Convert this read version of Cognite 360 image to the writing version."""
-        return Cognite360ImageWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            back=self.back.as_write() if isinstance(self.back, DomainModel) else self.back,
-            bottom=self.bottom.as_write() if isinstance(self.bottom, DomainModel) else self.bottom,
-            collection_360=(
-                self.collection_360.as_write() if isinstance(self.collection_360, DomainModel) else self.collection_360
-            ),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            front=self.front.as_write() if isinstance(self.front, DomainModel) else self.front,
-            left=self.left.as_write() if isinstance(self.left, DomainModel) else self.left,
-            right=self.right.as_write() if isinstance(self.right, DomainModel) else self.right,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            station_360=self.station_360.as_write() if isinstance(self.station_360, DomainModel) else self.station_360,
-            taken_at=self.taken_at,
-            top=self.top.as_write() if isinstance(self.top, DomainModel) else self.top,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite360ImageWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite360ImageWrite:
         """Convert this read version of Cognite 360 image to the writing version."""

@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -203,28 +204,9 @@ class MainShaft(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MainShaftWrite:
         """Convert this read version of main shaft to the writing version."""
-        return MainShaftWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_x=self.bending_x.as_write() if isinstance(self.bending_x, DomainModel) else self.bending_x,
-            bending_y=self.bending_y.as_write() if isinstance(self.bending_y, DomainModel) else self.bending_y,
-            calculated_tilt_moment=(
-                self.calculated_tilt_moment.as_write()
-                if isinstance(self.calculated_tilt_moment, DomainModel)
-                else self.calculated_tilt_moment
-            ),
-            calculated_yaw_moment=(
-                self.calculated_yaw_moment.as_write()
-                if isinstance(self.calculated_yaw_moment, DomainModel)
-                else self.calculated_yaw_moment
-            ),
-            torque=self.torque.as_write() if isinstance(self.torque, DomainModel) else self.torque,
-        )
+        return MainShaftWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> MainShaftWrite:
         """Convert this read version of main shaft to the writing version."""

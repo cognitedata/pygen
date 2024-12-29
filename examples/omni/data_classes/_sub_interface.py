@@ -28,6 +28,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -140,17 +141,9 @@ class SubInterface(MainInterface):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
-        return SubInterfaceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-        )
+        return SubInterfaceWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""

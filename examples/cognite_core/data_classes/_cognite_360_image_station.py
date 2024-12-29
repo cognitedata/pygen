@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -158,20 +159,9 @@ class Cognite360ImageStation(CogniteDescribableNode):
     node_type: Union[dm.DirectRelationReference, None] = None
     group_type: Optional[Literal["Station360"]] = Field(None, alias="groupType")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite360ImageStationWrite:
         """Convert this read version of Cognite 360 image station to the writing version."""
-        return Cognite360ImageStationWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            group_type=self.group_type,
-            name=self.name,
-            tags=self.tags,
-        )
+        return Cognite360ImageStationWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite360ImageStationWrite:
         """Convert this read version of Cognite 360 image station to the writing version."""

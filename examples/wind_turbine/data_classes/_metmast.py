@@ -39,6 +39,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -205,30 +206,9 @@ class Metmast(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""
-        return MetmastWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            position=self.position,
-            temperature=(
-                self.temperature.as_write() if isinstance(self.temperature, CogniteTimeSeries) else self.temperature
-            ),
-            tilt_angle=(
-                self.tilt_angle.as_write() if isinstance(self.tilt_angle, CogniteTimeSeries) else self.tilt_angle
-            ),
-            wind_speed=(
-                self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed
-            ),
-            wind_turbines=(
-                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return MetmastWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""

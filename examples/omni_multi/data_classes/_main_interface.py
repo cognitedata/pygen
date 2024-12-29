@@ -27,6 +27,7 @@ from omni_multi.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -133,16 +134,9 @@ class MainInterface(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""
-        return MainInterfaceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-        )
+        return MainInterfaceWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""

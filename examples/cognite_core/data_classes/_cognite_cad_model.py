@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -203,21 +204,9 @@ class CogniteCADModel(Cognite3DModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADModelWrite:
         """Convert this read version of Cognite cad model to the writing version."""
-        return CogniteCADModelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, DomainModel) else self.thumbnail,
-            type_=self.type_,
-        )
+        return CogniteCADModelWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteCADModelWrite:
         """Convert this read version of Cognite cad model to the writing version."""

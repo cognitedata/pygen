@@ -30,6 +30,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -175,19 +176,9 @@ class DataSheet(DomainModel):
     name: Optional[str] = None
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DataSheetWrite:
         """Convert this read version of data sheet to the writing version."""
-        return DataSheetWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            description=self.description,
-            directory=self.directory,
-            mime_type=self.mime_type,
-            name=self.name,
-        )
+        return DataSheetWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> DataSheetWrite:
         """Convert this read version of data sheet to the writing version."""

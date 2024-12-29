@@ -29,6 +29,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -326,51 +327,9 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteActivityWrite:
         """Convert this read version of Cognite activity to the writing version."""
-        return CogniteActivityWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            assets=(
-                [asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets]
-                if self.assets is not None
-                else None
-            ),
-            description=self.description,
-            end_time=self.end_time,
-            equipment=(
-                [
-                    equipment.as_write() if isinstance(equipment, DomainModel) else equipment
-                    for equipment in self.equipment
-                ]
-                if self.equipment is not None
-                else None
-            ),
-            name=self.name,
-            scheduled_end_time=self.scheduled_end_time,
-            scheduled_start_time=self.scheduled_start_time,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            start_time=self.start_time,
-            tags=self.tags,
-            time_series=(
-                [
-                    time_series.as_write() if isinstance(time_series, DomainModel) else time_series
-                    for time_series in self.time_series
-                ]
-                if self.time_series is not None
-                else None
-            ),
-        )
+        return CogniteActivityWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteActivityWrite:
         """Convert this read version of Cognite activity to the writing version."""

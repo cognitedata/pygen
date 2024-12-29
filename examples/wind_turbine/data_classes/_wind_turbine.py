@@ -38,6 +38,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -239,38 +240,9 @@ class WindTurbine(GeneratingUnit):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""
-        return WindTurbineWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=(
-                [blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades]
-                if self.blades is not None
-                else None
-            ),
-            capacity=self.capacity,
-            datasheets=(
-                [
-                    datasheet.as_write() if isinstance(datasheet, DomainModel) else datasheet
-                    for datasheet in self.datasheets
-                ]
-                if self.datasheets is not None
-                else None
-            ),
-            description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
-            name=self.name,
-            power_curve=(
-                self.power_curve.as_write() if isinstance(self.power_curve, CogniteSequence) else self.power_curve
-            ),
-            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbineWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""

@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -308,41 +309,9 @@ class Nacelle(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
-        return NacelleWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_write()
-                if isinstance(self.acc_from_back_side_y, DomainModel)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_write()
-                if isinstance(self.acc_from_back_side_z, DomainModel)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
-            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_write()
-                if isinstance(self.high_speed_shaft, DomainModel)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_write() if isinstance(self.yaw_direction, DomainModel) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, DomainModel) else self.yaw_error,
-        )
+        return NacelleWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""

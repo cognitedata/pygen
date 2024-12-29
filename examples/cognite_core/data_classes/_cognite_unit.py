@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -183,23 +184,9 @@ class CogniteUnit(CogniteDescribableNode):
     source_reference: Optional[str] = Field(None, alias="sourceReference")
     symbol: Optional[str] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteUnitWrite:
         """Convert this read version of Cognite unit to the writing version."""
-        return CogniteUnitWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            quantity=self.quantity,
-            source=self.source,
-            source_reference=self.source_reference,
-            symbol=self.symbol,
-            tags=self.tags,
-        )
+        return CogniteUnitWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteUnitWrite:
         """Convert this read version of Cognite unit to the writing version."""

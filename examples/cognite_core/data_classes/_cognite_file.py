@@ -30,6 +30,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -328,34 +329,9 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteFileWrite:
         """Convert this read version of Cognite file to the writing version."""
-        return CogniteFileWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            assets=(
-                [asset.as_write() if isinstance(asset, DomainModel) else asset for asset in self.assets]
-                if self.assets is not None
-                else None
-            ),
-            category=self.category.as_write() if isinstance(self.category, DomainModel) else self.category,
-            description=self.description,
-            directory=self.directory,
-            mime_type=self.mime_type,
-            name=self.name,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-        )
+        return CogniteFileWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteFileWrite:
         """Convert this read version of Cognite file to the writing version."""

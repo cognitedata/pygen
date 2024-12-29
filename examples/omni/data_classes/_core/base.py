@@ -826,6 +826,7 @@ def as_write_args(model: DomainModel) -> dict[str, Any]:
             output[field_name] = as_write_value(value)
     return output
 
+
 def as_write_value(value: Any) -> Any:
     if isinstance(value, DomainModel):
         return as_write_args(value)

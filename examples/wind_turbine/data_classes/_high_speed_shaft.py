@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -187,26 +188,9 @@ class HighSpeedShaft(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""
-        return HighSpeedShaftWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_moment_y=(
-                self.bending_moment_y.as_write()
-                if isinstance(self.bending_moment_y, DomainModel)
-                else self.bending_moment_y
-            ),
-            bending_monent_x=(
-                self.bending_monent_x.as_write()
-                if isinstance(self.bending_monent_x, DomainModel)
-                else self.bending_monent_x
-            ),
-            torque=self.torque.as_write() if isinstance(self.torque, DomainModel) else self.torque,
-        )
+        return HighSpeedShaftWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""

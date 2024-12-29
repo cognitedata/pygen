@@ -29,6 +29,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -198,24 +199,9 @@ class PrimitiveNullable(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PrimitiveNullableWrite:
         """Convert this read version of primitive nullable to the writing version."""
-        return PrimitiveNullableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            boolean=self.boolean,
-            date=self.date,
-            float_32=self.float_32,
-            float_64=self.float_64,
-            int_32=self.int_32,
-            int_64=self.int_64,
-            json_=self.json_,
-            text=self.text,
-            timestamp=self.timestamp,
-        )
+        return PrimitiveNullableWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> PrimitiveNullableWrite:
         """Convert this read version of primitive nullable to the writing version."""

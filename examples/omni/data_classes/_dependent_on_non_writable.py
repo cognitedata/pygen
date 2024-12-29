@@ -28,6 +28,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -176,24 +177,9 @@ class DependentOnNonWritable(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
-        return DependentOnNonWritableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            a_value=self.a_value,
-            to_non_writable=(
-                [
-                    to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
-                    for to_non_writable in self.to_non_writable
-                ]
-                if self.to_non_writable is not None
-                else None
-            ),
-        )
+        return DependentOnNonWritableWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""

@@ -28,6 +28,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -167,20 +168,9 @@ class PrimitiveWithDefaults(DomainModel):
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
-        return PrimitiveWithDefaultsWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            auto_increment_int_32=self.auto_increment_int_32,
-            default_boolean=self.default_boolean,
-            default_float_32=self.default_float_32,
-            default_object=self.default_object,
-            default_string=self.default_string,
-        )
+        return PrimitiveWithDefaultsWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""

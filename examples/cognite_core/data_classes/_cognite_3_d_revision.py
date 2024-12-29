@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -176,19 +177,9 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DRevisionWrite:
         """Convert this read version of Cognite 3D revision to the writing version."""
-        return Cognite3DRevisionWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
-            published=self.published,
-            status=self.status,
-            type_=self.type_,
-        )
+        return Cognite3DRevisionWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite3DRevisionWrite:
         """Convert this read version of Cognite 3D revision to the writing version."""

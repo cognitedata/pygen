@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -180,20 +181,9 @@ class SolarPanel(GeneratingUnit):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SolarPanelWrite:
         """Convert this read version of solar panel to the writing version."""
-        return SolarPanelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_write() if isinstance(self.efficiency, DomainModel) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_write() if isinstance(self.orientation, DomainModel) else self.orientation,
-        )
+        return SolarPanelWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> SolarPanelWrite:
         """Convert this read version of solar panel to the writing version."""

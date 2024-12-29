@@ -27,6 +27,7 @@ from omni_multi.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -147,18 +148,9 @@ class Implementation1v1(DomainModel):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Implementation1v1Write:
         """Convert this read version of implementation 1 v 1 to the writing version."""
-        return Implementation1v1Write(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1v1Write.model_validate(as_write_args(self))
 
     def as_apply(self) -> Implementation1v1Write:
         """Convert this read version of implementation 1 v 1 to the writing version."""

@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -201,24 +202,9 @@ class Cognite3DTransformationNode(DomainModel):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DTransformationNodeWrite:
         """Convert this read version of Cognite 3D transformation node to the writing version."""
-        return Cognite3DTransformationNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite3DTransformationNodeWrite:
         """Convert this read version of Cognite 3D transformation node to the writing version."""

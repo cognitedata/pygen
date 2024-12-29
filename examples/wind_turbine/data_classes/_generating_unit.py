@@ -27,6 +27,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -148,18 +149,9 @@ class GeneratingUnit(DomainModel):
     description: Optional[str] = None
     name: Optional[str] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""
-        return GeneratingUnitWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            capacity=self.capacity,
-            description=self.description,
-            name=self.name,
-        )
+        return GeneratingUnitWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""

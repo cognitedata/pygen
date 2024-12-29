@@ -29,6 +29,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -215,22 +216,9 @@ class CogniteSourceableNode(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteSourceableNodeWrite:
         """Convert this read version of Cognite sourceable node to the writing version."""
-        return CogniteSourceableNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-        )
+        return CogniteSourceableNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteSourceableNodeWrite:
         """Convert this read version of Cognite sourceable node to the writing version."""

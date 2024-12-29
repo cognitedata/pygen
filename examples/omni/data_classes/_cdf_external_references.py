@@ -45,6 +45,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -165,20 +166,9 @@ class CDFExternalReferences(DomainModel):
     sequence: Union[SequenceRead, str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
-        return CDFExternalReferencesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            file=self.file.as_write() if isinstance(self.file, CogniteFileMetadata) else self.file,
-            sequence=self.sequence.as_write() if isinstance(self.sequence, CogniteSequence) else self.sequence,
-            timeseries=(
-                self.timeseries.as_write() if isinstance(self.timeseries, CogniteTimeSeries) else self.timeseries
-            ),
-        )
+        return CDFExternalReferencesWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""

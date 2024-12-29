@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -176,22 +177,9 @@ class CogniteFileCategory(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteFileCategoryWrite:
         """Convert this read version of Cognite file category to the writing version."""
-        return CogniteFileCategoryWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            standard_reference=self.standard_reference,
-            tags=self.tags,
-        )
+        return CogniteFileCategoryWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteFileCategoryWrite:
         """Convert this read version of Cognite file category to the writing version."""

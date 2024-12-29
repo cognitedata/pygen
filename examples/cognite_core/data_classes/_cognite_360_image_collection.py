@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -200,23 +201,9 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite360ImageCollectionWrite:
         """Convert this read version of Cognite 360 image collection to the writing version."""
-        return Cognite360ImageCollectionWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
-            name=self.name,
-            published=self.published,
-            status=self.status,
-            tags=self.tags,
-            type_=self.type_,
-        )
+        return Cognite360ImageCollectionWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite360ImageCollectionWrite:
         """Convert this read version of Cognite 360 image collection to the writing version."""

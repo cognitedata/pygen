@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -195,30 +196,9 @@ class PowerInverter(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PowerInverterWrite:
         """Convert this read version of power inverter to the writing version."""
-        return PowerInverterWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            active_power_total=(
-                self.active_power_total.as_write()
-                if isinstance(self.active_power_total, DomainModel)
-                else self.active_power_total
-            ),
-            apparent_power_total=(
-                self.apparent_power_total.as_write()
-                if isinstance(self.apparent_power_total, DomainModel)
-                else self.apparent_power_total
-            ),
-            reactive_power_total=(
-                self.reactive_power_total.as_write()
-                if isinstance(self.reactive_power_total, DomainModel)
-                else self.reactive_power_total
-            ),
-        )
+        return PowerInverterWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> PowerInverterWrite:
         """Convert this read version of power inverter to the writing version."""

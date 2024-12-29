@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -193,22 +194,9 @@ class CogniteAssetType(CogniteDescribableNode):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetTypeWrite:
         """Convert this read version of Cognite asset type to the writing version."""
-        return CogniteAssetTypeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, DomainModel) else self.asset_class,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            tags=self.tags,
-        )
+        return CogniteAssetTypeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteAssetTypeWrite:
         """Convert this read version of Cognite asset type to the writing version."""

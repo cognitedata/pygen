@@ -27,6 +27,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -164,21 +165,9 @@ class CogniteAssetClass(CogniteDescribableNode):
     code: Optional[str] = None
     standard: Optional[str] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetClassWrite:
         """Convert this read version of Cognite asset clas to the writing version."""
-        return CogniteAssetClassWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            tags=self.tags,
-        )
+        return CogniteAssetClassWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteAssetClassWrite:
         """Convert this read version of Cognite asset clas to the writing version."""

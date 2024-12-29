@@ -28,6 +28,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -141,17 +142,9 @@ class Implementation2(SubInterface):
         "sp_pygen_models", "Implementation2"
     )
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""
-        return Implementation2Write(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-        )
+        return Implementation2Write.model_validate(as_write_args(self))
 
     def as_apply(self) -> Implementation2Write:
         """Convert this read version of implementation 2 to the writing version."""

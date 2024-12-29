@@ -28,6 +28,7 @@ from wind_turbine.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -189,25 +190,9 @@ class Rotor(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
-        return RotorWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_write()
-                if isinstance(self.rotor_speed_controller, DomainModel)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_write()
-                if isinstance(self.rpm_low_speed_shaft, DomainModel)
-                else self.rpm_low_speed_shaft
-            ),
-        )
+        return RotorWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""

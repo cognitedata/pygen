@@ -27,6 +27,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -154,19 +155,9 @@ class CogniteDescribableNode(DomainModel):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteDescribableNodeWrite:
         """Convert this read version of Cognite describable node to the writing version."""
-        return CogniteDescribableNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-        )
+        return CogniteDescribableNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteDescribableNodeWrite:
         """Convert this read version of Cognite describable node to the writing version."""

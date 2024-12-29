@@ -28,6 +28,7 @@ from cognite_core.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -254,30 +255,9 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CognitePointCloudVolumeWrite:
         """Convert this read version of Cognite point cloud volume to the writing version."""
-        return CognitePointCloudVolumeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            format_version=self.format_version,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
-            revisions=(
-                [revision.as_write() if isinstance(revision, DomainModel) else revision for revision in self.revisions]
-                if self.revisions is not None
-                else None
-            ),
-            tags=self.tags,
-            volume=self.volume,
-            volume_references=self.volume_references,
-            volume_type=self.volume_type,
-        )
+        return CognitePointCloudVolumeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CognitePointCloudVolumeWrite:
         """Convert this read version of Cognite point cloud volume to the writing version."""
