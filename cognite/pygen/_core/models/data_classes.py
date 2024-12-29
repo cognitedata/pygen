@@ -563,6 +563,77 @@ class DataClass:
         return (field_ for field_ in self.container_fields if field_.is_write_field)
 
     @property
+    def container_fields_writable_comma_sep(self) -> str:
+        """Container fields that are writable as a comma separated string."""
+        return ", ".join(sorted(f'"{field_.name}"' for field_ in self.container_fields_writable))
+
+    @property
+    def has_outwards_edges(self) -> bool:
+        """Check if the data class has any outwards edges."""
+        return any(
+            isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "outwards"
+            for field_ in self
+        )
+
+    @property
+    def outwards_edges_comma_sep(self) -> str:
+        """All outwards edges."""
+        return ", ".join(
+            sorted(
+                f'("{field_.name}", {field_.edge_type_str})'
+                for field_ in self
+                if isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "outwards"
+            )
+        )
+
+    @property
+    def has_inwards_edges(self) -> bool:
+        """Check if the data class has any inwards edges."""
+        return any(
+            isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "inwards"
+            for field_ in self
+        )
+
+    @property
+    def inwards_edges_comma_sep(self) -> str:
+        """All inwards edges."""
+        return ", ".join(
+            sorted(
+                f'("{field_.name}", {field_.edge_type_str})'
+                for field_ in self
+                if isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "inwards"
+            )
+        )
+
+    @property
+    def inwards_edges(self) -> Iterable[BaseConnectionField]:
+        """All inwards edges."""
+        return (
+            field_
+            for field_ in self
+            if isinstance(field_, BaseConnectionField) and field_.is_edge and field_.edge_direction == "inwards"
+        )
+
+    @property
+    def has_direct_relations_with_source(self) -> bool:
+        """Check if the data class has any direct relations with source."""
+        return any(
+            isinstance(field_, BaseConnectionField) and field_.is_direct_relation and field_.destination_class
+            for field_ in self
+        )
+
+    @property
+    def direct_relations_with_source(self) -> str:
+        """All direct relations with source."""
+        return ", ".join(
+            sorted(
+                f'"{field_.name}"'
+                for field_ in self
+                if isinstance(field_, BaseConnectionField) and field_.is_direct_relation and field_.destination_class
+            )
+        )
+
+    @property
     def has_single_connection_fields(self) -> bool:
         """Check if the data class has any single connection fields."""
         return any(isinstance(field_, OneToOneConnectionField) for field_ in self)
