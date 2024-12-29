@@ -47,6 +47,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 from omni.data_classes._core.cdf_external import GraphQLExternal
 from omni.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
+from omni.config import global_config
 
 if sys.version_info >= (3, 11):
     from typing import Self

@@ -5,6 +5,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
+from omni.config import global_config
 from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
@@ -195,3 +196,27 @@ class TestAPIClass:
             pygen = OmniClient(mock_client)
             with pytest.raises(ValidationError):
                 _ = pygen.primitive_required.list()
+            try:
+                global_config.validate_retrieve = False
+                invalid = pygen.primitive_required.list()
+            finally:
+                global_config.validate_retrieve = True
+            assert invalid.dump() == {
+                "items": [
+                    {
+                        "space": "my_space",
+                        "externalId": "invalid_node",
+                        "version": 1,
+                        "lastUpdatedTime": 1,
+                        "createdTime": 1,
+                        "deletedTime": None,
+                        "properties": {
+                            "sp_pygen_models.PrimitiveRequired.1": {
+                                "boolean": True,
+                                "int32": 10,
+                                "int64": "invalid_value",
+                            }
+                        },
+                    }
+                ]
+            }
