@@ -24,6 +24,8 @@ from omni_multi.data_classes._core import (
     T_DomainModelList,
     as_node_id,
     as_write_args,
+    is_tuple_id,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
