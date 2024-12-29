@@ -225,14 +225,42 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | None:
-        ...
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %},
+        {% if data_class.direct_children %}
+        as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None,
+        {% endif %}
+        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        {% endif %}
+    ) -> {{ data_class.read_name }} | None: ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_list_name }}:
-        ...
+    def retrieve(
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %},
+        {% if data_class.direct_children %}
+        as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None,
+        {% endif %}
+        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        {% endif %}
+    ) -> {{ data_class.read_list_name }}: ...
 
-    def retrieve(self, external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %}{% if data_class.direct_children %}, as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None{% endif %}) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
+    def retrieve(
+        self,
+        external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif %},
+        {% if data_class.direct_children %}
+        as_child_class: SequenceNotStr[{{ data_class.direct_children_literal }}] | None = None,
+        {% endif %}
+        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        {% endif %}
+    ) -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
@@ -242,6 +270,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             as_child_class: If you want to retrieve the {{ data_class.doc_list_name }} as a child class,
                 you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.
+            {% endif %}
+            {% if data_class.has_connection_with_target %}
+            {{ retrieve_connections_doc }}
             {% endif %}
 
         Returns:
@@ -258,31 +289,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ... )
 
         """
-        {% if data_class.has_field_of_type(ft.OneToManyConnectionField) %}
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                {% for edge_api in edge_apis %}
-                {% if edge_api.field.is_write_field %}
-                (
-                    self.{{ edge_api.parent_attribute }},
-                    "{{ edge_api.field_name }}",
-                    dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
-                    "{{ edge_api.direction }}",
-                    dm.ViewId("{{ edge_api.end_class.view_id.space }}", "{{ edge_api.end_class.view_id.external_id }}", "{{ edge_api.end_class.view_id.version }}"),
-                ),
-                {% endif %}
-                {% endfor %}
-                                               ]
-            {% if data_class.direct_children %},
-            as_child_class=as_child_class
-            {% endif %}
-        )
-        {% else %}
-        return self._retrieve(external_id, space{% if data_class.direct_children %}, as_child_class=as_child_class{% endif %})
-        {% endif %}
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -541,80 +548,19 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         return {{ data_class.query_cls_name }}(self._client)
 
-    def list(
+    def _query(
         self,
-        {% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
-        {% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
-        {% endif %}
-        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-        {% endif %}
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
     ) -> {{ data_class.read_list_name }}:
-        """List/filter {{ data_class.doc_list_name }}
-
-        Args:
-            {% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}
-            {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return.
-                Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient,
-                you can write your own filtering which will be ANDed with the filter above.
-            {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.
-            {% endif %}
-            {% if data_class.has_connection_with_target %}
-            {{ retrieve_connections_doc }}
-            {% endif %}
-
-        Returns:
-            List of requested {{ data_class.doc_list_name}}
-
-        Examples:
-
-            List {{ data_class.doc_list_name }} and limit to 5:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.list(limit=5)
-
-        """
-        filter_ = {{ data_class.filter_name }}(
-            self._view_id,
-            {% for parm in list_method.parameters %}
-            {{ parm.name }},
-            {% endfor %}
-            filter,
-        )
-{% if data_class.has_connection_with_target %}
-        if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-                {% endif %}
-            )
-
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(factory.root(
             filter=filter_,
             {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
+            sort=sort,
             {% endif %}
             limit=limit,
             {% if data_class.has_container_fields %}
@@ -686,14 +632,70 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
         return {{ data_class.read_list_name }}([{{ data_class.read_name }}.model_validate(item) for item in unpacked])
-        {% else %}
-        return self._list(
-            limit=limit,
-            filter=filter_,
+
+    def list(
+        self,
+        {% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+        {% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        {% endif %}
+        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        {% endif %}
+    ) -> {{ data_class.read_list_name }}:
+        """List/filter {{ data_class.doc_list_name }}
+
+        Args:
+            {% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}
+            {% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return.
+                Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
             {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
             {% endif %}
+            {% if data_class.has_connection_with_target %}
+            {{ retrieve_connections_doc }}
+            {% endif %}
+
+        Returns:
+            List of requested {{ data_class.doc_list_name}}
+
+        Examples:
+
+            List {{ data_class.doc_list_name }} and limit to 5:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.list(limit=5)
+
+        """
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,
+            {% for parm in list_method.parameters %}
+            {{ parm.name }},
+            {% endfor %}
+            filter,
         )
+        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        {% endif %}
+{% if data_class.has_connection_with_target %}
+        if retrieve_connections == "skip":
+            return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
+        return self._query(filter_, limit, retrieve_connections{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
+        {% else %}
+        return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
         {% endif %}

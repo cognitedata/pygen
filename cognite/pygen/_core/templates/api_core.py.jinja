@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections import defaultdict
 from collections.abc import Sequence
 from itertools import groupby
@@ -163,7 +163,6 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         else:
             return nodes[0]
 
-    @abstractmethod
     def _query(self, filter_: dm.Filter | None, limit: int, sort: list[InstanceSort] | None,
                retrieve_connections: Literal["skip", "identifier", "full"]) -> T_DomainModelList:
         raise NotImplementedError

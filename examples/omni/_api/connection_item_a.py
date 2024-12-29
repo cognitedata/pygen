@@ -599,7 +599,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         )
         return ConnectionItemAQuery(self._client)
 
-    def _query(self, filter_: dm.Filter | None, limit: int, sort: list[InstanceSort] | None, retrieve_connections: Literal["skip", "identifier", "full"]) -> ConnectionItemAList:
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> ConnectionItemAList:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -715,4 +721,4 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         sort_input =  self._create_sort(sort_by, direction, sort) # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit,  filter=filter_, sort=sort_input)
-        return self._query(filter_, limit, sort_input, retrieve_connections)
+        return self._query(filter_, limit, retrieve_connections, sort_input)
