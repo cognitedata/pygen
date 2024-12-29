@@ -799,7 +799,9 @@ def serialize_property(value: Any) -> Any:
     return value
 
 
-def serialize_relation(value: DomainModelWrite | str | dm.NodeId | None | Sequence[DomainModelWrite | str | dm.NodeId], default_space: str) -> Any:
+def serialize_relation(
+    value: DomainModelWrite | str | dm.NodeId | None | Sequence[DomainModelWrite | str | dm.NodeId], default_space: str
+) -> Any:
     if value is None:
         return None
     elif isinstance(value, str):

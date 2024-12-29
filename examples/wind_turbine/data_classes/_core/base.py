@@ -5,7 +5,7 @@ import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import (
     Callable,
@@ -24,8 +24,11 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
+    TimeSeriesWrite,
     TimeSeriesWriteList,
+    FileMetadataWrite,
     FileMetadataWriteList,
+    SequenceWrite,
     SequenceWriteList,
     TimeSeriesList,
     FileMetadataList,
@@ -328,7 +331,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), write_none, allow_version_increase)
+        return self._to_resources_write(set(), allow_version_increase)
 
     def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
         warnings.warn(
@@ -337,6 +340,87 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
             stacklevel=2,
         )
         return self.to_instances_write(write_none)
+
+    def _to_resources_write(self, cache: set[tuple[str, str]], allow_version_increase: bool = False) -> ResourcesWrite:
+        resources = ResourcesWrite()
+        if self.as_tuple_id() in cache:
+            return resources
+        properties: dict[str, Any] = {}
+        for field_name in self._container_fields:
+            if field_name in self.model_fields_set:
+                value = getattr(self, field_name)
+                key = self.model_fields[field_name].alias or field_name
+                if field_name in self._direct_relations:
+                    properties[key] = serialize_relation(value, self.space)
+                else:
+                    properties[key] = serialize_property(value)
+
+                values = value if isinstance(value, Sequence) else [value]
+                for item in values:
+                    if isinstance(item, FileMetadataWrite):
+                        resources.files.append(item)
+                    elif isinstance(item, TimeSeriesWrite):
+                        resources.time_series.append(item)
+                    elif isinstance(item, SequenceWrite):
+                        resources.sequences.append(item)
+
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            type=as_direct_relation_reference(self.node_type),
+            sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
+        )
+        resources.nodes.append(this_node)
+        cache.add(self.as_tuple_id())
+
+        for field_name in self._direct_relations:
+            value = getattr(self, field_name)
+            values = value if isinstance(value, Sequence) else [value]
+            for item in values:
+                if isinstance(item, DomainModelWrite):
+                    other_resources = item._to_resources_write(cache, allow_version_increase)
+                    resources.extend(other_resources)
+
+        for field_name, edge_type in self._outwards_edges:
+            value = getattr(self, field_name)
+            if value is None:
+                continue
+            values = value if isinstance(value, Sequence) else [value]
+            for item in values:
+                if isinstance(item, DomainRelationWrite):
+                    other_resources = item._to_instances_write(cache, self, edge_type, False, allow_version_increase)
+                else:
+                    other_resources = DomainRelationWrite.from_edge_to_resources(
+                        cache,
+                        start_node=self,
+                        end_node=item,
+                        edge_type=edge_type,
+                        write_none=False,
+                        allow_version_increase=allow_version_increase,
+                    )
+                resources.extend(other_resources)
+
+        for field_name, edge_type in self._inwards_edges:
+            value = getattr(self, field_name)
+            if value is None:
+                continue
+            values = value if isinstance(value, Sequence) else [value]
+            for item in values:
+                if isinstance(item, DomainRelationWrite):
+                    other_resources = item._to_instances_write(cache, self, edge_type, False, allow_version_increase)
+                else:
+                    other_resources = DomainRelationWrite.from_edge_to_resources(
+                        cache,
+                        start_node=item,
+                        end_node=self,
+                        edge_type=edge_type,
+                        write_none=False,
+                        allow_version_increase=allow_version_increase,
+                    )
+                resources.extend(other_resources)
+
+        return resources
 
     @abstractmethod
     def _to_instances_write(
@@ -701,6 +785,32 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
             else:
                 unpacked[prop_name] = prop_value
     return unpacked
+
+
+def serialize_property(value: Any) -> Any:
+    if isinstance(value, Sequence) and not isinstance(value, str):
+        return [serialize_property(item) for item in value]
+    elif isinstance(value, datetime.date):
+        return value.isoformat()
+    elif isinstance(value, datetime.datetime):
+        return value.isoformat(timespec="milliseconds")
+    elif isinstance(value, TimeSeriesWrite | FileMetadataWrite | SequenceWrite):
+        return value.external_id
+    return value
+
+
+def serialize_relation(
+    value: DomainModelWrite | str | dm.NodeId | None | Sequence[DomainModelWrite | str | dm.NodeId], default_space: str
+) -> Any:
+    if value is None:
+        return None
+    elif isinstance(value, str):
+        return {"space": default_space, "externalId": value}
+    elif isinstance(value, Sequence):
+        return [serialize_relation(item, default_space) for item in value]
+    elif isinstance(value, DomainModelWrite | dm.NodeId):
+        return {"space": value.space, "externalId": value.external_id}
+    raise TypeError(f"Expected str, subclass of {DomainModelWrite.__name__} or NodeId, got {type(value)}")
 
 
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
