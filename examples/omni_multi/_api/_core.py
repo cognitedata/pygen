@@ -413,7 +413,7 @@ class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
         if global_config.validate_retrieve:
             retrieved = [self._result_cls.model_validate(item) for item in unpacked]
         else:
-            retrieved = [self._result_cls.model_construct(**item) for item in unpacked]
+            retrieved = [self._result_cls.model_construct(**item) for item in unpacked]  # type: ignore[misc]
         return self._result_list_cls(retrieved)
 
 
