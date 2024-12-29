@@ -355,6 +355,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
                     properties[key] = serialize_relation(value, self.space)
                 else:
                     properties[key] = serialize_property(value)
+
                 values = value if isinstance(value, Sequence) else [value]
                 for item in values:
                     if isinstance(item, FileMetadataWrite):
@@ -364,16 +365,15 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
                     elif isinstance(item, SequenceWrite):
                         resources.sequences.append(item)
 
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            type=as_direct_relation_reference(self.node_type),
+            sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
+        )
+        resources.nodes.append(this_node)
+        cache.add(self.as_tuple_id())
 
         for field_name in self._direct_relations:
             value = getattr(self, field_name)
@@ -799,15 +799,15 @@ def serialize_property(value: Any) -> Any:
     return value
 
 
-def serialize_relation(value: DomainModel | str | dm.NodeId | None | Sequence[DomainModel | str | dm.NodeId], default_space: str) -> Any:
+def serialize_relation(value: DomainModelWrite | str | dm.NodeId | None | Sequence[DomainModelWrite | str | dm.NodeId], default_space: str) -> Any:
     if value is None:
         return None
     elif isinstance(value, str):
         return {"space": default_space, "externalId": value}
     elif isinstance(value, Sequence):
         return [serialize_relation(item, default_space) for item in value]
-    elif isinstance(value, DomainModel | dm.NodeId):
+    elif isinstance(value, DomainModelWrite | dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
-    raise TypeError(f"Expected str, subclass of {DomainModel.__name__} or NodeId, got {type(value)}")
+    raise TypeError(f"Expected str, subclass of {DomainModelWrite.__name__} or NodeId, got {type(value)}")
 
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
