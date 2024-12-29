@@ -571,6 +571,7 @@ class DomainRelationWrite(Core, extra="forbid"):
             str,
         ]
     ] = default_edge_external_id_factory
+    space: str
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
     end_node: Any
@@ -612,8 +613,8 @@ class DomainRelationWrite(Core, extra="forbid"):
             space=self.space,
             external_id=external_id,
             type=edge_type,
-            start_node=as_direct_relation_reference(start_node),
-            end_node=as_direct_relation_reference(end_node),
+            start_node=as_direct_relation_reference(start_node, return_none=False),
+            end_node=as_direct_relation_reference(end_node, return_none=False),
             existing_version=None if allow_version_increase else self.data_record.existing_version,
             sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
         )
@@ -786,7 +787,9 @@ def connection_resources(
         values = value if isinstance(value, Sequence) else [value]
         for item in values:
             if isinstance(item, DomainRelationWrite):
-                other_resources = item._to_resources_write(cache, model, edge_type, "outwards", allow_version_increase)
+                other_resources = item._to_resources_write(
+                    cache, model, edge_type, "outwards", allow_version_increase  # type: ignore[arg-type]
+                )
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
@@ -805,7 +808,9 @@ def connection_resources(
         values = value if isinstance(value, Sequence) else [value]
         for item in values:
             if isinstance(item, DomainRelationWrite):
-                other_resources = item._to_resources_write(cache, model, edge_type, "inwards", allow_version_increase)
+                other_resources = item._to_resources_write(
+                    cache, model, edge_type, "inwards", allow_version_increase  # type: ignore[arg-type]
+                )
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,

@@ -500,7 +500,6 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDiagramAnnotation", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node_page_number: Optional[int] = Field(None, alias="endNodePageNumber")
     end_node_text: Optional[str] = Field(None, alias="endNodeText")
     end_node_x_max: Optional[float] = Field(None, alias="endNodeXMax")

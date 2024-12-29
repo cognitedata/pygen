@@ -270,7 +270,6 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
     source: Union[CogniteSourceSystemWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     source_context: Optional[str] = Field(None, alias="sourceContext")

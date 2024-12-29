@@ -189,7 +189,6 @@ class DistanceWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
     distance: Optional[float] = None
 

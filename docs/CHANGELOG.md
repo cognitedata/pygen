@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Improved
+- When calling the `.upsert(...)` the `write_none` argument is now deprecated. Instead, `pygen` detects which
+  properties that are explicitly set to `None` and only sends those properties to the CDF. This way you can
+  now set properties to `None` and they will be updated in the CDF.
+
+### Fixed
+- Calling `.upsert` with an edge with properties in inwards direction, now creates the edge in the correct direction.
+
 ## [0.99.58] - 24-12-16
 ### Fixed
 - Updated the timeseries API to support TimeZone.

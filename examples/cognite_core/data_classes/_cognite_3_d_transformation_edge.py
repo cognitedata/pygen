@@ -273,7 +273,6 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
     euler_rotation_x: Optional[float] = Field(None, alias="eulerRotationX")
     euler_rotation_y: Optional[float] = Field(None, alias="eulerRotationY")

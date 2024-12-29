@@ -335,7 +335,6 @@ class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeW
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAnnotation", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     confidence: Optional[float] = None
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
 
