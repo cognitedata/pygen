@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
     TimestampFilter,
 )
@@ -838,13 +839,21 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.back_filter = DirectRelationFilter(self, self._view_id.as_property_ref("back"))
+        self.bottom_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bottom"))
+        self.collection_360_filter = DirectRelationFilter(self, self._view_id.as_property_ref("collection360"))
         self.euler_rotation_x = FloatFilter(self, self._view_id.as_property_ref("eulerRotationX"))
         self.euler_rotation_y = FloatFilter(self, self._view_id.as_property_ref("eulerRotationY"))
         self.euler_rotation_z = FloatFilter(self, self._view_id.as_property_ref("eulerRotationZ"))
+        self.front_filter = DirectRelationFilter(self, self._view_id.as_property_ref("front"))
+        self.left_filter = DirectRelationFilter(self, self._view_id.as_property_ref("left"))
+        self.right_filter = DirectRelationFilter(self, self._view_id.as_property_ref("right"))
         self.scale_x = FloatFilter(self, self._view_id.as_property_ref("scaleX"))
         self.scale_y = FloatFilter(self, self._view_id.as_property_ref("scaleY"))
         self.scale_z = FloatFilter(self, self._view_id.as_property_ref("scaleZ"))
+        self.station_360_filter = DirectRelationFilter(self, self._view_id.as_property_ref("station360"))
         self.taken_at = TimestampFilter(self, self._view_id.as_property_ref("takenAt"))
+        self.top_filter = DirectRelationFilter(self, self._view_id.as_property_ref("top"))
         self.translation_x = FloatFilter(self, self._view_id.as_property_ref("translationX"))
         self.translation_y = FloatFilter(self, self._view_id.as_property_ref("translationY"))
         self.translation_z = FloatFilter(self, self._view_id.as_property_ref("translationZ"))
@@ -852,13 +861,21 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
             [
                 self.space,
                 self.external_id,
+                self.back_filter,
+                self.bottom_filter,
+                self.collection_360_filter,
                 self.euler_rotation_x,
                 self.euler_rotation_y,
                 self.euler_rotation_z,
+                self.front_filter,
+                self.left_filter,
+                self.right_filter,
                 self.scale_x,
                 self.scale_y,
                 self.scale_z,
+                self.station_360_filter,
                 self.taken_at,
+                self.top_filter,
                 self.translation_x,
                 self.translation_y,
                 self.translation_z,

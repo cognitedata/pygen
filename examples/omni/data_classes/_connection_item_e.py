@@ -33,6 +33,7 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -537,11 +538,13 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.direct_no_source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("directNoSource"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.direct_no_source_filter,
                 self.name,
             ]
         )

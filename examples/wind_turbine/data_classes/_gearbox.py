@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -475,6 +476,18 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.displacement_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_x"))
+        self.displacement_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_y"))
+        self.displacement_z_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_z"))
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.displacement_x_filter,
+                self.displacement_y_filter,
+                self.displacement_z_filter,
+            ]
+        )
 
     def list_gearbox(self, limit: int = DEFAULT_QUERY_LIMIT) -> GearboxList:
         return self._list(limit=limit)

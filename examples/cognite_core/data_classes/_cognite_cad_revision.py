@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     StringFilter,
     ViewPropertyId,
     BooleanFilter,
+    DirectRelationFilter,
     IntFilter,
 )
 from cognite_core.data_classes._cognite_3_d_revision import Cognite3DRevision, Cognite3DRevisionWrite
@@ -339,12 +340,14 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
         self.revision_id = IntFilter(self, self._view_id.as_property_ref("revisionId"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.model_3d_filter,
                 self.published,
                 self.revision_id,
             ]

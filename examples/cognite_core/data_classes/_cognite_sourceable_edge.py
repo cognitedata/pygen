@@ -35,6 +35,7 @@ from cognite_core.data_classes._core import (
     QueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     TimestampFilter,
 )
 
@@ -471,6 +472,7 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -481,6 +483,7 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
             [
                 self.space,
                 self.external_id,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,

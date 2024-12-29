@@ -36,6 +36,7 @@ from cognite_core.data_classes._core import (
     StringFilter,
     ViewPropertyId,
     BooleanFilter,
+    DirectRelationFilter,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -747,6 +748,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.is_step = BooleanFilter(self, self._view_id.as_property_ref("isStep"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -754,6 +756,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
         self.source_unit = StringFilter(self, self._view_id.as_property_ref("sourceUnit"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
+        self.unit_filter = DirectRelationFilter(self, self._view_id.as_property_ref("unit"))
         self._filter_classes.extend(
             [
                 self.space,
@@ -761,6 +764,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 self.description,
                 self.is_step,
                 self.name,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,
@@ -768,6 +772,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 self.source_unit,
                 self.source_updated_time,
                 self.source_updated_user,
+                self.unit_filter,
             ]
         )
         self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())

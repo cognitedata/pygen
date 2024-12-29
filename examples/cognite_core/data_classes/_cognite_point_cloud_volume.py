@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -543,14 +544,18 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.format_version = StringFilter(self, self._view_id.as_property_ref("formatVersion"))
+        self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
                 self.description,
                 self.format_version,
+                self.model_3d_filter,
                 self.name,
+                self.object_3d_filter,
             ]
         )
 

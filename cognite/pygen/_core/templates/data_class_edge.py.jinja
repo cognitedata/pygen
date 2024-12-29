@@ -396,13 +396,13 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         {% for field in data_class.filtering_fields %}
-        self.{{ field.name }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
+        self.{{ field.filter_attribute }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
         {% endfor %}
         self._filter_classes.extend([
             self.space,
             self.external_id,
             {% for field in data_class.filtering_fields %}
-            self.{{ field.name }},
+            self.{{ field.filter_attribute }},
             {% endfor %}
         ])
         {% endif %}

@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     StringFilter,
     ViewPropertyId,
     BooleanFilter,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -343,11 +344,13 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.model_3d_filter,
                 self.published,
             ]
         )

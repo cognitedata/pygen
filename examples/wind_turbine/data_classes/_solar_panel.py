@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
@@ -428,14 +429,18 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self.efficiency_filter = DirectRelationFilter(self, self._view_id.as_property_ref("efficiency"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.orientation_filter = DirectRelationFilter(self, self._view_id.as_property_ref("orientation"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
                 self.capacity,
                 self.description,
+                self.efficiency_filter,
                 self.name,
+                self.orientation_filter,
             ]
         )
 

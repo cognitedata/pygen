@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
@@ -762,6 +763,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.scheduled_end_time = TimestampFilter(self, self._view_id.as_property_ref("scheduledEndTime"))
         self.scheduled_start_time = TimestampFilter(self, self._view_id.as_property_ref("scheduledStartTime"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
@@ -778,6 +780,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                 self.name,
                 self.scheduled_end_time,
                 self.scheduled_start_time,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,

@@ -27,7 +27,7 @@ nav:
         - Listing, filtering, and retrieving: usage/listing_filtering_retrieving.ipynb
         - Searching: usage/searching.ipynb
         - Aggregation: usage/aggregation.ipynb
-        - Querying/Selecting: usage/querying.ipynb
+        - Selecting: usage/querying.ipynb
         - Creating and Deleting: usage/creating_deleting.ipynb
         - Working with Time Series: usage/timeseries.ipynb
         - Working with Files: usage/files.ipynb

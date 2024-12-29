@@ -34,6 +34,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_visualizable import CogniteVisualizable, CogniteVisualizableWrite
@@ -999,28 +1000,40 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.asset_class_filter = DirectRelationFilter(self, self._view_id.as_property_ref("assetClass"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
+        self.parent_filter = DirectRelationFilter(self, self._view_id.as_property_ref("parent"))
         self.path_last_updated_time = TimestampFilter(self, self._view_id.as_property_ref("pathLastUpdatedTime"))
+        self.root_filter = DirectRelationFilter(self, self._view_id.as_property_ref("root"))
+        self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
         self.source_created_user = StringFilter(self, self._view_id.as_property_ref("sourceCreatedUser"))
         self.source_id = StringFilter(self, self._view_id.as_property_ref("sourceId"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
+        self.type__filter = DirectRelationFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.asset_class_filter,
                 self.description,
                 self.name,
+                self.object_3d_filter,
+                self.parent_filter,
                 self.path_last_updated_time,
+                self.root_filter,
+                self.source_filter,
                 self.source_context,
                 self.source_created_time,
                 self.source_created_user,
                 self.source_id,
                 self.source_updated_time,
                 self.source_updated_user,
+                self.type__filter,
             ]
         )
 

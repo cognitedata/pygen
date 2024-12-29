@@ -33,6 +33,7 @@ from wind_turbine.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
 
 if TYPE_CHECKING:
@@ -446,6 +447,20 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.generator_speed_controller_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("generator_speed_controller")
+        )
+        self.generator_speed_controller_reference_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("generator_speed_controller_reference")
+        )
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.generator_speed_controller_filter,
+                self.generator_speed_controller_reference_filter,
+            ]
+        )
 
     def list_generator(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratorList:
         return self._list(limit=limit)
