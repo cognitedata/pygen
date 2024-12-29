@@ -23,14 +23,8 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -270,98 +264,6 @@ class MainShaftWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.bending_x is not None:
-            properties["bending_x"] = {
-                "space": self.space if isinstance(self.bending_x, str) else self.bending_x.space,
-                "externalId": self.bending_x if isinstance(self.bending_x, str) else self.bending_x.external_id,
-            }
-
-        if self.bending_y is not None:
-            properties["bending_y"] = {
-                "space": self.space if isinstance(self.bending_y, str) else self.bending_y.space,
-                "externalId": self.bending_y if isinstance(self.bending_y, str) else self.bending_y.external_id,
-            }
-
-        if self.calculated_tilt_moment is not None:
-            properties["calculated_tilt_moment"] = {
-                "space": (
-                    self.space if isinstance(self.calculated_tilt_moment, str) else self.calculated_tilt_moment.space
-                ),
-                "externalId": (
-                    self.calculated_tilt_moment
-                    if isinstance(self.calculated_tilt_moment, str)
-                    else self.calculated_tilt_moment.external_id
-                ),
-            }
-
-        if self.calculated_yaw_moment is not None:
-            properties["calculated_yaw_moment"] = {
-                "space": (
-                    self.space if isinstance(self.calculated_yaw_moment, str) else self.calculated_yaw_moment.space
-                ),
-                "externalId": (
-                    self.calculated_yaw_moment
-                    if isinstance(self.calculated_yaw_moment, str)
-                    else self.calculated_yaw_moment.external_id
-                ),
-            }
-
-        if self.torque is not None:
-            properties["torque"] = {
-                "space": self.space if isinstance(self.torque, str) else self.torque.space,
-                "externalId": self.torque if isinstance(self.torque, str) else self.torque.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.bending_x, DomainModelWrite):
-            other_resources = self.bending_x._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.bending_y, DomainModelWrite):
-            other_resources = self.bending_y._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.calculated_tilt_moment, DomainModelWrite):
-            other_resources = self.calculated_tilt_moment._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.calculated_yaw_moment, DomainModelWrite):
-            other_resources = self.calculated_yaw_moment._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.torque, DomainModelWrite):
-            other_resources = self.torque._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class MainShaftApply(MainShaftWrite):

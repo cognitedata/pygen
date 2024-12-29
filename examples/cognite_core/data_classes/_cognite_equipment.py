@@ -24,14 +24,8 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -431,122 +425,6 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.asset is not None:
-            properties["asset"] = {
-                "space": self.space if isinstance(self.asset, str) else self.asset.space,
-                "externalId": self.asset if isinstance(self.asset, str) else self.asset.external_id,
-            }
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.equipment_type is not None:
-            properties["equipmentType"] = {
-                "space": self.space if isinstance(self.equipment_type, str) else self.equipment_type.space,
-                "externalId": (
-                    self.equipment_type if isinstance(self.equipment_type, str) else self.equipment_type.external_id
-                ),
-            }
-
-        if self.files is not None:
-            properties["files"] = [
-                {
-                    "space": self.space if isinstance(file, str) else file.space,
-                    "externalId": file if isinstance(file, str) else file.external_id,
-                }
-                for file in self.files or []
-            ]
-
-        if self.manufacturer is not None or write_none:
-            properties["manufacturer"] = self.manufacturer
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.serial_number is not None or write_none:
-            properties["serialNumber"] = self.serial_number
-
-        if self.source is not None:
-            properties["source"] = {
-                "space": self.space if isinstance(self.source, str) else self.source.space,
-                "externalId": self.source if isinstance(self.source, str) else self.source.external_id,
-            }
-
-        if self.source_context is not None or write_none:
-            properties["sourceContext"] = self.source_context
-
-        if self.source_created_time is not None or write_none:
-            properties["sourceCreatedTime"] = (
-                self.source_created_time.isoformat(timespec="milliseconds") if self.source_created_time else None
-            )
-
-        if self.source_created_user is not None or write_none:
-            properties["sourceCreatedUser"] = self.source_created_user
-
-        if self.source_id is not None or write_none:
-            properties["sourceId"] = self.source_id
-
-        if self.source_updated_time is not None or write_none:
-            properties["sourceUpdatedTime"] = (
-                self.source_updated_time.isoformat(timespec="milliseconds") if self.source_updated_time else None
-            )
-
-        if self.source_updated_user is not None or write_none:
-            properties["sourceUpdatedUser"] = self.source_updated_user
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.asset, DomainModelWrite):
-            other_resources = self.asset._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.equipment_type, DomainModelWrite):
-            other_resources = self.equipment_type._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.source, DomainModelWrite):
-            other_resources = self.source._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        for file in self.files or []:
-            if isinstance(file, DomainModelWrite):
-                other_resources = file._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteEquipmentApply(CogniteEquipmentWrite):

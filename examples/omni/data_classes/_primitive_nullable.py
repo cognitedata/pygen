@@ -24,14 +24,8 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -258,63 +252,6 @@ class PrimitiveNullableWrite(DomainModelWrite):
     json_: Optional[dict] = Field(None, alias="json")
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.boolean is not None or write_none:
-            properties["boolean"] = self.boolean
-
-        if self.date is not None or write_none:
-            properties["date"] = self.date.isoformat() if self.date else None
-
-        if self.float_32 is not None or write_none:
-            properties["float32"] = self.float_32
-
-        if self.float_64 is not None or write_none:
-            properties["float64"] = self.float_64
-
-        if self.int_32 is not None or write_none:
-            properties["int32"] = self.int_32
-
-        if self.int_64 is not None or write_none:
-            properties["int64"] = self.int_64
-
-        if self.json_ is not None or write_none:
-            properties["json"] = self.json_
-
-        if self.text is not None or write_none:
-            properties["text"] = self.text
-
-        if self.timestamp is not None or write_none:
-            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds") if self.timestamp else None
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class PrimitiveNullableApply(PrimitiveNullableWrite):

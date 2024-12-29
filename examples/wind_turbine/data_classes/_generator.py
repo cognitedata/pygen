@@ -23,14 +23,8 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -238,72 +232,6 @@ class GeneratorWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.generator_speed_controller is not None:
-            properties["generator_speed_controller"] = {
-                "space": (
-                    self.space
-                    if isinstance(self.generator_speed_controller, str)
-                    else self.generator_speed_controller.space
-                ),
-                "externalId": (
-                    self.generator_speed_controller
-                    if isinstance(self.generator_speed_controller, str)
-                    else self.generator_speed_controller.external_id
-                ),
-            }
-
-        if self.generator_speed_controller_reference is not None:
-            properties["generator_speed_controller_reference"] = {
-                "space": (
-                    self.space
-                    if isinstance(self.generator_speed_controller_reference, str)
-                    else self.generator_speed_controller_reference.space
-                ),
-                "externalId": (
-                    self.generator_speed_controller_reference
-                    if isinstance(self.generator_speed_controller_reference, str)
-                    else self.generator_speed_controller_reference.external_id
-                ),
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.generator_speed_controller, DomainModelWrite):
-            other_resources = self.generator_speed_controller._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.generator_speed_controller_reference, DomainModelWrite):
-            other_resources = self.generator_speed_controller_reference._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class GeneratorApply(GeneratorWrite):

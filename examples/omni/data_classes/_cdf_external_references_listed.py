@@ -40,14 +40,8 @@ from omni.data_classes._core import (
     SequenceWrite,
     SequenceGraphQL,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -219,69 +213,6 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
     files: Optional[list[Union[FileMetadataWrite, str]]] = None
     sequences: Optional[list[Union[SequenceWrite, str]]] = None
     timeseries: Optional[list[Union[TimeSeriesWrite, str]]] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.files is not None or write_none:
-            properties["files"] = (
-                [file if isinstance(file, str) else file.external_id for file in self.files or []]
-                if self.files is not None
-                else None
-            )
-
-        if self.sequences is not None or write_none:
-            properties["sequences"] = (
-                [sequence if isinstance(sequence, str) else sequence.external_id for sequence in self.sequences or []]
-                if self.sequences is not None
-                else None
-            )
-
-        if self.timeseries is not None or write_none:
-            properties["timeseries"] = (
-                [timesery if isinstance(timesery, str) else timesery.external_id for timesery in self.timeseries or []]
-                if self.timeseries is not None
-                else None
-            )
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        for file in self.files or []:
-            if isinstance(file, CogniteFileMetadataWrite):
-                resources.files.append(file)
-
-        for sequence in self.sequences or []:
-            if isinstance(sequence, CogniteSequenceWrite):
-                resources.sequences.append(sequence)
-
-        for timesery in self.timeseries or []:
-            if isinstance(timesery, CogniteTimeSeriesWrite):
-                resources.time_series.append(timesery)
-
-        return resources
 
 
 class CDFExternalReferencesListedApply(CDFExternalReferencesListedWrite):

@@ -422,15 +422,6 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
 
         return resources
 
-    @abstractmethod
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        raise NotImplementedError()
-
     @model_validator(mode="before")
     def create_external_id_if_factory(cls, data: Any) -> Any:
         if (

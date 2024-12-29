@@ -23,14 +23,8 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -238,65 +232,6 @@ class SolarPanelWrite(GeneratingUnitWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.capacity is not None or write_none:
-            properties["capacity"] = self.capacity
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.efficiency is not None:
-            properties["efficiency"] = {
-                "space": self.space if isinstance(self.efficiency, str) else self.efficiency.space,
-                "externalId": self.efficiency if isinstance(self.efficiency, str) else self.efficiency.external_id,
-            }
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.orientation is not None:
-            properties["orientation"] = {
-                "space": self.space if isinstance(self.orientation, str) else self.orientation.space,
-                "externalId": self.orientation if isinstance(self.orientation, str) else self.orientation.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.efficiency, DomainModelWrite):
-            other_resources = self.efficiency._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.orientation, DomainModelWrite):
-            other_resources = self.orientation._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class SolarPanelApply(SolarPanelWrite):

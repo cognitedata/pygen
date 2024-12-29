@@ -23,14 +23,8 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -248,61 +242,6 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudModel", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if self.thumbnail is not None:
-            properties["thumbnail"] = {
-                "space": self.space if isinstance(self.thumbnail, str) else self.thumbnail.space,
-                "externalId": self.thumbnail if isinstance(self.thumbnail, str) else self.thumbnail.external_id,
-            }
-
-        if self.type_ is not None or write_none:
-            properties["type"] = self.type_
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.thumbnail, DomainModelWrite):
-            other_resources = self.thumbnail._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CognitePointCloudModelApply(CognitePointCloudModelWrite):

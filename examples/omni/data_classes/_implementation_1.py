@@ -23,14 +23,8 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -199,48 +193,6 @@ class Implementation1Write(SubInterfaceWrite):
     )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.main_value is not None or write_none:
-            properties["mainValue"] = self.main_value
-
-        if self.sub_value is not None or write_none:
-            properties["subValue"] = self.sub_value
-
-        if self.value_1 is not None or write_none:
-            properties["value1"] = self.value_1
-
-        if self.value_2 is not None:
-            properties["value2"] = self.value_2
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class Implementation1Apply(Implementation1Write):

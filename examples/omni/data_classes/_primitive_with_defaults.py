@@ -23,14 +23,8 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
     as_write_args,
-    is_tuple_id,
-    select_best_node,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -215,51 +209,6 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
     default_float_32: Optional[float] = Field(0.42, alias="defaultFloat32")
     default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.auto_increment_int_32 is not None:
-            properties["autoIncrementInt32"] = self.auto_increment_int_32
-
-        if self.default_boolean is not None or write_none:
-            properties["defaultBoolean"] = self.default_boolean
-
-        if self.default_float_32 is not None or write_none:
-            properties["defaultFloat32"] = self.default_float_32
-
-        if self.default_object is not None or write_none:
-            properties["defaultObject"] = self.default_object
-
-        if self.default_string is not None or write_none:
-            properties["defaultString"] = self.default_string
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class PrimitiveWithDefaultsApply(PrimitiveWithDefaultsWrite):
