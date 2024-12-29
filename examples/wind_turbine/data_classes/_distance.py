@@ -25,9 +25,7 @@ from wind_turbine.data_classes._core import (
     as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -151,6 +149,29 @@ class Distance(DomainRelation):
         return self.as_write()
 
 
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+    MetmastWrite: {WindTurbineWrite},
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
+) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
+
+
 class DistanceWrite(DomainRelationWrite):
     """This represents the writing version of distance.
 
@@ -165,6 +186,7 @@ class DistanceWrite(DomainRelationWrite):
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = ("distance",)
+    _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
     space: str = DEFAULT_INSTANCE_SPACE
@@ -341,29 +363,6 @@ def _create_distance_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    MetmastWrite: {WindTurbineWrite},
-}
-
-
-def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
-) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):

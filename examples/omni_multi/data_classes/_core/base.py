@@ -12,6 +12,7 @@ from typing import (
     cast,
     ClassVar,
     Generic,
+    Literal,
     Optional,
     Any,
     Iterator,
@@ -343,24 +344,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         resources = ResourcesWrite()
         if self.as_tuple_id() in cache:
             return resources
-        properties: dict[str, Any] = {}
-        for field_name in self._container_fields:
-            if field_name in self.model_fields_set:
-                value = getattr(self, field_name)
-                key = self.model_fields[field_name].alias or field_name
-                if field_name in self._direct_relations:
-                    properties[key] = serialize_relation(value, self.space)
-                else:
-                    properties[key] = serialize_property(value)
-
-                values = value if isinstance(value, Sequence) else [value]
-                for item in values:
-                    if isinstance(item, FileMetadataWrite):
-                        resources.files.append(item)
-                    elif isinstance(item, TimeSeriesWrite):
-                        resources.time_series.append(item)
-                    elif isinstance(item, SequenceWrite):
-                        resources.sequences.append(item)
+        properties = serialize_properties(self, resources)
 
         this_node = dm.NodeApply(
             space=self.space,
@@ -372,51 +356,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         resources.nodes.append(this_node)
         cache.add(self.as_tuple_id())
 
-        for field_name in self._direct_relations:
-            value = getattr(self, field_name)
-            values = value if isinstance(value, Sequence) else [value]
-            for item in values:
-                if isinstance(item, DomainModelWrite):
-                    other_resources = item._to_resources_write(cache, allow_version_increase)
-                    resources.extend(other_resources)
-
-        for field_name, edge_type in self._outwards_edges:
-            value = getattr(self, field_name)
-            if value is None:
-                continue
-            values = value if isinstance(value, Sequence) else [value]
-            for item in values:
-                if isinstance(item, DomainRelationWrite):
-                    other_resources = item._to_instances_write(cache, self, edge_type, False, allow_version_increase)
-                else:
-                    other_resources = DomainRelationWrite.from_edge_to_resources(
-                        cache,
-                        start_node=self,
-                        end_node=item,
-                        edge_type=edge_type,
-                        write_none=False,
-                        allow_version_increase=allow_version_increase,
-                    )
-                resources.extend(other_resources)
-
-        for field_name, edge_type in self._inwards_edges:
-            value = getattr(self, field_name)
-            if value is None:
-                continue
-            values = value if isinstance(value, Sequence) else [value]
-            for item in values:
-                if isinstance(item, DomainRelationWrite):
-                    other_resources = item._to_instances_write(cache, self, edge_type, False, allow_version_increase)
-                else:
-                    other_resources = DomainRelationWrite.from_edge_to_resources(
-                        cache,
-                        start_node=item,
-                        end_node=self,
-                        edge_type=edge_type,
-                        write_none=False,
-                        allow_version_increase=allow_version_increase,
-                    )
-                resources.extend(other_resources)
+        resources.extend(connection_resources(self, cache, allow_version_increase))
 
         return resources
 
@@ -614,7 +554,13 @@ def default_edge_external_id_factory(
     return f"{start}:{end}"
 
 
-class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
+class DomainRelationWrite(Core, extra="forbid"):
+    _container_fields: ClassVar[tuple[str, ...]] = tuple()
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _direct_relations: ClassVar[tuple[str, ...]] = tuple()
+    _validate_other_node: ClassVar[Callable | None] = None
+
     external_id_factory: ClassVar[
         Callable[
             [
@@ -627,6 +573,7 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
     ] = default_edge_external_id_factory
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
+    end_node: Any
 
     @abstractmethod
     def _to_instances_write(
@@ -638,6 +585,47 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         raise NotImplementedError()
+
+    def _to_resources_write(
+        self,
+        cache: set[tuple[str, str]],
+        other_node: DomainModelWrite,
+        edge_type: dm.DirectRelationReference,
+        direction: Literal["outwards", "inwards"],
+        allow_version_increase: bool = False,
+    ) -> ResourcesWrite:
+        resources = ResourcesWrite()
+        if self.external_id and (self.space, self.external_id) in cache:
+            return resources
+
+        if self._validate_other_node:
+            self._validate_other_node(other_node, self.end_node)
+
+        start_node = other_node
+        end_node = self.end_node
+        if direction == "inwards":
+            start_node, end_node = end_node, start_node
+
+        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, end_node, edge_type)
+        properties = serialize_properties(self, resources)
+        this_edge = dm.EdgeApply(
+            space=self.space,
+            external_id=external_id,
+            type=edge_type,
+            start_node=as_direct_relation_reference(start_node),
+            end_node=as_direct_relation_reference(end_node),
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
+        )
+        resources.edges.append(this_edge)
+        cache.add((self.space, external_id))
+
+        if isinstance(self.end_node, DomainModelWrite):
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase)
+            resources.extend(other_resources)
+
+        resources.extend(connection_resources(self, cache, allow_version_increase))
+        return resources
 
     @classmethod
     def create_edge(
@@ -752,6 +740,83 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
             else:
                 unpacked[prop_name] = prop_value
     return unpacked
+
+
+def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resources: ResourcesWrite) -> dict[str, Any]:
+    properties: dict[str, Any] = {}
+    for field_name in model._container_fields:
+        if field_name in model.model_fields_set:
+            value = getattr(model, field_name)
+            key = model.model_fields[field_name].alias or field_name
+            if field_name in model._direct_relations:
+                properties[key] = serialize_relation(value, model.space)
+            else:
+                properties[key] = serialize_property(value)
+
+            values = value if isinstance(value, Sequence) else [value]
+            for item in values:
+                if isinstance(item, FileMetadataWrite):
+                    resources.files.append(item)
+                elif isinstance(item, TimeSeriesWrite):
+                    resources.time_series.append(item)
+                elif isinstance(item, SequenceWrite):
+                    resources.sequences.append(item)
+
+    return properties
+
+
+def connection_resources(
+    model: DomainModelWrite | DomainRelationWrite, cache: set[tuple[str, str]], allow_version_increase: bool = False
+) -> ResourcesWrite:
+    resources = ResourcesWrite()
+    for field_name in model._direct_relations:
+        if field_name not in model.model_fields_set:
+            continue
+        value = getattr(model, field_name)
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainModelWrite):
+                other_resources = item._to_resources_write(cache, allow_version_increase)
+                resources.extend(other_resources)
+
+    for field_name, edge_type in model._outwards_edges:
+        value = getattr(model, field_name)
+        if value is None or field_name not in model.model_fields_set:
+            continue
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainRelationWrite):
+                other_resources = item._to_resources_write(cache, model, edge_type, "outwards", allow_version_increase)
+            else:
+                other_resources = DomainRelationWrite.from_edge_to_resources(
+                    cache,
+                    start_node=model,
+                    end_node=item,
+                    edge_type=edge_type,
+                    write_none=False,
+                    allow_version_increase=allow_version_increase,
+                )
+            resources.extend(other_resources)
+
+    for field_name, edge_type in model._inwards_edges:
+        value = getattr(model, field_name)
+        if value is None or field_name not in model.model_fields_set:
+            continue
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainRelationWrite):
+                other_resources = item._to_resources_write(cache, model, edge_type, "inwards", allow_version_increase)
+            else:
+                other_resources = DomainRelationWrite.from_edge_to_resources(
+                    cache,
+                    start_node=item,
+                    end_node=model,
+                    edge_type=edge_type,
+                    write_none=False,
+                    allow_version_increase=allow_version_increase,
+                )
+            resources.extend(other_resources)
+    return resources
 
 
 def serialize_property(value: Any) -> Any:

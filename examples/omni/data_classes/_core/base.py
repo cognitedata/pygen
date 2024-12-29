@@ -788,7 +788,7 @@ def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resource
 
 
 def connection_resources(
-        model: DomainModelWrite | DomainRelationWrite, cache: set[tuple[str, str]], allow_version_increase: bool = False
+    model: DomainModelWrite | DomainRelationWrite, cache: set[tuple[str, str]], allow_version_increase: bool = False
 ) -> ResourcesWrite:
     resources = ResourcesWrite()
     for field_name in model._direct_relations:
@@ -808,9 +808,7 @@ def connection_resources(
         values = value if isinstance(value, Sequence) else [value]
         for item in values:
             if isinstance(item, DomainRelationWrite):
-                other_resources = item._to_resources_write(
-                    cache, model, edge_type, "outwards", allow_version_increase
-                )
+                other_resources = item._to_resources_write(cache, model, edge_type, "outwards", allow_version_increase)
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
@@ -829,9 +827,7 @@ def connection_resources(
         values = value if isinstance(value, Sequence) else [value]
         for item in values:
             if isinstance(item, DomainRelationWrite):
-                other_resources = item._to_resources_write(
-                    cache, model, edge_type, "inwards", allow_version_increase
-                )
+                other_resources = item._to_resources_write(cache, model, edge_type, "inwards", allow_version_increase)
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
