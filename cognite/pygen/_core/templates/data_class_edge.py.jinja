@@ -33,9 +33,7 @@ from {{ top_level_package }}.data_classes._core import (
     as_instance_dict_id,
     as_node_id,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -182,6 +180,29 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         return self.as_write()
 
 
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
+    {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
+{% raw %}}{% endraw %}
+
+
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
+) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
+
+
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
@@ -209,6 +230,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     {% if data_class.has_direct_relations_with_source %}
     _direct_relations: ClassVar[tuple[str, ...]] = ({{ data_class.direct_relations_with_source_comma_sep }},)
     {% endif %}
+    _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
     space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
@@ -388,29 +410,6 @@ def {{ data_class.filter_name }}(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
-    {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
-{% raw %}}{% endraw %}
-
-
-def _validate_end_node(
-    start_node: DomainModelWrite, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
-) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class.read_list_name }}]):
