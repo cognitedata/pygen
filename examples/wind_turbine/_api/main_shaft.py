@@ -261,7 +261,11 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_connections=retrieve_connections,
+        )
 
     def search(
         self,

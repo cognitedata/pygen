@@ -270,7 +270,11 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_connections=retrieve_connections,
+        )
 
     def search(
         self,

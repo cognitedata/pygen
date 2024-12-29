@@ -249,7 +249,10 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+        )
 
     def search(
         self,

@@ -174,7 +174,10 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+        )
 
     def search(
         self,

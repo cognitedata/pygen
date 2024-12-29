@@ -289,7 +289,16 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+            {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+            retrieve_connections=retrieve_connections,
+            {% endif %}
+            {% if data_class.direct_children %}
+            as_child_class=as_child_class
+            {% endif %}
+        )
 
     def search(
         self,

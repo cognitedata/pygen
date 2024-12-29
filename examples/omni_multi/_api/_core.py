@@ -146,14 +146,12 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             for space_key, external_ids in groupby(
                 sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]
             ):
-                external_ids = [ext_id[1] for ext_id in external_ids]
                 external_id_list = [ext_id[1] for ext_id in external_ids]
                 for ext_id_chunk in chunker(external_id_list, IN_FILTER_CHUNK_SIZE):
                     filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
                         ["node", "externalId"], ext_id_chunk
                     )
-                    instances = self._query(filter_, len(ext_id_chunk), None, retrieve_connections)
-                    items.extend([self._class_type.from_instance(node) for node in instances.nodes])
+                    items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections))
 
         nodes = self._class_list(items)
 
@@ -169,7 +167,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         filter_: dm.Filter | None,
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
-        sort: list[InstanceSort] | None,
+        sort: list[InstanceSort] | None = None,
     ) -> T_DomainModelList:
         raise NotImplementedError
 

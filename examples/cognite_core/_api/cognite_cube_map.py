@@ -281,7 +281,9 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id, space, retrieve_connections=retrieve_connections, as_child_class=as_child_class
+        )
 
     def search(
         self,

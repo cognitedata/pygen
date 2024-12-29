@@ -224,7 +224,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(external_id, space, as_child_class=as_child_class)
 
     def search(
         self,

@@ -233,7 +233,11 @@ class CogniteCADRevisionAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_connections)
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_connections=retrieve_connections,
+        )
 
     def search(
         self,
