@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -24,6 +24,8 @@ from wind_turbine.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
     is_tuple_id,
     EdgeQueryCore,
@@ -78,35 +80,13 @@ class DistanceGraphQL(GraphQLCore):
     end_node: Union[MetmastGraphQL, WindTurbineGraphQL, None] = None
     distance: Optional[float] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Distance:
         """Convert this GraphQL format of distance to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Distance(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            distance=self.distance,
-        )
+        return Distance.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DistanceWrite:
         """Convert this GraphQL format of distance to the writing format."""
-        return DistanceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            distance=self.distance,
-        )
+        return DistanceWrite.model_validate(as_write_args(self))
 
 
 class Distance(DomainRelation):
@@ -127,17 +107,9 @@ class Distance(DomainRelation):
     end_node: Union[Metmast, WindTurbine, str, dm.NodeId]
     distance: Optional[float] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DistanceWrite:
         """Convert this read version of distance to the writing version."""
-        return DistanceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            distance=self.distance,
-        )
+        return DistanceWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> DistanceWrite:
         """Convert this read version of distance to the writing version."""

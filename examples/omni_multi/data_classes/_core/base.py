@@ -871,11 +871,11 @@ def as_read_value(value: Any) -> Any:
     return value
 
 
-def as_write_args(model: DomainModel | GraphQLCore) -> dict[str, Any]:
+def as_write_args(model: DomainModel | GraphQLCore | DomainRelation) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for field_name in model.model_fields_set:
         value = getattr(model, field_name)
-        if field_name == "data_record" and isinstance(model, DomainModel):
+        if field_name == "data_record" and isinstance(model, DomainModel | DomainRelation):
             output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
         elif field_name == "data_record" and isinstance(model, GraphQLCore):
             output[field_name] = DataRecordWrite(existing_version=0)

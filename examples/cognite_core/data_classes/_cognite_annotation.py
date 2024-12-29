@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,6 +26,8 @@ from cognite_core.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
     is_tuple_id,
     EdgeQueryCore,
@@ -147,59 +149,13 @@ class CogniteAnnotationGraphQL(GraphQLCore):
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
     tags: Optional[list[str]] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteAnnotation:
         """Convert this GraphQL format of Cognite annotation to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteAnnotation(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            aliases=self.aliases,
-            confidence=self.confidence,
-            description=self.description,
-            name=self.name,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            status=self.status,
-            tags=self.tags,
-        )
+        return CogniteAnnotation.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAnnotationWrite:
         """Convert this GraphQL format of Cognite annotation to the writing format."""
-        return CogniteAnnotationWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node,
-            aliases=self.aliases,
-            confidence=self.confidence,
-            description=self.description,
-            name=self.name,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            status=self.status,
-            tags=self.tags,
-        )
+        return CogniteAnnotationWrite.model_validate(as_write_args(self))
 
 
 class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
@@ -235,29 +191,9 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
     confidence: Optional[float] = None
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAnnotationWrite:
         """Convert this read version of Cognite annotation to the writing version."""
-        return CogniteAnnotationWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node,
-            aliases=self.aliases,
-            confidence=self.confidence,
-            description=self.description,
-            name=self.name,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            status=self.status,
-            tags=self.tags,
-        )
+        return CogniteAnnotationWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteAnnotationWrite:
         """Convert this read version of Cognite annotation to the writing version."""

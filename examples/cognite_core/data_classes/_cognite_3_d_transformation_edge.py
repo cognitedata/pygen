@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,8 @@ from cognite_core.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
     is_tuple_id,
     EdgeQueryCore,
@@ -108,51 +110,13 @@ class Cognite3DTransformationEdgeGraphQL(GraphQLCore):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite3DTransformationEdge:
         """Convert this GraphQL format of Cognite 3D transformation edge to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite3DTransformationEdge(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationEdge.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DTransformationEdgeWrite:
         """Convert this GraphQL format of Cognite 3D transformation edge to the writing format."""
-        return Cognite3DTransformationEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node,
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationEdgeWrite.model_validate(as_write_args(self))
 
 
 class Cognite3DTransformationEdge(DomainRelation):
@@ -189,25 +153,9 @@ class Cognite3DTransformationEdge(DomainRelation):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DTransformationEdgeWrite:
         """Convert this read version of Cognite 3D transformation edge to the writing version."""
-        return Cognite3DTransformationEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node,
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationEdgeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite3DTransformationEdgeWrite:
         """Convert this read version of Cognite 3D transformation edge to the writing version."""

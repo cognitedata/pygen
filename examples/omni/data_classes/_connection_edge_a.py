@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,6 +26,8 @@ from omni.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
     is_tuple_id,
     EdgeQueryCore,
@@ -89,39 +91,13 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionEdgeA:
         """Convert this GraphQL format of connection edge a to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionEdgeA(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeA.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this GraphQL format of connection edge a to the writing format."""
-        return ConnectionEdgeAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
 
 class ConnectionEdgeA(DomainRelation):
@@ -146,19 +122,9 @@ class ConnectionEdgeA(DomainRelation):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
-        return ConnectionEdgeAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
