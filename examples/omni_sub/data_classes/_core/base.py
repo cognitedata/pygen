@@ -5,13 +5,14 @@ import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import (
     Callable,
     cast,
     ClassVar,
     Generic,
+    Literal,
     Optional,
     Any,
     Iterator,
@@ -24,8 +25,11 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
+    TimeSeriesWrite,
     TimeSeriesWriteList,
+    FileMetadataWrite,
     FileMetadataWriteList,
+    SequenceWrite,
     SequenceWriteList,
     TimeSeriesList,
     FileMetadataList,
@@ -39,6 +43,7 @@ from cognite.client.data_classes.data_modeling.instances import (
 )
 from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
+from omni_sub.data_classes._core.cdf_external import GraphQLExternal
 from omni_sub.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 
 if sys.version_info >= (3, 11):
@@ -310,6 +315,10 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
 
 
 class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
+    _container_fields: ClassVar[tuple[str, ...]] = tuple()
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _direct_relations: ClassVar[tuple[str, ...]] = tuple()
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -322,7 +331,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        return self._to_instances_write(set(), write_none, allow_version_increase)
+        return self._to_resources_write(set(), allow_version_increase)
 
     def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
         warnings.warn(
@@ -332,14 +341,25 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         )
         return self.to_instances_write(write_none)
 
-    @abstractmethod
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        raise NotImplementedError()
+    def _to_resources_write(self, cache: set[tuple[str, str]], allow_version_increase: bool = False) -> ResourcesWrite:
+        resources = ResourcesWrite()
+        if self.as_tuple_id() in cache:
+            return resources
+        properties = serialize_properties(self, resources)
+
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            type=as_direct_relation_reference(self.node_type),
+            sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
+        )
+        resources.nodes.append(this_node)
+        cache.add(self.as_tuple_id())
+
+        resources.extend(connection_resources(self, cache, allow_version_increase))
+
+        return resources
 
     @model_validator(mode="before")
     def create_external_id_if_factory(cls, data: Any) -> Any:
@@ -467,7 +487,7 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_write(cache, write_none, allow_version_increase)
+            result = node._to_resources_write(cache, allow_version_increase)
             domains.extend(result)
         return domains
 
@@ -535,7 +555,15 @@ def default_edge_external_id_factory(
     return f"{start}:{end}"
 
 
-class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
+class DomainRelationWrite(Core, extra="forbid"):
+    _view_id: ClassVar[dm.ViewId]
+
+    _container_fields: ClassVar[tuple[str, ...]] = tuple()
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _direct_relations: ClassVar[tuple[str, ...]] = tuple()
+    _validate_other_node: ClassVar[Callable | None] = None
+
     external_id_factory: ClassVar[
         Callable[
             [
@@ -546,19 +574,51 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
             str,
         ]
     ] = default_edge_external_id_factory
+    space: str
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
+    end_node: Any
 
-    @abstractmethod
-    def _to_instances_write(
+    def _to_resources_write(
         self,
         cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
+        other_node: DomainModelWrite,
         edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
+        direction: Literal["outwards", "inwards"],
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
-        raise NotImplementedError()
+        resources = ResourcesWrite()
+        if self.external_id and (self.space, self.external_id) in cache:
+            return resources
+
+        if self._validate_other_node:
+            self._validate_other_node(other_node, self.end_node)
+
+        start_node = other_node
+        end_node = self.end_node
+        if direction == "inwards":
+            start_node, end_node = end_node, start_node
+
+        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, end_node, edge_type)
+        properties = serialize_properties(self, resources)
+        this_edge = dm.EdgeApply(
+            space=self.space,
+            external_id=external_id,
+            type=edge_type,
+            start_node=as_direct_relation_reference(start_node, return_none=False),
+            end_node=as_direct_relation_reference(end_node, return_none=False),
+            existing_version=None if allow_version_increase else self.data_record.existing_version,
+            sources=[dm.NodeOrEdgeData(source=self._view_id, properties=properties)] if properties else None,
+        )
+        resources.edges.append(this_edge)
+        cache.add((self.space, external_id))
+
+        if isinstance(self.end_node, DomainModelWrite):
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase)
+            resources.extend(other_resources)
+
+        resources.extend(connection_resources(self, cache, allow_version_increase))
+        return resources
 
     @classmethod
     def create_edge(
@@ -609,16 +669,14 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
         cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
-            other_resources = end_node._to_instances_write(
+            other_resources = end_node._to_resources_write(
                 cache,
-                write_none,
                 allow_version_increase,
             )
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelWrite):
-            other_resources = start_node._to_instances_write(
+            other_resources = start_node._to_resources_write(
                 cache,
-                write_none,
                 allow_version_increase,
             )
             resources.extend(other_resources)
@@ -677,4 +735,161 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
     return unpacked
 
 
+def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resources: ResourcesWrite) -> dict[str, Any]:
+    properties: dict[str, Any] = {}
+    for field_name in model._container_fields:
+        if field_name in model.model_fields_set:
+            value = getattr(model, field_name)
+            key = model.model_fields[field_name].alias or field_name
+            if field_name in model._direct_relations:
+                properties[key] = serialize_relation(value, model.space)
+            else:
+                properties[key] = serialize_property(value)
+
+            values = value if isinstance(value, Sequence) else [value]
+            for item in values:
+                if isinstance(item, FileMetadataWrite):
+                    resources.files.append(item)
+                elif isinstance(item, TimeSeriesWrite):
+                    resources.time_series.append(item)
+                elif isinstance(item, SequenceWrite):
+                    resources.sequences.append(item)
+
+    return properties
+
+
+def connection_resources(
+    model: DomainModelWrite | DomainRelationWrite, cache: set[tuple[str, str]], allow_version_increase: bool = False
+) -> ResourcesWrite:
+    resources = ResourcesWrite()
+    for field_name in model._direct_relations:
+        if field_name not in model.model_fields_set:
+            continue
+        value = getattr(model, field_name)
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainModelWrite):
+                other_resources = item._to_resources_write(cache, allow_version_increase)
+                resources.extend(other_resources)
+
+    for field_name, edge_type in model._outwards_edges:
+        value = getattr(model, field_name)
+        if value is None or field_name not in model.model_fields_set:
+            continue
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainRelationWrite):
+                other_resources = item._to_resources_write(
+                    cache, model, edge_type, "outwards", allow_version_increase  # type: ignore[arg-type]
+                )
+            else:
+                other_resources = DomainRelationWrite.from_edge_to_resources(
+                    cache,
+                    start_node=model,  # type: ignore[arg-type]
+                    end_node=item,  # type: ignore[arg-type]
+                    edge_type=edge_type,
+                    write_none=False,
+                    allow_version_increase=allow_version_increase,
+                )
+            resources.extend(other_resources)
+
+    for field_name, edge_type in model._inwards_edges:
+        value = getattr(model, field_name)
+        if value is None or field_name not in model.model_fields_set:
+            continue
+        values = value if isinstance(value, Sequence) else [value]
+        for item in values:
+            if isinstance(item, DomainRelationWrite):
+                other_resources = item._to_resources_write(
+                    cache, model, edge_type, "inwards", allow_version_increase  # type: ignore[arg-type]
+                )
+            else:
+                other_resources = DomainRelationWrite.from_edge_to_resources(
+                    cache,
+                    start_node=item,  # type: ignore[arg-type]
+                    end_node=model,  # type: ignore[arg-type]
+                    edge_type=edge_type,
+                    write_none=False,
+                    allow_version_increase=allow_version_increase,
+                )
+            resources.extend(other_resources)
+    return resources
+
+
+def serialize_property(value: Any) -> Any:
+    if isinstance(value, Sequence) and not isinstance(value, str):
+        return [serialize_property(item) for item in value]
+    elif isinstance(value, datetime.datetime):
+        return value.isoformat(timespec="milliseconds")
+    elif isinstance(value, datetime.date):
+        return value.isoformat()
+    elif isinstance(value, TimeSeriesWrite | FileMetadataWrite | SequenceWrite):
+        return value.external_id
+    return value
+
+
+def serialize_relation(
+    value: DomainModelWrite | str | dm.NodeId | None | Sequence[DomainModelWrite | str | dm.NodeId], default_space: str
+) -> Any:
+    if value is None:
+        return None
+    elif isinstance(value, str):
+        return {"space": default_space, "externalId": value}
+    elif isinstance(value, Sequence):
+        return [serialize_relation(item, default_space) for item in value]
+    elif isinstance(value, DomainModelWrite | dm.NodeId):
+        return {"space": value.space, "externalId": value.external_id}
+    raise TypeError(f"Expected str, subclass of {DomainModelWrite.__name__} or NodeId, got {type(value)}")
+
+
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
+
+
+def as_read_args(model: GraphQLCore | GraphQLExternal) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for field_name in model.model_fields_set:
+        value = getattr(model, field_name)
+        key = model.model_fields[field_name].alias or field_name
+        if field_name == "data_record" and isinstance(model, GraphQLCore):
+            # Dict to postpone validation
+            if model.data_record is None:
+                output[field_name] = None
+            else:
+                output[field_name] = dict(
+                    version=0,
+                    last_updated_time=model.data_record.last_updated_time,
+                    created_time=model.data_record.created_time,
+                )
+        else:
+            output[key] = as_read_value(value)
+    return output
+
+
+def as_read_value(value: Any) -> Any:
+    if isinstance(value, GraphQLCore | GraphQLExternal):
+        return as_read_args(value)
+    elif isinstance(value, Sequence) and not isinstance(value, str):
+        return [as_read_value(item) for item in value]
+    return value
+
+
+def as_write_args(model: DomainModel | GraphQLCore | DomainRelation | GraphQLExternal) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for field_name in model.model_fields_set:
+        value = getattr(model, field_name)
+        key = model.model_fields[field_name].alias or field_name
+        if field_name == "data_record" and isinstance(model, DomainModel | DomainRelation):
+            output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
+        elif field_name == "data_record" and isinstance(model, GraphQLCore):
+            output[field_name] = DataRecordWrite(existing_version=0)
+        else:
+            output[key] = as_write_value(value)
+    return output
+
+
+def as_write_value(value: Any) -> Any:
+    if isinstance(value, DomainModel | GraphQLCore | GraphQLExternal):
+        return as_write_args(value)
+    elif isinstance(value, Sequence) and not isinstance(value, str):
+        return [as_write_value(item) for item in value]
+    return value

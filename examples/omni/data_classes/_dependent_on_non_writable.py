@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -106,43 +104,13 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> DependentOnNonWritable:
         """Convert this GraphQL format of dependent on non writable to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return DependentOnNonWritable(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            a_value=self.a_value,
-            to_non_writable=(
-                [to_non_writable.as_read() for to_non_writable in self.to_non_writable]
-                if self.to_non_writable is not None
-                else None
-            ),
-        )
+        return DependentOnNonWritable.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this GraphQL format of dependent on non writable to the writing format."""
-        return DependentOnNonWritableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            a_value=self.a_value,
-            to_non_writable=(
-                [to_non_writable.as_write() for to_non_writable in self.to_non_writable]
-                if self.to_non_writable is not None
-                else None
-            ),
-        )
+        return DependentOnNonWritableWrite.model_validate(as_write_args(self))
 
 
 class DependentOnNonWritable(DomainModel):
@@ -176,24 +144,9 @@ class DependentOnNonWritable(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
-        return DependentOnNonWritableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            a_value=self.a_value,
-            to_non_writable=(
-                [
-                    to_non_writable.as_id() if isinstance(to_non_writable, DomainModel) else to_non_writable
-                    for to_non_writable in self.to_non_writable
-                ]
-                if self.to_non_writable is not None
-                else None
-            ),
-        )
+        return DependentOnNonWritableWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
@@ -218,6 +171,11 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         to_non_writable: The to non writable field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("a_value",)
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("to_non_writable", dm.DirectRelationReference("sp_pygen_models", "toNonWritable")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -236,51 +194,6 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.a_value is not None or write_none:
-            properties["aValue"] = self.a_value
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        edge_type = dm.DirectRelationReference("sp_pygen_models", "toNonWritable")
-        for to_non_writable in self.to_non_writable or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self,
-                end_node=to_non_writable,
-                edge_type=edge_type,
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        return resources
 
 
 class DependentOnNonWritableApply(DependentOnNonWritableWrite):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -122,45 +120,13 @@ class CogniteAssetTypeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteAssetType:
         """Convert this GraphQL format of Cognite asset type to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteAssetType(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_read() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            tags=self.tags,
-        )
+        return CogniteAssetType.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetTypeWrite:
         """Convert this GraphQL format of Cognite asset type to the writing format."""
-        return CogniteAssetTypeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            tags=self.tags,
-        )
+        return CogniteAssetTypeWrite.model_validate(as_write_args(self))
 
 
 class CogniteAssetType(CogniteDescribableNode):
@@ -193,22 +159,9 @@ class CogniteAssetType(CogniteDescribableNode):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetTypeWrite:
         """Convert this read version of Cognite asset type to the writing version."""
-        return CogniteAssetTypeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, DomainModel) else self.asset_class,
-            code=self.code,
-            description=self.description,
-            name=self.name,
-            standard=self.standard,
-            tags=self.tags,
-        )
+        return CogniteAssetTypeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteAssetTypeWrite:
         """Convert this read version of Cognite asset type to the writing version."""
@@ -238,6 +191,17 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset_class",
+        "code",
+        "description",
+        "name",
+        "standard",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("asset_class",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -256,64 +220,6 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.asset_class is not None:
-            properties["assetClass"] = {
-                "space": self.space if isinstance(self.asset_class, str) else self.asset_class.space,
-                "externalId": self.asset_class if isinstance(self.asset_class, str) else self.asset_class.external_id,
-            }
-
-        if self.code is not None or write_none:
-            properties["code"] = self.code
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.standard is not None or write_none:
-            properties["standard"] = self.standard
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.asset_class, DomainModelWrite):
-            other_resources = self.asset_class._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteAssetTypeApply(CogniteAssetTypeWrite):

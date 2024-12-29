@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -22,13 +22,11 @@ from omni_sub.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -116,43 +114,13 @@ class ConnectionItemAGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemA:
         """Convert this GraphQL format of connection item a to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemA(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
-            ),
-            outwards=[outward.as_read() for outward in self.outwards] if self.outwards is not None else None,
-            self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
-        )
+        return ConnectionItemA.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this GraphQL format of connection item a to the writing format."""
-        return ConnectionItemAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
-            ),
-            outwards=[outward.as_write() for outward in self.outwards] if self.outwards is not None else None,
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
-        )
+        return ConnectionItemAWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemA(DomainModel):
@@ -193,25 +161,9 @@ class ConnectionItemA(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
-        return ConnectionItemAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
-            ),
-            outwards=(
-                [outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards]
-                if self.outwards is not None
-                else None
-            ),
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
-        )
+        return ConnectionItemAWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
@@ -238,6 +190,19 @@ class ConnectionItemAWrite(DomainModelWrite):
         self_direct: The self direct field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "name",
+        "other_direct",
+        "self_direct",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("outwards", dm.DirectRelationReference("sp_pygen_models", "bidirectional")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "other_direct",
+        "self_direct",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     space: str
@@ -260,73 +225,6 @@ class ConnectionItemAWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.other_direct is not None:
-            properties["otherDirect"] = {
-                "space": self.space if isinstance(self.other_direct, str) else self.other_direct.space,
-                "externalId": (
-                    self.other_direct if isinstance(self.other_direct, str) else self.other_direct.external_id
-                ),
-            }
-
-        if self.self_direct is not None:
-            properties["selfDirect"] = {
-                "space": self.space if isinstance(self.self_direct, str) else self.self_direct.space,
-                "externalId": self.self_direct if isinstance(self.self_direct, str) else self.self_direct.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        edge_type = dm.DirectRelationReference("sp_pygen_models", "bidirectional")
-        for outward in self.outwards or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self,
-                end_node=outward,
-                edge_type=edge_type,
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        if isinstance(self.other_direct, DomainModelWrite):
-            other_resources = self.other_direct._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.self_direct, DomainModelWrite):
-            other_resources = self.self_direct._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class ConnectionItemAApply(ConnectionItemAWrite):

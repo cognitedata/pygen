@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -112,54 +110,13 @@ class RotorGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Rotor:
         """Convert this GraphQL format of rotor to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Rotor(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_read()
-                if isinstance(self.rotor_speed_controller, GraphQLCore)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_read()
-                if isinstance(self.rpm_low_speed_shaft, GraphQLCore)
-                else self.rpm_low_speed_shaft
-            ),
-            wind_turbine=(
-                self.wind_turbine.as_read() if isinstance(self.wind_turbine, GraphQLCore) else self.wind_turbine
-            ),
-        )
+        return Rotor.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this GraphQL format of rotor to the writing format."""
-        return RotorWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_write()
-                if isinstance(self.rotor_speed_controller, GraphQLCore)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_write()
-                if isinstance(self.rpm_low_speed_shaft, GraphQLCore)
-                else self.rpm_low_speed_shaft
-            ),
-        )
+        return RotorWrite.model_validate(as_write_args(self))
 
 
 class Rotor(DomainModel):
@@ -189,25 +146,9 @@ class Rotor(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
-        return RotorWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_write()
-                if isinstance(self.rotor_speed_controller, DomainModel)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_write()
-                if isinstance(self.rpm_low_speed_shaft, DomainModel)
-                else self.rpm_low_speed_shaft
-            ),
-        )
+        return RotorWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
@@ -232,6 +173,15 @@ class RotorWrite(DomainModelWrite):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Rotor", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -248,66 +198,6 @@ class RotorWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.rotor_speed_controller is not None:
-            properties["rotor_speed_controller"] = {
-                "space": (
-                    self.space if isinstance(self.rotor_speed_controller, str) else self.rotor_speed_controller.space
-                ),
-                "externalId": (
-                    self.rotor_speed_controller
-                    if isinstance(self.rotor_speed_controller, str)
-                    else self.rotor_speed_controller.external_id
-                ),
-            }
-
-        if self.rpm_low_speed_shaft is not None:
-            properties["rpm_low_speed_shaft"] = {
-                "space": self.space if isinstance(self.rpm_low_speed_shaft, str) else self.rpm_low_speed_shaft.space,
-                "externalId": (
-                    self.rpm_low_speed_shaft
-                    if isinstance(self.rpm_low_speed_shaft, str)
-                    else self.rpm_low_speed_shaft.external_id
-                ),
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.rotor_speed_controller, DomainModelWrite):
-            other_resources = self.rotor_speed_controller._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.rpm_low_speed_shaft, DomainModelWrite):
-            other_resources = self.rpm_low_speed_shaft._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class RotorApply(RotorWrite):

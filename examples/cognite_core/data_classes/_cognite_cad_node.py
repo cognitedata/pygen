@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -147,51 +145,13 @@ class CogniteCADNodeGraphQL(GraphQLCore, protected_namespaces=()):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteCADNode:
         """Convert this GraphQL format of Cognite cad node to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteCADNode(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            cad_node_reference=self.cad_node_reference,
-            description=self.description,
-            model_3d=self.model_3d.as_read() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
-            sub_tree_sizes=self.sub_tree_sizes,
-            tags=self.tags,
-            tree_indexes=self.tree_indexes,
-        )
+        return CogniteCADNode.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADNodeWrite:
         """Convert this GraphQL format of Cognite cad node to the writing format."""
-        return CogniteCADNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            cad_node_reference=self.cad_node_reference,
-            description=self.description,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_write() for revision in self.revisions] if self.revisions is not None else None,
-            sub_tree_sizes=self.sub_tree_sizes,
-            tags=self.tags,
-            tree_indexes=self.tree_indexes,
-        )
+        return CogniteCADNodeWrite.model_validate(as_write_args(self))
 
 
 class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
@@ -239,29 +199,9 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADNodeWrite:
         """Convert this read version of Cognite cad node to the writing version."""
-        return CogniteCADNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            cad_node_reference=self.cad_node_reference,
-            description=self.description,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, DomainModel) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
-            revisions=(
-                [revision.as_write() if isinstance(revision, DomainModel) else revision for revision in self.revisions]
-                if self.revisions is not None
-                else None
-            ),
-            sub_tree_sizes=self.sub_tree_sizes,
-            tags=self.tags,
-            tree_indexes=self.tree_indexes,
-        )
+        return CogniteCADNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteCADNodeWrite:
         """Convert this read version of Cognite cad node to the writing version."""
@@ -296,6 +236,24 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
             map from CogniteCADNode to tree index
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "cad_node_reference",
+        "description",
+        "model_3d",
+        "name",
+        "object_3d",
+        "revisions",
+        "sub_tree_sizes",
+        "tags",
+        "tree_indexes",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "object_3d",
+        "revisions",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADNode", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -315,91 +273,6 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.cad_node_reference is not None or write_none:
-            properties["cadNodeReference"] = self.cad_node_reference
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.model_3d is not None:
-            properties["model3D"] = {
-                "space": self.space if isinstance(self.model_3d, str) else self.model_3d.space,
-                "externalId": self.model_3d if isinstance(self.model_3d, str) else self.model_3d.external_id,
-            }
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.object_3d is not None:
-            properties["object3D"] = {
-                "space": self.space if isinstance(self.object_3d, str) else self.object_3d.space,
-                "externalId": self.object_3d if isinstance(self.object_3d, str) else self.object_3d.external_id,
-            }
-
-        if self.revisions is not None:
-            properties["revisions"] = [
-                {
-                    "space": self.space if isinstance(revision, str) else revision.space,
-                    "externalId": revision if isinstance(revision, str) else revision.external_id,
-                }
-                for revision in self.revisions or []
-            ]
-
-        if self.sub_tree_sizes is not None or write_none:
-            properties["subTreeSizes"] = self.sub_tree_sizes
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if self.tree_indexes is not None or write_none:
-            properties["treeIndexes"] = self.tree_indexes
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.model_3d, DomainModelWrite):
-            other_resources = self.model_3d._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.object_3d, DomainModelWrite):
-            other_resources = self.object_3d._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        for revision in self.revisions or []:
-            if isinstance(revision, DomainModelWrite):
-                other_resources = revision._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteCADNodeApply(CogniteCADNodeWrite):

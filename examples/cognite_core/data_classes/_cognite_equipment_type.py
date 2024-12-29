@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -113,47 +111,13 @@ class CogniteEquipmentTypeGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteEquipmentType:
         """Convert this GraphQL format of Cognite equipment type to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteEquipmentType(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            code=self.code,
-            description=self.description,
-            equipment_class=self.equipment_class,
-            name=self.name,
-            standard=self.standard,
-            standard_reference=self.standard_reference,
-            tags=self.tags,
-        )
+        return CogniteEquipmentType.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteEquipmentTypeWrite:
         """Convert this GraphQL format of Cognite equipment type to the writing format."""
-        return CogniteEquipmentTypeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            code=self.code,
-            description=self.description,
-            equipment_class=self.equipment_class,
-            name=self.name,
-            standard=self.standard,
-            standard_reference=self.standard_reference,
-            tags=self.tags,
-        )
+        return CogniteEquipmentTypeWrite.model_validate(as_write_args(self))
 
 
 class CogniteEquipmentType(CogniteDescribableNode):
@@ -183,23 +147,9 @@ class CogniteEquipmentType(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteEquipmentTypeWrite:
         """Convert this read version of Cognite equipment type to the writing version."""
-        return CogniteEquipmentTypeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            code=self.code,
-            description=self.description,
-            equipment_class=self.equipment_class,
-            name=self.name,
-            standard=self.standard,
-            standard_reference=self.standard_reference,
-            tags=self.tags,
-        )
+        return CogniteEquipmentTypeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteEquipmentTypeWrite:
         """Convert this read version of Cognite equipment type to the writing version."""
@@ -230,6 +180,17 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "code",
+        "description",
+        "equipment_class",
+        "name",
+        "standard",
+        "standard_reference",
+        "tags",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipmentType", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -237,60 +198,6 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
     equipment_class: Optional[str] = Field(None, alias="equipmentClass")
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.code is not None or write_none:
-            properties["code"] = self.code
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.equipment_class is not None or write_none:
-            properties["equipmentClass"] = self.equipment_class
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.standard is not None or write_none:
-            properties["standard"] = self.standard
-
-        if self.standard_reference is not None or write_none:
-            properties["standardReference"] = self.standard_reference
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class CogniteEquipmentTypeApply(CogniteEquipmentTypeWrite):

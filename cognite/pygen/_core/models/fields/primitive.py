@@ -53,12 +53,6 @@ class BasePrimitiveField(Field, ABC):
     def type_as_string(self) -> str:
         return _to_python_type(self.type_)
 
-    def as_write(self) -> str:
-        return f"self.{self.name}"
-
-    def as_read_graphql(self) -> str:
-        return f"self.{self.name}"
-
     def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
         type_ = _to_python_type(self.type_, typed=True, operation=operation)
         if isinstance(self.type_, ListablePropertyType) and self.type_.is_list:
@@ -168,15 +162,6 @@ class PrimitiveField(BasePrimitiveField):
         elif self.default is not None or self.is_nullable:
             out_type = f"{self.type_as_string} = {self.default_code}"
         return out_type
-
-    def as_value(self) -> str:
-        base = f"self.{self.name}"
-        if isinstance(self.type_, dm.Date):
-            return f"{base}.isoformat() if {base} else None"
-        elif isinstance(self.type_, dm.Timestamp):
-            return f'{base}.isoformat(timespec="milliseconds") if {base} else None'
-        else:
-            return base
 
 
 @dataclass(frozen=True)

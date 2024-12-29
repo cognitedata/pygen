@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -33,13 +33,11 @@ from wind_turbine.data_classes._core import (
     SequenceWrite,
     SequenceGraphQL,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -148,51 +146,13 @@ class WindTurbineGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> WindTurbine:
         """Convert this GraphQL format of wind turbine to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return WindTurbine(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            blades=[blade.as_read() for blade in self.blades] if self.blades is not None else None,
-            capacity=self.capacity,
-            datasheets=[datasheet.as_read() for datasheet in self.datasheets] if self.datasheets is not None else None,
-            description=self.description,
-            metmast=[metmast.as_read() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            name=self.name,
-            power_curve=self.power_curve.as_read() if self.power_curve else None,
-            rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbine.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> WindTurbineWrite:
         """Convert this GraphQL format of wind turbine to the writing format."""
-        return WindTurbineWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            blades=[blade.as_write() for blade in self.blades] if self.blades is not None else None,
-            capacity=self.capacity,
-            datasheets=[datasheet.as_write() for datasheet in self.datasheets] if self.datasheets is not None else None,
-            description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            name=self.name,
-            power_curve=self.power_curve.as_write() if self.power_curve else None,
-            rotor=self.rotor.as_write() if isinstance(self.rotor, GraphQLCore) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbineWrite.model_validate(as_write_args(self))
 
 
 class WindTurbine(GeneratingUnit):
@@ -239,38 +199,9 @@ class WindTurbine(GeneratingUnit):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""
-        return WindTurbineWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            blades=(
-                [blade.as_write() if isinstance(blade, DomainModel) else blade for blade in self.blades]
-                if self.blades is not None
-                else None
-            ),
-            capacity=self.capacity,
-            datasheets=(
-                [
-                    datasheet.as_write() if isinstance(datasheet, DomainModel) else datasheet
-                    for datasheet in self.datasheets
-                ]
-                if self.datasheets is not None
-                else None
-            ),
-            description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, DomainModel) else self.nacelle,
-            name=self.name,
-            power_curve=(
-                self.power_curve.as_write() if isinstance(self.power_curve, CogniteSequence) else self.power_curve
-            ),
-            rotor=self.rotor.as_write() if isinstance(self.rotor, DomainModel) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbineWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""
@@ -303,6 +234,27 @@ class WindTurbineWrite(GeneratingUnitWrite):
         windfarm: The windfarm field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "capacity",
+        "datasheets",
+        "description",
+        "nacelle",
+        "name",
+        "power_curve",
+        "rotor",
+        "windfarm",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("metmast", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "datasheets",
+        "nacelle",
+        "rotor",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "WindTurbine", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -323,115 +275,6 @@ class WindTurbineWrite(GeneratingUnitWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.blades is not None:
-            properties["blades"] = [
-                {
-                    "space": self.space if isinstance(blade, str) else blade.space,
-                    "externalId": blade if isinstance(blade, str) else blade.external_id,
-                }
-                for blade in self.blades or []
-            ]
-
-        if self.capacity is not None or write_none:
-            properties["capacity"] = self.capacity
-
-        if self.datasheets is not None:
-            properties["datasheets"] = [
-                {
-                    "space": self.space if isinstance(datasheet, str) else datasheet.space,
-                    "externalId": datasheet if isinstance(datasheet, str) else datasheet.external_id,
-                }
-                for datasheet in self.datasheets or []
-            ]
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.nacelle is not None:
-            properties["nacelle"] = {
-                "space": self.space if isinstance(self.nacelle, str) else self.nacelle.space,
-                "externalId": self.nacelle if isinstance(self.nacelle, str) else self.nacelle.external_id,
-            }
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.power_curve is not None or write_none:
-            properties["powerCurve"] = (
-                self.power_curve
-                if isinstance(self.power_curve, str) or self.power_curve is None
-                else self.power_curve.external_id
-            )
-
-        if self.rotor is not None:
-            properties["rotor"] = {
-                "space": self.space if isinstance(self.rotor, str) else self.rotor.space,
-                "externalId": self.rotor if isinstance(self.rotor, str) else self.rotor.external_id,
-            }
-
-        if self.windfarm is not None or write_none:
-            properties["windfarm"] = self.windfarm
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        for metmast in self.metmast or []:
-            if isinstance(metmast, DomainRelationWrite):
-                other_resources = metmast._to_instances_write(
-                    cache,
-                    self,
-                    dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance"),
-                )
-                resources.extend(other_resources)
-
-        if isinstance(self.nacelle, DomainModelWrite):
-            other_resources = self.nacelle._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.rotor, DomainModelWrite):
-            other_resources = self.rotor._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        for blade in self.blades or []:
-            if isinstance(blade, DomainModelWrite):
-                other_resources = blade._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        for datasheet in self.datasheets or []:
-            if isinstance(datasheet, DomainModelWrite):
-                other_resources = datasheet._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        if isinstance(self.power_curve, CogniteSequenceWrite):
-            resources.sequences.append(self.power_curve)
-
-        return resources
 
 
 class WindTurbineApply(WindTurbineWrite):

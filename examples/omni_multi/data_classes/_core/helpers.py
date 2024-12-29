@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, overload, TYPE_CHECKING
 
 from cognite.client import data_modeling as dm
 
@@ -14,10 +14,25 @@ def as_node_id(value: dm.DirectRelationReference) -> dm.NodeId:
     return dm.NodeId(space=value.space, external_id=value.external_id)
 
 
+@overload
 def as_direct_relation_reference(
-    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | dict[str, Any] | None
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | dict[str, Any] | Any | None,
+    return_none: Literal[False],
+) -> dm.DirectRelationReference: ...
+
+
+@overload
+def as_direct_relation_reference(
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | dict[str, Any] | Any | None,
+    return_none: Literal[True] = True,
+) -> dm.DirectRelationReference | None: ...
+
+
+def as_direct_relation_reference(
+    value: dm.DirectRelationReference | dm.NodeId | tuple[str, str] | dict[str, Any] | Any | None,
+    return_none: bool = True,
 ) -> dm.DirectRelationReference | None:
-    if value is None or isinstance(value, dm.DirectRelationReference):
+    if (value is None and return_none) or isinstance(value, dm.DirectRelationReference):
         return value
     elif isinstance(value, dm.NodeId):
         return dm.DirectRelationReference(space=value.space, external_id=value.external_id)
@@ -27,6 +42,8 @@ def as_direct_relation_reference(
         return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
     elif isinstance(value, dict) and "space" in value and "external_id" in value:
         return dm.DirectRelationReference(space=value["space"], external_id=value["external_id"])
+    elif value is not None and hasattr(value, "space") and hasattr(value, "external_id"):
+        return dm.DirectRelationReference(space=value.space, external_id=value.external_id)
     raise TypeError(f"Expected DirectRelationReference, NodeId or tuple, got {type(value)}")
 
 

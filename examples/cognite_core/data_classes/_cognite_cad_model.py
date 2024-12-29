@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -128,44 +126,13 @@ class CogniteCADModelGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteCADModel:
         """Convert this GraphQL format of Cognite cad model to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteCADModel(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_read() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            type_=self.type_,
-        )
+        return CogniteCADModel.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADModelWrite:
         """Convert this GraphQL format of Cognite cad model to the writing format."""
-        return CogniteCADModelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            type_=self.type_,
-        )
+        return CogniteCADModelWrite.model_validate(as_write_args(self))
 
 
 class CogniteCADModel(Cognite3DModel):
@@ -203,21 +170,9 @@ class CogniteCADModel(Cognite3DModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADModelWrite:
         """Convert this read version of Cognite cad model to the writing version."""
-        return CogniteCADModelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, DomainModel) else self.thumbnail,
-            type_=self.type_,
-        )
+        return CogniteCADModelWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteCADModelWrite:
         """Convert this read version of Cognite cad model to the writing version."""
@@ -246,64 +201,19 @@ class CogniteCADModelWrite(Cognite3DModelWrite):
         type_: CAD, PointCloud or Image360
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "thumbnail",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("thumbnail",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADModel", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if self.thumbnail is not None:
-            properties["thumbnail"] = {
-                "space": self.space if isinstance(self.thumbnail, str) else self.thumbnail.space,
-                "externalId": self.thumbnail if isinstance(self.thumbnail, str) else self.thumbnail.external_id,
-            }
-
-        if self.type_ is not None or write_none:
-            properties["type"] = self.type_
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.thumbnail, DomainModelWrite):
-            other_resources = self.thumbnail._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteCADModelApply(CogniteCADModelWrite):

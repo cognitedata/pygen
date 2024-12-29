@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -34,13 +34,11 @@ from wind_turbine.data_classes._core import (
     TimeSeriesGraphQL,
     TimeSeriesReferenceAPI,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -127,49 +125,13 @@ class MetmastGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Metmast:
         """Convert this GraphQL format of metmast to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Metmast(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            position=self.position,
-            temperature=self.temperature.as_read() if self.temperature else None,
-            tilt_angle=self.tilt_angle.as_read() if self.tilt_angle else None,
-            wind_speed=self.wind_speed.as_read() if self.wind_speed else None,
-            wind_turbines=(
-                [wind_turbine.as_read() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return Metmast.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MetmastWrite:
         """Convert this GraphQL format of metmast to the writing format."""
-        return MetmastWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            position=self.position,
-            temperature=self.temperature.as_write() if self.temperature else None,
-            tilt_angle=self.tilt_angle.as_write() if self.tilt_angle else None,
-            wind_speed=self.wind_speed.as_write() if self.wind_speed else None,
-            wind_turbines=(
-                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return MetmastWrite.model_validate(as_write_args(self))
 
 
 class Metmast(DomainModel):
@@ -205,30 +167,9 @@ class Metmast(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""
-        return MetmastWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            position=self.position,
-            temperature=(
-                self.temperature.as_write() if isinstance(self.temperature, CogniteTimeSeries) else self.temperature
-            ),
-            tilt_angle=(
-                self.tilt_angle.as_write() if isinstance(self.tilt_angle, CogniteTimeSeries) else self.tilt_angle
-            ),
-            wind_speed=(
-                self.wind_speed.as_write() if isinstance(self.wind_speed, CogniteTimeSeries) else self.wind_speed
-            ),
-            wind_turbines=(
-                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return MetmastWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> MetmastWrite:
         """Convert this read version of metmast to the writing version."""
@@ -256,6 +197,16 @@ class MetmastWrite(DomainModelWrite):
         wind_turbines: The wind turbine field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "position",
+        "temperature",
+        "tilt_angle",
+        "wind_speed",
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("wind_turbines", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Metmast", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -275,78 +226,6 @@ class MetmastWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.position is not None or write_none:
-            properties["position"] = self.position
-
-        if self.temperature is not None or write_none:
-            properties["temperature"] = (
-                self.temperature
-                if isinstance(self.temperature, str) or self.temperature is None
-                else self.temperature.external_id
-            )
-
-        if self.tilt_angle is not None or write_none:
-            properties["tilt_angle"] = (
-                self.tilt_angle
-                if isinstance(self.tilt_angle, str) or self.tilt_angle is None
-                else self.tilt_angle.external_id
-            )
-
-        if self.wind_speed is not None or write_none:
-            properties["wind_speed"] = (
-                self.wind_speed
-                if isinstance(self.wind_speed, str) or self.wind_speed is None
-                else self.wind_speed.external_id
-            )
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        for wind_turbine in self.wind_turbines or []:
-            if isinstance(wind_turbine, DomainRelationWrite):
-                other_resources = wind_turbine._to_instances_write(
-                    cache,
-                    self,
-                    dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance"),
-                )
-                resources.extend(other_resources)
-
-        if isinstance(self.temperature, CogniteTimeSeriesWrite):
-            resources.time_series.append(self.temperature)
-
-        if isinstance(self.tilt_angle, CogniteTimeSeriesWrite):
-            resources.time_series.append(self.tilt_angle)
-
-        if isinstance(self.wind_speed, CogniteTimeSeriesWrite):
-            resources.time_series.append(self.wind_speed)
-
-        return resources
 
 
 class MetmastApply(MetmastWrite):

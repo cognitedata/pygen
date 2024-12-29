@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,10 +26,10 @@ from cognite_core.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -114,47 +114,13 @@ class CogniteSourceableEdgeGraphQL(GraphQLCore):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteSourceableEdge:
         """Convert this GraphQL format of Cognite sourceable edge to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteSourceableEdge(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-        )
+        return CogniteSourceableEdge.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteSourceableEdgeWrite:
         """Convert this GraphQL format of Cognite sourceable edge to the writing format."""
-        return CogniteSourceableEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-        )
+        return CogniteSourceableEdgeWrite.model_validate(as_write_args(self))
 
 
 class CogniteSourceableEdge(DomainRelation):
@@ -190,23 +156,9 @@ class CogniteSourceableEdge(DomainRelation):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteSourceableEdgeWrite:
         """Convert this read version of Cognite sourceable edge to the writing version."""
-        return CogniteSourceableEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-        )
+        return CogniteSourceableEdgeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteSourceableEdgeWrite:
         """Convert this read version of Cognite sourceable edge to the writing version."""
@@ -216,6 +168,25 @@ class CogniteSourceableEdge(DomainRelation):
             stacklevel=2,
         )
         return self.as_write()
+
+
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
+
+
+def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
 
 
 class CogniteSourceableEdgeWrite(DomainRelationWrite):
@@ -240,8 +211,19 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
             identifier is not guaranteed to match the user identifiers in CDF
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
+    _validate_end_node = _validate_end_node
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
     source: Union[CogniteSourceSystemWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     source_context: Optional[str] = Field(None, alias="sourceContext")
@@ -250,85 +232,6 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
     source_id: Optional[str] = Field(None, alias="sourceId")
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.external_id and (self.space, self.external_id) in cache:
-            return resources
-
-        _validate_end_node(start_node, self.end_node)
-
-        if isinstance(self.end_node, DomainModelWrite):
-            end_node = self.end_node.as_direct_reference()
-        elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.end_node)
-        elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
-
-        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        properties: dict[str, Any] = {}
-
-        if self.source is not None:
-            properties["source"] = {
-                "space": self.space if isinstance(self.source, str) else self.source.space,
-                "externalId": self.source if isinstance(self.source, str) else self.source.external_id,
-            }
-
-        if self.source_context is not None or write_none:
-            properties["sourceContext"] = self.source_context
-
-        if self.source_created_time is not None or write_none:
-            properties["sourceCreatedTime"] = (
-                self.source_created_time.isoformat(timespec="milliseconds") if self.source_created_time else None
-            )
-
-        if self.source_created_user is not None or write_none:
-            properties["sourceCreatedUser"] = self.source_created_user
-
-        if self.source_id is not None or write_none:
-            properties["sourceId"] = self.source_id
-
-        if self.source_updated_time is not None or write_none:
-            properties["sourceUpdatedTime"] = (
-                self.source_updated_time.isoformat(timespec="milliseconds") if self.source_updated_time else None
-            )
-
-        if self.source_updated_user is not None or write_none:
-            properties["sourceUpdatedUser"] = self.source_updated_user
-
-        if properties:
-            this_edge = dm.EdgeApply(
-                space=self.space,
-                external_id=external_id,
-                type=edge_type,
-                start_node=start_node.as_direct_reference(),
-                end_node=end_node,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.edges.append(this_edge)
-            cache.add((self.space, external_id))
-
-        if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteSourceableEdgeApply(CogniteSourceableEdgeWrite):
@@ -512,25 +415,6 @@ def _create_cognite_sourceable_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
-
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableEdgeList]):

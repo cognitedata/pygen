@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,10 +24,10 @@ from omni_sub.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -73,32 +73,9 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
     connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemCEdge:
         """Convert this GraphQL format of connection item c edge to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemCEdge(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            connection_item_a=(
-                [connection_item_a.as_read() for connection_item_a in self.connection_item_a]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [connection_item_b.as_read() for connection_item_b in self.connection_item_b]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCEdge.model_validate(as_read_args(self))
 
 
 class ConnectionItemCEdge(DomainRelation):
@@ -180,25 +157,6 @@ def _create_connection_item_c_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
-
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeList]):

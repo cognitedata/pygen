@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 
@@ -24,10 +24,10 @@ from cognite_core.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -83,41 +83,13 @@ class CogniteDescribableEdgeGraphQL(GraphQLCore):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteDescribableEdge:
         """Convert this GraphQL format of Cognite describable edge to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteDescribableEdge(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-        )
+        return CogniteDescribableEdge.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteDescribableEdgeWrite:
         """Convert this GraphQL format of Cognite describable edge to the writing format."""
-        return CogniteDescribableEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node,
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-        )
+        return CogniteDescribableEdgeWrite.model_validate(as_write_args(self))
 
 
 class CogniteDescribableEdge(DomainRelation):
@@ -144,20 +116,9 @@ class CogniteDescribableEdge(DomainRelation):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteDescribableEdgeWrite:
         """Convert this read version of Cognite describable edge to the writing version."""
-        return CogniteDescribableEdgeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node,
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-        )
+        return CogniteDescribableEdgeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteDescribableEdgeWrite:
         """Convert this read version of Cognite describable edge to the writing version."""
@@ -167,6 +128,25 @@ class CogniteDescribableEdge(DomainRelation):
             stacklevel=2,
         )
         return self.as_write()
+
+
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
+
+
+def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
 
 
 class CogniteDescribableEdgeWrite(DomainRelationWrite):
@@ -185,76 +165,20 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+    )
+    _validate_end_node = _validate_end_node
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
     aliases: Optional[list[str]] = None
     description: Optional[str] = None
     name: Optional[str] = None
     tags: Optional[list[str]] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.external_id and (self.space, self.external_id) in cache:
-            return resources
-
-        _validate_end_node(start_node, self.end_node)
-
-        if isinstance(self.end_node, DomainModelWrite):
-            end_node = self.end_node.as_direct_reference()
-        elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.end_node)
-        elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
-
-        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_edge = dm.EdgeApply(
-                space=self.space,
-                external_id=external_id,
-                type=edge_type,
-                start_node=start_node.as_direct_reference(),
-                end_node=end_node,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.edges.append(this_edge)
-            cache.add((self.space, external_id))
-
-        if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteDescribableEdgeApply(CogniteDescribableEdgeWrite):
@@ -384,25 +308,6 @@ def _create_cognite_describable_edge_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
-
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _CogniteDescribableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteDescribableEdgeList]):

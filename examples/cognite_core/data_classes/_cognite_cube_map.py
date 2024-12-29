@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -111,43 +109,13 @@ class CogniteCubeMapGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteCubeMap:
         """Convert this GraphQL format of Cognite cube map to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteCubeMap(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            back=self.back.as_read() if isinstance(self.back, GraphQLCore) else self.back,
-            bottom=self.bottom.as_read() if isinstance(self.bottom, GraphQLCore) else self.bottom,
-            front=self.front.as_read() if isinstance(self.front, GraphQLCore) else self.front,
-            left=self.left.as_read() if isinstance(self.left, GraphQLCore) else self.left,
-            right=self.right.as_read() if isinstance(self.right, GraphQLCore) else self.right,
-            top=self.top.as_read() if isinstance(self.top, GraphQLCore) else self.top,
-        )
+        return CogniteCubeMap.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCubeMapWrite:
         """Convert this GraphQL format of Cognite cube map to the writing format."""
-        return CogniteCubeMapWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            back=self.back.as_write() if isinstance(self.back, GraphQLCore) else self.back,
-            bottom=self.bottom.as_write() if isinstance(self.bottom, GraphQLCore) else self.bottom,
-            front=self.front.as_write() if isinstance(self.front, GraphQLCore) else self.front,
-            left=self.left.as_write() if isinstance(self.left, GraphQLCore) else self.left,
-            right=self.right.as_write() if isinstance(self.right, GraphQLCore) else self.right,
-            top=self.top.as_write() if isinstance(self.top, GraphQLCore) else self.top,
-        )
+        return CogniteCubeMapWrite.model_validate(as_write_args(self))
 
 
 class CogniteCubeMap(DomainModel):
@@ -183,21 +151,9 @@ class CogniteCubeMap(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCubeMapWrite:
         """Convert this read version of Cognite cube map to the writing version."""
-        return CogniteCubeMapWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            back=self.back.as_write() if isinstance(self.back, DomainModel) else self.back,
-            bottom=self.bottom.as_write() if isinstance(self.bottom, DomainModel) else self.bottom,
-            front=self.front.as_write() if isinstance(self.front, DomainModel) else self.front,
-            left=self.left.as_write() if isinstance(self.left, DomainModel) else self.left,
-            right=self.right.as_write() if isinstance(self.right, DomainModel) else self.right,
-            top=self.top.as_write() if isinstance(self.top, DomainModel) else self.top,
-        )
+        return CogniteCubeMapWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteCubeMapWrite:
         """Convert this read version of Cognite cube map to the writing version."""
@@ -226,6 +182,23 @@ class CogniteCubeMapWrite(DomainModelWrite):
         top: Direct relation to a file holding the top projection of the cube map
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCubeMap", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -246,96 +219,6 @@ class CogniteCubeMapWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.back is not None:
-            properties["back"] = {
-                "space": self.space if isinstance(self.back, str) else self.back.space,
-                "externalId": self.back if isinstance(self.back, str) else self.back.external_id,
-            }
-
-        if self.bottom is not None:
-            properties["bottom"] = {
-                "space": self.space if isinstance(self.bottom, str) else self.bottom.space,
-                "externalId": self.bottom if isinstance(self.bottom, str) else self.bottom.external_id,
-            }
-
-        if self.front is not None:
-            properties["front"] = {
-                "space": self.space if isinstance(self.front, str) else self.front.space,
-                "externalId": self.front if isinstance(self.front, str) else self.front.external_id,
-            }
-
-        if self.left is not None:
-            properties["left"] = {
-                "space": self.space if isinstance(self.left, str) else self.left.space,
-                "externalId": self.left if isinstance(self.left, str) else self.left.external_id,
-            }
-
-        if self.right is not None:
-            properties["right"] = {
-                "space": self.space if isinstance(self.right, str) else self.right.space,
-                "externalId": self.right if isinstance(self.right, str) else self.right.external_id,
-            }
-
-        if self.top is not None:
-            properties["top"] = {
-                "space": self.space if isinstance(self.top, str) else self.top.space,
-                "externalId": self.top if isinstance(self.top, str) else self.top.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.back, DomainModelWrite):
-            other_resources = self.back._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.bottom, DomainModelWrite):
-            other_resources = self.bottom._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.front, DomainModelWrite):
-            other_resources = self.front._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.left, DomainModelWrite):
-            other_resources = self.left._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.right, DomainModelWrite):
-            other_resources = self.right._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.top, DomainModelWrite):
-            other_resources = self.top._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteCubeMapApply(CogniteCubeMapWrite):

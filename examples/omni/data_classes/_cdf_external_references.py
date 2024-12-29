@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -40,13 +40,11 @@ from omni.data_classes._core import (
     SequenceWrite,
     SequenceGraphQL,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -110,37 +108,13 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CDFExternalReferences:
         """Convert this GraphQL format of cdf external reference to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CDFExternalReferences(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            file=self.file.as_read() if self.file else None,
-            sequence=self.sequence.as_read() if self.sequence else None,
-            timeseries=self.timeseries.as_read() if self.timeseries else None,
-        )
+        return CDFExternalReferences.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this GraphQL format of cdf external reference to the writing format."""
-        return CDFExternalReferencesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            file=self.file.as_write() if self.file else None,
-            sequence=self.sequence.as_write() if self.sequence else None,
-            timeseries=self.timeseries.as_write() if self.timeseries else None,
-        )
+        return CDFExternalReferencesWrite.model_validate(as_write_args(self))
 
 
 class CDFExternalReferences(DomainModel):
@@ -165,20 +139,9 @@ class CDFExternalReferences(DomainModel):
     sequence: Union[SequenceRead, str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
-        return CDFExternalReferencesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            file=self.file.as_write() if isinstance(self.file, CogniteFileMetadata) else self.file,
-            sequence=self.sequence.as_write() if isinstance(self.sequence, CogniteSequence) else self.sequence,
-            timeseries=(
-                self.timeseries.as_write() if isinstance(self.timeseries, CogniteTimeSeries) else self.timeseries
-            ),
-        )
+        return CDFExternalReferencesWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
@@ -204,6 +167,12 @@ class CDFExternalReferencesWrite(DomainModelWrite):
         timeseries: The timesery field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "file",
+        "sequence",
+        "timeseries",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -211,60 +180,6 @@ class CDFExternalReferencesWrite(DomainModelWrite):
     file: Union[FileMetadataWrite, str, None] = None
     sequence: Union[SequenceWrite, str, None] = None
     timeseries: Union[TimeSeriesWrite, str, None] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.file is not None or write_none:
-            properties["file"] = self.file if isinstance(self.file, str) or self.file is None else self.file.external_id
-
-        if self.sequence is not None or write_none:
-            properties["sequence"] = (
-                self.sequence if isinstance(self.sequence, str) or self.sequence is None else self.sequence.external_id
-            )
-
-        if self.timeseries is not None or write_none:
-            properties["timeseries"] = (
-                self.timeseries
-                if isinstance(self.timeseries, str) or self.timeseries is None
-                else self.timeseries.external_id
-            )
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.file, CogniteFileMetadataWrite):
-            resources.files.append(self.file)
-
-        if isinstance(self.sequence, CogniteSequenceWrite):
-            resources.sequences.append(self.sequence)
-
-        if isinstance(self.timeseries, CogniteTimeSeriesWrite):
-            resources.time_series.append(self.timeseries)
-
-        return resources
 
 
 class CDFExternalReferencesApply(CDFExternalReferencesWrite):

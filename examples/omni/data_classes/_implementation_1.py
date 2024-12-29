@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -97,39 +95,13 @@ class Implementation1GraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Implementation1:
         """Convert this GraphQL format of implementation 1 to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Implementation1(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Implementation1Write:
         """Convert this GraphQL format of implementation 1 to the writing format."""
-        return Implementation1Write(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1Write.model_validate(as_write_args(self))
 
 
 class Implementation1(SubInterface):
@@ -155,19 +127,9 @@ class Implementation1(SubInterface):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Implementation1Write:
         """Convert this read version of implementation 1 to the writing version."""
-        return Implementation1Write(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1Write.model_validate(as_write_args(self))
 
     def as_apply(self) -> Implementation1Write:
         """Convert this read version of implementation 1 to the writing version."""
@@ -194,6 +156,13 @@ class Implementation1Write(SubInterfaceWrite):
         value_2: The value 2 field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+        "value_1",
+        "value_2",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
@@ -201,48 +170,6 @@ class Implementation1Write(SubInterfaceWrite):
     )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.main_value is not None or write_none:
-            properties["mainValue"] = self.main_value
-
-        if self.sub_value is not None or write_none:
-            properties["subValue"] = self.sub_value
-
-        if self.value_1 is not None or write_none:
-            properties["value1"] = self.value_1
-
-        if self.value_2 is not None:
-            properties["value2"] = self.value_2
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class Implementation1Apply(Implementation1Write):

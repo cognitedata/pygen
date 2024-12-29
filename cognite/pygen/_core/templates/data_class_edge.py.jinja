@@ -5,7 +5,7 @@ import datetime
 {% endif %}
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 {% if data_class.use_pydantic_field %}
@@ -32,10 +32,10 @@ from {{ top_level_package }}.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -108,37 +108,16 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
     {{ field.name }}: {{ field.as_graphql_type_hint() }}
     {% endfor %}
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> {{ data_class.read_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return {{ data_class.read_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            {% for field in data_class %}
-            {{ field.name }}={{ field.as_read_graphql() }},
-            {% endfor %}
-        )
+        return {{ data_class.read_name }}.model_validate(as_read_args(self))
 
 {% if data_class.is_writable or data_class.is_interface %}
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
-        return {{ data_class.write_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),{% for field in data_class %}{% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write() }},{% endif %}{% endfor %}
-        )
+        return {{ data_class.write_name }}.model_validate(as_write_args(self))
 {% endif %}
+
 
 class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the reading version of {{ data_class.doc_name }}.
@@ -161,16 +140,9 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
 
 
 {% if data_class.is_writable or data_class.is_interface %}
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
-        return {{ data_class.write_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),{% for field in data_class %}{% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write() }},{% endif %}{% endfor %}
-        )
+        return {{ data_class.write_name }}.model_validate(as_write_args(self))
 
     def as_apply(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
@@ -180,6 +152,29 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
             stacklevel=2,
         )
         return self.as_write()
+
+
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
+    {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
+{% raw %}}{% endraw %}
+
+
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
+) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
 
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
@@ -197,67 +192,24 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
         {% endif %}
         {% endfor %}
     """
+    {% if data_class.has_container_fields_writable %}
+    _container_fields: ClassVar[tuple[str, ...]] = ({{ data_class.container_fields_writable_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_outwards_edges %}
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = ({{ data_class.outwards_edges_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_inwards_edges %}
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = ({{ data_class.inwards_edges_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_direct_relations_with_source %}
+    _direct_relations: ClassVar[tuple[str, ...]] = ({{ data_class.direct_relations_with_source_comma_sep }},)
+    {% endif %}
+    _validate_end_node = _validate_end_node
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
-    space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
     {% for field in data_class.write_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}
     {% endfor %}
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.external_id and (self.space, self.external_id) in cache:
-            return resources
-
-        _validate_end_node(start_node, self.end_node)
-
-        if isinstance(self.end_node, DomainModelWrite):
-            end_node = self.end_node.as_direct_reference()
-        elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.end_node)
-        elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
-
-        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        properties: dict[str, Any]  = {}
-        {% for field in data_class.container_fields_writable %}
-
-        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
-            properties["{{ field.prop_name }}"] = {{ field.as_value() }}
-        {% endfor %}
-
-        if properties:
-            this_edge = dm.EdgeApply(
-                space=self.space,
-                external_id=external_id,
-                type=edge_type,
-                start_node=start_node.as_direct_reference(),
-                end_node=end_node,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.edges.append(this_edge)
-            cache.add((self.space, external_id))
-
-        if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
@@ -375,29 +327,6 @@ def {{ data_class.filter_name }}(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
-    {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
-{% raw %}}{% endraw %}
-
-
-def _validate_end_node(
-    start_node: DomainModelWrite, end_node: {{ data_class.end_node_field.as_write_type_hint() }}
-) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class.read_list_name }}]):

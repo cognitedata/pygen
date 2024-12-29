@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -108,54 +106,13 @@ class HighSpeedShaftGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> HighSpeedShaft:
         """Convert this GraphQL format of high speed shaft to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return HighSpeedShaft(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            bending_moment_y=(
-                self.bending_moment_y.as_read()
-                if isinstance(self.bending_moment_y, GraphQLCore)
-                else self.bending_moment_y
-            ),
-            bending_monent_x=(
-                self.bending_monent_x.as_read()
-                if isinstance(self.bending_monent_x, GraphQLCore)
-                else self.bending_monent_x
-            ),
-            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            torque=self.torque.as_read() if isinstance(self.torque, GraphQLCore) else self.torque,
-        )
+        return HighSpeedShaft.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> HighSpeedShaftWrite:
         """Convert this GraphQL format of high speed shaft to the writing format."""
-        return HighSpeedShaftWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            bending_moment_y=(
-                self.bending_moment_y.as_write()
-                if isinstance(self.bending_moment_y, GraphQLCore)
-                else self.bending_moment_y
-            ),
-            bending_monent_x=(
-                self.bending_monent_x.as_write()
-                if isinstance(self.bending_monent_x, GraphQLCore)
-                else self.bending_monent_x
-            ),
-            torque=self.torque.as_write() if isinstance(self.torque, GraphQLCore) else self.torque,
-        )
+        return HighSpeedShaftWrite.model_validate(as_write_args(self))
 
 
 class HighSpeedShaft(DomainModel):
@@ -187,26 +144,9 @@ class HighSpeedShaft(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""
-        return HighSpeedShaftWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            bending_moment_y=(
-                self.bending_moment_y.as_write()
-                if isinstance(self.bending_moment_y, DomainModel)
-                else self.bending_moment_y
-            ),
-            bending_monent_x=(
-                self.bending_monent_x.as_write()
-                if isinstance(self.bending_monent_x, DomainModel)
-                else self.bending_monent_x
-            ),
-            torque=self.torque.as_write() if isinstance(self.torque, DomainModel) else self.torque,
-        )
+        return HighSpeedShaftWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""
@@ -232,6 +172,17 @@ class HighSpeedShaftWrite(DomainModelWrite):
         torque: The torque field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "bending_moment_y",
+        "bending_monent_x",
+        "torque",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "bending_moment_y",
+        "bending_monent_x",
+        "torque",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "HighSpeedShaft", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -249,74 +200,6 @@ class HighSpeedShaftWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.bending_moment_y is not None:
-            properties["bending_moment_y"] = {
-                "space": self.space if isinstance(self.bending_moment_y, str) else self.bending_moment_y.space,
-                "externalId": (
-                    self.bending_moment_y
-                    if isinstance(self.bending_moment_y, str)
-                    else self.bending_moment_y.external_id
-                ),
-            }
-
-        if self.bending_monent_x is not None:
-            properties["bending_monent_x"] = {
-                "space": self.space if isinstance(self.bending_monent_x, str) else self.bending_monent_x.space,
-                "externalId": (
-                    self.bending_monent_x
-                    if isinstance(self.bending_monent_x, str)
-                    else self.bending_monent_x.external_id
-                ),
-            }
-
-        if self.torque is not None:
-            properties["torque"] = {
-                "space": self.space if isinstance(self.torque, str) else self.torque.space,
-                "externalId": self.torque if isinstance(self.torque, str) else self.torque.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.bending_moment_y, DomainModelWrite):
-            other_resources = self.bending_moment_y._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.bending_monent_x, DomainModelWrite):
-            other_resources = self.bending_monent_x._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.torque, DomainModelWrite):
-            other_resources = self.torque._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class HighSpeedShaftApply(HighSpeedShaftWrite):

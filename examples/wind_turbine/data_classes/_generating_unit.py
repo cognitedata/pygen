@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import field_validator, model_validator, ValidationInfo
@@ -22,13 +22,11 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -93,37 +91,13 @@ class GeneratingUnitGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> GeneratingUnit:
         """Convert this GraphQL format of generating unit to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return GeneratingUnit(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            capacity=self.capacity,
-            description=self.description,
-            name=self.name,
-        )
+        return GeneratingUnit.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> GeneratingUnitWrite:
         """Convert this GraphQL format of generating unit to the writing format."""
-        return GeneratingUnitWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            capacity=self.capacity,
-            description=self.description,
-            name=self.name,
-        )
+        return GeneratingUnitWrite.model_validate(as_write_args(self))
 
 
 class GeneratingUnit(DomainModel):
@@ -148,18 +122,9 @@ class GeneratingUnit(DomainModel):
     description: Optional[str] = None
     name: Optional[str] = None
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""
-        return GeneratingUnitWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            capacity=self.capacity,
-            description=self.description,
-            name=self.name,
-        )
+        return GeneratingUnitWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""
@@ -185,6 +150,12 @@ class GeneratingUnitWrite(DomainModelWrite):
         name: Name of the instance
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "capacity",
+        "description",
+        "name",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "GeneratingUnit", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -192,45 +163,6 @@ class GeneratingUnitWrite(DomainModelWrite):
     capacity: Optional[float] = None
     description: Optional[str] = None
     name: Optional[str] = None
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.capacity is not None or write_none:
-            properties["capacity"] = self.capacity
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class GeneratingUnitApply(GeneratingUnitWrite):

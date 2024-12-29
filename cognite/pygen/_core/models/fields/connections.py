@@ -4,7 +4,7 @@ another object in the data model."""
 from __future__ import annotations
 
 import warnings
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from functools import total_ordering
 from typing import TYPE_CHECKING, ClassVar, Literal, cast
@@ -131,15 +131,6 @@ class EndNodeField(Field):
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
         else:
             return left_side
-
-    def as_write(self) -> str:
-        if self.destination_classes:
-            return f"self.{self.name}.as_write() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
-        else:
-            return f"self.{self.name}"
-
-    def as_read_graphql(self) -> str:
-        return f"self.{self.name}.as_read() if isinstance(self.{self.name}, GraphQLCore) else self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -454,28 +445,6 @@ class BaseConnectionField(Field, ABC):
             type_hint = f"Union[{types_hint}, None]"
         return f"{type_hint} = {self.pydantic_field}({field_args})"
 
-    def as_write(self) -> str:
-        """Return the code to convert the field from read to write data class."""
-        method = "as_write"
-        if self.destination_class and not self.destination_class.is_writable:
-            method = "as_id"
-
-        base_cls = "DomainRelation" if self.is_edge_with_properties else "DomainModel"
-
-        return self._create_as_method(method, base_cls, bool(self.type_hint_node_reference))
-
-    def as_read_graphql(self) -> str:
-        """Return the code to convert the field from the GraphQL to the read data class."""
-        return self._create_as_method("as_read", "GraphQLCore", False)
-
-    def as_write_graphql(self) -> str:
-        """Return the code to convert the field from the write data class to the GraphQL."""
-        return self._create_as_method("as_write", "GraphQLCore", False)
-
-    @abstractmethod
-    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        raise NotImplementedError()
-
 
 @dataclass(frozen=True)
 class OneToManyConnectionField(BaseConnectionField):
@@ -485,28 +454,6 @@ class OneToManyConnectionField(BaseConnectionField):
     @property
     def is_one_to_many(self) -> bool:
         return True
-
-    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        if self.destination_class and use_node_reference:
-            inner = f"{self.variable}.{method}() if isinstance({self.variable}, {base_cls}) else {self.variable}"
-        elif self.destination_class:
-            inner = f"{self.variable}.{method}()"
-        elif base_cls == "GraphQLCore":
-            inner = f"dm.NodeId.load({self.variable})"
-        else:
-            inner = f"{self.variable}"
-        return f"[{inner} for {self.variable} in self.{self.name}] if self.{self.name} is not None else None"
-
-    def as_value(self) -> str:
-        if not self.is_direct_relation:
-            raise NotImplementedError("as_value is not implemented for edge fields")
-        return f"""[
-                {{
-                "space": self.space if isinstance({ self.variable }, str) else { self.variable }.space,
-                "externalId": { self.variable } if isinstance({self.variable}, str) else {self.variable}.external_id,
-                }}
-                for { self.variable } in self.{ self.name } or []
-            ]"""
 
     def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
         if self.is_direct_relation and operation == "write":
@@ -531,20 +478,6 @@ class OneToOneConnectionField(BaseConnectionField):
     @property
     def is_one_to_many(self) -> bool:
         return False
-
-    def _create_as_method(self, method: str, base_cls: str, use_node_reference: bool) -> str:
-        if self.destination_class:
-            return f"self.{self.name}.{method}()\nif isinstance(self.{self.name}, {base_cls})\nelse self.{self.name}"
-        else:
-            return f"self.{self.name}"
-
-    def as_value(self) -> str:
-        if not self.is_direct_relation:
-            raise NotImplementedError("as_value is not implemented for edge fields")
-        return f"""{{
-                "space":  self.space if isinstance(self.{ self.name }, str) else self.{ self.name }.space,
-                "externalId": self.{ self.name } if isinstance(self.{self.name}, str) else self.{self.name}.external_id,
-            }}"""
 
     def as_typed_hint(self, operation: Literal["write", "read"] = "write") -> str:
         if self.is_direct_relation and operation == "write":

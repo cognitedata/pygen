@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -122,49 +120,13 @@ class Cognite3DTransformationNodeGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite3DTransformationNode:
         """Convert this GraphQL format of Cognite 3D transformation node to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite3DTransformationNode(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationNode.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DTransformationNodeWrite:
         """Convert this GraphQL format of Cognite 3D transformation node to the writing format."""
-        return Cognite3DTransformationNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationNodeWrite.model_validate(as_write_args(self))
 
 
 class Cognite3DTransformationNode(DomainModel):
@@ -201,24 +163,9 @@ class Cognite3DTransformationNode(DomainModel):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DTransformationNodeWrite:
         """Convert this read version of Cognite 3D transformation node to the writing version."""
-        return Cognite3DTransformationNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite3DTransformationNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite3DTransformationNodeWrite:
         """Convert this read version of Cognite 3D transformation node to the writing version."""
@@ -250,6 +197,18 @@ class Cognite3DTransformationNodeWrite(DomainModelWrite):
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "euler_rotation_x",
+        "euler_rotation_y",
+        "euler_rotation_z",
+        "scale_x",
+        "scale_y",
+        "scale_z",
+        "translation_x",
+        "translation_y",
+        "translation_z",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -263,63 +222,6 @@ class Cognite3DTransformationNodeWrite(DomainModelWrite):
     translation_x: Optional[float] = Field(None, alias="translationX")
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.euler_rotation_x is not None or write_none:
-            properties["eulerRotationX"] = self.euler_rotation_x
-
-        if self.euler_rotation_y is not None or write_none:
-            properties["eulerRotationY"] = self.euler_rotation_y
-
-        if self.euler_rotation_z is not None or write_none:
-            properties["eulerRotationZ"] = self.euler_rotation_z
-
-        if self.scale_x is not None or write_none:
-            properties["scaleX"] = self.scale_x
-
-        if self.scale_y is not None or write_none:
-            properties["scaleY"] = self.scale_y
-
-        if self.scale_z is not None or write_none:
-            properties["scaleZ"] = self.scale_z
-
-        if self.translation_x is not None or write_none:
-            properties["translationX"] = self.translation_x
-
-        if self.translation_y is not None or write_none:
-            properties["translationY"] = self.translation_y
-
-        if self.translation_z is not None or write_none:
-            properties["translationZ"] = self.translation_z
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class Cognite3DTransformationNodeApply(Cognite3DTransformationNodeWrite):

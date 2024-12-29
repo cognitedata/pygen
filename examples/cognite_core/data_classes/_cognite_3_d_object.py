@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -166,64 +164,13 @@ class Cognite3DObjectGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite3DObject:
         """Convert this GraphQL format of Cognite 3D object to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite3DObject(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            asset=self.asset.as_read() if isinstance(self.asset, GraphQLCore) else self.asset,
-            cad_nodes=[cad_node.as_read() for cad_node in self.cad_nodes] if self.cad_nodes is not None else None,
-            description=self.description,
-            images_360=(
-                [images_360.as_read() for images_360 in self.images_360] if self.images_360 is not None else None
-            ),
-            name=self.name,
-            point_cloud_volumes=(
-                [point_cloud_volume.as_read() for point_cloud_volume in self.point_cloud_volumes]
-                if self.point_cloud_volumes is not None
-                else None
-            ),
-            tags=self.tags,
-            x_max=self.x_max,
-            x_min=self.x_min,
-            y_max=self.y_max,
-            y_min=self.y_min,
-            z_max=self.z_max,
-            z_min=self.z_min,
-        )
+        return Cognite3DObject.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DObjectWrite:
         """Convert this GraphQL format of Cognite 3D object to the writing format."""
-        return Cognite3DObjectWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            description=self.description,
-            images_360=(
-                [images_360.as_write() for images_360 in self.images_360] if self.images_360 is not None else None
-            ),
-            name=self.name,
-            tags=self.tags,
-            x_max=self.x_max,
-            x_min=self.x_min,
-            y_max=self.y_max,
-            y_min=self.y_min,
-            z_max=self.z_max,
-            z_min=self.z_min,
-        )
+        return Cognite3DObjectWrite.model_validate(as_write_args(self))
 
 
 class Cognite3DObject(CogniteDescribableNode):
@@ -279,28 +226,9 @@ class Cognite3DObject(CogniteDescribableNode):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DObjectWrite:
         """Convert this read version of Cognite 3D object to the writing version."""
-        return Cognite3DObjectWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            description=self.description,
-            images_360=(
-                [images_360.as_write() for images_360 in self.images_360] if self.images_360 is not None else None
-            ),
-            name=self.name,
-            tags=self.tags,
-            x_max=self.x_max,
-            x_min=self.x_min,
-            y_max=self.y_max,
-            y_min=self.y_min,
-            z_max=self.z_max,
-            z_min=self.z_min,
-        )
+        return Cognite3DObjectWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> Cognite3DObjectWrite:
         """Convert this read version of Cognite 3D object to the writing version."""
@@ -334,6 +262,22 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
         z_min: Lowest Z value in bounding box
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "x_max",
+        "x_min",
+        "y_max",
+        "y_min",
+        "z_max",
+        "z_min",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("images_360", dm.DirectRelationReference("cdf_cdm", "image-360-annotation")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DObject", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -354,75 +298,6 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if self.x_max is not None or write_none:
-            properties["xMax"] = self.x_max
-
-        if self.x_min is not None or write_none:
-            properties["xMin"] = self.x_min
-
-        if self.y_max is not None or write_none:
-            properties["yMax"] = self.y_max
-
-        if self.y_min is not None or write_none:
-            properties["yMin"] = self.y_min
-
-        if self.z_max is not None or write_none:
-            properties["zMax"] = self.z_max
-
-        if self.z_min is not None or write_none:
-            properties["zMin"] = self.z_min
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        for images_360 in self.images_360 or []:
-            if isinstance(images_360, DomainRelationWrite):
-                other_resources = images_360._to_instances_write(
-                    cache,
-                    self,
-                    dm.DirectRelationReference("cdf_cdm", "image-360-annotation"),
-                )
-                resources.extend(other_resources)
-
-        return resources
 
 
 class Cognite3DObjectApply(Cognite3DObjectWrite):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, TYPE_CHECKING, Union
+from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,10 +26,10 @@ from omni.data_classes._core import (
     as_direct_relation_reference,
     as_instance_dict_id,
     as_node_id,
+    as_read_args,
+    as_write_args,
     as_pygen_node_id,
-    are_nodes_equal,
     is_tuple_id,
-    select_best_node,
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -91,39 +91,13 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionEdgeA:
         """Convert this GraphQL format of connection edge a to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionEdgeA(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_node=self.end_node.as_read() if isinstance(self.end_node, GraphQLCore) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeA.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this GraphQL format of connection edge a to the writing format."""
-        return ConnectionEdgeAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
 
 class ConnectionEdgeA(DomainRelation):
@@ -148,19 +122,9 @@ class ConnectionEdgeA(DomainRelation):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
-        return ConnectionEdgeAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            end_node=self.end_node.as_write() if isinstance(self.end_node, DomainModel) else self.end_node,
-            end_time=self.end_time,
-            name=self.name,
-            start_time=self.start_time,
-        )
+        return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
@@ -170,6 +134,32 @@ class ConnectionEdgeA(DomainRelation):
             stacklevel=2,
         )
         return self.as_write()
+
+
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+    ConnectionItemEWrite: {ConnectionItemFWrite},
+    ConnectionItemFWrite: {ConnectionItemEWrite},
+    ConnectionItemGWrite: {ConnectionItemFWrite},
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelWrite,
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
+) -> None:
+    if isinstance(end_node, str | dm.NodeId):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
+        )
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. "
+            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
+        )
 
 
 class ConnectionEdgeAWrite(DomainRelationWrite):
@@ -187,72 +177,18 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         start_time: The start time field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "end_time",
+        "name",
+        "start_time",
+    )
+    _validate_end_node = _validate_end_node
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
-    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        start_node: DomainModelWrite,
-        edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.external_id and (self.space, self.external_id) in cache:
-            return resources
-
-        _validate_end_node(start_node, self.end_node)
-
-        if isinstance(self.end_node, DomainModelWrite):
-            end_node = self.end_node.as_direct_reference()
-        elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.end_node)
-        elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
-
-        external_id = self.external_id or DomainRelationWrite.external_id_factory(start_node, self.end_node, edge_type)
-
-        properties: dict[str, Any] = {}
-
-        if self.end_time is not None or write_none:
-            properties["endTime"] = self.end_time.isoformat(timespec="milliseconds") if self.end_time else None
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.start_time is not None or write_none:
-            properties["startTime"] = self.start_time.isoformat(timespec="milliseconds") if self.start_time else None
-
-        if properties:
-            this_edge = dm.EdgeApply(
-                space=self.space,
-                external_id=external_id,
-                type=edge_type,
-                start_node=start_node.as_direct_reference(),
-                end_node=end_node,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.edges.append(this_edge)
-            cache.add((self.space, external_id))
-
-        if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class ConnectionEdgeAApply(ConnectionEdgeAWrite):
@@ -394,32 +330,6 @@ def _create_connection_edge_a_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
-
-
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    ConnectionItemEWrite: {ConnectionItemFWrite},
-    ConnectionItemFWrite: {ConnectionItemEWrite},
-    ConnectionItemGWrite: {ConnectionItemFWrite},
-}
-
-
-def _validate_end_node(
-    start_node: DomainModelWrite,
-    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
-) -> None:
-    if isinstance(end_node, str | dm.NodeId):
-        # Nothing to validate
-        return
-    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
-        )
-    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
-        raise ValueError(
-            f"Invalid end node type: {type(end_node)}. "
-            f"Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
-        )
 
 
 class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):

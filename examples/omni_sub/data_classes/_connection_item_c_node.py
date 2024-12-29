@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -22,13 +22,11 @@ from omni_sub.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -109,51 +107,13 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemCNode:
         """Convert this GraphQL format of connection item c node to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemCNode(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            connection_item_a=(
-                [connection_item_a.as_read() for connection_item_a in self.connection_item_a]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [connection_item_b.as_read() for connection_item_b in self.connection_item_b]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCNode.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this GraphQL format of connection item c node to the writing format."""
-        return ConnectionItemCNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            connection_item_a=(
-                [connection_item_a.as_write() for connection_item_a in self.connection_item_a]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [connection_item_b.as_write() for connection_item_b in self.connection_item_b]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCNodeWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemCNode(DomainModel):
@@ -189,31 +149,9 @@ class ConnectionItemCNode(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this read version of connection item c node to the writing version."""
-        return ConnectionItemCNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            connection_item_a=(
-                [
-                    connection_item_a.as_write() if isinstance(connection_item_a, DomainModel) else connection_item_a
-                    for connection_item_a in self.connection_item_a
-                ]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [
-                    connection_item_b.as_write() if isinstance(connection_item_b, DomainModel) else connection_item_b
-                    for connection_item_b in self.connection_item_b
-                ]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCNodeWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionItemCNodeWrite:
         """Convert this read version of connection item c node to the writing version."""
@@ -238,6 +176,11 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         connection_item_b: The connection item b field.
     """
 
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("connection_item_a", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+        ("connection_item_b", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str
@@ -260,52 +203,6 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-        cache.add(self.as_tuple_id())
-
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=None if allow_version_increase else self.data_record.existing_version,
-            type=as_direct_relation_reference(self.node_type),
-            sources=None,
-        )
-        resources.nodes.append(this_node)
-
-        edge_type = dm.DirectRelationReference("sp_pygen_models", "unidirectional")
-        for connection_item_a in self.connection_item_a or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self,
-                end_node=connection_item_a,
-                edge_type=edge_type,
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        edge_type = dm.DirectRelationReference("sp_pygen_models", "unidirectional")
-        for connection_item_b in self.connection_item_b or []:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self,
-                end_node=connection_item_b,
-                edge_type=edge_type,
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        return resources
 
 
 class ConnectionItemCNodeApply(ConnectionItemCNodeWrite):

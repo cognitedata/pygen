@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,13 +24,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -217,71 +215,13 @@ class CogniteEquipmentGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteEquipment:
         """Convert this GraphQL format of Cognite equipment to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteEquipment(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
-            aliases=self.aliases,
-            asset=self.asset.as_read() if isinstance(self.asset, GraphQLCore) else self.asset,
-            description=self.description,
-            equipment_type=(
-                self.equipment_type.as_read() if isinstance(self.equipment_type, GraphQLCore) else self.equipment_type
-            ),
-            files=[file.as_read() for file in self.files] if self.files is not None else None,
-            manufacturer=self.manufacturer,
-            name=self.name,
-            serial_number=self.serial_number,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            time_series=(
-                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
-            ),
-        )
+        return CogniteEquipment.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteEquipmentWrite:
         """Convert this GraphQL format of Cognite equipment to the writing format."""
-        return CogniteEquipmentWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            asset=self.asset.as_write() if isinstance(self.asset, GraphQLCore) else self.asset,
-            description=self.description,
-            equipment_type=(
-                self.equipment_type.as_write() if isinstance(self.equipment_type, GraphQLCore) else self.equipment_type
-            ),
-            files=[file.as_write() for file in self.files] if self.files is not None else None,
-            manufacturer=self.manufacturer,
-            name=self.name,
-            serial_number=self.serial_number,
-            source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-        )
+        return CogniteEquipmentWrite.model_validate(as_write_args(self))
 
 
 class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
@@ -341,37 +281,9 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteEquipmentWrite:
         """Convert this read version of Cognite equipment to the writing version."""
-        return CogniteEquipmentWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            asset=self.asset.as_write() if isinstance(self.asset, DomainModel) else self.asset,
-            description=self.description,
-            equipment_type=(
-                self.equipment_type.as_write() if isinstance(self.equipment_type, DomainModel) else self.equipment_type
-            ),
-            files=(
-                [file.as_write() if isinstance(file, DomainModel) else file for file in self.files]
-                if self.files is not None
-                else None
-            ),
-            manufacturer=self.manufacturer,
-            name=self.name,
-            serial_number=self.serial_number,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-        )
+        return CogniteEquipmentWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteEquipmentWrite:
         """Convert this read version of Cognite equipment to the writing version."""
@@ -413,6 +325,31 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset",
+        "description",
+        "equipment_type",
+        "files",
+        "manufacturer",
+        "name",
+        "serial_number",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "asset",
+        "equipment_type",
+        "files",
+        "source",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipment", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -433,122 +370,6 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.asset is not None:
-            properties["asset"] = {
-                "space": self.space if isinstance(self.asset, str) else self.asset.space,
-                "externalId": self.asset if isinstance(self.asset, str) else self.asset.external_id,
-            }
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.equipment_type is not None:
-            properties["equipmentType"] = {
-                "space": self.space if isinstance(self.equipment_type, str) else self.equipment_type.space,
-                "externalId": (
-                    self.equipment_type if isinstance(self.equipment_type, str) else self.equipment_type.external_id
-                ),
-            }
-
-        if self.files is not None:
-            properties["files"] = [
-                {
-                    "space": self.space if isinstance(file, str) else file.space,
-                    "externalId": file if isinstance(file, str) else file.external_id,
-                }
-                for file in self.files or []
-            ]
-
-        if self.manufacturer is not None or write_none:
-            properties["manufacturer"] = self.manufacturer
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.serial_number is not None or write_none:
-            properties["serialNumber"] = self.serial_number
-
-        if self.source is not None:
-            properties["source"] = {
-                "space": self.space if isinstance(self.source, str) else self.source.space,
-                "externalId": self.source if isinstance(self.source, str) else self.source.external_id,
-            }
-
-        if self.source_context is not None or write_none:
-            properties["sourceContext"] = self.source_context
-
-        if self.source_created_time is not None or write_none:
-            properties["sourceCreatedTime"] = (
-                self.source_created_time.isoformat(timespec="milliseconds") if self.source_created_time else None
-            )
-
-        if self.source_created_user is not None or write_none:
-            properties["sourceCreatedUser"] = self.source_created_user
-
-        if self.source_id is not None or write_none:
-            properties["sourceId"] = self.source_id
-
-        if self.source_updated_time is not None or write_none:
-            properties["sourceUpdatedTime"] = (
-                self.source_updated_time.isoformat(timespec="milliseconds") if self.source_updated_time else None
-            )
-
-        if self.source_updated_user is not None or write_none:
-            properties["sourceUpdatedUser"] = self.source_updated_user
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.asset, DomainModelWrite):
-            other_resources = self.asset._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.equipment_type, DomainModelWrite):
-            other_resources = self.equipment_type._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.source, DomainModelWrite):
-            other_resources = self.source._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        for file in self.files or []:
-            if isinstance(file, DomainModelWrite):
-                other_resources = file._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteEquipmentApply(CogniteEquipmentWrite):

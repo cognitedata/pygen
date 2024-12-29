@@ -103,7 +103,15 @@ class WindTurbineClient:
             Created instance(s), i.e., nodes, edges, and time series.
 
         """
-        instances = self._create_instances(items, write_none, allow_version_increase)
+        if write_none is True:
+            warnings.warn(
+                "The write_none argument is deprecated and will be removed in v1.0. "
+                "Setting it has no effect. Instead, pygen will detect properties "
+                "that are explicitly set to None and write them.",
+                UserWarning,
+                stacklevel=2,
+            )
+        instances = self._create_instances(items, allow_version_increase)
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -129,19 +137,17 @@ class WindTurbineClient:
     def _create_instances(
         self,
         items: data_classes.DomainModelWrite | Sequence[data_classes.DomainModelWrite],
-        write_none: bool,
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(write_none, allow_version_increase)
+            instances = items.to_instances_write(False, allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
             for item in items:
                 instances.extend(
-                    item._to_instances_write(
+                    item._to_resources_write(
                         cache,
-                        write_none,
                         allow_version_increase,
                     )
                 )
@@ -212,7 +218,7 @@ class WindTurbineClient:
         elif isinstance(external_id, dm.NodeId):
             return self._client.data_modeling.instances.delete(nodes=external_id)
         elif isinstance(external_id, data_classes.DomainModelWrite):
-            resources = self._create_instances(external_id, False, False)
+            resources = self._create_instances(external_id, False)
             return self._client.data_modeling.instances.delete(
                 nodes=resources.nodes.as_ids(),
                 edges=resources.edges.as_ids(),
@@ -226,7 +232,7 @@ class WindTurbineClient:
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
                 elif isinstance(item, data_classes.DomainModelWrite):
-                    resources = self._create_instances(item, False, False)
+                    resources = self._create_instances(item, False)
                     node_ids.extend(resources.nodes.as_ids())
                     edge_ids.extend(resources.edges.as_ids())
                 else:

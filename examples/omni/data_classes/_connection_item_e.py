@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -137,71 +135,13 @@ class ConnectionItemEGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemE:
         """Convert this GraphQL format of connection item e to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemE(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            direct_list_no_source=(
-                [dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source]
-                if self.direct_list_no_source is not None
-                else None
-            ),
-            direct_no_source=self.direct_no_source,
-            direct_reverse_multi=(
-                [direct_reverse_multi.as_read() for direct_reverse_multi in self.direct_reverse_multi]
-                if self.direct_reverse_multi is not None
-                else None
-            ),
-            direct_reverse_single=(
-                self.direct_reverse_single.as_read()
-                if isinstance(self.direct_reverse_single, GraphQLCore)
-                else self.direct_reverse_single
-            ),
-            inwards_single=(
-                self.inwards_single.as_read() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
-            ),
-            inwards_single_property=(
-                self.inwards_single_property.as_read()
-                if isinstance(self.inwards_single_property, GraphQLCore)
-                else self.inwards_single_property
-            ),
-            name=self.name,
-        )
+        return ConnectionItemE.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this GraphQL format of connection item e to the writing format."""
-        return ConnectionItemEWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            direct_list_no_source=(
-                [dm.NodeId.load(direct_list_no_source) for direct_list_no_source in self.direct_list_no_source]
-                if self.direct_list_no_source is not None
-                else None
-            ),
-            direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, GraphQLCore) else self.inwards_single
-            ),
-            inwards_single_property=(
-                self.inwards_single_property.as_write()
-                if isinstance(self.inwards_single_property, GraphQLCore)
-                else self.inwards_single_property
-            ),
-            name=self.name,
-        )
+        return ConnectionItemEWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemE(DomainModel):
@@ -252,30 +192,9 @@ class ConnectionItemE(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this read version of connection item e to the writing version."""
-        return ConnectionItemEWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list_no_source=(
-                [direct_list_no_source for direct_list_no_source in self.direct_list_no_source]
-                if self.direct_list_no_source is not None
-                else None
-            ),
-            direct_no_source=self.direct_no_source,
-            inwards_single=(
-                self.inwards_single.as_write() if isinstance(self.inwards_single, DomainModel) else self.inwards_single
-            ),
-            inwards_single_property=(
-                self.inwards_single_property.as_write()
-                if isinstance(self.inwards_single_property, DomainRelation)
-                else self.inwards_single_property
-            ),
-            name=self.name,
-        )
+        return ConnectionItemEWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionItemEWrite:
         """Convert this read version of connection item e to the writing version."""
@@ -303,6 +222,16 @@ class ConnectionItemEWrite(DomainModelWrite):
         name: The name field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "direct_list_no_source",
+        "direct_no_source",
+        "name",
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("inwards_single", dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle")),
+        ("inwards_single_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -328,81 +257,6 @@ class ConnectionItemEWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.direct_list_no_source is not None:
-            properties["directListNoSource"] = [
-                {
-                    "space": self.space if isinstance(direct_list_no_source, str) else direct_list_no_source.space,
-                    "externalId": (
-                        direct_list_no_source
-                        if isinstance(direct_list_no_source, str)
-                        else direct_list_no_source.external_id
-                    ),
-                }
-                for direct_list_no_source in self.direct_list_no_source or []
-            ]
-
-        if self.direct_no_source is not None:
-            properties["directNoSource"] = {
-                "space": self.space if isinstance(self.direct_no_source, str) else self.direct_no_source.space,
-                "externalId": (
-                    self.direct_no_source
-                    if isinstance(self.direct_no_source, str)
-                    else self.direct_no_source.external_id
-                ),
-            }
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if self.inwards_single_property is not None:
-            other_resources = self.inwards_single_property._to_instances_write(
-                cache,
-                self,
-                dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
-            )
-            resources.extend(other_resources)
-
-        if self.inwards_single is not None:
-            other_resources = DomainRelationWrite.from_edge_to_resources(
-                cache,
-                start_node=self.inwards_single,
-                end_node=self,
-                edge_type=dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
-                write_none=write_none,
-                allow_version_increase=allow_version_increase,
-            )
-            resources.extend(other_resources)
-
-        return resources
 
 
 class ConnectionItemEApply(ConnectionItemEWrite):

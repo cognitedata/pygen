@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -22,13 +22,11 @@ from omni_multi.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -90,35 +88,13 @@ class SubInterfaceGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> SubInterface:
         """Convert this GraphQL format of sub interface to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return SubInterface(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-        )
+        return SubInterface.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SubInterfaceWrite:
         """Convert this GraphQL format of sub interface to the writing format."""
-        return SubInterfaceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-        )
+        return SubInterfaceWrite.model_validate(as_write_args(self))
 
 
 class SubInterface(MainInterface):
@@ -139,17 +115,9 @@ class SubInterface(MainInterface):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
-        return SubInterfaceWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-        )
+        return SubInterfaceWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
@@ -174,46 +142,15 @@ class SubInterfaceWrite(MainInterfaceWrite):
         sub_value: The sub value field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.main_value is not None or write_none:
-            properties["mainValue"] = self.main_value
-
-        if self.sub_value is not None or write_none:
-            properties["subValue"] = self.sub_value
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        return resources
 
 
 class SubInterfaceApply(SubInterfaceWrite):

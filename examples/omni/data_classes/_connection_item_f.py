@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from omni.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -117,59 +115,13 @@ class ConnectionItemFGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemF:
         """Convert this GraphQL format of connection item f to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemF(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            direct_list=(
-                [direct_list.as_read() for direct_list in self.direct_list] if self.direct_list is not None else None
-            ),
-            name=self.name,
-            outwards_multi=(
-                [outwards_multi.as_read() for outwards_multi in self.outwards_multi]
-                if self.outwards_multi is not None
-                else None
-            ),
-            outwards_single=(
-                self.outwards_single.as_read()
-                if isinstance(self.outwards_single, GraphQLCore)
-                else self.outwards_single
-            ),
-        )
+        return ConnectionItemF.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this GraphQL format of connection item f to the writing format."""
-        return ConnectionItemFWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            direct_list=(
-                [direct_list.as_write() for direct_list in self.direct_list] if self.direct_list is not None else None
-            ),
-            name=self.name,
-            outwards_multi=(
-                [outwards_multi.as_write() for outwards_multi in self.outwards_multi]
-                if self.outwards_multi is not None
-                else None
-            ),
-            outwards_single=(
-                self.outwards_single.as_write()
-                if isinstance(self.outwards_single, GraphQLCore)
-                else self.outwards_single
-            ),
-        )
+        return ConnectionItemFWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemF(DomainModel):
@@ -212,34 +164,9 @@ class ConnectionItemF(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemFWrite:
         """Convert this read version of connection item f to the writing version."""
-        return ConnectionItemFWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            direct_list=(
-                [
-                    direct_list.as_write() if isinstance(direct_list, DomainModel) else direct_list
-                    for direct_list in self.direct_list
-                ]
-                if self.direct_list is not None
-                else None
-            ),
-            name=self.name,
-            outwards_multi=(
-                [outwards_multi.as_write() for outwards_multi in self.outwards_multi]
-                if self.outwards_multi is not None
-                else None
-            ),
-            outwards_single=(
-                self.outwards_single.as_write()
-                if isinstance(self.outwards_single, DomainRelation)
-                else self.outwards_single
-            ),
-        )
+        return ConnectionItemFWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionItemFWrite:
         """Convert this read version of connection item f to the writing version."""
@@ -266,6 +193,16 @@ class ConnectionItemFWrite(DomainModelWrite):
         outwards_single: The outwards single field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "direct_list",
+        "name",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("outwards_multi", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
+        ("outwards_single", dm.DirectRelationReference("sp_pygen_models", "singleProperty")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("direct_list",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemF", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -288,70 +225,6 @@ class ConnectionItemFWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.direct_list is not None:
-            properties["directList"] = [
-                {
-                    "space": self.space if isinstance(direct_list, str) else direct_list.space,
-                    "externalId": direct_list if isinstance(direct_list, str) else direct_list.external_id,
-                }
-                for direct_list in self.direct_list or []
-            ]
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        for outwards_multi in self.outwards_multi or []:
-            if isinstance(outwards_multi, DomainRelationWrite):
-                other_resources = outwards_multi._to_instances_write(
-                    cache,
-                    self,
-                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
-                )
-                resources.extend(other_resources)
-
-        if self.outwards_single is not None:
-            other_resources = self.outwards_single._to_instances_write(
-                cache,
-                self,
-                dm.DirectRelationReference("sp_pygen_models", "singleProperty"),
-            )
-            resources.extend(other_resources)
-
-        for direct_list in self.direct_list or []:
-            if isinstance(direct_list, DomainModelWrite):
-                other_resources = direct_list._to_instances_write(cache)
-                resources.extend(other_resources)
-
-        return resources
 
 
 class ConnectionItemFApply(ConnectionItemFWrite):

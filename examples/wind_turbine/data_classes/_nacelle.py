@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -170,86 +168,13 @@ class NacelleGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Nacelle:
         """Convert this GraphQL format of nacelle to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Nacelle(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_read()
-                if isinstance(self.acc_from_back_side_y, GraphQLCore)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_read()
-                if isinstance(self.acc_from_back_side_z, GraphQLCore)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_read() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
-            generator=self.generator.as_read() if isinstance(self.generator, GraphQLCore) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_read()
-                if isinstance(self.high_speed_shaft, GraphQLCore)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_read() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_read() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
-            ),
-            wind_turbine=(
-                self.wind_turbine.as_read() if isinstance(self.wind_turbine, GraphQLCore) else self.wind_turbine
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_read() if isinstance(self.yaw_direction, GraphQLCore) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_read() if isinstance(self.yaw_error, GraphQLCore) else self.yaw_error,
-        )
+        return Nacelle.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this GraphQL format of nacelle to the writing format."""
-        return NacelleWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_write()
-                if isinstance(self.acc_from_back_side_y, GraphQLCore)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_write()
-                if isinstance(self.acc_from_back_side_z, GraphQLCore)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
-            generator=self.generator.as_write() if isinstance(self.generator, GraphQLCore) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_write()
-                if isinstance(self.high_speed_shaft, GraphQLCore)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_write() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_write() if isinstance(self.yaw_direction, GraphQLCore) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, GraphQLCore) else self.yaw_error,
-        )
+        return NacelleWrite.model_validate(as_write_args(self))
 
 
 class Nacelle(DomainModel):
@@ -308,41 +233,9 @@ class Nacelle(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
-        return NacelleWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_write()
-                if isinstance(self.acc_from_back_side_y, DomainModel)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_write()
-                if isinstance(self.acc_from_back_side_z, DomainModel)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, DomainModel) else self.gearbox,
-            generator=self.generator.as_write() if isinstance(self.generator, DomainModel) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_write()
-                if isinstance(self.high_speed_shaft, DomainModel)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, DomainModel) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_write() if isinstance(self.power_inverter, DomainModel) else self.power_inverter
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_write() if isinstance(self.yaw_direction, DomainModel) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, DomainModel) else self.yaw_error,
-        )
+        return NacelleWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
@@ -374,6 +267,30 @@ class NacelleWrite(DomainModelWrite):
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
     """
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Nacelle", "1")
 
@@ -410,152 +327,6 @@ class NacelleWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.acc_from_back_side_x is not None:
-            properties["acc_from_back_side_x"] = {
-                "space": self.space if isinstance(self.acc_from_back_side_x, str) else self.acc_from_back_side_x.space,
-                "externalId": (
-                    self.acc_from_back_side_x
-                    if isinstance(self.acc_from_back_side_x, str)
-                    else self.acc_from_back_side_x.external_id
-                ),
-            }
-
-        if self.acc_from_back_side_y is not None:
-            properties["acc_from_back_side_y"] = {
-                "space": self.space if isinstance(self.acc_from_back_side_y, str) else self.acc_from_back_side_y.space,
-                "externalId": (
-                    self.acc_from_back_side_y
-                    if isinstance(self.acc_from_back_side_y, str)
-                    else self.acc_from_back_side_y.external_id
-                ),
-            }
-
-        if self.acc_from_back_side_z is not None:
-            properties["acc_from_back_side_z"] = {
-                "space": self.space if isinstance(self.acc_from_back_side_z, str) else self.acc_from_back_side_z.space,
-                "externalId": (
-                    self.acc_from_back_side_z
-                    if isinstance(self.acc_from_back_side_z, str)
-                    else self.acc_from_back_side_z.external_id
-                ),
-            }
-
-        if self.gearbox is not None:
-            properties["gearbox"] = {
-                "space": self.space if isinstance(self.gearbox, str) else self.gearbox.space,
-                "externalId": self.gearbox if isinstance(self.gearbox, str) else self.gearbox.external_id,
-            }
-
-        if self.generator is not None:
-            properties["generator"] = {
-                "space": self.space if isinstance(self.generator, str) else self.generator.space,
-                "externalId": self.generator if isinstance(self.generator, str) else self.generator.external_id,
-            }
-
-        if self.high_speed_shaft is not None:
-            properties["high_speed_shaft"] = {
-                "space": self.space if isinstance(self.high_speed_shaft, str) else self.high_speed_shaft.space,
-                "externalId": (
-                    self.high_speed_shaft
-                    if isinstance(self.high_speed_shaft, str)
-                    else self.high_speed_shaft.external_id
-                ),
-            }
-
-        if self.main_shaft is not None:
-            properties["main_shaft"] = {
-                "space": self.space if isinstance(self.main_shaft, str) else self.main_shaft.space,
-                "externalId": self.main_shaft if isinstance(self.main_shaft, str) else self.main_shaft.external_id,
-            }
-
-        if self.power_inverter is not None:
-            properties["power_inverter"] = {
-                "space": self.space if isinstance(self.power_inverter, str) else self.power_inverter.space,
-                "externalId": (
-                    self.power_inverter if isinstance(self.power_inverter, str) else self.power_inverter.external_id
-                ),
-            }
-
-        if self.yaw_direction is not None:
-            properties["yaw_direction"] = {
-                "space": self.space if isinstance(self.yaw_direction, str) else self.yaw_direction.space,
-                "externalId": (
-                    self.yaw_direction if isinstance(self.yaw_direction, str) else self.yaw_direction.external_id
-                ),
-            }
-
-        if self.yaw_error is not None:
-            properties["yaw_error"] = {
-                "space": self.space if isinstance(self.yaw_error, str) else self.yaw_error.space,
-                "externalId": self.yaw_error if isinstance(self.yaw_error, str) else self.yaw_error.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.acc_from_back_side_y, DomainModelWrite):
-            other_resources = self.acc_from_back_side_y._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.acc_from_back_side_z, DomainModelWrite):
-            other_resources = self.acc_from_back_side_z._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.gearbox, DomainModelWrite):
-            other_resources = self.gearbox._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.generator, DomainModelWrite):
-            other_resources = self.generator._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.high_speed_shaft, DomainModelWrite):
-            other_resources = self.high_speed_shaft._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.main_shaft, DomainModelWrite):
-            other_resources = self.main_shaft._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.power_inverter, DomainModelWrite):
-            other_resources = self.power_inverter._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.yaw_direction, DomainModelWrite):
-            other_resources = self.yaw_direction._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.yaw_error, DomainModelWrite):
-            other_resources = self.yaw_error._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class NacelleApply(NacelleWrite):

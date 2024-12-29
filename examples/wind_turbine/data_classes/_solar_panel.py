@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from wind_turbine.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -116,41 +114,13 @@ class SolarPanelGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> SolarPanel:
         """Convert this GraphQL format of solar panel to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return SolarPanel(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_read() if isinstance(self.efficiency, GraphQLCore) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_read() if isinstance(self.orientation, GraphQLCore) else self.orientation,
-        )
+        return SolarPanel.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SolarPanelWrite:
         """Convert this GraphQL format of solar panel to the writing format."""
-        return SolarPanelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_write() if isinstance(self.efficiency, GraphQLCore) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_write() if isinstance(self.orientation, GraphQLCore) else self.orientation,
-        )
+        return SolarPanelWrite.model_validate(as_write_args(self))
 
 
 class SolarPanel(GeneratingUnit):
@@ -180,20 +150,9 @@ class SolarPanel(GeneratingUnit):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SolarPanelWrite:
         """Convert this read version of solar panel to the writing version."""
-        return SolarPanelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_write() if isinstance(self.efficiency, DomainModel) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_write() if isinstance(self.orientation, DomainModel) else self.orientation,
-        )
+        return SolarPanelWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> SolarPanelWrite:
         """Convert this read version of solar panel to the writing version."""
@@ -221,6 +180,18 @@ class SolarPanelWrite(GeneratingUnitWrite):
         orientation: The orientation field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "capacity",
+        "description",
+        "efficiency",
+        "name",
+        "orientation",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "efficiency",
+        "orientation",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SolarPanel", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -236,65 +207,6 @@ class SolarPanelWrite(GeneratingUnitWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.capacity is not None or write_none:
-            properties["capacity"] = self.capacity
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.efficiency is not None:
-            properties["efficiency"] = {
-                "space": self.space if isinstance(self.efficiency, str) else self.efficiency.space,
-                "externalId": self.efficiency if isinstance(self.efficiency, str) else self.efficiency.external_id,
-            }
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.orientation is not None:
-            properties["orientation"] = {
-                "space": self.space if isinstance(self.orientation, str) else self.orientation.space,
-                "externalId": self.orientation if isinstance(self.orientation, str) else self.orientation.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.efficiency, DomainModelWrite):
-            other_resources = self.efficiency._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.orientation, DomainModelWrite):
-            other_resources = self.orientation._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class SolarPanelApply(SolarPanelWrite):

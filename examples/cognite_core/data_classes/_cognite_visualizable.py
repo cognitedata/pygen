@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -23,13 +23,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -101,33 +99,13 @@ class CogniteVisualizableGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteVisualizable:
         """Convert this GraphQL format of Cognite visualizable to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteVisualizable(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-        )
+        return CogniteVisualizable.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteVisualizableWrite:
         """Convert this GraphQL format of Cognite visualizable to the writing format."""
-        return CogniteVisualizableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-        )
+        return CogniteVisualizableWrite.model_validate(as_write_args(self))
 
 
 class CogniteVisualizable(DomainModel):
@@ -153,16 +131,9 @@ class CogniteVisualizable(DomainModel):
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteVisualizableWrite:
         """Convert this read version of Cognite visualizable to the writing version."""
-        return CogniteVisualizableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
-        )
+        return CogniteVisualizableWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteVisualizableWrite:
         """Convert this read version of Cognite visualizable to the writing version."""
@@ -186,6 +157,9 @@ class CogniteVisualizableWrite(DomainModelWrite):
         object_3d: Direct relation to an Object3D instance representing the 3D resource
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("object_3d",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("object_3d",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -201,46 +175,6 @@ class CogniteVisualizableWrite(DomainModelWrite):
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.object_3d is not None:
-            properties["object3D"] = {
-                "space": self.space if isinstance(self.object_3d, str) else self.object_3d.space,
-                "externalId": self.object_3d if isinstance(self.object_3d, str) else self.object_3d.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.object_3d, DomainModelWrite):
-            other_resources = self.object_3d._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteVisualizableApply(CogniteVisualizableWrite):

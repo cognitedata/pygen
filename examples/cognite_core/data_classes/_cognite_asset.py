@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,13 +24,11 @@ from cognite_core.data_classes._core import (
     GraphQLCore,
     ResourcesWrite,
     T_DomainModelList,
-    as_direct_relation_reference,
-    as_instance_dict_id,
     as_node_id,
-    as_pygen_node_id,
-    are_nodes_equal,
+    as_read_args,
+    as_write_args,
     is_tuple_id,
-    select_best_node,
+    as_instance_dict_id,
     parse_single_connection,
     QueryCore,
     NodeQueryCore,
@@ -253,71 +251,13 @@ class CogniteAssetGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteAsset:
         """Convert this GraphQL format of Cognite asset to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteAsset(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_read() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            children=[child.as_read() for child in self.children] if self.children is not None else None,
-            description=self.description,
-            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
-            files=[file.as_read() for file in self.files] if self.files is not None else None,
-            name=self.name,
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            parent=self.parent.as_read() if isinstance(self.parent, GraphQLCore) else self.parent,
-            path=[path.as_read() for path in self.path] if self.path is not None else None,
-            path_last_updated_time=self.path_last_updated_time,
-            root=self.root.as_read() if isinstance(self.root, GraphQLCore) else self.root,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            time_series=(
-                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
-            ),
-            type_=self.type_.as_read() if isinstance(self.type_, GraphQLCore) else self.type_,
-        )
+        return CogniteAsset.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetWrite:
         """Convert this GraphQL format of Cognite asset to the writing format."""
-        return CogniteAssetWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            description=self.description,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            parent=self.parent.as_write() if isinstance(self.parent, GraphQLCore) else self.parent,
-            source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            type_=self.type_.as_write() if isinstance(self.type_, GraphQLCore) else self.type_,
-        )
+        return CogniteAssetWrite.model_validate(as_write_args(self))
 
 
 class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceableNode):
@@ -385,30 +325,9 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
-        return CogniteAssetWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, DomainModel) else self.asset_class,
-            description=self.description,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, DomainModel) else self.object_3d,
-            parent=self.parent.as_write() if isinstance(self.parent, DomainModel) else self.parent,
-            source=self.source.as_write() if isinstance(self.source, DomainModel) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            type_=self.type_.as_write() if isinstance(self.type_, DomainModel) else self.type_,
-        )
+        return CogniteAssetWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
@@ -449,6 +368,33 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset_class",
+        "description",
+        "name",
+        "object_3d",
+        "parent",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "asset_class",
+        "object_3d",
+        "parent",
+        "path",
+        "root",
+        "source",
+        "type_",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
@@ -467,120 +413,6 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         elif isinstance(value, list):
             return [cls.as_node_id(item) for item in value]
         return value
-
-    def _to_instances_write(
-        self,
-        cache: set[tuple[str, str]],
-        write_none: bool = False,
-        allow_version_increase: bool = False,
-    ) -> ResourcesWrite:
-        resources = ResourcesWrite()
-        if self.as_tuple_id() in cache:
-            return resources
-
-        properties: dict[str, Any] = {}
-
-        if self.aliases is not None or write_none:
-            properties["aliases"] = self.aliases
-
-        if self.asset_class is not None:
-            properties["assetClass"] = {
-                "space": self.space if isinstance(self.asset_class, str) else self.asset_class.space,
-                "externalId": self.asset_class if isinstance(self.asset_class, str) else self.asset_class.external_id,
-            }
-
-        if self.description is not None or write_none:
-            properties["description"] = self.description
-
-        if self.name is not None or write_none:
-            properties["name"] = self.name
-
-        if self.object_3d is not None:
-            properties["object3D"] = {
-                "space": self.space if isinstance(self.object_3d, str) else self.object_3d.space,
-                "externalId": self.object_3d if isinstance(self.object_3d, str) else self.object_3d.external_id,
-            }
-
-        if self.parent is not None:
-            properties["parent"] = {
-                "space": self.space if isinstance(self.parent, str) else self.parent.space,
-                "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
-            }
-
-        if self.source is not None:
-            properties["source"] = {
-                "space": self.space if isinstance(self.source, str) else self.source.space,
-                "externalId": self.source if isinstance(self.source, str) else self.source.external_id,
-            }
-
-        if self.source_context is not None or write_none:
-            properties["sourceContext"] = self.source_context
-
-        if self.source_created_time is not None or write_none:
-            properties["sourceCreatedTime"] = (
-                self.source_created_time.isoformat(timespec="milliseconds") if self.source_created_time else None
-            )
-
-        if self.source_created_user is not None or write_none:
-            properties["sourceCreatedUser"] = self.source_created_user
-
-        if self.source_id is not None or write_none:
-            properties["sourceId"] = self.source_id
-
-        if self.source_updated_time is not None or write_none:
-            properties["sourceUpdatedTime"] = (
-                self.source_updated_time.isoformat(timespec="milliseconds") if self.source_updated_time else None
-            )
-
-        if self.source_updated_user is not None or write_none:
-            properties["sourceUpdatedUser"] = self.source_updated_user
-
-        if self.tags is not None or write_none:
-            properties["tags"] = self.tags
-
-        if self.type_ is not None:
-            properties["type"] = {
-                "space": self.space if isinstance(self.type_, str) else self.type_.space,
-                "externalId": self.type_ if isinstance(self.type_, str) else self.type_.external_id,
-            }
-
-        if properties:
-            this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=None if allow_version_increase else self.data_record.existing_version,
-                type=as_direct_relation_reference(self.node_type),
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=self._view_id,
-                        properties=properties,
-                    )
-                ],
-            )
-            resources.nodes.append(this_node)
-            cache.add(self.as_tuple_id())
-
-        if isinstance(self.asset_class, DomainModelWrite):
-            other_resources = self.asset_class._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.object_3d, DomainModelWrite):
-            other_resources = self.object_3d._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.parent, DomainModelWrite):
-            other_resources = self.parent._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.source, DomainModelWrite):
-            other_resources = self.source._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        if isinstance(self.type_, DomainModelWrite):
-            other_resources = self.type_._to_instances_write(cache)
-            resources.extend(other_resources)
-
-        return resources
 
 
 class CogniteAssetApply(CogniteAssetWrite):
