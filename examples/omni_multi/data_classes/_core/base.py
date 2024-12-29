@@ -45,6 +45,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 from omni_multi.data_classes._core.cdf_external import GraphQLExternal
 from omni_multi.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
+from omni_multi.config import global_config
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -244,7 +245,10 @@ class DomainModel(DomainModelCore, ABC):
             node_type=node_type,
             **unpack_properties(instance.properties),
         )
-        return cls.model_validate(args)
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -391,7 +395,10 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         args = dict(
             space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
         )
-        return cls.model_validate(args)
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)
 
 
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
@@ -542,7 +549,10 @@ class DomainRelation(DomainModelCore):
             end_node=end_node,
             **unpack_properties(instance.properties),
         )
-        return cls.model_validate(args)
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
