@@ -12,13 +12,14 @@ from typing import (
     cast,
     ClassVar,
     Generic,
+    Literal,
     Optional,
     Any,
     Iterator,
     TypeVar,
     overload,
     Union,
-    SupportsIndex, Literal,
+    SupportsIndex,
 )
 
 import pandas as pd
@@ -633,7 +634,6 @@ class DomainRelationWrite(Core, extra="forbid"):
         resources.extend(connection_resources(self, cache, allow_version_increase))
         return resources
 
-
     @classmethod
     def create_edge(
         cls,
@@ -762,6 +762,7 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
             else:
                 unpacked[prop_name] = prop_value
     return unpacked
+
 
 def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resources: ResourcesWrite) -> dict[str, Any]:
     properties: dict[str, Any] = {}

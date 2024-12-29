@@ -192,7 +192,6 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         "name",
         "start_time",
     )
-    _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
