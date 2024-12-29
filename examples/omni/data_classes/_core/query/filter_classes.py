@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm
 
 from omni.data_classes._core.helpers import as_instance_dict_id
 
+
 T_QueryCore = TypeVar("T_QueryCore")
 
 

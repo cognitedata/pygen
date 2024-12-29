@@ -52,7 +52,7 @@ def as_direct_relation_reference(
 def as_instance_dict_id(value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> dict[str, str]:
     if isinstance(value, str):
         return {"space": DEFAULT_INSTANCE_SPACE, "externalId": value}
-    elif isinstance(value, dm.NodeId):
+    if isinstance(value, dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
     elif isinstance(value, tuple) and is_tuple_id(value):
         return {"space": value[0], "externalId": value[1]}

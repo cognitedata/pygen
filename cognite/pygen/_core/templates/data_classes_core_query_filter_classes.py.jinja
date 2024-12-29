@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import datetime
 from abc import ABC
-from typing import ClassVar, Generic, TypeVar
+from typing import Any, ClassVar, Generic, Sequence, TypeVar
 
 from cognite.client import data_modeling as dm
+
+from {{ top_level_package }}.data_classes._core.helpers import as_instance_dict_id
 
 
 T_QueryCore = TypeVar("T_QueryCore")
@@ -144,4 +146,16 @@ class DateFilter(Filtering[T_QueryCore]):
         self._sort = dm.InstanceSort(self._prop_path, "descending")
         self._sort_priority = self._get_sort_priority()
         self._limit = 1
+        return self._query
+
+
+class DirectRelationFilter(Filtering[T_QueryCore]):
+    def equals(self, value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.Equals(self._prop_path, as_instance_dict_id(value))
+        return self._query
+
+    def in_(self, values: Sequence[str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any]) -> T_QueryCore:
+        self._raise_if_filter_set()
+        self._filter = dm.filters.In(self._prop_path, [as_instance_dict_id(value) for value in values])
         return self._query
