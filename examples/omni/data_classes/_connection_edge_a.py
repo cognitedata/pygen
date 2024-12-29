@@ -86,7 +86,9 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = None
+    end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = Field(
+        None, alias="endNode"
+    )
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -117,7 +119,7 @@ class ConnectionEdgeA(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId]
+    end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId] = Field(alias="endNode")
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -145,7 +147,9 @@ _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainM
 
 def _validate_end_node(
     start_node: DomainModelWrite,
-    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId] = Field(
+        alias="endNode"
+    ),
 ) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
@@ -185,7 +189,9 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId] = Field(
+        alias="endNode"
+    )
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")

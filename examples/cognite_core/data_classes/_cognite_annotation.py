@@ -135,7 +135,7 @@ class CogniteAnnotationGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAnnotation", "v1")
-    end_node: Union[dm.NodeId, None] = None
+    end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
     confidence: Optional[float] = None
     description: Optional[str] = None
@@ -209,7 +209,7 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
 
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId] = Field(alias="endNode")) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
