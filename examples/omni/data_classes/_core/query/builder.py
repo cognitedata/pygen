@@ -174,14 +174,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 if e.code == 408:
                     # Too big query, try to reduce the limit
                     if self._reduce_max_batch_limit():
+                        new_limit = select_step._max_retrieve_batch_limit
+                        warnings.warn(
+                            f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
+                            QueryReducingBatchSize,
+                            stacklevel=2,
+                        )
                         continue
-                    new_limit = select_step._max_retrieve_batch_limit
-                    warnings.warn(
-                        f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
-                        QueryReducingBatchSize,
-                        stacklevel=2,
-                    )
-
                 raise e
 
             self._fetch_reverse_direct_relation_of_lists(client, to_search, batch)
