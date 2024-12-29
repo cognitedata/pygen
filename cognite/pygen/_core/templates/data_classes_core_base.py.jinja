@@ -568,6 +568,8 @@ def default_edge_external_id_factory(
 
 
 class DomainRelationWrite(Core, extra="forbid"):
+    _view_id: ClassVar[dm.ViewId]
+
     _container_fields: ClassVar[tuple[str, ...]] = tuple()
     _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
     _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
@@ -837,8 +839,8 @@ def connection_resources(
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
-                    start_node=model,
-                    end_node=item,
+                    start_node=model, # type: ignore[arg-type]
+                    end_node=item, # type: ignore[arg-type]
                     edge_type=edge_type,
                     write_none=False,
                     allow_version_increase=allow_version_increase,
@@ -858,8 +860,8 @@ def connection_resources(
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
-                    start_node=item,
-                    end_node=model,
+                    start_node=item, # type: ignore[arg-type]
+                    end_node=model, # type: ignore[arg-type]
                     edge_type=edge_type,
                     write_none=False,
                     allow_version_increase=allow_version_increase,
