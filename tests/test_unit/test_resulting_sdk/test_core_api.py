@@ -201,22 +201,11 @@ class TestAPIClass:
                 invalid = pygen.primitive_required.list()
             finally:
                 global_config.validate_retrieve = True
-            assert invalid.dump() == {
-                "items": [
-                    {
-                        "space": "my_space",
-                        "externalId": "invalid_node",
-                        "version": 1,
-                        "lastUpdatedTime": 1,
-                        "createdTime": 1,
-                        "deletedTime": None,
-                        "properties": {
-                            "sp_pygen_models.PrimitiveRequired.1": {
-                                "boolean": True,
-                                "int32": 10,
-                                "int64": "invalid_value",
-                            }
-                        },
-                    }
-                ]
+            # Skipping data record and node type to focus on the properties:
+            assert invalid[0].model_dump(exclude={"data_record", "node_type"}) == {
+                "boolean": True,
+                "external_id": "invalid_node",
+                "int_32": 10,
+                "int_64": "invalid_value",
+                "space": "my_space",
             }

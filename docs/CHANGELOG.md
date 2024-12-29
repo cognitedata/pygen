@@ -17,6 +17,8 @@ Changes are grouped as follows
 ### Added
 - Support for filtering on direct relations in the `.select()` method.
 - Parameter `retrieve_connections` in the `.retrieve()` method to retrieve all connections for a node.
+- Support for turning off the validation in the `.retrieve()`/`.list(...)`/`.select()` methods using the 
+  `my_sdk.config import global_config; global_config.validate_retrieve = False`.
 
 ### Improved
 - When calling the `.upsert(...)` the `write_none` argument is now deprecated. Instead, `pygen` detects which
