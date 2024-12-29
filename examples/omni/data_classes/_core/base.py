@@ -34,7 +34,6 @@ from cognite.client.data_classes import (
     FileMetadataList,
     SequenceList,
 )
-from cognite.client.data_classes._base import CogniteResource
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
     InstanceApply,
@@ -787,6 +786,7 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
                 unpacked[prop_name] = prop_value
     return unpacked
 
+
 def serialize_property(value: Any) -> Any:
     if isinstance(value, Sequence) and not isinstance(value, str):
         return [serialize_property(item) for item in value]
@@ -794,7 +794,7 @@ def serialize_property(value: Any) -> Any:
         return value.isoformat()
     elif isinstance(value, datetime.datetime):
         return value.isoformat(timespec="milliseconds")
-    elif isinstance(value, CogniteResource) and hasattr(value, "external_id"):
+    elif isinstance(value, TimeSeriesWrite | FileMetadataWrite | SequenceWrite):
         return value.external_id
     return value
 
@@ -809,5 +809,6 @@ def serialize_relation(value: DomainModelWrite | str | dm.NodeId | None | Sequen
     elif isinstance(value, DomainModelWrite | dm.NodeId):
         return {"space": value.space, "externalId": value.external_id}
     raise TypeError(f"Expected str, subclass of {DomainModelWrite.__name__} or NodeId, got {type(value)}")
+
 
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
