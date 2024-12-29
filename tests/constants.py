@@ -158,6 +158,7 @@ WIND_TURBINE = ExampleSDK(
 class OmniFiles:
     client_dir = OMNI_SDK.client_dir
     client = client_dir / "_api_client.py"
+    config = client_dir / "config.py"
     data_classes = client_dir / "data_classes"
     core_data = data_classes / "_core"
     data_core_base = core_data / "base.py"

@@ -115,6 +115,7 @@ class SDKGenerator:
         client_dir = Path()
         sdk = self._multi_api_generator.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
+        sdk[client_dir / "config.py"] = self._generate_config_file()
         return sdk
 
     def _generate_api_client_file(self) -> str:
@@ -138,6 +139,10 @@ class SDKGenerator:
             )
             + "\n"
         )
+
+    def _generate_config_file(self) -> str:
+        config = self._multi_api_generator.env.get_template("config.py.jinja")
+        return config.render() + "\n"
 
 
 def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:

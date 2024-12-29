@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni_multi.config import global_config
 from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -489,7 +490,11 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return MainInterfaceList([MainInterface.model_validate(item) for item in unpacked])
+        if global_config.validate_retrieve:
+            retrieved = [MainInterface.model_validate(item) for item in unpacked]
+        else:
+            retrieved = [MainInterface.model_construct(**item) for item in unpacked]
+        return MainInterfaceList(retrieved)
 
     def list(
         self,

@@ -45,6 +45,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 from omni_multi.data_classes._core.cdf_external import GraphQLExternal
 from omni_multi.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
+from omni_multi.config import global_config
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -237,13 +238,17 @@ class DomainModel(DomainModelCore, ABC):
         node_type = data.pop("type", None)
         space = data.pop("space")
         external_id = data.pop("external_id")
-        return cls(
+        args = dict(
             space=space,
             external_id=external_id,
             data_record=DataRecord(**data),
             node_type=node_type,
             **unpack_properties(instance.properties),
         )
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -387,9 +392,13 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
                     properties[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
                 else:
                     properties[prop_name] = prop_value
-        return cls(
+        args = dict(
             space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
         )
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
@@ -531,7 +540,7 @@ class DomainRelation(DomainModelCore):
         end_node = data.pop("end_node")
         space = data.pop("space")
         external_id = data.pop("external_id")
-        return cls(
+        args = dict(
             space=space,
             external_id=external_id,
             data_record=DataRecord(**data),
@@ -540,6 +549,10 @@ class DomainRelation(DomainModelCore):
             end_node=end_node,
             **unpack_properties(instance.properties),
         )
+        if global_config.validate_retrieve:
+            return cls.model_validate(args)
+        else:
+            return cls.model_construct(**args)  # type: ignore[return-value]
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)

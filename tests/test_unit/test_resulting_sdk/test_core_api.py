@@ -2,6 +2,11 @@ from typing import Any
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Properties
+from cognite.client.testing import monkeypatch_cognite_client
+from omni import OmniClient
+from omni.config import global_config
+from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
 
@@ -159,3 +164,48 @@ class TestGraphQLQuery:
         with pytest.raises(RuntimeError) as exc_info:
             GraphQLQueryResponse(dm.DataModelId("sp_pygen_power", "WindTurbine", "1")).parse(result)
         assert exc_info.match("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")
+
+
+class TestAPIClass:
+    def test_skip_validation(self) -> None:
+        with monkeypatch_cognite_client() as mock_client:
+            mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
+                [
+                    dm.Node(
+                        space="my_space",
+                        external_id="invalid_node",
+                        version=1,
+                        last_updated_time=1,
+                        created_time=1,
+                        deleted_time=None,
+                        type=None,
+                        properties=Properties(
+                            {
+                                dm.ViewId("sp_pygen_models", "PrimitiveRequired", "1"): {
+                                    # Invalid as multiple required fields are missing
+                                    # And the type of int64 is wrong
+                                    "boolean": True,
+                                    "int32": 10,
+                                    "int64": "invalid_value",
+                                }
+                            }
+                        ),
+                    )
+                ]
+            )
+            pygen = OmniClient(mock_client)
+            with pytest.raises(ValidationError):
+                _ = pygen.primitive_required.list()
+            try:
+                global_config.validate_retrieve = False
+                invalid = pygen.primitive_required.list()
+            finally:
+                global_config.validate_retrieve = True
+            # Skipping data record and node type to focus on the properties:
+            assert invalid[0].model_dump(exclude={"data_record", "node_type"}) == {
+                "boolean": True,
+                "external_id": "invalid_node",
+                "int_32": 10,
+                "int_64": "invalid_value",
+                "space": "my_space",
+            }

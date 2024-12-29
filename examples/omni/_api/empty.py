@@ -9,6 +9,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from omni.config import global_config
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -679,7 +680,11 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return EmptyList([Empty.model_validate(item) for item in unpacked])
+        if global_config.validate_retrieve:
+            retrieved = [Empty.model_validate(item) for item in unpacked]
+        else:
+            retrieved = [Empty.model_construct(**item) for item in unpacked]
+        return EmptyList(retrieved)
 
     def list(
         self,

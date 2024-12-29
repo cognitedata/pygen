@@ -191,3 +191,14 @@ def test_create_api_client(omni_sdk_generator: SDKGenerator, code_formatter: Cod
 
     # Assert
     assert actual == expected, "\n".join(difflib.unified_diff(expected.splitlines(), actual.splitlines()))
+
+
+def test_generate_config_py(omni_sdk_generator: SDKGenerator) -> None:
+    # Arrange
+    expected = OmniFiles.config.read_text()
+
+    # Act
+    actual = omni_sdk_generator._generate_config_file()
+
+    # Assert
+    assert actual == expected

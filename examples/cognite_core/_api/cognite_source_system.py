@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
+from cognite_core.config import global_config
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
     Aggregations,
@@ -577,7 +578,11 @@ class CogniteSourceSystemAPI(
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return CogniteSourceSystemList([CogniteSourceSystem.model_validate(item) for item in unpacked])
+        if global_config.validate_retrieve:
+            retrieved = [CogniteSourceSystem.model_validate(item) for item in unpacked]
+        else:
+            retrieved = [CogniteSourceSystem.model_construct(**item) for item in unpacked]
+        return CogniteSourceSystemList(retrieved)
 
     def list(
         self,

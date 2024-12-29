@@ -21,6 +21,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
 
+from wind_turbine.config import global_config
 from wind_turbine import data_classes
 from wind_turbine.data_classes._core import (
     chunker,
@@ -410,7 +411,11 @@ class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
     def _query(self) -> T_DomainModelList:
         self._builder.execute_query(self._client, remove_not_connected=True)
         unpacked = QueryUnpacker(self._builder).unpack()
-        return self._result_list_cls([self._result_cls.model_validate(node) for node in unpacked])
+        if global_config.validate_retrieve:
+            retrieved = [self._result_cls.model_validate(item) for item in unpacked]
+        else:
+            retrieved = [self._result_cls.model_construct(**item) for item in unpacked]  # type: ignore[misc]
+        return self._result_list_cls(retrieved)
 
 
 def _create_edge_filter(
