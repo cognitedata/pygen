@@ -2,8 +2,10 @@ from typing import Any
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Properties
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
+from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
 
@@ -166,6 +168,30 @@ class TestGraphQLQuery:
 class TestAPIClass:
     def test_skip_validation(self) -> None:
         with monkeypatch_cognite_client() as mock_client:
-            mock_client.data_modeling.instances.list.return_value = []
+            mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
+                [
+                    dm.Node(
+                        space="my_space",
+                        external_id="invalid_node",
+                        version=1,
+                        last_updated_time=1,
+                        created_time=1,
+                        deleted_time=None,
+                        type=None,
+                        properties=Properties(
+                            {
+                                dm.ViewId("sp_pygen_models", "PrimitiveRequired", "1"): {
+                                    # Invalid as multiple required fields are missing
+                                    # And the type of int64 is wrong
+                                    "boolean": True,
+                                    "int32": 10,
+                                    "int64": "invalid_value",
+                                }
+                            }
+                        ),
+                    )
+                ]
+            )
             pygen = OmniClient(mock_client)
-            _ = pygen.primitive_required.list()
+            with pytest.raises(ValidationError):
+                _ = pygen.primitive_required.list()
