@@ -452,6 +452,35 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "confidence",
+        "description",
+        "end_node_page_number",
+        "end_node_text",
+        "end_node_x_max",
+        "end_node_x_min",
+        "end_node_y_max",
+        "end_node_y_min",
+        "name",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "start_node_page_number",
+        "start_node_text",
+        "start_node_x_max",
+        "start_node_x_min",
+        "start_node_y_max",
+        "start_node_y_min",
+        "status",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDiagramAnnotation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node_page_number: Optional[int] = Field(None, alias="endNodePageNumber")
@@ -595,7 +624,7 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

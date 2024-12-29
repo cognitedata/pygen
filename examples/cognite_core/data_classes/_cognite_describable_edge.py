@@ -185,6 +185,13 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
@@ -251,7 +258,7 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

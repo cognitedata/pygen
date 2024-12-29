@@ -187,6 +187,12 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         start_time: The start time field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "end_time",
+        "name",
+        "start_time",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
@@ -249,7 +255,7 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

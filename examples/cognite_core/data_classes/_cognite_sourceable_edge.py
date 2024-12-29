@@ -240,6 +240,17 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
             identifier is not guaranteed to match the user identifiers in CDF
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
@@ -325,7 +336,7 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

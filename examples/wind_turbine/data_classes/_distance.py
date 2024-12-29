@@ -164,6 +164,8 @@ class DistanceWrite(DomainRelationWrite):
         distance: The distance field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("distance",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
@@ -218,7 +220,7 @@ class DistanceWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

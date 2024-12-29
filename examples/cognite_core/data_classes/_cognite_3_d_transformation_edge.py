@@ -242,6 +242,18 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "euler_rotation_x",
+        "euler_rotation_y",
+        "euler_rotation_z",
+        "scale_x",
+        "scale_y",
+        "scale_z",
+        "translation_x",
+        "translation_y",
+        "translation_z",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId]
@@ -328,7 +340,7 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources

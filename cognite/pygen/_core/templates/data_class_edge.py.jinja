@@ -197,6 +197,19 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
         {% endif %}
         {% endfor %}
     """
+    {% if data_class.has_container_fields_writable %}
+    _container_fields: ClassVar[tuple[str, ...]] = ({{ data_class.container_fields_writable_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_outwards_edges %}
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = ({{ data_class.outwards_edges_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_inwards_edges %}
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = ({{ data_class.inwards_edges_comma_sep }},)
+    {% endif %}
+    {% if data_class.has_direct_relations_with_source %}
+    _direct_relations: ClassVar[tuple[str, ...]] = ({{ data_class.direct_relations_with_source_comma_sep }},)
+    {% endif %}
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}")
     space: str{% if has_default_instance_space %} = DEFAULT_INSTANCE_SPACE{% endif +%}
     {% for field in data_class.write_fields %}
@@ -254,7 +267,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelWrite):
-            other_resources = self.end_node._to_instances_write(cache)
+            other_resources = self.end_node._to_resources_write(cache, allow_version_increase=allow_version_increase)
             resources.extend(other_resources)
 
         return resources
