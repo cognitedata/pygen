@@ -6,9 +6,9 @@ import datetime
 import warnings
 from collections.abc import Sequence
 {% if data_class.has_dependencies %}
-from typing import TYPE_CHECKING, Any, ClassVar, Literal,  no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 {% else %}
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 {% endif %}
 {% if not data_class.use_optional_type %}
 {% endif %}
@@ -75,6 +75,7 @@ from {{ top_level_package }}.data_classes._core import (
     {% endif %}
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -183,40 +184,14 @@ class {{ data_class.graphql_name }}(GraphQLCore{% if data_class.has_any_field_mo
         return value
     {% endif %}
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> {{ data_class.read_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return {{ data_class.read_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            {% for field in data_class %}
-            {{ field.name }}={{ field.as_read_graphql() }},
-            {% endfor %}
-        )
+        return {{ data_class.read_name }}.model_validate(as_read_args(self))
 
     {% if data_class.is_writable or data_class.is_interface %}
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this GraphQL format of {{ data_class.doc_name }} to the writing format."""
-        return {{ data_class.write_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            {% for field in data_class %}
-            {% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write_graphql() }},
-            {% endif %}
-            {% endfor %}
-        )
+        return {{ data_class.write_name }}.model_validate(as_write_args(self))
     {% endif %}
 
 

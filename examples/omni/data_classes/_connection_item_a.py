@@ -24,6 +24,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -114,43 +115,13 @@ class ConnectionItemAGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemA:
         """Convert this GraphQL format of connection item a to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemA(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_read() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
-            ),
-            outwards=[outward.as_read() for outward in self.outwards] if self.outwards is not None else None,
-            self_direct=self.self_direct.as_read() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
-        )
+        return ConnectionItemA.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this GraphQL format of connection item a to the writing format."""
-        return ConnectionItemAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, GraphQLCore) else self.other_direct
-            ),
-            outwards=[outward.as_write() for outward in self.outwards] if self.outwards is not None else None,
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, GraphQLCore) else self.self_direct,
-        )
+        return ConnectionItemAWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemA(DomainModel):

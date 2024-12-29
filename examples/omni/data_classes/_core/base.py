@@ -866,19 +866,45 @@ def serialize_relation(
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
-def as_write_args(model: DomainModel) -> dict[str, Any]:
+def as_read_args(model: GraphQLCore) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for field_name in model.model_fields_set:
         value = getattr(model, field_name)
         if field_name == "data_record":
+            # Dict to postpone validation
+            output[field_name] = dict(
+                version=0,
+                last_updated_time=model.data_record.last_updated_time,
+                created_time=model.data_record.created_time
+            )
+        else:
+            output[field_name] = as_read_value(value)
+    return output
+
+
+def as_read_value(value: Any) -> Any:
+    if isinstance(value, GraphQLCore):
+        return as_read_args(value)
+    elif isinstance(value, Sequence) and not isinstance(value, str):
+        return [as_read_value(item) for item in value]
+    return value
+
+
+def as_write_args(model: DomainModel | GraphQLCore) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for field_name in model.model_fields_set:
+        value = getattr(model, field_name)
+        if field_name == "data_record" and isinstance(model, DomainModel):
             output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
+        elif field_name == "data_record" and isinstance(model, GraphQLCore):
+            output[field_name] = DataRecordWrite(existing_version=0)
         else:
             output[field_name] = as_write_value(value)
     return output
 
 
 def as_write_value(value: Any) -> Any:
-    if isinstance(value, DomainModel):
+    if isinstance(value, DomainModel | GraphQLCore):
         return as_write_args(value)
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_write_value(item) for item in value]
