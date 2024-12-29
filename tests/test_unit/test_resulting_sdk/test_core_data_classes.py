@@ -82,6 +82,7 @@ class TestDomainModelWrite:
         node = result.nodes[0]
         assert node.external_id == "1"
         assert node.existing_version is None
+        assert node.sources[0].properties == {"float64": 1.0}
 
 
 def unpack_properties_test_cases():
