@@ -120,14 +120,24 @@ class EndNodeField(Field):
             ]
         )
 
-    def _type_hint(self, data_class_names: list[str]) -> str:
+    def as_validate_function_type_hint(self) -> str:
+        return self._type_hint(
+            [
+                data_class.write_name
+                for data_class in self.destination_classes
+                if data_class.is_writable or data_class.is_interface
+            ],
+            skip_right_side=True,
+        )
+
+    def _type_hint(self, data_class_names: list[str], skip_right_side: bool = False) -> str:
         data_class_names = list(set(data_class_names))
         data_class_names_hint = ", ".join(sorted(data_class_names))
         if data_class_names_hint:
             left_side = f"Union[{data_class_names_hint}, str, dm.NodeId]"
         else:
             left_side = "Union[str, dm.NodeId]"
-        if self.need_alias:
+        if self.need_alias and not skip_right_side:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
         else:
             return left_side
