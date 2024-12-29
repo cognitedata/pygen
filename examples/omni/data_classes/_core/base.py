@@ -45,6 +45,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
+from omni.data_classes._core.cdf_external import GraphQLExternal
 from omni.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 
 if sys.version_info >= (3, 11):
@@ -866,11 +867,12 @@ def serialize_relation(
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
-def as_read_args(model: GraphQLCore) -> dict[str, Any]:
+def as_read_args(model: GraphQLCore | GraphQLExternal) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for field_name in model.model_fields_set:
         value = getattr(model, field_name)
-        if field_name == "data_record":
+        key = model.model_fields[field_name].alias or field_name
+        if field_name == "data_record" and isinstance(model, GraphQLCore):
             # Dict to postpone validation
             if model.data_record is None:
                 output[field_name] = None
@@ -881,33 +883,34 @@ def as_read_args(model: GraphQLCore) -> dict[str, Any]:
                     created_time=model.data_record.created_time,
                 )
         else:
-            output[field_name] = as_read_value(value)
+            output[key] = as_read_value(value)
     return output
 
 
 def as_read_value(value: Any) -> Any:
-    if isinstance(value, GraphQLCore):
+    if isinstance(value, GraphQLCore | GraphQLExternal):
         return as_read_args(value)
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_read_value(item) for item in value]
     return value
 
 
-def as_write_args(model: DomainModel | GraphQLCore | DomainRelation) -> dict[str, Any]:
+def as_write_args(model: DomainModel | GraphQLCore | DomainRelation | GraphQLExternal) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for field_name in model.model_fields_set:
         value = getattr(model, field_name)
+        key = model.model_fields[field_name].alias or field_name
         if field_name == "data_record" and isinstance(model, DomainModel | DomainRelation):
             output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
         elif field_name == "data_record" and isinstance(model, GraphQLCore):
             output[field_name] = DataRecordWrite(existing_version=0)
         else:
-            output[field_name] = as_write_value(value)
+            output[key] = as_write_value(value)
     return output
 
 
 def as_write_value(value: Any) -> Any:
-    if isinstance(value, DomainModel | GraphQLCore):
+    if isinstance(value, DomainModel | GraphQLCore | GraphQLExternal):
         return as_write_args(value)
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_write_value(item) for item in value]
