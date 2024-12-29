@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Sequence
 from itertools import groupby
@@ -39,6 +39,8 @@ from omni.data_classes._core import (
     T_DomainRelationList,
     QueryBuilder,
     QueryUnpacker,
+    chunker,
+    IN_FILTER_CHUNK_SIZE,
 )
 
 DEFAULT_LIMIT_READ = 25
@@ -142,7 +144,13 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
             items.extend([self._class_type.from_instance(node) for node in instances.nodes])
         else:
-            raise NotImplementedError
+            for space_key, external_ids in groupby(sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]):
+                external_ids = [ext_id[1] for ext_id in external_ids]
+                external_id_list = [ext_id[1] for ext_id in external_ids]
+                for ext_id_chunk in chunker(external_id_list, IN_FILTER_CHUNK_SIZE):
+                    filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(["node", "externalId"], ext_id_chunk)
+                    instances = self._query(filter_, len(ext_id_chunk), None, retrieve_connections)
+                    items.extend([self._class_type.from_instance(node) for node in instances.nodes])
 
         nodes = self._class_list(items)
 
@@ -152,6 +160,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             return None
         else:
             return nodes[0]
+
+    @abstractmethod
+    def _query(self, filter_: dm.Filter | None, limit: int, sort: list[InstanceSort] | None,
+               retrieve_connections: Literal["skip", "identifier", "full"]) -> T_DomainModelList:
+        raise NotImplementedError
 
     def _search(
         self,
