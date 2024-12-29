@@ -395,7 +395,6 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
                         )
                 else:
                     properties[prop_name] = prop_value
-
         args = dict(
             space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
         )

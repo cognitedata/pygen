@@ -2,6 +2,8 @@ from typing import Any
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.testing import monkeypatch_cognite_client
+from omni import OmniClient
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
 
@@ -159,3 +161,11 @@ class TestGraphQLQuery:
         with pytest.raises(RuntimeError) as exc_info:
             GraphQLQueryResponse(dm.DataModelId("sp_pygen_power", "WindTurbine", "1")).parse(result)
         assert exc_info.match("Missing '__typename' in GraphQL response. Cannot determine the type of the response.")
+
+
+class TestAPIClass:
+    def test_skip_validation(self) -> None:
+        with monkeypatch_cognite_client() as mock_client:
+            mock_client.data_modeling.instances.list.return_value = []
+            pygen = OmniClient(mock_client)
+            _ = pygen.primitive_required.list()
