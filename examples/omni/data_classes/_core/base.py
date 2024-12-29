@@ -814,3 +814,21 @@ def serialize_relation(
 
 
 T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelationList], covariant=True)
+
+
+def as_write_args(model: DomainModel) -> dict[str, Any]:
+    output: dict[str, Any] = {}
+    for field_name in model.model_fields_set:
+        value = getattr(model, field_name)
+        if field_name == "data_record":
+            output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
+        else:
+            output[field_name] = as_write_value(value)
+    return output
+
+def as_write_value(value: Any) -> Any:
+    if isinstance(value, DomainModel):
+        return as_write_args(value)
+    elif isinstance(value, Sequence) and not isinstance(value, str):
+        return [as_write_value(item) for item in value]
+    return value

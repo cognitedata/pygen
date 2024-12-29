@@ -28,6 +28,7 @@ from omni.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -196,25 +197,9 @@ class ConnectionItemA(DomainModel):
             return None
         return [parse_single_connection(item, info.field_name) for item in value]
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
-        return ConnectionItemAWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            name=self.name,
-            other_direct=(
-                self.other_direct.as_write() if isinstance(self.other_direct, DomainModel) else self.other_direct
-            ),
-            outwards=(
-                [outward.as_write() if isinstance(outward, DomainModel) else outward for outward in self.outwards]
-                if self.outwards is not None
-                else None
-            ),
-            self_direct=self.self_direct.as_write() if isinstance(self.self_direct, DomainModel) else self.self_direct,
-        )
+        return ConnectionItemAWrite.model_validate(as_write_args(self))
 
     def as_apply(self) -> ConnectionItemAWrite:
         """Convert this read version of connection item a to the writing version."""
