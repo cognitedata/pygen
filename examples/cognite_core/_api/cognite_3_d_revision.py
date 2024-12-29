@@ -199,6 +199,7 @@ class Cognite3DRevisionAPI(
             SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
             | None
         ) = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevision | None: ...
 
     @overload
@@ -210,6 +211,7 @@ class Cognite3DRevisionAPI(
             SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
             | None
         ) = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevisionList: ...
 
     def retrieve(
@@ -220,6 +222,7 @@ class Cognite3DRevisionAPI(
             SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
             | None
         ) = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevision | Cognite3DRevisionList | None:
         """Retrieve one or more Cognite 3D revisions by id(s).
 
@@ -229,6 +232,9 @@ class Cognite3DRevisionAPI(
             as_child_class: If you want to retrieve the Cognite 3D revisions as a child class,
                 you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.
+            retrieve_connections: Whether to retrieve `model_3d` for the Cognite 3D revisions. Defaults to 'skip'.'skip'
+            will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items,
+            and 'full' will retrieve the full connected items.
 
         Returns:
             The requested Cognite 3D revisions.
@@ -244,7 +250,7 @@ class Cognite3DRevisionAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, as_child_class=as_child_class)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -523,6 +529,36 @@ class Cognite3DRevisionAPI(
         )
         return Cognite3DRevisionQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> Cognite3DRevisionList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite3DModel._view_id,
+                    ViewPropertyId(self._view_id, "model3D"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return Cognite3DRevisionList([Cognite3DRevision.model_validate(item) for item in unpacked])
+
     def list(
         self,
         model_3d: (
@@ -583,34 +619,7 @@ class Cognite3DRevisionAPI(
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_direct_relation(
-                    Cognite3DModel._view_id,
-                    ViewPropertyId(self._view_id, "model3D"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return Cognite3DRevisionList([Cognite3DRevision.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

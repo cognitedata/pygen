@@ -236,6 +236,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: SequenceNotStr[Literal["Cognite360Image"]] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteCubeMap | None: ...
 
     @overload
@@ -244,6 +245,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: SequenceNotStr[Literal["Cognite360Image"]] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteCubeMapList: ...
 
     def retrieve(
@@ -251,6 +253,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: SequenceNotStr[Literal["Cognite360Image"]] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteCubeMap | CogniteCubeMapList | None:
         """Retrieve one or more Cognite cube maps by id(s).
 
@@ -260,6 +263,9 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
             as_child_class: If you want to retrieve the Cognite cube maps as a child class,
                 you can specify the child class here. Note that if one node has properties in
                 multiple child classes, you will get duplicate nodes in the result.
+            retrieve_connections: Whether to retrieve `back`, `bottom`, `front`, `left`, `right` and `top` for the
+            Cognite cube maps. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested Cognite cube maps.
@@ -275,7 +281,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
                 ... )
 
         """
-        return self._retrieve(external_id, space, as_child_class=as_child_class)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -812,6 +818,70 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
         )
         return CogniteCubeMapQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> CogniteCubeMapList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "back"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "bottom"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "front"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "left"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "right"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "top"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return CogniteCubeMapList([CogniteCubeMap.model_validate(item) for item in unpacked])
+
     def list(
         self,
         back: (
@@ -912,64 +982,5 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "back"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "bottom"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "front"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "left"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "right"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "top"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return CogniteCubeMapList([CogniteCubeMap.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_)
+        return self._query(filter_, limit, retrieve_connections)

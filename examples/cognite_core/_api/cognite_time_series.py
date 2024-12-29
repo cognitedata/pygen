@@ -273,24 +273,34 @@ class CogniteTimeSeriesAPI(
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteTimeSeries | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteTimeSeriesList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteTimeSeries | CogniteTimeSeriesList | None:
         """Retrieve one or more Cognite time series by id(s).
 
         Args:
             external_id: External id or list of external ids of the Cognite time series.
             space: The space where all the Cognite time series are located.
+            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
+            Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested Cognite time series.
@@ -306,7 +316,7 @@ class CogniteTimeSeriesAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, retrieve_edges=True, edge_api_name_type_direction_view_id_penta=[])
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -977,6 +987,66 @@ class CogniteTimeSeriesAPI(
         )
         return CogniteTimeSeriesQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> CogniteTimeSeriesList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteActivity._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteActivity", "v1"), "timeSeries"),
+                    connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "activities"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteAsset._view_id,
+                    ViewPropertyId(self._view_id, "assets"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteEquipment._view_id,
+                    ViewPropertyId(self._view_id, "equipment"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteSourceSystem._view_id,
+                    ViewPropertyId(self._view_id, "source"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteUnit._view_id,
+                    ViewPropertyId(self._view_id, "unit"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return CogniteTimeSeriesList([CogniteTimeSeries.model_validate(item) for item in unpacked])
+
     def list(
         self,
         assets: (
@@ -1121,64 +1191,7 @@ class CogniteTimeSeriesAPI(
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    CogniteActivity._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteActivity", "v1"), "timeSeries"),
-                    connection_type="reverse-list",
-                    connection_property=ViewPropertyId(self._view_id, "activities"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteAsset._view_id,
-                    ViewPropertyId(self._view_id, "assets"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteEquipment._view_id,
-                    ViewPropertyId(self._view_id, "equipment"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteSourceSystem._view_id,
-                    ViewPropertyId(self._view_id, "source"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteUnit._view_id,
-                    ViewPropertyId(self._view_id, "unit"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return CogniteTimeSeriesList([CogniteTimeSeries.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

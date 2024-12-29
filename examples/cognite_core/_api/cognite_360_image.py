@@ -312,24 +312,35 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite360Image | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite360ImageList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite360Image | Cognite360ImageList | None:
         """Retrieve one or more Cognite 360 images by id(s).
 
         Args:
             external_id: External id or list of external ids of the Cognite 360 images.
             space: The space where all the Cognite 360 images are located.
+            retrieve_connections: Whether to retrieve `back`, `bottom`, `collection_360`, `front`, `left`, `right`,
+            `station_360` and `top` for the Cognite 360 images. Defaults to 'skip'.'skip' will not retrieve any
+            connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve
+            the full connected items.
 
         Returns:
             The requested Cognite 360 images.
@@ -345,7 +356,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
                 ... )
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -1230,6 +1241,85 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
         )
         return Cognite360ImageQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> Cognite360ImageList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "back"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "bottom"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite360ImageCollection._view_id,
+                    ViewPropertyId(self._view_id, "collection360"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "front"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "left"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "right"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    Cognite360ImageStation._view_id,
+                    ViewPropertyId(self._view_id, "station360"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    CogniteFile._view_id,
+                    ViewPropertyId(self._view_id, "top"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return Cognite360ImageList([Cognite360Image.model_validate(item) for item in unpacked])
+
     def list(
         self,
         back: (
@@ -1418,83 +1508,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "back"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "bottom"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    Cognite360ImageCollection._view_id,
-                    ViewPropertyId(self._view_id, "collection360"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "front"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "left"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "right"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    Cognite360ImageStation._view_id,
-                    ViewPropertyId(self._view_id, "station360"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteFile._view_id,
-                    ViewPropertyId(self._view_id, "top"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return Cognite360ImageList([Cognite360Image.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

@@ -205,24 +205,35 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemE | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemEList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemE | ConnectionItemEList | None:
         """Retrieve one or more connection item es by id(s).
 
         Args:
             external_id: External id or list of external ids of the connection item es.
             space: The space where all the connection item es are located.
+            retrieve_connections: Whether to retrieve `direct_reverse_multi`, `direct_reverse_single`, `inwards_single`
+            and `inwards_single_property` for the connection item es. Defaults to 'skip'.'skip' will not retrieve any
+            connections, 'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve
+            the full connected items.
 
         Returns:
             The requested connection item es.
@@ -238,27 +249,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.inwards_single_edge,
-                    "inwards_single",
-                    dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle"),
-                    "inwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"),
-                ),
-                (
-                    self.inwards_single_property_edge,
-                    "inwards_single_property",
-                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
-                    "inwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemF", "1"),
-                ),
-            ],
-        )
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -617,6 +608,66 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
         )
         return ConnectionItemEQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> ConnectionItemEList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemD._view_id,
+                "inwards",
+                ViewPropertyId(self._view_id, "inwardsSingle"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemF._view_id,
+                "inwards",
+                ViewPropertyId(self._view_id, "inwardsSingleProperty"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+                edge_view=ConnectionEdgeA._view_id,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    ConnectionItemD._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"), "directMulti"),
+                    connection_type="reverse-list",
+                    connection_property=ViewPropertyId(self._view_id, "directReverseMulti"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_reverse_relation(
+                    ConnectionItemD._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"), "directSingle"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return ConnectionItemEList([ConnectionItemE.model_validate(item) for item in unpacked])
+
     def list(
         self,
         direct_list_no_source: (
@@ -691,64 +742,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemD._view_id,
-                "inwards",
-                ViewPropertyId(self._view_id, "inwardsSingle"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemF._view_id,
-                "inwards",
-                ViewPropertyId(self._view_id, "inwardsSingleProperty"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-                edge_view=ConnectionEdgeA._view_id,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    ConnectionItemD._view_id,
-                    through=dm.PropertyId(dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"), "directMulti"),
-                    connection_type="reverse-list",
-                    connection_property=ViewPropertyId(self._view_id, "directReverseMulti"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_reverse_relation(
-                    ConnectionItemD._view_id,
-                    through=dm.PropertyId(dm.ViewId("sp_pygen_models", "ConnectionItemD", "1"), "directSingle"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return ConnectionItemEList([ConnectionItemE.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

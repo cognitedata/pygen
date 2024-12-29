@@ -272,24 +272,35 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Nacelle | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> NacelleList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Nacelle | NacelleList | None:
         """Retrieve one or more nacelles by id(s).
 
         Args:
             external_id: External id or list of external ids of the nacelles.
             space: The space where all the nacelles are located.
+            retrieve_connections: Whether to retrieve `acc_from_back_side_y`, `acc_from_back_side_z`, `gearbox`,
+            `generator`, `high_speed_shaft`, `main_shaft`, `power_inverter`, `wind_turbine`, `yaw_direction` and
+            `yaw_error` for the nacelles. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will
+            only retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested nacelles.
@@ -305,7 +316,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
                 ... )
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -1058,6 +1069,100 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
         )
         return NacelleQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> NacelleList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    WindTurbine._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "WindTurbine", "1"), "nacelle"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "acc_from_back_side_y"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "acc_from_back_side_z"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    Gearbox._view_id,
+                    ViewPropertyId(self._view_id, "gearbox"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    Generator._view_id,
+                    ViewPropertyId(self._view_id, "generator"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    HighSpeedShaft._view_id,
+                    ViewPropertyId(self._view_id, "high_speed_shaft"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    MainShaft._view_id,
+                    ViewPropertyId(self._view_id, "main_shaft"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    PowerInverter._view_id,
+                    ViewPropertyId(self._view_id, "power_inverter"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "yaw_direction"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "yaw_error"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return NacelleList([Nacelle.model_validate(item) for item in unpacked])
+
     def list(
         self,
         acc_from_back_side_x: (
@@ -1199,94 +1304,5 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    WindTurbine._view_id,
-                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "WindTurbine", "1"), "nacelle"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "acc_from_back_side_y"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "acc_from_back_side_z"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    Gearbox._view_id,
-                    ViewPropertyId(self._view_id, "gearbox"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    Generator._view_id,
-                    ViewPropertyId(self._view_id, "generator"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    HighSpeedShaft._view_id,
-                    ViewPropertyId(self._view_id, "high_speed_shaft"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    MainShaft._view_id,
-                    ViewPropertyId(self._view_id, "main_shaft"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    PowerInverter._view_id,
-                    ViewPropertyId(self._view_id, "power_inverter"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "yaw_direction"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "yaw_error"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return NacelleList([Nacelle.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_)
+        return self._query(filter_, limit, retrieve_connections)

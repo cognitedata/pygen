@@ -242,7 +242,7 @@ class CogniteSchedulableAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, as_child_class=as_child_class)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -551,6 +551,28 @@ class CogniteSchedulableAPI(
         )
         return CogniteSchedulableQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> CogniteSchedulableList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return CogniteSchedulableList([CogniteSchedulable.model_validate(item) for item in unpacked])
+
     def list(
         self,
         min_end_time: datetime.datetime | None = None,
@@ -618,10 +640,5 @@ class CogniteSchedulableAPI(
             space,
             filter,
         )
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            sort_by=sort_by,  # type: ignore[arg-type]
-            direction=direction,
-            sort=sort,
-        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

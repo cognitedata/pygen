@@ -182,24 +182,34 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemG | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemGList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemG | ConnectionItemGList | None:
         """Retrieve one or more connection item gs by id(s).
 
         Args:
             external_id: External id or list of external ids of the connection item gs.
             space: The space where all the connection item gs are located.
+            retrieve_connections: Whether to retrieve `inwards_multi_property` for the connection item gs. Defaults to
+            'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested connection item gs.
@@ -215,20 +225,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.inwards_multi_property_edge,
-                    "inwards_multi_property",
-                    dm.DirectRelationReference("sp_pygen_models", "multiProperty"),
-                    "inwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemF", "1"),
-                ),
-            ],
-        )
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -479,6 +476,38 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         )
         return ConnectionItemGQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> ConnectionItemGList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemF._view_id,
+                "inwards",
+                ViewPropertyId(self._view_id, "inwardsMultiProperty"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+                edge_view=ConnectionEdgeA._view_id,
+            )
+        )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return ConnectionItemGList([ConnectionItemG.model_validate(item) for item in unpacked])
+
     def list(
         self,
         name: str | list[str] | None = None,
@@ -532,36 +561,7 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemF._view_id,
-                "inwards",
-                ViewPropertyId(self._view_id, "inwardsMultiProperty"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-                edge_view=ConnectionEdgeA._view_id,
-            )
-        )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return ConnectionItemGList([ConnectionItemG.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

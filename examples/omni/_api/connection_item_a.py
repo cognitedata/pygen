@@ -224,7 +224,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         Args:
             external_id: External id or list of external ids of the connection item as.
             space: The space where all the connection item as are located.
-            retrieve_connections: Whether to retrieve `other_direct`, `outwards` and `self_direct` for the connection.
+            retrieve_connections: Whether to retrieve `other_direct`, `outwards` and `self_direct` for the connection
+            item as. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the
+            identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested connection item as.
@@ -718,7 +720,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort) # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input)

@@ -187,24 +187,35 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Generator | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> GeneratorList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Generator | GeneratorList | None:
         """Retrieve one or more generators by id(s).
 
         Args:
             external_id: External id or list of external ids of the generators.
             space: The space where all the generators are located.
+            retrieve_connections: Whether to retrieve `generator_speed_controller`,
+            `generator_speed_controller_reference` and `nacelle` for the generators. Defaults to 'skip'.'skip' will not
+            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
+            will retrieve the full connected items.
 
         Returns:
             The requested generators.
@@ -220,7 +231,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
                 ... )
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -541,6 +552,51 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
         )
         return GeneratorQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> GeneratorList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    Nacelle._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "Nacelle", "1"), "main_shaft"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "nacelle"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "generator_speed_controller"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "generator_speed_controller_reference"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return GeneratorList([Generator.model_validate(item) for item in unpacked])
+
     def list(
         self,
         generator_speed_controller: (
@@ -602,45 +658,5 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    Nacelle._view_id,
-                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "Nacelle", "1"), "main_shaft"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "nacelle"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "generator_speed_controller"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "generator_speed_controller_reference"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return GeneratorList([Generator.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_)
+        return self._query(filter_, limit, retrieve_connections)

@@ -227,24 +227,34 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DObject | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DObjectList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DObject | Cognite3DObjectList | None:
         """Retrieve one or more Cognite 3D objects by id(s).
 
         Args:
             external_id: External id or list of external ids of the Cognite 3D objects.
             space: The space where all the Cognite 3D objects are located.
+            retrieve_connections: Whether to retrieve `asset`, `cad_nodes`, `images_360` and `point_cloud_volumes` for
+            the Cognite 3D objects. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested Cognite 3D objects.
@@ -260,20 +270,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.images_360_edge,
-                    "images_360",
-                    dm.DirectRelationReference("cdf_cdm", "image-360-annotation"),
-                    "outwards",
-                    dm.ViewId("cdf_cdm", "Cognite360Image", "v1"),
-                ),
-            ],
-        )
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -692,6 +689,66 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         )
         return Cognite3DObjectQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> Cognite3DObjectList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                Cognite360Image._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "images360"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+                edge_view=Cognite360ImageAnnotation._view_id,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteAsset._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "asset"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_reverse_relation(
+                    CogniteCADNode._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADNode", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "cadNodes"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_reverse_relation(
+                    CognitePointCloudVolume._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return Cognite3DObjectList([Cognite3DObject.model_validate(item) for item in unpacked])
+
     def list(
         self,
         description: str | list[str] | None = None,
@@ -787,64 +844,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             space,
             filter,
         )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-                sort_by=sort_by,  # type: ignore[arg-type]
-                direction=direction,
-                sort=sort,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=self._create_sort(sort_by, direction, sort),  # type: ignore[arg-type]
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                Cognite360Image._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "images360"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-                edge_view=Cognite360ImageAnnotation._view_id,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    CogniteAsset._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "object3D"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "asset"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_reverse_relation(
-                    CogniteCADNode._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADNode", "v1"), "object3D"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "cadNodes"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_reverse_relation(
-                    CognitePointCloudVolume._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1"), "object3D"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return Cognite3DObjectList([Cognite3DObject.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

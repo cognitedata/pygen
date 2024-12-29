@@ -199,24 +199,35 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> PowerInverter | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> PowerInverterList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> PowerInverter | PowerInverterList | None:
         """Retrieve one or more power inverters by id(s).
 
         Args:
             external_id: External id or list of external ids of the power inverters.
             space: The space where all the power inverters are located.
+            retrieve_connections: Whether to retrieve `active_power_total`, `apparent_power_total`, `nacelle` and
+            `reactive_power_total` for the power inverters. Defaults to 'skip'.'skip' will not retrieve any connections,
+            'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
+            connected items.
 
         Returns:
             The requested power inverters.
@@ -232,7 +243,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
                 ... )
 
         """
-        return self._retrieve(external_id, space)
+        return self._retrieve(external_id, space, retrieve_connections)
 
     def search(
         self,
@@ -607,6 +618,58 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         )
         return PowerInverterQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> PowerInverterList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=True,
+            )
+        )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_reverse_relation(
+                    Nacelle._view_id,
+                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "Nacelle", "1"), "power_inverter"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "nacelle"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "active_power_total"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "apparent_power_total"),
+                    has_container_fields=True,
+                )
+            )
+            builder.extend(
+                factory.from_direct_relation(
+                    SensorTimeSeries._view_id,
+                    ViewPropertyId(self._view_id, "reactive_power_total"),
+                    has_container_fields=True,
+                )
+            )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return PowerInverterList([PowerInverter.model_validate(item) for item in unpacked])
+
     def list(
         self,
         active_power_total: (
@@ -678,52 +741,5 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                has_container_fields=True,
-            )
-        )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_reverse_relation(
-                    Nacelle._view_id,
-                    through=dm.PropertyId(dm.ViewId("sp_pygen_power", "Nacelle", "1"), "power_inverter"),
-                    connection_type=None,
-                    connection_property=ViewPropertyId(self._view_id, "nacelle"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "active_power_total"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "apparent_power_total"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    SensorTimeSeries._view_id,
-                    ViewPropertyId(self._view_id, "reactive_power_total"),
-                    has_container_fields=True,
-                )
-            )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return PowerInverterList([PowerInverter.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_)
+        return self._query(filter_, limit, retrieve_connections)
