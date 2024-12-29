@@ -1,3 +1,4 @@
+import pytest
 from omni import OmniClient
 from omni import data_classes as dc
 
@@ -46,3 +47,27 @@ def test_retrieve_as_child_class(omni_client: OmniClient) -> None:
 
     assert isinstance(items[0], dc.Implementation1)
     assert isinstance(items[1], dc.Implementation2)
+
+
+@pytest.fixture(scope="session")
+def item_a_list(omni_client: OmniClient) -> dc.ConnectionItemAList:
+    return omni_client.connection_item_a.list(limit=5)
+
+
+def test_retrieve_single_with_connections(omni_client: OmniClient, item_a_list: dc.ConnectionItemAList) -> None:
+    item_a = item_a_list[0]
+    item = omni_client.connection_item_a.retrieve(external_id=item_a.external_id, retrieve_connections="full")
+
+    assert item is not None
+    connections = [c for c in [item.outwards, item.self_direct, item.other_direct] if c is not None]
+    assert connections
+
+
+def test_retrieve_multiple_with_connections(omni_client: OmniClient, item_a_list: dc.ConnectionItemAList) -> None:
+    external_ids = [item_a.external_id for item_a in item_a_list]
+    items = omni_client.connection_item_a.retrieve(external_id=external_ids, retrieve_connections="full")
+
+    assert len(items) == len(item_a_list)
+    for item in items:
+        connections = [c for c in [item.outwards, item.self_direct, item.other_direct] if c is not None]
+        assert connections
